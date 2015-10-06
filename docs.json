@@ -1,0 +1,32 @@
+{
+	"tools": {
+		"dotnet": { 
+			"copyright": "https://github.com/dotnet/coreclr/blob/master/LICENSE.TXT",
+			"license" : "https://github.com/dotnet/coreclr/blob/master/LICENSE.TXT",
+			"author":"Microsoft",
+			"author_email":"optimus@service.microsoft.com",
+			"short_description":"The .NET all-in-one tool",
+			"long_description":"",
+			"commands": {     
+				"build":{
+					"description":"builds a native executable from specified source files",
+					"options" : {
+						"target": {
+							"short": "-t",
+							"long":"--target",
+							"description":"Specifies target binary output type. EXE or DLL",
+							"parameter":"TARGET"
+						}
+					},
+					"argumentlist" : {
+						"name":"source-files",
+						"description":"A list of source files to build"
+					}
+					
+				}
+				
+			}
+		
+		}
+	}
+}
