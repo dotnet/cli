@@ -1,0 +1,11 @@
+#!/bin/bash
+
+export PACKAGE_NAME="dotnet"
+export PACKAGE_VERSION="1.0"
+export PACKAGE_MAINTAINER="Microsoft"
+export PACKAGE_MAINTAINER_EMAIL="optimus@service.microsoft.com"
+
+export INSTALL_ROOT="/usr/share/${PACKAGE_NAME}"
+
+export NUGET_PACKAGE_CACHE="${INSTALL_ROOT}/packages"
+export NUGET_PACKAGE_SOURCES=( "https://myget.org/f/dotnet-core" "https://nuget.org/api/v2" )
