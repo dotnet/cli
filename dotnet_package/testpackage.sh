@@ -114,17 +114,6 @@ test_coreclr_exists(){
 	fi
 }
 
-test_dotnet_builtin_commands(){
-	output=$(cd ./builtins; dotnet-commands )
-
-	if [[ "$output" == "commands" ]]; then
-		return 0
-	else
-		echo $output
-		return 1
-	fi
-}
-
 run_test_function() {
 	if [ -z "$1" ]; then
 		echo "run_test_function requires a test function name as the first parameter"
@@ -180,8 +169,6 @@ if [ "$1" == "build" ]; then
 	run_test_function test_build_package
 elif [ "$1" == "install" ]; then
 	run_test_function install_package
-elif [ "$1" == "builtin" ]; then
-	run_test_function test_dotnet_builtin_commands
 else
 	run_tests
 fi
