@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Dnx.Runtime.Common.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
 
 namespace Microsoft.DotNet.Cli
@@ -8,47 +11,58 @@ namespace Microsoft.DotNet.Cli
     {
         public static int Main(string[] args)
         {
-            if (args.Length < 1)
+            var app = new CommandLineApplication(throwOnUnexpectedArg: false)
             {
-                // Handle missing args
-                PrintCommandList();
-                return 1;
-            }
+                Name = "dotnet",
+                FullName = ".NET Driver",
+                Description = "Command Line Driver for the .NET Platform"
+            };
+            app.HelpOption("-h|--help");
 
-            if (args[0].Equals("help", StringComparison.OrdinalIgnoreCase))
+            app.OnExecute(() =>
             {
-                if (args.Length > 1)
+                if (args.Length > 0)
                 {
-                    return Command.Create("dotnet-" + args[1], "--help")
-                        .ForwardStdErr()
-                        .ForwardStdOut()
-                        .RunAsync()
-                        .Result
-                        .ExitCode;
+                    var exitCode = CreateCommand(args);
+                    if (exitCode != 0)
+                    {
+                        app.ShowHelp();
+                    }
+                    return exitCode;
                 }
-                else
-                {
-                    PrintCommandList();
-                    return 0;
-                }
+                app.ShowHelp();
+                return 0;
+            });
+
+            app.Command("commands", c =>
+            {
+                c.Description = "List all commands";
+
+                c.HelpOption("-h|--help");
+
+                // TODO: Build the 'dotnet-commands' command to list all possible commands
+                c.OnExecute(() => CreateCommand(args));
+            });
+
+            try
+            {
+                return app.Execute(args);
             }
-            else
+            catch (OperationCanceledException ex)
             {
-                return Command.Create("dotnet-" + args[0], args.Skip(1))
-                    .ForwardStdErr()
-                    .ForwardStdOut()
-                    .RunAsync()
-                    .Result
-                    .ExitCode;
+                Console.Error.WriteLine(ex.Message);
+                return 1;
             }
         }
 
-        private static void PrintCommandList()
+        private static int CreateCommand(IReadOnlyList<string> args)
         {
-            Console.WriteLine("Some dotnet Commands (use 'dotnet help <command>' to get help):");
-            Console.WriteLine("* compile - Compiles code");
-            Console.WriteLine("* publish - Publishes a project to a self-contained application");
-            Console.WriteLine("* run - Publishes and immediately runs a project");
+            return Command.Create("dotnet-" + args[0], args.Skip(1))
+                .ForwardStdErr()
+                .ForwardStdOut()
+                .RunAsync()
+                .Result
+                .ExitCode;
         }
     }
 }
