@@ -24,6 +24,8 @@ namespace Microsoft.DotNet.Cli.Utils
 
         private bool _running = false;
 
+        static readonly Log Log = new Log();
+
         private Command(string executable, string args)
         {
             // Set the things we need
@@ -50,6 +52,18 @@ namespace Microsoft.DotNet.Cli.Utils
 
         public static Command Create(string executable, string args)
         {
+            var arguments = args.Split(' ');
+            var index = Array.IndexOf(arguments, "--log");
+            if (index >= 0 && index < arguments.Length - 1)
+            {
+                index++;
+                int level;
+                if (int.TryParse(arguments[index], out level))
+                {
+                    Log.Level = level;
+                }
+            }
+
             var comSpec = Environment.GetEnvironmentVariable("ComSpec");
             if (!string.IsNullOrEmpty(comSpec))
             {
@@ -88,9 +102,8 @@ namespace Microsoft.DotNet.Cli.Utils
             _process.Exited += (sender, _) =>
                 _processTcs.SetResult(_process.ExitCode);
 
-#if DEBUG
-            Console.WriteLine($"> {_process.StartInfo.FileName} {_process.StartInfo.Arguments}");
-#endif
+            Log.Debug($"> {_process.StartInfo.FileName} {_process.StartInfo.Arguments}");
+
             _process.Start();
             _process.BeginOutputReadLine();
             _process.BeginErrorReadLine();
