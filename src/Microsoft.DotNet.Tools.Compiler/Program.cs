@@ -122,7 +122,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             File.WriteAllLines(rsp, cscArgs);
 
             // Run csc
-            return Command.Create("csc", $"@{rsp}")
+            return Command.Create(Csc.Path, $"@{rsp}")
                 .ForwardStdErr(Console.Error)
                 .ForwardStdOut(Console.Out)
                 .RunAsync()

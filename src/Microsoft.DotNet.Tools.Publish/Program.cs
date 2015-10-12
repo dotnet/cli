@@ -121,7 +121,7 @@ namespace Microsoft.DotNet.Tools.Publish
                 Console.Error.WriteLine($"Unable to find {Constants.CoreConsoleName} at {coreConsole}. You must have an explicit dependency on Microsoft.NETCore.ConsoleHost (for now ;))");
                 return 1;
             }
-            var outputExe = Path.Combine(outputPath, projectDir.Name + Constants.ExeSuffix);
+            var outputExe = Path.Combine(outputPath, PAL.ExeName(projectDir.Name));
             if (File.Exists(outputExe))
             {
                 File.Delete(outputExe);
