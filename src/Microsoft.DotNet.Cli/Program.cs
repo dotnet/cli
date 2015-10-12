@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.Cli
             {
                 if (args.Length > 0)
                 {
-                    var exitCode = CreateCommand(args);
+                    var exitCode = CreateCommand(args[0], args.Skip(1));
                     if (exitCode != 0)
                     {
                         app.ShowHelp();
@@ -33,14 +33,15 @@ namespace Microsoft.DotNet.Cli
                 return 0;
             });
 
-            app.Command("commands", c =>
+            const string commandName = "commands";
+            app.Command(commandName, c =>
             {
                 c.Description = "List all commands";
 
                 c.HelpOption("-h|--help");
 
                 // TODO: Build the 'dotnet-commands' command to list all possible commands
-                c.OnExecute(() => CreateCommand(args));
+                c.OnExecute(() => CreateCommand(commandName, args));
             });
 
             try
@@ -54,9 +55,9 @@ namespace Microsoft.DotNet.Cli
             }
         }
 
-        private static int CreateCommand(IReadOnlyList<string> args)
+        private static int CreateCommand(string commandName, IEnumerable<string> args)
         {
-            return Command.Create("dotnet-" + args[0], args.Skip(1))
+            return Command.Create("dotnet-" + commandName, args.ToArray())
                 .ForwardStdErr()
                 .ForwardStdOut()
                 .RunAsync()
