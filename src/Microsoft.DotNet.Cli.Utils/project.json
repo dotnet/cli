@@ -5,6 +5,7 @@
 
   "dependencies": {
     "System.Console": "4.0.0-*",
+    "System.Runtime.InteropServices.RuntimeInformation": "4.0.0-*",
     "System.Diagnostics.Process": "4.1.0-*"
   },
   "frameworks": {

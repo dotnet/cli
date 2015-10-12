@@ -4,8 +4,9 @@
 
     "dependencies": {
         "Microsoft.NETCore.ConsoleHost": "1.0.0-*",
-        "Microsoft.NETCore.Runtime": "1.0.0-*",
-        "System.Console": "4.0.0-beta-23109"
+        "Microsoft.NETCore.Runtime": "1.0.1-*",
+        "Microsoft.NETCore.Targets": "1.0.1-*",
+        "System.Console": "4.0.0-*"
     },
 
     "frameworks": {
