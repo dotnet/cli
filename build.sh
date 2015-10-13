@@ -13,6 +13,7 @@ if test ! -f $nugetPath; then
     wget -O $nugetPath $url 2>/dev/null || curl -o $nugetPath --location $url /dev/null
 fi
 
+mono --version
 
 if test ! -d packages/KoreBuild; then
     mono .nuget/nuget.exe install KoreBuild -ExcludeVersion -o packages -nocache -pre -source https://www.myget.org/F/aspnetvnext/api/v3/index.json
