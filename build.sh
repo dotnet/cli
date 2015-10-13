@@ -1,5 +1,33 @@
 #!/usr/bin/env bash
 
+# Install the specified Mono toolset from our Azure blob storage.
+install_mono_toolset()
+{
+    local target=/tmp/$1
+    echo "Installing Mono toolset $1"
+
+    if [ -d $target ]; then
+        if [ "$USE_CACHE" = "true" ]; then
+            echo "Already installed"
+            return
+        fi
+    fi
+
+    pushd /tmp
+
+    rm -r $target 2>/dev/null
+    rm $1.tar.bz2 2>/dev/null
+    curl -O https://dotnetci.blob.core.windows.net/roslyn/$1.tar.bz2
+    tar -jxf $1.tar.bz2
+    if [ $? -ne 0 ]; then
+        echo "Unable to download toolset"
+        exit 1
+    fi
+
+    popd
+}
+
+
 nugetVersion=latest
 nugetPath=.nuget/nuget.exe
 
@@ -14,10 +42,7 @@ if test ! -f $nugetPath; then
 fi
 
 # install mono
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-echo "deb http://download.mono-project.com/repo/debian wheezy main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list
-sudo apt-get update
-sudo apt-get install mono-complete
+install_mono_toolset mono.linux.3
 mono --version
 
 if test ! -d packages/KoreBuild; then
