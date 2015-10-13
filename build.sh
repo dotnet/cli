@@ -13,6 +13,11 @@ if test ! -f $nugetPath; then
     wget -O $nugetPath $url 2>/dev/null || curl -o $nugetPath --location $url /dev/null
 fi
 
+# install mono
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+echo "deb http://download.mono-project.com/repo/debian wheezy main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list
+sudo apt-get update
+sudo apt-get install mono-complete
 mono --version
 
 if test ! -d packages/KoreBuild; then
