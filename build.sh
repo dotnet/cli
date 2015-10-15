@@ -7,10 +7,8 @@ install_mono_toolset()
     echo "Installing Mono toolset $1"
 
     if [ -d $target ]; then
-        if [ "$USE_CACHE" = "true" ]; then
-            echo "Already installed"
-            return
-        fi
+        echo "Already installed"
+        return
     fi
 
     pushd /tmp
@@ -42,7 +40,8 @@ if test ! -f $nugetPath; then
 fi
 
 # install mono
-install_mono_toolset mono.linux.3
+install_mono_toolset mono.linux.1
+PATH=/tmp/mono.linux.1/bin:$PATH
 mono --version
 
 if test ! -d packages/KoreBuild; then
