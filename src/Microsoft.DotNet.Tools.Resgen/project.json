@@ -8,7 +8,7 @@
     "resgen": "Microsoft.DotNet.Tools.Resgen"
   },
   "dependencies": {
-    "Microsoft.NETCore.TestHost": "1.0.0-*",
+    "Microsoft.NETCore.TestHost": "1.0.0-beta-23413",
     "Microsoft.NETCore.Runtime": "1.0.1-beta-23413",
     "System.Console": "4.0.0-*",
     "System.Collections": "4.0.11-*",
