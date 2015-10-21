@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# TODO: Replace this with a dotnet generation
+TFM=dnxcore50
+
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
   DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
@@ -75,27 +78,47 @@ rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 [ -d "$STAGE1_DIR" ] && rm -Rf "$STAGE1_DIR"
 
 echo "Building basic dotnet tools using Stage 0"
-dotnet publish --framework dnxcore50 --runtime $RID --output "$STAGE1_DIR" "$REPOROOT/src/Microsoft.DotNet.Cli"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" "$REPOROOT/src/Microsoft.DotNet.Cli"
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-dotnet publish --framework dnxcore50 --runtime $RID --output "$STAGE1_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler"
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-dotnet publish --framework dnxcore50 --runtime $RID --output "$STAGE1_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler.Csc"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler.Csc"
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-dotnet publish --framework dnxcore50 --runtime $RID --output "$STAGE1_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Publish"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Publish"
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-dotnet publish --framework dnxcore50 --runtime $RID --output "$STAGE1_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Resgen"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Resgen"
 
 # Add stage1 to the path and use it to build stage2
 export PATH=$STAGE1_DIR:$PATH
 
 echo "Building stage2 dotnet using stage1 ..."
-dotnet publish --framework dnxcore50 --runtime $RID --output "$STAGE2_DIR" "$REPOROOT/src/Microsoft.DotNet.Cli"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" "$REPOROOT/src/Microsoft.DotNet.Cli"
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-dotnet publish --framework dnxcore50 --runtime $RID --output "$STAGE2_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler"
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-dotnet publish --framework dnxcore50 --runtime $RID --output "$STAGE2_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler.Csc"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler.Csc"
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-dotnet publish --framework dnxcore50 --runtime $RID --output "$STAGE2_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Publish"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Publish"
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-dotnet publish --framework dnxcore50 --runtime $RID --output "$STAGE2_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Resgen"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Resgen"
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+
+# Smoke-test the output
+export PATH=$STAGE2_DIR:$PATH
+
+rm "$REPOROOT/test/TestApp/project.lock.json"
+dnu restore "$REPOROOT/test/TestApp" --runtime "$RID"
+dotnet publish "$REPOROOT/test/TestApp" --framework "$TFM" --runtime "$RID" --output "$REPOROOT/artifacts/$RID/smoketest"
+
+OUTPUT=$($REPOROOT/artifacts/$RID/smoketest/TestApp)
+[ "$OUTPUT" == "This is a test app" ] || (echo "Smoke test failed!" && exit 1)
+
+# Check that a compiler error is reported
+set +e
+dotnet compile "$REPOROOT/test/compile/failing/SimpleCompilerError" --framework "$TFM"
+rc=$?
+if [ $rc == 0 ]; then
+    echo "Compiler failure test failed! The compiler did not fail to compile!"
+    exit 1
+fi
+set -e
