@@ -4,6 +4,7 @@
 _ReSharper.*/
 packages/
 artifacts/
+dotnet-cli-bootstrap*
 *.user
 *.suo
 *.cache
