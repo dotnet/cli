@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.Tools.Compiler
         public static int Main(string[] args)
         {
             DebugHelper.HandleDebugSwitch(ref args);
-
+herp derp how do i code
             var app = new CommandLineApplication();
             app.Name = "dotnet compile";
             app.FullName = ".NET Compiler";
