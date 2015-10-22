@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+set -e
+
+CONFIGURAITON=$1
+
+[ -z "$CONFIGURATION" ] && CONFIGURATION=Debug
+
 # TODO: Replace this with a dotnet generation
 TFM=dnxcore50
 
@@ -11,6 +17,8 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 REPOROOT="$( cd -P "$DIR/.." && pwd )"
+
+START_PATH=$PATH
 
 echo "Bootstrapping dotnet.exe using DNX"
 
@@ -40,7 +48,6 @@ echo "Installing stage0"
 # Use a sub-shell to ensure the DNVM gets cleaned up
 mkdir -p $STAGE0_DIR
 $DIR/install-stage0.sh $STAGE0_DIR $DIR/dnvm2.sh
-rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 
 export PATH=$STAGE0_DIR/bin:$PATH
 
@@ -72,39 +79,29 @@ fi
 echo "Running 'dnu restore' to restore packages"
 
 dnu restore "$REPOROOT" --runtime osx.10.10-x64 --runtime ubuntu.14.04-x64 --runtime osx.10.11-x64
-rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 
 # Clean up stage1
 [ -d "$STAGE1_DIR" ] && rm -Rf "$STAGE1_DIR"
 
 echo "Building basic dotnet tools using Stage 0"
-dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" "$REPOROOT/src/Microsoft.DotNet.Cli"
-rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler"
-rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler.Csc"
-rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Publish"
-rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Resgen"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Cli"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler.Csc"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Tools.Publish"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Tools.Resgen"
 
 # Add stage1 to the path and use it to build stage2
-export PATH=$STAGE1_DIR:$PATH
+export PATH=$STAGE1_DIR:$START_PATH
 
 echo "Building stage2 dotnet using stage1 ..."
-dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" "$REPOROOT/src/Microsoft.DotNet.Cli"
-rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler"
-rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler.Csc"
-rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Publish"
-rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" "$REPOROOT/src/Microsoft.DotNet.Tools.Resgen"
-rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Cli"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler.Csc"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Tools.Publish"
+dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Tools.Resgen"
 
 # Smoke-test the output
-export PATH=$STAGE2_DIR:$PATH
+export PATH=$STAGE2_DIR:$START_PATH
 
 rm "$REPOROOT/test/TestApp/project.lock.json"
 dnu restore "$REPOROOT/test/TestApp" --runtime "$RID"

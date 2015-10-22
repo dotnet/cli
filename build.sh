@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
   DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
@@ -10,11 +8,10 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-# Some things depend on HOME and it may not be set. We should fix those things, but until then, we just patch a value in
-if [ -z "$HOME" ]; then
-    export HOME=$DIR/artifacts/home
-    mkdir -p $HOME
-fi
 
-$DIR/scripts/bootstrap.sh
+set -e
+
+CONFIGURATION=$1
+
+$DIR/scripts/bootstrap.sh "$CONFIGURATION"
 $DIR/scripts/package.sh
