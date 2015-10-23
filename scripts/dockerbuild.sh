@@ -21,7 +21,7 @@ echo $DOCKER_HOST_SHARE_DIR
 docker build -t $DOTNET_BUILD_CONTAINER_TAG scripts/docker/
 
 # Run the build in the container
-docker run --rm \
+docker run --rm -t \
     -v $DOCKER_HOST_SHARE_DIR:/opt/code \
     -e DOTNET_BUILD_VERSION=$DOTNET_BUILD_VERSION \
     $DOTNET_BUILD_CONTAINER_TAG $BUILD_COMMAND $1
