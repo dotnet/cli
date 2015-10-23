@@ -32,7 +32,3 @@ docker run --rm \
     -v $DOCKER_HOST_SHARE_DIR:/opt/code \
     -e DOTNET_BUILD_VERSION=$DOTNET_BUILD_VERSION \
     $DOTNET_BUILD_CONTAINER_TAG chmod -R a+rwx /opt/code
-
-# Clean up the exited images so we stop running out of disk space
-docker rm -v $(docker ps -a -q -f status=exited)
-
