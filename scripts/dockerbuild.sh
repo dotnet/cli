@@ -26,8 +26,15 @@ docker run --rm \
     -e DOTNET_BUILD_VERSION=$DOTNET_BUILD_VERSION \
     $DOTNET_BUILD_CONTAINER_TAG $BUILD_COMMAND $1
 
+# Remove the sticky bit on directories created by docker so we can delete them
 docker run --rm \
     -v $DOCKER_HOST_SHARE_DIR:/opt/code \
     -e DOTNET_BUILD_VERSION=$DOTNET_BUILD_VERSION \
     $DOTNET_BUILD_CONTAINER_TAG chmod -R -t /opt/code
+
+# And Actually make those directories accessible to be deleted
+docker run --rm \
+    -v $DOCKER_HOST_SHARE_DIR:/opt/code \
+    -e DOTNET_BUILD_VERSION=$DOTNET_BUILD_VERSION \
+    $DOTNET_BUILD_CONTAINER_TAG chmod -R a+rx /opt/code
 
