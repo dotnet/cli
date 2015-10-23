@@ -3,7 +3,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 if [[ "$(uname)" == "Linux" ]]; then
     # Set Docker Container name to be unique
-    local container_name=""
+    container_name=""
 
     #Jenkins
     [ ! -z "$BUILD_TAG" ] && container_name="$BUILD_TAG"

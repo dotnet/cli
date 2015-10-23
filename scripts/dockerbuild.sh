@@ -22,7 +22,7 @@ docker build -t $DOTNET_BUILD_CONTAINER_TAG scripts/docker/
 
 # Run the build in the container
 docker run --rm --sig-proxy=true \
-	--name $DOTNET_BUILD_CONTAINER_NAME
+	--name $DOTNET_BUILD_CONTAINER_NAME \
     -v $DOCKER_HOST_SHARE_DIR:/opt/code \
     -e DOTNET_BUILD_VERSION=$DOTNET_BUILD_VERSION \
     $DOTNET_BUILD_CONTAINER_TAG $BUILD_COMMAND $1

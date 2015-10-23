@@ -5,7 +5,7 @@ echo $(ls)
 
 if [[ "$(uname)" == "Linux" ]]; then
     # Set Docker Container name to be unique
-    local container_name=""
+    container_name=""
 
     #Jenkins
     [ ! -z "$BUILD_TAG" ] && container_name="$BUILD_TAG"
@@ -13,7 +13,7 @@ if [[ "$(uname)" == "Linux" ]]; then
     [ ! -z "$BUILD_BUILDID" ] && container_name="$BUILD_BUILDID"
 
     export DOTNET_BUILD_CONTAINER_NAME="$container_name"
-    
+
     $SCRIPT_DIR/dockerpostbuild.sh $@
 fi
 
