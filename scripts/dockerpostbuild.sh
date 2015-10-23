@@ -17,6 +17,10 @@ cd $DIR/..
 # Build the docker container (will be fast if it is already built)
 docker build -t $DOTNET_BUILD_CONTAINER_TAG scripts/docker/
 
+# First thing make sure all of our build containers are stopped
+docker stop $DOTNET_BUILD_CONTAINER_NAME
+docker rm $DOTNET_BUILD_CONTAINER_NAME
+
 # Remove the sticky bit on directories created by docker so we can delete them
 docker run --rm \
     -v $DOCKER_HOST_SHARE_DIR:/opt/code \
@@ -28,4 +32,7 @@ docker run --rm \
     -v $DOCKER_HOST_SHARE_DIR:/opt/code \
     -e DOTNET_BUILD_VERSION=$DOTNET_BUILD_VERSION \
     $DOTNET_BUILD_CONTAINER_TAG chmod -R a+rwx /opt/code
+
+# Clean up the exited images so we stop running out of disk space
+docker rm -v $(docker ps -a -q -f status=exited)
 
