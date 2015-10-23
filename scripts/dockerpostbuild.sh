@@ -27,5 +27,5 @@ docker run --rm \
 docker run --rm \
     -v $DOCKER_HOST_SHARE_DIR:/opt/code \
     -e DOTNET_BUILD_VERSION=$DOTNET_BUILD_VERSION \
-    $DOTNET_BUILD_CONTAINER_TAG chmod -R a+rx /opt/code
+    $DOTNET_BUILD_CONTAINER_TAG chmod -R a+rwx /opt/code
 
