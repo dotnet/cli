@@ -35,7 +35,7 @@ rm -rf $OUTPUT_ROOT
 
 echo "Installing stage0"
 # Use a sub-shell to ensure the DNVM gets cleaned up
-mkdir -p $STAGE0_DIR
+mkdir -m 777 -p $STAGE0_DIR
 $DIR/install-stage0.sh $STAGE0_DIR $DIR/dnvm2.sh
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 
@@ -45,7 +45,7 @@ export DOTNET_CLR_HOSTS_PATH=$REPOROOT/ext/CLRHost/$RID
 
 if ! type dnx > /dev/null 2>&1; then
     echo "Installing and use-ing the latest CoreCLR x64 DNX ..."
-    mkdir -p $DNX_DIR
+    mkdir -m 777 -p $DNX_DIR
 
     export DNX_HOME=$DNX_DIR
     export DNX_USER_HOME=$DNX_DIR
