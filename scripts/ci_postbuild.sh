@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+echo $(ls)
+
 if [[ "$(uname)" == "Linux" ]]; then
-    ./dockerpostbuild.sh $@
+    $SCRIPT_DIR/dockerpostbuild.sh $@
 fi
 
 ret_code=$?
