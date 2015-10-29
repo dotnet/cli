@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+echo Build Number - $BUILD_NUMBER
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Some things depend on HOME and it may not be set. We should fix those things, but until then, we just patch a value in
