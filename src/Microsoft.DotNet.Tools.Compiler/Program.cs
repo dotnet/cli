@@ -89,10 +89,11 @@ namespace Microsoft.DotNet.Tools.Compiler
 
         private static bool CompileNative(ProjectContext context, string configuration, string outputOptionValue, bool buildProjectReferences)
         {
+            string managedOutputPath = GetOutputPath(context, configuration, outputOptionValue);
             string outputPath = Path.Combine(GetOutputPath(context, configuration, outputOptionValue), "native");
             
             var compilationOptions = context.ProjectFile.GetCompilerOptions(context.TargetFramework, configuration);
-            var managedBinaryPath = Path.Combine(outputPath, context.ProjectFile.Name + (compilationOptions.EmitEntryPoint.GetValueOrDefault() ? ".exe" : ".dll"));
+            var managedBinaryPath = Path.Combine(managedOutputPath, context.ProjectFile.Name + (compilationOptions.EmitEntryPoint.GetValueOrDefault() ? ".exe" : ".dll"));
             
             // Do Native Compilation
             var result = Command.Create($"dotnet-compile-native", $"\"{managedBinaryPath}\" \"{outputPath}\"")
