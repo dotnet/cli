@@ -101,6 +101,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             }
             
             var managedBinaryPath = Path.Combine(managedOutputPath, context.ProjectFile.Name + outputExtension);
+            CleanOrCreateDirectory(outputPath);
             
             // Do Native Compilation
             var result = Command.Create($"dotnet-compile-native", $"\"{managedBinaryPath}\" \"{outputPath}\"")
