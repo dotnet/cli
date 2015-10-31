@@ -60,12 +60,19 @@ make
 cp "$REPOROOT/src/corehost/cmake/$RID/corehost" $HOST_DIR
 popd 2>&1 >/dev/null
 
+# UGLY_HACK - Copy the patched System.Diagnostics.Process.dll to downloaded dotnet
+DOTNET_ROOT="$(dirname $(which dotnet))"
+curl -o "$DOTNET_ROOT/System.Diagnostics.Process.dll"   https://dotnetcli.blob.core.windows.net/dotnet/dev/patch/System.Diagnostics.Process.dll
+
 banner "Building stage1 using downloaded stage0"
 dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Cli"
 dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler"
 dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler.Csc"
 dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Tools.Publish"
 dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE1_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Tools.Resgen"
+
+# UGLY_HACK - Copy the patched System.Diagnostics.Process.dll to stage1
+cp "$DOTNET_ROOT/System.Diagnostics.Process.dll" "$STAGE1_DIR"
 
 # Deploy CLR host to the output
 cp "$HOST_DIR/corehost" "$STAGE1_DIR"
@@ -82,6 +89,9 @@ dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" --config
 dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Tools.Compiler.Csc"
 dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Tools.Publish"
 dotnet publish --framework "$TFM" --runtime $RID --output "$STAGE2_DIR" --configuration "$CONFIGURATION" "$REPOROOT/src/Microsoft.DotNet.Tools.Resgen"
+
+# UGLY_HACK - Copy the patched System.Diagnostics.Process.dll to stage2
+cp "$DOTNET_ROOT/System.Diagnostics.Process.dll" "$STAGE2_DIR"
 
 # Deploy CLR host to the output
 cp "$HOST_DIR/corehost" "$STAGE2_DIR"
