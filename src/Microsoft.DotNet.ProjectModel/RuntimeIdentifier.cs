@@ -19,7 +19,7 @@ namespace Microsoft.Extensions.ProjectModel
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                return "osx.10.10-x64";
+                return "osx.10.11-x64";
             }
             return "unknown";
         }

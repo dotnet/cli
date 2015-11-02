@@ -12,4 +12,6 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 # work around restore timeouts on Mono
 [ -z "$MONO_THREADS_PER_CPU" ] && export MONO_THREADS_PER_CPU=50
 
-exec "$DIR/dnx/dnx" "$DIR/dnx/lib/Microsoft.Dnx.Tooling/Microsoft.Dnx.Tooling.dll" "restore" --runtime "osx.10.10-x64" --runtime "ubuntu.14.04-x64" "$@"
+MAJOR_MAC_VERSION=$(sw_vers -productVersion | awk -F '.' '{print $1 "." $2}')
+
+exec "$DIR/dnx/dnx" "$DIR/dnx/lib/Microsoft.Dnx.Tooling/Microsoft.Dnx.Tooling.dll" "restore" --runtime "osx.${MAJOR_MAC_VERSION}-x64" --runtime "ubuntu.14.04-x64" "$@"
