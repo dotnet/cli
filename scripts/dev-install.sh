@@ -15,7 +15,8 @@ if [ -z "$RID" ]; then
     UNAME=$(uname)
     if [ "$UNAME" == "Darwin" ]; then
         OSNAME=osx
-        RID=osx.10.10-x64
+        MAJOR_MAC_VERSION=$(sw_vers -productVersion | awk -F '.' '{print $1 "." $2}')
+        RID=osx.${MAJOR_MAC_VERSION}-x64
     elif [ "$UNAME" == "Linux" ]; then
         # Detect Distro?
         OSNAME=linux
