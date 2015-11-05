@@ -15,13 +15,14 @@ source "$SCRIPT_DIR/_common.sh"
 echo "---------------------"
 echo "CI DEBUGGING"
 echo $DOCKER_HOST
+
+echo $(service docker start)
 echo $(whoami)
 echo $(docker version)
 echo $(docker ps -a)
 echo $PATH
 echo $(which docker)
-echo $(type docker)
-echo $(service docker status)s
+echo $(service docker status)
 
 exit 1
 
