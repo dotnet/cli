@@ -18,6 +18,10 @@ echo $DOCKER_HOST
 echo $(whoami)
 echo $(docker version)
 echo $(docker ps -a)
+echo $PATH
+echo $(which docker)
+echo $(type docker)
+echo $(service docker status)s
 
 exit 1
 
