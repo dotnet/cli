@@ -11,6 +11,16 @@ SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 source "$SCRIPT_DIR/_common.sh"
 
+# TEMP do some debugging on the ci
+echo "---------------------"
+echo "CI DEBUGGING"
+echo $DOCKER_HOST
+echo $(whoami)
+echo $(docker version)
+echo $(docker ps -a)
+
+exit 1
+
 # Some things depend on HOME and it may not be set. We should fix those things, but until then, we just patch a value in
 if [ -z "$HOME" ]; then
     export HOME=$SCRIPT_DIR/../artifacts/home
