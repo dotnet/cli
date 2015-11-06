@@ -1,0 +1,26 @@
+{
+  "description": "Abstractions for test runners to communicate to a tool, such as Visual Studio.",
+  "version": "1.0.0-*",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dotnet/cli"
+  },
+  "compilationOptions": {
+    "warningsAsErrors": true
+  },
+  "dependencies": {
+    "Microsoft.Extensions.Logging.Abstractions": "1.0.0-*"
+  },
+  "frameworks": {
+    "net451": {},
+    "dotnet5.4": {
+      "dependencies": {
+        "System.Collections": "4.0.11-beta-*",
+        "System.Reflection": "4.0.11-beta-*",
+        "System.Resources.ResourceManager": "4.0.1-beta-*",
+        "System.Runtime": "4.0.21-beta-*",
+        "System.Runtime.Extensions": "4.0.11-beta-*"
+      }
+    }
+  }
+}
