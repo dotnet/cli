@@ -5,11 +5,11 @@
 #include "utils.h"
 #include "coreclr.h"
 
-void get_tpafile_path(const pal::string_t& app_base, const pal::string_t& app_name, pal::string_t& tpapath)
+void get_tpafile_path(const pal::string_t& app_path, const pal::string_t& app_name, pal::string_t& tpapath)
 {
-    tpapath.reserve(app_base.length() + app_name.length() + 5);
+    tpapath.reserve(app_path.length() + app_name.length() + 5);
 
-    tpapath.append(app_base);
+    tpapath.append(app_path);
     tpapath.push_back(DIR_SEPARATOR);
 
     // Remove the extension from the app_name
@@ -25,9 +25,9 @@ void get_tpafile_path(const pal::string_t& app_base, const pal::string_t& app_na
     tpapath.append(_X(".deps"));
 }
 
-int run(arguments_t args, pal::string_t app_base, tpafile tpa)
+int run(arguments_t& args, pal::string_t& app_path, pal::string_t& app_name, tpafile& tpa)
 {
-    tpa.add_from_local_dir(app_base);
+    tpa.add_from_local_dir(app_path);
 
     // Add packages directory
     pal::string_t packages_dir;
@@ -56,6 +56,7 @@ int run(arguments_t args, pal::string_t app_base, tpafile tpa)
 
     // Build CoreCLR properties
     const char* property_keys[] = {
+        "APPBASE",
         "TRUSTED_PLATFORM_ASSEMBLIES",
         "APP_PATHS",
         "APP_NI_PATHS",
@@ -64,16 +65,19 @@ int run(arguments_t args, pal::string_t app_base, tpafile tpa)
     };
 
     auto tpa_cstr = pal::to_stdstring(tpalist);
-    auto app_base_cstr = pal::to_stdstring(app_base);
+    auto app_path_cstr = pal::to_stdstring(app_path);
     auto search_paths_cstr = pal::to_stdstring(search_paths);
+    auto app_base_cstr = pal::to_stdstring(args.app_base);
 
     const char* property_values[] = {
+        // APPBASE
+        app_base_cstr.c_str(),
         // TRUSTED_PLATFORM_ASSEMBLIES
         tpa_cstr.c_str(),
         // APP_PATHS
-        app_base_cstr.c_str(),
+        app_path_cstr.c_str(),
         // APP_NI_PATHS
-        app_base_cstr.c_str(),
+        app_path_cstr.c_str(),
         // NATIVE_DLL_SEARCH_DIRECTORIES
         search_paths_cstr.c_str(),
         // AppDomainCompatSwitch
@@ -180,13 +184,18 @@ int main(const int argc, const pal::char_t* argv[])
     trace::info(_X("App argc: %d"), args.app_argc);
     trace::info(_X("App argv: %s"), argstr.c_str());
 
-    auto app_base = get_directory(args.managed_application);
+    auto app_path = get_directory(args.managed_application);
     auto app_name = get_filename(args.managed_application);
+
+    if (args.app_base.empty())
+    {
+        args.app_base.assign(app_path);
+    }
 
     if (args.clr_path.empty())
     {
         // Use the directory containing the managed assembly
-        if (!find_coreclr(app_base, args.clr_path))
+        if (!find_coreclr(app_path, args.clr_path))
         {
             trace::error(_X("failed to locate CLR files"));
             return 1;
@@ -201,11 +210,11 @@ int main(const int argc, const pal::char_t* argv[])
 
     trace::info(_X("using CLR files from: %s"), args.clr_path.c_str());
     trace::info(_X("preparing to launch: %s"), app_name.c_str());
-    trace::info(_X("using app base: %s"), app_base.c_str());
+    trace::info(_X("using app base: %s"), app_path.c_str());
 
     // Check for and load tpa file
     pal::string_t tpafile_path;
-    get_tpafile_path(app_base, app_name, tpafile_path);
+    get_tpafile_path(app_path, app_name, tpafile_path);
     trace::info(_X("checking for TPA File at: %s"), tpafile_path.c_str());
     tpafile tpa;
     if (!tpa.load(tpafile_path))
@@ -213,5 +222,5 @@ int main(const int argc, const pal::char_t* argv[])
         trace::error(_X("invalid TPA file"));
         return 1;
     }
-    return run(args, app_base, tpa);
+    return run(args, app_path, app_name, tpa);
 }

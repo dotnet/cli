@@ -10,6 +10,7 @@ struct arguments_t
     pal::string_t own_path;
     pal::string_t managed_application;
     pal::string_t clr_path;
+    pal::string_t app_base;
 
     int app_argc;
     const pal::char_t** app_argv;

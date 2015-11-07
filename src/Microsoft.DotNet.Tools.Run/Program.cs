@@ -111,7 +111,8 @@ namespace Microsoft.DotNet.Tools.Run
             result = Command.Create(outputName, string.Join(" ", remainingArguments))
                 .ForwardStdOut()
                 .ForwardStdErr()
-                .EnvironmentVariable("CLRHOST_CLR_PATH", AppContext.BaseDirectory)
+                .EnvironmentVariable("COREHOST_CLR_PATH", AppContext.BaseDirectory)
+                .EnvironmentVariable("COREHOST_APP_BASE", context.ProjectDirectory)
                 .Execute();
 
             // Clean up
