@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.Dnx.Testing.Abstractions
+namespace Microsoft.Extensions.Testing.Abstractions
 {
     public class Test
     {

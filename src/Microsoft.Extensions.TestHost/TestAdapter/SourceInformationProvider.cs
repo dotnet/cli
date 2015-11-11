@@ -7,13 +7,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using dia2;
-using Microsoft.Dnx.Testing.Abstractions;
 using Microsoft.Extensions.Compilation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Extensions.Testing.Abstractions;
+using dia2;
 
-namespace Microsoft.Dnx.TestHost.TestAdapter
+namespace Microsoft.Extensions.TestHost
 {
     public class SourceInformationProvider : ISourceInformationProvider
     {

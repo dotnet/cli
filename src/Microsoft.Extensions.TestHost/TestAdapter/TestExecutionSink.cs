@@ -3,10 +3,10 @@
 
 using System;
 using System.Collections.Concurrent;
-using Microsoft.Dnx.Testing.Abstractions;
+using Microsoft.Extensions.Testing.Abstractions;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.Dnx.TestHost
+namespace Microsoft.Extensions.TestHost
 {
     public class TestExecutionSink : ITestExecutionSink
     {

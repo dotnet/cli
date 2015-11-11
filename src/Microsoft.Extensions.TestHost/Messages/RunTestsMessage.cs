@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.Dnx.TestHost
+namespace Microsoft.Extensions.TestHost
 {
     public class RunTestsMessage
     {

@@ -7,10 +7,10 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Dnx.Runtime.CommandParsing;
 using Microsoft.Dnx.Runtime.Common;
-using Microsoft.Dnx.Testing.Abstractions;
 using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Extensions.Testing.Abstractions;
 
-namespace Microsoft.Dnx.TestHost
+namespace Microsoft.Extensions.TestHost
 {
     public static class ProjectCommand
     {

@@ -1,15 +1,12 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
 using System.Linq;
-using Microsoft.Dnx.Runtime.Common.DependencyInjection;
-using Microsoft.Dnx.TestHost.TestAdapter;
-using Microsoft.Dnx.Testing.Abstractions;
 using Microsoft.Extensions.Compilation;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Testing.Abstractions;
 
-namespace Microsoft.Dnx.TestHost
+namespace Microsoft.Extensions.TestHost
 {
     internal class ProjectTestHostServices: TestHostServices
     {

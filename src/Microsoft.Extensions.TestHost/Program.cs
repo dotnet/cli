@@ -8,9 +8,10 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Dnx.Runtime.Common.CommandLine;
 using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Extensions.TestHost;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.Dnx.TestHost
+namespace Microsoft.Extensions.TestHost
 {
     public class Program
     {

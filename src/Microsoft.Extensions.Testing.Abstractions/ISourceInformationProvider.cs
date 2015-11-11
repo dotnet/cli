@@ -3,7 +3,7 @@
 
 using System.Reflection;
 
-namespace Microsoft.Dnx.Testing.Abstractions
+namespace Microsoft.Extensions.Testing.Abstractions
 {
     public interface ISourceInformationProvider
     {

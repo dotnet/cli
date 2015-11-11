@@ -4,7 +4,7 @@
 using System;
 using System.Collections.ObjectModel;
 
-namespace Microsoft.Dnx.Testing.Abstractions
+namespace Microsoft.Extensions.Testing.Abstractions
 {
     public sealed class TestResult
     {
