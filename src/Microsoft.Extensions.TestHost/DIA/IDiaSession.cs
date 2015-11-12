@@ -1,8 +1,8 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
 using System.Runtime.InteropServices;
+
 namespace dia2
 {
     [Guid("2F609EE1-D1C8-4E24-8288-3326BADCD211"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]

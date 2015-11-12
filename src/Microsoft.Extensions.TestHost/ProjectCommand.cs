@@ -100,7 +100,7 @@ namespace Microsoft.Extensions.TestHost
 
                 if (programTypeInfo == null)
                 {
-                    System.Console.WriteLine("'{0}' does not contain a static 'TestMain' method suitable for an entry point", name);
+                    Console.WriteLine("'{0}' does not contain a static 'TestMain' method suitable for an entry point", name);
                     return false;
                 }
 
@@ -111,7 +111,7 @@ namespace Microsoft.Extensions.TestHost
 
             if (entryPoint == null || !entryPoint.IsStatic)
             {
-                System.Console.WriteLine("'{0}' does not contain a static 'TestMain' method suitable for an entry point", name);
+                Console.WriteLine("'{0}' does not contain a static 'TestMain' method suitable for an entry point", name);
                 return false;
             }
             return true;
