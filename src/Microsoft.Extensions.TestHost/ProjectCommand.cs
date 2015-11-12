@@ -119,12 +119,7 @@ namespace Microsoft.Extensions.TestHost
 
         private static MethodInfo GetEntryPoint(Assembly assembly)
         {
-#if DNX451
             return assembly.EntryPoint;
-#else
-            // Temporary until https://github.com/dotnet/corefx/issues/3336 is fully merged and built
-            return assembly.GetType().GetRuntimeProperty("EntryPoint").GetValue(assembly) as MethodInfo;
-#endif
         }
 
     }
