@@ -105,7 +105,7 @@ namespace Microsoft.Extensions.TestHost
                     try
                     {
                         string testCommand = null;
-                        Project project = null;
+                        Project project;
                         if (Project.TryGetProject(projectPath, out project))
                         {
                             project.Commands.TryGetValue("test", out testCommand);

@@ -1,0 +1,39 @@
+﻿{
+  "authors": [ "James Newkirk", "Brad Wilson" ],
+  "title": "xUnit.net [Runner: dotnet]",
+  "description": "Console and Visual Studio runner for xUnit.net.\r\n\r\nSupported platforms:\r\n- dotnet 5.4+",
+  "projectUrl": "https://github.com/xunit/dotnet.xunit",
+  "iconUrl": "https://raw.githubusercontent.com/xunit/media/master/logo-512-transparent.png",
+  "licenseUrl": "https://raw.githubusercontent.com/xunit/xunit/master/license.txt",
+  "requireLicenseAcceptance": false,
+  "version": "99.99.99-dev",
+  "compilationOptions": {
+    "warningsAsErrors": true
+  },
+  "frameworks": {
+    "dnxcore50": {
+      "dependencies": {
+        "System.Security.Cryptography.Algorithms": "4.0.0-beta-*",
+        "System.Threading.ThreadPool": "4.0.10-beta-*",
+        "System.Xml.XDocument": "4.0.11-beta-*"
+      }
+    }
+  },
+  "dependencies": {
+    "Microsoft.Extensions.Testing.Abstractions": {
+      "version": "1.0.0",
+      "type": "build"
+    },
+    "Microsoft.Extensions.TestHost": {
+      "version": "1.0.0",
+      "type": "build"
+    },
+    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*",
+    "xunit.runner.utility": "2.1.0",
+    "xunit.runner.reporters": "2.1.0"
+  },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/xunit/dnx.xunit"
+    }
+}

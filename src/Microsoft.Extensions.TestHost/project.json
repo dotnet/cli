@@ -30,7 +30,7 @@
       "type": "build"
     },
     "Microsoft.Extensions.Logging": "1.0.0-*",
-    "Newtonsoft.Json": "6.0.6"
+    "Newtonsoft.Json": "7.0.1"
   },
   "frameworks": {
     "dnx451": {
