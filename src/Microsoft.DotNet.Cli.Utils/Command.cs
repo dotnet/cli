@@ -84,11 +84,6 @@ namespace Microsoft.DotNet.Cli.Utils
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                if (Path.IsPathRooted(executable))
-                {
-                    return false;
-                }
-
                 var extension = Path.GetExtension(executable);
                 if (!string.IsNullOrEmpty(extension))
                 {
