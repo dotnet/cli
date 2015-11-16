@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Resources;
 using System.Xml.Linq;
 using Microsoft.Dnx.Runtime.Common.CommandLine;
@@ -23,32 +25,42 @@ namespace Microsoft.DotNet.Tools.Resgen
 
             app.OnExecute(() =>
             {
-                WriteResourcesFile(inputFile.Value, outputFile.Value);
+                WriteResourcesFileIfNotEmpty(inputFile.Value, outputFile.Value);
                 return 0;
             });
 
             return app.Execute(args);
         }
 
-        private static void WriteResourcesFile(string resxFilePath, string outputFile)
+        private static void WriteResourcesFileIfNotEmpty(string resxFilePath, string outputFile)
         {
             using (var fs = File.OpenRead(resxFilePath))
             using (var outfs = File.Create(outputFile))
             {
                 var document = XDocument.Load(fs);
 
-                var rw = new ResourceWriter(outfs);
+                var data = document.Root.Elements("data");
 
-                foreach (var e in document.Root.Elements("data"))
+                if (data.Any())
                 {
-                    string name = e.Attribute("name").Value;
-                    string value = e.Element("value").Value;
-
-                    rw.AddResource(name, value);
+                    WriteResourcesFile(outfs, data);
                 }
-
-                rw.Generate();
             }
+        }
+
+        private static void WriteResourcesFile(Stream outfs, IEnumerable<XElement> data)
+        {
+            var rw = new ResourceWriter(outfs);
+
+            foreach (var e in data)
+            {
+                var name = e.Attribute("name").Value;
+                var value = e.Element("value").Value;
+
+                rw.AddResource(name, value);
+            }
+
+            rw.Generate();
         }
     }
 }
