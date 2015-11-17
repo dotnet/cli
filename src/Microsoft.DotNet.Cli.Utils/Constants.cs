@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.Cli.Utils
 
         public static readonly string StaticLibSuffix = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".lib" : ".a" ;
         
-        public static readonly string CommandPrefix = "dotnet-";
+        public static readonly string CommandPrefix = "dotnet";
         public static readonly string CommandSearchPattern = CommandPrefix + "*";
     }
 }

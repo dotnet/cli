@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.Tools.Commands
         
         private static CommandLineApplication SetupApp()
         {
-             var app = new CommandLineApplication();
+            var app = new CommandLineApplication();
             app.Name = "dotnet commands";
             app.FullName = ".NET Commands Listing";
             app.Description = "List all available commands in the dotnet tool";
@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.Tools.Commands
 #if DEBUG
                 Console.Error.WriteLine(ex);
 #else
-                Console.Error.WriteLine(ex.Message);
+                Reporter.Error.WriteLine(ex.Message);
 #endif
                 return 1;
             }
@@ -56,12 +56,12 @@ namespace Microsoft.DotNet.Tools.Commands
         
         private static void PrintCommandList()
         {
-            List<string> availableCommands = GetAvailableCommands();
+            var availableCommands = GetAvailableCommands();
             availableCommands.Sort();
             
             PrintHeader();
             
-            foreach (string command in availableCommands)
+            foreach (var command in availableCommands)
             {
                 System.Console.WriteLine(command);
             }
@@ -69,25 +69,29 @@ namespace Microsoft.DotNet.Tools.Commands
         
         private static void PrintHeader()
         {
-            System.Console.WriteLine("Dotnet Tool Available Commands:");
+            System.Console.WriteLine("dotnet available commands:");
         }
         
         private static List<string> GetAvailableCommands()
         {
-            List<string> available = new List<string>();
+            var available = new List<string>();
             
-            string pathValue = Environment.GetEnvironmentVariable("PATH");
-            string[] pathDirs = pathValue.Split(Path.PathSeparator);
+            var pathValue = Environment.GetEnvironmentVariable("PATH");
+            var pathDirs = pathValue.Split(Path.PathSeparator);
             
-            foreach(string dir in pathDirs)
+            foreach(var dir in pathDirs)
             {
-                string[] files = Directory.GetFiles(dir, Constants.CommandSearchPattern);
-                
-                foreach(string filepath in files){
-                    string filename = Path.GetFileNameWithoutExtension(filepath);
-                    string commandName = FileNameToCommandName(filename);
+                if (Directory.Exists(dir))
+                {
+                    var files = Directory.GetFiles(dir, Constants.CommandSearchPattern);
                     
-                    available.Add(commandName);
+                    foreach(var filepath in files)
+                    {
+                        var filename = Path.GetFileNameWithoutExtension(filepath);
+                        var commandName = FileNameToCommandName(filename);
+                        
+                        available.Add(commandName);
+                    }
                 }
             }
             
@@ -96,7 +100,7 @@ namespace Microsoft.DotNet.Tools.Commands
         
         private static string FileNameToCommandName(string filename)
         {
-             return filename.Replace(Constants.CommandPrefix, "");
+             return filename.Replace(Constants.CommandPrefix + "-", "");
         }
         
     }
