@@ -32,6 +32,8 @@ namespace Microsoft.DotNet.Tools.Run
             // This is required to be an option because otherwise we can't tell if the first argument is a project or the first argument to pass to an application
             var project = app.Option("-p|--project <PROJECT_PATH>", "The path to the project to run (defaults to the current directory). Can be a path to a project.json or a project directory.", CommandOptionType.SingleValue);
 
+            var noRestore = app.Option("--no-restore", "Do not restore packages before the build.", CommandOptionType.NoValue);
+
             app.OnExecute(() =>
             {
                 // Locate the project and get the name and full path
@@ -59,7 +61,7 @@ namespace Microsoft.DotNet.Tools.Run
                     var fx = NuGetFramework.Parse(framework.Value());
                     context = contexts.FirstOrDefault(c => c.TargetFramework.Equals(fx));
                 }
-                return Run(context, configuration.Value() ?? Constants.DefaultConfiguration, app.RemainingArguments, preserveTemporaryOutput.HasValue());
+                return Run(context, configuration.Value() ?? Constants.DefaultConfiguration, app.RemainingArguments, preserveTemporaryOutput.HasValue(), !noRestore.HasValue());
             });
 
             try
@@ -77,10 +79,28 @@ namespace Microsoft.DotNet.Tools.Run
             }
         }
 
-        private static int Run(ProjectContext context, string configuration, List<string> remainingArguments, bool preserveTemporaryOutput)
+        private static int Run(ProjectContext context, string configuration, List<string> remainingArguments, bool preserveTemporaryOutput, bool restore)
         {
             // Create a temporary directory
             var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+
+            if (restore)
+            {
+                Reporter.Verbose.WriteLine("Restoring Nuget packages...");
+                var restoreResult = Command.Create($"dotnet-restore", "")
+                    .ForwardStdOut(onlyIfVerbose: true)
+                    .ForwardStdErr()
+                    .Execute();
+
+                if (restoreResult.ExitCode != 0)
+                {
+                    return restoreResult.ExitCode;
+                }
+            }
+            else
+            {
+                Reporter.Verbose.WriteLine("Restoring Nuget packages skipped.");
+            }
 
             // Compile to that directory
             var result = Command.Create($"dotnet-compile", $"--output \"{tempDir}\" --temp-output \"{tempDir}\" --framework \"{context.TargetFramework}\" --configuration \"{configuration}\" {context.ProjectFile.ProjectDirectory}")
