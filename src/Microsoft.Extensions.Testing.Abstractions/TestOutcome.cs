@@ -1,7 +1,14 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.DotNet.Cli.Utils.CommandParsing
+namespace Microsoft.Extensions.Testing.Abstractions
 {
-    internal delegate Result<TValue> Parser<TValue>(Cursor cursor);
+    public enum TestOutcome
+    {
+        None,
+        Passed,
+        Failed,
+        Skipped,
+        NotFound
+    }
 }
