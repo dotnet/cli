@@ -1,7 +1,7 @@
+@echo off
+
 REM Copyright (c) .NET Foundation and contributors. All rights reserved.
 REM Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
-@echo off
 
 REM Get absolute path
 pushd %1
@@ -9,7 +9,7 @@ set BIN_DIR=%CD%\bin
 popd
 
 REM Replace with a robust method for finding the right crossgen.exe
-set CROSSGEN_UTIL=%UserProfile%\.dnx\packages\runtime.win7-x64.Microsoft.NETCore.Runtime.CoreCLR\1.0.1-beta-23504\tools\crossgen.exe
+set CROSSGEN_UTIL=%UserProfile%\.dnx\packages\runtime.win7-x64.Microsoft.NETCore.Runtime.CoreCLR\1.0.1-beta-23516\tools\crossgen.exe
 
 REM Crossgen currently requires itself to be next to mscorlib
 copy %CROSSGEN_UTIL% /Y %BIN_DIR% > nul

@@ -1,28 +1,33 @@
 {
     "name": "dotnet-publish",
+    "description": "Publishes a .NET project into a self-contained application folder",
     "version": "1.0.0-*",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/dotnet/cli"
+    },
     "compilationOptions": {
+        "warningsAsErrors": true,
         "emitEntryPoint": true
     },
     "dependencies": {
-        "Microsoft.NETCore.Runtime": "1.0.1-beta-23504",
+        "Microsoft.NETCore.Runtime": "1.0.1-beta-23516",
+        "Microsoft.NETCore.Platforms": "1.0.1-beta-23516",
 
-        "System.Console": "4.0.0-beta-23504",
-        "System.Collections": "4.0.11-beta-23504",
-        "System.Linq": "4.0.1-beta-23504",
-        "System.Diagnostics.Process": "4.1.0-beta-23504",
-        "System.IO.FileSystem": "4.0.1-beta-23504",
-        "System.AppContext": "4.0.1-beta-23504",
+        "System.Console": "4.0.0-beta-23516",
+        "System.Collections": "4.0.11-beta-23516",
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Diagnostics.Process": "4.1.0-beta-23516",
+        "System.IO.FileSystem": "4.0.1-beta-23516",
+        "System.AppContext": "4.0.1-beta-23516",
 
-        "Microsoft.DotNet.ProjectModel": "1.0.0-*",
-        "Microsoft.DotNet.Cli.Utils": {
-            "type": "build",
-            "version": "1.0.0-*"
-        },
         "Microsoft.Extensions.CommandLineUtils.Sources": {
             "type": "build",
-            "version": "1.0.0-*"
-        }
+            "version": "1.0.0-rc1-final"
+        },
+
+        "Microsoft.DotNet.ProjectModel": { "target": "project" },
+        "Microsoft.DotNet.Cli.Utils": { "target": "project" }
     },
     "frameworks": {
         "dnxcore50": { }

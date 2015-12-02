@@ -1,7 +1,7 @@
 ﻿{
     "version": "1.0.0-*",
     "dependencies": {
-        "System.Runtime": "4.0.21-beta-23428"
+        "System.Runtime": "4.0.21-beta-23516"
     },
 
     "frameworks": {
