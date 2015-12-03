@@ -1,7 +1,17 @@
 {
+    "description": "Tools to create Roslyn Workspaces from project.json projects",
+    "version": "1.0.0-*",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/dotnet/cli"
+    },
+    "compilationOptions": {
+        "warningsAsErrors": true
+    },
     "dependencies": {
-        "Microsoft.DotNet.ProjectModel": "1.0.0-*",
-        "Microsoft.CodeAnalysis.CSharp.Workspaces": "1.1.0-*"
+        "Microsoft.CodeAnalysis.CSharp.Workspaces": "1.1.0-*",
+
+        "Microsoft.DotNet.ProjectModel": { "target": "project" }
     },
     "frameworks": {
         "dnxcore50": { }

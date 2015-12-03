@@ -109,7 +109,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
             {
                 File.Copy(sharedLibPath, outputSharedLibPath);
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 Reporter.Error.WriteLine("Unable to copy System.Native.so to output");
             }

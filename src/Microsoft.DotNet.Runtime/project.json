@@ -1,13 +1,14 @@
 {
-  "compilationOptions": {
-      "emitEntryPoint": true
-  },
+    "description": "[NOT FOR PUBLISHING] Project used to publish the runtime into a folder during the build scripts",
+    "compilationOptions": {
+        "emitEntryPoint": true
+    },
 
-  "dependencies": {
-    "Microsoft.NETCore.Runtime": "1.0.1-beta-23504"
-  },
+    "dependencies": {
+        "Microsoft.NETCore.Runtime": "1.0.1-beta-23516"
+    },
 
-  "frameworks": {
-    "dnxcore50": { }
-  }
+    "frameworks": {
+        "dnxcore50": { }
+    }
 }
