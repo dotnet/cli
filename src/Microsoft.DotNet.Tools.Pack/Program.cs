@@ -19,6 +19,7 @@ using Microsoft.DotNet.ProjectModel.Files;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using Microsoft.DotNet.ProjectModel.Utilities;
+using Microsoft.DotNet.Tools.Pack;
 
 namespace Microsoft.DotNet.Tools.Compiler
 {
@@ -37,12 +38,12 @@ namespace Microsoft.DotNet.Tools.Compiler
             var output = app.Option("-o|--output <OUTPUT_DIR>", "Directory in which to place outputs", CommandOptionType.SingleValue);
             var intermediateOutput = app.Option("-t|--temp-output <OUTPUT_DIR>", "Directory in which to place temporary outputs", CommandOptionType.SingleValue);
             var configuration = app.Option("-c|--configuration <CONFIGURATION>", "Configuration under which to build", CommandOptionType.SingleValue);
-            var project = app.Argument("<PROJECT>", "The project to compile, defaults to the current directory. Can be a path to a project.json or a project directory");
+            var projectPath = app.Argument("<PROJECT>", "The project to compile, defaults to the current directory. Can be a path to a project.json or a project directory");
 
             app.OnExecute(() =>
             {
                 // Locate the project and get the name and full path
-                var path = project.Value;
+                var path = projectPath.Value;
                 if (string.IsNullOrEmpty(path))
                 {
                     path = Directory.GetCurrentDirectory();
@@ -59,10 +60,17 @@ namespace Microsoft.DotNet.Tools.Compiler
                     return 1;
                 }
 
+                var contexts = ProjectContext.CreateContextForEachFramework(path);
+
                 var configValue = configuration.Value() ?? Cli.Utils.Constants.DefaultConfiguration;
                 var outputValue = output.Value();
+                var intermediateOutputValue = intermediateOutput.Value();
 
-                return TryBuildPackage(path, configValue, outputValue, intermediateOutput.Value()) ? 0 : 1;
+                CompileProject(contexts, path, configValue, outputValue, intermediateOutputValue);
+                
+                BuildPackage(contexts, configValue, outputValue);
+
+                return 0;
             });
 
             try
@@ -80,12 +88,9 @@ namespace Microsoft.DotNet.Tools.Compiler
             }
         }
 
-        private static bool TryBuildPackage(string path, string configuration, string outputValue, string intermediateOutputValue)
+        private static void CompileProject(IEnumerable<ProjectContext> projects, string path, string configuration, string outputValue, string intermediateOutputValue)
         {
-            var contexts = ProjectContext.CreateContextForEachFramework(path);
-            var project = contexts.First().ProjectFile;
-
-            if (project.Files.SourceFiles.Any())
+            if (projects.First().ProjectFile.Files.SourceFiles.Any())
             {
                 var argsBuilder = new StringBuilder();
                 argsBuilder.Append($"--configuration {configuration}");
@@ -109,15 +114,19 @@ namespace Microsoft.DotNet.Tools.Compiler
 
                 if (result.ExitCode != 0)
                 {
-                    return false;
+                    throw new InvalidOperationException($"dotnet-compile returned a non-0 exit code: '{result.ExitCode}'.");
                 }
             }
+        }
+
+        private static void BuildPackage(IEnumerable<ProjectContext> contexts, string configuration, string outputValue)
+        {
+            var project = contexts.First().ProjectFile;
 
             Reporter.Output.WriteLine($"Producing nuget package for {project.Name}");
 
             var packDiagnostics = new List<DiagnosticMessage>();
-
-            // Things compiled now build the package
+            
             var packageBuilder = CreatePackageBuilder(project);
 
             // TODO: Report errors for required fields
@@ -132,13 +141,16 @@ namespace Microsoft.DotNet.Tools.Compiler
                 var outputPath = GetOutputPath(context, configuration, outputValue);
                 var outputName = GetProjectOutputName(context.ProjectFile, context.TargetFramework, configuration);
 
-                TryAddOutputFile(packageBuilder, context, outputPath, outputName);
+                packageBuilder.TryAddOutputFile(context, outputPath, outputName);
 
-                // REVIEW: Do we keep making symbols packages?
-                TryAddOutputFile(packageBuilder, context, outputPath, $"{project.Name}.pdb");
-                TryAddOutputFile(packageBuilder, context, outputPath, $"{project.Name}.mdb");
+                packageBuilder.TryAddSymbolFiles(context, outputPath, project);
 
-                TryAddOutputFile(packageBuilder, context, outputPath, $"{project.Name}.xml");
+                packageBuilder.TryAddIntellisenseFiles(context, outputPath, project);
+
+                if (project.IsCommand(context.TargetFramework, configuration))
+                {
+                    packageBuilder.TryAddCommandFiles(context, outputPath, project);
+                }
 
                 Reporter.Verbose.WriteLine("");
             }
@@ -146,55 +158,49 @@ namespace Microsoft.DotNet.Tools.Compiler
             var rootOutputPath = GetOutputPath(project, configuration, outputValue);
             var packageOutputPath = GetPackagePath(project, rootOutputPath);
 
-            if (GeneratePackage(project, packageBuilder, packageOutputPath, packDiagnostics))
-            {
-                return true;
-            }
-
-            return false;
+            GeneratePackage(project, packageBuilder, packageOutputPath, packDiagnostics);
         }
 
-        private static bool GeneratePackage(Project project, PackageBuilder packageBuilder, string nupkg, List<DiagnosticMessage> packDiagnostics)
+        private static void GeneratePackage(Project project, PackageBuilder packageBuilder, string nupkg, List<DiagnosticMessage> packDiagnostics)
         {
             foreach (var sharedFile in project.Files.SharedFiles)
             {
-                var file = new PhysicalPackageFile();
-                file.SourcePath = sharedFile;
-                file.TargetPath = Path.Combine("shared", Path.GetFileName(sharedFile));
+                var file = new PhysicalPackageFile
+                {
+                    SourcePath = sharedFile,
+                    TargetPath = Path.Combine("shared", Path.GetFileName(sharedFile))
+                };
+
                 packageBuilder.Files.Add(file);
             }
-
-            var root = project.ProjectDirectory;
-
+            
             if (project.Files.PackInclude != null && project.Files.PackInclude.Any())
             {
                 AddPackageFiles(project, project.Files.PackInclude, packageBuilder, packDiagnostics);
             }
 
-            // Write the packages as long as we're still in a success state.
-            if (!packDiagnostics.Any(d => d.Severity == DiagnosticMessageSeverity.Error))
+            var errorMessage = packDiagnostics.FirstOrDefault(d => d.Severity == DiagnosticMessageSeverity.Error);
+            if (errorMessage != null)
             {
-                Reporter.Verbose.WriteLine($"Adding package files");
-                foreach (var file in packageBuilder.Files.OfType<PhysicalPackageFile>())
-                {
-                    if (file.SourcePath != null && File.Exists(file.SourcePath))
-                    {
-                        Reporter.Verbose.WriteLine($"Adding {file.Path.Yellow()}");
-                    }
-                }
-
-                Directory.CreateDirectory(Path.GetDirectoryName(nupkg));
-
-                using (var fs = File.Create(nupkg))
-                {
-                    packageBuilder.Save(fs);
-                    Reporter.Output.WriteLine($"{project.Name} -> {Path.GetFullPath(nupkg)}");
-                }
-
-                return true;
+                throw new InvalidOperationException(errorMessage.Message);
             }
 
-            return false;
+            Reporter.Verbose.WriteLine($"Adding package files");
+            foreach (var file in packageBuilder.Files.OfType<PhysicalPackageFile>())
+            {
+                if (file.SourcePath != null && File.Exists(file.SourcePath))
+                {
+                    Reporter.Verbose.WriteLine($"Adding {file.Path.Yellow()}");
+                }
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(nupkg));
+
+            using (var fs = File.Create(nupkg))
+            {
+                packageBuilder.Save(fs);
+                Reporter.Output.WriteLine($"{project.Name} -> {Path.GetFullPath(nupkg)}");
+            }
         }
 
         private static void AddPackageFiles(Project project, IEnumerable<PackIncludeEntry> packageFiles, PackageBuilder packageBuilder, IList<DiagnosticMessage> diagnostics)
@@ -289,26 +295,6 @@ namespace Microsoft.DotNet.Tools.Compiler
                     }
                 }
             }
-        }
-
-        private static void TryAddOutputFile(PackageBuilder packageBuilder,
-                                             ProjectContext context,
-                                             string outputPath,
-                                             string filePath)
-        {
-            var targetPath = Path.Combine("lib", context.TargetFramework.GetTwoDigitShortFolderName(), Path.GetFileName(filePath));
-            var sourcePath = Path.Combine(outputPath, filePath);
-
-            if (!File.Exists(sourcePath))
-            {
-                return;
-            }
-
-            packageBuilder.Files.Add(new PhysicalPackageFile
-            {
-                SourcePath = sourcePath,
-                TargetPath = targetPath
-            });
         }
 
         public static void PopulateDependencies(ProjectContext context, PackageBuilder packageBuilder)
