@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-
+using System.Text;
 using Microsoft.Dnx.Runtime.Common.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Cli.Compiler.Common;
@@ -20,6 +20,7 @@ namespace Microsoft.DotNet.Tools.Compiler
 {
     public class Program
     {
+        private const string BuildProfile = "--build-profile";
         private static readonly string[] KnownCompilers = new string[]{ "csc", "vbc", "fsc"};
 
         public static int Main(string[] args)
@@ -39,6 +40,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             var noProjectDependencies = app.Option("--no-project-dependencies", "Skips building project references.", CommandOptionType.NoValue);
             var noHost = app.Option("--no-host", "Set this to skip publishing a runtime host when building for CoreCLR", CommandOptionType.NoValue);
             var project = app.Argument("<PROJECT>", "The project to compile, defaults to the current directory. Can be a path to a project.json or a project directory");
+            var profile = app.Option(BuildProfile, "Examine the compilation process to identify why incremental compilation is turned off", CommandOptionType.NoValue);
 
             // Native Args
             var native = app.Option("-n|--native", "Compiles source to native machine code.", CommandOptionType.NoValue);
@@ -67,6 +69,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 var configValue = configuration.Value() ?? Constants.DefaultConfiguration;
                 var outputValue = output.Value();
                 var intermediateValue = intermediateOutput.Value();
+                var profileValue = profile.HasValue();
 
                 var preconditions = new Preconditions();
 
@@ -77,7 +80,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                     ProjectContext.CreateContextForEachFramework(path);
                 foreach (var context in contexts)
                 {
-                    success &= Compile(context, configValue, outputValue, intermediateOutput.Value(), buildProjectReferences, noHost.HasValue(), preconditions);
+                    success &= Compile(context, configValue, outputValue, intermediateOutput.Value(), buildProjectReferences, noHost.HasValue(), profileValue, preconditions);
                     if (isNative && success)
                     {
                         success &= CompileNative(context, configValue, outputValue, buildProjectReferences, intermediateValue, archValue, ilcArgsValue, ilcPathValue, ilcSdkPathValue, isCppMode, preconditions);
@@ -210,7 +213,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             return command;
         }
 
-        private static bool Compile(ProjectContext context, string configuration, string outputOptionValue, string intermediateOutputValue, bool buildProjectReferences, bool noHost, Preconditions preconditions)
+        private static bool Compile(ProjectContext context, string configuration, string outputOptionValue, string intermediateOutputValue, bool buildProjectReferences, bool noHost, bool profile, Preconditions preconditions)
         {
             // Set up Output Paths
             string outputPath = GetOutputPath(context, configuration, outputOptionValue);
@@ -250,6 +253,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                         $"--temp-output \"{intermediateOutputPath}\" " +
                         "--no-project-dependencies " +
                         (noHost ? "--no-host " : string.Empty) +
+                        (profile ? BuildProfile + " " : string.Empty) +
                         $"\"{projectDependency.Project.ProjectDirectory}\"",
                         ProjectName(context),
                         preconditions)
@@ -266,10 +270,10 @@ namespace Microsoft.DotNet.Tools.Compiler
                 projects.Clear();
             }
 
-            return CompileProject(context, configuration, outputPath, intermediateOutputPath, dependencies, noHost, preconditions);
+            return CompileProject(context, configuration, outputPath, intermediateOutputPath, dependencies, noHost, profile, preconditions);
         }
 
-        private static bool CompileProject(ProjectContext context, string configuration, string outputPath, string intermediateOutputPath, List<LibraryExport> dependencies, bool noHost, Preconditions preconditions)
+        private static bool CompileProject(ProjectContext context, string configuration, string outputPath, string intermediateOutputPath, List<LibraryExport> dependencies, bool noHost, bool profile, Preconditions preconditions)
         {
             Reporter.Output.WriteLine($"Compiling {ProjectName(context).Yellow()} for {context.TargetFramework.DotNetFrameworkName.Yellow()}");
             var sw = Stopwatch.StartNew();
@@ -293,7 +297,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             {
                 // The framework isn't installed so we should short circuit the rest of the compilation
                 // so we don't get flooded with errors
-                PrintSummary(missingFrameworkDiagnostics, sw, preconditions);
+                PrintSummary(missingFrameworkDiagnostics, sw, profile, preconditions);
                 return false;
             }
 
@@ -406,7 +410,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                              runtimeContext.CreateExporter(configuration));
             }
 
-            return PrintSummary(diagnostics, sw, preconditions, success);
+            return PrintSummary(diagnostics, sw, profile, preconditions, success);
         }
 
         private static string ResolveCompilerName(ProjectContext context, Preconditions preconditions)
@@ -600,7 +604,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             return "\"" + input.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
         }
 
-        private static bool PrintSummary(List<DiagnosticMessage> diagnostics, Stopwatch sw, Preconditions preconditions, bool success = true)
+        private static bool PrintSummary(List<DiagnosticMessage> diagnostics, Stopwatch sw, bool profile, Preconditions preconditions, bool success = true)
         {
             PrintDiagnostics(diagnostics);
 
@@ -627,6 +631,12 @@ namespace Microsoft.DotNet.Tools.Compiler
             if (preconditions.Present())
             {
                 Reporter.Output.WriteLine($"Time elapsed {sw.Elapsed}".Green() + @" (The compilation time can be improved. Run ""DotNet compile --BuildProfile"" for more information)".White());
+
+                if (profile)
+                {
+                    var logMessage = preconditions.BuildLogMessage();
+                    Reporter.Output.WriteLine(logMessage.Yellow());
+                }
             }
             else
             {
@@ -906,6 +916,30 @@ namespace Microsoft.DotNet.Tools.Compiler
         public bool Present()
         {
             return _preconditions.Any();
+        }
+
+        public string BuildLogMessage()
+        {
+            var log = new StringBuilder();
+
+            log.AppendLine();
+            log.Append("Incremental compilation has been disabled due to the following project properties:");
+
+            foreach (var precondition in _preconditions)
+            {
+                log.AppendLine();
+                log.Append("\t" + precondition);
+            }
+
+            log.AppendLine();
+            log.AppendLine();
+
+            log.Append(
+                "Incremental compilation will be automatically enabled if the above mentioned project properties are not used. " +
+                "For more information on the properties and how to address them, please consult:\n" +
+                @"https://github.com/cdmihai/cli/wiki/Addressing-Incremental-Compilation-Warnings");
+
+            return log.ToString();
         }
     }
 }
