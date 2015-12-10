@@ -51,7 +51,7 @@ if [ ! -d "$DNX_ROOT" ] || [ ! -e "$DNX_ROOT/dnx" ]; then
 fi
 
 header "Restoring packages"
-dotnet restore "$REPOROOT" --quiet --runtime "osx.10.10-x64" --runtime "ubuntu.14.04-x64" --runtime "win7-x64" --no-cache
+dotnet restore "$REPOROOT" --quiet --runtime "osx.10.10-x64" --runtime "ubuntu.14.04-x64" --runtime "win7-x64" --runtime "centos.7-x64" --no-cache
 
 header "Building corehost"
 
