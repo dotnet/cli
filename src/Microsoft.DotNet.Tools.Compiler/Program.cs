@@ -20,6 +20,8 @@ namespace Microsoft.DotNet.Tools.Compiler
 {
     public class Program
     {
+        private static readonly string[] KnownCompilers = new string[]{ "csc", "vbc", "fsc"};
+
         public static int Main(string[] args)
         {
             DebugHelper.HandleDebugSwitch(ref args);
@@ -66,6 +68,8 @@ namespace Microsoft.DotNet.Tools.Compiler
                 var outputValue = output.Value();
                 var intermediateValue = intermediateOutput.Value();
 
+                var preconditions = new Preconditions();
+
                 // Load project contexts for each framework and compile them
                 bool success = true;
                 var contexts = framework.HasValue() ?
@@ -73,10 +77,10 @@ namespace Microsoft.DotNet.Tools.Compiler
                     ProjectContext.CreateContextForEachFramework(path);
                 foreach (var context in contexts)
                 {
-                    success &= Compile(context, configValue, outputValue, intermediateOutput.Value(), buildProjectReferences, noHost.HasValue());
+                    success &= Compile(context, configValue, outputValue, intermediateOutput.Value(), buildProjectReferences, noHost.HasValue(), preconditions);
                     if (isNative && success)
                     {
-                        success &= CompileNative(context, configValue, outputValue, buildProjectReferences, intermediateValue, archValue, ilcArgsValue, ilcPathValue, ilcSdkPathValue, isCppMode);
+                        success &= CompileNative(context, configValue, outputValue, buildProjectReferences, intermediateValue, archValue, ilcArgsValue, ilcPathValue, ilcSdkPathValue, isCppMode, preconditions);
                     }
                 }
 
@@ -108,7 +112,8 @@ namespace Microsoft.DotNet.Tools.Compiler
             string ilcArgsValue, 
             string ilcPathValue,
             string ilcSdkPathValue,
-            bool isCppMode)
+            bool isCppMode,
+            Preconditions preconditions)
         {
             var outputPath = GetOutputPath(context, configuration, outputOptionValue);
             var nativeOutputPath = Path.Combine(GetOutputPath(context, configuration, outputOptionValue), "native");
@@ -185,7 +190,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             //     Need CoreRT Framework published to nuget
 
             // Do Native Compilation
-            var result = Command.Create("dotnet-compile-native", $"--rsp \"{rsp}\"")
+            var result = ResolveCommand("dotnet-compile-native", $"--rsp \"{rsp}\"", ProjectName(context), preconditions)
                                 .ForwardStdErr()
                                 .ForwardStdOut()
                                 .Execute();
@@ -193,7 +198,19 @@ namespace Microsoft.DotNet.Tools.Compiler
             return result.ExitCode == 0;
         }
 
-        private static bool Compile(ProjectContext context, string configuration, string outputOptionValue, string intermediateOutputValue, bool buildProjectReferences, bool noHost)
+        private static Command ResolveCommand(string commandName, string args, string projectName, Preconditions preconditions)
+        {
+            var command = Command.Create(commandName, args);
+
+            if (command.IsUnsafe)
+            {
+                preconditions.AddPathProbingPrecondition(projectName, commandName, args);
+            }
+
+            return command;
+        }
+
+        private static bool Compile(ProjectContext context, string configuration, string outputOptionValue, string intermediateOutputValue, bool buildProjectReferences, bool noHost, Preconditions preconditions)
         {
             // Set up Output Paths
             string outputPath = GetOutputPath(context, configuration, outputOptionValue);
@@ -226,14 +243,16 @@ namespace Microsoft.DotNet.Tools.Compiler
                 foreach (var projectDependency in Sort(projects))
                 {
                     // Skip compiling project dependencies since we've already figured out the build order
-                    var compileResult = Command.Create("dotnet-compile", 
+                    var compileResult = ResolveCommand("dotnet-compile", 
                         $"--framework {projectDependency.Framework} " +
                         $"--configuration {configuration} " +
                         $"--output \"{outputPath}\" " +
                         $"--temp-output \"{intermediateOutputPath}\" " +
                         "--no-project-dependencies " +
                         (noHost ? "--no-host " : string.Empty) +
-                        $"\"{projectDependency.Project.ProjectDirectory}\"")
+                        $"\"{projectDependency.Project.ProjectDirectory}\"",
+                        ProjectName(context),
+                        preconditions)
                             .ForwardStdOut()
                             .ForwardStdErr()
                             .Execute();
@@ -247,12 +266,12 @@ namespace Microsoft.DotNet.Tools.Compiler
                 projects.Clear();
             }
 
-            return CompileProject(context, configuration, outputPath, intermediateOutputPath, dependencies, noHost);
+            return CompileProject(context, configuration, outputPath, intermediateOutputPath, dependencies, noHost, preconditions);
         }
 
-        private static bool CompileProject(ProjectContext context, string configuration, string outputPath, string intermediateOutputPath, List<LibraryExport> dependencies, bool noHost)
+        private static bool CompileProject(ProjectContext context, string configuration, string outputPath, string intermediateOutputPath, List<LibraryExport> dependencies, bool noHost, Preconditions preconditions)
         {
-            Reporter.Output.WriteLine($"Compiling {context.RootProject.Identity.Name.Yellow()} for {context.TargetFramework.DotNetFrameworkName.Yellow()}");
+            Reporter.Output.WriteLine($"Compiling {ProjectName(context).Yellow()} for {context.TargetFramework.DotNetFrameworkName.Yellow()}");
             var sw = Stopwatch.StartNew();
 
             var diagnostics = new List<DiagnosticMessage>();
@@ -274,7 +293,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             {
                 // The framework isn't installed so we should short circuit the rest of the compilation
                 // so we don't get flooded with errors
-                PrintSummary(missingFrameworkDiagnostics, sw);
+                PrintSummary(missingFrameworkDiagnostics, sw, preconditions);
                 return false;
             }
 
@@ -321,7 +340,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 compilerArgs.AddRange(dependency.SourceReferences);
             }
 
-            if (!AddResources(context.ProjectFile, compilerArgs, intermediateOutputPath))
+            if (!AddResources(context, compilerArgs, intermediateOutputPath, preconditions))
             {
                 return false;
             }
@@ -330,8 +349,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             var sourceFiles = context.ProjectFile.Files.SourceFiles;
             compilerArgs.AddRange(sourceFiles);
 
-            var compilerName = context.ProjectFile.CompilerName;
-            compilerName = compilerName ?? "csc";
+            var compilerName = ResolveCompilerName(context, preconditions);
 
             // Write RSP file
             var rsp = Path.Combine(intermediateOutputPath, $"dotnet-compile.{context.ProjectFile.Name}.rsp");
@@ -346,9 +364,9 @@ namespace Microsoft.DotNet.Tools.Compiler
                 { "compile:OutputDir", outputPath },
                 { "compile:ResponseFile", rsp }
             };
-            RunScripts(context, ScriptNames.PreCompile, contextVariables);
+            RunScripts(context, ScriptNames.PreCompile, contextVariables, preconditions);
 
-            var result = Command.Create($"dotnet-compile-{compilerName}", $"@\"{rsp}\"")
+            var result = ResolveCommand($"dotnet-compile-{compilerName}", $"@\"{rsp}\"", ProjectName(context), preconditions)
                 .OnErrorLine(line =>
                 {
                     var diagnostic = ParseDiagnostic(context.ProjectDirectory, line);
@@ -376,7 +394,7 @@ namespace Microsoft.DotNet.Tools.Compiler
 
             // Run post-compile event
             contextVariables["compile:CompilerExitCode"] = result.ExitCode.ToString();
-            RunScripts(context, ScriptNames.PostCompile, contextVariables);
+            RunScripts(context, ScriptNames.PostCompile, contextVariables, preconditions);
 
             var success = result.ExitCode == 0;
 
@@ -388,12 +406,32 @@ namespace Microsoft.DotNet.Tools.Compiler
                              runtimeContext.CreateExporter(configuration));
             }
 
-            return PrintSummary(diagnostics, sw, success);
+            return PrintSummary(diagnostics, sw, preconditions, success);
         }
 
-        private static void RunScripts(ProjectContext context, string name, Dictionary<string, string> contextVariables)
+        private static string ResolveCompilerName(ProjectContext context, Preconditions preconditions)
         {
-            foreach (var script in context.ProjectFile.Scripts.GetOrEmpty(name))
+            var compilerName = context.ProjectFile.CompilerName;
+            compilerName = compilerName ?? "csc";
+
+            if (!KnownCompilers.Any(knownCompiler => knownCompiler.Equals(compilerName, StringComparison.Ordinal)))
+            {
+                preconditions.AddUnknownCompilerPrecondition(ProjectName(context), compilerName);
+            }
+
+            return compilerName;
+        }
+
+        private static void RunScripts(ProjectContext context, string scriptCategory, Dictionary<string, string> contextVariables, Preconditions preconditions)
+        {
+            IEnumerable<string> scripts = context.ProjectFile.Scripts.GetOrEmpty(scriptCategory);
+
+            if (scripts.Any())
+            {
+                preconditions.AddPrePostScriptPrecondition(ProjectName(context), scriptCategory);
+            }
+
+            foreach (var script in scripts)
             {
                 ScriptExecutor.CreateCommandForScript(context.ProjectFile, script, contextVariables)
                     .ForwardStdErr()
@@ -581,7 +619,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             return "\"" + input.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
         }
 
-        private static bool PrintSummary(List<DiagnosticMessage> diagnostics, Stopwatch sw, bool success = true)
+        private static bool PrintSummary(List<DiagnosticMessage> diagnostics, Stopwatch sw, Preconditions preconditions, bool success = true)
         {
             PrintDiagnostics(diagnostics);
 
@@ -605,14 +643,25 @@ namespace Microsoft.DotNet.Tools.Compiler
 
             Reporter.Output.WriteLine();
 
-            Reporter.Output.WriteLine($"Time elapsed {sw.Elapsed}");
+            if (preconditions.Present())
+            {
+                Reporter.Output.WriteLine($"Time elapsed {sw.Elapsed}".Green() + @" (The compilation time can be improved. Run ""DotNet compile --BuildProfile"" for more information)".White());
+            }
+            else
+            {
+                Reporter.Output.WriteLine($"Time elapsed {sw.Elapsed}".Green());
+            }
+
             Reporter.Output.WriteLine();
 
             return success;
         }
 
-        private static bool AddResources(Project project, List<string> compilerArgs, string intermediateOutputPath)
+        private static bool AddResources(ProjectContext context, List<string> compilerArgs, string intermediateOutputPath, Preconditions preconditions)
         {
+
+            Project project = context.ProjectFile;
+
             string root = PathUtility.EnsureTrailingSlash(project.ProjectDirectory);
 
             foreach (var resourceFile in project.Files.ResourceFiles)
@@ -646,7 +695,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                         // {file}.resx -> {file}.resources
                         var resourcesFile = Path.Combine(intermediateOutputPath, name);
 
-                        var result = Command.Create("dotnet-resgen", $"\"{fileName}\" \"{resourcesFile}\"")
+                        var result = ResolveCommand("dotnet-resgen", $"\"{fileName}\" \"{resourcesFile}\"", ProjectName(context), preconditions)
                                             .ForwardStdErr()
                                             .ForwardStdOut()
                                             .Execute();
@@ -666,6 +715,8 @@ namespace Microsoft.DotNet.Tools.Compiler
 
             return true;
         }
+
+        private static string ProjectName(ProjectContext context) => context.RootProject.Identity.Name;
 
         private static ISet<ProjectDescription> Sort(Dictionary<string, ProjectDescription> projects)
         {
@@ -844,6 +895,36 @@ namespace Microsoft.DotNet.Tools.Compiler
             }
 
             return path + trailingCharacter;
+        }
+    }
+
+    class Preconditions
+    {
+        private readonly List<string> _preconditions;
+
+        public Preconditions()
+        {
+            _preconditions = new List<string>();
+        }
+
+        public void AddPrePostScriptPrecondition(string projectName, string scriptType)
+        {
+            _preconditions.Add($"[Pre / Post Scripts] Project {projectName} is using {scriptType} scripts.");
+        }
+
+        public void AddUnknownCompilerPrecondition(string projectName, string compilerName)
+        {
+            _preconditions.Add($"[Unknown Compiler] Project {projectName} is using unknown compiler {compilerName}.");
+        }
+
+        public void AddPathProbingPrecondition(string projectName, string commandName, string args)
+        {
+            _preconditions.Add($"[PATH Probing] Project {projectName} is loading tool \"{commandName}\" from PATH");
+        }
+
+        public bool Present()
+        {
+            return _preconditions.Any();
         }
     }
 }
