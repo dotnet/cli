@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using Microsoft.DotNet.Tools.Common;
 
-namespace Microsoft.DotNet.Tools.Compiler
+namespace Microsoft.DotNet.Tools.Build
 {
     internal static class ResourcePathUtility
     {

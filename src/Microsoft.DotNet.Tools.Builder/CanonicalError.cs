@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 // https://github.com/dotnet/roslyn/blob/master/src/Compilers/Core/MSBuildTask/CanonicalError.cs
 
-namespace Microsoft.DotNet.Tools.Compiler
+namespace Microsoft.DotNet.Tools.Build
 {
     /// <summary>
     /// Functions for dealing with the specially formatted errors returned by

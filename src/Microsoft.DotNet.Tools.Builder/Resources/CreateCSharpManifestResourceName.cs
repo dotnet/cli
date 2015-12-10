@@ -6,7 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
-namespace Microsoft.DotNet.Tools.Compiler
+namespace Microsoft.DotNet.Tools.Build
 {
     internal static class CreateCSharpManifestResourceName
     {

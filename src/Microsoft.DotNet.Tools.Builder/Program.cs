@@ -16,7 +16,7 @@ using Microsoft.DotNet.ProjectModel.Compilation;
 using NuGet.Frameworks;
 using Microsoft.DotNet.ProjectModel.Utilities;
 
-namespace Microsoft.DotNet.Tools.Compiler
+namespace Microsoft.DotNet.Tools.Build
 {
     public class Program
     {
@@ -25,9 +25,9 @@ namespace Microsoft.DotNet.Tools.Compiler
             DebugHelper.HandleDebugSwitch(ref args);
 
             var app = new CommandLineApplication();
-            app.Name = "dotnet compile";
-            app.FullName = ".NET Compiler";
-            app.Description = "Compiler for the .NET Platform";
+            app.Name = "dotnet build";
+            app.FullName = ".NET Builder";
+            app.Description = "Builder for the .NET Platform. It performs incremental compilation if it's safe to do so. Otherwise it delegates to dotnet-compile which performs non-incremental compilation";
             app.HelpOption("-h|--help");
 
             var output = app.Option("-o|--output <OUTPUT_DIR>", "Directory in which to place outputs", CommandOptionType.SingleValue);
@@ -226,7 +226,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 foreach (var projectDependency in Sort(projects))
                 {
                     // Skip compiling project dependencies since we've already figured out the build order
-                    var compileResult = Command.Create("dotnet-compile", 
+                    var compileResult = Command.Create("dotnet-build", 
                         $"--framework {projectDependency.Framework} " +
                         $"--configuration {configuration} " +
                         $"--output \"{outputPath}\" " +

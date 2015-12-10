@@ -12,7 +12,7 @@ using System.Text;
 using System.Xml.Linq;
 using Microsoft.DotNet.ProjectModel.Compilation;
 
-namespace Microsoft.DotNet.Tools.Compiler
+namespace Microsoft.DotNet.Tools.Build
 {
     internal class BindingRedirectGenerator
     {
