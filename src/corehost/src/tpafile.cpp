@@ -8,8 +8,28 @@
 #include "tpafile.h"
 #include "utils.h"
 
-bool read_field(pal::string_t line, int& offset, pal::string_t& value_recv)
+bool tpaentry_t::to_full_path(const pal::string_t& base, pal::string_t* str) const
 {
+    pal::string_t& candidate = *str;
+
+    candidate.reserve(base.length() +
+        library_name.length() +
+        library_version.length() +
+        relative_path.length() + 3);
+
+    candidate.assign(base);
+    append_path(candidate, library_name.c_str());
+    append_path(candidate, library_version.c_str());
+    append_path(candidate, relative_path.c_str());
+    
+    return pal::file_exists(*str);
+}
+
+bool read_field(const pal::string_t& line, pal::char_t* buf, unsigned* ofs, pal::string_t* field)
+{
+    unsigned& offset = *ofs;
+    pal::string_t& value_recv = *field;
+
     // The first character should be a '"'
     if (line[offset] != '"')
     {
@@ -18,8 +38,6 @@ bool read_field(pal::string_t line, int& offset, pal::string_t& value_recv)
     }
     offset++;
 
-    // Set up destination buffer (it can't be bigger than the original line)
-    pal::char_t buf[PATH_MAX];
     auto buf_offset = 0;
 
     // Iterate through characters in the string
@@ -57,195 +75,188 @@ bool read_field(pal::string_t line, int& offset, pal::string_t& value_recv)
     return true;
 }
 
-bool tpafile::load(pal::string_t path)
+bool tpafile::load(const pal::string_t& path)
 {
-    // Check if the file exists, if not, there is nothing to add
     if (!pal::file_exists(path))
     {
         return true;
     }
 
-    // Open the file
     pal::ifstream_t file(path);
     if (!file.good())
     {
-        // Failed to open the file!
         return false;
     }
 
-    // Read lines from the file
-    while (true)
+    std::string line;
+    while (std::getline(file, line))
     {
-        std::string line;
-        std::getline(file, line);
-        auto line_palstr = pal::to_palstring(line);
-        if (file.eof())
-        {
-            break;
-        }
-
-        auto offset = 0;
-
         tpaentry_t entry;
+        pal::string_t* fields[] = {
+            &entry.library_type,
+            &entry.library_name,
+            &entry.library_version,
+            &entry.library_hash,
+            &entry.asset_type,
+            &entry.asset_name,
+            &entry.relative_path
+        };
 
-        // Read fields
-        if (!(read_field(line_palstr, offset, entry.library_type))) return false;
-        if (!(read_field(line_palstr, offset, entry.library_name))) return false;
-        if (!(read_field(line_palstr, offset, entry.library_version))) return false;
-        if (!(read_field(line_palstr, offset, entry.library_hash))) return false;
-        if (!(read_field(line_palstr, offset, entry.asset_type))) return false;
-        if (!(read_field(line_palstr, offset, entry.asset_name))) return false;
-        if (!(read_field(line_palstr, offset, entry.relative_path))) return false;
+        auto line_palstr = pal::to_palstring(line);
+        std::vector<pal::char_t> buf(line_palstr.length());
 
-        m_entries.push_back(entry);
+        for (unsigned i = 0, offset = 0; i < sizeof(fields) / sizeof(fields[0]); ++i)
+        {
+            if (!(read_field(line_palstr, buf.data(), &offset, fields[i])))
+            {
+                return false;
+            }
+        }
+        m_tpa_entries.push_back(entry);
     }
-
     return true;
 }
 
-void tpafile::add_from_local_dir(const pal::string_t& dir)
+void tpafile::get_local_assemblies(const pal::string_t& dir)
 {
     trace::verbose(_X("adding files from %s to TPA"), dir.c_str());
-    const pal::char_t * const tpa_extensions[] = {
-        _X(".ni.dll"),      // Probe for .ni.dll first so that it's preferred if ni and il coexist in the same dir
-        _X(".dll"),
-        _X(".ni.exe"),
-        _X(".exe"),
-    };
 
-    std::set<pal::string_t> added_assemblies;
+    const pal::string_t tpa_extensions[] = { _X(".ni.dll"), _X(".dll"), _X(".ni.exe"), _X(".exe") };
 
-    // Get directory entries
-    auto files = pal::readdir(dir);
-    for (auto ext : tpa_extensions)
+    std::vector<pal::string_t> files;
+    pal::readdir(dir, &files);
+
+    for (const auto& ext : tpa_extensions)
     {
-        auto len = pal::strlen(ext);
-        for (auto file : files)
+        for (const auto& file : files)
         {
-            // Can't be a match if it's the same length as the extension :)
-            if (file.length() > len)
+            if (file.length() <= ext.length())
             {
-                // Extract the same amount of text from the end of file name
-                auto file_ext = file.substr(file.length() - len, len);
-
-                // Check if this file name matches
-                if (pal::strcasecmp(ext, file_ext.c_str()) == 0)
-                {
-                    // Get the assembly name by stripping the extension
-                    // and add it to the set so we can de-dupe
-                    auto asm_name = file.substr(0, file.length() - len);
-
-                    // TODO(anurse): Also check if already in TPA file
-                    if (added_assemblies.find(asm_name) == added_assemblies.end())
-                    {
-                        added_assemblies.insert(asm_name);
-
-                        tpaentry_t entry;
-                        entry.asset_type = pal::string_t(_X("runtime"));
-                        entry.library_name = pal::string_t(asm_name);
-                        entry.library_version = pal::string_t(_X(""));
-
-                        pal::string_t relpath(dir);
-                        relpath.push_back(DIR_SEPARATOR);
-                        relpath.append(file);
-                        entry.relative_path = relpath;
-                        entry.asset_name = asm_name;
-
-                        trace::verbose(_X("adding %s to TPA list from %s"), asm_name.c_str(), relpath.c_str());
-                        m_entries.push_back(entry);
-                    }
-                }
+                continue;
             }
+
+            auto file_name = file.substr(0, file.length() - ext.length());
+            if (file_name.empty() || m_local_assemblies.count(file_name))
+            {
+                continue;
+            }
+
+            auto file_ext = file.substr(file_name.length());
+            if (pal::strcasecmp(ext.c_str(), file_ext.c_str()))
+            {
+                continue;
+            }
+
+            pal::string_t file_path = dir + DIR_SEPARATOR + file;            
+            trace::verbose(_X("adding %s to local list from %s"), file_name.c_str(), file_path.c_str());
+            m_local_assemblies.emplace(file_name, file_path);
         }
     }
 }
 
-void tpafile::write_tpa_list(pal::string_t& output)
+void add_tpa_asset(
+    const pal::string_t& asset_name,
+    const pal::string_t& asset_path,
+    std::set<pal::string_t>* items,
+    pal::string_t* output)
 {
+    if (items->count(asset_name))
+    {
+        return;
+    }
+
+    trace::verbose(_X("adding tpa entry: %s"), asset_path.c_str());
+    output->append(asset_path);
+    output->push_back(PATH_SEPARATOR);
+    items->insert(asset_name);
+}
+
+void tpafile::write_tpa_list(
+        const pal::string_t& app_dir,
+        const pal::string_t& package_dir,
+        const pal::string_t& clr_dir,
+        pal::string_t& output)
+{
+    get_local_assemblies(app_dir);
+
     std::set<pal::string_t> items;
-    for (auto entry : m_entries)
+    for (const tpaentry_t& entry : m_tpa_entries)
     {
-        if (pal::strcmp(entry.asset_type.c_str(), _X("runtime")) == 0 && items.find(entry.asset_name) == items.end())
+        if (entry.asset_type != _X("runtime") || items.count(entry.asset_name))
         {
-            // Resolve the full path
-            for (auto search_path : m_package_search_paths)
-            {
-                pal::string_t candidate;
-                candidate.reserve(search_path.length() +
-                    entry.library_name.length() +
-                    entry.library_version.length() +
-                    entry.relative_path.length() + 3);
-                candidate.append(search_path);
-
-                append_path(candidate, entry.library_name.c_str());
-                append_path(candidate, entry.library_version.c_str());
-                append_path(candidate, entry.relative_path.c_str());
-                if (pal::file_exists(candidate))
-                {
-                    trace::verbose(_X("adding tpa entry: %s"), candidate.c_str());
-
-                    output.append(candidate);
-                    output.push_back(PATH_SEPARATOR);
-                    items.insert(entry.asset_name);
-                    break;
-                }
-            }
+            continue;
         }
+
+        pal::string_t redirection_path, candidate;
+        if (entry.library_type == _X("Package") &&
+                m_svc->find_redirection(entry.library_name, entry.library_version, entry.relative_path, &redirection_path))
+        {
+            add_tpa_asset(entry.asset_name, redirection_path, &items, &output);
+        }
+        else if (m_local_assemblies.count(entry.asset_name))
+        {
+            // TODO: Case insensitive look up?
+            add_tpa_asset(entry.asset_name, m_local_assemblies.find(entry.asset_name)->second, &items, &output);
+        }
+        else if (entry.to_full_path(package_dir, &candidate))
+        {
+            add_tpa_asset(entry.asset_name, candidate, &items, &output);
+        }
+    }
+    for (const auto& kv : m_local_assemblies)
+    {
+        add_tpa_asset(kv.first, kv.second, &items, &output);
     }
 }
 
-void tpafile::write_native_paths(pal::string_t& output)
+void add_native_path(
+    const pal::string_t& path,
+    std::set<pal::string_t>* items,
+    pal::string_t* output)
 {
+    if (items->count(path))
+    {
+        return;
+    }
+
+    trace::verbose(_X("adding native search path: %s"), path.c_str());
+    output->append(path);
+    output->push_back(PATH_SEPARATOR);
+    items->insert(path);
+}
+
+void tpafile::write_native_paths(
+        const pal::string_t& app_dir,
+        const pal::string_t& package_dir,
+        const pal::string_t& clr_dir,
+        pal::string_t& output)
+{
+    // First take care of serviced native dlls.
     std::set<pal::string_t> items;
-    for (auto search_path : m_native_search_paths)
+    for (const tpaentry_t& entry : m_tpa_entries)
     {
-        if (items.find(search_path) == items.end())
+        pal::string_t redirection_path;
+        if (entry.asset_type == _X("native") && entry.library_type == _X("Package") &&
+                m_svc->find_redirection(entry.library_name, entry.library_version, entry.relative_path, &redirection_path))
         {
-            trace::verbose(_X("adding native search path: %s"), search_path.c_str());
-            output.append(search_path);
-            output.push_back(PATH_SEPARATOR);
-            items.insert(search_path);
+            add_native_path(get_directory(redirection_path), &items, &output);
         }
     }
 
-    for (auto entry : m_entries)
+    // App local path
+    add_native_path(app_dir, &items, &output);
+
+    // Take care of the packages cached path
+    for (const tpaentry_t& entry : m_tpa_entries)
     {
-        auto dir = entry.relative_path.substr(0, entry.relative_path.find_last_of(DIR_SEPARATOR));
-        if (pal::strcmp(entry.asset_type.c_str(), _X("native")) == 0 && items.find(dir) == items.end())
+        pal::string_t candidate;
+        if (entry.asset_type == _X("native") && entry.to_full_path(package_dir, &candidate))
         {
-            // Resolve the full path
-            for (auto search_path : m_package_search_paths)
-            {
-                pal::string_t candidate;
-                candidate.reserve(search_path.length() +
-                    entry.library_name.length() +
-                    entry.library_version.length() +
-                    dir.length() + 3);
-                candidate.append(search_path);
-
-                append_path(candidate, entry.library_name.c_str());
-                append_path(candidate, entry.library_version.c_str());
-                append_path(candidate, get_directory(entry.relative_path).c_str());
-
-                if (pal::file_exists(candidate))
-                {
-                    trace::verbose(_X("adding native search path: %s"), candidate.c_str());
-                    output.append(candidate);
-                    output.push_back(PATH_SEPARATOR);
-                    items.insert(dir);
-                    break;
-                }
-            }
+            add_native_path(get_directory(candidate), &items, &output);
         }
     }
+
+    // CLR path
+    add_native_path(clr_dir, &items, &output);
 }
 
-void tpafile::add_package_dir(pal::string_t dir)
-{
-    m_package_search_paths.push_back(dir);
-}
-
-void tpafile::add_native_search_path(pal::string_t dir)
-{
-    m_native_search_paths.push_back(dir);
-}

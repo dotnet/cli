@@ -12,6 +12,8 @@
 #include <cstring>
 #include <cstdarg>
 #include <tuple>
+#include <unordered_map>
+#include <memory>
 
 #if defined(_WIN32)
 
@@ -96,7 +98,7 @@ namespace pal
 
     bool realpath(string_t& path);
     bool file_exists(const string_t& path);
-    std::vector<pal::string_t> readdir(const string_t& path);
+    void readdir(const string_t& path, std::vector<pal::string_t>* list);
 
     bool get_own_executable_path(string_t& recv);
     bool getenv(const char_t* name, string_t& recv);

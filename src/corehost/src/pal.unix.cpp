@@ -151,9 +151,9 @@ bool pal::file_exists(const pal::string_t& path)
     return (::stat(path.c_str(), &buffer) == 0);
 }
 
-std::vector<pal::string_t> pal::readdir(const pal::string_t& path)
+void pal::readdir(const pal::string_t& path, std::vector<pal::string_t>* list)
 {
-    std::vector<pal::string_t> files;
+    std::vector<pal::string_t>& files = *list;
 
     auto dir = opendir(path.c_str());
     if (dir != nullptr)
@@ -197,6 +197,4 @@ std::vector<pal::string_t> pal::readdir(const pal::string_t& path)
             files.push_back(pal::string_t(entry->d_name));
         }
     }
-
-    return files;
 }

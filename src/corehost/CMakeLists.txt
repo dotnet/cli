@@ -14,9 +14,11 @@ set(SOURCES
     src/trace.cpp
     src/utils.cpp
     src/coreclr.cpp
+    src/servicing_index.cpp
 
     inc/args.h
     inc/pal.h
+    inc/servicing_index.h
     inc/tpafile.h
     inc/trace.h
     inc/coreclr.h

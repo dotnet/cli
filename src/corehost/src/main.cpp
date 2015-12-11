@@ -28,10 +28,33 @@ void get_tpafile_path(const pal::string_t& app_base, const pal::string_t& app_na
     tpapath.append(_X(".deps"));
 }
 
-int run(arguments_t args, pal::string_t app_base, tpafile tpa)
+bool resolve_clr_path(const arguments_t& args, pal::string_t* clr_path)
 {
-    tpa.add_from_local_dir(app_base);
+    const pal::string_t* dirs[] = { &args.svc_dir, &args.app_dir, &args.home_dir };
+    for (int i = 0; i < sizeof(dirs) / sizeof(dirs[0]); ++i)
+    {
+        if (dirs[i]->empty())
+        {
+            continue;
+        }
+        pal::string_t cur = *dirs[i];
+        if (dirs[i] != &args.app_dir)
+        {
+            append_path(cur, _X("runtime"));
+            append_path(cur, _X("coreclr"));
+        }
+        if (coreclr_exists_in_dir(cur))
+        {
+            clr_path->assign(cur);
+            return true;
+        }
+    }
+    return false;
+}
 
+
+int run(arguments_t args, const pal::string_t& clr_path, tpafile tpa)
+{
     // Add packages directory
     pal::string_t packages_dir;
     if (!pal::get_default_packages_directory(packages_dir))
@@ -43,19 +66,20 @@ int run(arguments_t args, pal::string_t app_base, tpafile tpa)
     else
     {
         trace::info(_X("using packages directory: %s"), packages_dir.c_str());
-        tpa.add_package_dir(packages_dir);
     }
-
-    // Add native search path
-    trace::info(_X("using native search path: %s"), packages_dir.c_str());
-    tpa.add_native_search_path(args.clr_path);
 
     // Build TPA list and search paths
     pal::string_t tpalist;
-    tpa.write_tpa_list(tpalist);
+    tpa.write_tpa_list(args.app_dir, packages_dir, clr_path, tpalist);
+
+    trace::info(_X("using native search path: %s"), packages_dir.c_str());
 
     pal::string_t search_paths;
-    tpa.write_native_paths(search_paths);
+    tpa.write_native_paths(args.app_dir, packages_dir, clr_path, search_paths);
+
+    // TODO:
+    // pal::string_t culture_paths;
+    // tpa.write_culture_paths(args.app_dir, packages_dir, clr_path, culture_paths);
 
     // Build CoreCLR properties
     const char* property_keys[] = {
@@ -67,7 +91,7 @@ int run(arguments_t args, pal::string_t app_base, tpafile tpa)
     };
 
     auto tpa_cstr = pal::to_stdstring(tpalist);
-    auto app_base_cstr = pal::to_stdstring(app_base);
+    auto app_base_cstr = pal::to_stdstring(args.app_dir);
     auto search_paths_cstr = pal::to_stdstring(search_paths);
 
     const char* property_values[] = {
@@ -90,7 +114,7 @@ int run(arguments_t args, pal::string_t app_base, tpafile tpa)
     trace::verbose(_X("Native Paths: %s"), search_paths.c_str());
 
     // Bind CoreCLR
-    if (!coreclr::bind(args.clr_path))
+    if (!coreclr::bind(clr_path))
     {
         trace::error(_X("failed to bind to coreclr"));
         return 1;
@@ -179,46 +203,26 @@ int main(const int argc, const pal::char_t* argv[])
     trace::info(_X("App argc: %d"), args.app_argc);
     trace::info(_X("App argv: %s"), argstr.c_str());
 
-    auto app_base = get_directory(args.managed_application);
-    auto app_name = get_filename(args.managed_application);
-
-    // App-local coreclr wins
+    pal::string_t clr_path;
+    if (!resolve_clr_path(args, &clr_path))
     {
-        pal::string_t candidate;
-        candidate.assign(app_base);
-        append_path(candidate, LIBCORECLR_NAME);
-
-        if (pal::file_exists(candidate))
-        {
-            args.clr_path.assign(app_base);
-        }
-    }
-
-    if (args.clr_path.empty())
-    {
-        trace::error(_X("failed to locate CLR files, set the DOTNET_HOME environment variable"));
+        trace::error(_X("could not resolve coreclr path"));
         return 1;
     }
-
-    if (!pal::realpath(args.clr_path))
-    {
-        trace::error(_X("failed to locate CLR files at %s"), args.clr_path.c_str());
-        return 1;
-    }
-
-    trace::info(_X("using CLR files from: %s"), args.clr_path.c_str());
-    trace::info(_X("preparing to launch: %s"), app_name.c_str());
-    trace::info(_X("using app base: %s"), app_base.c_str());
 
     // Check for and load deps file
     pal::string_t tpafile_path;
-    get_tpafile_path(app_base, app_name, tpafile_path);
-    trace::info(_X("checking for .deps File at: %s"), tpafile_path.c_str());
-    tpafile tpa;
+    auto app_name = get_filename(args.managed_application);
+    get_tpafile_path(args.app_dir, app_name, tpafile_path);
+    trace::info(_X("checking for .deps File"));
+
+    servicing_index_t svc(args);
+    tpafile tpa(&svc);
     if (!tpa.load(tpafile_path))
     {
         trace::error(_X("invalid .deps file"));
         return 1;
     }
-    return run(args, app_base, tpa);
+
+    return run(args, clr_path, tpa);
 }

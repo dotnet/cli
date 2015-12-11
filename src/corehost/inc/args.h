@@ -4,14 +4,18 @@
 #ifndef ARGS_H
 #define ARGS_H
 
+#include "utils.h"
 #include "pal.h"
 #include "trace.h"
 
 struct arguments_t
 {
     pal::string_t own_path;
+    pal::string_t app_dir;
+    pal::string_t svc_dir;
+    pal::string_t runtime_svc_dir;
+    pal::string_t home_dir;
     pal::string_t managed_application;
-    pal::string_t clr_path;
 
     int app_argc;
     const pal::char_t** app_argv;

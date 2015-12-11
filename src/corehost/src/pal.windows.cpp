@@ -158,9 +158,9 @@ bool pal::file_exists(const string_t& path)
     return found;
 }
 
-std::vector<pal::string_t> pal::readdir(const string_t& path)
+void pal::readdir(const string_t& path, std::vector<pal::string_t>* list)
 {
-    std::vector<string_t> files;
+    std::vector<string_t>& files = *list;
 
     string_t search_string(path);
     search_string.push_back(DIR_SEPARATOR);
@@ -174,6 +174,4 @@ std::vector<pal::string_t> pal::readdir(const string_t& path)
         files.push_back(filepath);
     } while (::FindNextFileW(handle, &data));
     ::FindClose(handle);
-
-    return files;
 }

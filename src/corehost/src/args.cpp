@@ -3,10 +3,12 @@
 
 #include "args.h"
 #include "utils.h"
+#include "coreclr.h"
 
 arguments_t::arguments_t() :
     managed_application(_X("")),
-    clr_path(_X("")),
+    own_path(_X("")),
+    app_dir(_X("")),
     app_argc(0),
     app_argv(nullptr)
 {
@@ -43,6 +45,15 @@ bool parse_arguments(const int argc, const pal::char_t* argv[], arguments_t& arg
             return false;
         }
         args.managed_application = pal::string_t(argv[1]);
+
+        // Take care of app_dir
+        args.app_dir = args.managed_application;
+        if (!pal::realpath(args.app_dir))
+        {
+            return false;
+        }
+        args.app_dir = get_directory(args.app_dir);
+
         args.app_argc = argc - 2;
         args.app_argv = &argv[2];
     }
@@ -53,6 +64,7 @@ bool parse_arguments(const int argc, const pal::char_t* argv[], arguments_t& arg
         managed_app.push_back(DIR_SEPARATOR);
         managed_app.append(get_executable(own_name));
         managed_app.append(_X(".dll"));
+        args.app_dir = own_dir;
         args.managed_application = managed_app;
         args.app_argv = &argv[1];
         args.app_argc = argc - 1;
@@ -70,23 +82,8 @@ bool parse_arguments(const int argc, const pal::char_t* argv[], arguments_t& arg
         }
     }
 
-    // Read CLR path from environment variable
-    pal::string_t home_str;
-    pal::getenv(_X("DOTNET_HOME"), home_str);
-    if (!home_str.empty())
-    {
-        append_path(home_str, _X("runtime"));
-        append_path(home_str, _X("coreclr"));
-        args.clr_path.assign(home_str);
-    }
-    else
-    {
-        // Use platform-specific search algorithm
-        if (pal::find_coreclr(home_str))
-        {
-            args.clr_path.assign(home_str);
-        }
-    }
-
+    pal::getenv(_X("DOTNET_SERVICING"), args.svc_dir);
+    pal::getenv(_X("DOTNET_RUNTIME_SERVICING"), args.runtime_svc_dir);
+    pal::getenv(_X("DOTNET_HOME"), args.home_dir);
     return true;
 }

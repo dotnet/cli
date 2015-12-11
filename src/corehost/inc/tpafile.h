@@ -9,6 +9,8 @@
 #include "pal.h"
 #include "trace.h"
 
+#include "servicing_index.h"
+
 struct tpaentry_t
 {
     pal::string_t library_type;
@@ -18,23 +20,38 @@ struct tpaentry_t
     pal::string_t asset_type;
     pal::string_t asset_name;
     pal::string_t relative_path;
+
+    bool to_full_path(const pal::string_t& root, pal::string_t* str) const;
 };
 
 class tpafile
 {
 public:
-    bool load(pal::string_t path);
+    tpafile(servicing_index_t* svc)
+        : m_svc(svc)
+    {
+    }
 
-    void add_from_local_dir(const pal::string_t& dir);
-    void add_package_dir(pal::string_t dir);
-    void add_native_search_path(pal::string_t dir);
+    bool load(const pal::string_t& path);
 
-    void write_tpa_list(pal::string_t& output);
-    void write_native_paths(pal::string_t& output);
+    void write_tpa_list(
+        const pal::string_t& app_dir,
+        const pal::string_t& package_dir,
+        const pal::string_t& clr_dir,
+        pal::string_t& output);
+
+    void write_native_paths(
+        const pal::string_t& app_dir,
+        const pal::string_t& package_dir,
+        const pal::string_t& clr_dir,
+        pal::string_t& output);
 
 private:
-    std::vector<tpaentry_t> m_entries;
-    std::vector<pal::string_t> m_native_search_paths;
+    void get_local_assemblies(const pal::string_t& dir);
+
+    servicing_index_t* m_svc;
+    std::unordered_map<pal::string_t, pal::string_t> m_local_assemblies;
+    std::vector<tpaentry_t> m_tpa_entries;
     std::vector<pal::string_t> m_package_search_paths;
 };
 
