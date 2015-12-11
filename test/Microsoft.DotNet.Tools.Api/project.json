@@ -1,0 +1,22 @@
+﻿{
+    "name": "dotnet-api",
+    "version": "1.0.0-*",
+    "compilationOptions": {
+        "emitEntryPoint": true
+    },
+    "commands": {
+        "dotnet api": "Microsoft.DotNet.Tools.Api"
+    },
+    "dependencies": {
+        "NETStandard.Library": "1.0.0-rc2-23608",
+        "System.Net.Requests": "4.0.11-rc2-23608",
+        "System.Text.Encodings.Web": "4.0.0-rc2-23608",
+        "Newtonsoft.Json": "7.0.1",
+        "System.Runtime.Serialization.Primitives": "4.0.0",
+        "System.Dynamic.Runtime": "4.0.11-rc2-23608",
+        "System.Xml.XDocument": "4.0.11-rc2-23608"
+    },
+    "frameworks": {
+        "dnxcore50": { }
+    }
+}
