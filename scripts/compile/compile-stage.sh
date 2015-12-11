@@ -34,6 +34,7 @@ PROJECTS=( \
     Microsoft.DotNet.Tools.Publish \
     Microsoft.DotNet.Tools.Repl \
     Microsoft.DotNet.Tools.Repl.Csi \
+    dotnet-restore \
     Microsoft.DotNet.Tools.Resgen \
     Microsoft.DotNet.Tools.Run \
     Microsoft.DotNet.Tools.Test \
