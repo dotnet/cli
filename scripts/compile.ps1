@@ -14,12 +14,12 @@ $ErrorActionPreference="Stop"
 $StartPath = $env:PATH
 $StartDotNetHome = $env:DOTNET_HOME
 
-try {
+ try {
 
     # Check prereqs
     if (!(Get-Command -ErrorAction SilentlyContinue cmake)) {
         throw @"
-cmake is required to build the native host 'corehost'"
+cmake is required to build the native host 'corehost'
 Download it from https://www.cmake.org
 "@
     }
