@@ -20,80 +20,10 @@ namespace Microsoft.DotNet.Tools.Build
         {
             DebugHelper.HandleDebugSwitch(ref args);
 
-            var app = new CommandLineApplication();
-            app.Name = "dotnet build";
-            app.FullName = ".NET Builder";
-            app.Description = "Builder for the .NET Platform. It performs incremental compilation if it's safe to do so. Otherwise it delegates to dotnet-compile which performs non-incremental compilation";
-            app.HelpOption("-h|--help");
-
-            var output = app.Option("-o|--output <OUTPUT_DIR>", "Directory in which to place outputs", CommandOptionType.SingleValue);
-            var intermediateOutput = app.Option("-t|--temp-output <OUTPUT_DIR>", "Directory in which to place temporary outputs", CommandOptionType.SingleValue);
-            var framework = app.Option("-f|--framework <FRAMEWORK>", "Compile a specific framework", CommandOptionType.MultipleValue);
-            var configuration = app.Option("-c|--configuration <CONFIGURATION>", "Configuration under which to build", CommandOptionType.SingleValue);
-            var noHost = app.Option("--no-host", "Set this to skip publishing a runtime host when building for CoreCLR", CommandOptionType.NoValue);
-            var project = app.Argument("<PROJECT>", "The project to compile, defaults to the current directory. Can be a path to a project.json or a project directory");
-
-            // Native Args
-            var native = app.Option("-n|--native", "Compiles source to native machine code.", CommandOptionType.NoValue);
-            var arch = app.Option("-a|--arch <ARCH>", "The architecture for which to compile. x64 only currently supported.", CommandOptionType.SingleValue);
-            var ilcArgs = app.Option("--ilcargs <ARGS>", "Command line arguments to be passed directly to ILCompiler.", CommandOptionType.SingleValue);
-            var ilcPath = app.Option("--ilcpath <PATH>", "Path to the folder containing custom built ILCompiler.", CommandOptionType.SingleValue);
-            var ilcSdkPath = app.Option("--ilcsdkpath <PATH>", "Path to the folder containing ILCompiler application dependencies.", CommandOptionType.SingleValue);
-            var cppMode = app.Option("--cpp", "Flag to do native compilation with C++ code generator.", CommandOptionType.NoValue);
-
-            app.OnExecute(() =>
-            {
-                // Locate the project and get the name and full path
-                var path = project.Value;
-                if (string.IsNullOrEmpty(path))
-                {
-                    path = Directory.GetCurrentDirectory();
-                }
-
-                var isNative = native.HasValue();
-                var isCppMode = cppMode.HasValue();
-                var archValue = arch.Value();
-                var ilcArgsValue = ilcArgs.Value();
-                var ilcPathValue = ilcPath.Value();
-                var ilcSdkPathValue = ilcSdkPath.Value();
-                var configValue = configuration.Value() ?? Constants.DefaultConfiguration;
-                var outputValue = output.Value();
-                var intermediateValue = intermediateOutput.Value();
-                var isNoHost = noHost.HasValue();
-
-                var contexts = framework.HasValue() ?
-                    framework.Values.Select(f => ProjectContext.Create(path, NuGetFramework.Parse(f))) :
-                    ProjectContext.CreateContextForEachFramework(path);
-
-                bool success = true;
-
-                foreach (var context in contexts)
-                {
-                    // Set up Output Paths
-                    string outputPath = context.GetOutputPath(configValue, outputValue);
-                    string intermediateOutputPath = context.GetIntermediateOutputPath(configValue, intermediateValue, outputValue);
-
-                    Directory.CreateDirectory(outputPath);
-                    Directory.CreateDirectory(intermediateOutputPath);
-
-                    //compile dependencies
-                    success &= CompileDependencies(context, configValue, outputPath, intermediateOutputPath, isNoHost);
-
-                    if (!success)
-                    {
-                        return 1;
-                    }
-
-                    //compile project
-                    success &= CompileProject(context, configValue, outputPath, intermediateOutputPath, isNoHost, isNative, isCppMode, archValue, ilcArgsValue, ilcPathValue, ilcSdkPathValue, path);
-                }
-
-                return success ? 0 : 1;
-            });
-
             try
             {
-                return app.Execute(args);
+                var app = new CompilerCommandApp("dotnet build", ".NET Builder", "Builder for the .NET Platform. It performs incremental compilation if it's safe to do so. Otherwise it delegates to dotnet-compile which performs non-incremental compilation");
+                return app.Execute(OnExecute, args);
             }
             catch (Exception ex)
             {
@@ -104,6 +34,36 @@ namespace Microsoft.DotNet.Tools.Build
 #endif
                 return 1;
             }
+        }
+
+        private static bool OnExecute(List<ProjectContext> contexts, string configValue, string outputValue, string intermediateValue, bool noHost,
+            bool isNative, string archValue, string ilcArgsValue, string ilcPathValue, string ilcSdkPathValue,
+            bool isCppMode)
+        {
+            foreach (var context in contexts)
+            {
+                // Set up Output Paths
+                string outputPath = context.GetOutputPath(configValue, outputValue);
+                string intermediateOutputPath = context.GetIntermediateOutputPath(configValue, intermediateValue, outputValue);
+
+                Directory.CreateDirectory(outputPath);
+                Directory.CreateDirectory(intermediateOutputPath);
+
+                //compile dependencies
+                if (!CompileDependencies(context, configValue, outputPath, intermediateOutputPath, noHost))
+                {
+                    return false;
+                }
+                
+                //compile project
+                if (!CompileProject(context, configValue, outputPath, intermediateOutputPath, noHost, isNative,
+                    isCppMode, archValue, ilcArgsValue, ilcPathValue, ilcSdkPathValue))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private static bool CompileDependencies(ProjectContext context, string configuration, string outputPath, string intermediateOutputPath, bool noHost)
@@ -156,7 +116,7 @@ namespace Microsoft.DotNet.Tools.Build
 
         private static bool CompileProject(ProjectContext context, string configValue, string outputPath,
             string intermediateOutputPath, bool isNoHost, bool isNative, bool isCppMode, string archValue, string ilcArgsValue,
-            string ilcPathValue, string ilcSdkPathValue, string path)
+            string ilcPathValue, string ilcSdkPathValue)
         {
             var compileResult = Command.Create("dotnet-compile",
                 $"--framework {context.TargetFramework} " +
@@ -171,7 +131,7 @@ namespace Microsoft.DotNet.Tools.Build
                 (!string.IsNullOrWhiteSpace(ilcArgsValue) ? $"--ilcargs \"{ilcArgsValue}\" " : string.Empty) +
                 (!string.IsNullOrWhiteSpace(ilcPathValue) ? $"--ilcpath \"{ilcPathValue}\" " : string.Empty) +
                 (!string.IsNullOrWhiteSpace(ilcSdkPathValue) ? $"--ilcsdkpath \"{ilcSdkPathValue}\" " : string.Empty) +
-                $"\"{path}\"")
+                $"\"{context.ProjectDirectory}\"")
                 .ForwardStdOut()
                 .ForwardStdErr()
                 .Execute();

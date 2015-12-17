@@ -26,68 +26,10 @@ namespace Microsoft.DotNet.Tools.Compiler
         {
             DebugHelper.HandleDebugSwitch(ref args);
 
-            var app = new CommandLineApplication();
-            app.Name = "dotnet compile";
-            app.FullName = ".NET Compiler";
-            app.Description = "Compiler for the .NET Platform";
-            app.HelpOption("-h|--help");
-
-            var output = app.Option("-o|--output <OUTPUT_DIR>", "Directory in which to place outputs", CommandOptionType.SingleValue);
-            var intermediateOutput = app.Option("-t|--temp-output <OUTPUT_DIR>", "Directory in which to place temporary outputs", CommandOptionType.SingleValue);
-            var framework = app.Option("-f|--framework <FRAMEWORK>", "Compile a specific framework", CommandOptionType.MultipleValue);
-            var configuration = app.Option("-c|--configuration <CONFIGURATION>", "Configuration under which to build", CommandOptionType.SingleValue);
-            var noHost = app.Option("--no-host", "Set this to skip publishing a runtime host when building for CoreCLR", CommandOptionType.NoValue);
-            var project = app.Argument("<PROJECT>", "The project to compile, defaults to the current directory. Can be a path to a project.json or a project directory");
-
-            // Native Args
-            var native = app.Option("-n|--native", "Compiles source to native machine code.", CommandOptionType.NoValue);
-            var arch = app.Option("-a|--arch <ARCH>", "The architecture for which to compile. x64 only currently supported.", CommandOptionType.SingleValue);
-            var ilcArgs = app.Option("--ilcargs <ARGS>", "Command line arguments to be passed directly to ILCompiler.", CommandOptionType.SingleValue);
-            var ilcPath = app.Option("--ilcpath <PATH>", "Path to the folder containing custom built ILCompiler.", CommandOptionType.SingleValue);
-            var ilcSdkPath = app.Option("--ilcsdkpath <PATH>", "Path to the folder containing ILCompiler application dependencies.", CommandOptionType.SingleValue);
-            var cppMode = app.Option("--cpp", "Flag to do native compilation with C++ code generator.", CommandOptionType.NoValue);
-
-            app.OnExecute(() =>
-            {
-                // Locate the project and get the name and full path
-                var path = project.Value;
-                if (string.IsNullOrEmpty(path))
-                {
-                    path = Directory.GetCurrentDirectory();
-                }
-
-                var isNative = native.HasValue();
-                var isCppMode = cppMode.HasValue();
-                var archValue = arch.Value();
-                var ilcArgsValue = ilcArgs.Value();
-                var ilcPathValue = ilcPath.Value();
-                var ilcSdkPathValue = ilcSdkPath.Value();
-                var configValue = configuration.Value() ?? Constants.DefaultConfiguration;
-                var outputValue = output.Value();
-                var intermediateValue = intermediateOutput.Value();
-
-                // Load project contexts for each framework and compile them
-                bool success = true;
-                var contexts = framework.HasValue() ?
-                    framework.Values.Select(f => ProjectContext.Create(path, NuGetFramework.Parse(f))) :
-                    ProjectContext.CreateContextForEachFramework(path);
-
-
-                foreach (var context in contexts)
-                {
-                    success &= CompileProject(context, configValue, outputValue, intermediateValue, noHost.HasValue());
-                    if (isNative && success)
-                    {
-                        success &= CompileNative(context, configValue, outputValue, intermediateValue, archValue, ilcArgsValue, ilcPathValue, ilcSdkPathValue, isCppMode);
-                    }
-                }
-
-                return success ? 0 : 1;
-            });
-
             try
             {
-                return app.Execute(args);
+                var compilerCommandArgs = new CompilerCommandApp("dotnet compile", ".NET Compiler", "Compiler for the .NET Platform");
+                return compilerCommandArgs.Execute(OnExecute, args);
             }
             catch (Exception ex)
             {
@@ -98,6 +40,24 @@ namespace Microsoft.DotNet.Tools.Compiler
 #endif
                 return 1;
             }
+        }
+
+        private static bool OnExecute(List<ProjectContext> contexts, string configValue, string outputValue, string intermediateValue,
+            bool noHost, bool isNative, string archValue, string ilcArgsValue, string ilcPathValue,
+            string ilcSdkPathValue, bool isCppMode)
+        {
+            var success = true;
+
+            foreach (var context in contexts)
+            {
+                success &= CompileProject(context, configValue, outputValue, intermediateValue, noHost);
+                if (isNative && success)
+                {
+                    success &= CompileNative(context, configValue, outputValue, intermediateValue, archValue, ilcArgsValue,
+                        ilcPathValue, ilcSdkPathValue, isCppMode);
+                }
+            }
+            return success;
         }
 
         private static bool CompileNative(
