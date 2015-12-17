@@ -3,18 +3,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
 using Microsoft.Dnx.Runtime.Common.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
-using Microsoft.DotNet.Cli.Compiler.Common;
-using Microsoft.DotNet.Tools.Common;
 using Microsoft.DotNet.ProjectModel;
-using Microsoft.DotNet.ProjectModel.Compilation;
 using NuGet.Frameworks;
-using Microsoft.DotNet.ProjectModel.Utilities;
+
 
 namespace Microsoft.DotNet.Tools.Build
 {
@@ -74,8 +70,8 @@ namespace Microsoft.DotNet.Tools.Build
                 foreach (var context in contexts)
                 {
                     // Set up Output Paths
-                    string outputPath = GetOutputPath(context, configValue, outputValue);
-                    string intermediateOutputPath = GetIntermediateOutputPath(context, configValue, intermediateValue, outputValue);
+                    string outputPath = context.GetOutputPath(configValue, outputValue);
+                    string intermediateOutputPath = context.GetIntermediateOutputPath(configValue, intermediateValue, outputValue);
 
                     Directory.CreateDirectory(outputPath);
                     Directory.CreateDirectory(intermediateOutputPath);
@@ -181,58 +177,6 @@ namespace Microsoft.DotNet.Tools.Build
                 .Execute();
 
             return compileResult.ExitCode == 0;
-        }
-
-        private static string GetOutputPath(ProjectContext context, string configuration, string outputOptionValue)
-        {
-            var outputPath = string.Empty;
-
-            if (string.IsNullOrEmpty(outputOptionValue))
-            {
-                outputPath = Path.Combine(
-                    GetDefaultRootOutputPath(context, outputOptionValue),
-                    Constants.BinDirectoryName,
-                    configuration,
-                    context.TargetFramework.GetTwoDigitShortFolderName());
-            }
-            else
-            {
-                outputPath = outputOptionValue;
-            }
-
-            return outputPath;
-        }
-
-        private static string GetIntermediateOutputPath(ProjectContext context, string configuration, string intermediateOutputValue, string outputOptionValue)
-        {
-            var intermediateOutputPath = string.Empty;
-
-            if (string.IsNullOrEmpty(intermediateOutputValue))
-            {
-                intermediateOutputPath = Path.Combine(
-                    GetDefaultRootOutputPath(context, outputOptionValue),
-                    Constants.ObjDirectoryName,
-                    configuration,
-                    context.TargetFramework.GetTwoDigitShortFolderName());
-            }
-            else
-            {
-                intermediateOutputPath = intermediateOutputValue;
-            }
-
-            return intermediateOutputPath;
-        }
-
-        private static string GetDefaultRootOutputPath(ProjectContext context, string outputOptionValue)
-        {
-            string rootOutputPath = string.Empty;
-
-            if (string.IsNullOrEmpty(outputOptionValue))
-            {
-                rootOutputPath = context.ProjectFile.ProjectDirectory;
-            }
-
-            return rootOutputPath;
         }
 
         private static ISet<ProjectDescription> Sort(Dictionary<string, ProjectDescription> projects)

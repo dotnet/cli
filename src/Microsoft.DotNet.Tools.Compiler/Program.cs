@@ -111,10 +111,10 @@ namespace Microsoft.DotNet.Tools.Compiler
             string ilcSdkPathValue,
             bool isCppMode)
         {
-            var outputPath = GetOutputPath(context, configuration, outputOptionValue);
-            var nativeOutputPath = Path.Combine(GetOutputPath(context, configuration, outputOptionValue), "native");
+            var outputPath = context.GetOutputPath(configuration, outputOptionValue);
+            var nativeOutputPath = Path.Combine(outputPath, "native");
             var intermediateOutputPath = 
-                GetIntermediateOutputPath(context, configuration, intermediateOutputValue, outputOptionValue);
+                context.GetIntermediateOutputPath(configuration, intermediateOutputValue, outputOptionValue);
 
             Directory.CreateDirectory(nativeOutputPath);
             Directory.CreateDirectory(intermediateOutputPath);
@@ -197,8 +197,8 @@ namespace Microsoft.DotNet.Tools.Compiler
         private static bool CompileProject(ProjectContext context, string configuration, string outputOptionValue, string intermediateOutputValue, bool noHost)
         {
             // Set up Output Paths
-            string outputPath = GetOutputPath(context, configuration, outputOptionValue);
-            string intermediateOutputPath = GetIntermediateOutputPath(context, configuration, intermediateOutputValue, outputOptionValue);
+            string outputPath = context.GetOutputPath(configuration, outputOptionValue);
+            string intermediateOutputPath = context.GetIntermediateOutputPath(configuration, intermediateOutputValue, outputOptionValue);
 
             Directory.CreateDirectory(outputPath);
             Directory.CreateDirectory(intermediateOutputPath);
@@ -415,58 +415,6 @@ namespace Microsoft.DotNet.Tools.Compiler
             }
 
             return Path.Combine(outputPath, project.Name + outputExtension);
-        }
-
-        private static string GetOutputPath(ProjectContext context, string configuration, string outputOptionValue)
-        {
-            var outputPath = string.Empty;
-
-            if (string.IsNullOrEmpty(outputOptionValue))
-            {
-                outputPath = Path.Combine(
-                    GetDefaultRootOutputPath(context, outputOptionValue),
-                    Constants.BinDirectoryName,
-                    configuration,
-                    context.TargetFramework.GetTwoDigitShortFolderName());
-            }
-            else
-            {
-                outputPath = outputOptionValue;
-            }
-
-            return outputPath;
-        }
-
-        private static string GetIntermediateOutputPath(ProjectContext context, string configuration, string intermediateOutputValue, string outputOptionValue)
-        {
-            var intermediateOutputPath = string.Empty;
-
-            if (string.IsNullOrEmpty(intermediateOutputValue))
-            {
-                intermediateOutputPath = Path.Combine(
-                    GetDefaultRootOutputPath(context, outputOptionValue),
-                    Constants.ObjDirectoryName,
-                    configuration,
-                    context.TargetFramework.GetTwoDigitShortFolderName());
-            }
-            else
-            {
-                intermediateOutputPath = intermediateOutputValue;
-            }
-
-            return intermediateOutputPath;
-        }
-
-        private static string GetDefaultRootOutputPath(ProjectContext context, string outputOptionValue)
-        {
-            string rootOutputPath = string.Empty;
-
-            if (string.IsNullOrEmpty(outputOptionValue))
-            {
-                rootOutputPath = context.ProjectFile.ProjectDirectory;
-            }
-
-            return rootOutputPath;
         }
 
         private static void CleanOrCreateDirectory(string path)
