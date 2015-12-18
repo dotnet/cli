@@ -5,7 +5,7 @@
 #
 
 set -e
-
+set -x
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
   DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
@@ -72,7 +72,7 @@ do
 done
 
 # Copy the runtime app-local for the tools
-cp -R $RUNTIME_OUTPUT_DIR/* $OUTPUT_DIR/bin
+cp -R "$RUNTIME_OUTPUT_DIR"/* "$OUTPUT_DIR/bin"
 
 # Deploy CLR host to the output
 cp "$HOST_DIR/corehost" "$OUTPUT_DIR/bin"
@@ -80,12 +80,12 @@ cp "$HOST_DIR/corehost" "$OUTPUT_DIR/bin"
 # corehostify externally-provided binaries (csc, vbc, etc.)
 for binary in ${BINARIES_FOR_COREHOST[@]}
 do
-    cp $OUTPUT_DIR/bin/corehost $OUTPUT_DIR/bin/$binary
-    mv $OUTPUT_DIR/bin/${binary}.exe $OUTPUT_DIR/bin/${binary}.dll
+    cp "$OUTPUT_DIR/bin/corehost" "$OUTPUT_DIR/bin/$binary"
+    mv "$OUTPUT_DIR/bin/${binary}.exe" "$OUTPUT_DIR/bin/${binary}.dll"
 done
 
-cd $OUTPUT_DIR
+cd "$OUTPUT_DIR"
 
 # Fix up permissions. Sometimes they get dropped with the wrong info
 find . -type f | xargs chmod 644
-$DIR/fix-mode-flags.sh
+"$DIR/fix-mode-flags.sh"

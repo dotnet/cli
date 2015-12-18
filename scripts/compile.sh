@@ -5,7 +5,7 @@
 #
 
 set -e
-
+set -x
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
   DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
@@ -24,6 +24,7 @@ if ! type -p cmake >/dev/null; then
 fi
 
 [ -z "$CONFIGURATION" ] && export CONFIGURATION=Debug
+
 
 if [[ ! -z "$OFFLINE" ]]; then
     header "Skipping Stage 0, Dnx, and Packages download: Offline Build"
@@ -53,7 +54,6 @@ else
     header "Restoring packages"
     $DNX_ROOT/dnu restore "$REPOROOT" --quiet --runtime "$RID" --no-cache
 fi
-
 header "Building corehost"
 
 # Set up the environment to be used for building with clang.
@@ -80,36 +80,36 @@ make
 
 # Publish to artifacts
 [ -d "$HOST_DIR" ] || mkdir -p $HOST_DIR
-cp "$REPOROOT/src/corehost/cmake/$RID/corehost" $HOST_DIR
+cp "$REPOROOT/src/corehost/cmake/$RID/corehost" "$HOST_DIR"
 popd 2>&1 >/dev/null
 
 # Build Stage 1
 header "Building stage1 dotnet using downloaded stage0 ..."
-OUTPUT_DIR=$STAGE1_DIR $DIR/build/build-stage.sh
+OUTPUT_DIR="$STAGE1_DIR" "$DIR/build/build-stage.sh"
 
 # Use stage1 tools
-export DOTNET_TOOLS=$STAGE1_DIR
+export DOTNET_TOOLS="$STAGE1_DIR"
 
 # Build Stage 2
 header "Building stage2 dotnet using just-built stage1 ..."
-OUTPUT_DIR=$STAGE2_DIR $DIR/build/build-stage.sh
+OUTPUT_DIR="$STAGE2_DIR" "$DIR/build/build-stage.sh"
 
 echo "Crossgenning Roslyn compiler ..."
-$REPOROOT/scripts/crossgen/crossgen_roslyn.sh "$STAGE2_DIR/bin"
+"$REPOROOT/scripts/crossgen/crossgen_roslyn.sh" "$STAGE2_DIR/bin"
 
 # Make Stage 2 Folder Accessible
-chmod -R a+r $REPOROOT
+chmod -R a+r "$REPOROOT"
 
 # Copy DNX in to stage2
-cp -R $DNX_ROOT $STAGE2_DIR/bin/dnx
+cp -R "$DNX_ROOT" "$STAGE2_DIR/bin/dnx"
 
 # Copy and CHMOD the dotnet-restore script
-cp $DIR/dotnet-restore.sh $STAGE2_DIR/bin/dotnet-restore
-chmod a+x $STAGE2_DIR/bin/dotnet-restore
+cp "$DIR/dotnet-restore.sh" "$STAGE2_DIR/bin/dotnet-restore"
+chmod a+x "$STAGE2_DIR/bin/dotnet-restore"
 
 # Copy in AppDeps
 header "Acquiring Native App Dependencies"
-DOTNET_HOME=$STAGE2_DIR DOTNET_TOOLS=$STAGE2_DIR $REPOROOT/scripts/build/build_appdeps.sh "$STAGE2_DIR/bin"
+DOTNET_HOME="$STAGE2_DIR" DOTNET_TOOLS="$STAGE2_DIR" "$REPOROOT/scripts/build/build_appdeps.sh" "$STAGE2_DIR/bin"
 
 # Stamp the output with the commit metadata
 COMMIT_ID=$(git rev-parse HEAD)
@@ -117,11 +117,11 @@ echo $COMMIT_ID > $STAGE2_DIR/.commit
 
 # Smoke-test the output
 header "Testing stage2 ..."
-DOTNET_HOME=$STAGE2_DIR DOTNET_TOOLS=$STAGE2_DIR $DIR/test/smoke-test.sh
+DOTNET_HOME="$STAGE2_DIR" DOTNET_TOOLS="$STAGE2_DIR" "$DIR/test/smoke-test.sh"
 
 # E2E test on the output
 header "Testing stage2 End to End ..."
-DOTNET_HOME=$STAGE2_DIR DOTNET_TOOLS=$STAGE2_DIR $DIR/test/e2e-test.sh
+DOTNET_HOME="$STAGE2_DIR" DOTNET_TOOLS="$STAGE2_DIR" "$DIR/test/e2e-test.sh"
 
 # Run Validation for Project.json dependencies
 dotnet publish "$REPOROOT/tools/MultiProjectValidator" -o "$STAGE2_DIR/../tools"

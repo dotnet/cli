@@ -23,7 +23,7 @@ if [ "$UNAME" != "Linux" ]; then
     exit 1
 fi
 
-PACKAGING_ROOT=$REPOROOT/packaging/debian
+PACKAGING_ROOT="$REPOROOT/packaging/debian"
 
 OUTPUT_DIR="$REPOROOT/artifacts"
 PACKAGE_LAYOUT_DIR="$OUTPUT_DIR/deb_intermediate"
@@ -44,8 +44,8 @@ execute_test(){
 create_empty_debian_layout(){
     header "Creating empty debian package layout"
 
-    rm -rf $PACKAGE_LAYOUT_DIR
-    mkdir -p $PACKAGE_LAYOUT_DIR
+    rm -rf "$PACKAGE_LAYOUT_DIR"
+    mkdir -p "$PACKAGE_LAYOUT_DIR"
 
     mkdir "$PACKAGE_LAYOUT_DIR/\$"
     mkdir "$PACKAGE_LAYOUT_DIR/package_root"
@@ -66,18 +66,18 @@ copy_files_to_debian_layout(){
 create_debian_package(){
     header "Packing .deb"
 
-    mkdir -p $PACKAGE_OUTPUT_DIR
+    mkdir -p "$PACKAGE_OUTPUT_DIR"
 
-    $PACKAGING_ROOT/package_tool/package_tool $PACKAGE_LAYOUT_DIR $PACKAGE_OUTPUT_DIR $DOTNET_BUILD_VERSION
+    "$PACKAGING_ROOT/package_tool/package_tool" "$PACKAGE_LAYOUT_DIR" "$PACKAGE_OUTPUT_DIR" "$DOTNET_BUILD_VERSION"
 }
 
 test_debian_package(){
     header "Testing debian package"
 
-    rm -rf $TEST_STAGE_DIR
-    git clone https://github.com/sstephenson/bats.git $TEST_STAGE_DIR
+    rm -rf "$TEST_STAGE_DIR"
+    git clone https://github.com/sstephenson/bats.git "$TEST_STAGE_DIR"
     
-    $TEST_STAGE_DIR/bin/bats $PACKAGE_OUTPUT_DIR/test_package.bats
+    "$TEST_STAGE_DIR/bin/bats" "$PACKAGE_OUTPUT_DIR/test_package.bats"
 
     # E2E Testing of package surface area
     # Disabled: https://github.com/dotnet/cli/issues/381
@@ -86,8 +86,8 @@ test_debian_package(){
 
 run_e2e_test(){
     set +e    
-    sudo dpkg -i $DEBIAN_FILE
-    $REPOROOT/scripts/test/e2e-test.sh
+    sudo dpkg -i "$DEBIAN_FILE"
+    "$REPOROOT/scripts/test/e2e-test.sh"
     result=$?
     sudo dpkg -r dotnet
     set -e
@@ -97,9 +97,9 @@ run_e2e_test(){
 
 execute_build
 
-DEBIAN_FILE=$(find $PACKAGE_OUTPUT_DIR -iname "*.deb")
+DEBIAN_FILE="$(find "$PACKAGE_OUTPUT_DIR" -iname "*.deb")"
 
 execute_test
 
 # Publish
-$REPOROOT/scripts/publish/publish.sh $DEBIAN_FILE 
+"$REPOROOT/scripts/publish/publish.sh" "$DEBIAN_FILE" 
