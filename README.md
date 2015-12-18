@@ -71,7 +71,7 @@ On Mac OSX, we currently support the C++ Codegenerator (as shown below) and supp
 
 This will drop a native single binary in `./bin/[configuration]/[framework]/native/[binary name]` that you can run.
 
-For more details, please refer to the [documentation](https://github.com/dotnet/corert/tree/master/Documentation).
+For more details, please refer to the [documentation](https://github.com/dotnet/cli/tree/master/Documentation).
 
 Building from source
 --------------------
