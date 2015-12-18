@@ -8,24 +8,24 @@
 #include "utils.h"
 #include "coreclr.h"
 
-void get_tpafile_path(const pal::string_t& app_base, const pal::string_t& app_name, pal::string_t& tpapath)
+void get_tpafile_path(const pal::string_t& app_base, const pal::string_t& app_name, pal::string_t* tpapath)
 {
-    tpapath.reserve(app_base.length() + app_name.length() + 5);
+    tpapath->reserve(app_base.length() + app_name.length() + 5);
 
-    tpapath.append(app_base);
-    tpapath.push_back(DIR_SEPARATOR);
+    tpapath->append(app_base);
+    tpapath->push_back(DIR_SEPARATOR);
 
     // Remove the extension from the app_name
     auto ext_location = app_name.find_last_of('.');
     if (ext_location != std::string::npos)
     {
-        tpapath.append(app_name.substr(0, ext_location));
+        tpapath->append(app_name.substr(0, ext_location));
     }
     else
     {
-        tpapath.append(app_name);
+        tpapath->append(app_name);
     }
-    tpapath.append(_X(".deps"));
+    tpapath->append(_X(".deps"));
 }
 
 bool resolve_clr_path(const arguments_t& args, pal::string_t* clr_path)
@@ -53,7 +53,7 @@ bool resolve_clr_path(const arguments_t& args, pal::string_t* clr_path)
 }
 
 
-int run(arguments_t args, const pal::string_t& clr_path, tpafile* tpa)
+int run(const arguments_t& args, const pal::string_t& clr_path, tpafile* tpa)
 {
     // Add packages directory
     pal::string_t packages_dir;
@@ -213,7 +213,7 @@ int main(const int argc, const pal::char_t* argv[])
     // Check for and load deps file
     pal::string_t tpafile_path;
     auto app_name = get_filename(args.managed_application);
-    get_tpafile_path(args.app_dir, app_name, tpafile_path);
+    get_tpafile_path(args.app_dir, app_name, &tpafile_path);
     trace::info(_X("checking for .deps File"));
 
     servicing_index_t svc(args);
