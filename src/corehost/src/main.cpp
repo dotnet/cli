@@ -53,7 +53,7 @@ bool resolve_clr_path(const arguments_t& args, pal::string_t* clr_path)
 }
 
 
-int run(arguments_t args, const pal::string_t& clr_path, tpafile tpa)
+int run(arguments_t args, const pal::string_t& clr_path, tpafile* tpa)
 {
     // Add packages directory
     pal::string_t packages_dir;
@@ -70,16 +70,16 @@ int run(arguments_t args, const pal::string_t& clr_path, tpafile tpa)
 
     // Build TPA list and search paths
     pal::string_t tpalist;
-    tpa.write_tpa_list(args.app_dir, packages_dir, clr_path, tpalist);
+    tpa->write_tpa_list(args.app_dir, packages_dir, clr_path, tpalist);
 
     trace::info(_X("using native search path: %s"), packages_dir.c_str());
 
     pal::string_t search_paths;
-    tpa.write_native_paths(args.app_dir, packages_dir, clr_path, search_paths);
+    tpa->write_native_paths(args.app_dir, packages_dir, clr_path, search_paths);
 
     // TODO:
     // pal::string_t culture_paths;
-    // tpa.write_culture_paths(args.app_dir, packages_dir, clr_path, culture_paths);
+    // tpa->write_culture_paths(args.app_dir, packages_dir, clr_path, culture_paths);
 
     // Build CoreCLR properties
     const char* property_keys[] = {
@@ -224,5 +224,5 @@ int main(const int argc, const pal::char_t* argv[])
         return 1;
     }
 
-    return run(args, clr_path, tpa);
+    return run(args, clr_path, &tpa);
 }
