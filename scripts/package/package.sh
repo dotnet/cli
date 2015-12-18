@@ -30,12 +30,12 @@ echo $COMMIT > $STAGE2_DIR/.version
 echo $DOTNET_BUILD_VERSION >> $STAGE2_DIR/.version
 
 # Create Dnvm Package
-$DIR/package-dnvm.sh
+"$DIR/package-dnvm.sh"
 
 if [[ "$OSNAME" == "ubuntu" ]]; then
     # Create Debian package
-    $DIR/package-debian.sh
+    "$DIR/package-debian.sh"
 elif [[ "$OSNAME" == "osx" ]]; then
     # Create OSX PKG
-    $DIR/../../packaging/osx/package-osx.sh
+    "$DIR/../../packaging/osx/package-osx.sh"
 fi

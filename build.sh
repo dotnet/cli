@@ -42,9 +42,9 @@ if [ ! -z "$OFFLINE" ]; then
 fi
 
 # Use a repo-local install directory (but not the artifacts directory because that gets cleaned a lot
-export DOTNET_INSTALL_DIR=$DIR/.dotnet_stage0/$RID
-[ -d $DOTNET_INSTALL_DIR ] || mkdir -p $DOTNET_INSTALL_DIR
-export PATH=$DOTNET_INSTALL_DIR/bin:$PATH
+export DOTNET_INSTALL_DIR="$DIR/.dotnet_stage0/$RID"
+[ -d "$DOTNET_INSTALL_DIR" ] || mkdir -p "$DOTNET_INSTALL_DIR"
+export PATH="$DOTNET_INSTALL_DIR/bin":$PATH
 
 # UTC Timestamp of the last commit is used as the build number. This is for easy synchronization of build number between Windows, OSX and Linux builds.
 LAST_COMMIT_TIMESTAMP=$(git log -1 --format=%ct)
@@ -60,14 +60,14 @@ header "Building dotnet tools version $DOTNET_BUILD_VERSION - $CONFIGURATION"
 
 if [ ! -z "$BUILD_IN_DOCKER" ]; then
     export BUILD_COMMAND="/opt/code/scripts/compile.sh"
-    $DIR/scripts/docker/dockerbuild.sh
+    "$DIR/scripts/docker/dockerbuild.sh"
 else
-    $DIR/scripts/compile.sh
+    "$DIR/scripts/compile.sh"
 fi
 
 if [ ! -z "$PACKAGE_IN_DOCKER" ]; then
     export BUILD_COMMAND="/opt/code/scripts/package/package.sh"
-    $DIR/scripts/docker/dockerbuild.sh
+    "$DIR/scripts/docker/dockerbuild.sh"
 else
-    $DIR/scripts/package/package.sh
+    "$DIR/scripts/package/package.sh"
 fi

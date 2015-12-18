@@ -23,7 +23,7 @@ REPOROOT="$( cd -P "$SCRIPT_DIR/../.." && pwd )"
 
 source "$SCRIPT_DIR/../_common.sh"
 
-UPLOAD_FILE=$1
+UPLOAD_FILE="$1"
 UPLOAD_JSON_FILE="package_upload.json"
 
 header "Publishing package"
@@ -39,11 +39,11 @@ execute(){
         exit 1
     fi
 
-    if [[ $UPLOAD_FILE == *.deb || $UPLOAD_FILE == *.pkg ]]; then
-        upload_installers_to_blob_storage $UPLOAD_FILE
+    if [[ "$UPLOAD_FILE" == *.deb || "$UPLOAD_FILE" == *.pkg ]]; then
+        upload_installers_to_blob_storage "$UPLOAD_FILE"
         result=$?
     elif [[ $UPLOAD_FILE == *.tar.gz ]]; then
-        upload_binaries_to_blob_storage $UPLOAD_FILE
+        upload_binaries_to_blob_storage "$UPLOAD_FILE"
         result=$?
     fi
 
@@ -87,14 +87,14 @@ validate_env_variables(){
 }
 
 upload_file_to_blob_storage_azure_cli(){
-    local blob=$1
-    local file=$2
+    local blob="$1"
+    local file="$2"
 
     header "Uploading $file to blob storage"
 
     # use azure cli to upload to blob storage. We cannot use curl to do this becuase azure has a max limit of 64mb that can be uploaded using REST
     # statusCode=$(curl -s -w "%{http_code}" -L -H "x-ms-blob-type: BlockBlob" -H "x-ms-date: 2015-10-21" -H "x-ms-version: 2013-08-15" $upload_URL -T $file)
-    azure storage blob upload --quiet --container $STORAGE_CONTAINER --blob $blob --blobtype block --connection-string "$CONNECTION_STRING" --file $file
+    azure storage blob upload --quiet --container $STORAGE_CONTAINER --blob "$blob" --blobtype block --connection-string "$CONNECTION_STRING" --file "$file"
     result=$?
 
     if [ "$result" -eq "0" ]; then
@@ -107,13 +107,13 @@ upload_file_to_blob_storage_azure_cli(){
 }
 
 update_file_in_blob_storage(){
-    local update_URL=$1
-    local file=$2
-    local filecontent=$3
+    local update_URL="$1"
+    local file="$2"
+    local filecontent="$3"
 
     header "Updating $file in blob storage"
 
-    statusCode=$(curl -s -w "%{http_code}" -L -H "x-ms-blob-type: BlockBlob" -H "x-ms-date: 2015-10-21" -H "x-ms-version: 2013-08-15" -H "Content-Type: text/plain" $update_URL --data-binary $filecontent --request PUT )
+    statusCode=$(curl -s -w "%{http_code}" -L -H "x-ms-blob-type: BlockBlob" -H "x-ms-date: 2015-10-21" -H "x-ms-version: 2013-08-15" -H "Content-Type: text/plain" $update_URL --data-binary "$filecontent" --request PUT )
 
     if [ "$statusCode" -eq "201" ]; then
         info "successfully updated $file in blob storage."
@@ -125,11 +125,11 @@ update_file_in_blob_storage(){
 }
 
 upload_binaries_to_blob_storage(){
-    local tarfile=$1
-    local filename=$(basename $tarfile)
+    local tarfile="$1"
+    local filename="$(basename "$tarfile")"
     local blob="$CHANNEL/Binaries/$DOTNET_BUILD_VERSION/$filename"
 
-    if ! upload_file_to_blob_storage_azure_cli $blob $tarfile; then
+    if ! upload_file_to_blob_storage_azure_cli "$blob" "$tarfile"; then
         return 1
     fi
 
@@ -137,7 +137,7 @@ upload_binaries_to_blob_storage(){
     echo "Updating the latest dotnet binaries.."
     local latestblob="$CHANNEL/Binaries/Latest/dotnet-$OSNAME-x64.latest.tar.gz"
 
-    if ! upload_file_to_blob_storage_azure_cli $latestblob $tarfile; then
+    if ! upload_file_to_blob_storage_azure_cli "$latestblob" "$tarfile"; then
         return 1
     fi
 
@@ -158,11 +158,11 @@ upload_binaries_to_blob_storage(){
 }
 
 upload_installers_to_blob_storage(){
-    local installfile=$1
-    local filename=$(basename $installfile)
+    local installfile="$1"
+    local filename=$(basename "$installfile")
     local blob="$CHANNEL/Installers/$DOTNET_BUILD_VERSION/$filename"
 
-    if ! upload_file_to_blob_storage_azure_cli $blob $installfile; then
+    if ! upload_file_to_blob_storage_azure_cli $blob "$installfile"; then
         return 1
     fi
 
@@ -171,13 +171,13 @@ upload_installers_to_blob_storage(){
     local extension="${filename##*.}"
     local latestblob="$CHANNEL/Installers/Latest/dotnet-$OSNAME-x64.latest.$extension"
 
-    if ! upload_file_to_blob_storage_azure_cli $latestblob $installfile; then
+    if ! upload_file_to_blob_storage_azure_cli $latestblob "$installfile"; then
         return 1
     fi
 
     # debain packages need to be uploaded to the PPA feed too
-    if [[ $installfile == *.deb ]]; then
-        DEB_FILE=$installfile
+    if [[ "$installfile" == *.deb ]]; then
+        DEB_FILE="$installfile"
         UPLOAD_URL="https://$STORAGE_ACCOUNT.blob.core.windows.net/$STORAGE_CONTAINER/$blob"
         generate_repoclient_json
         call_repo_client
@@ -188,7 +188,7 @@ upload_installers_to_blob_storage(){
 
 generate_repoclient_json(){
     # Clean any existing json file
-    rm -f $SCRIPT_DIR/$UPLOAD_JSON_FILE
+    rm -f "$SCRIPT_DIR/$UPLOAD_JSON_FILE"
 
     echo "{"                                            >> "$SCRIPT_DIR/$UPLOAD_JSON_FILE"
     echo "  \"name\":\"$(_get_package_name)\","         >> "$SCRIPT_DIR/$UPLOAD_JSON_FILE"
@@ -199,21 +199,21 @@ generate_repoclient_json(){
 }
 
 call_repo_client(){
-    $SCRIPT_DIR/repoapi_client.sh -addpkg $SCRIPT_DIR/$UPLOAD_JSON_FILE
+    "$SCRIPT_DIR/repoapi_client.sh" -addpkg "$SCRIPT_DIR/$UPLOAD_JSON_FILE"
 }
 
 # Extract the package name from the .deb filename
 _get_package_name(){
-    local deb_filename=$(basename $DEB_FILE)
-    local package_name=${deb_filename%%_*}
+    local deb_filename="$(basename "$DEB_FILE")"
+    local package_name="${deb_filename%%_*}"
 
     echo $package_name
 }
 
 # Extract the package version from the .deb filename
 _get_package_version(){
-    local deb_filename=$(basename $DEB_FILE)
-    local package_version=${deb_filename#*_}
+    local deb_filename="$(basename "$DEB_FILE")"
+    local package_version="${deb_filename#*_}"
     package_version=${package_version%-*}
 
     echo $package_version

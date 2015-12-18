@@ -6,7 +6,7 @@
 # Source this to add some fancy stuff to your scripts
 
 COMMONSOURCE="${BASH_SOURCE[0]}"
-while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+while [ -h "$COMMONSOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
   COMMONDIR="$( cd -P "$( dirname "$COMMONSOURCE" )" && pwd )"
   COMMONSOURCE="$(readlink "$COMMONSOURCE")"
   [[ $COMMONSOURCE != /* ]] && COMMONSOURCE="$COMMONDIR/$COMMONSOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
@@ -98,12 +98,12 @@ fi
 
 export DNX_VERSION="1.0.0-rc1-update1"
 
-export REPOROOT=$(cd $COMMONDIR/.. && pwd)
-export OUTPUT_ROOT=$REPOROOT/artifacts/$RID
-export DNX_DIR=$OUTPUT_ROOT/dnx
-export STAGE1_DIR=$OUTPUT_ROOT/stage1
-export STAGE2_DIR=$OUTPUT_ROOT/stage2
-export HOST_DIR=$OUTPUT_ROOT/corehost
+export REPOROOT="$(cd "$COMMONDIR/.." && pwd)"
+export OUTPUT_ROOT="$REPOROOT/artifacts/$RID"
+export DNX_DIR="$OUTPUT_ROOT/dnx"
+export STAGE1_DIR="$OUTPUT_ROOT/stage1"
+export STAGE2_DIR="$OUTPUT_ROOT/stage2"
+export HOST_DIR="$OUTPUT_ROOT/corehost"
 
 # TODO: Replace this with a dotnet generation
 export TFM=dnxcore50

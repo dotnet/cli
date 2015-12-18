@@ -37,8 +37,8 @@ if [ -z "$DOTNET_TOOLS" ]; then
     fi
 fi
 
-MY_NAME=$(basename ${BASH_SOURCE[0]})
-MY_TARGET=$DOTNET_TOOLS/bin/$MY_NAME
+MY_NAME="$(basename "${BASH_SOURCE[0]}")"
+MY_TARGET="$DOTNET_TOOLS/bin/$MY_NAME"
 
 if [ ! -e "$MY_TARGET" ]; then
     echo "error: the tool $MY_TARGET cannot be found" 1>&2
@@ -56,7 +56,7 @@ EOF
 
 #set default prefix (PREFIX is a fairly standard env-var, but we also want to allow the use the specific "DOTNET_INSTALL_DIR" one)
 if [ ! -z "$DOTNET_INSTALL_DIR" ]; then
-    PREFIX=$DOTNET_INSTALL_DIR
+    PREFIX="$DOTNET_INSTALL_DIR"
 elif [ -z "$PREFIX" ]; then
     PREFIX=/usr/local
 fi
@@ -135,18 +135,18 @@ say() {
 
 make_link() {
     local target_name=$1
-    local dest=$PREFIX/bin/$target_name
+    local dest="$PREFIX/bin/$target_name"
     say "Linking $dest -> $PREFIX/share/dotnet/cli/$target_name"
-    if [ -e $dest ]; then
-        rm $dest
+    if [ -e "$dest" ]; then
+        rm "$dest"
     fi
 
-    [ -d "$PREFIX/bin" ] || mkdir -p $PREFIX/bin
+    [ -d "$PREFIX/bin" ] || mkdir -p "$PREFIX/bin"
 
-    echo "$LINK_SCRIPT_CONTENT" > $dest
+    echo "$LINK_SCRIPT_CONTENT" > "$dest"
 
     # Make mode: rwxr-xr-x
-    chmod 755 $dest
+    chmod 755 "$dest"
 }
 
 install_dotnet()
@@ -194,7 +194,7 @@ install_dotnet()
         fi
 
         #This should noop if the directory already exists.
-        mkdir -p $installLocation
+        mkdir -p "$installLocation"
 
         say "Downloading $dotnet_filename from $dotnet_url"
 
@@ -224,8 +224,8 @@ install_dotnet()
 
     for f in $(find "$installLocation/cli" -regex ".*/dotnet[a-z\-]*$")
     do
-        local baseFile=$(basename $f)
-        make_link $baseFile
+        local baseFile=$(basename "$f")
+        make_link "$baseFile"
     done
 
     if [ -e "$installLocation/$dotnet_filename" ]; then
