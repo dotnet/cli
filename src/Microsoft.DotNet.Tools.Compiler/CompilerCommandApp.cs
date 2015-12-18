@@ -10,30 +10,29 @@ using Microsoft.DotNet.ProjectModel;
 using NuGet.Frameworks;
 using System.Linq;
 
-//This code is cloned in the Compiler project, until there's a better way to specify, share, and extend verb interfaces
 namespace Microsoft.DotNet.Tools.Compiler
 {
-    internal delegate bool OnExecute(
+    public delegate bool OnExecute(
             List<ProjectContext> contexts, string configValue, string outputValue, string intermediateValue, bool noHost,
             bool isNative, string archValue, string ilcArgsValue, string ilcPathValue, string ilcSdkPathValue,
             bool isCppMode);
 
-    internal class CompilerCommandApp
+    public class CompilerCommandApp
     {
         private readonly CommandLineApplication _app;
-        
-        public CommandOption Framework { get; }
-        public CommandOption IntermediateOutput { get; }
-        public CommandOption Output { get; }
-        public CommandOption Configuration { get; }
-        public CommandOption NoHost { get; }
-        public CommandArgument Project { get; }
-        public CommandOption Native { get; }
-        public CommandOption Arch { get; }
-        public CommandOption IlcArgs { get; }
-        public CommandOption CppMode { get; }
-        public CommandOption IlcSdkPath { get; }
-        public CommandOption IlcPath { get; }
+
+        private CommandOption Framework { get; }
+        private CommandOption IntermediateOutput { get; }
+        private CommandOption Output { get; }
+        private CommandOption Configuration { get; }
+        private CommandOption NoHost { get; }
+        private CommandArgument Project { get; }
+        private CommandOption Native { get; }
+        private CommandOption Arch { get; }
+        private CommandOption IlcArgs { get; }
+        private CommandOption CppMode { get; }
+        private CommandOption IlcSdkPath { get; }
+        private CommandOption IlcPath { get; }
 
         public CompilerCommandApp(string name, string fullName, string description)
         {

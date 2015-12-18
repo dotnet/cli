@@ -9,6 +9,7 @@ using System.Linq;
 using Microsoft.Dnx.Runtime.Common.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.Tools.Compiler;
 using NuGet.Frameworks;
 
 
