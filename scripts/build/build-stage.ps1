@@ -49,7 +49,7 @@ $RuntimeOutputDir = "$OutputDir\runtime\coreclr"
 
 # Publish each project
 $Projects | ForEach-Object {
-    dotnet publish --framework "$Tfm" --runtime "$Rid" --output "$OutputDir\bin" --configuration "$Configuration" "$RepoRoot\src\$_"
+    dotnet --verbose publish --framework "$Tfm" --runtime "$Rid" --output "$OutputDir\bin" --configuration "$Configuration" "$RepoRoot\src\$_"
     if (!$?) {
         Write-Host Command failed: dotnet publish --framework "$Tfm" --runtime "$Rid" --output "$OutputDir\bin" --configuration "$Configuration" "$RepoRoot\src\$_"
         exit 1

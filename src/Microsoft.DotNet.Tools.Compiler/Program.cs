@@ -42,19 +42,16 @@ namespace Microsoft.DotNet.Tools.Compiler
             }
         }
 
-        private static bool OnExecute(List<ProjectContext> contexts, string configValue, string outputValue, string intermediateValue,
-            bool noHost, bool isNative, string archValue, string ilcArgsValue, string ilcPathValue,
-            string ilcSdkPathValue, string appDepSdkPathValue, bool isCppMode)
+        private static bool OnExecute(List<ProjectContext> contexts, CompilerCommandApp args)
         {
             var success = true;
 
             foreach (var context in contexts)
             {
-                success &= CompileProject(context, configValue, outputValue, intermediateValue, noHost);
-                if (isNative && success)
+                success &= CompileProject(context, args);
+                if (args.IsNativeValue && success)
                 {
-                    success &= CompileNative(context, configValue, outputValue, intermediateValue, archValue, ilcArgsValue,
-                        ilcPathValue, ilcSdkPathValue, appDepSdkPathValue, isCppMode);
+                    success &= CompileNative(context, args);
                 }
             }
             return success;
@@ -62,27 +59,19 @@ namespace Microsoft.DotNet.Tools.Compiler
 
         private static bool CompileNative(
             ProjectContext context, 
-            string configuration, 
-            string outputOptionValue, 
-            string intermediateOutputValue, 
-            string archValue, 
-            string ilcArgsValue, 
-            string ilcPathValue,
-            string ilcSdkPathValue,
-            string appDepSdkPathValue,
-            bool isCppMode)
+            CompilerCommandApp args)
         {
-            var outputPath = context.GetOutputPath(configuration, outputOptionValue);
+            var outputPath = context.GetOutputPath(args.ConfigValue, args.OutputValue);
             var nativeOutputPath = Path.Combine(outputPath, "native");
             var intermediateOutputPath = 
-                context.GetIntermediateOutputPath(configuration, intermediateOutputValue, outputOptionValue);
+                context.GetIntermediateOutputPath(args.ConfigValue, args.IntermediateValue, outputPath);
 
             Directory.CreateDirectory(nativeOutputPath);
             Directory.CreateDirectory(intermediateOutputPath);
 
-            var compilationOptions = context.ProjectFile.GetCompilerOptions(context.TargetFramework, configuration);
+            var compilationOptions = context.ProjectFile.GetCompilerOptions(context.TargetFramework, args.ConfigValue);
             var managedOutput = 
-                GetProjectOutput(context.ProjectFile, context.TargetFramework, configuration, outputPath);
+                GetProjectOutput(context.ProjectFile, context.TargetFramework, args.ConfigValue, outputPath);
             
             var nativeArgs = new List<string>();
 
@@ -90,52 +79,52 @@ namespace Microsoft.DotNet.Tools.Compiler
             nativeArgs.Add($"{managedOutput}");
 
             // ILC Args
-            if (!string.IsNullOrWhiteSpace(ilcArgsValue))
+            if (!string.IsNullOrWhiteSpace(args.IlcArgsValue))
             {
                 nativeArgs.Add("--ilcargs");
-                nativeArgs.Add($"{ilcArgsValue}");
+                nativeArgs.Add($"{args.IlcArgsValue}");
             }            
             
             // ILC Path
-            if (!string.IsNullOrWhiteSpace(ilcPathValue))
+            if (!string.IsNullOrWhiteSpace(args.IlcPathValue))
             {
                 nativeArgs.Add("--ilcpath");
-                nativeArgs.Add(ilcPathValue);
+                nativeArgs.Add(args.IlcPathValue);
             }
 
             // ILC SDK Path
-            if (!string.IsNullOrWhiteSpace(ilcSdkPathValue))
+            if (!string.IsNullOrWhiteSpace(args.IlcSdkPathValue))
             {
                 nativeArgs.Add("--ilcsdkpath");
-                nativeArgs.Add(ilcSdkPathValue);
+                nativeArgs.Add(args.IlcSdkPathValue);
             }
 
             // AppDep SDK Path
-            if (!string.IsNullOrWhiteSpace(appDepSdkPathValue))
+            if (!string.IsNullOrWhiteSpace(args.AppDepSdkPathValue))
             {
                 nativeArgs.Add("--appdepsdk");
-                nativeArgs.Add(appDepSdkPathValue);
+                nativeArgs.Add(args.AppDepSdkPathValue);
             }
 
             // CodeGen Mode
-            if(isCppMode)
+            if(args.IsCppModeValue)
             {
                 nativeArgs.Add("--mode");
                 nativeArgs.Add("cpp");
             }
 
             // Configuration
-            if (configuration != null)
+            if (args.ConfigValue != null)
             {
                 nativeArgs.Add("--configuration");
-                nativeArgs.Add(configuration);
+                nativeArgs.Add(args.ConfigValue);
             }
 
             // Architecture
-            if (archValue != null)
+            if (args.ArchValue != null)
             {
                 nativeArgs.Add("--arch");
-                nativeArgs.Add(archValue);
+                nativeArgs.Add(args.ArchValue);
             }
 
             // Intermediate Path
@@ -162,17 +151,17 @@ namespace Microsoft.DotNet.Tools.Compiler
             return result.ExitCode == 0;
         }
 
-        private static bool CompileProject(ProjectContext context, string configuration, string outputOptionValue, string intermediateOutputValue, bool noHost)
+        private static bool CompileProject(ProjectContext context, CompilerCommandApp args)
         {
             // Set up Output Paths
-            string outputPath = context.GetOutputPath(configuration, outputOptionValue);
-            string intermediateOutputPath = context.GetIntermediateOutputPath(configuration, intermediateOutputValue, outputOptionValue);
+            string outputPath = context.GetOutputPath(args.ConfigValue, args.OutputValue);
+            string intermediateOutputPath = context.GetIntermediateOutputPath(args.ConfigValue, args.IntermediateValue, outputPath);
 
             Directory.CreateDirectory(outputPath);
             Directory.CreateDirectory(intermediateOutputPath);
 
             // Create the library exporter
-            var exporter = context.CreateExporter(configuration);
+            var exporter = context.CreateExporter(args.ConfigValue);
 
             // Gather exports for the project
             var dependencies = exporter.GetDependencies().ToList();
@@ -204,7 +193,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             }
 
             // Get compilation options
-            var outputName = GetProjectOutput(context.ProjectFile, context.TargetFramework, configuration, outputPath);
+            var outputName = GetProjectOutput(context.ProjectFile, context.TargetFramework, args.ConfigValue, outputPath);
 
             // Assemble args
             var compilerArgs = new List<string>()
@@ -213,7 +202,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 $"--out:{outputName}"
             };
 
-            var compilationOptions = context.ProjectFile.GetCompilerOptions(context.TargetFramework, configuration);
+            var compilationOptions = context.ProjectFile.GetCompilerOptions(context.TargetFramework, args.ConfigValue);
 
             // Path to strong naming key in environment variable overrides path in project.json
             var environmentKeyFile = Environment.GetEnvironmentVariable(EnvironmentNames.StrongNameKeyFile);
@@ -244,7 +233,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 {
                     if (projectDependency.Project.Files.SourceFiles.Any())
                     {
-                        var projectOutputPath = GetProjectOutput(projectDependency.Project, projectDependency.Framework, configuration, outputPath);
+                        var projectOutputPath = GetProjectOutput(projectDependency.Project, projectDependency.Framework, args.ConfigValue, outputPath);
                         references.Add(projectOutputPath);
                     }
                 }
@@ -259,7 +248,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             compilerArgs.AddRange(references.Select(r => $"--reference:{r}"));
 
             var runtimeContext = ProjectContext.Create(context.ProjectDirectory, context.TargetFramework, new[] { RuntimeIdentifier.Current });
-            var libraryExporter = runtimeContext.CreateExporter(configuration);
+            var libraryExporter = runtimeContext.CreateExporter(args.ConfigValue);
 
             if (compilationOptions.PreserveCompilationContext == true)
             {
@@ -307,7 +296,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             var contextVariables = new Dictionary<string, string>()
             {
                 { "compile:TargetFramework", context.TargetFramework.DotNetFrameworkName },
-                { "compile:Configuration", configuration },
+                { "compile:Configuration", args.ConfigValue },
                 { "compile:OutputFile", outputName },
                 { "compile:OutputDir", outputPath },
                 { "compile:ResponseFile", rsp }
@@ -348,10 +337,10 @@ namespace Microsoft.DotNet.Tools.Compiler
 
             if (success)
             {
-                success &= GenerateResourceAssemblies(context.ProjectFile, dependencies, outputPath, configuration);
+                success &= GenerateResourceAssemblies(context.ProjectFile, dependencies, outputPath, args.ConfigValue);
             }
 
-            if (success && !noHost && compilationOptions.EmitEntryPoint.GetValueOrDefault())
+            if (success && !args.NoHostValue && compilationOptions.EmitEntryPoint.GetValueOrDefault())
             {
                 MakeRunnable(runtimeContext,
                              outputPath,

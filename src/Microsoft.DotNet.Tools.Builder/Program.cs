@@ -13,6 +13,7 @@ using Microsoft.DotNet.Tools.Compiler;
 using NuGet.Frameworks;
 
 
+
 namespace Microsoft.DotNet.Tools.Build
 {
     public class Program
@@ -37,28 +38,25 @@ namespace Microsoft.DotNet.Tools.Build
             }
         }
 
-        private static bool OnExecute(List<ProjectContext> contexts, string configValue, string outputValue, string intermediateValue, bool noHost,
-            bool isNative, string archValue, string ilcArgsValue, string ilcPathValue, string ilcSdkPathValue,
-            string appDepSdkPath, bool isCppMode)
+        private static bool OnExecute(List<ProjectContext> contexts, CompilerCommandApp args)
         {
             foreach (var context in contexts)
             {
                 // Set up Output Paths
-                string outputPath = context.GetOutputPath(configValue, outputValue);
-                string intermediateOutputPath = context.GetIntermediateOutputPath(configValue, intermediateValue, outputValue);
+                string outputPath = context.GetOutputPath(args.ConfigValue, args.OutputValue);
+                string intermediateOutputPath = context.GetIntermediateOutputPath(args.ConfigValue, args.IntermediateValue, outputPath);
 
                 Directory.CreateDirectory(outputPath);
                 Directory.CreateDirectory(intermediateOutputPath);
 
                 //compile dependencies
-                if (!CompileDependencies(context, configValue, outputPath, intermediateOutputPath, noHost))
+                if (!CompileDependencies(context, outputPath, intermediateOutputPath, args))
                 {
                     return false;
                 }
                 
                 //compile project
-                if (!CompileProject(context, configValue, outputPath, intermediateOutputPath, noHost, isNative,
-                    isCppMode, archValue, ilcArgsValue, ilcPathValue, appDepSdkPath, ilcSdkPathValue))
+                if (!CompileProject(context, outputPath, intermediateOutputPath, args))
                 {
                     return false;
                 }
@@ -67,10 +65,10 @@ namespace Microsoft.DotNet.Tools.Build
             return true;
         }
 
-        private static bool CompileDependencies(ProjectContext context, string configuration, string outputPath, string intermediateOutputPath, bool noHost)
+        private static bool CompileDependencies(ProjectContext context, string outputPath, string intermediateOutputPath, CompilerCommandApp args)
         {
             // Create the library exporter
-            var exporter = context.CreateExporter(configuration);
+            var exporter = context.CreateExporter(args.ConfigValue);
 
             // Gather exports for the project
             var dependencies = exporter.GetDependencies().ToList();
@@ -90,7 +88,7 @@ namespace Microsoft.DotNet.Tools.Build
 
             foreach (var projectDependency in Sort(projects))
             {
-                if (!CompileDependency(projectDependency, configuration, noHost, outputPath, intermediateOutputPath))
+                if (!CompileDependency(projectDependency, outputPath, intermediateOutputPath, args))
                     return false;
             }
 
@@ -99,14 +97,14 @@ namespace Microsoft.DotNet.Tools.Build
             return true;
         }
 
-        private static bool CompileDependency(ProjectDescription projectDependency, string configuration, bool noHost, string outputPath, string intermediateOutputPath)
+        private static bool CompileDependency(ProjectDescription projectDependency, string outputPath, string intermediateOutputPath, CompilerCommandApp args)
         {
             var compileResult = Command.Create("dotnet-compile",
                 $"--framework {projectDependency.Framework} " +
-                $"--configuration {configuration} " +
+                $"--configuration {args.ConfigValue} " +
                 $"--output \"{outputPath}\" " +
                 $"--temp-output \"{intermediateOutputPath}\" " +
-                (noHost ? "--no-host " : string.Empty) +
+                (args.NoHostValue ? "--no-host " : string.Empty) +
                 $"\"{projectDependency.Project.ProjectDirectory}\"")
                 .ForwardStdOut()
                 .ForwardStdErr()
@@ -115,24 +113,22 @@ namespace Microsoft.DotNet.Tools.Build
             return compileResult.ExitCode == 0;
         }
 
-        private static bool CompileProject(ProjectContext context, string configValue, string outputPath,
-            string intermediateOutputPath, bool isNoHost, bool isNative, bool isCppMode, string archValue, string ilcArgsValue,
-            string ilcPathValue, string ilcSdkPathValue, string appDepSdkPath)
+        private static bool CompileProject(ProjectContext context, string outputPath, string intermediateOutputPath, CompilerCommandApp args)
         {
             var compileResult = Command.Create("dotnet-compile",
                 $"--framework {context.TargetFramework} " +
-                $"--configuration {configValue} " +
+                $"--configuration {args.ConfigValue} " +
                 $"--output \"{outputPath}\" " +
                 $"--temp-output \"{intermediateOutputPath}\" " +
-                (isNoHost ? "--no-host " : string.Empty) +
+                (args.NoHostValue ? "--no-host " : string.Empty) +
                 //nativeArgs
-                (isNative ? "--native " : string.Empty) +
-                (isCppMode ? "--cpp " : string.Empty) +
-                (!string.IsNullOrWhiteSpace(archValue) ? $"--arch {archValue} " : string.Empty) +
-                (!string.IsNullOrWhiteSpace(ilcArgsValue) ? $"--ilcargs \"{ilcArgsValue}\" " : string.Empty) +
-                (!string.IsNullOrWhiteSpace(ilcPathValue) ? $"--ilcpath \"{ilcPathValue}\" " : string.Empty) +
-                (!string.IsNullOrWhiteSpace(ilcSdkPathValue) ? $"--ilcsdkpath \"{ilcSdkPathValue}\" " : string.Empty) +
-                (!string.IsNullOrWhiteSpace(appDepSdkPath) ? $"--appdepsdkpath \"{appDepSdkPath}\" " : string.Empty) +
+                (args.IsNativeValue ? "--native " : string.Empty) +
+                (args.IsCppModeValue ? "--cpp " : string.Empty) +
+                (!string.IsNullOrWhiteSpace(args.ArchValue) ? $"--arch {args.ArchValue} " : string.Empty) +
+                (!string.IsNullOrWhiteSpace(args.IlcArgsValue) ? $"--ilcargs \"{args.IlcArgsValue}\" " : string.Empty) +
+                (!string.IsNullOrWhiteSpace(args.IlcPathValue) ? $"--ilcpath \"{args.IlcPathValue}\" " : string.Empty) +
+                (!string.IsNullOrWhiteSpace(args.IlcSdkPathValue) ? $"--ilcsdkpath \"{args.IlcSdkPathValue}\" " : string.Empty) +
+                (!string.IsNullOrWhiteSpace(args.AppDepSdkPathValue) ? $"--appdepsdkpath \"{args.AppDepSdkPathValue}\" " : string.Empty) +
                 $"\"{context.ProjectDirectory}\"")
                 .ForwardStdOut()
                 .ForwardStdErr()
