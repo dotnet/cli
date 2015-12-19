@@ -7,12 +7,12 @@
 servicing_index_t::servicing_index_t(const arguments_t& args)
 {
     m_patch_root = args.svc_dir;
-	if (!m_patch_root.empty())
-	{
-		m_index_file.assign(m_patch_root);
-		append_path(m_index_file, _X("dotnet_servicing_index.txt"));
-	}
-	m_parsed = m_index_file.empty() || !pal::file_exists(m_index_file);
+    if (!m_patch_root.empty())
+    {
+        m_index_file.assign(m_patch_root);
+		    append_path(m_index_file, _X("dotnet_servicing_index.txt"));
+    }
+    m_parsed = m_index_file.empty() || !pal::file_exists(m_index_file);
 }
 
 bool servicing_index_t::find_redirection(
@@ -22,6 +22,11 @@ bool servicing_index_t::find_redirection(
         pal::string_t* redirection)
 {
     ensure_redirections();
+
+    if (m_redirections.empty())
+    {
+        return false;
+    }
 
     pal::stringstream_t stream;
     stream << package_name << _X("|") << package_version << _X("|") << package_relative;
@@ -53,7 +58,7 @@ void servicing_index_t::ensure_redirections()
     {
         return;
     }
-    
+
     pal::stringstream_t sstream;
     std::string line;
     while (std::getline(fstream, line))
@@ -100,7 +105,6 @@ void servicing_index_t::ensure_redirections()
         // Store just the filename.
         m_redirections.emplace(sstream.str(), str.substr(from));
     }
-    
+
     m_parsed = true;
 }
-
