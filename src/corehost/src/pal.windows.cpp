@@ -10,7 +10,7 @@
 
 static std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> g_converter;
 
-bool pal::find_coreclr(pal::string_t& recv)
+bool pal::find_coreclr(pal::string_t* recv)
 {
     pal::string_t candidate;
     pal::string_t test;
@@ -21,7 +21,7 @@ bool pal::find_coreclr(pal::string_t& recv)
         append_path(candidate, _X("runtime"));
         append_path(candidate, _X("coreclr"));
         if (coreclr_exists_in_dir(candidate)) {
-            recv.assign(candidate);
+            recv->assign(candidate);
             return true;
         }
     }
@@ -134,6 +134,16 @@ std::string pal::to_stdstring(const string_t& str)
 pal::string_t pal::to_palstring(const std::string& str)
 {
     return g_converter.from_bytes(str);
+}
+
+void to_palstring(const char* str, pal::string_t* out)
+{
+    out->assign(g_converter.from_bytes(str));
+}
+
+void to_stdstring(const pal::char_t* str, std::string* out)
+{
+    out->assign(g_converter.to_bytes(str));
 }
 
 bool pal::realpath(string_t& path)

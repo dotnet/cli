@@ -19,7 +19,7 @@
 #define symlinkEntrypointExecutable "/proc/curproc/exe"
 #endif
 
-bool pal::find_coreclr(pal::string_t& recv)
+bool pal::find_coreclr(pal::string_t* recv)
 {
     pal::string_t candidate;
     pal::string_t test;
@@ -28,13 +28,13 @@ bool pal::find_coreclr(pal::string_t& recv)
     // TODO: These paths should be consistent
     candidate.assign("/usr/share/dotnet/runtime/coreclr");
     if (coreclr_exists_in_dir(candidate)) {
-        recv.assign(candidate);
+        recv->assign(candidate);
         return true;
     }
-     
+
     candidate.assign("/usr/local/share/dotnet/runtime/coreclr");
     if (coreclr_exists_in_dir(candidate)) {
-        recv.assign(candidate);
+        recv->assign(candidate);
         return true;
     }
     return false;

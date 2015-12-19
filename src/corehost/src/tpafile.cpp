@@ -21,7 +21,7 @@ bool tpaentry_t::to_full_path(const pal::string_t& base, pal::string_t* str) con
     append_path(candidate, library_name.c_str());
     append_path(candidate, library_version.c_str());
     append_path(candidate, relative_path.c_str());
-    
+
     return pal::file_exists(*str);
 }
 
@@ -75,7 +75,7 @@ bool read_field(const pal::string_t& line, pal::char_t* buf, unsigned* ofs, pal:
     return true;
 }
 
-bool tpafile::load(const pal::string_t& path)
+bool tpafile_t::load(const pal::string_t& path)
 {
     if (!pal::file_exists(path))
     {
@@ -117,7 +117,7 @@ bool tpafile::load(const pal::string_t& path)
     return true;
 }
 
-void tpafile::get_local_assemblies(const pal::string_t& dir)
+void tpafile_t::get_local_assemblies(const pal::string_t& dir)
 {
     trace::verbose(_X("adding files from %s to TPA"), dir.c_str());
 
@@ -147,7 +147,7 @@ void tpafile::get_local_assemblies(const pal::string_t& dir)
                 continue;
             }
 
-            pal::string_t file_path = dir + DIR_SEPARATOR + file;            
+            pal::string_t file_path = dir + DIR_SEPARATOR + file;
             trace::verbose(_X("adding %s to local list from %s"), file_name.c_str(), file_path.c_str());
             m_local_assemblies.emplace(file_name, file_path);
         }
@@ -171,11 +171,11 @@ void add_tpa_asset(
     items->insert(asset_name);
 }
 
-void tpafile::write_tpa_list(
+void tpafile_t::write_tpa_list(
         const pal::string_t& app_dir,
         const pal::string_t& package_dir,
         const pal::string_t& clr_dir,
-        pal::string_t& output)
+        pal::string_t* output)
 {
     get_local_assemblies(app_dir);
 
@@ -189,23 +189,23 @@ void tpafile::write_tpa_list(
 
         pal::string_t redirection_path, candidate;
         if (entry.library_type == _X("Package") &&
-                m_svc->find_redirection(entry.library_name, entry.library_version, entry.relative_path, &redirection_path))
+                m_svc.find_redirection(entry.library_name, entry.library_version, entry.relative_path, &redirection_path))
         {
-            add_tpa_asset(entry.asset_name, redirection_path, &items, &output);
+            add_tpa_asset(entry.asset_name, redirection_path, &items, output);
         }
         else if (m_local_assemblies.count(entry.asset_name))
         {
             // TODO: Case insensitive look up?
-            add_tpa_asset(entry.asset_name, m_local_assemblies.find(entry.asset_name)->second, &items, &output);
+            add_tpa_asset(entry.asset_name, m_local_assemblies.find(entry.asset_name)->second, &items, output);
         }
         else if (entry.to_full_path(package_dir, &candidate))
         {
-            add_tpa_asset(entry.asset_name, candidate, &items, &output);
+            add_tpa_asset(entry.asset_name, candidate, &items, output);
         }
     }
     for (const auto& kv : m_local_assemblies)
     {
-        add_tpa_asset(kv.first, kv.second, &items, &output);
+        add_tpa_asset(kv.first, kv.second, &items, output);
     }
 }
 
@@ -225,11 +225,11 @@ void add_native_path(
     items->insert(path);
 }
 
-void tpafile::write_native_paths(
+void tpafile_t::write_native_paths(
         const pal::string_t& app_dir,
         const pal::string_t& package_dir,
         const pal::string_t& clr_dir,
-        pal::string_t& output)
+        pal::string_t* output)
 {
     // First take care of serviced native dlls.
     std::set<pal::string_t> items;
@@ -237,14 +237,14 @@ void tpafile::write_native_paths(
     {
         pal::string_t redirection_path;
         if (entry.asset_type == _X("native") && entry.library_type == _X("Package") &&
-                m_svc->find_redirection(entry.library_name, entry.library_version, entry.relative_path, &redirection_path))
+                m_svc.find_redirection(entry.library_name, entry.library_version, entry.relative_path, &redirection_path))
         {
-            add_native_path(get_directory(redirection_path), &items, &output);
+            add_native_path(get_directory(redirection_path), &items, output);
         }
     }
 
     // App local path
-    add_native_path(app_dir, &items, &output);
+    add_native_path(app_dir, &items, output);
 
     // Take care of the packages cached path
     for (const tpaentry_t& entry : m_tpa_entries)
@@ -252,11 +252,23 @@ void tpafile::write_native_paths(
         pal::string_t candidate;
         if (entry.asset_type == _X("native") && entry.to_full_path(package_dir, &candidate))
         {
-            add_native_path(get_directory(candidate), &items, &output);
+            add_native_path(get_directory(candidate), &items, output);
         }
     }
 
     // CLR path
-    add_native_path(clr_dir, &items, &output);
+    add_native_path(clr_dir, &items, output);
 }
 
+
+bool tpafile_t::write_probe_paths(
+    const pal::string_t& app_dir,
+    const pal::string_t& package_dir,
+    const pal::string_t& clr_dir,
+    probe_paths_t* probe_paths)
+{
+    write_tpa_list(app_dir, package_dir, clr_dir, &probe_paths->tpa);
+    write_native_paths(app_dir, package_dir, clr_dir, &probe_paths->native);
+    // write_culture_paths(app_dir, package_dir, clr_dir, &probe_paths->culture);
+    return true;
+}

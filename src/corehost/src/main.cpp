@@ -8,29 +8,42 @@
 #include "utils.h"
 #include "coreclr.h"
 
-void get_tpafile_path(const pal::string_t& app_base, const pal::string_t& app_name, pal::string_t* tpapath)
+// ----------------------------------------------------------------------
+//
+// get_tpafile_path: Obtain the TPA file path from the app base directory
+//
+void get_tpafile_path(const arguments_t& args, pal::string_t* tpapath)
 {
-    tpapath->reserve(app_base.length() + app_name.length() + 5);
+    const auto& app_base = args.app_dir;
+    auto app_name = get_filename(args.managed_application);
 
+    tpapath->clear();
+    tpapath->reserve(app_base.length() + 1 + app_name.length() + 5);
     tpapath->append(app_base);
     tpapath->push_back(DIR_SEPARATOR);
-
-    // Remove the extension from the app_name
-    auto ext_location = app_name.find_last_of('.');
-    if (ext_location != std::string::npos)
-    {
-        tpapath->append(app_name.substr(0, ext_location));
-    }
-    else
-    {
-        tpapath->append(app_name);
-    }
+    tpapath->append(app_name, 0, app_name.find_last_of(_X(".")));
     tpapath->append(_X(".deps"));
 }
 
+// ----------------------------------------------------------------------
+// resolve_clr_path: Resolve CLR Path in priority order
+//
+// Description:
+//   Check if CoreCLR library exists in runtime servicing dir or app
+//   local or DOTNET_HOME directory in that order of priority. If these
+//   fail to locate CoreCLR, then check platform-specific search.
+//
+// Returns:
+//   "true" if path to the CoreCLR dir can be resolved in "clr_path"
+//    parameter. Else, returns "false" with "clr_path" unmodified.
+//
 bool resolve_clr_path(const arguments_t& args, pal::string_t* clr_path)
 {
-    const pal::string_t* dirs[] = { &args.svc_dir, &args.app_dir, &args.home_dir };
+    const pal::string_t* dirs[] = {
+        &args.svc_dir, // DOTNET_RUNTIME_SERVICING
+        &args.app_dir, // APP LOCAL
+        &args.home_dir // DOTNET_HOME
+    };
     for (int i = 0; i < sizeof(dirs) / sizeof(dirs[0]); ++i)
     {
         if (dirs[i]->empty())
@@ -49,37 +62,40 @@ bool resolve_clr_path(const arguments_t& args, pal::string_t* clr_path)
             return true;
         }
     }
+
+    // Use platform-specific search algorithm
+    pal::string_t home_dir = args.home_dir;
+    if (pal::find_coreclr(&home_dir))
+    {
+        clr_path->assign(home_dir);
+        return true;
+    }
     return false;
 }
 
 
-int run(const arguments_t& args, const pal::string_t& clr_path, tpafile* tpa)
+int run(const arguments_t& args, const pal::string_t& clr_path)
 {
+    // Check for and load deps file
+    pal::string_t tpafile_path;
+    get_tpafile_path(args, &tpafile_path);
+
+    tpafile_t tpa(args);
+    if (!tpa.load(tpafile_path))
+    {
+        trace::error(_X("invalid .deps file"));
+        return 1;
+    }
     // Add packages directory
     pal::string_t packages_dir;
-    if (!pal::get_default_packages_directory(packages_dir))
+    pal::get_default_packages_directory(packages_dir);
+    trace::info(_X("Package directory %s"), packages_dir.empty() ? _X("not specified") : packages_dir.c_str());
+
+    probe_paths_t probe_paths;
+    if (!tpa.write_probe_paths(args.app_dir, packages_dir, clr_path, &probe_paths))
     {
-        trace::info(_X("did not find local packages directory"));
-
-        // We can continue, the app may have it's dependencies locally
+        return 1;
     }
-    else
-    {
-        trace::info(_X("using packages directory: %s"), packages_dir.c_str());
-    }
-
-    // Build TPA list and search paths
-    pal::string_t tpalist;
-    tpa->write_tpa_list(args.app_dir, packages_dir, clr_path, tpalist);
-
-    trace::info(_X("using native search path: %s"), packages_dir.c_str());
-
-    pal::string_t search_paths;
-    tpa->write_native_paths(args.app_dir, packages_dir, clr_path, search_paths);
-
-    // TODO:
-    // pal::string_t culture_paths;
-    // tpa->write_culture_paths(args.app_dir, packages_dir, clr_path, culture_paths);
 
     // Build CoreCLR properties
     const char* property_keys[] = {
@@ -87,31 +103,35 @@ int run(const arguments_t& args, const pal::string_t& clr_path, tpafile* tpa)
         "APP_PATHS",
         "APP_NI_PATHS",
         "NATIVE_DLL_SEARCH_DIRECTORIES",
-        "AppDomainCompatSwitch"
+        "PLATFORM_RESOURCE_ROOTS",
+        "AppDomainCompatSwitch",
+        // TODO: pipe this from corehost.json
+        "SERVER_GC"
     };
 
-    auto tpa_cstr = pal::to_stdstring(tpalist);
+    auto tpa_paths_cstr = pal::to_stdstring(probe_paths.tpa);
     auto app_base_cstr = pal::to_stdstring(args.app_dir);
-    auto search_paths_cstr = pal::to_stdstring(search_paths);
+    auto native_dirs_cstr = pal::to_stdstring(probe_paths.native);
+    auto culture_dirs_cstr = pal::to_stdstring(probe_paths.culture);
 
     const char* property_values[] = {
         // TRUSTED_PLATFORM_ASSEMBLIES
-        tpa_cstr.c_str(),
+        tpa_paths_cstr.c_str(),
         // APP_PATHS
         app_base_cstr.c_str(),
         // APP_NI_PATHS
         app_base_cstr.c_str(),
         // NATIVE_DLL_SEARCH_DIRECTORIES
-        search_paths_cstr.c_str(),
+        native_dirs_cstr.c_str(),
+        // PLATFORM_RESOURCE_ROOTS
+        culture_dirs_cstr.c_str(),
         // AppDomainCompatSwitch
-        "UseLatestBehaviorWhenTFMNotSpecified"
+        "UseLatestBehaviorWhenTFMNotSpecified",
+        // SERVER_GC
+        "1"
     };
 
-    // Dump TPA list
-    trace::verbose(_X("TPA List: %s"), tpalist.c_str());
-
-    // Dump native search paths
-    trace::verbose(_X("Native Paths: %s"), search_paths.c_str());
+    size_t property_size = sizeof(property_keys) / sizeof(property_keys[0]);
 
     // Bind CoreCLR
     if (!coreclr::bind(clr_path))
@@ -120,15 +140,27 @@ int run(const arguments_t& args, const pal::string_t& clr_path, tpafile* tpa)
         return 1;
     }
 
+    // Verbose logging
+    if (trace::is_enabled())
+    {
+        for (int i = 0; i < property_size; ++i)
+        {
+            trace::verbose(_X("Property %s = %s"), property_keys[i], property_values[i]);
+        }
+    }
+
+    std::string own_path;
+    pal::to_stdstring(args.own_path.c_str(), &own_path);
+
     // Initialize CoreCLR
     coreclr::host_handle_t host_handle;
     coreclr::domain_id_t domain_id;
     auto hr = coreclr::initialize(
-        pal::to_stdstring(args.own_path).c_str(),
+        own_path.c_str(),
         "clrhost",
         property_keys,
         property_values,
-        sizeof(property_keys) / sizeof(property_keys[0]),
+        property_size,
         &host_handle,
         &domain_id);
     if (!SUCCEEDED(hr))
@@ -137,12 +169,24 @@ int run(const arguments_t& args, const pal::string_t& clr_path, tpafile* tpa)
         return 1;
     }
 
-    // Convert the args (probably not the most performant way to do this...)
-    auto argv_strs = new std::string[args.app_argc];
-    auto argv = new const char*[args.app_argc];
+    if (trace::is_enabled())
+    {
+        pal::string_t arg_str;
+        for (int i = 0; i < args.app_argc; i++)
+        {
+            arg_str.append(args.app_argv[i]);
+            arg_str.append(_X(","));
+        }
+        trace::info(_X("Launch host: %s app: %s, argc: %d args: %s"), args.own_path.c_str(),
+            args.managed_application.c_str(), args.app_argc, arg_str.c_str());
+    }
+
+    // Initialize with empty strings
+    std::vector<std::string> argv_strs(args.app_argc);
+    std::vector<const char*> argv(args.app_argc);
     for (int i = 0; i < args.app_argc; i++)
     {
-        argv_strs[i] = pal::to_stdstring(pal::string_t(args.app_argv[i]));
+        pal::to_stdstring(args.app_argv[i], &argv_strs[i]);
         argv[i] = argv_strs[i].c_str();
     }
 
@@ -151,8 +195,8 @@ int run(const arguments_t& args, const pal::string_t& clr_path, tpafile* tpa)
     hr = coreclr::execute_assembly(
         host_handle,
         domain_id,
-        args.app_argc,
-        argv,
+        argv.size(),
+        argv.data(),
         pal::to_stdstring(args.managed_application).c_str(),
         &exit_code);
     if (!SUCCEEDED(hr))
@@ -179,50 +223,26 @@ int __cdecl wmain(const int argc, const pal::char_t* argv[])
 int main(const int argc, const pal::char_t* argv[])
 #endif
 {
+    // Take care of arguments
     arguments_t args;
     if (!parse_arguments(argc, argv, args))
     {
         return 1;
     }
 
-    // Resolve paths
+    // Resolve application path
     if (!pal::realpath(args.managed_application))
     {
         trace::error(_X("failed to locate managed application: %s"), args.managed_application.c_str());
         return 1;
     }
-    trace::info(_X("preparing to launch managed application: %s"), args.managed_application.c_str());
-    trace::info(_X("host path: %s"), args.own_path.c_str());
 
-    pal::string_t argstr;
-    for (int i = 0; i < args.app_argc; i++)
-    {
-        argstr.append(args.app_argv[i]);
-        argstr.append(_X(","));
-    }
-    trace::info(_X("App argc: %d"), args.app_argc);
-    trace::info(_X("App argv: %s"), argstr.c_str());
-
+    // Resolve CLR path
     pal::string_t clr_path;
     if (!resolve_clr_path(args, &clr_path))
     {
         trace::error(_X("could not resolve coreclr path"));
         return 1;
     }
-
-    // Check for and load deps file
-    pal::string_t tpafile_path;
-    auto app_name = get_filename(args.managed_application);
-    get_tpafile_path(args.app_dir, app_name, &tpafile_path);
-    trace::info(_X("checking for .deps File"));
-
-    servicing_index_t svc(args);
-    tpafile tpa(&svc);
-    if (!tpa.load(tpafile_path))
-    {
-        trace::error(_X("invalid .deps file"));
-        return 1;
-    }
-
-    return run(args, clr_path, &tpa);
+    return run(args, clr_path);
 }
