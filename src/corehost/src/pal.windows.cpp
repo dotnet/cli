@@ -136,12 +136,12 @@ pal::string_t pal::to_palstring(const std::string& str)
     return g_converter.from_bytes(str);
 }
 
-void to_palstring(const char* str, pal::string_t* out)
+void pal::to_palstring(const char* str, pal::string_t* out)
 {
     out->assign(g_converter.from_bytes(str));
 }
 
-void to_stdstring(const pal::char_t* str, std::string* out)
+void pal::to_stdstring(const pal::char_t* str, std::string* out)
 {
     out->assign(g_converter.to_bytes(str));
 }
