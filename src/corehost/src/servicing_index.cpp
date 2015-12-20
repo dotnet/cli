@@ -4,13 +4,15 @@
 #include "trace.h"
 #include "servicing_index.h"
 
-servicing_index_t::servicing_index_t(const arguments_t& args)
+static const pal::char_t* DOTNET_SERVICING_INDEX_TXT = _X("dotnet_servicing_index.txt");
+
+servicing_index_t::servicing_index_t(const pal::string_t& svc_dir)
 {
-    m_patch_root = args.svc_dir;
+    m_patch_root = svc_dir;
     if (!m_patch_root.empty())
     {
         m_index_file.assign(m_patch_root);
-		    append_path(m_index_file, _X("dotnet_servicing_index.txt"));
+		    append_path(m_index_file, DOTNET_SERVICING_INDEX_TXT);
     }
     m_parsed = m_index_file.empty() || !pal::file_exists(m_index_file);
 }
@@ -94,7 +96,7 @@ void servicing_index_t::ensure_redirections()
 
         if (bad_line)
         {
-            trace::error(_X("Bad line in servicing index. Skipping..."));
+            trace::error(_X("Invalid line in servicing index. Skipping..."));
             continue;
         }
 

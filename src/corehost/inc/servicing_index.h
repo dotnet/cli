@@ -7,7 +7,7 @@
 class servicing_index_t
 {
 public:
-    servicing_index_t(const arguments_t& args);
+    servicing_index_t(const pal::string_t& svc_dir);
 
     bool find_redirection(const pal::string_t& package_name,
             const pal::string_t& package_version,
@@ -22,4 +22,3 @@ private:
     pal::string_t m_index_file;
     bool m_parsed;
 };
-

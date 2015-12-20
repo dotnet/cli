@@ -1,8 +1,8 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#ifndef TPAFILE_H
-#define TPAFILE_H
+#ifndef DEPS_RESOLVER_H
+#define DEPS_RESOLVER_H
 
 #include <vector>
 
@@ -11,7 +11,7 @@
 
 #include "servicing_index.h"
 
-struct tpaentry_t
+struct deps_entry_t
 {
     pal::string_t library_type;
     pal::string_t library_name;
@@ -31,14 +31,16 @@ struct probe_paths_t
     pal::string_t culture;
 };
 
-class tpafile_t
+class deps_resolver_t
 {
 public:
-    tpafile_t(const arguments_t& args)
-        : m_svc(args)
+    deps_resolver_t(const arguments_t& args)
+        : m_svc(args.svc_dir)
     {
+        m_valid = parse_deps_file(args);
     }
-    bool load(const pal::string_t& path);
+
+    bool valid() { return m_valid; }
 
     bool write_probe_paths(
       const pal::string_t& app_dir,
@@ -48,24 +50,36 @@ public:
 
 private:
 
-  void write_tpa_list(
-      const pal::string_t& app_dir,
-      const pal::string_t& package_dir,
-      const pal::string_t& clr_dir,
-      pal::string_t* output);
+    bool load();
 
-  void write_native_paths(
-      const pal::string_t& app_dir,
-      const pal::string_t& package_dir,
-      const pal::string_t& clr_dir,
-      pal::string_t* output);
+    bool parse_deps_file(const arguments_t& args);
+
+    void write_tpa_list(
+        const pal::string_t& app_dir,
+        const pal::string_t& package_dir,
+        const pal::string_t& clr_dir,
+        pal::string_t* output);
+
+    void write_native_paths(
+        const pal::string_t& app_dir,
+        const pal::string_t& package_dir,
+        const pal::string_t& clr_dir,
+        pal::string_t* output);
+
+    void write_culture_paths(
+        const pal::string_t& app_dir,
+        const pal::string_t& package_dir,
+        const pal::string_t& clr_dir,
+        pal::string_t* output);
 
     void get_local_assemblies(const pal::string_t& dir);
 
     servicing_index_t m_svc;
     std::unordered_map<pal::string_t, pal::string_t> m_local_assemblies;
-    std::vector<tpaentry_t> m_tpa_entries;
+    std::vector<deps_entry_t> m_deps_entries;
     std::vector<pal::string_t> m_package_search_paths;
+    pal::string_t m_deps_path;
+    bool m_valid;
 };
 
-#endif // TPAFILE_H
+#endif // DEPS_RESOLVER_H

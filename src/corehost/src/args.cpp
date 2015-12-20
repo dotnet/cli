@@ -26,6 +26,18 @@ void display_help()
 
 bool parse_arguments(const int argc, const pal::char_t* argv[], arguments_t& args)
 {
+    // Read trace environment variable
+    pal::string_t trace_str;
+    if (pal::getenv(_X("COREHOST_TRACE"), trace_str))
+    {
+        auto trace_val = pal::xtoi(trace_str.c_str());
+        if (trace_val > 0)
+        {
+            trace::enable();
+            trace::info(_X("tracing enabled"));
+        }
+    }
+
     // Get the full name of the application
     if (!pal::get_own_executable_path(args.own_path) || !pal::realpath(args.own_path))
     {
@@ -45,15 +57,12 @@ bool parse_arguments(const int argc, const pal::char_t* argv[], arguments_t& arg
             return false;
         }
         args.managed_application = pal::string_t(argv[1]);
-
-        // Take care of app_dir
-        args.app_dir = args.managed_application;
-        if (!pal::realpath(args.app_dir))
+        if (!pal::realpath(args.managed_application))
         {
+            trace::error(_X("failed to locate managed application: %s"), args.managed_application.c_str());
             return false;
         }
-        args.app_dir = get_directory(args.app_dir);
-
+        args.app_dir = get_directory(args.managed_application);
         args.app_argc = argc - 2;
         args.app_argv = &argv[2];
     }
@@ -64,26 +73,21 @@ bool parse_arguments(const int argc, const pal::char_t* argv[], arguments_t& arg
         managed_app.push_back(DIR_SEPARATOR);
         managed_app.append(get_executable(own_name));
         managed_app.append(_X(".dll"));
-        args.app_dir = own_dir;
         args.managed_application = managed_app;
+        if (!pal::realpath(args.managed_application))
+        {
+            trace::error(_X("failed to locate managed application: %s"), args.managed_application.c_str());
+            return false;
+        }
+        args.app_dir = own_dir;
         args.app_argv = &argv[1];
         args.app_argc = argc - 1;
     }
 
-    // Read trace environment variable
-    pal::string_t trace_str;
-    if (pal::getenv(_X("COREHOST_TRACE"), trace_str))
-    {
-        auto trace_val = pal::xtoi(trace_str.c_str());
-        if (trace_val > 0)
-        {
-            trace::enable();
-            trace::info(_X("tracing enabled"));
-        }
-    }
-
-    pal::getenv(_X("DOTNET_SERVICING"), args.svc_dir);
-    pal::getenv(_X("DOTNET_RUNTIME_SERVICING"), args.runtime_svc_dir);
-    pal::getenv(_X("DOTNET_HOME"), args.home_dir);
+    pal::getenv(_X("DOTNET_PACKAGES"), args.dotnet_packages);
+    pal::getenv(_X("DOTNET_PACKAGES_CACHE"), args.dotnet_packages_cache);
+    pal::getenv(_X("DOTNET_SERVICING"), args.dotnet_servicing);
+    pal::getenv(_X("DOTNET_RUNTIME_SERVICING"), args.dotnet_runtime_servicing);
+    pal::getenv(_X("DOTNET_HOME"), args.dotnet_home);
     return true;
 }

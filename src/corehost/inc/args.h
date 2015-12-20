@@ -12,9 +12,11 @@ struct arguments_t
 {
     pal::string_t own_path;
     pal::string_t app_dir;
-    pal::string_t svc_dir;
-    pal::string_t runtime_svc_dir;
-    pal::string_t home_dir;
+    pal::string_t dotnet_servicing;
+    pal::string_t dotnet_runtime_servicing;
+    pal::string_t dotnet_home;
+    pal::string_t dotnet_packages;
+    pal::string_t dotnet_packages_cache;
     pal::string_t managed_application;
 
     int app_argc;

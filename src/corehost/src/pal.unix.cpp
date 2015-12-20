@@ -153,6 +153,8 @@ bool pal::file_exists(const pal::string_t& path)
 
 void pal::readdir(const pal::string_t& path, std::vector<pal::string_t>* list)
 {
+    assert(list == nullptr);
+
     std::vector<pal::string_t>& files = *list;
 
     auto dir = opendir(path.c_str());

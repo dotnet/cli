@@ -5,10 +5,10 @@
 #include <functional>
 
 #include "trace.h"
-#include "tpafile.h"
+#include "deps_resolver.h"
 #include "utils.h"
 
-bool tpaentry_t::to_full_path(const pal::string_t& base, pal::string_t* str) const
+bool deps_entry_t::to_full_path(const pal::string_t& base, pal::string_t* str) const
 {
     pal::string_t& candidate = *str;
 
@@ -22,7 +22,12 @@ bool tpaentry_t::to_full_path(const pal::string_t& base, pal::string_t* str) con
     append_path(candidate, library_version.c_str());
     append_path(candidate, relative_path.c_str());
 
-    return pal::file_exists(*str);
+    bool exists = pal::file_exists(*str);
+    if (!exists)
+    {
+        candidate.clear();
+    }
+    return exists;
 }
 
 bool read_field(const pal::string_t& line, pal::char_t* buf, unsigned* ofs, pal::string_t* field)
@@ -75,14 +80,14 @@ bool read_field(const pal::string_t& line, pal::char_t* buf, unsigned* ofs, pal:
     return true;
 }
 
-bool tpafile_t::load(const pal::string_t& path)
+bool deps_resolver_t::load()
 {
-    if (!pal::file_exists(path))
+    if (!pal::file_exists(m_deps_path))
     {
         return true;
     }
 
-    pal::ifstream_t file(path);
+    pal::ifstream_t file(m_deps_path);
     if (!file.good())
     {
         return false;
@@ -91,7 +96,7 @@ bool tpafile_t::load(const pal::string_t& path)
     std::string line;
     while (std::getline(file, line))
     {
-        tpaentry_t entry;
+        deps_entry_t entry;
         pal::string_t* fields[] = {
             &entry.library_type,
             &entry.library_name,
@@ -112,21 +117,41 @@ bool tpafile_t::load(const pal::string_t& path)
                 return false;
             }
         }
-        m_tpa_entries.push_back(entry);
+        m_deps_entries.push_back(entry);
     }
     return true;
 }
 
-void tpafile_t::get_local_assemblies(const pal::string_t& dir)
-{
-    trace::verbose(_X("adding files from %s to TPA"), dir.c_str());
 
-    const pal::string_t tpa_extensions[] = { _X(".ni.dll"), _X(".dll"), _X(".ni.exe"), _X(".exe") };
+// ----------------------------------------------------------------------
+//
+// parse_deps_file: Obtain the .deps file path from the app base directory
+//                 and parse it
+//
+bool deps_resolver_t::parse_deps_file(const arguments_t& args)
+{
+    const auto& app_base = args.app_dir;
+    auto app_name = get_filename(args.managed_application);
+
+    m_deps_path.reserve(app_base.length() + 1 + app_name.length() + 5);
+    m_deps_path.append(app_base);
+    m_deps_path.push_back(DIR_SEPARATOR);
+    m_deps_path.append(app_name, 0, app_name.find_last_of(_X(".")));
+    m_deps_path.append(_X(".deps"));
+
+    return load();
+}
+
+void deps_resolver_t::get_local_assemblies(const pal::string_t& dir)
+{
+    trace::verbose(_X("adding files from dir %s"), dir.c_str());
+
+    const pal::string_t managed_ext[] = { _X(".ni.dll"), _X(".dll"), _X(".ni.exe"), _X(".exe") };
 
     std::vector<pal::string_t> files;
     pal::readdir(dir, &files);
 
-    for (const auto& ext : tpa_extensions)
+    for (const auto& ext : managed_ext)
     {
         for (const auto& file : files)
         {
@@ -136,19 +161,22 @@ void tpafile_t::get_local_assemblies(const pal::string_t& dir)
             }
 
             auto file_name = file.substr(0, file.length() - ext.length());
-            if (file_name.empty() || m_local_assemblies.count(file_name))
-            {
-                continue;
-            }
-
             auto file_ext = file.substr(file_name.length());
+
             if (pal::strcasecmp(ext.c_str(), file_ext.c_str()))
             {
                 continue;
             }
 
+            // TODO: Do a case insensitive lookup.
+            if (m_local_assemblies.count(file_name))
+            {
+                trace::verbose(_X("Skipping %s because the filename already exists in loscal assemblies"), file.c_str());
+                continue;
+            }
+
             pal::string_t file_path = dir + DIR_SEPARATOR + file;
-            trace::verbose(_X("adding %s to local list from %s"), file_name.c_str(), file_path.c_str());
+            trace::verbose(_X("adding %s to local assembly set from %s"), file_name.c_str(), file_path.c_str());
             m_local_assemblies.emplace(file_name, file_path);
         }
     }
@@ -171,7 +199,7 @@ void add_tpa_asset(
     items->insert(asset_name);
 }
 
-void tpafile_t::write_tpa_list(
+void deps_resolver_t::write_tpa_list(
         const pal::string_t& app_dir,
         const pal::string_t& package_dir,
         const pal::string_t& clr_dir,
@@ -180,7 +208,13 @@ void tpafile_t::write_tpa_list(
     get_local_assemblies(app_dir);
 
     std::set<pal::string_t> items;
-    for (const tpaentry_t& entry : m_tpa_entries)
+
+    pal::string_t mscorlib_path = clr_dir;
+    mscorlib_path.push_back(DIR_SEPARATOR);
+    mscorlib_path.append(_X("mscorlib.dll"));
+    add_tpa_asset(_X("mscorlib"), mscorlib_path, &items, output);
+
+    for (const deps_entry_t& entry : m_deps_entries)
     {
         if (entry.asset_type != _X("runtime") || items.count(entry.asset_name))
         {
@@ -209,23 +243,24 @@ void tpafile_t::write_tpa_list(
     }
 }
 
-void add_native_path(
+void add_unique_path(
+    const pal::string_t& type,
     const pal::string_t& path,
-    std::set<pal::string_t>* items,
+    std::set<pal::string_t>* existing,
     pal::string_t* output)
 {
-    if (items->count(path))
+    if (existing->count(path))
     {
         return;
     }
 
-    trace::verbose(_X("adding native search path: %s"), path.c_str());
+    trace::verbose(_X("adding to %s path: %s"), type.c_str(), path.c_str());
     output->append(path);
     output->push_back(PATH_SEPARATOR);
-    items->insert(path);
+    existing->insert(path);
 }
 
-void tpafile_t::write_native_paths(
+void deps_resolver_t::write_native_paths(
         const pal::string_t& app_dir,
         const pal::string_t& package_dir,
         const pal::string_t& clr_dir,
@@ -233,35 +268,55 @@ void tpafile_t::write_native_paths(
 {
     // First take care of serviced native dlls.
     std::set<pal::string_t> items;
-    for (const tpaentry_t& entry : m_tpa_entries)
+    for (const deps_entry_t& entry : m_deps_entries)
     {
         pal::string_t redirection_path;
         if (entry.asset_type == _X("native") && entry.library_type == _X("Package") &&
                 m_svc.find_redirection(entry.library_name, entry.library_version, entry.relative_path, &redirection_path))
         {
-            add_native_path(get_directory(redirection_path), &items, output);
+            add_unique_path(_X("native"), get_directory(redirection_path), &items, output);
         }
     }
 
     // App local path
-    add_native_path(app_dir, &items, output);
+    add_unique_path(_X("native"), app_dir, &items, output);
 
     // Take care of the packages cached path
-    for (const tpaentry_t& entry : m_tpa_entries)
+    for (const deps_entry_t& entry : m_deps_entries)
     {
         pal::string_t candidate;
         if (entry.asset_type == _X("native") && entry.to_full_path(package_dir, &candidate))
         {
-            add_native_path(get_directory(candidate), &items, output);
+            add_unique_path(_X("native"), get_directory(candidate), &items, output);
         }
     }
 
     // CLR path
-    add_native_path(clr_dir, &items, output);
+    add_unique_path(_X("native"), clr_dir, &items, output);
 }
 
+void deps_resolver_t::write_culture_paths(
+    const pal::string_t& app_dir,
+    const pal::string_t& package_dir,
+    const pal::string_t& clr_dir,
+    pal::string_t* output)
+{
+    std::set<pal::string_t> items;
+    for (const deps_entry_t& entry : m_deps_entries)
+    {
+        pal::string_t redirection_path;
+        if (entry.asset_type == _X("culture") && entry.library_type == _X("Package") &&
+                m_svc.find_redirection(entry.library_name, entry.library_version, entry.relative_path, &redirection_path))
+        {
+            add_unique_path(_X("culture"), get_directory(get_directory(redirection_path)), &items, output);
+        }
+    }
 
-bool tpafile_t::write_probe_paths(
+    // App local path
+    add_unique_path(_X("culture"), app_dir, &items, output);
+}
+
+bool deps_resolver_t::write_probe_paths(
     const pal::string_t& app_dir,
     const pal::string_t& package_dir,
     const pal::string_t& clr_dir,
@@ -269,6 +324,6 @@ bool tpafile_t::write_probe_paths(
 {
     write_tpa_list(app_dir, package_dir, clr_dir, &probe_paths->tpa);
     write_native_paths(app_dir, package_dir, clr_dir, &probe_paths->native);
-    // write_culture_paths(app_dir, package_dir, clr_dir, &probe_paths->culture);
+    write_culture_paths(app_dir, package_dir, clr_dir, &probe_paths->culture);
     return true;
 }

@@ -4,26 +4,9 @@
 #include "pal.h"
 #include "args.h"
 #include "trace.h"
-#include "tpafile.h"
+#include "deps_resolver.h"
 #include "utils.h"
 #include "coreclr.h"
-
-// ----------------------------------------------------------------------
-//
-// get_tpafile_path: Obtain the TPA file path from the app base directory
-//
-void get_tpafile_path(const arguments_t& args, pal::string_t* tpapath)
-{
-    const auto& app_base = args.app_dir;
-    auto app_name = get_filename(args.managed_application);
-
-    tpapath->clear();
-    tpapath->reserve(app_base.length() + 1 + app_name.length() + 5);
-    tpapath->append(app_base);
-    tpapath->push_back(DIR_SEPARATOR);
-    tpapath->append(app_name, 0, app_name.find_last_of(_X(".")));
-    tpapath->append(_X(".deps"));
-}
 
 // ----------------------------------------------------------------------
 // resolve_clr_path: Resolve CLR Path in priority order
@@ -50,15 +33,15 @@ bool resolve_clr_path(const arguments_t& args, pal::string_t* clr_path)
         {
             continue;
         }
-        pal::string_t cur = *dirs[i];
+        pal::string_t cur_dir = *dirs[i];
         if (dirs[i] != &args.app_dir)
         {
-            append_path(cur, _X("runtime"));
-            append_path(cur, _X("coreclr"));
+            append_path(cur_dir, _X("runtime"));
+            append_path(cur_dir, _X("coreclr"));
         }
-        if (coreclr_exists_in_dir(cur))
+        if (coreclr_exists_in_dir(cur_dir))
         {
-            clr_path->assign(cur);
+            clr_path->assign(cur_dir);
             return true;
         }
     }
@@ -73,26 +56,23 @@ bool resolve_clr_path(const arguments_t& args, pal::string_t* clr_path)
     return false;
 }
 
-
 int run(const arguments_t& args, const pal::string_t& clr_path)
 {
-    // Check for and load deps file
-    pal::string_t tpafile_path;
-    get_tpafile_path(args, &tpafile_path);
-
-    tpafile_t tpa(args);
-    if (!tpa.load(tpafile_path))
+    // Load the deps resolver
+    deps_resolver_t resolver(args);
+    if (!resolver.valid())
     {
         trace::error(_X("invalid .deps file"));
         return 1;
     }
+
     // Add packages directory
     pal::string_t packages_dir;
     pal::get_default_packages_directory(packages_dir);
     trace::info(_X("Package directory %s"), packages_dir.empty() ? _X("not specified") : packages_dir.c_str());
 
     probe_paths_t probe_paths;
-    if (!tpa.write_probe_paths(args.app_dir, packages_dir, clr_path, &probe_paths))
+    if (!resolver.write_probe_paths(args.app_dir, packages_dir, clr_path, &probe_paths))
     {
         return 1;
     }
@@ -227,13 +207,6 @@ int main(const int argc, const pal::char_t* argv[])
     arguments_t args;
     if (!parse_arguments(argc, argv, args))
     {
-        return 1;
-    }
-
-    // Resolve application path
-    if (!pal::realpath(args.managed_application))
-    {
-        trace::error(_X("failed to locate managed application: %s"), args.managed_application.c_str());
         return 1;
     }
 
