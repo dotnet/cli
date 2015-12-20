@@ -10,7 +10,7 @@
 
 static std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> g_converter;
 
-bool pal::find_coreclr(pal::string_t& recv)
+bool pal::find_coreclr(pal::string_t* recv)
 {
     pal::string_t candidate;
     pal::string_t test;
@@ -21,7 +21,7 @@ bool pal::find_coreclr(pal::string_t& recv)
         append_path(candidate, _X("runtime"));
         append_path(candidate, _X("coreclr"));
         if (coreclr_exists_in_dir(candidate)) {
-            recv.assign(candidate);
+            recv->assign(candidate);
             return true;
         }
     }
@@ -136,6 +136,16 @@ pal::string_t pal::to_palstring(const std::string& str)
     return g_converter.from_bytes(str);
 }
 
+void pal::to_palstring(const char* str, pal::string_t* out)
+{
+    out->assign(g_converter.from_bytes(str));
+}
+
+void pal::to_stdstring(const pal::char_t* str, std::string* out)
+{
+    out->assign(g_converter.to_bytes(str));
+}
+
 bool pal::realpath(string_t& path)
 {
     char_t buf[MAX_PATH];
@@ -158,9 +168,9 @@ bool pal::file_exists(const string_t& path)
     return found;
 }
 
-std::vector<pal::string_t> pal::readdir(const string_t& path)
+void pal::readdir(const string_t& path, std::vector<pal::string_t>* list)
 {
-    std::vector<string_t> files;
+    std::vector<string_t>& files = *list;
 
     string_t search_string(path);
     search_string.push_back(DIR_SEPARATOR);
@@ -174,6 +184,4 @@ std::vector<pal::string_t> pal::readdir(const string_t& path)
         files.push_back(filepath);
     } while (::FindNextFileW(handle, &data));
     ::FindClose(handle);
-
-    return files;
 }

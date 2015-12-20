@@ -19,7 +19,7 @@
 #define symlinkEntrypointExecutable "/proc/curproc/exe"
 #endif
 
-bool pal::find_coreclr(pal::string_t& recv)
+bool pal::find_coreclr(pal::string_t* recv)
 {
     pal::string_t candidate;
     pal::string_t test;
@@ -28,13 +28,13 @@ bool pal::find_coreclr(pal::string_t& recv)
     // TODO: These paths should be consistent
     candidate.assign("/usr/share/dotnet/runtime/coreclr");
     if (coreclr_exists_in_dir(candidate)) {
-        recv.assign(candidate);
+        recv->assign(candidate);
         return true;
     }
-     
+
     candidate.assign("/usr/local/share/dotnet/runtime/coreclr");
     if (coreclr_exists_in_dir(candidate)) {
-        recv.assign(candidate);
+        recv->assign(candidate);
         return true;
     }
     return false;
@@ -151,9 +151,11 @@ bool pal::file_exists(const pal::string_t& path)
     return (::stat(path.c_str(), &buffer) == 0);
 }
 
-std::vector<pal::string_t> pal::readdir(const pal::string_t& path)
+void pal::readdir(const pal::string_t& path, std::vector<pal::string_t>* list)
 {
-    std::vector<pal::string_t> files;
+    assert(list == nullptr);
+
+    std::vector<pal::string_t>& files = *list;
 
     auto dir = opendir(path.c_str());
     if (dir != nullptr)
@@ -197,6 +199,4 @@ std::vector<pal::string_t> pal::readdir(const pal::string_t& path)
             files.push_back(pal::string_t(entry->d_name));
         }
     }
-
-    return files;
 }
