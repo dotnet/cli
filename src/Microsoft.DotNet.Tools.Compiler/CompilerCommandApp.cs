@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.Tools.Compiler
 {
     public delegate bool OnExecute(
             List<ProjectContext> contexts, string configValue, string outputValue, string intermediateValue, bool noHost,
-            bool isNative, string archValue, string ilcArgsValue, string ilcPathValue, string ilcSdkPathValue,
+            bool isNative, string archValue, string ilcArgsValue, string ilcPathValue, string ilcSdkPathValue, string appDepSdkPathValue,
             bool isCppMode);
 
     public class CompilerCommandApp
@@ -32,6 +32,7 @@ namespace Microsoft.DotNet.Tools.Compiler
         private CommandOption IlcArgs { get; }
         private CommandOption CppMode { get; }
         private CommandOption IlcSdkPath { get; }
+        private CommandOption AppDepSdkPath { get; }
         private CommandOption IlcPath { get; }
 
         public CompilerCommandApp(string name, string fullName, string description)
@@ -58,6 +59,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             IlcArgs = _app.Option("--ilcargs <ARGS>", "Command line arguments to be passed directly to ILCompiler.", CommandOptionType.SingleValue);
             IlcPath = _app.Option("--ilcpath <PATH>", "Path to the folder containing custom built ILCompiler.", CommandOptionType.SingleValue);
             IlcSdkPath = _app.Option("--ilcsdkpath <PATH>", "Path to the folder containing ILCompiler application dependencies.", CommandOptionType.SingleValue);
+            AppDepSdkPath = _app.Option("--appdepsdkpath <PATH>", "Path to the folder containing ILCompiler application dependencies.", CommandOptionType.SingleValue);
             CppMode = _app.Option("--cpp", "Flag to do native compilation with C++ code generator.", CommandOptionType.NoValue);
         }
 
@@ -82,6 +84,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 var ilcArgsValue = IlcArgs.Value();
                 var ilcPathValue = IlcPath.Value();
                 var ilcSdkPathValue = IlcSdkPath.Value();
+                var appDepSdkPathValue = AppDepSdkPath.Value();
                 var isCppMode = CppMode.HasValue();
                
 
@@ -91,7 +94,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                     ProjectContext.CreateContextForEachFramework(projectPath);
 
                 var success = execute(contexts.ToList(), configValue, outputValue, intermediateValue, noHost, isNative, archValue,
-                    ilcArgsValue, ilcPathValue, ilcSdkPathValue, isCppMode);
+                    ilcArgsValue, ilcPathValue, ilcSdkPathValue, appDepSdkPathValue, isCppMode);
 
                 return success ? 0 : 1;
             });

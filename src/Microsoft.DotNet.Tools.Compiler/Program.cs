@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.Tools.Compiler
 
         private static bool OnExecute(List<ProjectContext> contexts, string configValue, string outputValue, string intermediateValue,
             bool noHost, bool isNative, string archValue, string ilcArgsValue, string ilcPathValue,
-            string ilcSdkPathValue, bool isCppMode)
+            string ilcSdkPathValue, string appDepSdkPathValue, bool isCppMode)
         {
             var success = true;
 
@@ -54,7 +54,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 if (isNative && success)
                 {
                     success &= CompileNative(context, configValue, outputValue, intermediateValue, archValue, ilcArgsValue,
-                        ilcPathValue, ilcSdkPathValue, isCppMode);
+                        ilcPathValue, ilcSdkPathValue, appDepSdkPathValue, isCppMode);
                 }
             }
             return success;
@@ -69,6 +69,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             string ilcArgsValue, 
             string ilcPathValue,
             string ilcSdkPathValue,
+            string appDepSdkPathValue,
             bool isCppMode)
         {
             var outputPath = context.GetOutputPath(configuration, outputOptionValue);
@@ -105,8 +106,15 @@ namespace Microsoft.DotNet.Tools.Compiler
             // ILC SDK Path
             if (!string.IsNullOrWhiteSpace(ilcSdkPathValue))
             {
-                nativeArgs.Add("--appdepsdk");
+                nativeArgs.Add("--ilcsdkpath");
                 nativeArgs.Add(ilcSdkPathValue);
+            }
+
+            // AppDep SDK Path
+            if (!string.IsNullOrWhiteSpace(appDepSdkPathValue))
+            {
+                nativeArgs.Add("--appdepsdk");
+                nativeArgs.Add(appDepSdkPathValue);
             }
 
             // CodeGen Mode

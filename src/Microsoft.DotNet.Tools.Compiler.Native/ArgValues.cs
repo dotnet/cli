@@ -16,6 +16,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
         public IEnumerable<string> LinkLibPaths { get; set; }
         public string AppDepSDKPath { get; set; }
         public string IlcPath { get; set; }
+        public string IlcSdkPath { get; set; }
 
         public bool IsHelp { get; set; }
         public int ReturnCode { get; set; }
@@ -55,6 +56,17 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
             if (!string.IsNullOrEmpty(IlcPath))
             {
                 config.IlcPath = IlcPath;
+
+                // If ILCSdkPath is not specified, then default it to be the same as the overridden ILCPath
+                if (string.IsNullOrEmpty(IlcSdkPath))
+                {
+                    IlcSdkPath = IlcPath;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(IlcSdkPath))
+            {
+                config.IlcSdkPath = IlcSdkPath;
             }
 
             if (!string.IsNullOrEmpty(LogPath))

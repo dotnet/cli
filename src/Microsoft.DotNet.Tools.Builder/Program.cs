@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.Tools.Build
 
         private static bool OnExecute(List<ProjectContext> contexts, string configValue, string outputValue, string intermediateValue, bool noHost,
             bool isNative, string archValue, string ilcArgsValue, string ilcPathValue, string ilcSdkPathValue,
-            bool isCppMode)
+            string appDepSdkPath, bool isCppMode)
         {
             foreach (var context in contexts)
             {
@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.Tools.Build
                 
                 //compile project
                 if (!CompileProject(context, configValue, outputPath, intermediateOutputPath, noHost, isNative,
-                    isCppMode, archValue, ilcArgsValue, ilcPathValue, ilcSdkPathValue))
+                    isCppMode, archValue, ilcArgsValue, ilcPathValue, appDepSdkPath, ilcSdkPathValue))
                 {
                     return false;
                 }
@@ -117,7 +117,7 @@ namespace Microsoft.DotNet.Tools.Build
 
         private static bool CompileProject(ProjectContext context, string configValue, string outputPath,
             string intermediateOutputPath, bool isNoHost, bool isNative, bool isCppMode, string archValue, string ilcArgsValue,
-            string ilcPathValue, string ilcSdkPathValue)
+            string ilcPathValue, string ilcSdkPathValue, string appDepSdkPath)
         {
             var compileResult = Command.Create("dotnet-compile",
                 $"--framework {context.TargetFramework} " +
@@ -132,6 +132,7 @@ namespace Microsoft.DotNet.Tools.Build
                 (!string.IsNullOrWhiteSpace(ilcArgsValue) ? $"--ilcargs \"{ilcArgsValue}\" " : string.Empty) +
                 (!string.IsNullOrWhiteSpace(ilcPathValue) ? $"--ilcpath \"{ilcPathValue}\" " : string.Empty) +
                 (!string.IsNullOrWhiteSpace(ilcSdkPathValue) ? $"--ilcsdkpath \"{ilcSdkPathValue}\" " : string.Empty) +
+                (!string.IsNullOrWhiteSpace(appDepSdkPath) ? $"--appdepsdkpath \"{appDepSdkPath}\" " : string.Empty) +
                 $"\"{context.ProjectDirectory}\"")
                 .ForwardStdOut()
                 .ForwardStdErr()
