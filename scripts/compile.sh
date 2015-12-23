@@ -30,7 +30,9 @@ DNX_ROOT="$DNX_DIR/bin"
 if [[ ! -z "$OFFLINE" ]]; then
     header "Skipping Stage 0, Dnx, and Packages download: Offline Build"
 else
-    if [[! -e "$DNX_DIR/__version_$DNX_VERSION" ]]; then
+    if [[ -e "$DNX_DIR/__version_$DNX_VERSION" ]]; then
+        header "DNX $DNX_VERSION is already installed"
+    else
         # Download DNX to copy into stage2
         header "Downloading DNX $DNX_VERSION"
         DNX_URL="https://api.nuget.org/packages/$DNX_FLAVOR.$DNX_VERSION.nupkg"
@@ -39,7 +41,7 @@ else
         curl -o $DNX_DIR/dnx.zip $DNX_URL --silent
         unzip -qq $DNX_DIR/dnx.zip -d $DNX_DIR
         chmod a+x $DNX_ROOT/dnu $DNX_ROOT/dnx
-        "" > "$DNX_DIR/__version_$DNX_VERSION"
+        > "$DNX_DIR/__version_$DNX_VERSION"
     fi
 
     # Ensure the latest stage0 is installed
