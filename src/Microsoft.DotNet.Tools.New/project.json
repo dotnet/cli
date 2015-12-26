@@ -14,8 +14,8 @@
             "version": "1.0.0-*"
         }
     },
-    "compileExclude": [ "Template/**" ],
-    "resource": [ "Template/**" ],
+    "compileExclude": [ "CSharpTemplate/**", "FSharpTemplate/**" ],
+    "resource": [ "CSharpTemplate/**", "FSharpTemplate/**" ],
     "frameworks": {
         "dnxcore50": { }
     },
