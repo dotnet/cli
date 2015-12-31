@@ -26,6 +26,14 @@ function setEnvIfDefault([string]$envVarName, [string]$value)
     }
 }
 
+function setVarIfDefault([string]$varName, [string]$value)
+{
+    If (-not (Get-Variable -name $varName -ErrorAction SilentlyContinue))
+    {
+        Set-Variable -name $varName -value $value -scope 1
+    }
+}
+
 function setPathAndHomeIfDefault([string]$rootPath)
 {
     If ($env:DOTNET_HOME -eq $null)

@@ -51,6 +51,12 @@ do
     fi
 done
 
+"$REPOROOT\scripts\test\package-command-test.sh"
+if [ $? -ne 0 ]; then
+    failCount+=1
+    failedTests+=("package-command-test.sh")
+fi
+
 for test in ${failedTests[@]}
 do
     error "$test.dll failed. Logs in '$TestBinRoot/$test.xml'"

@@ -131,13 +131,13 @@ namespace Microsoft.DotNet.Tools.Restore
             var depsPath = Path.Combine(
                 toolDescription.Path,
                 Path.GetDirectoryName(toolDescription.Target.RuntimeAssemblies.First().Path),
-                toolDescription.Identity.Name + ".deps");
+                toolDescription.Identity.Name + FileNameSuffixes.Deps);
             
             context.MakeRunnable(context.ProjectDirectory, Constants.DefaultConfiguration);
 
             if (File.Exists(depsPath)) File.Delete(depsPath);
 
-            File.Move(Path.Combine(context.ProjectDirectory, "bin.deps"), depsPath);
+            File.Move(Path.Combine(context.ProjectDirectory, "bin" + FileNameSuffixes.Deps), depsPath);
         }
 
         private static void RestoreToolToPath(LibraryRange tooldep, IEnumerable<string> args, string tempPath)

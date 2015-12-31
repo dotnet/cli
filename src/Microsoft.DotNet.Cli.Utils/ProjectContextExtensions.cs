@@ -94,7 +94,7 @@ namespace Microsoft.DotNet.Cli.Utils
             {
                 exporter
                     .GetDependencies(LibraryType.Package)
-                    .WriteDepsTo(Path.Combine(outputPath, context.ProjectFile.Name + ".deps"));
+                    .WriteDepsTo(Path.Combine(outputPath, context.ProjectFile.Name + FileNameSuffixes.Deps));
 
                 exporter.GetDependencies(LibraryType.Project)
                     .SelectMany(e => e.RuntimeAssets())
@@ -176,6 +176,11 @@ namespace Microsoft.DotNet.Cli.Utils
             {
                 appConfig.Save(stream);
             }
+        }
+        
+        public static string GetDepsPath(this ProjectContext context, string buildConfiguration)
+        {
+            return Path.Combine(context.GetOutputDirectoryPath(buildConfiguration), context.ProjectFile.Name + ".deps");
         }
     }
 }

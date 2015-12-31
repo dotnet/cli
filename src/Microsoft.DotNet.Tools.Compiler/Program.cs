@@ -369,7 +369,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 projectContext
                     .CreateExporter(args.ConfigValue)
                     .GetDependencies(LibraryType.Package)
-                    .WriteDepsTo(Path.Combine(outputPath, projectContext.ProjectFile.Name + ".deps"));
+                    .WriteDepsTo(Path.Combine(outputPath, projectContext.ProjectFile.Name + FileNameSuffixes.Deps));
             }
 
             return PrintSummary(diagnostics, sw, success);

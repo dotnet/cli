@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.Cli.Utils
 {
     internal static class CommandResolver
     {
-        public static ProcessStartInfo TryResolvePathAndArgs(string commandName, string args, NuGetFramework framework = null)
+        public static CommandSpec TryResolveCommandSpec(string commandName, string args, NuGetFramework framework = null)
         {
             return ResolveFromRootedCommand(commandName, args) ??
                    ResolveFromProjectDependencies(commandName, args, framework) ??
@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.Cli.Utils
                    ResolveFromPath(commandName, args);
         }
 
-        private static ProcessStartInfo ResolveFromPath(string commandName, string args)
+        private static CommandSpec ResolveFromPath(string commandName, string args)
         {
             var commandPath = Env.GetCommandPath(commandName);
 
@@ -40,28 +40,20 @@ namespace Microsoft.DotNet.Cli.Utils
                 }
             }
 
-            return new ProcessStartInfo
-            {
-                FileName = commandPath,
-                Arguments = args
-            };
+            return new CommandSpec(commandPath, args, CommandResolutionStrategy.Path);
         }
 
-        private static ProcessStartInfo ResolveFromRootedCommand(string commandName, string args)
+        private static CommandSpec ResolveFromRootedCommand(string commandName, string args)
         {
             if (Path.IsPathRooted(commandName))
             {
-                return new ProcessStartInfo
-                {
-                    FileName = commandName,
-                    Arguments = args
-                };
+                return new CommandSpec(commandName, args, CommandResolutionStrategy.Path);
             }
 
             return null;
         }
 
-        public static ProcessStartInfo ResolveFromProjectDependencies(string commandName, string args,
+        public static CommandSpec ResolveFromProjectDependencies(string commandName, string args,
             NuGetFramework framework)
         {
             if (framework == null) return null;
@@ -83,7 +75,10 @@ namespace Microsoft.DotNet.Cli.Utils
         {
             var projectRootPath = Directory.GetCurrentDirectory();
 
-            if (!File.Exists(Path.Combine(projectRootPath, Project.FileName))) return null;
+            if (!File.Exists(Path.Combine(projectRootPath, Project.FileName)))
+            {
+                return null;
+            }
 
             var projectContext = ProjectContext.Create(projectRootPath, framework);
             return projectContext;
@@ -102,21 +97,30 @@ namespace Microsoft.DotNet.Cli.Utils
                               e == FileNameSuffixes.DotNet.DynamicLib));
         }
 
-        public static ProcessStartInfo ResolveFromProjectTools(string commandName, string args)
+        public static CommandSpec ResolveFromProjectTools(string commandName, string args)
         {
             var context = GetProjectContext(FrameworkConstants.CommonFrameworks.DnxCore50);
 
-            if (context == null) return null;
+            if (context == null)
+            {
+                return null;
+            }
 
             var commandLibrary = context.ProjectFile.Tools
                 .FirstOrDefault(l => l.Name == commandName);
 
-            if (commandLibrary == default(LibraryRange)) return null;
+            if (commandLibrary == default(LibraryRange))
+            {
+                return null;
+            }
 
             var lockPath = Path.Combine(context.ProjectDirectory, "artifacts", "Tools", commandName,
                 "project.lock.json");
 
-            if (!File.Exists(lockPath)) return null;
+            if (!File.Exists(lockPath))
+            {
+                return null;
+            }
 
             var lockFile = LockFileReader.Read(lockPath);
 
@@ -129,7 +133,7 @@ namespace Microsoft.DotNet.Cli.Utils
                 : null;
         }
 
-        private static ProcessStartInfo ConfigureCommandFromPackage(string commandName, string args, string packageDir)
+        private static CommandSpec ConfigureCommandFromPackage(string commandName, string args, string packageDir)
         {
             var commandPackage = new PackageFolderReader(packageDir);
 
@@ -138,7 +142,7 @@ namespace Microsoft.DotNet.Cli.Utils
             return ConfigureCommandFromPackage(commandName, args, files, packageDir);
         }
 
-        private static ProcessStartInfo ConfigureCommandFromPackage(string commandName, string args,
+        private static CommandSpec ConfigureCommandFromPackage(string commandName, string args,
             PackageDescription commandPackage, ProjectContext projectContext, string depsPath = null)
         {
             var files = commandPackage.Library.Files;
@@ -152,7 +156,7 @@ namespace Microsoft.DotNet.Cli.Utils
             return ConfigureCommandFromPackage(commandName, args, files, packageDir, depsPath);
         }
 
-        private static ProcessStartInfo ConfigureCommandFromPackage(string commandName, string args,
+        private static CommandSpec ConfigureCommandFromPackage(string commandName, string args,
             IEnumerable<string> files, string packageDir, string depsPath = null)
         {
             var fileName = string.Empty;
@@ -181,11 +185,7 @@ namespace Microsoft.DotNet.Cli.Utils
                 fileName = Path.Combine(packageDir, commandPath);
             }
 
-            return new ProcessStartInfo
-            {
-                FileName = fileName,
-                Arguments = args
-            };
+            return new CommandSpec(fileName, args, CommandResolutionStrategy.NugetPackage);
         }
     }
 }

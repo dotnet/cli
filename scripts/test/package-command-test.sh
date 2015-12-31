@@ -67,3 +67,5 @@ do
     
     popd
 done
+
+exit 0

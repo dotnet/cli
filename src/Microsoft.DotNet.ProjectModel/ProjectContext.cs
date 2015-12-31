@@ -142,10 +142,5 @@ namespace Microsoft.DotNet.ProjectModel
             }
             return outDir;
         }
-
-        public string GetDepsPath(string buildConfiguration)
-        {
-            return Path.Combine(GetOutputDirectoryPath(buildConfiguration), this.ProjectFile.Name + ".deps");
-        }
     }
 }

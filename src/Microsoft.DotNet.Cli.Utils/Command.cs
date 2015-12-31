@@ -18,10 +18,15 @@ namespace Microsoft.DotNet.Cli.Utils
 
         private bool _running = false;
 
-        private Command(ProcessStartInfo psi, CommandResolutionStrategy resolutionStrategy)
+        private Command(CommandSpec commandSpec)
         {
-            psi.RedirectStandardError = true;
-            psi.RedirectStandardOutput = true;
+            var psi = new ProcessStartInfo
+            {
+                FileName = commandSpec.Path,
+                Arguments = commandSpec.Args,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
+            };
 
             _stdOut = new StreamForwarder();
             _stdErr = new StreamForwarder();
@@ -31,7 +36,7 @@ namespace Microsoft.DotNet.Cli.Utils
                 StartInfo = psi
             };
 
-            ResolutionStrategy = resolutionStrategy;
+            ResolutionStrategy = commandSpec.ResolutionStrategy;
         }
 
         public static Command Create(string commandName, IEnumerable<string> args, NuGetFramework framework = null)
@@ -41,16 +46,14 @@ namespace Microsoft.DotNet.Cli.Utils
 
         public static Command Create(string commandName, string args, NuGetFramework framework = null)
         {
-            var psi = CommandResolver.TryResolvePathAndArgs(commandName, args, framework);
+            var commandSpec = CommandResolver.TryResolveCommandSpec(commandName, args, framework);
 
-            if (psi == null)
+            if (commandSpec == null)
             {
                 throw new CommandUnknownException($"No executable found matching command \"{commandName}\"");
             }
             
-            var resolutionStrategy = CommandResolutionStrategy.None;
-
-            var command = new Command(psi, resolutionStrategy);
+            var command = new Command(commandSpec);
 
             return command;
         }

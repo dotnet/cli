@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.Cli.Utils
                         : new [] { string.Empty };
                 }
 
-                return _executableExtensions;;
+                return _executableExtensions;
             }
         } 
 

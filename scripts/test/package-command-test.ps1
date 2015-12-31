@@ -77,3 +77,5 @@ foreach {
     del project.json
     popd
 }
+
+Exit 0
