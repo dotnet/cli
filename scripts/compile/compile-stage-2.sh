@@ -34,9 +34,9 @@ chmod -R a+r $REPOROOT
 # Copy DNX in to stage2
 cp -R $DNX_ROOT $STAGE2_DIR/bin/dnx
 
-# Copy and CHMOD the dotnet-restore script
-cp $REPOROOT/scripts/dotnet-restore.sh $STAGE2_DIR/bin/dotnet-restore
-chmod a+x $STAGE2_DIR/bin/dotnet-restore
+# Copy and CHMOD the dotnet-dnx script
+cp $REPOROOT/scripts/dotnet-dnx.sh $STAGE2_DIR/bin/dotnet-dnx
+chmod a+x $STAGE2_DIR/bin/dotnet-dnx
 
 # No compile native support in centos yet
 # https://github.com/dotnet/cli/issues/453

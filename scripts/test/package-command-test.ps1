@@ -3,7 +3,7 @@
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 #
 
-. "$PSScriptRoot\..\_common.ps1"
+. "$PSScriptRoot\..\common\_common.ps1"
 
 # Restore and compile the test app
 dotnet restore "$RepoRoot\test\PackagedCommands\Commands" --runtime "osx.10.10-x64" --runtime "ubuntu.14.04-x64" --runtime "win7-x64"
@@ -65,6 +65,8 @@ foreach {
         Write-Host "             returned $LastExitCode"
         Exit 1  
     }
+    
+    Write-Host "Test passed: $testName"
     popd
 }
 

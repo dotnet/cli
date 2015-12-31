@@ -358,7 +358,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             {
                 var projectContext = ProjectContext.Create(context.ProjectDirectory, context.TargetFramework, new[] { RuntimeIdentifier.Current });
                 projectContext
-                    .MakeRunnable(outputPath, configuration);
+                    .MakeRunnable(outputPath, args.ConfigValue);
             }
             else if (!string.IsNullOrEmpty(context.ProjectFile.TestRunner))
             {
@@ -367,7 +367,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                         new[] {RuntimeIdentifier.Current});
                 
                 projectContext
-                    .CreateExporter(configuration)
+                    .CreateExporter(args.ConfigValue)
                     .GetDependencies(LibraryType.Package)
                     .WriteDepsTo(Path.Combine(outputPath, projectContext.ProjectFile.Name + ".deps"));
             }

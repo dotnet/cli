@@ -23,4 +23,8 @@ export PATH=$DOTNET_INSTALL_DIR/bin:$PATH
 header "Building stage1 dotnet using downloaded stage0 ..."
 OUTPUT_DIR=$STAGE1_DIR $REPOROOT/scripts/compile/compile-stage.sh
 
+# Copy and CHMOD the dotnet-dnx script
+cp $REPOROOT/scripts/dotnet-dnx.sh $STAGE1_DIR/bin/dotnet-dnx
+chmod a+x $STAGE1_DIR/bin/dotnet-dnx
+
 export PATH=$StartPath
