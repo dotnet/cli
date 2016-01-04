@@ -43,8 +43,8 @@
         "bin/dotnet-publish" : "usr/bin/dotnet-publish",
         "bin/dotnet-repl" : "usr/bin/dotnet-repl",
         "bin/dotnet-repl-csi" : "usr/bin/dotnet-repl-csi",
+        "bin/dotnet-resgen" : "usr/bin/dotnet-resgen",
         "bin/dotnet-restore" : "usr/bin/dotnet-restore",
-        "bin/dotnet-test" : "usr/bin/dotnet-test",
-        "bin/dotnet-resgen" : "usr/bin/dotnet-resgen"
+        "bin/dotnet-test" : "usr/bin/dotnet-test"
     }
 }

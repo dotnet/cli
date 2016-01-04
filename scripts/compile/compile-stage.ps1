@@ -21,6 +21,7 @@ $Projects = @(
     "Microsoft.DotNet.Tools.New",
     "Microsoft.DotNet.Tools.Pack",
     "Microsoft.DotNet.Tools.Publish",
+    "dotnet-restore",
     "Microsoft.DotNet.Tools.Repl",
     "Microsoft.DotNet.Tools.Repl.Csi",
     "Microsoft.DotNet.Tools.Resgen",

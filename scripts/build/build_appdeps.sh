@@ -25,7 +25,7 @@ popd
 
 ## App Deps ##
 pushd $APPDEPS_PROJECT_DIR
-dotnet restore --packages $APPDEPS_PROJECT_DIR/packages
+dotnet restore --packages $APPDEPS_PROJECT_DIR/packages --no-cache
 APPDEP_SDK=$APPDEPS_PROJECT_DIR/packages/toolchain*/*/
 popd
 

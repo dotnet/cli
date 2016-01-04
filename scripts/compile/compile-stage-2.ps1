@@ -19,8 +19,8 @@ _cmd "$RepoRoot\scripts\crossgen\crossgen_roslyn.cmd ""$Stage2Dir"""
 # Copy dnx into stage 2
 cp -rec "$DnxRoot\" "$Stage2Dir\bin\dnx\"
 
-# Copy in the dotnet-restore script
-cp "$RepoRoot\scripts\dotnet-restore.cmd" "$Stage2Dir\bin\dotnet-restore.cmd"
+# Copy in the dotnet-dnx script
+cp "$RepoRoot\scripts\dotnet-dnx.cmd" "$Stage2Dir\bin\dotnet-dnx.cmd"
 
 # Copy in AppDeps
 $env:PATH = "$Stage2Dir\bin;$StartPath"
