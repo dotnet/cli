@@ -16,6 +16,12 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 source "$DIR/../common/_common.sh"
 
+if [ ! -z "$1" ]; then
+    export DOTNET_HOME=$1
+    export DOTNET_TOOLS=$1
+    export PATH=$1/bin:$PATH
+fi
+
 TestBinRoot="$REPOROOT/artifacts/tests"
 
 TestProjects=( \

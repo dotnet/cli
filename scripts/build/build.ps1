@@ -38,8 +38,8 @@ _ "$RepoRoot\scripts\compile\compile.ps1" @("$Configuration")
 $env:PATH = "$Stage2Dir\bin;$env:PATH"
 $env:DOTNET_HOME = "$Stage2Dir"
 
-header "Running Tests"
-_ "$RepoRoot\scripts\test\runtests.ps1"
+header "Running Tests on Stage 2"
+_ "$RepoRoot\scripts\test\runtests.ps1" @("$Stage2Dir")
 
 header "Validating Dependencies"
 _ "$RepoRoot\scripts\test\validate-dependencies.ps1"
