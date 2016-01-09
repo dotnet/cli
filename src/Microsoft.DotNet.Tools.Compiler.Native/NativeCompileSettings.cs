@@ -80,10 +80,8 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
         {
             get
             {
-                var referencePaths = new List<string>(_referencePaths)
-                {
-                    Path.Combine(AppDepSDKPath, "*.dll")
-                };
+                var referencePaths = _referencePaths.Union(
+                        Directory.EnumerateFiles(AppDepSDKPath, "*.dll"));
 
                 return referencePaths;
             }            
