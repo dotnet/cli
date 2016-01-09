@@ -3,7 +3,16 @@
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 #
 
+param(
+    [string]$StageToTest)
+
 . "$PSScriptRoot\..\common\_common.ps1"
+
+$StartPath = $env:PATH
+if ($StageToTest){
+    $env:DOTNET_HOME = $StageToTest
+    $env:PATH = "$StageToTest\bin;$env:PATH"
+}
 
 $failCount = 0
 
@@ -67,5 +76,7 @@ if ($failCount -ne 0) {
 } else {
     Write-Host -ForegroundColor Green "All the tests passed!"
 }
+
+$env:PATH=$StartPath
 
 Exit $failCount

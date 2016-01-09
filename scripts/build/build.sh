@@ -42,7 +42,7 @@ export DOTNET_TOOLS=$STAGE1_DIR
 export PATH=$STAGE2_DIR/bin:$PATH
 
 header "Testing stage2..."
-DOTNET_HOME=$STAGE2_DIR DOTNET_TOOLS=$STAGE2_DIR $REPOROOT/scripts/test/runtests.sh
+$REPOROOT/scripts/test/runtests.sh $STAGE2_DIR
 
 header "Validating Dependencies"
 $REPOROOT/scripts/test/validate-dependencies.sh
