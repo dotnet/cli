@@ -82,7 +82,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
             {
                 var referencePaths = new List<string>(_referencePaths)
                 {
-                    Directory.EnumerateFiles(AppDepSDKPath, "*.dll"));
+                    Directory.EnumerateFiles(AppDepSDKPath, "*.dll");
                 };
                 return referencePaths;
             }            
