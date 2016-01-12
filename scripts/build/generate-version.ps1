@@ -13,4 +13,4 @@ $CommitCountVersion = (git rev-list --count HEAD).PadLeft(6, "0")
 # Zero Padded Suffix for use with Nuget
 $VersionSuffix = "$ReleaseSuffix-$CommitCountVersion"
 
-$env:DOTNET_BUILD_VERSION = "$MajorVersion.$MinorVersion.$PatchVersion.$CommitCountVersion"
+$env:DOTNET_CLI_VERSION = "$MajorVersion.$MinorVersion.$PatchVersion.$CommitCountVersion"
