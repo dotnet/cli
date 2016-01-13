@@ -113,12 +113,12 @@ validate_inputs(){
         ret=1
     fi
 
-    if [[ -z "$INPUT_DIR" ]];
+    if [[ -z "$INPUT_DIR" ]]; then
         echo "ERROR: -i <INPUT_DIRECTORY> Not Specified"
         ret=1
     fi
 
-    if [[ -z "$OUTPUT_DIR" ]];
+    if [[ -z "$OUTPUT_DIR" ]]; then
         echo "ERROR: -o <OUTPUT_DIRECTORY> Not Specified."
         ret=1
     fi
