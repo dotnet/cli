@@ -146,13 +146,23 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             RunRestore(testLibDir.Path);
 
             var testProject = GetProjectPath(testLibDir);
-            var publishCommand = new PublishCommand(testProject);
+            var publishCommand = new PublishCommand(testProject, "dnx451");
             publishCommand.Execute().Should().Pass();
 
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryWithRunner.dll");
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryWithRunner.pdb");
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryWithRunner.deps");
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryWithRunner.dll.config");
+            // dependencies should also be copied
+            publishCommand.GetOutputDirectory().Should().HaveFile("Newtonsoft.Json.dll");
+
+            publishCommand = new PublishCommand(testProject, "dnxcore50");
+            publishCommand.Execute().Should().Pass();
+
+            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryWithRunner.dll");
+            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryWithRunner.pdb");
+            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryWithRunner.deps");
+            publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibraryWithRunner.dll.config");
             // dependencies should also be copied
             publishCommand.GetOutputDirectory().Should().HaveFile("Newtonsoft.Json.dll");
         }
