@@ -7,9 +7,11 @@ namespace Microsoft.DotNet.Tools.Restore
 {
     public static class Dnx
     {
+        private static readonly string _fallbackFeed = "https://www.myget.org/F/dotnet-core/api/v3/index.json";
+
         public static int RunRestore(IEnumerable<string> args)
         {
-            var result = RunDnx(new List<string> {"restore"}.Concat(args))
+            var result = RunDnx(new List<string> {$"restore -f {Dnx._fallbackFeed}"}.Concat(args))
                 .ForwardStdErr()
                 .ForwardStdOut()
                 .Execute();
