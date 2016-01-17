@@ -69,6 +69,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
                 _intermediateDirectory = value;
             }
         }
+        public bool EnableInterop { get; set; }
 
         public BuildConfiguration BuildType { get; set; }
         
