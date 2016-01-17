@@ -18,6 +18,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
         public string IlcPath { get; set; }
         public string IlcSdkPath { get; set; }
         public string CppCompilerFlags { get; set; }
+        public bool EnableInterop { get; set; }
 
         public bool IsHelp { get; set; }
         public int ReturnCode { get; set; }
@@ -28,6 +29,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
 
             config.InputManagedAssemblyPath = InputManagedAssemblyPath;
             config.Architecture = Architecture;
+            config.EnableInterop = EnableInterop;
 
             if (BuildConfiguration.HasValue)
             {
