@@ -132,6 +132,37 @@ namespace Microsoft.DotNet.ProjectModel
                     throw new FormatException("The assembly file version is invalid: " + fileVersion, ex);
                 }
             }
+            
+            var analyzerOptionsJson = rawProject.Value("analyzerOptions") as JsonObject;
+            if (analyzerOptionsJson != null)
+            {
+                var analyzerOptions = new AnalyzerOptions();
+                
+                foreach (var key in analyzerOptionsJson.Keys)
+                {
+                    switch (key)
+                    {
+                        case "languageId":
+                            var languageId = analyzerOptionsJson.ValueAsString(key);
+                            if (languageId == null)
+                            {
+                                throw FileFormatException.Create(
+                                    "The analyzer languageId must be a string",
+                                    analyzerOptionsJson.Value(key),
+                                    project.ProjectFilePath);
+                            }
+                            analyzerOptions.LanguageId = languageId;
+                            break;
+                            
+                        default:;
+                            throw FileFormatException.Create(
+                               $"Unrecognized analyzerOption key: {key}",
+                               project.ProjectFilePath);
+                    }
+                }
+                
+                project.AnalyzerOptions = analyzerOptions;
+            }
 
             project.Description = rawProject.ValueAsString("description");
             project.Summary = rawProject.ValueAsString("summary");

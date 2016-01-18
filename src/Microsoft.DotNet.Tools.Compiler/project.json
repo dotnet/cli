@@ -19,7 +19,7 @@
         "Microsoft.Extensions.DependencyModel": {
             "type": "build",
             "version": "1.0.0-*"
-        }
+        },
     },
     "frameworks": {
         "dnxcore50": { }
