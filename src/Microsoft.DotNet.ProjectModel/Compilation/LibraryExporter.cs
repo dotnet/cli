@@ -93,7 +93,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                     }
                 }
 
-                // Source references and analyzers are not transitive
+                // Source references are not transitive
                 if (library.Parents.Contains(_rootProject))
                 {
                     sourceReferences.AddRange(libraryExport.SourceReferences);
