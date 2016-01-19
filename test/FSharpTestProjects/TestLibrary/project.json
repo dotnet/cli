@@ -1,15 +1,15 @@
 ﻿{
     "version": "1.0.0-*",
-    "dependencies": {
-        "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-151221",
-        "System.Runtime": "4.0.21-beta-23428",
-        "System.Console": "4.0.0-beta-23428"
-    },
     "compilerName": "fsc",
     "compileFiles": [
         "Helper2.fs",
         "Helper.fs"
     ],
+    "dependencies": {
+        "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-151221",
+        "System.Runtime": "4.0.21-rc2-*",
+        "System.Console": "4.0.0-rc2-*"
+    },
     "frameworks": {
         "dnxcore50": { }
     }
