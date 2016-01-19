@@ -166,8 +166,32 @@ namespace Microsoft.DotNet.ProjectModel.Graph
             library.CompileTimeAssemblies = ReadObject(jobject.ValueAsJsonObject("compile"), ReadFileItem);
             library.ResourceAssemblies = ReadObject(jobject.ValueAsJsonObject("resource"), ReadFileItem);
             library.NativeLibraries = ReadObject(jobject.ValueAsJsonObject("native"), ReadFileItem);
-
+            library.ContentFiles = ReadObject(jobject.ValueAsJsonObject("contentFiles"), ReadContentFile);
             return library;
+        }
+
+        private static LockFileContentFile ReadContentFile(string property, JsonValue json)
+        {
+            var contentFile = new LockFileContentFile()
+            {
+                Path = property
+            };
+
+            var jsonObject = json as JsonObject;
+            if (jsonObject != null)
+            {
+
+                BuildAction action;
+                BuildAction.TryParse(jsonObject.ValueAsString("buildAction"), out action);
+
+                contentFile.BuildAction = action;
+                contentFile.CodeLanguage = jsonObject.ValueAsString("codeLanguage");
+                contentFile.OutputPath = jsonObject.ValueAsString("outputPath");
+                contentFile.PPOutputPath = jsonObject.ValueAsString("ppOutputPath");
+                contentFile.CopyToOutput = ReadBool(jsonObject, "copyToOutput", false);
+            }
+
+            return contentFile;
         }
 
         private static ProjectFileDependencyGroup ReadProjectFileDependencyGroup(string property, JsonValue json)

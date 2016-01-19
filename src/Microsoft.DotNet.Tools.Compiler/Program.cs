@@ -6,14 +6,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Microsoft.Dnx.Runtime.Common.CommandLine;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Utilities;
-using NuGet.Frameworks;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.PlatformAbstractions;
 
@@ -200,6 +198,8 @@ namespace Microsoft.DotNet.Tools.Compiler
 
             // Get compilation options
             var outputName = CompilerUtil.GetCompilationOutput(context.ProjectFile, context.TargetFramework, args.ConfigValue, outputPath);
+            
+            var compilerName = CompilerUtil.ResolveCompilerName(context);
 
             // Assemble args
             var compilerArgs = new List<string>()
@@ -211,6 +211,8 @@ namespace Microsoft.DotNet.Tools.Compiler
             var compilationOptions = CompilerUtil.ResolveCompilationOptions(context, args.ConfigValue);
 
             var references = new List<string>();
+            var sourceFiles = new List<string>();
+            var resourceFiles = new List<string>();
 
             // Add compilation options to the args
             compilerArgs.AddRange(compilationOptions.SerializeToArgs());
@@ -235,10 +237,59 @@ namespace Microsoft.DotNet.Tools.Compiler
                     references.AddRange(dependency.CompilationAssemblies.Select(r => r.ResolvedPath));
                 }
 
-                compilerArgs.AddRange(dependency.SourceReferences);
+                sourceFiles.AddRange(dependency.SourceReferences);
+
+                foreach (var contentFile in dependency.ContentFiles)
+                {
+                    if (contentFile.CodeLanguage != null &&
+                        !contentFile.CodeLanguage.Equals("any", StringComparison.OrdinalIgnoreCase) &&
+                        !compilerName.StartsWith(contentFile.CodeLanguage, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    var path = contentFile.Path;
+                    if (contentFile.Preprocess)
+                    {
+                        var newPath = Path.Combine(intermediateOutputPath, Path.GetFileName(path));
+
+                        using (var input = File.OpenRead(path))
+                        {
+                            using (var output = File.Create(newPath))
+                            {
+                                PPFilePreprocessor.Preprocess(input, output, new Dictionary<string, string>()
+                                {
+                                    {"rootnamespace", context.ProjectFile.Name },
+                                    {"assemblyname", context.ProjectFile.Name }
+                                });
+                            }
+                        }
+
+                        path = newPath;
+                    }
+
+                    if (contentFile.CopyToOutput)
+                    {
+                        var destinationFile = Path.Combine(outputPath, contentFile.OutputPath);
+                        var destinationDirectory = Path.GetDirectoryName(destinationFile);
+                        if (!Directory.Exists(destinationDirectory))
+                        {
+                            Directory.CreateDirectory(destinationDirectory);
+                        }
+                        File.Copy(path, destinationFile, true);
+                    }
+
+                    if (contentFile.BuildAction == BuildAction.Compile)
+                    {
+                        sourceFiles.Add(path);
+                    }
+                    else if (contentFile.BuildAction == BuildAction.EmbeddedResource)
+                    {
+                        resourceFiles.Add($"--resource:\"{path}\",{context.ProjectFile.Name}.{Path.GetFileName(path)}");
+                    }
+                }
             }
 
-            compilerArgs.AddRange(references.Select(r => $"--reference:{r}"));
 
             if (compilationOptions.PreserveCompilationContext == true)
             {
@@ -275,10 +326,11 @@ namespace Microsoft.DotNet.Tools.Compiler
                 return false;
             }
             // Add project source files
-            var sourceFiles = CompilerUtil.GetCompilationSources(context);
-            compilerArgs.AddRange(sourceFiles);
+            sourceFiles.AddRange(CompilerUtil.GetCompilationSources(context));
 
-            var compilerName = CompilerUtil.ResolveCompilerName(context);
+            compilerArgs.AddRange(sourceFiles);
+            compilerArgs.AddRange(resourceFiles);
+            compilerArgs.AddRange(references.Select(r => $"--reference:{r}"));
 
             // Write RSP file
             var rsp = Path.Combine(intermediateOutputPath, $"dotnet-compile.{context.ProjectFile.Name}.rsp");
