@@ -18,12 +18,12 @@ else {
 
 # Restore packages
 header "Restoring packages"
-& "$DnxRoot\dnu" restore "$RepoRoot\src" --quiet --runtime "$Rid" "$NoCacheArg"
-& "$DnxRoot\dnu" restore "$RepoRoot\test" --quiet --runtime "$Rid" "$NoCacheArg"
-& "$DnxRoot\dnu" restore "$RepoRoot\tools" --quiet --runtime "$Rid" "$NoCacheArg"
+& dotnet restore "$RepoRoot\src" --quiet --runtime "$Rid" "$NoCacheArg"
+& dotnet restore "$RepoRoot\test" --quiet --runtime "$Rid" "$NoCacheArg"
+& dotnet restore "$RepoRoot\tools" --quiet --runtime "$Rid" "$NoCacheArg"
 
 $oldErrorAction=$ErrorActionPreference
 $ErrorActionPreference="SilentlyContinue"
-& "$DnxRoot\dnu" restore "$RepoRoot\testapp" --quiet --runtime "$Rid" "$NoCacheArg" 2>&1 | Out-Null
+& dotnet restore "$RepoRoot\testapp" --quiet --runtime "$Rid" "$NoCacheArg" 2>&1 | Out-Null
 $ErrorActionPreference=$oldErrorAction
 
