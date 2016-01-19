@@ -22,6 +22,7 @@ $Projects = @(
     "Microsoft.DotNet.Tools.Compiler.Csc",
     "Microsoft.DotNet.Tools.Compiler.Fsc",
     "Microsoft.DotNet.Tools.Compiler.Native",
+    "Microsoft.DotNet.Tools.Mcg",
     "Microsoft.DotNet.Tools.New",
     "Microsoft.DotNet.Tools.Pack",
     "Microsoft.DotNet.Tools.Publish",

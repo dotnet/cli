@@ -24,6 +24,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
             string helpText = null;
             var returnCode = 0;
             string cppCompilerFlags = null;
+            bool enableInterop = false;
 
             IReadOnlyList<string> references = Array.Empty<string>();
             IReadOnlyList<string> linklib = Array.Empty<string>();            
@@ -62,6 +63,8 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
                     syntax.DefineOption("cppcompilerflags", ref cppCompilerFlags, "Additional flags to be passed to the native compiler.");
 
                     syntax.DefineOption("h|help", ref help, "Help for compile native.");
+
+                    syntax.DefineOption("enableinterop", ref enableInterop, "Mcg based interop support");
 
                     syntax.DefineParameter("INPUT_ASSEMBLY", ref inputAssembly,
                         "The managed input assembly to compile to native.");
@@ -136,7 +139,8 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
                 LinkLibPaths = linklib,
                 AppDepSDKPath = appDepSdk,
                 LogPath = logPath,
-                CppCompilerFlags = cppCompilerFlags
+                CppCompilerFlags = cppCompilerFlags,
+                EnableInterop = enableInterop
             };
         }
     }
