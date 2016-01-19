@@ -65,6 +65,15 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             // verify the output xml file
             Assert.True(File.Exists(Path.Combine(outputDir, "scripts\\run.cmd")));
             Assert.True(File.Exists(Path.Combine(outputDir, "config.xml")));
+            // verify embedded resources
+            Assert.True(result.StdOut.Contains("TestAppWithContentPackage.dnf.png"));
+            Assert.True(result.StdOut.Contains("TestAppWithContentPackage.ui.png"));
+            // verify 'all' language files not included
+            Assert.False(result.StdOut.Contains("TestAppWithContentPackage.dnf_all.png"));
+            Assert.False(result.StdOut.Contains("TestAppWithContentPackage.ui_all.png"));
+            // verify classes
+            Assert.True(result.StdOut.Contains("TestAppWithContentPackage.Foo"));
+            Assert.True(result.StdOut.Contains("MyNamespace.Util"));
         }
 
         private void CopyProjectToTempDir(string projectDir, TempDirectory tempDir)

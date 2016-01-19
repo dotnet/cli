@@ -14,6 +14,7 @@ using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Utilities;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.PlatformAbstractions;
+using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Compiler
 {
@@ -239,11 +240,16 @@ namespace Microsoft.DotNet.Tools.Compiler
 
                 sourceFiles.AddRange(dependency.SourceReferences);
 
+                // To detect language we check if compiler name starts with if so:
+                // `cs` would be detected for `csc` compiler, `vb` for `vbc`, etc.
+                // if there is no language for current compiler just use `any`
+                var selectedLanguage = dependency.ContentFiles
+                    .Select(file => file.CodeLanguage)
+                    .FirstOrDefault(language => compilerName.StartsWith(language, StringComparison.OrdinalIgnoreCase)) ?? "any";
+
                 foreach (var contentFile in dependency.ContentFiles)
                 {
-                    if (contentFile.CodeLanguage != null &&
-                        !contentFile.CodeLanguage.Equals("any", StringComparison.OrdinalIgnoreCase) &&
-                        !compilerName.StartsWith(contentFile.CodeLanguage, StringComparison.OrdinalIgnoreCase))
+                    if (!contentFile.CodeLanguage.Equals(selectedLanguage, StringComparison.OrdinalIgnoreCase))
                     {
                         continue;
                     }
