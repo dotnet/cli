@@ -44,7 +44,8 @@
         "bin/dotnet-repl" : "usr/bin/dotnet-repl",
         "bin/dotnet-repl-csi" : "usr/bin/dotnet-repl-csi",
         "bin/dotnet-restore" : "usr/bin/dotnet-restore",
-        "bin/dotnet-test" : "usr/bin/dotnet-test",
+		"bin/dotnet-test": "usr/bin/dotnet-test",
+		"bin/dotnet-mcg" : "usr/bin/dotnet-mcg",
         "bin/dotnet-resgen" : "usr/bin/dotnet-resgen"
     }
 }
