@@ -162,6 +162,19 @@ namespace Microsoft.DotNet.ProjectModel
             // Project files
             project.Files = new ProjectFilesCollection(rawProject, project.ProjectDirectory, project.ProjectFilePath);
 
+            var packOptions = rawProject.Value("packOptions") as JsonObject;
+            if (packOptions != null)
+            {
+                var contentFiles = rawProject.Value("contentFiles") as JsonObject;
+                if (contentFiles != null)
+                {
+                    foreach (var key in contentFiles.Keys)
+                    {
+                        project.ContentFiles.Add(ReadContentFile(key, contentFiles.ValueAsJsonObject(key)));
+                    }
+                }
+            }
+
             var commands = rawProject.Value("commands") as JsonObject;
             if (commands != null)
             {
@@ -218,6 +231,34 @@ namespace Microsoft.DotNet.ProjectModel
                 isGacOrFrameworkReference: false);
 
             return project;
+        }
+
+        private static ProjectContentFileGroup ReadContentFile(string include, JsonObject contentFileObject)
+        {
+            var excludeProperty = "exclude";
+            var excludeArray = contentFileObject.ValueAsStringArray(excludeProperty);
+            if (excludeArray == null)
+            {
+                var exclude = contentFileObject.ValueAsString(excludeProperty);
+                if (exclude != null)
+                {
+                    excludeArray = new string[] { exclude };
+                }
+                throw FileFormatException.Create("Value must be either string or array.", contentFileObject.Value(excludeProperty));
+            }
+
+            var contentFile = new ProjectContentFileGroup()
+            {
+                Exclude = excludeArray,
+                BuildAction = contentFileObject.ValueAsString("buildAction"),
+                OutputPath = contentFileObject.ValueAsString("outputPath"),
+                CopyToOutput = contentFileObject.ValueAsBoolean("copyToOutput"),
+                Include = new[] { include },
+                Language = contentFileObject.ValueAsString("language") ?? "any",
+                Target = contentFileObject.ValueAsString("language") ?? "any",
+            };
+
+            return contentFile;
         }
 
         private static NuGetVersion SpecifySnapshot(string version, string snapshotValue)

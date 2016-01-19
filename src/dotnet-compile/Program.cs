@@ -14,6 +14,7 @@ using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Utilities;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.PlatformAbstractions;
+using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Compiler
 {
@@ -200,6 +201,8 @@ namespace Microsoft.DotNet.Tools.Compiler
 
             // Get compilation options
             var outputName = outputPathCalculator.GetAssemblyPath(args.ConfigValue);
+            
+            var compilerName = CompilerUtil.ResolveCompilerName(context);
 
             // Assemble args
             var compilerArgs = new List<string>()
@@ -212,6 +215,8 @@ namespace Microsoft.DotNet.Tools.Compiler
             var languageId = CompilerUtil.ResolveLanguageId(context);
 
             var references = new List<string>();
+            var sourceFiles = new List<string>();
+            var resourceFiles = new List<string>();
 
             // Add compilation options to the args
             compilerArgs.AddRange(compilationOptions.SerializeToArgs());
@@ -228,9 +233,64 @@ namespace Microsoft.DotNet.Tools.Compiler
                 compilerArgs.AddRange(dependency.AnalyzerReferences
                     .Where(a => a.AnalyzerLanguage == languageId)
                     .Select(a => $"--analyzer:\"{a.AssemblyPath}\""));
-            }
 
-            compilerArgs.AddRange(references.Select(r => $"--reference:\"{r}\""));
+                sourceFiles.AddRange(dependency.SourceReferences);
+
+                // To detect language we check if compiler name starts with if so:
+                // `cs` would be detected for `csc` compiler, `vb` for `vbc`, etc.
+                // if there is no language for current compiler just use `any`
+                var selectedLanguage = dependency.ContentFiles
+                    .Select(file => file.CodeLanguage)
+                    .FirstOrDefault(language => compilerName.StartsWith(language, StringComparison.OrdinalIgnoreCase)) ?? "any";
+
+                foreach (var contentFile in dependency.ContentFiles)
+                {
+                    if (!contentFile.CodeLanguage.Equals(selectedLanguage, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    var path = contentFile.Path;
+                    if (contentFile.Preprocess)
+                    {
+                        var newPath = Path.Combine(intermediateOutputPath, Path.GetFileName(path));
+
+                        using (var input = File.OpenRead(path))
+                        {
+                            using (var output = File.Create(newPath))
+                            {
+                                PPFilePreprocessor.Preprocess(input, output, new Dictionary<string, string>()
+                                {
+                                    {"rootnamespace", context.ProjectFile.Name },
+                                    {"assemblyname", context.ProjectFile.Name }
+                                });
+                            }
+                        }
+
+                        path = newPath;
+                    }
+
+                    if (contentFile.CopyToOutput)
+                    {
+                        var destinationFile = Path.Combine(outputPath, contentFile.OutputPath);
+                        var destinationDirectory = Path.GetDirectoryName(destinationFile);
+                        if (!Directory.Exists(destinationDirectory))
+                        {
+                            Directory.CreateDirectory(destinationDirectory);
+                        }
+                        File.Copy(path, destinationFile, true);
+                    }
+
+                    if (contentFile.BuildAction == BuildAction.Compile)
+                    {
+                        sourceFiles.Add(path);
+                    }
+                    else if (contentFile.BuildAction == BuildAction.EmbeddedResource)
+                    {
+                        resourceFiles.Add($"--resource:\"{path},{context.ProjectFile.Name}.{Path.GetFileName(path)}\"");
+                    }
+                }
+            }
 
             if (compilationOptions.PreserveCompilationContext == true)
             {
@@ -255,10 +315,11 @@ namespace Microsoft.DotNet.Tools.Compiler
                 return false;
             }
             // Add project source files
-            var sourceFiles = CompilerUtil.GetCompilationSources(context);
-            compilerArgs.AddRange(sourceFiles);
+            sourceFiles.AddRange(CompilerUtil.GetCompilationSources(context));
 
-            var compilerName = CompilerUtil.ResolveCompilerName(context);
+            compilerArgs.AddRange(sourceFiles);
+            compilerArgs.AddRange(resourceFiles.Select(s => $"\"{s}\""));
+            compilerArgs.AddRange(references.Select(r => $"--reference:\"{r}\""));
 
             // Write RSP file
             var rsp = Path.Combine(intermediateOutputPath, $"dotnet-compile.rsp");

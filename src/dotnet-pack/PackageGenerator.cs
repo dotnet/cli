@@ -110,6 +110,36 @@ namespace Microsoft.DotNet.Tools.Compiler
             {
                 AddPackageFiles(Project.Files.PackInclude, packDiagnostics);
             }
+            foreach (var contentFile in Project.ContentFiles)
+            {
+                var root = Project.ProjectDirectory;
+                var basePath = $"{contentFile.Language}/{contentFile.Target}/{contentFile.OutputPath}";
+                var files = contentFile.PatternGroup.SearchFiles(root);
+                foreach (var file in files)
+                {
+                    var subpath = file.Substring(root.Length);
+
+                    string targetPath = basePath;
+                    if (!contentFile.Flatten)
+                    {
+                        targetPath = Path.Combine(targetPath, subpath);
+                    }
+
+                    Reporter.Verbose.WriteLine($"Adding contnet file {targetPath}"); 
+                    PackageBuilder.Files.Add(new PhysicalPackageFile()
+                        {
+                            TargetPath = targetPath,
+                            SourcePath = file
+                        });
+                    PackageBuilder.ContentFiles.Add(
+                        new ManifestContentFiles()
+                        {
+                            Include = targetPath,
+                            BuildAction = contentFile.BuildAction,
+                            CopyToOutput = contentFile.CopyToOutput.ToString(),
+                        });
+                }
+            }
 
             // Write the packages as long as we're still in a success state.
             if (!packDiagnostics.Any(d => d.Severity == DiagnosticMessageSeverity.Error))

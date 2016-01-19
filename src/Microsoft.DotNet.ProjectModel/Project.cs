@@ -2,8 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Microsoft.DotNet.ProjectModel.Files;
 using Microsoft.DotNet.ProjectModel.Graph;
 using NuGet.Frameworks;
@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.ProjectModel
                 return Path.GetDirectoryName(ProjectFilePath);
             }
         }
-        
+
         public AnalyzerOptions AnalyzerOptions { get; set; }
 
         public string Name { get; set; }
@@ -87,6 +87,8 @@ namespace Microsoft.DotNet.ProjectModel
         public IDictionary<string, string> Commands { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         public IDictionary<string, IEnumerable<string>> Scripts { get; } = new Dictionary<string, IEnumerable<string>>(StringComparer.OrdinalIgnoreCase);
+
+        public IList<ProjectContentFileGroup> ContentFiles { get; } = new List<ProjectContentFileGroup>();
 
         public IEnumerable<TargetFrameworkInformation> GetTargetFrameworks()
         {

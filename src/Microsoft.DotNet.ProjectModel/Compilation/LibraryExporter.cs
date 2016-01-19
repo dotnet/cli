@@ -106,7 +106,8 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                                                libraryExport.RuntimeAssemblies,
                                                libraryExport.RuntimeAssets,
                                                libraryExport.NativeLibraries,
-                                               analyzerReferences);
+                                               analyzerReferences,
+                                               libraryExport.ContentFiles);
             }
         }
 
@@ -149,9 +150,28 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             }
 
             var analyzers = GetAnalyzerReferences(package);
+            var contentFiles = new List<LibraryContentFile>();
+            PopulateContentFiles(package, package.Target.ContentFiles, contentFiles);
+
 
             return new LibraryExport(package, compileAssemblies,
-                sourceReferences, runtimeAssemblies, Array.Empty<string>(), nativeLibraries, analyzers);
+                sourceReferences, runtimeAssemblies, Array.Empty<string>(), nativeLibraries, analyzers, contentFiles);
+        }
+
+        private void PopulateContentFiles(PackageDescription package, IList<LockFileContentFile> lockContentFiles, List<LibraryContentFile> contentFiles)
+        {
+            foreach (var lockContentFile in lockContentFiles)
+            {
+                contentFiles.Add(new LibraryContentFile()
+                {
+                    CopyToOutput = lockContentFile.CopyToOutput,
+                    BuildAction = lockContentFile.BuildAction,
+                    Preprocess = !string.IsNullOrEmpty(lockContentFile.PPOutputPath),
+                    OutputPath = lockContentFile.OutputPath,
+                    Path = Path.Combine(package.Path, lockContentFile.Path),
+                    CodeLanguage = lockContentFile.CodeLanguage
+                });
+            }
         }
 
         private LibraryExport ExportProject(ProjectDescription project)
@@ -197,11 +217,40 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                 sourceReferences.Add(sharedFile);
             }
 
+            var projectRoot = project.Project.ProjectDirectory;
+            var contentFiles = new List<LockFileContentFile>();
+            foreach (var contentFileGroup in project.Project.ContentFiles)
+            {
+                BuildAction action;
+                BuildAction.TryParse(contentFileGroup.BuildAction, out action);
+                foreach (var compileAssembly in compileAssemblies)
+                {
+                    foreach (var file in contentFileGroup.PatternGroup.SearchFiles(projectRoot))
+                    {
+                        string outputPath = contentFileGroup.OutputPath;
+                        if (!contentFileGroup.Flatten)
+                        {
+                            outputPath = Path.Combine(file.Substring(projectRoot.Length), outputPath);
+                        }
+
+                        contentFiles.Add(new LockFileContentFile()
+                        {
+                            BuildAction = action,
+                            CodeLanguage = contentFileGroup.Language,
+                            CopyToOutput = contentFileGroup.CopyToOutput,
+                            OutputPath = outputPath,
+                            Path = file,
+                            //PREPROCESS??
+                        });
+                    }
+                }
+            }
+
             // No support for ref or native in projects, so runtimeAssemblies is
             // just the same as compileAssemblies and nativeLibraries are empty
             // Also no support for analyzer projects
             return new LibraryExport(project, compileAssemblies, sourceReferences,
-                compileAssemblies, runtimeAssets, Array.Empty<LibraryAsset>(), Array.Empty<AnalyzerReference>());
+                compileAssemblies, runtimeAssets, Array.Empty<LibraryAsset>(), Array.Empty<AnalyzerReference>(), Enumerable.Empty<LibraryContentFile>());
         }
 
         private static string ResolvePath(Project project, string configuration, string path)
@@ -231,7 +280,8 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                 Array.Empty<LibraryAsset>(),
                 Array.Empty<string>(),
                 Array.Empty<LibraryAsset>(),
-                Array.Empty<AnalyzerReference>());
+                Array.Empty<AnalyzerReference>(),
+                Enumerable.Empty<LibraryContentFile>());
         }
 
         private IEnumerable<string> GetSharedSources(PackageDescription package)
