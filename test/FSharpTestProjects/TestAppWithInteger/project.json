@@ -1,4 +1,4 @@
-{
+﻿{
     "version": "1.0.0-*",
     "compilationOptions": {
         "emitEntryPoint": true
@@ -8,14 +8,13 @@
         "Program.fs"
     ],
     "dependencies": {
-        "TestLibrary": "1.0.0-*",
-        "NETStandard.Library": "1.0.0-rc3-23722",
-        "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-151221"
+        "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-151221",
+        "NETStandard.Library": "1.0.0-rc3-23722"
     },
 
     "frameworks": {
         "dnxcore50": {
-            "imports": "portable-net45+win8"
+            "imports": "portable-net451+win8"
         }
     }
 }
