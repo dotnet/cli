@@ -16,6 +16,10 @@ else {
     $NoCacheArg = ""
 }
 
+# Use Stage0 binaries
+$StartPath = $env:PATH
+$env:PATH = "$env:DOTNET_INSTALL_DIR\cli\bin;$StartPath"
+
 # Restore packages
 header "Restoring packages"
 & dotnet restore "$RepoRoot\src" --quiet --runtime "$Rid" "$NoCacheArg"
@@ -26,4 +30,6 @@ $oldErrorAction=$ErrorActionPreference
 $ErrorActionPreference="SilentlyContinue"
 & dotnet restore "$RepoRoot\testapp" --quiet --runtime "$Rid" "$NoCacheArg" 2>&1 | Out-Null
 $ErrorActionPreference=$oldErrorAction
+
+$env:PATH = $StartPath
 

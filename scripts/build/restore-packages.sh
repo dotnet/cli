@@ -16,6 +16,9 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 source "$DIR/../common/_common.sh"
 
+# Use Stage0 Binaries
+export PATH="$DOTNET_INSTALL_DIR/bin:$PATH"
+
 header "Restoring packages"
 
 dotnet restore "$REPOROOT/src" --quiet "$NOCACHE"
