@@ -16,11 +16,14 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 source "$DIR/../common/_common.sh"
 
+# Use Stage0 Binaries
+export PATH="$DOTNET_INSTALL_DIR/bin:$PATH"
+
 header "Restoring packages"
 
-$DNX_ROOT/dnu restore "$REPOROOT/src" --quiet "$NOCACHE"
-$DNX_ROOT/dnu restore "$REPOROOT/test" --quiet "$NOCACHE"
-$DNX_ROOT/dnu restore "$REPOROOT/tools" --quiet "$NOCACHE"
+dotnet restore "$REPOROOT/src" --quiet
+dotnet restore "$REPOROOT/test" --quiet
+dotnet restore "$REPOROOT/tools" --quiet
 set +e
-$DNX_ROOT/dnu restore "$REPOROOT/testapp" --quiet "$NOCACHE" >/dev/null 2>&1
+dotnet restore "$REPOROOT/testapp" --quiet >/dev/null 2>&1
 set -e

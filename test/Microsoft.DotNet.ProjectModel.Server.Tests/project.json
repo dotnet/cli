@@ -1,8 +1,9 @@
 {
   "dependencies": {
+    "NETStandard.Library":"1.0.0-rc2-23714",
     "System.Dynamic.Runtime": "4.0.11-*",
-    "Microsoft.DotNet.ProjectModel": "1.0.0-*",
-    "Microsoft.DotNet.ProjectModel.Server": "1.0.0-*",
+    "Microsoft.DotNet.ProjectModel": {"target":"project"},
+    "Microsoft.DotNet.ProjectModel.Server":{"target":"project"},
     "Newtonsoft.Json": "7.0.1",
     "xunit.runner.aspnet": "2.0.0-aspnet-*"
   },

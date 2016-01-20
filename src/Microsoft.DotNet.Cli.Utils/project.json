@@ -2,7 +2,8 @@
     "version": "1.0.0-*",
 
     "dependencies": {
-        "NETStandard.Library": "1.0.0-rc2-23704",
+        "NETStandard.Library": "1.0.0-rc2-23714",
+        "Microsoft.NETCore.Targets": "1.0.1-rc2-23714",
         "Microsoft.DotNet.ProjectModel": "1.0.0-*",
         "System.Reflection.Metadata": "1.1.0",
         "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc2-16530"

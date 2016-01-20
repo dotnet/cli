@@ -5,10 +5,11 @@
         "emitEntryPoint": true
     },
     "dependencies": {
-        "NETStandard.Library": "1.0.0-rc2-23704",
-        
+        "NETStandard.Library": "1.0.0-rc2-23714",
+        "Microsoft.NETCore.Targets": "1.0.1-rc2-23714",
+        "System.Collections.Immutable": "1.1.37",
         "Microsoft.Net.Compilers.netcore": "1.2.0-beta1-20160108-01",
-        "System.CommandLine" : "0.1.0-d111815-3",
+        "System.CommandLine" : "0.1.0-e160114-1",
 
         "Microsoft.DotNet.ProjectModel": "1.0.0-*",
         "Microsoft.DotNet.Cli.Utils": "1.0.0-*"

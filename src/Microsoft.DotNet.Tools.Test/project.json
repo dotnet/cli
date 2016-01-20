@@ -11,8 +11,8 @@
     "emitEntryPoint": true
   },
   "dependencies": {
-    "Microsoft.NETCore.ConsoleHost": "1.0.0-rc2-23616",
-    "Microsoft.NETCore.TestHost": "1.0.0-rc2-23616",
+    "Microsoft.NETCore.ConsoleHost": "1.0.0-rc2-23714",
+    "Microsoft.NETCore.TestHost": "1.0.0-rc2-23714",
     "Microsoft.Extensions.Compilation.Abstractions": "1.0.0-*",
     "Microsoft.DotNet.Cli.Utils": "1.0.0-*",
     "Microsoft.Dnx.Runtime.CommandParsing.Sources": {
@@ -37,11 +37,12 @@
   "frameworks": {
     "dnxcore50": {
       "dependencies": {
-        "NETStandard.Library": "1.0.0-rc2-23704",
-        "System.Diagnostics.TextWriterTraceListener": "4.0.0-rc2-23616",
-        "System.Diagnostics.TraceSource": "4.0.0-rc2-23616",
-        "System.Dynamic.Runtime": "4.0.11-rc2-23616",
-        "System.Threading.Thread": "4.0.0-rc2-23616"
+        "NETStandard.Library": "1.0.0-rc2-23714",
+        "Microsoft.NETCore.Targets": "1.0.1-rc2-23714",
+        "System.Diagnostics.TextWriterTraceListener": "4.0.0-rc2-23714",
+        "System.Diagnostics.TraceSource": "4.0.0-rc2-23714",
+        "System.Dynamic.Runtime": "4.0.11-rc2-23714",
+        "System.Threading.Thread": "4.0.0-rc2-23714"
       }
     }
   },
