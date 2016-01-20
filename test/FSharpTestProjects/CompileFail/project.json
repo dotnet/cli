@@ -9,9 +9,8 @@
     ],
     "dependencies": {
         "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-151221",
-        "Microsoft.NETCore.ConsoleHost": "1.0.0-rc2-*",
-        "Microsoft.NETCore.Runtime": "1.0.1-rc2-*",
-        "System.Console": "4.0.0-rc2-*"
+        "NETStandard.Library": "1.0.0-rc2-23704",
+        "Microsoft.NETCore.Platforms": "1.0.1-rc2-23704"
     },
 
     "frameworks": {
