@@ -21,9 +21,9 @@ export PATH="$DOTNET_INSTALL_DIR/bin:$PATH"
 
 header "Restoring packages"
 
-dotnet restore "$REPOROOT/src" --quiet "$NOCACHE"
-dotnet restore "$REPOROOT/test" --quiet "$NOCACHE"
-dotnet restore "$REPOROOT/tools" --quiet "$NOCACHE"
+dotnet restore "$REPOROOT/src" --quiet
+dotnet restore "$REPOROOT/test" --quiet
+dotnet restore "$REPOROOT/tools" --quiet
 set +e
-dotnet restore "$REPOROOT/testapp" --quiet "$NOCACHE" >/dev/null 2>&1
+dotnet restore "$REPOROOT/testapp" --quiet >/dev/null 2>&1
 set -e

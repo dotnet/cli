@@ -22,13 +22,13 @@ $env:PATH = "$env:DOTNET_INSTALL_DIR\cli\bin;$StartPath"
 
 # Restore packages
 header "Restoring packages"
-& dotnet restore "$RepoRoot\src" --quiet --runtime "$Rid" "$NoCacheArg"
-& dotnet restore "$RepoRoot\test" --quiet --runtime "$Rid" "$NoCacheArg"
-& dotnet restore "$RepoRoot\tools" --quiet --runtime "$Rid" "$NoCacheArg"
+& dotnet restore "$RepoRoot\src" --quiet --runtime "$Rid"
+& dotnet restore "$RepoRoot\test" --quiet --runtime "$Rid"
+& dotnet restore "$RepoRoot\tools" --quiet --runtime "$Rid"
 
 $oldErrorAction=$ErrorActionPreference
 $ErrorActionPreference="SilentlyContinue"
-& dotnet restore "$RepoRoot\testapp" --quiet --runtime "$Rid" "$NoCacheArg" 2>&1 | Out-Null
+& dotnet restore "$RepoRoot\testapp" --quiet --runtime "$Rid" 2>&1 | Out-Null
 $ErrorActionPreference=$oldErrorAction
 
 $env:PATH = $StartPath
