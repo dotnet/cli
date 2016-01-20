@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Microsoft.Dnx.Runtime.Common.CommandLine;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
@@ -209,6 +208,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             };
 
             var compilationOptions = CompilerUtil.ResolveCompilationOptions(context, args.ConfigValue);
+            var languageId = CompilerUtil.ResolveLanguageId(context);
 
             var references = new List<string>();
 
@@ -217,7 +217,7 @@ namespace Microsoft.DotNet.Tools.Compiler
 
             // Add metadata options
             compilerArgs.AddRange(AssemblyInfoOptions.SerializeToArgs(AssemblyInfoOptions.CreateForProject(context)));
-
+            
             foreach (var dependency in dependencies)
             {
                 var projectDependency = dependency.Library as ProjectDescription;
@@ -234,8 +234,13 @@ namespace Microsoft.DotNet.Tools.Compiler
                 {
                     references.AddRange(dependency.CompilationAssemblies.Select(r => r.ResolvedPath));
                 }
-
+                
                 compilerArgs.AddRange(dependency.SourceReferences);
+                
+                // Add analyzer references
+                compilerArgs.AddRange(dependency.AnalyzerReferences
+                    .Where(a => a.AnalyzerLanguage == languageId)
+                    .Select(a => $"--analyzer:{a.AssemblyPath}"));
             }
 
             compilerArgs.AddRange(references.Select(r => $"--reference:{r}"));
