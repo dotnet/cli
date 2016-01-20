@@ -77,7 +77,7 @@ namespace Microsoft.DotNet.Tools.New
             app.Description = "Initializes empty project for .NET Platform";
             app.HelpOption("-h|--help");
 
-            var lang = app.Option("-l|--lang <LANGUAGE>", "Language of project ( C#, F# )", CommandOptionType.SingleValue);
+            var lang = app.Option("-l|--lang <LANGUAGE>", "Language of project [C#|F#]", CommandOptionType.SingleValue);
 
             var dotnetNew = new Program();
             app.OnExecute(() => {
