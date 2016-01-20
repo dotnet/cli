@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "NETStandard.Library": "1.0.0-rc2-23714",
+    "Microsoft.NETCore.Targets": "1.0.1-rc2-23714",
     "System.IO.Compression.ZipFile": "4.0.1-rc2-23714",
     
     "Microsoft.DotNet.Compiler.Common": "1.0.0-*",

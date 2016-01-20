@@ -6,6 +6,7 @@
     },
     "dependencies": {
         "NETStandard.Library": "1.0.0-rc2-23714",
+        "Microsoft.NETCore.Targets": "1.0.1-rc2-23714",
         
         "Microsoft.FSharp.Compiler.netcore": "1.0.0-alpha-151218",
 
