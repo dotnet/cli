@@ -52,7 +52,7 @@ function GetMSIVersionFromCLIVersion([uint32]$Major, [uint32]$Minor, [uint32]$Pa
 $env:ReleaseSuffix = "dev"
 $env:MajorVersion = 1
 $env:MinorVersion = 0
-$env:PatchVersion = 0
+$env:PatchVersion = 1
 
 $CommitCount = [int32](git rev-list --count HEAD)
 $env:CommitCountVersion = ([string]$CommitCount).PadLeft(6, "0")

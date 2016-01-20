@@ -7,7 +7,7 @@
 export RELEASE_SUFFIX=dev
 export MAJOR_VERSION=1
 export MINOR_VERSION=0
-export PATCH_VERSION=0
+export PATCH_VERSION=1
 
 export COMMIT_COUNT_VERSION=$(printf "%06d" $(git rev-list --count HEAD))
 
