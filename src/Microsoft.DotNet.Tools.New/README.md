@@ -33,7 +33,7 @@ Language of project. Defaults to `C#`. Also `csharp` ( `fsharp` ) or `cs` ( `fs`
     
     Drops a sample F# project in the current directory.
 
-`dotnet new --lang csharp`
+`dotnet new --lang c#`
     
     Drops a sample C# project in the current directory.
 
