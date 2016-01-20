@@ -13,6 +13,7 @@ namespace Microsoft.DotNet.ProjectModel.Server
     internal class ProjectContextSnapshot
     {
         public string RootDependency { get; set; }
+        public string CompilerName { get; set; }
         public NuGetFramework TargetFramework { get; set; }
         public IReadOnlyList<string> SourceFiles { get; set; }
         public CommonCompilerOptions CompilerOptions { get; set; }
@@ -59,6 +60,7 @@ namespace Microsoft.DotNet.ProjectModel.Server
                 }
             }
 
+            snapshot.CompilerName = context.ProjectFile.CompilerName ?? "csc";
             snapshot.RootDependency = context.ProjectFile.Name;
             snapshot.TargetFramework = context.TargetFramework;
             snapshot.SourceFiles = allSourceFiles.Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(path => path).ToList();

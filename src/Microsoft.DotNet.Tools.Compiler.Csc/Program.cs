@@ -12,6 +12,7 @@ using System.Text;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.Cli.Compiler.Common;
 
 namespace Microsoft.DotNet.Tools.Compiler.Csc
 {
@@ -124,9 +125,10 @@ namespace Microsoft.DotNet.Tools.Compiler.Csc
                 ? "-debug:full"
                 : "-debug:portable");
 
-            args.Add("-nowarn:CS1701");
-            args.Add("-nowarn:CS1702");
-            args.Add("-nowarn:CS1705");
+            foreach (var suppress in DefaultCompilerWarningSuppresses.Instance["csc"])
+            {
+                args.Add($"-nowarn:{suppress}");
+            }
 
             return args;
         }
