@@ -100,7 +100,12 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                     }
                 }
 
-                yield return new LibraryExport(library, compilationAssemblies, sourceReferences, libraryExport.RuntimeAssemblies, libraryExport.NativeLibraries);
+                yield return new LibraryExport(library,
+                    compilationAssemblies,
+                    sourceReferences,
+                    libraryExport.RuntimeAssemblies,
+                    libraryExport.NativeLibraries,
+                    libraryExport.ContentFiles);
             }
         }
 
@@ -142,7 +147,26 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                 sourceReferences.Add(sharedSource);
             }
 
-            return new LibraryExport(package, compileAssemblies, sourceReferences, runtimeAssemblies, nativeLibraries);
+            var contentFiles = new List<LibraryContentFile>();
+            PopulateContentFiles(package, package.Target.ContentFiles, contentFiles);
+
+            return new LibraryExport(package, compileAssemblies, sourceReferences, runtimeAssemblies, nativeLibraries, contentFiles);
+        }
+
+        private void PopulateContentFiles(PackageDescription package, IList<LockFileContentFile> lockContentFiles, List<LibraryContentFile> contentFiles)
+        {
+            foreach (var lockContentFile in lockContentFiles)
+            {
+                contentFiles.Add(new LibraryContentFile()
+                {
+                    CopyToOutput = lockContentFile.CopyToOutput,
+                    BuildAction = lockContentFile.BuildAction,
+                    Preprocess = !string.IsNullOrEmpty(lockContentFile.PPOutputPath),
+                    OutputPath = lockContentFile.OutputPath,
+                    Path = Path.Combine(package.Path, lockContentFile.Path),
+                    CodeLanguage = lockContentFile.CodeLanguage
+                });
+            }
         }
 
         private LibraryExport ExportProject(ProjectDescription project)
@@ -166,8 +190,15 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                 sourceReferences.Add(sharedFile);
             }
 
+            //TODO: implement this after nuget/dotnet pack will include content files to packages
+            //var contentFiles = project.Project.Files.GetContentFiles().Select(file => new LibraryContentFile()
+            //{
+            //    Path = file,
+            //    CopyToOutput = true
+            //});
+
             // No support for ref or native in projects, so runtimeAssemblies is just the same as compileAssemblies and nativeLibraries are empty
-            return new LibraryExport(project, compileAssemblies, sourceReferences, compileAssemblies, Enumerable.Empty<LibraryAsset>());
+            return new LibraryExport(project, compileAssemblies, sourceReferences, compileAssemblies, Enumerable.Empty<LibraryAsset>(), Enumerable.Empty<LibraryContentFile>());
         }
 
         private static string ResolvePath(Project project, string configuration, string path)
@@ -195,7 +226,8 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                     new[] { new LibraryAsset(library.Identity.Name, library.Path, library.Path) },
                 Enumerable.Empty<string>(),
                 Enumerable.Empty<LibraryAsset>(),
-                Enumerable.Empty<LibraryAsset>());
+                Enumerable.Empty<LibraryAsset>(),
+                Enumerable.Empty<LibraryContentFile>());
         }
 
         private IEnumerable<string> GetSharedSources(PackageDescription package)

@@ -34,13 +34,24 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         /// </summary>
         public IEnumerable<string> SourceReferences { get; }
 
-        public LibraryExport(LibraryDescription library, IEnumerable<LibraryAsset> compileAssemblies, IEnumerable<string> sourceReferences, IEnumerable<LibraryAsset> runtimeAssemblies, IEnumerable<LibraryAsset> nativeLibraries)
+        /// <summary>
+        /// Gets a list of content file references
+        /// </summary>
+        public IEnumerable<LibraryContentFile> ContentFiles { get; }
+
+        public LibraryExport(LibraryDescription library,
+            IEnumerable<LibraryAsset> compileAssemblies,
+            IEnumerable<string> sourceReferences,
+            IEnumerable<LibraryAsset> runtimeAssemblies,
+            IEnumerable<LibraryAsset> nativeLibraries,
+            IEnumerable<LibraryContentFile> contentFiles)
         {
             Library = library;
             CompilationAssemblies = compileAssemblies;
             SourceReferences = sourceReferences;
             RuntimeAssemblies = runtimeAssemblies;
             NativeLibraries = nativeLibraries;
+            ContentFiles = contentFiles;
         }
 
         private string DebuggerDisplay => Library.Identity.ToString();
