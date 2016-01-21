@@ -30,10 +30,7 @@ namespace Microsoft.DotNet.Tools.Restore
 
         private static Command Run(IEnumerable<string> nugetArgs)
         {
-            var corerun = Path.Combine(
-                AppContext.BaseDirectory,
-                "corerun" + Constants.ExeSuffix);
-            return Command.Create(corerun, Enumerable.Concat(
+            return Command.Create(CoreHost.LocalHostExePath, Enumerable.Concat(
                 new[] { Path.Combine(AppContext.BaseDirectory, "NuGet.CommandLine.XPlat.dll") },
                 nugetArgs));
         }
