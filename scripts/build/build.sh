@@ -44,8 +44,9 @@ if [ ! -z "$OFFLINE" ]; then
     info "Skipping Tools and Package Download: Offline build"
 else
    $REPOROOT/scripts/obtain/install-tools.sh
-    
-   $REPOROOT/scripts/build/restore-packages.sh
+
+   # Restore using the stage 0
+   PATH="$REPOROOT/artifacts/$RID/stage0/bin:$PATH" $REPOROOT/scripts/build/restore-packages.sh
 fi
 
 header "Compiling"

@@ -17,13 +17,14 @@ else {
 }
 
 # Restore packages
+# NOTE(anurse): I had to remove --quiet, because NuGet3 is too quiet when that's provided :(
 header "Restoring packages"
-& "$DnxRoot\dnu" restore "$RepoRoot\src" --quiet --runtime "$Rid" "$NoCacheArg"
-& "$DnxRoot\dnu" restore "$RepoRoot\test" --quiet --runtime "$Rid" "$NoCacheArg"
-& "$DnxRoot\dnu" restore "$RepoRoot\tools" --quiet --runtime "$Rid" "$NoCacheArg"
+dotnet restore "$RepoRoot\src" --runtime "$Rid" "$NoCacheArg"
+dotnet restore "$RepoRoot\test" --runtime "$Rid" "$NoCacheArg"
+dotnet restore "$RepoRoot\tools" --runtime "$Rid" "$NoCacheArg"
 
 $oldErrorAction=$ErrorActionPreference
 $ErrorActionPreference="SilentlyContinue"
-& "$DnxRoot\dnu" restore "$RepoRoot\testapp" --quiet --runtime "$Rid" "$NoCacheArg" 2>&1 | Out-Null
+dotnet restore "$RepoRoot\testapp" --runtime "$Rid" "$NoCacheArg" 2>&1 | Out-Null
 $ErrorActionPreference=$oldErrorAction
 
