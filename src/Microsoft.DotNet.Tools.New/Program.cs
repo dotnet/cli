@@ -78,12 +78,13 @@ namespace Microsoft.DotNet.Tools.New
             app.HelpOption("-h|--help");
 
             var lang = app.Option("-l|--lang <LANGUAGE>", "Language of project [C#|F#]", CommandOptionType.SingleValue);
+            var type = app.Option("-t|--type <TYPE>", "Type of project", CommandOptionType.SingleValue);
 
             var dotnetNew = new Program();
             app.OnExecute(() => {
 
-                var csharp = new { Name = "C#", TemplateDir = "CSharpTemplate", Alias = new[] { "c#", "cs", "csharp" } };
-                var fsharp = new { Name = "F#", TemplateDir = "FSharpTemplate", Alias = new[] { "f#", "fs", "fsharp" } };
+                var csharp = new { Name = "C#", Alias = new[] { "c#", "cs", "csharp" }, TemplatePrefix = "CSharp", Templates = new[] { "Console" } };
+                var fsharp = new { Name = "F#", Alias = new[] { "f#", "fs", "fsharp" }, TemplatePrefix = "FSharp", Templates = new[] { "Console" } };
 
                 string languageValue = lang.Value() ?? csharp.Name;
 
@@ -96,7 +97,18 @@ namespace Microsoft.DotNet.Tools.New
                     return -1;
                 }
 
-                return dotnetNew.CreateEmptyProject(language.Name, language.TemplateDir);
+                string typeValue = type.Value() ?? language.Templates.First();
+
+                string templateName = language.Templates.FirstOrDefault(t => StringComparer.OrdinalIgnoreCase.Equals(typeValue, t));
+                if (templateName == null)
+                {
+                    Reporter.Error.WriteLine($"Unrecognized type: {typeValue}".Red());
+                    return -1;
+                }
+
+                string templateDir = $"{language.TemplatePrefix}_{templateName}";
+
+                return dotnetNew.CreateEmptyProject(language.Name, templateDir);
             });
 
             try
