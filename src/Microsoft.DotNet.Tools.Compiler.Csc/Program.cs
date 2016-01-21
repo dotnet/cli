@@ -125,7 +125,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Csc
                 ? "-debug:full"
                 : "-debug:portable");
 
-            foreach (var suppress in DefaultCompilerWarningSuppresses.Instance["csc"])
+            foreach (var suppress in DefaultCompilerWarningSuppresses.Map["csc"])
             {
                 args.Add($"-nowarn:{suppress}");
             }

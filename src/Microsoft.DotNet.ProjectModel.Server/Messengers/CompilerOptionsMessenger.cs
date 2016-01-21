@@ -2,8 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
-using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.ProjectModel.Server.Models;
 
 namespace Microsoft.DotNet.ProjectModel.Server.Messengers
@@ -17,21 +15,15 @@ namespace Microsoft.DotNet.ProjectModel.Server.Messengers
         protected override bool CheckDifference(ProjectContextSnapshot local, ProjectContextSnapshot remote)
         {
             return remote.CompilerOptions != null &&
-                   Equals(local.CompilerName, remote.CompilerName) &&
                    Equals(local.CompilerOptions, remote.CompilerOptions);
         }
 
         protected override object CreatePayload(ProjectContextSnapshot local)
         {
-            var option = CommonCompilerOptions.Combine(local.CompilerOptions, new CommonCompilerOptions
-            {
-                SuppressWarnings = DefaultCompilerWarningSuppresses.Instance[local.CompilerName]
-            });
-
             return new CompilationOptionsMessage
             {
                 Framework = local.TargetFramework.ToPayload(),
-                Options = option
+                Options = local.CompilerOptions
             };
         }
 

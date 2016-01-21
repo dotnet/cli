@@ -68,7 +68,7 @@ namespace Microsoft.DotNet.ProjectModel.Workspaces
             // TODO: ctor argument?
             var configuration = "Debug";
 
-            var compilationOptions = project.ProjectFile.GetCompilerOptions(project.TargetFramework, configuration);
+            var compilationOptions = project.GetLanguageSpecificCompilerOption(project.TargetFramework, configuration);
 
             var compilationSettings = ToCompilationSettings(compilationOptions, project.TargetFramework, project.ProjectFile.ProjectDirectory);
 
@@ -146,10 +146,7 @@ namespace Microsoft.DotNet.ProjectModel.Workspaces
         {
             var options = GetCompilationOptions(compilerOptions, projectDirectory);
 
-            // Disable 1702 until roslyn turns this off by default
-            var defaultCSharpSuppresses = DefaultCompilerWarningSuppresses.Instance["csc"];
-
-            options = options.WithSpecificDiagnosticOptions(defaultCSharpSuppresses.ToDictionary(
+            options = options.WithSpecificDiagnosticOptions(compilerOptions.SuppressWarnings.ToDictionary(
                 suppress => suppress, _ => ReportDiagnostic.Suppress));
 
             AssemblyIdentityComparer assemblyIdentityComparer =
