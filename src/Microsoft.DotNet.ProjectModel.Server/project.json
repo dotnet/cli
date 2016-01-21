@@ -5,9 +5,9 @@
         "emitEntryPoint": true
     },
     "dependencies": {
-        "NETStandard.Library": "1.0.0-rc2-23704",
-        "System.Threading.ThreadPool": "4.0.10-rc2-23704",
-        "System.Runtime.Serialization.Primitives": "4.1.0-rc2-23704",
+        "NETStandard.Library": "1.0.0-rc2-23720",
+        "System.Threading.ThreadPool": "4.0.10-rc2-23720",
+        "System.Runtime.Serialization.Primitives": "4.1.0-rc2-23720",
         "Microsoft.DotNet.ProjectModel": "1.0.0-*",
         "Microsoft.DotNet.Compiler.Common": "1.0.0-*",
         "Microsoft.Extensions.CommandLineUtils.Sources": {
