@@ -13,8 +13,8 @@
         "Microsoft.DotNet.Cli.Utils": "1.0.0-*"
     },
     "frameworks": {
-        "dnxcore50": { 
-            "imports": "portable-win8+net45"
+        "dnxcore50": {
+            "imports": "portable-net451+win8"
         }
     },
     "scripts": {
