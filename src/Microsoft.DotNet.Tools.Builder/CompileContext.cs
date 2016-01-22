@@ -123,7 +123,7 @@ namespace Microsoft.DotNet.Tools.Build
 
             if (!newInputs.Any())
             {
-                Reporter.Output.WriteLine($"\nProject {project.ProjectName()} was previoulsy compiled. Skipping compilation.");
+                Reporter.Output.WriteLine($"\nProject {project.ProjectName()} was previously compiled. Skipping compilation.");
                 return false;
             }
 
