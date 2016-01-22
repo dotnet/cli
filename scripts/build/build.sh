@@ -46,7 +46,7 @@ else
    $REPOROOT/scripts/obtain/install-tools.sh
 
    # Restore using the stage 0
-   PATH="$REPOROOT/artifacts/$RID/stage0/bin:$PATH" $REPOROOT/scripts/build/restore-packages.sh
+   PATH="$REPOROOT/.dotnet_stage0/$RID/bin:$PATH" $REPOROOT/scripts/build/restore-packages.sh
 fi
 
 header "Compiling"
