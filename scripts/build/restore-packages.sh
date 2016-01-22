@@ -18,9 +18,10 @@ source "$DIR/../common/_common.sh"
 
 header "Restoring packages"
 
-$DNX_ROOT/dnu restore "$REPOROOT/src" --quiet "$NOCACHE"
-$DNX_ROOT/dnu restore "$REPOROOT/test" --quiet "$NOCACHE"
-$DNX_ROOT/dnu restore "$REPOROOT/tools" --quiet "$NOCACHE"
+# NOTE(anurse): I had to remove --quiet, because NuGet3 is too quiet when that's provided :(
+dotnet restore "$REPOROOT/src" "$NOCACHE"
+dotnet restore "$REPOROOT/test" "$NOCACHE"
+dotnet restore "$REPOROOT/tools" "$NOCACHE"
 set +e
-$DNX_ROOT/dnu restore "$REPOROOT/testapp" --quiet "$NOCACHE" >/dev/null 2>&1
+dotnet restore "$REPOROOT/testapp" "$NOCACHE" >/dev/null 2>&1
 set -e

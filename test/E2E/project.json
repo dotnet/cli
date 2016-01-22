@@ -5,7 +5,7 @@
     },
 
     "dependencies": {
-        "NETStandard.Library" : "1.0.0-rc2-23704",
+        "NETStandard.Library" : "1.0.0-rc2-23720",
 
         "xunit": "2.1.0",
         "xunit.console.netcore": "1.0.2-prerelease-00101",
@@ -18,6 +18,8 @@
     },
 
     "frameworks": {
-        "dnxcore50": { }
+        "dnxcore50": {
+            "imports": "portable-net451+win8"
+        }
     }
 }
