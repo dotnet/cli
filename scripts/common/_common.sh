@@ -36,7 +36,7 @@ export CHANNEL=$RELEASE_SUFFIX
 [ -z "$DOTNET_HOME" ] && export DOTNET_HOME=$STAGE2_DIR && export PATH=$STAGE2_DIR/bin:$PATH
 [ -z "$CONFIGURATION" ] && export CONFIGURATION=Debug
 
+source "$COMMONDIR/_nuget.sh"
+
 unset COMMONSOURCE
 unset COMMONDIR
-
-source "$COMMONDIR/_nuget.sh"
