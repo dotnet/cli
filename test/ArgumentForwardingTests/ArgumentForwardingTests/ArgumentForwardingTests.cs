@@ -106,6 +106,11 @@ namespace Microsoft.DotNet.Tests.ArgumentForwarding
         [InlineData(@"a\""b \\ cd ""\e f\"" \\""\\\")]
         public void TestArgumentForwardingCmd(string testUserArgument)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return;
+            }
+
             // Get Baseline Argument Evaluation via Reflector
             // This does not need to be different for cmd because
             // it only establishes what the string[] args should be
