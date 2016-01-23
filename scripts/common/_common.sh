@@ -13,6 +13,7 @@ COMMONDIR="$( cd -P "$( dirname "$COMMONSOURCE" )" && pwd )"
 
 source "$COMMONDIR/_prettyprint.sh"
 source "$COMMONDIR/_rid.sh"
+source "$COMMONDIR/_configuration.sh"
 
 # TODO: Replace this with a dotnet generation
 export TFM=dnxcore50
@@ -25,6 +26,8 @@ export STAGE1_COMPILATION_DIR=$OUTPUT_ROOT/stage1compilation
 export STAGE2_DIR=$OUTPUT_ROOT/stage2
 export STAGE2_COMPILATION_DIR=$OUTPUT_ROOT/stage2compilation
 export HOST_DIR=$OUTPUT_ROOT/corehost
+export TEST_BIN_ROOT="$REPOROOT/artifacts/tests"
+export TEST_PACKAGE_DIR="$TEST_BIN_ROOT/packages"
 export RELEASE_SUFFIX=beta
 export CHANNEL=$RELEASE_SUFFIX
 
@@ -32,6 +35,8 @@ export CHANNEL=$RELEASE_SUFFIX
 [ -z "$DOTNET_CLI_VERSION" ] && export DOTNET_CLI_VERSION=0.1.0.0
 [ -z "$DOTNET_HOME" ] && export DOTNET_HOME=$STAGE2_DIR && export PATH=$STAGE2_DIR/bin:$PATH
 [ -z "$CONFIGURATION" ] && export CONFIGURATION=Debug
+
+source "$COMMONDIR/_nuget.sh"
 
 unset COMMONSOURCE
 unset COMMONDIR

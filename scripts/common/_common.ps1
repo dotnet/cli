@@ -4,6 +4,7 @@
 #
 
 . $PSScriptRoot\_utility.ps1
+. $PSScriptRoot\_configuration.ps1
 
 $Rid = "win7-x64"
 $Tfm = "dnxcore50"
@@ -17,6 +18,8 @@ $Stage2Dir = "$OutputDir\stage2"
 $Stage2CompilationDir = "$OutputDir\stage2compilation"
 $HostDir = "$OutputDir\corehost"
 $PackageDir = "$RepoRoot\artifacts\packages\dnvm"
+$TestBinRoot = "$RepoRoot\artifacts\tests"
+$TestPackageDir = "$TestBinRoot\packages"
 $env:ReleaseSuffix = "beta"
 $env:Channel = "$env:ReleaseSuffix"
 
@@ -25,3 +28,5 @@ setEnvIfDefault "DOTNET_INSTALL_DIR"  "$(Convert-Path "$PSScriptRoot\..")\.dotne
 setEnvIfDefault "DOTNET_CLI_VERSION" "0.1.0.0"
 setPathAndHomeIfDefault "$Stage2Dir"
 setVarIfDefault "Configuration" "Debug"
+
+. $PSScriptRoot\_nuget.ps1
