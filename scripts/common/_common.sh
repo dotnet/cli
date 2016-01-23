@@ -26,8 +26,8 @@ export STAGE1_COMPILATION_DIR=$OUTPUT_ROOT/stage1compilation
 export STAGE2_DIR=$OUTPUT_ROOT/stage2
 export STAGE2_COMPILATION_DIR=$OUTPUT_ROOT/stage2compilation
 export HOST_DIR=$OUTPUT_ROOT/corehost
-export TEST_BIN_ROOT = "$REPOROOT/artifacts/tests"
-export TEST_PACKAGE_DIR = "$TEST_BIN_ROOT/packages"
+export TEST_BIN_ROOT="$REPOROOT/artifacts/tests"
+export TEST_PACKAGE_DIR="$TEST_BIN_ROOT/packages"
 export RELEASE_SUFFIX=beta
 export CHANNEL=$RELEASE_SUFFIX
 
