@@ -7,6 +7,4 @@
 
 # Restore packages
 header "Restoring packages"
-& "$DnxRoot\dnu" restore "$RepoRoot\src"
-& "$DnxRoot\dnu" restore "$RepoRoot\tools"
-
+& "$DnxRoot\dnu" restore "$RepoRoot\test\TestPackages" --quiet --runtime "$Rid"

@@ -12,11 +12,22 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
   SOURCE="$(readlink "$SOURCE")"
   [[ "$SOURCE" != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 done
+
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 source "$DIR/../common/_common.sh"
 
-header "Restoring packages"
+header "Restoring test dependencies"
+_ "$REPOROOT/scripts/test/restore-testDependencies.sh"
 
-$DNX_ROOT/dnu restore "$REPOROOT/src"
-$DNX_ROOT/dnu restore "$REPOROOT/tools"
+header "Building test dependencies"
+_ "$REPOROOT/scripts/test/build-testDependencies.sh"
+
+header "Restoring test projects"
+_ "$REPOROOT/scripts/test/restore-tests.sh"
+
+header "Building test projects"
+_ "$REPOROOT/scripts/test/build-tests.sh"
+
+header "Running Tests"
+_ "$REPOROOT/scripts/test/run-tests.sh"

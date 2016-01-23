@@ -16,7 +16,10 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 source "$DIR/../common/_common.sh"
 
-header "Restoring packages"
+header "Restoring Test Packages"
 
-$DNX_ROOT/dnu restore "$REPOROOT/src"
-$DNX_ROOT/dnu restore "$REPOROOT/tools"
+$DNX_ROOT/dnu restore "$REPOROOT/test" -f "$TEST_PACKAGE_DIR"
+
+set +e
+$DNX_ROOT/dnu restore "$REPOROOT/testapp" >/dev/null 2>&1
+set -e

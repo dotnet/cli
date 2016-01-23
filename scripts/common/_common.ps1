@@ -4,6 +4,8 @@
 #
 
 . $PSScriptRoot\_utility.ps1
+. $PSScriptRoot\_configuration.ps1
+. $PSScriptRoot\_nuget.ps1
 
 $Rid = "win7-x64"
 $Tfm = "dnxcore50"
@@ -17,6 +19,8 @@ $Stage2Dir = "$OutputDir\stage2"
 $Stage2CompilationDir = "$OutputDir\stage2compilation"
 $HostDir = "$OutputDir\corehost"
 $PackageDir = "$RepoRoot\artifacts\packages\dnvm"
+$TestBinRoot = "$RepoRoot\artifacts\tests"
+$TestPackageDir = "$TestBinRoot\packages"
 $env:ReleaseSuffix = "beta"
 $env:Channel = "$env:ReleaseSuffix"
 
