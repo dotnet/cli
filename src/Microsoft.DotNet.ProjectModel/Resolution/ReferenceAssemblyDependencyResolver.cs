@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Versioning;
 using Microsoft.DotNet.ProjectModel.Graph;
@@ -46,6 +47,12 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                 targetFramework,
                 resolved: true,
                 compatible: true);
+        }
+
+        public IEnumerable<LibraryDescription> GetDefaultDescriptions(NuGetFramework targetFramework)
+        {
+            var assemblies = FrameworkResolver.GetDefaultAssemblies(targetFramework);
+            return assemblies.Select(assembly => GetDescription(new LibraryRange(assembly, LibraryType.ReferenceAssembly), targetFramework));
         }
     }
 }

@@ -269,6 +269,17 @@ namespace Microsoft.DotNet.ProjectModel
         {
             requiresFrameworkAssemblies = false;
 
+            var defaultLibraries = referenceAssemblyDependencyResolver.GetDefaultDescriptions(TargetFramework);
+            if (defaultLibraries.Any())
+            {
+                requiresFrameworkAssemblies = true;
+                foreach (var library in defaultLibraries)
+                {
+                    var key = new LibraryKey(library.Identity.Name, library.Identity.Type);
+                    libraries[key] = library;
+                }
+            }
+
             foreach (var library in libraries.Values.ToList())
             {
                 if (Equals(library.Identity.Type, LibraryType.Package) &&
