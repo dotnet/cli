@@ -14,7 +14,6 @@ COMMONDIR="$( cd -P "$( dirname "$COMMONSOURCE" )" && pwd )"
 source "$COMMONDIR/_prettyprint.sh"
 source "$COMMONDIR/_rid.sh"
 source "$COMMONDIR/_configuration.sh"
-source "$COMMONDIR/_nuget.sh"
 
 # TODO: Replace this with a dotnet generation
 export TFM=dnxcore50
@@ -39,3 +38,5 @@ export CHANNEL=$RELEASE_SUFFIX
 
 unset COMMONSOURCE
 unset COMMONDIR
+
+source "$COMMONDIR/_nuget.sh"

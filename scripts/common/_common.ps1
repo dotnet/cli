@@ -5,7 +5,6 @@
 
 . $PSScriptRoot\_utility.ps1
 . $PSScriptRoot\_configuration.ps1
-. $PSScriptRoot\_nuget.ps1
 
 $Rid = "win7-x64"
 $Tfm = "dnxcore50"
@@ -29,3 +28,5 @@ setEnvIfDefault "DOTNET_INSTALL_DIR"  "$(Convert-Path "$PSScriptRoot\..")\.dotne
 setEnvIfDefault "DOTNET_CLI_VERSION" "0.1.0.0"
 setPathAndHomeIfDefault "$Stage2Dir"
 setVarIfDefault "Configuration" "Debug"
+
+. $PSScriptRoot\_nuget.ps1
