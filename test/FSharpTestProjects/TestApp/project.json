@@ -8,16 +8,18 @@
         "Program.fs"
     ],
     "dependencies": {
-        "TestLibrary": { "target": "project" },
+        "TestLibrary": "1.0.0-*",
         "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-151221",
-        "System.IO": "4.0.11-beta-23428",
-        "System.Console": "4.0.0-beta-23428",
-        "System.Runtime": "4.0.21-beta-23428",
-        "System.Diagnostics.Process": "4.1.0-beta-23428",
-        "Microsoft.NETCore.Runtime": "1.0.1-beta-23428"
+        "NETStandard.Library": "1.0.0-rc2-23704",
+        "Microsoft.NETCore.Platforms": "1.0.1-rc2-23704"
     },
 
     "frameworks": {
         "dnxcore50": { }
+    },
+
+    "scripts": {
+        "prepublish" : ["echo prepublish_output ?%publish:ProjectPath%? ?%publish:Configuration%? ?%publish:OutputPath%? ?%publish:Framework%? ?%publish:Runtime%?"],
+        "postpublish" : ["echo postpublish_output ?%publish:ProjectPath%? ?%publish:Configuration%? ?%publish:OutputPath%? ?%publish:Framework%? ?%publish:Runtime%?"]
     }
 }
