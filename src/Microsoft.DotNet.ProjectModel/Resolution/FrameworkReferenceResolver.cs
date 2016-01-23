@@ -88,6 +88,27 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                     "Reference Assemblies", "Microsoft", "Framework");
         }
 
+        public string[] GetDefaultAssemblies(NuGetFramework targetFramework)
+        {
+            if (string.IsNullOrEmpty(ReferenceAssembliesPath))
+            {
+                return new String[0];
+            }
+
+            var information = _cache.GetOrAdd(targetFramework, GetFrameworkInformation);
+
+            if (information == null || !information.Exists)
+            {
+                return new String[0];
+            }
+
+            return new DirectoryInfo(information.Path)
+                .GetFiles("*.dll")
+                .Select(file => Path.GetFileNameWithoutExtension(file.Name))
+                .ToArray();
+
+        }
+
         public bool TryGetAssembly(string name, NuGetFramework targetFramework, out string path, out Version version)
         {
             path = null;
