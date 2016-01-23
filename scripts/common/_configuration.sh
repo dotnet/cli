@@ -6,10 +6,10 @@
 
 loadTestList()
 {
-    return ( `cat "$REPOROOT/scripts/configuration/testProjects.csv" `)
+    return $(cat "$REPOROOT/scripts/configuration/testProjects.csv")
 }
 
 loadTestPackageList()
 {
-    return ( `cat "$RepoRoot/scripts/configuration/testPackageProjects.csv" `)
+    return $(cat "$RepoRoot/scripts/configuration/testPackageProjects.csv")
 }
