@@ -6,9 +6,5 @@
 . $PSScriptRoot\..\common\_common.ps1
 
 # Restore packages
-# NOTE(anurse): I had to remove --quiet, because NuGet3 is too quiet when that's provided :(
 header "Restoring packages"
-
-& "$DnxRoot\dnu" restore "$RepoRoot\src"
-& "$DnxRoot\dnu" restore "$RepoRoot\tools"
-
+& "$DnxRoot\dnu" restore "$RepoRoot\test\TestPackages" --quiet --runtime "$Rid"

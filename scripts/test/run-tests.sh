@@ -19,28 +19,10 @@ source "$DIR/../common/_common.sh"
 
 TestBinRoot="$REPOROOT/artifacts/tests"
 
-TestProjects=( \
-    E2E \
-    StreamForwarderTests \
-    dotnet-publish.Tests \
-    dotnet-compile.Tests \
-    dotnet-build.Tests \
-)
-
 TestScripts=( \
     "package-command-test.sh" \
     "argument-forwarding-tests.sh" \
 )
-
-for project in ${TestProjects[@]}
-do
-    dotnet publish --framework "dnxcore50" --output "$TestBinRoot" --configuration "$CONFIGURATION" "$REPOROOT/test/$project"
-done
-
-if [ -d "$TestBinRoot/$CONFIGURATION/dnxcore50" ]
-then
-    cp -R -f $TestBinRoot/$CONFIGURATION/dnxcore50/* $TestBinRoot
-fi
 
 # copy TestProjects folder which is used by the test cases
 mkdir -p "$TestBinRoot/TestProjects"

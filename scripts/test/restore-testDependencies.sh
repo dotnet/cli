@@ -18,5 +18,4 @@ source "$DIR/../common/_common.sh"
 
 header "Restoring packages"
 
-$DNX_ROOT/dnu restore "$REPOROOT/src"
-$DNX_ROOT/dnu restore "$REPOROOT/tools"
+$DNX_ROOT/dnu restore "$REPOROOT/test/TestPackages" --quiet
