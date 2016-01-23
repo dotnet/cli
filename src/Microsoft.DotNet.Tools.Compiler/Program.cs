@@ -149,7 +149,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             //     Need CoreRT Framework published to nuget
 
             // Do Native Compilation
-            var result = Command.Create("dotnet-compile-native", $"--rsp \"{rsp}\"")
+            var result = Command.Create("dotnet-compile-native", new string[] { "--rsp", $"{rsp}" })
                                 .ForwardStdErr()
                                 .ForwardStdOut()
                                 .Execute();
@@ -204,8 +204,8 @@ namespace Microsoft.DotNet.Tools.Compiler
             // Assemble args
             var compilerArgs = new List<string>()
             {
-                $"--temp-output:{intermediateOutputPath}",
-                $"--out:{outputName}"
+                $"--temp-output:\"{intermediateOutputPath}\"",
+                $"--out:\"{outputName}\""
             };
 
             var compilationOptions = CompilerUtil.ResolveCompilationOptions(context, args.ConfigValue);
@@ -235,10 +235,10 @@ namespace Microsoft.DotNet.Tools.Compiler
                     references.AddRange(dependency.CompilationAssemblies.Select(r => r.ResolvedPath));
                 }
 
-                compilerArgs.AddRange(dependency.SourceReferences);
+                compilerArgs.AddRange(dependency.SourceReferences.Select(s => $"\"{s}\""));
             }
 
-            compilerArgs.AddRange(references.Select(r => $"--reference:{r}"));
+            compilerArgs.AddRange(references.Select(r => $"--reference:\"{r}\""));
 
             if (compilationOptions.PreserveCompilationContext == true)
             {
@@ -255,7 +255,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                     writer.Write(dependencyContext, fileStream);
                 }
 
-                compilerArgs.Add($"--resource:\"{depsJsonFile}\",{context.ProjectFile.Name}.deps.json");
+                compilerArgs.Add($"--resource:\"{depsJsonFile},{context.ProjectFile.Name}.deps.json\"");
 
                 var refsFolder = Path.Combine(outputPath, "refs");
                 if (Directory.Exists(refsFolder))
@@ -295,7 +295,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             };
             RunScripts(context, ScriptNames.PreCompile, contextVariables);
 
-            var result = Command.Create($"dotnet-compile-{compilerName}", $"@\"{rsp}\"")
+            var result = Command.Create($"dotnet-compile-{compilerName}", new string[] {"@" + $"{rsp}" })
                 .OnErrorLine(line =>
                 {
                     var diagnostic = ParseDiagnostic(context.ProjectDirectory, line);
@@ -420,7 +420,14 @@ namespace Microsoft.DotNet.Tools.Compiler
                 {
                     var result =
                         Command.Create("dotnet-resgen",
-                            $"\"{resgenFile.InputFile}\" -o \"{resgenFile.OutputFile}\" -v \"{project.Version.Version}\"")
+                            new string[]
+                            {
+                                $"{resgenFile.InputFile}",
+                                "-o",
+                                $"{resgenFile.OutputFile}",
+                                "-v",
+                                $"{project.Version.Version}"
+                            })
                             .ForwardStdErr()
                             .ForwardStdOut()
                             .Execute();
@@ -430,11 +437,11 @@ namespace Microsoft.DotNet.Tools.Compiler
                         return false;
                     }
 
-                    compilerArgs.Add($"--resource:\"{resgenFile.OutputFile}\",{Path.GetFileName(resgenFile.MetadataName)}");
+                    compilerArgs.Add($"--resource:\"{resgenFile.OutputFile},{Path.GetFileName(resgenFile.MetadataName)}\"");
                 }
                 else
                 {
-                    compilerArgs.Add($"--resource:\"{resgenFile.InputFile}\",{Path.GetFileName(resgenFile.MetadataName)}");
+                    compilerArgs.Add($"--resource:\"{resgenFile.InputFile},{Path.GetFileName(resgenFile.MetadataName)}\"");
                 }
             }
 
