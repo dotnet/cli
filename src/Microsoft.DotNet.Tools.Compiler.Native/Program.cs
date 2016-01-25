@@ -95,7 +95,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
             var rsp = Path.Combine(config.IntermediateDirectory, $"dotnet-compile-mcg.rsp");
             File.WriteAllLines(rsp, mcgArgs);
 
-            var result = Command.Create("dotnet-mcg", $"--rsp \"{rsp}\"")
+            var result = Command.Create("dotnet-mcg", new string[] {"--rsp", $"{rsp}" })
                                 .ForwardStdErr()
                                 .ForwardStdOut()
                                 .Execute();

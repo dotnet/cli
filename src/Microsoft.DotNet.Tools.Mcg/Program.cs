@@ -42,12 +42,11 @@ namespace Microsoft.DotNet.Tools.Compiler.Mcg
             return nArgs;
         }
 
-        private static string TransformCommandLine(string[] args)
+        private static IEnumerable<string> TransformCommandLine(string[] args)
         {
-            StringBuilder mcgArgs = new StringBuilder(512);
+            var mcgArgs = new List<string>();
 
             //TODO : Mcg argument need to be consistent with ilc.exe , also expose all mcg arguments         
-            const string mcgArgFormat = "{0} -p:{1} -referencepath:{2} -outputpath:{3}";
             ArgumentSyntax.Parse(args, syntax =>
             {
                 syntax.HandleHelp = false;
@@ -66,8 +65,19 @@ namespace Microsoft.DotNet.Tools.Compiler.Mcg
             // TODO : References necessary to resolve types and compile mcg generated code.This should 
             // come from nuget.
             string referencepath = Path.Combine(AppContext.BaseDirectory, "mcg", "ref");
-            mcgArgs.AppendFormat(mcgArgFormat, inputAssembly, targetArch, referencepath, outputPath);
-            return mcgArgs.ToString();
+
+            mcgArgs.Add($"{inputAssembly}");
+
+            mcgArgs.Add("-p");
+            mcgArgs.Add($"{targetArch}");
+
+            mcgArgs.Add("-referencepath");
+            mcgArgs.Add($"{referencepath}");
+
+            mcgArgs.Add("-outputpath");
+            mcgArgs.Add($"{outputPath}");
+
+            return mcgArgs;
         }
 
         public static int Main(string[] args)
@@ -87,11 +97,11 @@ namespace Microsoft.DotNet.Tools.Compiler.Mcg
                     }
                 }
             }
-            string mcgArguments = TransformCommandLine(args);
+            var mcgArguments = TransformCommandLine(args);
             return ExecuteMcg(mcgArguments);
         }
 
-        private static int ExecuteMcg(string arguments)
+        private static int ExecuteMcg(IEnumerable<string> arguments)
         {
             // TODO : Mcg is assumed to be present under the current path.This will change once 
             // we have mcg working on coreclr and is available as a nuget package.                                 
