@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
                     new object[] { "", PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier(), "", "" },
                     new object[] { "", "", "Release", "" },
                     new object[] { "", "", "", "some/dir"},
-                    //new object[] { "", "", "", "\"some/dir/with spaces\"" }, // issue - https://github.com/dotnet/cli/issues/525
+                    new object[] { "", "", "", "some/dir/with spaces" }, 
                     new object[] { "dnxcore50", PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier(), "Debug", "some/dir" },
                 };
             }
@@ -138,6 +138,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
         {
             // create unique directories in the 'temp' folder
             var root = Temp.CreateDirectory();
+            root.CopyFile(Path.Combine(_testProjectsRoot, "global.json"));
             var testLibDir = root.CreateDirectory("TestLibraryWithRunner");
 
             //copy projects to the temp dir
@@ -146,13 +147,24 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             RunRestore(testLibDir.Path);
 
             var testProject = GetProjectPath(testLibDir);
-            var publishCommand = new PublishCommand(testProject);
+            var publishCommand = new PublishCommand(testProject, "net451");
             publishCommand.Execute().Should().Pass();
 
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryWithRunner.dll");
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryWithRunner.pdb");
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryWithRunner.deps");
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryWithRunner.dll.config");
+            // dependencies should also be copied
+            publishCommand.GetOutputDirectory().Should().HaveFile("Newtonsoft.Json.dll");
+            publishCommand.GetOutputDirectory().Delete(true);
+
+            publishCommand = new PublishCommand(testProject, "dnxcore50", PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier());
+            publishCommand.Execute().Should().Pass();
+
+            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryWithRunner.dll");
+            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryWithRunner.pdb");
+            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryWithRunner.deps");
+            publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibraryWithRunner.dll.config");
             // dependencies should also be copied
             publishCommand.GetOutputDirectory().Should().HaveFile("Newtonsoft.Json.dll");
         }
@@ -175,6 +187,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
         }
 
         [Fact]
+        [ActiveIssue(982)]
         public void PublishScriptsRun()
         {
             // create unique directories in the 'temp' folder
