@@ -5,7 +5,7 @@
 There are two main breaking changes in beta. 
 
 1. Versioning change - we have changed the way we version the packages and introduced a new branching mechanism. You can see more in #668. 
-2. Nightly and dev packages cannot co-exist with release packages on one box. 
+2. Dev packages cannot co-exist with release packages on one box. 
 
 The solution for both of these is uninstall:
 
@@ -19,7 +19,13 @@ Due to the above breaking change, we reccommend that you uninstall the pre-Beta 
 Simply uninstall the MSI using Control Panel. 
 
 ## Ubuntu
-The best way to remove the package is to purge it with the following command: `sudo apt-get purge [package-name]`. This will remove all of the dotnet that was installed via apt-get. The `[[ackage-name]` above will most likely be `dotnet` but if you installed dev or nightly it will be `dotnet-dev` or `dotnet-nightly` respectivelly.  
+Use the below commands to remove all traces of previous dotnet packages off your system:
+
+```console
+sudo apt-get purge dotnet dotnet-dev dotnet-nightly
+sudo apt-get update
+sudo apt-get install dotnet
+```
 
 ## OS X 
 OS X doesn't provide any native uninstall option for PKG installs, so you will have to do some manual work. Luckily, it is not difficult if you follow the steps below:
@@ -53,7 +59,7 @@ Installing is as simple as unzipping/untarring the file into a location.  After 
 Also, please refer to the following dependencies that you need for each platform, since the 
 
 ## Building from source
-If you're adventureous and want to build from source, it is quite easy. Clone this repo and run `build.cmd` or `build.sh` for Windows and Linux/OS X respectively. 
+If you're adventurous and want to build from source, it is quite easy. Clone this repo and run `build.cmd` or `build.sh` for Windows and Linux/OS X respectively. 
 
 After that, do not forget to define the `$DOTNET_HOME` environment variable to point to the stage2 directory that was created in the build process. 
 

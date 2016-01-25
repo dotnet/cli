@@ -3,10 +3,6 @@ Native dependencies and requirements
 
 As any other software on the planet, the CLI toolchain and the .NET Core framework that powers it (and is powered by it) have certain native dependencies across the platforms that it supports. These dependencies are listed in this document as well as the best way to install them on your machine. 
 
-# When do I need to worry about this?
-TBD
-
-
 # Ubuntu
 The following dependencies are needed on Linux:
 
