@@ -16,8 +16,6 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
     {
         private string _testProjectsRoot = @"TestProjects";
 
-        private string RepoRoot { get; set; }
-
         public static IEnumerable<object[]> PublishOptions
         {
             get
@@ -35,19 +33,12 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             }
         }
 
-        public PublishTests() : base()
-        {
-            RepoRoot = Path.Combine(Directory.GetCurrentDirectory(), "..\\..\\");
-        }
-
         [Theory]
         [MemberData("PublishOptions")]
         public void PublishOptionsTest(string framework, string runtime, string config, string outputDir)
         {
             // create unique directories in the 'temp' folder
             var root = Temp.CreateDirectory();
-            
-            GenerateTempGlobalJson(root, RepoRoot);
 
             var testAppDir = root.CreateDirectory("TestApp");
             var testLibDir = root.CreateDirectory("TestLibrary");
@@ -82,7 +73,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
         {
             // create unique directories in the 'temp' folder
             var testDir = Temp.CreateDirectory();
-            GenerateTempGlobalJson(testDir, RepoRoot);
+
             var testAppDir = Path.Combine(_testProjectsRoot, "TestAppWithContents");
 
             // copy projects to the temp dir
@@ -102,7 +93,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
         {
             // create unique directories in the 'temp' folder
             var root = Temp.CreateDirectory();
-            GenerateTempGlobalJson(root, RepoRoot);
+
             var testAppDir = root.CreateDirectory("TestApp");
             var testLibDir = root.CreateDirectory("TestLibrary");
 
@@ -123,7 +114,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
         {
             // create unique directories in the 'temp' folder
             var root = Temp.CreateDirectory();
-            GenerateTempGlobalJson(root, RepoRoot);
+
             var testLibDir = root.CreateDirectory("TestLibrary");
 
             //copy projects to the temp dir
@@ -178,7 +169,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
         public void CompilationFailedTest()
         {
             var testDir = Temp.CreateDirectory();
-            GenerateTempGlobalJson(testDir, RepoRoot);
+
             var compileFailDir = Path.Combine(_testProjectsRoot, "CompileFail");
 
             CopyProjectToTempDir(compileFailDir, testDir);
@@ -195,7 +186,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
         {
             // create unique directories in the 'temp' folder
             var root = Temp.CreateDirectory();
-            GenerateTempGlobalJson(root, RepoRoot);
+
             var testAppDir = root.CreateDirectory("TestApp");
             var testLibDir = root.CreateDirectory("TestLibrary");
 
@@ -211,21 +202,6 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
 
             result.Should().StdOutMatchPattern("\nprepublish_output( \\?[^%]+\\?){5}.+\npostpublish_output( \\?[^%]+\\?){5}", RegexOptions.Singleline);
             result.Should().Pass();
-        }
-
-        private void GenerateTempGlobalJson(TempDirectory tempDir, string repoRoot)
-        {
-            var contents = 
-                "{\n" + 
-                    $"    \"projects\": [ \".\", \"{repoRoot}src\" ], " + 
-                "}\n";
-
-            // Global.json doesn't support backslashes
-            contents = contents.Replace('\\', '/');
-
-            var globalJsonPath = Path.Combine(tempDir.Path, "global.json");
-
-            File.WriteAllText(globalJsonPath, contents);
         }
 
         private void CopyProjectToTempDir(string projectDir, TempDirectory tempDir)
