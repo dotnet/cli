@@ -15,11 +15,11 @@ done
 
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-source "$DIR/../common/_common.sh"
+source "$DIR/../../common/_common.sh"
 
 mkdir -p "$TEST_PACKAGE_DIR"
 
-for project in loadTestPackagesList()
+for project in loadTestPackageList()
 do
     dotnet pack "$REPOROOT/test/TestPackages/$project" --output "$TEST_PACKAGE_DIR"
 done

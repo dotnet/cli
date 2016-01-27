@@ -5,14 +5,13 @@
 
 . "$PSScriptRoot\..\common\_common.ps1"
 
-$failCount = 0
-
 $TestBinRoot = "$RepoRoot\artifacts\tests"
 
-$TestScripts = @(
-    "package-command-test.ps1",
-    "argument-forwarding-tests.ps1"
-)
+$TestProjects = loadTestProjectList
+$TestScripts = loadTestScriptList
+
+$failCount = 0
+$failingTests = @()
 
 ## Temporary Workaround for Native Compilation
 ## Need x64 Native Tools Dev Prompt Env Vars
@@ -26,17 +25,13 @@ foreach {
 }
 popd
 
-# copy TestProjects folder which is used by the test cases
+# copy TestProjects to $TestBinRoot
 mkdir -Force "$TestBinRoot\TestProjects"
 cp -rec -Force "$RepoRoot\test\TestProjects\*" "$TestBinRoot\TestProjects"
 
-$failCount = 0
-$failingTests = @()
-
 pushd "$TestBinRoot"
-
 # Run each test project
-loadTestList | foreach {
+$TestProjects | foreach {
     & ".\corerun" "xunit.console.netcore.exe" "$($_.ProjectName).dll" -xml "$($_.ProjectName)-testResults.xml" -notrait category=failing
     $exitCode = $LastExitCode
     if ($exitCode -ne 0) {
@@ -48,11 +43,13 @@ loadTestList | foreach {
 
 popd
 
-$TestScripts | ForEach-Object {
-    & "$RepoRoot\scripts\test\$_"
+$TestScripts | foreach {
+    $scriptName = "$($_.ProjectName).ps1"
+
+    & "$RepoRoot\scripts\test\$scriptName"
     $exitCode = $LastExitCode
     if ($exitCode -ne 0) {
-        $failingTests += "$_"
+        $failingTests += "$scriptName"
         $failCount += 1
     }
 }

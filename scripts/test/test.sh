@@ -17,17 +17,14 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 source "$DIR/../common/_common.sh"
 
-header "Restoring test dependencies"
-_ "$REPOROOT/scripts/test/restore-testDependencies.sh"
-
-header "Building test dependencies"
-_ "$REPOROOT/scripts/test/build-testDependencies.sh"
+header "Setting up Tests"
+"$REPOROOT/scripts/test/setup/setup-tests.sh"
 
 header "Restoring test projects"
-_ "$REPOROOT/scripts/test/restore-tests.sh"
+"$REPOROOT/scripts/test/restore-tests.sh"
 
 header "Building test projects"
-_ "$REPOROOT/scripts/test/build-tests.sh"
+"$REPOROOT/scripts/test/build-tests.sh"
 
 header "Running Tests"
-_ "$REPOROOT/scripts/test/run-tests.sh"
+"$REPOROOT/scripts/test/run-tests.sh"

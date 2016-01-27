@@ -5,11 +5,8 @@
 
 . "$PSScriptRoot\..\common\_common.ps1"
 
-header "Restoring test dependencies"
-_ "$RepoRoot\scripts\test\restore-testDependencies.ps1"
-
-header "Building test dependencies"
-_ "$RepoRoot\scripts\test\build-testDependencies.ps1"
+header "Setting up Tests"
+_ "$RepoRoot\scripts\test\setup\setup-tests.ps1"
 
 header "Restoring test projects"
 _ "$RepoRoot\scripts\test\restore-tests.ps1"

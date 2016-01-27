@@ -6,10 +6,13 @@
 . "$PSScriptRoot\..\common\_common.ps1"
 
 # Publish each test project
-loadTestList | foreach {
+loadTestProjectList | foreach {
     dotnet publish --framework "dnxcore50" --runtime "$Rid" --output "$TestBinRoot" --configuration "$Configuration" "$RepoRoot\test\$($_.ProjectName)"
     if (!$?) {
         Write-Host Command failed: dotnet publish --framework "dnxcore50" --runtime "$Rid" --output "$TestBinRoot" --configuration "$Configuration" "$RepoRoot\test\$($_.ProjectName)"
         exit 1
     }
 }
+
+# TODO: Remove this when publish paths change back
+cp -rec -Force "$TestBinRoot\Debug\dnxcore50\*" "$TestBinRoot"

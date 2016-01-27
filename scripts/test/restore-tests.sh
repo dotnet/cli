@@ -18,8 +18,8 @@ source "$DIR/../common/_common.sh"
 
 header "Restoring Test Packages"
 
-$DNX_ROOT/dnu restore "$REPOROOT/test" -f "$TEST_PACKAGE_DIR"
+dotnet restore "$REPOROOT/test" -f "$TEST_PACKAGE_DIR"
 
 set +e
-$DNX_ROOT/dnu restore "$REPOROOT/testapp" >/dev/null 2>&1
+dotnet restore "$REPOROOT/testapp" >/dev/null 2>&1
 set -e

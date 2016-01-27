@@ -18,5 +18,5 @@ source "$DIR/../common/_common.sh"
 
 header "Restoring packages"
 
-$DNX_ROOT/dnu restore "$REPOROOT/src"
-$DNX_ROOT/dnu restore "$REPOROOT/tools"
+dotnet restore "$REPOROOT/src"
+dotnet restore "$REPOROOT/tools"

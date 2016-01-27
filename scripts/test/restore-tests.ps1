@@ -5,13 +5,8 @@
 
 . $PSScriptRoot\..\common\_common.ps1
 
-info "Restoring Test Packages"
+info "Restoring Test Projects"
 
 # Restore packages
-& "$DnxRoot\dnu" restore "$RepoRoot\test" -f "$TestPackageDir"
-
-$oldErrorAction=$ErrorActionPreference
-$ErrorActionPreference="SilentlyContinue"
-& "$DnxRoot\dnu" restore "$RepoRoot\testapp" "$Rid" 2>&1 | Out-Null
-$ErrorActionPreference=$oldErrorAction
+& dotnet restore "$RepoRoot\test" -f "$TestPackageDir"
 

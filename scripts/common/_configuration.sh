@@ -4,12 +4,22 @@
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 #
 
-loadTestList()
+loadTestProjectList()
 {
-    return $(cat "$REPOROOT/scripts/configuration/testProjects.csv")
+    echo $(cat "$REPOROOT/scripts/configuration/testProjects.csv")
+}
+
+loadTestScriptList()
+{
+    echo $(cat "$REPOROOT/scripts/configuration/testScripts.csv")
 }
 
 loadTestPackageList()
 {
-    return $(cat "$RepoRoot/scripts/configuration/testPackageProjects.csv")
+    echo $(cat "$REPOROOT/scripts/configuration/testPackageProjects.csv")
+}
+
+loadBuildProjectList()
+{
+    echo $(cat "$REPOROOT/scripts/configuration/buildProjects.csv")
 }
