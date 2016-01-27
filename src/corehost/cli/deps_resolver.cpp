@@ -260,20 +260,11 @@ bool deps_entry_t::to_hash_matched_path(const pal::string_t& base, pal::string_t
     append_path(&hash_file, library_version.c_str());
     append_path(&hash_file, nupkg_filename.c_str());
 
-    // Read the contents of the hash file.
-    pal::ifstream_t fstream(hash_file);
-    if (!fstream.good())
+    pal::string_t pal_hash;
+    if (!read_contents_to_string(hash_file, &pal_hash))
     {
-        trace::verbose(_X("The hash file is invalid [%s]"), hash_file.c_str());
         return false;
     }
-
-    // Obtain the hash from the file.
-    std::string hash;
-    hash.assign(pal::istreambuf_iterator_t(fstream),
-        pal::istreambuf_iterator_t());
-    pal::string_t pal_hash;
-    pal::to_palstring(hash.c_str(), &pal_hash);
 
     // Check if contents match deps entry.
     pal::string_t entry_hash = library_hash.substr(pos + 1);
