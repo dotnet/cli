@@ -53,6 +53,7 @@ cp -rec -Force "$RepoRoot\test\TestProjects\*" "$TestBinRoot\TestProjects"
 
 $failCount = 0
 $failingTests = @()
+$jobs = @()
 
 pushd "$TestBinRoot"
 
