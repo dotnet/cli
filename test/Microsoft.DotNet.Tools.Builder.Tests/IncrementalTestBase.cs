@@ -28,9 +28,8 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             // create unique directories in the 'temp' folder
             var root = Temp.CreateDirectory();
 
-            // recursively copy projects to the temp dir and restore them
+            // recursively already restored copy projects to the temp dir
             _tempProjectRoot = root.CopyDirectory(testProjectsRoot);
-            RunRestore(_tempProjectRoot.Path);
         }
 
         protected void TouchSourcesOfProject()
@@ -114,12 +113,6 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             var executablePath = Path.Combine(GetBinDirectory(), "Debug", "dnxcore50");
 
             return executablePath;
-        }
-
-        private void RunRestore(string args)
-        {
-            var restoreCommand = new RestoreCommand();
-            restoreCommand.Execute($"--quiet {args}").Should().Pass();
         }
     }
 }

@@ -364,6 +364,7 @@ namespace Microsoft.DotNet.Tools.Compiler
 
             if (generateBindingRedirects && context.TargetFramework.IsDesktop())
             {
+                Console.WriteLine("generating binding redirects!"); //todo remove
                 context.GenerateBindingRedirects(exporter, outputName);
             }
 
