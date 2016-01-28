@@ -32,6 +32,10 @@ TestScripts=( \
     "argument-forwarding-tests.sh" \
 )
 
+# Adds the parameter if one is passed or CLI_UNDER_TEST to the head of the path
+export StartPath=$PATH
+export PATH=${1-$CLI_UNDER_TEST}:$PATH
+
 for project in ${TestProjects[@]}
 do
     dotnet publish --framework "dnxcore50" --output "$TestBinRoot" --configuration "$CONFIGURATION" "$REPOROOT/test/$project"
@@ -80,5 +84,8 @@ done
 
 popd
 set -e
+
+#resetting the path so that we can be good neighbors to other scripts running after this.
+export PATH=$StartPath
 
 exit $failCount
