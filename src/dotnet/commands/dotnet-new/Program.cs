@@ -82,6 +82,7 @@ namespace Microsoft.DotNet.Tools.New
             app.Description = "Initializes empty project for .NET Platform";
             app.HelpOption("-h|--help");
 
+            var langAndType = app.Argument("<LANG/TYPE>", "The lang/type to create");
             var lang = app.Option("-l|--lang <LANGUAGE>", "Language of project [C#|F#]", CommandOptionType.SingleValue);
             var type = app.Option("-t|--type <TYPE>", "Type of project", CommandOptionType.SingleValue);
 
@@ -91,7 +92,25 @@ namespace Microsoft.DotNet.Tools.New
                 var csharp = new { Name = "C#", Alias = new[] { "c#", "cs", "csharp" }, TemplatePrefix = "CSharp", Templates = new[] { "Console" } };
                 var fsharp = new { Name = "F#", Alias = new[] { "f#", "fs", "fsharp" }, TemplatePrefix = "FSharp", Templates = new[] { "Console" } };
 
-                string languageValue = lang.Value() ?? csharp.Name;
+                var langTypeParts = (langAndType.Value ?? string.Empty).Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+                Tuple<string,string> langAndTypeValue;
+                switch (langTypeParts.Length)
+                {
+                    case 0: // blank string
+                        langAndTypeValue = Tuple.Create<string,string>(null, null);
+                        break;
+                    case 1: // only 1 argument mean type
+                        langAndTypeValue = Tuple.Create<string,string>(null, langTypeParts[0]);
+                        break;
+                    case 2: // lang/type
+                        langAndTypeValue = Tuple.Create(langTypeParts[0], langTypeParts[1]);
+                        break;
+                    default:
+                        Reporter.Error.WriteLine($"Unrecognized lang/type: {langAndType.Value}".Red());
+                        return -1;
+                }
+
+                string languageValue = lang.Value() ?? langAndTypeValue.Item1 ?? csharp.Name;
 
                 var language = new[] { csharp, fsharp }
                     .FirstOrDefault(l => l.Alias.Contains(languageValue, StringComparer.OrdinalIgnoreCase));
@@ -102,7 +121,7 @@ namespace Microsoft.DotNet.Tools.New
                     return -1;
                 }
 
-                string typeValue = type.Value() ?? language.Templates.First();
+                string typeValue = type.Value() ?? langAndTypeValue.Item2 ?? language.Templates.First();
 
                 string templateName = language.Templates.FirstOrDefault(t => StringComparer.OrdinalIgnoreCase.Equals(typeValue, t));
                 if (templateName == null)
