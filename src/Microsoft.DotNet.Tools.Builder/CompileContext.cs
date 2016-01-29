@@ -406,6 +406,7 @@ namespace Microsoft.DotNet.Tools.Build
             var compilerIO = new CompilerIO(new List<string>(), new List<string>());
             var calculator = project.GetOutputPathCalculator(outputPath);
             var binariesOutputPath = calculator.GetOutputDirectoryPath(buildConfiguration);
+            var intermediateOutputPath = calculator.GetIntermediateOutputDirectoryPath(buildConfiguration, intermediaryOutputPath);
 
             // input: project.json
             compilerIO.Inputs.Add(project.ProjectFile.ProjectFilePath);
@@ -430,7 +431,7 @@ namespace Microsoft.DotNet.Tools.Build
             AddCompilationOptions(project, buildConfiguration, compilerIO);
 
             // input / output: resources without culture
-            AddCultureResources(project, intermediaryOutputPath, compilerIO);
+            AddCultureResources(project, intermediateOutputPath, compilerIO);
 
             // input / output: resources with culture
             AddNonCultureResources(project, binariesOutputPath, compilerIO);
