@@ -23,6 +23,8 @@ source "$DIR/../common/_common.sh"
 [ ! -z "$HOST_DIR" ] || die "Missing required environment variable HOST_DIR"
 [ ! -z "$COMPILATION_OUTPUT_DIR" ] || die "Missing required environment variable COMPILATION_OUTPUT_DIR"
 
+PROJECTS=$(loadBuildProjectList)
+
 BINARIES_FOR_COREHOST=( \
     csi \
     csc \

@@ -15,6 +15,8 @@ param(
 . $PSScriptRoot\..\common\_common.ps1
 . $REPOROOT\scripts\package\projectsToPack.ps1
 
+$Projects = loadBuildProjectList
+
 $BinariesForCoreHost = @(
     "csi"
     "csc"
