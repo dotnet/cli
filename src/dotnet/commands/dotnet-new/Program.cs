@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.Tools.New
             return parts[parts.Length - 2] + "." + parts[parts.Length - 1];
         }
 
-        public int CreateEmptyProject(string languageName, string templateDir)
+        public int CreateEmptyProject(string languageName, string templateName, string templateDir)
         {
             var thisAssembly = typeof(NewCommand).GetTypeInfo().Assembly;
             var resources = from resourceName in thisAssembly.GetManifestResourceNames()
@@ -45,14 +45,14 @@ namespace Microsoft.DotNet.Tools.New
                 resourceNameToFileName.Add(resourceName, fileName);
                 if (File.Exists(fileName))
                 {
-                    Reporter.Error.WriteLine($"Creating new {languageName} project would override file {fileName}.");
+                    Reporter.Error.WriteLine($"Creating new {languageName} {templateName} project would override file {fileName}.");
                     hasFilesToOverride = true;
                 }
             }
 
             if (hasFilesToOverride)
             {
-                Reporter.Error.WriteLine($"Creating new {languageName} project failed.");
+                Reporter.Error.WriteLine($"Creating new {languageName} {templateName} project failed.");
                 return 1;
             }
 
@@ -67,7 +67,7 @@ namespace Microsoft.DotNet.Tools.New
                 }
             }
 
-            Reporter.Output.WriteLine($"Created new {languageName} project in {Directory.GetCurrentDirectory()}.");
+            Reporter.Output.WriteLine($"Created new {languageName} {templateName} project in {Directory.GetCurrentDirectory()}.");
 
             return 0;
         }
@@ -137,7 +137,7 @@ namespace Microsoft.DotNet.Tools.New
 
                 string templateDir = $"{language.TemplatePrefix}_{templateName}";
 
-                return dotnetNew.CreateEmptyProject(language.Name, templateDir);
+                return dotnetNew.CreateEmptyProject(language.Name, templateName, templateDir);
             });
 
             try
