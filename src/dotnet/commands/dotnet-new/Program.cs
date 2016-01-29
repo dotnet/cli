@@ -82,6 +82,7 @@ namespace Microsoft.DotNet.Tools.New
             app.Description = "Initializes empty project for .NET Platform";
             app.HelpOption("-h|--help");
 
+            var dirname = app.Argument("<DIRNAME>", "The output directory");
             var langAndType = app.Argument("<LANG/TYPE>", "The lang/type to create");
             var lang = app.Option("-l|--lang <LANGUAGE>", "Language of project [C#|F#]", CommandOptionType.SingleValue);
             var type = app.Option("-t|--type <TYPE>", "Type of project", CommandOptionType.SingleValue);
@@ -91,6 +92,8 @@ namespace Microsoft.DotNet.Tools.New
 
                 var csharp = new { Name = "C#", Alias = new[] { "c#", "cs", "csharp" }, TemplatePrefix = "CSharp", Templates = new[] { "Console" } };
                 var fsharp = new { Name = "F#", Alias = new[] { "f#", "fs", "fsharp" }, TemplatePrefix = "FSharp", Templates = new[] { "Console" } };
+
+                var dirnameValue = dirname.Value ?? ".";
 
                 var langTypeParts = (langAndType.Value ?? string.Empty).Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
                 Tuple<string,string> langAndTypeValue;
@@ -136,6 +139,27 @@ namespace Microsoft.DotNet.Tools.New
                 }
 
                 string templateDir = $"{language.TemplatePrefix}_{templateName}";
+
+                if (dirnameValue != ".")
+                {
+                    string toDirectory = Path.GetFullPath(dirnameValue);
+                    if (Directory.Exists(toDirectory))
+                    {
+                        Reporter.Error.WriteLine($"Directory {dirnameValue} already exists".Red());
+                        return -1;
+                    }
+
+                    try
+                    {
+                        Directory.CreateDirectory(toDirectory);    
+                        Directory.SetCurrentDirectory(toDirectory);
+                    }
+                    catch (Exception)
+                    {
+                        Reporter.Error.WriteLine($"Error during creation of directory {dirnameValue} ( '{toDirectory}' )".Red());
+                        return -1;
+                    }
+                }
 
                 return dotnetNew.CreateEmptyProject(language.Name, templateName, templateDir);
             });
