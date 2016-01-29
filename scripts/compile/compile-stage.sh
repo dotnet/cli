@@ -24,22 +24,7 @@ source "$DIR/../common/_common.sh"
 [ ! -z "$COMPILATION_OUTPUT_DIR" ] || die "Missing required environment variable COMPILATION_OUTPUT_DIR"
 
 PROJECTS=( \
-    dotnet \
-    dotnet-build \
-    dotnet-compile \
-    dotnet-compile-csc \
-    dotnet-compile-fsc \
-    dotnet-compile-native \
-    dotnet-new \
-    dotnet-pack \
-    dotnet-projectmodel-server \
-    dotnet-publish \
-    dotnet-repl \
-    dotnet-repl-csi \
-    dotnet-restore \
-    dotnet-resgen \
-    dotnet-run \
-    dotnet-test \
+    bundler \
 )
 
 BINARIES_FOR_COREHOST=( \
@@ -54,6 +39,10 @@ FILES_TO_CLEAN=( \
     Microsoft.DotNet.Runtime.dll \
     Microsoft.DotNet.Runtime.deps \
     Microsoft.DotNet.Runtime.pdb \
+    bundler \
+    bundler.dll \
+    bundler.deps \
+    bundler.pdb \
 )
 
 RUNTIME_OUTPUT_DIR="$OUTPUT_DIR/runtime/coreclr"
