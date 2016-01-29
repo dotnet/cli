@@ -7,14 +7,14 @@
     },
 
     "dependencies": {
-        "NETStandard.Library" : "1.0.0-rc3-23727",
+        "NETStandard.Library" : "1.0.0-rc2-23727",
         "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc2-16530",
         "Microsoft.DotNet.ProjectModel.Loader": "1.0.0-*"
     },
 
     "frameworks": {
         "dnxcore50": {
-            "imports": "portable-net451+win8"
+            "imports": "portable-net45+win8"
         }
     }
 }

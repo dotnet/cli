@@ -1,0 +1,13 @@
+{
+    "version": "1.0.0-*",
+    "compilationOptions": {
+        "emitEntryPoint": true
+    },
+    "dependencies": {
+        "NETStandard.Library": "1.0.0-rc2-23727",
+        "Microsoft.DotNet.AppDep":"1.0.5-*"
+    },
+    "frameworks": {
+        "dnxcore50": { }
+    }
+}

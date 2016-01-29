@@ -1,5 +1,4 @@
 {
-  "name": "dotnet-restore",
   "description": "Restore packages specified in project.json (project file)",
   "version": "1.0.0-*",
   "repository": {
@@ -11,11 +10,11 @@
     "emitEntryPoint": true
   },
   "dependencies": {
-    "NuGet.CommandLine.XPlat": "3.4.0-beta-536",
-    "Microsoft.NETCore.Platforms": "1.0.1-rc3-23727",
-    "Microsoft.NETCore.TestHost": "1.0.0-rc3-23727",
-    "NETStandard.Library": "1.0.0-rc3-23727",
-    "System.Linq.Expressions": "4.0.11-rc3-23727",
+    "NuGet.CommandLine.XPlat": "3.4.0-beta-559",
+    "Microsoft.NETCore.Platforms": "1.0.1-rc2-23727",
+    "Microsoft.NETCore.TestHost": "1.0.0-rc2-23727",
+    "NETStandard.Library": "1.0.0-rc2-23727",
+    "System.Linq.Expressions": "4.0.11-rc2-23727",
     "Microsoft.DotNet.Cli.Utils": "1.0.0-*",
     "Microsoft.DotNet.Compiler.Common": "1.0.0-*",
     "Microsoft.Dnx.Runtime.CommandParsing.Sources": {
@@ -31,7 +30,7 @@
   },
   "frameworks": {
     "dnxcore50": {
-      "imports": "portable-net451+win8"
+      "imports": "portable-net45+win8"
     }
   },
   "scripts": {
