@@ -32,6 +32,7 @@ PROJECTS=( \
     dotnet-compile-native \
     dotnet-mcg \
     dotnet-new \
+    dotnet-pack \
     dotnet-projectmodel-server \
     dotnet-publish \
     dotnet-repl \
