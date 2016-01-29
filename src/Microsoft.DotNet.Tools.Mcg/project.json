@@ -14,9 +14,9 @@
         "Microsoft.Extensions.CommandLineUtils.Sources": {
             "type": "build",
             "version": "1.0.0-*"
-        },        
-        "Microsoft.DotNet.ILCompiler.SDK": "1.0.4-*",
-        "Microsoft.DotNet.Compiler.Common": "1.0.0-*"
+        },                
+        "Microsoft.DotNet.Compiler.Common": "1.0.0-*",
+        "Microsoft.DotNet.Mcg": "1.0.0-prerelease-0003"
     },
     "frameworks": {
         "dnxcore50": {
