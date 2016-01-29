@@ -14,7 +14,7 @@ Microsoft.DotNet.Tools.Publish
 Microsoft.DotNet.Tools.Repl
 Microsoft.DotNet.Tools.Repl.Csi
 Microsoft.DotNet.Tools.Resgen
+dotnet-restore
 Microsoft.DotNet.Tools.Run
 Microsoft.DotNet.Tools.Test
 Microsoft.Extensions.Testing.Abstractions
-dotnet-restore
