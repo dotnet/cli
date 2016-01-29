@@ -22,8 +22,8 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
         
         private static readonly Dictionary<BuildConfiguration, string[]> ConfigurationCompilerOptionsMap = new Dictionary<BuildConfiguration, string[]>
         {
-            { BuildConfiguration.debug, new string[] {"/ZI", "/nologo", "/W3", "/WX-", "/sdl", "/Od", "/D", "CPPCODEGEN", "/D", "WIN32", "/D", "_CONSOLE", "/D", "_LIB", "/D", "_UNICODE", "/D", "UNICODE", "/Gm", "/EHsc", "/RTC1", "/MD", "/GS", "/fp:precise", "/Zc:wchar_t", "/Zc:forScope", "/Zc:inline", "/Gd", "/TP", "/wd4477", "/errorReport:prompt"} },
-            { BuildConfiguration.release, new string[] {"/Zi", "/nologo", "/W3", "/WX-", "/sdl", "/O2", "/Oi", "/GL", "/D", "CPPCODEGEN", "/D", "WIN32", "/D", "NDEBUG", "/D", "_CONSOLE", "/D", "_LIB", "/D", "_UNICODE", "/D", "UNICODE", "/Gm-", "/EHsc", "/MD", "/GS", "/Gy", "/fp:precise", "/Zc:wchar_t", "/Zc:forScope", "/Zc:inline", "/Gd", "/TP", "/wd4477", "/errorReport:prompt"} }
+            { BuildConfiguration.debug, new string[] {"/ZI", "/nologo", "/W3", "/WX-", "/sdl", "/Od", "/D", "CPPCODEGEN", "/D", "WIN32", "/D", "_CONSOLE", "/D", "_LIB", "/D", "_UNICODE", "/D", "UNICODE", "/Gm", "/EHsc", "/RTC1", "/MT", "/GS", "/fp:precise", "/Zc:wchar_t", "/Zc:forScope", "/Zc:inline", "/Gd", "/TP", "/wd4477", "/errorReport:prompt"} },
+            { BuildConfiguration.release, new string[] {"/Zi", "/nologo", "/W3", "/WX-", "/sdl", "/O2", "/Oi", "/GL", "/D", "CPPCODEGEN", "/D", "WIN32", "/D", "NDEBUG", "/D", "_CONSOLE", "/D", "_LIB", "/D", "_UNICODE", "/D", "UNICODE", "/Gm-", "/EHsc", "/MT", "/GS", "/Gy", "/fp:precise", "/Zc:wchar_t", "/Zc:forScope", "/Zc:inline", "/Gd", "/TP", "/wd4477", "/errorReport:prompt"} }
         };
         
         private IEnumerable<string> CompilerArgs { get; set; }
