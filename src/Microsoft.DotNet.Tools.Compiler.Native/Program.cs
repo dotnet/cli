@@ -52,16 +52,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
 
                     string interopAssemblyPath = Path.Combine(Path.GetDirectoryName(config.InputManagedAssemblyPath), "Interop");
                     string inputAssemblyName = Path.GetFileNameWithoutExtension(config.InputManagedAssemblyPath);
-                    
-                    // update input managed assembly to be the one re-written by mcg. This's temporary 
-                    // until we avoid re-writing. 
-                    config.InputManagedAssemblyPath = Path.Combine(interopAssemblyPath, inputAssemblyName+".dll");
-
-                    // these addtional references are injected by mcg
-                    config.AddReference(Path.Combine(config.IlcSdkPath, "System.Private.Interop.dll"));
-                    config.AddReference(Path.Combine(config.AppDepSDKPath, "System.Private.Mcg.dll"));
                     config.AddReference(Path.Combine(interopAssemblyPath, inputAssemblyName + ".mcginterop.dll"));
-                    config.AddReference(Path.Combine(config.IlcSdkPath, "System.Private.Mcg.dll"));
                 }
 
                 var nativeCompiler = NativeCompiler.Create(config);
@@ -90,6 +81,24 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
             mcgArgs.Add(config.Architecture.ToString());
             mcgArgs.Add("--outputpath");
             mcgArgs.Add(outPath);
+
+            var ilSdkPath = Path.Combine(config.IlcSdkPath, "sdk");
+            foreach (string refPath in Directory.EnumerateFiles(ilSdkPath, "*.dll"))
+            {
+
+                mcgArgs.Add("--r");
+                mcgArgs.Add(refPath);
+            }
+
+            foreach (string refPath in Directory.EnumerateFiles(config.AppDepSDKPath, "*.dll"))
+            {
+                // System.Runtime.Extensions define an internal type called System.Runtime.InteropServices.Marshal which 
+                // conflicts with Marshal from S.P.Interop , we don't need System.Runtime.Extensions anyways,skip it.
+                if (refPath.Contains("System.Runtime.Extensions.dll")) continue;
+
+                mcgArgs.Add("--r");
+                mcgArgs.Add(refPath);
+            }
 
             // Write Response File
             var rsp = Path.Combine(config.IntermediateDirectory, $"dotnet-compile-mcg.rsp");
