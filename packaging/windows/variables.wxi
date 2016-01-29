@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <Include xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <?if $(var.ReleaseSuffix) ~= "beta" OR $(var.ReleaseSuffix) ~= "rc1" OR $(var.ReleaseSuffix) ~= "rtm" OR $(var.ReleaseSuffix) ~= ""?>
+  <?if $(var.ReleaseSuffix) ~= "beta" OR $(var.ReleaseSuffix) ~= "preview" OR $(var.ReleaseSuffix) ~= "rc1" OR $(var.ReleaseSuffix) ~= "rtm" OR $(var.ReleaseSuffix) ~= ""?>
   <?define BuildType="Release"?>
   <?else?>
   <?define BuildType="Nightly"?>
@@ -8,7 +8,7 @@
 
   <?define Servicing_Key_SP   =   "0" ?>
   <?define Servicing_Key_SPIndex   =   "0" ?>
-  <?define Servicing_Key_SPName   =   "Beta" ?>
+  <?define Servicing_Key_SPName   =   "Preview" ?>
   <?define Dotnet_ProductVersion   =   "$(var.BuildVersion)" ?>
   <?define Dotnet_DisplayVersion   =   "1.0" ?>
   <?define Dotnet_BuildVersion   =   "$(var.BuildVersion)" ?>
