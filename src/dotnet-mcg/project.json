@@ -4,7 +4,7 @@
         "emitEntryPoint": true
     },
     "dependencies": {
-        "NETStandard.Library": "1.0.0-rc3-23727",
+        "NETStandard.Library": "1.0.0-rc2-23727",
         
         "Microsoft.DotNet.Cli.Utils": {
             "type": "build",
@@ -19,9 +19,7 @@
     },
     "frameworks": {
         "dnxcore50": {
-            "imports": "portable-net451+win8"
+            "imports": "portable-net45+win8"
         }
-    },
-    "scripts": {
     }
 }
