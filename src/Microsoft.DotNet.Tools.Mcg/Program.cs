@@ -45,9 +45,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Mcg
         }
 
         private static int ExecuteMcg(IEnumerable<string> arguments)
-        {
-            // TODO : Mcg is assumed to be present under the current path.This will change once 
-            // we have mcg working on coreclr and is available as a nuget package.                                 
+        {            
             var executablePath = Path.Combine(AppContext.BaseDirectory, McgBinaryName);
             
             var result = Command.Create(executablePath, arguments)
