@@ -23,24 +23,7 @@ source "$DIR/../common/_common.sh"
 [ ! -z "$HOST_DIR" ] || die "Missing required environment variable HOST_DIR"
 [ ! -z "$COMPILATION_OUTPUT_DIR" ] || die "Missing required environment variable COMPILATION_OUTPUT_DIR"
 
-PROJECTS=( \
-    dotnet \
-    dotnet-build \
-    dotnet-compile \
-    dotnet-compile-csc \
-    dotnet-compile-fsc \
-    dotnet-compile-native \
-    dotnet-new \
-    dotnet-pack \
-    dotnet-projectmodel-server \
-    dotnet-publish \
-    dotnet-repl \
-    dotnet-repl-csi \
-    dotnet-restore \
-    dotnet-resgen \
-    dotnet-run \
-    dotnet-test \
-)
+PROJECTS=$(loadBuildProjectList)
 
 BINARIES_FOR_COREHOST=( \
     csi \
@@ -63,7 +46,7 @@ RUNTIME_BINARIES_OUTPUT_DIR="$COMPILATION_OUTPUT_DIR/runtime/coreclr/$CONFIGURAT
 mkdir -p "$OUTPUT_DIR/bin"
 mkdir -p "$RUNTIME_OUTPUT_DIR"
 
-for project in ${PROJECTS[@]}
+for project in $PROJECTS
 do
     echo dotnet publish --native-subdirectory --framework "$TFM" --output "$COMPILATION_OUTPUT_DIR/bin" --configuration "$CONFIGURATION" "$REPOROOT/src/$project"
     dotnet publish --native-subdirectory --framework "$TFM" --output "$COMPILATION_OUTPUT_DIR/bin" --configuration "$CONFIGURATION" "$REPOROOT/src/$project"

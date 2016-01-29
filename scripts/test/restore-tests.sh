@@ -14,17 +14,12 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-. "$DIR/../common/_common.sh"
+source "$DIR/../common/_common.sh"
 
-# Run Validation for Project.json dependencies
-dotnet publish "$REPOROOT/tools/MultiProjectValidator" -o "$STAGE2_DIR/../tools" -c "$CONFIGURATION"
-#TODO for release builds this should fail
+header "Restoring Test Packages"
+
+dotnet restore "$REPOROOT/test" -f "$TEST_PACKAGE_DIR"
+
 set +e
-PJ_VALIDATE_PATH="$STAGE2_DIR/../tools/$CONFIGURATION/$TFM"
-if [ ! -d "$PJ_VALIDATE_PATH" ]
-then
-	PJ_VALIDATE_PATH="$STAGE2_DIR/../tools"
-fi
-
-"$PJ_VALIDATE_PATH/pjvalidate" "$REPOROOT/src"
+dotnet restore "$REPOROOT/testapp" >/dev/null 2>&1
 set -e

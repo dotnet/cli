@@ -12,19 +12,19 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
   SOURCE="$(readlink "$SOURCE")"
   [[ "$SOURCE" != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 done
+
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-. "$DIR/../common/_common.sh"
+source "$DIR/../common/_common.sh"
 
-# Run Validation for Project.json dependencies
-dotnet publish "$REPOROOT/tools/MultiProjectValidator" -o "$STAGE2_DIR/../tools" -c "$CONFIGURATION"
-#TODO for release builds this should fail
-set +e
-PJ_VALIDATE_PATH="$STAGE2_DIR/../tools/$CONFIGURATION/$TFM"
-if [ ! -d "$PJ_VALIDATE_PATH" ]
-then
-	PJ_VALIDATE_PATH="$STAGE2_DIR/../tools"
-fi
+header "Setting up Tests"
+"$REPOROOT/scripts/test/setup/setup-tests.sh"
 
-"$PJ_VALIDATE_PATH/pjvalidate" "$REPOROOT/src"
-set -e
+header "Restoring test projects"
+"$REPOROOT/scripts/test/restore-tests.sh"
+
+header "Building test projects"
+"$REPOROOT/scripts/test/build-tests.sh"
+
+header "Running Tests"
+"$REPOROOT/scripts/test/run-tests.sh"
