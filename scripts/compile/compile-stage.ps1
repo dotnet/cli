@@ -15,26 +15,26 @@ param(
 . $REPOROOT\scripts\package\projectsToPack.ps1
 
 $Projects = @(
-    "Microsoft.DotNet.Cli",
+    "dotnet",
+    "dotnet-build",
+    "dotnet-compile",
+    "dotnet-compile-csc",
+    "dotnet-compile-fsc",
+    "dotnet-compile-native",
+    "dotnet-mcg",
+    "dotnet-new",
+    "dotnet-pack",
+    "dotnet-projectmodel-server",
+    "dotnet-publish",
+    "dotnet-restore",
+    "dotnet-repl",
+    "dotnet-repl-csi",
+    "dotnet-resgen",
+    "dotnet-run",
+    "dotnet-test",
     "Microsoft.DotNet.Cli.Utils",
     "Microsoft.DotNet.ProjectModel.Loader",
-    "Microsoft.DotNet.ProjectModel.Server",
     "Microsoft.DotNet.ProjectModel.Workspaces",
-    "Microsoft.DotNet.Tools.Builder",
-    "Microsoft.DotNet.Tools.Compiler",
-    "Microsoft.DotNet.Tools.Compiler.Csc",
-    "Microsoft.DotNet.Tools.Compiler.Fsc",
-    "Microsoft.DotNet.Tools.Compiler.Native",
-    "Microsoft.DotNet.Tools.Mcg",
-    "Microsoft.DotNet.Tools.New",
-    "Microsoft.DotNet.Tools.Pack",
-    "Microsoft.DotNet.Tools.Publish",
-    "dotnet-restore",
-    "Microsoft.DotNet.Tools.Repl",
-    "Microsoft.DotNet.Tools.Repl.Csi",
-    "Microsoft.DotNet.Tools.Resgen",
-    "Microsoft.DotNet.Tools.Run",
-    "Microsoft.DotNet.Tools.Test",
     "Microsoft.Extensions.Testing.Abstractions"
 )
 
@@ -137,8 +137,6 @@ $BinariesForCoreHost | ForEach-Object {
 #}
 
 # Copy in AppDeps
-if (-not (Test-Path "$OutputDir\bin\appdepsdk\")) {
-    $env:PATH = "$OutputDir\bin;$StartPath"
-	header "Acquiring Native App Dependencies"
-	_cmd "$RepoRoot\scripts\build\build_appdeps.cmd ""$OutputDir"""
-}
+header "Acquiring Native App Dependencies"
+_ "$RepoRoot\scripts\build\build_appdeps.ps1" @("$RepoRoot", "$OutputDir")
+
