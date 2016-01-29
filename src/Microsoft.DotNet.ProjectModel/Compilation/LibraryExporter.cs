@@ -160,6 +160,12 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             var runtimeAssets = new List<string>();
             var sourceReferences = new List<string>();
 
+            if (project.Project == null)
+            {
+                // for a broken project reference, the project instance is null there is no asset associated 
+                return new LibraryExport(project, compileAssemblies, sourceReferences, compileAssemblies, runtimeAssets, Array.Empty<LibraryAsset>(), Array.Empty<AnalyzerReference>());
+            }
+
             if (!string.IsNullOrEmpty(project.TargetFrameworkInfo?.AssemblyPath))
             {
                 // Project specifies a pre-compiled binary. We're done!

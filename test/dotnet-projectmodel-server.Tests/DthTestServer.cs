@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
 
             _program = new Program(Port, HostId, LoggerFactory);
 
-            _thread = new Thread(() => { _program.OpenChannel(); });
+            _thread = new Thread(() => { _program.OpenChannel(); }) { IsBackground = true };
             _thread.Start();
         }
 
