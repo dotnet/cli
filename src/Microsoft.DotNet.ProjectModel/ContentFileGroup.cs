@@ -1,5 +1,6 @@
 using System.Linq;
 using Microsoft.DotNet.ProjectModel.Files;
+using Microsoft.DotNet.ProjectModel.Graph;
 
 namespace Microsoft.DotNet.ProjectModel
 {
@@ -11,7 +12,7 @@ namespace Microsoft.DotNet.ProjectModel
 
         public string[] Exclude { get; set; }
 
-        public string BuildAction { get; set; }
+        public BuildAction BuildAction { get; set; }
 
         public string OutputPath { get; set; }
 

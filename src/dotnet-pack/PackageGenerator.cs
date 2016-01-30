@@ -19,6 +19,7 @@ using NuGet.Versioning;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.Tools.Pack;
 using PackageBuilder = NuGet.PackageBuilder;
+using PathUtility = Microsoft.DotNet.Tools.Common.PathUtility;
 
 namespace Microsoft.DotNet.Tools.Compiler
 {
@@ -112,8 +113,13 @@ namespace Microsoft.DotNet.Tools.Compiler
             }
             foreach (var contentFile in Project.ContentFiles)
             {
-                var root = Project.ProjectDirectory;
-                var basePath = $"{contentFile.Language}/{contentFile.Target}/{contentFile.OutputPath}";
+                var root = PathUtility.EnsureTrailingSlash(Project.ProjectDirectory);
+                var basePath = Path.Combine("contentFiles", contentFile.Language,contentFile.Target);
+                if (!string.IsNullOrEmpty(contentFile.OutputPath))
+                {
+                    basePath = Path.Combine(basePath, contentFile.OutputPath);
+                }
+                basePath = PathUtility.EnsureTrailingSlash(basePath);
                 var files = contentFile.PatternGroup.SearchFiles(root);
                 foreach (var file in files)
                 {
@@ -122,10 +128,10 @@ namespace Microsoft.DotNet.Tools.Compiler
                     string targetPath = basePath;
                     if (!contentFile.Flatten)
                     {
-                        targetPath = Path.Combine(targetPath, subpath);
+                        targetPath = targetPath + subpath;
                     }
 
-                    Reporter.Verbose.WriteLine($"Adding contnet file {targetPath}"); 
+                    Reporter.Verbose.WriteLine($"Adding contnet file {targetPath}");
                     PackageBuilder.Files.Add(new PhysicalPackageFile()
                         {
                             TargetPath = targetPath,
@@ -135,8 +141,10 @@ namespace Microsoft.DotNet.Tools.Compiler
                         new ManifestContentFiles()
                         {
                             Include = targetPath,
-                            BuildAction = contentFile.BuildAction,
-                            CopyToOutput = contentFile.CopyToOutput.ToString(),
+                            Exclude = string.Empty,
+                            BuildAction = contentFile.BuildAction.Value,
+                            Flatten = contentFile.Flatten.ToString(),
+                            CopyToOutput = contentFile.CopyToOutput.ToString()
                         });
                 }
             }

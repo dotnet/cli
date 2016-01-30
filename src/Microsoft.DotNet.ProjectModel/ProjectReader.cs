@@ -165,7 +165,7 @@ namespace Microsoft.DotNet.ProjectModel
             var packOptions = rawProject.Value("packOptions") as JsonObject;
             if (packOptions != null)
             {
-                var contentFiles = rawProject.Value("contentFiles") as JsonObject;
+                var contentFiles = packOptions.Value("contentFiles") as JsonObject;
                 if (contentFiles != null)
                 {
                     foreach (var key in contentFiles.Keys)
@@ -244,13 +244,18 @@ namespace Microsoft.DotNet.ProjectModel
                 {
                     excludeArray = new string[] { exclude };
                 }
-                throw FileFormatException.Create("Value must be either string or array.", contentFileObject.Value(excludeProperty));
+                else
+                {
+                    excludeArray = new string[0];
+                }
             }
 
+            BuildAction action;
+            BuildAction.TryParse(contentFileObject.ValueAsString("buildAction"), out action);
             var contentFile = new ProjectContentFileGroup()
             {
                 Exclude = excludeArray,
-                BuildAction = contentFileObject.ValueAsString("buildAction"),
+                BuildAction = action,
                 OutputPath = contentFileObject.ValueAsString("outputPath"),
                 CopyToOutput = contentFileObject.ValueAsBoolean("copyToOutput"),
                 Include = new[] { include },

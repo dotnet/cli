@@ -221,8 +221,6 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             var contentFiles = new List<LockFileContentFile>();
             foreach (var contentFileGroup in project.Project.ContentFiles)
             {
-                BuildAction action;
-                BuildAction.TryParse(contentFileGroup.BuildAction, out action);
                 foreach (var compileAssembly in compileAssemblies)
                 {
                     foreach (var file in contentFileGroup.PatternGroup.SearchFiles(projectRoot))
@@ -235,7 +233,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
 
                         contentFiles.Add(new LockFileContentFile()
                         {
-                            BuildAction = action,
+                            BuildAction = contentFileGroup.BuildAction,
                             CodeLanguage = contentFileGroup.Language,
                             CopyToOutput = contentFileGroup.CopyToOutput,
                             OutputPath = outputPath,
