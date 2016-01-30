@@ -27,6 +27,13 @@ if [ -z "$RID" ]; then
         else
             error "unknown Linux Distro" 1>&2
         fi
+    elif [ "$UNAME" == "NetBSD" ]; then
+        export OSNAME=netbsd
+        version=$(uname -r)
+        machine=$(uname -m)
+        if [ "x$machine" = "xamd64" ]; then
+            export RID=${OSNAME}.${version}-x64
+        fi
     else
         error "unknown OS: $UNAME" 1>&2
     fi

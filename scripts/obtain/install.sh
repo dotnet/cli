@@ -88,6 +88,8 @@ current_os()
     local uname=$(uname)
     if [ "$uname" = "Darwin" ]; then
         echo "osx"
+    elif [ "$uname" = "NetBSD" ]; then
+        echo "netbsd"
     else
         # Detect Distro
         if [ "$(cat /etc/*-release | grep -cim1 ubuntu)" -eq 1 ]; then
