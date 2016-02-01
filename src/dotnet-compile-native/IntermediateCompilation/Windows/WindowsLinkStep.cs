@@ -18,10 +18,12 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
 
         private readonly string InputExtension = ".obj";
 
-        private static readonly Dictionary<BuildConfiguration, string> ConfigurationLinkerOptionsMap = new Dictionary<BuildConfiguration, string>
+        private static readonly string[] DefaultLinkerOptions = new string[] { "/NOLOGO", "/DEBUG", "/MANIFEST:NO", "/IGNORE:4099" };
+
+        private static readonly Dictionary<BuildConfiguration, string[]> ConfigurationLinkerOptionsMap = new Dictionary<BuildConfiguration, string[]>
         {
-            { BuildConfiguration.debug, "/NOLOGO /ERRORREPORT:PROMPT /MANIFEST /MANIFESTUAC:\"level='asInvoker' uiAccess='false'\" /manifest:embed /Debug /TLBID:1 /DYNAMICBASE /NXCOMPAT" },
-            { BuildConfiguration.release, "/NOLOGO /ERRORREPORT:PROMPT /INCREMENTAL:NO /OPT:REF /OPT:ICF /LTCG:incremental /MANIFEST /MANIFESTUAC:\"level='asInvoker' uiAccess='false'\" /manifest:embed /Debug /TLBID:1 /DYNAMICBASE /NXCOMPAT" }
+            { BuildConfiguration.debug, new string[] { } },
+            { BuildConfiguration.release, new string[] { "/INCREMENTAL:NO", "/OPT:REF", "/OPT:ICF" } }
         };
 
         private static readonly Dictionary<NativeIntermediateMode, string[]> IlcSdkLibMap = new Dictionary<NativeIntermediateMode, string[]>
@@ -81,9 +83,11 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
         private void InitializeArgs(NativeCompileSettings config)
         {
             var argsList = new List<string>();
-            
+
+            argsList.AddRange(DefaultLinkerOptions);
+
             // Configuration Based Linker Options 
-            argsList.Add(ConfigurationLinkerOptionsMap[config.BuildType]);
+            argsList.AddRange(ConfigurationLinkerOptionsMap[config.BuildType]);
             
             //Output
             var outFile = DetermineOutputFile(config);
