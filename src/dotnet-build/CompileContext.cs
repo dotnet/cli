@@ -5,12 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
+using Microsoft.Dotnet.Cli.Compiler.Common;
+using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
-using Microsoft.DotNet.Tools.Compiler;
 using Microsoft.DotNet.ProjectModel.Utilities;
-using Microsoft.DotNet.Cli.Compiler.Common;
+using Microsoft.DotNet.Tools.Compiler;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Microsoft.DotNet.Tools.Build
 {
@@ -115,21 +116,21 @@ namespace Microsoft.DotNet.Tools.Build
 
             // find the output with the earliest write time
             var minOutputPath = compilerIO.Outputs.First();
-            var minDate = File.GetLastWriteTime(minOutputPath);
+            var minDateUtc = File.GetLastWriteTimeUtc(minOutputPath);
 
             foreach (var outputPath in compilerIO.Outputs)
             {
-                if (File.GetLastWriteTime(outputPath) >= minDate)
+                if (File.GetLastWriteTimeUtc(outputPath) >= minDateUtc)
                 {
                     continue;
                 }
 
-                minDate = File.GetLastWriteTime(outputPath);
+                minDateUtc = File.GetLastWriteTimeUtc(outputPath);
                 minOutputPath = outputPath;
             }
 
             // find inputs that are older than the earliest output
-            var newInputs = compilerIO.Inputs.FindAll(p => File.GetLastWriteTime(p) > minDate);
+            var newInputs = compilerIO.Inputs.FindAll(p => File.GetLastWriteTimeUtc(p) > minDateUtc);
 
             if (!newInputs.Any())
             {
@@ -140,7 +141,7 @@ namespace Microsoft.DotNet.Tools.Build
             Reporter.Output.WriteLine($"Project {project.GetDisplayName()} will be compiled because some of its inputs were newer than its oldest output.");
             Reporter.Verbose.WriteLine();
             Reporter.Verbose.WriteLine($" Oldest output item:");
-            Reporter.Verbose.WriteLine($"  {minDate}: {minOutputPath}");
+            Reporter.Verbose.WriteLine($"  {minDateUtc.ToLocalTime()}: {minOutputPath}");
             Reporter.Verbose.WriteLine();
 
             Reporter.Verbose.WriteLine($" Inputs newer than the oldest output item:");
@@ -274,16 +275,12 @@ namespace Microsoft.DotNet.Tools.Build
             var args = new List<string>();
 
             args.Add("--framework");
-            args.Add($"{projectDependency.Framework}");
+            args.Add($"{projectDependency.Framework}");                       
+            
             args.Add("--configuration");
             args.Add(_args.ConfigValue);
             args.Add(projectDependency.Project.ProjectDirectory);
-
-            if (_args.NoHostValue)
-            {
-                args.Add("--no-host");
-            }
-
+            
             var compileResult = Command.Create("dotnet-compile", args)
                 .ForwardStdOut()
                 .ForwardStdErr()
@@ -297,18 +294,13 @@ namespace Microsoft.DotNet.Tools.Build
             // todo: add methods to CompilerCommandApp to generate the arg string?
             var args = new List<string>();
             args.Add("--framework");
-            args.Add(_rootProject.TargetFramework.ToString());
+            args.Add(_rootProject.TargetFramework.ToString());            
             args.Add("--configuration");
             args.Add(_args.ConfigValue);
             args.Add("--output");
             args.Add(_args.OutputValue);
             args.Add("--temp-output");
             args.Add(_args.IntermediateValue);
-
-            if (_args.NoHostValue)
-            {
-                args.Add("--no-host");
-            }
 
             //native args
             if (_args.IsNativeValue)
@@ -352,7 +344,41 @@ namespace Microsoft.DotNet.Tools.Build
                 .ForwardStdErr()
                 .Execute();
 
-            return compileResult.ExitCode == 0;
+            var succeeded = compileResult.ExitCode == 0;
+
+            if (succeeded)
+            {
+                MakeRunnableIfNecessary();
+            }            
+            
+            return succeeded;
+        }
+
+        private void MakeRunnableIfNecessary()
+        {
+            var compilationOptions = CompilerUtil.ResolveCompilationOptions(_rootProject, _args.ConfigValue);
+
+            // TODO: Make this opt in via another mechanism
+            var makeRunnable = compilationOptions.EmitEntryPoint.GetValueOrDefault() ||
+                               _rootProject.IsTestProject();
+
+            if (makeRunnable)
+            {
+                var outputPathCalculator = _rootProject.GetOutputPathCalculator(_args.OutputValue);
+                var rids = new List<string>();
+                if (string.IsNullOrEmpty(_args.RuntimeValue))
+                {
+                    rids.AddRange(PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
+                }
+                else
+                {
+                    rids.Add(_args.RuntimeValue);
+                }
+
+                var runtimeContext = ProjectContext.Create(_rootProject.ProjectDirectory, _rootProject.TargetFramework, rids);
+                var executable = new Executable(runtimeContext, outputPathCalculator);
+                executable.MakeCompilationOutputRunnable(_args.ConfigValue);
+            }
         }
 
         private static ISet<ProjectDescription> Sort(Dictionary<string, ProjectDescription> projects)

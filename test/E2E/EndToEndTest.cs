@@ -2,16 +2,12 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using Xunit;
-using Microsoft.DotNet.Cli.Utils;
-using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Microsoft.Extensions.PlatformAbstractions;
+using Xunit;
 
 namespace Microsoft.DotNet.Tests.EndToEnd
 {
@@ -21,10 +17,17 @@ namespace Microsoft.DotNet.Tests.EndToEnd
         private static readonly string s_testdirName = "e2etestroot";
         private static readonly string s_outputdirName = "test space/bin";
         
+        private static string RestoredTestProjectDirectory { get; set; }
+
         private string Rid { get; set; }
         private string TestDirectory { get; set; }
         private string TestProject { get; set; }
         private string OutputDirectory { get; set; }
+
+        static EndToEndTest()
+        {
+            EndToEndTest.SetupStaticTestProject();
+        }
 
         public static void Main()
         {
@@ -33,9 +36,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
        
         public EndToEndTest()
         {
-            TestSetup();
-
-            Rid = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
+            TestInstanceSetup();
         }
 
         [Fact]
@@ -57,16 +58,16 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             TestOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
 
             var binariesOutputDirectory = GetCompilationOutputPath(OutputDirectory, false);
-            var latestWriteTimeFirstBuild = GetLastWriteTimeOfDirectoryFiles(
+            var latestWriteTimeFirstBuild = GetLastWriteTimeUtcOfDirectoryFiles(
                 binariesOutputDirectory);
 
             // second build; should get skipped (incremental because no inputs changed)
             buildCommand.Execute().Should().Pass();
             TestOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
 
-            var latestWriteTimeSecondBuild = GetLastWriteTimeOfDirectoryFiles(
+            var latestWriteTimeUtcSecondBuild = GetLastWriteTimeUtcOfDirectoryFiles(
                 binariesOutputDirectory);
-            Assert.Equal(latestWriteTimeFirstBuild, latestWriteTimeSecondBuild);
+            Assert.Equal(latestWriteTimeFirstBuild, latestWriteTimeUtcSecondBuild);
 
             TouchSourceFileInDirectory(TestDirectory);
 
@@ -74,9 +75,9 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             buildCommand.Execute().Should().Pass();
             TestOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
 
-            var latestWriteTimeThirdBuild = GetLastWriteTimeOfDirectoryFiles(
+            var latestWriteTimeUtcThirdBuild = GetLastWriteTimeUtcOfDirectoryFiles(
                 binariesOutputDirectory);
-            Assert.NotEqual(latestWriteTimeSecondBuild, latestWriteTimeThirdBuild);
+            Assert.NotEqual(latestWriteTimeUtcSecondBuild, latestWriteTimeUtcThirdBuild);
         }
 
         [Fact]
@@ -129,15 +130,15 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 
             TestNativeOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
 
-            var latestWriteTimeFirstBuild = GetLastWriteTimeOfDirectoryFiles(binariesOutputDirectory);
+            var latestWriteTimeUtcFirstBuild = GetLastWriteTimeUtcOfDirectoryFiles(binariesOutputDirectory);
 
             // second build; should be skipped because nothing changed
             buildCommand.Execute().Should().Pass();
 
             TestNativeOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
 
-            var latestWriteTimeSecondBuild = GetLastWriteTimeOfDirectoryFiles(binariesOutputDirectory);
-            Assert.Equal(latestWriteTimeFirstBuild, latestWriteTimeSecondBuild);
+            var latestWriteTimeUtcSecondBuild = GetLastWriteTimeUtcOfDirectoryFiles(binariesOutputDirectory);
+            Assert.Equal(latestWriteTimeUtcFirstBuild, latestWriteTimeUtcSecondBuild);
         }
 
         [Fact]
@@ -169,21 +170,34 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             TestExecutable(OutputDirectory, publishCommand.GetOutputExecutable(), s_expectedOutput);    
         }
 
-        private void TestSetup()
+        private void TestInstanceSetup()
         {
             var root = Temp.CreateDirectory();
 
-            TestDirectory = root.CreateDirectory(s_testdirName).Path;
+            var testInstanceDir = root.CopyDirectory(RestoredTestProjectDirectory);
+
+            TestDirectory = testInstanceDir.Path;
             TestProject = Path.Combine(TestDirectory, "project.json");
             OutputDirectory = Path.Combine(TestDirectory, s_outputdirName);
 
-            InitializeTestDirectory();   
+            Rid = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
         }
 
-        private void InitializeTestDirectory()
+        private static void SetupStaticTestProject()
         {
+            RestoredTestProjectDirectory = Path.Combine(AppContext.BaseDirectory, "bin", s_testdirName);
+
+            // Ignore Delete Failure
+            try
+            {
+                Directory.Delete(RestoredTestProjectDirectory, true);
+            }
+            catch(Exception e) {}
+
+            Directory.CreateDirectory(RestoredTestProjectDirectory);
+
             var currentDirectory = Directory.GetCurrentDirectory();
-            Directory.SetCurrentDirectory(TestDirectory);
+            Directory.SetCurrentDirectory(RestoredTestProjectDirectory);
 
             new NewCommand().Execute().Should().Pass();
             new RestoreCommand().Execute("--quiet").Should().Pass();
@@ -206,9 +220,9 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             return false;
         }
 
-        private static DateTime GetLastWriteTimeOfDirectoryFiles(string outputDirectory)
+        private static DateTime GetLastWriteTimeUtcOfDirectoryFiles(string outputDirectory)
         {
-            return Directory.EnumerateFiles(outputDirectory).Max(f => File.GetLastWriteTime(f));
+            return Directory.EnumerateFiles(outputDirectory).Max(f => File.GetLastWriteTimeUtc(f));
         }
 
         private static void TouchSourceFileInDirectory(string directory)
