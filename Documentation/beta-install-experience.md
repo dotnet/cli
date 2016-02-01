@@ -1,7 +1,7 @@
-Beta install options and experience
+Preview install options and experience
 ===================================
 
-For the Beta timeframe, we will have two main install/acquisition experiences:
+For the Preview timeframe, we will have two main install/acquisition experiences:
 
 1. Native/package installers
 2. Local install
@@ -10,7 +10,7 @@ For the Beta timeframe, we will have two main install/acquisition experiences:
 
 Native/package installers refers to the pre-packaged installers that are using whatever technology is "native" to the targeted platform. These installers are meant to be used mostly for setting up a development environment one one's computer for writing applications, trying out the CLI tooling etc. Their benefit is that they install all of the pre-requisites for the CLI tooling to work. Their downside is that they install a machine-wide copy of the CLI tooling and they require (with the sole exception of the Homebrew package) super-user privileges. 
 
-For Beta in January timeframe, we will have these native installers:
+For Preview in January timeframe, we will have these native installers:
 
 * Windows
 	* [MSI installer](https://dotnetcli.blob.core.windows.net/dotnet/dev/Installers/Latest/dotnet-win-x64.latest.msi)

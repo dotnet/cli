@@ -25,7 +25,7 @@ export STAGE1_COMPILATION_DIR=$OUTPUT_ROOT/stage1compilation
 export STAGE2_DIR=$OUTPUT_ROOT/stage2
 export STAGE2_COMPILATION_DIR=$OUTPUT_ROOT/stage2compilation
 export HOST_DIR=$OUTPUT_ROOT/corehost
-export RELEASE_SUFFIX=beta
+export RELEASE_SUFFIX=preview
 export CHANNEL=$RELEASE_SUFFIX
 
 [ -z "$DOTNET_INSTALL_DIR" ] && export DOTNET_INSTALL_DIR=$REPOROOT/.dotnet_stage0/$RID

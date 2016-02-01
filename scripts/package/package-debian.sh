@@ -47,7 +47,7 @@ execute_build(){
 determine_package_name(){
     if [[ "$RELEASE_SUFFIX" == "dev" ]]; then
         DOTNET_DEB_PACKAGE_NAME=$NIGHTLY_PACKAGE_NAME
-    elif [[ "beta rc1 rc2 rtm" =~ (^| )"$RELEASE_SUFFIX"($| ) ]]; then
+    elif [[ "beta preview rc1 rc2 rtm" =~ (^| )"$RELEASE_SUFFIX"($| ) ]]; then
         DOTNET_DEB_PACKAGE_NAME=$RELEASE_PACKAGE_NAME
     elif [[ "$RELEASE_SUFFIX" == "" ]]; then
         DOTNET_DEB_PACKAGE_NAME=$RELEASE_PACKAGE_NAME
