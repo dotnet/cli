@@ -40,6 +40,11 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         public IEnumerable<string> SourceReferences { get; }
 
         /// <summary>
+        /// Get a list of content files provided by this export.
+        /// </summary>
+        public IEnumerable<LibraryContentFile> ContentFiles { get; }
+
+        /// <summary>
         /// Get a list of analyzers provided by this export.
         /// </summary>
         public IEnumerable<AnalyzerReference> AnalyzerReferences { get; }
@@ -50,7 +55,8 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                              IEnumerable<LibraryAsset> runtimeAssemblies,
                              IEnumerable<string> runtimeAssets,
                              IEnumerable<LibraryAsset> nativeLibraries,
-                             IEnumerable<AnalyzerReference> analyzers)
+                             IEnumerable<AnalyzerReference> analyzers,
+                             IEnumerable<LibraryContentFile> contentFiles)
         {
             Library = library;
             CompilationAssemblies = compileAssemblies;
@@ -59,6 +65,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             RuntimeAssets = runtimeAssets;
             NativeLibraries = nativeLibraries;
             AnalyzerReferences = analyzers;
+            ContentFiles = contentFiles;
         }
 
         private string DebuggerDisplay => Library.Identity.ToString();

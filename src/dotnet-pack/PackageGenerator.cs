@@ -19,6 +19,7 @@ using NuGet.Versioning;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.Tools.Pack;
 using PackageBuilder = NuGet.PackageBuilder;
+using PathUtility = Microsoft.DotNet.Tools.Common.PathUtility;
 
 namespace Microsoft.DotNet.Tools.Compiler
 {
@@ -109,6 +110,43 @@ namespace Microsoft.DotNet.Tools.Compiler
             if (Project.Files.PackInclude != null && Project.Files.PackInclude.Any())
             {
                 AddPackageFiles(Project.Files.PackInclude, packDiagnostics);
+            }
+            foreach (var contentFile in Project.ContentFiles)
+            {
+                var root = PathUtility.EnsureTrailingSlash(Project.ProjectDirectory);
+                var basePath = Path.Combine("contentFiles", contentFile.Language,contentFile.Target);
+                if (!string.IsNullOrEmpty(contentFile.OutputPath))
+                {
+                    basePath = Path.Combine(basePath, contentFile.OutputPath);
+                }
+                basePath = PathUtility.EnsureTrailingSlash(basePath);
+                var files = contentFile.PatternGroup.SearchFiles(root);
+                foreach (var file in files)
+                {
+                    var subpath = file.Substring(root.Length);
+
+                    string targetPath = basePath;
+                    if (!contentFile.Flatten)
+                    {
+                        targetPath = targetPath + subpath;
+                    }
+
+                    Reporter.Verbose.WriteLine($"Adding contnet file {targetPath}");
+                    PackageBuilder.Files.Add(new PhysicalPackageFile()
+                        {
+                            TargetPath = targetPath,
+                            SourcePath = file
+                        });
+                    PackageBuilder.ContentFiles.Add(
+                        new ManifestContentFiles()
+                        {
+                            Include = targetPath,
+                            Exclude = string.Empty,
+                            BuildAction = contentFile.BuildAction.Value,
+                            Flatten = contentFile.Flatten.ToString(),
+                            CopyToOutput = contentFile.CopyToOutput.ToString()
+                        });
+                }
             }
 
             // Write the packages as long as we're still in a success state.
