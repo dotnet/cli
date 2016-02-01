@@ -1,0 +1,28 @@
+{
+    "compilationOptions": {
+        "emitEntryPoint": true
+    },
+    "dependencies": {
+        "dotnet": "1.0.0-*",
+        "dotnet-build": "1.0.0-*",
+        "dotnet-compile": "1.0.0-*",
+        "dotnet-compile-csc": "1.0.0-*",
+        "dotnet-compile-fsc": "1.0.0-*",
+        "dotnet-compile-native": "1.0.0-*",
+        "dotnet-new": "1.0.0-*",
+        "dotnet-pack": "1.0.0-*",
+        "dotnet-projectmodel-server": "1.0.0-*",
+        "dotnet-publish": "1.0.0-*",
+        "dotnet-repl": "1.0.0-*",
+        "dotnet-repl-csi": "1.0.0-*",
+        "dotnet-resgen": "1.0.0-*",
+        "dotnet-restore": "1.0.0-*",
+        "dotnet-run": "1.0.0-*",
+        "dotnet-test": "1.0.0-*"
+    },
+    "frameworks": {
+        "dnxcore50": {
+            "imports": "portable-net45+win8"
+        }
+    }
+}
