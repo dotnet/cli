@@ -15,6 +15,7 @@ $TestProjects = @(
     "dotnet-publish.Tests",
     "dotnet-compile.Tests",
     "dotnet-build.Tests"
+    "dotnet-projectmodel-server.Tests"
 )
 
 $TestScripts = @(
