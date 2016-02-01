@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/dotnet/cli](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/dotnet/cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-This repo contains the source code for cross-platform [.NET Core](http://github.com/dotnet/core) command line toolchain. It contains the implementation of each command, the native packages for various supported platforms as well as documentation. 
+This repo contains the source code for cross-platform [.NET Core 1.0](http://github.com/dotnet/core) command line toolchain. It contains the implementation of each command, the native packages for various supported platforms as well as documentation. 
 
 New to .NET CLI?
 ------------
@@ -24,10 +24,10 @@ Installers
 |**Installers**|[Download Debian Package](https://dotnetcli.blob.core.windows.net/dotnet/dev/Installers/Latest/dotnet-ubuntu-x64.latest.deb)|[Download Msi](https://dotnetcli.blob.core.windows.net/dotnet/dev/Installers/Latest/dotnet-win-x64.latest.msi)|[Download Pkg](https://dotnetcli.blob.core.windows.net/dotnet/dev/Installers/Latest/dotnet-osx-x64.latest.pkg) |N/A |
 |**Binaries**|[Download tar file](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-ubuntu-x64.latest.tar.gz)|[Download zip file](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-win-x64.latest.zip)|[Download tar file](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-osx-x64.latest.tar.gz) |[Download tar file](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-centos-x64.latest.tar.gz) |
 
-Interested in .NET Core + ASP.NET Core RC bits?
+Interested in .NET Core + ASP.NET Core 1.0 RC bits?
 ----------------------------------------
 
-This toolchain is independent from the DNX-based .NET Core + ASP.NET Core RC bits. If you are looking for .NET Core + ASP.NET Core RC bits, you can find instructions on the http://get.asp.net/.  
+This toolchain is independent from the DNX-based .NET Core + ASP.NET Core 1.0 RC bits. If you are looking for .NET Core + ASP.NET Core 1.0 RC bits, you can find instructions on the http://get.asp.net/.  
 
 Docker
 ------
