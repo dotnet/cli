@@ -87,7 +87,7 @@ $BinariesForCoreHost | ForEach-Object {
 # Crossgen Roslyn
 if (-not (Test-Path "$OutputDir\bin\csc.ni.exe")) {
     header "Crossgening Roslyn compiler ..."
-    _cmd "$RepoRoot\scripts\crossgen\crossgen_roslyn.cmd ""$OutputDir"""
+    _cmd "$RepoRoot\scripts\crossgen\crossgen_roslyn.cmd ""$StageOutputDir"""
 }
 
 # Copy in AppDeps
