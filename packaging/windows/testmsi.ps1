@@ -56,7 +56,7 @@ try {
         Exit 0
     }
     
-    & $xunitRunner $testBin\Dotnet.Cli.Msi.Tests.exe | Out-Host
+    & $xunitRunner $testBin\Debug\net46\Dotnet.Cli.Msi.Tests.exe | Out-Host
 
     if($LastExitCode -ne 0)
     {
