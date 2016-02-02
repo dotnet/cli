@@ -93,6 +93,32 @@ The runtime is located by searching the following paths in order, where `APP_BAS
     * `%LocalAppData%\dotnet\runtime\coreclr\LIBCORECLR`
     * `%ProgramFiles%\dotnet\runtime\coreclr\LIBCORECLR` [2]
 
+
+## CoreHost Servicing
+
+For **RC** milestone, the servicing for the host is tied to the `dotnet/cli` tools i.e., the app developer would have to pull the `corehost.exe` and `hostpolicy.dll` from the appropriate CLI binary drop and replace it in their app or re-publish their app with a serviced CLI.
+
+For **RTM**:
+* We will version the host independently as NuGet packages.
+* WU based servicing
+   * The host will leave a breadcrumb at a known (TBD) location about its own version for WU.
+      * Example: `$BREADCRUMB/COREHOST_PACKAGE_NAME/COREHOST_PACKAGE_VERSION.txt`
+* General servicing
+   * The servicing process would pull in the right NuGet package and place it in:
+      * `$DOTNET_SERVICING/COREHOST_PACKAGE_NAME/COREHOST_PACKAGE_VERSION/<SERVICED_PACKAGE_CONTENTS>`
+      * **Example**: `$DOTNET_SERVICING/Microsoft.DotNet.HostPolicy/1.0.0/<contents of Microsoft.DotNet.HostPolicy.1.0.1.nupkg>`
+      * **Invalid**: `$DOTNET_SERVICING/Microsoft.DotNet.HostPolicy/1.0.0/<contents of Microsoft.DotNet.HostPolicy.1.1.0.nupkg>`
+        * Invalid because `1.1.0` is breaking change. The host version `1.0.0` will not pick up a serviced host of a version higher than itself that differs in the `Major` or `Minor` in `Major.Minor.Patch`, say, `1.1.0` (i.e., a host with a breaking change)
+    * If the user wants to upgrade the host to a higher breaking version than the currently deployed version, then it can be done so manually through a pull from the NuGet feed or by publishing the app with latest dotnet tools.
+
+# Servicing of managed assemblies
+
+* The host during the first launch of a *deps* based application leave breadcrumbs for servicing processes to know what packages are used by the applications machine-wide.
+    * A file named `DOTNET_SERVICING/host/breadcrumbs/PackageId/PackageVersion` per serviceable package.
+    * A directory named `DOTNET_SERVICING/host/metadata` will be used for book-keeping by the host, for deps signatures.
+* The host will implement a quick change detection (hash/signature etc.) per `deps package collection` to leave these breadcrumbs performantly.
+* The servicing process can then read information from `DOTNET_SERVICING/host/breadcrumbs/ to service the packages in the DOTNET_SERVICING location machine-wide.
+
 Notes:
 
 1. The Unix paths should be this way but are reversed in the actual code. Generally `/usr/local` is considered to have higher precedence than `/usr`
