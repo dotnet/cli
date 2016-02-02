@@ -84,3 +84,22 @@ void replace_char(pal::string_t* path, pal::char_t match, pal::char_t repl)
         (*path)[pos] = repl;
     }
 }
+
+bool read_contents_to_string(const pal::string_t& file, pal::string_t* str)
+{
+    // Read the contents of the file.
+    pal::ifstream_t fstream(file);
+    if (!fstream.good())
+    {
+        trace::verbose(_X("The file is invalid [%s]"), file.c_str());
+        return false;
+    }
+
+    // Obtain the hash from the file.
+    std::string content;
+    content.assign(pal::istreambuf_iterator_t(fstream),
+        pal::istreambuf_iterator_t());
+    pal::to_palstring(content.c_str(), str);
+    return true;
+}
+

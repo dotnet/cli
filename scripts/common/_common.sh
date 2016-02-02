@@ -18,6 +18,7 @@ source "$COMMONDIR/_rid.sh"
 export TFM=dnxcore50
 export REPOROOT=$(cd $COMMONDIR/../.. && pwd)
 export OUTPUT_ROOT=$REPOROOT/artifacts/$RID
+export NUGET_DIR=$OUTPUT_ROOT/nuget
 export STAGE1_DIR=$OUTPUT_ROOT/stage1
 export STAGE1_COMPILATION_DIR=$OUTPUT_ROOT/stage1compilation
 export STAGE2_DIR=$OUTPUT_ROOT/stage2

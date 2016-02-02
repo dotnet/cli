@@ -14,3 +14,7 @@ if (!(Test-Path $env:DOTNET_INSTALL_DIR))
 # Install a stage 0
 header "Installing dotnet stage 0"
 _ "$RepoRoot\scripts\obtain\install.ps1" @("$env:Channel")
+
+# Download NuGet to package corehost
+header "Downloading NuGet"
+_ "$RepoRoot\scripts\obtain\install-nuget.ps1"

@@ -5,6 +5,7 @@
 #include "pal.h"
 #include "utils.h"
 #include "libhost.h"
+#include "packaging.h"
 
 extern int corehost_main(const int argc, const pal::char_t* argv[]);
 
@@ -68,33 +69,51 @@ int main(const int argc, const pal::char_t* argv[])
 #endif
 {
     trace::setup();
+    trace::info(_X("CoreHost built for package: %s %s in %s"),
+            COREHOST_PACKAGE_NAME,
+            COREHOST_PACKAGE_VERSION,
+            COREHOST_PACKAGE_LIBHOST_RELATIVE_DIR);
 
     pal::dll_t corehost;
 
-#ifdef COREHOST_PACKAGE_SERVICING
     // No custom host asked, so load the corehost if serviced first.
     pal::string_t svc_dir;
     if (pal::getenv(_X("DOTNET_SERVICING"), &svc_dir))
     {
-        pal::string_t path = svc_dir;
-        append_path(&path, COREHOST_PACKAGE_NAME);
-        append_path(&path, COREHOST_PACKAGE_VERSION);
-        append_path(&path, COREHOST_PACKAGE_COREHOST_RELATIVE_DIR);
+        pal::string_t idx = svc_dir;
+        append_path(&idx, COREHOST_PACKAGE_NAME);
+        append_path(&idx, COREHOST_PACKAGE_VERSION);
+        append_path(&idx, COREHOST_PACKAGE_LIBHOST_RELATIVE_DIR);
+        append_path(&idx, _X("corehost_servicing"));
 
-        corehost_main_fn host_main;
-        StatusCode code = load_host_lib(path, &corehost, &host_main);
-        if (code != StatusCode::Success)
+        trace::info(_X("Probing serviced corehost from %s"), idx.c_str());
+
+        pal::string_t redirection;
+        if (pal::file_exists(idx) && read_contents_to_string(idx, &redirection))
         {
-            trace::info(_X("Failed to load host library from servicing dir: %s; Status=%08X"), path.c_str(), code);
-            // Ignore all errors for the servicing case, and proceed to the next step.
+            pal::string_t path = svc_dir;
+            append_path(&path, redirection.c_str());
+        
+            trace::info(_X("Probe of serviced corehost redirected to load %s"), path.c_str());
+
+            corehost_main_fn host_main;
+            StatusCode code = load_host_lib(path, &corehost, &host_main);
+            if (code != StatusCode::Success)
+            {
+                trace::info(_X("Failed to load host library from servicing dir: %s; Status=%08X"), path.c_str(), code);
+                // Ignore all errors for the servicing case, and proceed to the next step.
+            }
+            else
+            {
+                trace::info(_X("Calling host entrypoint from library at servicing dir %s"), path.c_str());
+                return host_main(argc, argv);
+            }
         }
         else
         {
-            trace::info(_X("Calling host entrypoint from library at servicing dir %s"), path.c_str());
-            return host_main(argc, argv);
+            trace::info(_X("Did not find a serviced corehost in the servicing index"));
         }
     }
-#endif
 
     // Get current path to look for the library app locally.
     pal::string_t own_path;

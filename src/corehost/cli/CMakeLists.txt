@@ -14,6 +14,7 @@ include(setup.cmake)
 
 set (CMAKE_CXX_STANDARD 11)
 
+include_directories(${PROJECT_BINARY_DIR}/../packaging)
 include_directories(../common)
 include_directories(.)
 
@@ -42,5 +43,10 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     add_definitions(-D__LINUX__)
     target_link_libraries (corehost "dl")
 endif()
+
+FILE(STRINGS "../packaging/.name" COREHOST_PACKAGE_NAME)
+FILE(STRINGS "../packaging/.version" COREHOST_PACKAGE_VERSION)
+FILE(STRINGS "../packaging/.relative" COREHOST_PACKAGE_LIBHOST_RELATIVE_DIR)
+configure_file("../packaging/packaging.h.cmake" "../packaging/packaging.h")
 
 add_subdirectory(dll)
