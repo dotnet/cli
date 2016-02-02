@@ -25,6 +25,7 @@ source "$DIR/../common/_common.sh"
 SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 UPLOAD_FILE=$1
+MAKE_LATEST=$2
 UPLOAD_JSON_FILE="package_upload.json"
 
 header "Publishing package"
@@ -41,7 +42,7 @@ execute(){
     fi
 
     if [[ $UPLOAD_FILE == *.deb || $UPLOAD_FILE == *.pkg ]]; then
-        upload_installers_to_blob_storage $UPLOAD_FILE
+        upload_installers_to_blob_storage $UPLOAD_FILE $MAKE_LATEST
         result=$?
     elif [[ $UPLOAD_FILE == *.tar.gz ]]; then
         upload_binaries_to_blob_storage $UPLOAD_FILE
@@ -160,6 +161,7 @@ upload_binaries_to_blob_storage(){
 
 upload_installers_to_blob_storage(){
     local installfile=$1
+    local makelatest=${2:-true} #default to true if empty.
     local filename=$(basename $installfile)
     local blob="$CHANNEL/Installers/$DOTNET_CLI_VERSION/$filename"
 
@@ -167,13 +169,24 @@ upload_installers_to_blob_storage(){
         return 1
     fi
 
-    # create the latest blob
-    echo "Updating the latest dotnet installer.."
-    local extension="${filename##*.}"
-    local latestblob="$CHANNEL/Installers/Latest/dotnet-$OSNAME-x64.latest.$extension"
+    if $makelatest; then
+        # create the latest blob
+        echo "Updating the latest dotnet installer.."
+        local extension="${filename##*.}"
+        local latestblob="$CHANNEL/Installers/Latest/dotnet-$OSNAME-x64.latest.$extension"
 
-    if ! upload_file_to_blob_storage_azure_cli $latestblob $installfile; then
-        return 1
+        if ! upload_file_to_blob_storage_azure_cli $latestblob $installfile; then
+            return 1
+        fi
+
+        local localVersionFilename="latest.$OSNAME.version"
+        local latestVersionBlob="$CHANNEL/Installers/Latest/$localVersionFilename"
+        rm -f "$SCRIPT_DIR/$localVersionFilename"
+        echo "$(_get_pkg_version $filename)" > "$SCRIPT_DIR/$localVersionFilename"
+
+        if ! upload_file_to_blob_storage_azure_cli $latestVersionBlob "$SCRIPT_DIR/$localVersionFilename"; then
+            return 1
+        fi
     fi
 
     # debain packages need to be uploaded to the PPA feed too
@@ -218,6 +231,13 @@ _get_package_version(){
     package_version=${package_version%-*}
 
     echo $package_version
+}
+
+_get_pkg_version(){
+    local pkg_filename=$(basename $1 .pkg)
+    local pkg_version=${pkg_filename#*.}
+    pkg_version=${package_version%-*}
+    echo $pkg_version
 }
 
 execute

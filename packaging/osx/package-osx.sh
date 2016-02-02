@@ -41,6 +41,9 @@ cat $DIR/Distribution-Template | sed "/{VERSION}/s//$DOTNET_CLI_VERSION/g" > $DI
 
 productbuild --version $DOTNET_CLI_VERSION --identifier com.microsoft.dotnet.cli --package-path $DIR --resources $DIR/resources --distribution $DIR/Dist $PACKAGE_NAME
 
+#Upload the bundle for consumption by other installers.
+$REPOROOT/scripts/publish/publish.sh $DIR/dotnet-osx-x64.$DOTNET_BUILD_VERSION.pkg false
+
 #Clean temp files
 rm $DIR/dotnet-osx-x64.$DOTNET_CLI_VERSION.pkg
 rm $DIR/Dist
