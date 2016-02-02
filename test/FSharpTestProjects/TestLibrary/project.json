@@ -1,17 +1,18 @@
 {
     "version": "1.0.0-*",
-    "dependencies": {    
-        "NETStandard.Library": "1.0.0-rc2-23727",
-        "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-151221"
+    "compilationOptions": {
+        "xmlDoc": true
     },
     "compilerName": "fsc",
     "compileFiles": [
         "Helper2.fs",
         "Helper.fs"
     ],
+    "dependencies": {    
+        "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-151221",
+        "NETStandard.Library": "1.0.0-rc2-23727"
+    },
     "frameworks": {
-        "dnxcore50": {
-            "imports": "portable-net45+win8"
-        }
+        "dnxcore50": { }
     }
 }

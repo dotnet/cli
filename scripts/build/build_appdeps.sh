@@ -16,7 +16,7 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 source "$DIR/../common/_common.sh"
 
-APPDEPS_PROJECT_DIR="$REPOROOT/src/dotnet-compile-native/appdep"
+APPDEPS_PROJECT_DIR="$REPOROOT/src/dotnet/commands/dotnet-compile-native/appdep"
 
 # Get Absolute Output Dir
 pushd $1
@@ -25,7 +25,7 @@ popd
 
 ## App Deps ##
 pushd $APPDEPS_PROJECT_DIR
-dotnet restore --packages $APPDEPS_PROJECT_DIR/packages
+dotnet restore --runtime $RID --packages $APPDEPS_PROJECT_DIR/packages $DISABLE_PARALLEL
 APPDEP_SDK=$APPDEPS_PROJECT_DIR/packages/toolchain*/*/
 popd
 
