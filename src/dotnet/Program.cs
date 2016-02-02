@@ -12,6 +12,7 @@ using Microsoft.DotNet.Tools.Compiler;
 using Microsoft.DotNet.Tools.Compiler.Csc;
 using Microsoft.DotNet.Tools.Compiler.Fsc;
 using Microsoft.DotNet.Tools.Compiler.Native;
+using Microsoft.DotNet.Tools.Compiler.Mcg;
 using Microsoft.DotNet.Tools.New;
 using Microsoft.DotNet.Tools.Publish;
 using Microsoft.Extensions.PlatformAbstractions;
@@ -125,6 +126,7 @@ Common Commands:
                 ["compile-csc"] = CompileCscCommand.Run,
                 ["compile-fsc"] = CompileFscCommand.Run,
                 ["compile-native"] = CompileNativeCommand.Run,
+                ["mcg"] = McgCommand.Run,
                 ["new"] = NewCommand.Run,
                 ["pack"] = PackCommand.Run,
                 ["projectmodel-server"] = ProjectModelServerCommand.Run,

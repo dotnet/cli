@@ -10,8 +10,9 @@ $intermediateDir = "$RepoRoot\artifacts\appdepssdk\packages"
 $appdepBinDir = "$OutputDir\bin\appdepsdk"
 
 If (Test-Path $intermediateDir){
-    rmdir -Force -Rec  $intermediateDir
+    Remove-Item  $intermediateDir -Force -Recurse
 }
+
 mkdir $intermediateDir
 & dotnet restore --packages "$intermediateDir" "$RepoRoot\src\dotnet\commands\dotnet-compile-native\appdep\project.json"
 

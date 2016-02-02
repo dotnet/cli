@@ -10,7 +10,7 @@ using System.CommandLine;
 
 namespace Microsoft.DotNet.Tools.Compiler.Mcg
 {
-    public class Program
+    public class McgCommand
     {        
         private readonly static string HostExecutableName = "corerun" + Constants.ExeSuffix;
         private readonly static string McgBinaryName = "mcg.exe"; 
@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Mcg
             return nArgs;
         }      
 
-        public static int Main(string[] args)
+        public static int Run(string[] args)
         {
             DebugHelper.HandleDebugSwitch(ref args);
             return ExecuteMcg(args);
