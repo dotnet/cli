@@ -11,10 +11,8 @@
         "xunit.runner.utility": "2.1.0",
 
         "Microsoft.DotNet.Tools.Tests.Utilities": { "target": "project" },
-        "Microsoft.DotNet.Cli.Utils": {
-            "target": "project",
-            "type": "build"
-        }
+        "Microsoft.DotNet.ProjectModel": { "target": "project" },
+        "Microsoft.DotNet.Compiler.Common": { "target": "project" }
     },
 
     "frameworks": {
