@@ -20,8 +20,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
         
         private readonly string CompilerOutputExtension = ".obj";
 
-        // TODO: Remove /DWIN32
-        private static readonly string[] DefaultCompilerOptions = { "/nologo", "/W3", "/GS", "/DCPPCODEGEN", "/DWIN32", "/EHs", "/MT", "/Zi" };
+        private static readonly string[] DefaultCompilerOptions = { "/nologo", "/W3", "/GS", "/DCPPCODEGEN", "/EHs", "/MT", "/Zi" };
 
         private static readonly Dictionary<BuildConfiguration, string[]> ConfigurationCompilerOptionsMap = new Dictionary<BuildConfiguration, string[]>
         {

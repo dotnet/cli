@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
 
         private readonly string InputExtension = ".obj";
 
-        private static readonly string[] DefaultLinkerOptions = new string[] { "/NOLOGO", "/DEBUG", "/MANIFEST:NO", "/IGNORE:4099" };
+        private static readonly string[] DefaultLinkerOptions = new string[] { "/NOLOGO", "/DEBUG", "/MANIFEST:NO" };
 
         private static readonly Dictionary<BuildConfiguration, string[]> ConfigurationLinkerOptionsMap = new Dictionary<BuildConfiguration, string[]>
         {

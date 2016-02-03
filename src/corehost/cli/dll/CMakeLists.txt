@@ -32,6 +32,12 @@ else()
     list(APPEND SOURCES ../../common/pal.unix.cpp)
 endif()
 
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    add_definitions(-D__LINUX__)
+    target_link_libraries (hostpolicy "dl" "pthread")
+endif()
+
 add_definitions(-DCOREHOST_MAKE_DLL=1)
 
 add_library(hostpolicy SHARED ${SOURCES})
