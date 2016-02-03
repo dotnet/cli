@@ -147,12 +147,10 @@ namespace Microsoft.DotNet.Tools.Compiler
             //     Need CoreRT Framework published to nuget
 
             // Do Native Compilation
-            var result = Command.CreateDotNet("compile-native", new string[] { "--rsp", $"{rsp}" })
-                                .ForwardStdErr()
-                                .ForwardStdOut()
-                                .Execute();
+            var result = Microsoft.DotNet.Tools.Compiler.Native.CompileNativeCommand.Run(
+                new string[] { "--rsp", $"{rsp}" });
 
-            return result.ExitCode == 0;
+            return result == 0;
         }
 
         private static bool CompileProject(ProjectContext context, CompilerCommandApp args)
@@ -371,7 +369,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 if (ResourceUtility.IsResxFile(resgenFile.InputFile))
                 {
                     var result =
-                        Command.CreateDotNet("resgen",
+                        Microsoft.DotNet.Tools.Resgen.ResgenCommand.Run(
                             new string[]
                             {
                                 $"{resgenFile.InputFile}",
@@ -379,12 +377,9 @@ namespace Microsoft.DotNet.Tools.Compiler
                                 $"{resgenFile.OutputFile}",
                                 "-v",
                                 $"{project.Version.Version}"
-                            })
-                            .ForwardStdErr()
-                            .ForwardStdOut()
-                            .Execute();
+                            });
 
-                    if (result.ExitCode != 0)
+                    if (result != 0)
                     {
                         return false;
                     }
@@ -424,11 +419,8 @@ namespace Microsoft.DotNet.Tools.Compiler
                 arguments.Add($"-v {project.Version.Version}");
                 arguments.AddRange(resgenFile.InputFileToMetadata.Select(fileToMetadata => $"\"{fileToMetadata.Key}\",{fileToMetadata.Value}"));
 
-                var result = Command.CreateDotNet("resgen", arguments)
-                                        .ForwardStdErr()
-                                        .ForwardStdOut()
-                                        .Execute();
-                if (result.ExitCode != 0)
+                var result = Microsoft.DotNet.Tools.Resgen.ResgenCommand.Run(arguments.ToArray());
+                if (result != 0)
                 {
                     return false;
                 }
