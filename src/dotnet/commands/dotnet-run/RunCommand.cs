@@ -90,7 +90,7 @@ namespace Microsoft.DotNet.Tools.Run
             var tempDir = Path.Combine(_context.ProjectDirectory, "bin", ".dotnetrun", Guid.NewGuid().ToString("N"));
 
             // Compile to that directory
-            var result = Command.CreateDotNet($"build", new []
+            var result = Microsoft.DotNet.Tools.Build.BuildCommand.Run(new []
                 {
                     $"--output",
                     $"{tempDir}",
@@ -101,14 +101,11 @@ namespace Microsoft.DotNet.Tools.Run
                     $"--configuration",
                     $"{Configuration}",
                     $"{_context.ProjectFile.ProjectDirectory}"
-                })
-                .ForwardStdOut(onlyIfVerbose: true)
-                .ForwardStdErr()
-                .Execute();
+                });
 
-            if (result.ExitCode != 0)
+            if (result != 0)
             {
-                return result.ExitCode;
+                return result;
             }
 
             // Now launch the output and give it the results
@@ -148,7 +145,8 @@ namespace Microsoft.DotNet.Tools.Run
                 .ForwardStdOut()
                 .ForwardStdErr()
                 .EnvironmentVariable("DOTNET_HOME", runtime)
-                .Execute();
+                .Execute()
+                .ExitCode;
 
             // Clean up
             if (!PreserveTemporary)
@@ -156,7 +154,7 @@ namespace Microsoft.DotNet.Tools.Run
                 Directory.Delete(tempDir, recursive: true);
             }
 
-            return result.ExitCode;
+            return result;
         }
 
         private static int RunInteractive(string scriptName)
