@@ -91,7 +91,8 @@ namespace Microsoft.DotNet.Tools.Compiler.Csc
             var tempOutputStrippedSpaces = tempOutDir.Trim('"');
             var assemblyInfo = Path.Combine(tempOutputStrippedSpaces, $"dotnet-compile.assemblyinfo.cs");
             
-            File.WriteAllText(assemblyInfo, AssemblyInfoFileGenerator.Generate(assemblyInfoOptions, sources));
+            File.WriteAllText(assemblyInfo, AssemblyInfoFileGenerator.GenerateCSharp(assemblyInfoOptions, sources));
+
             allArgs.Add($"\"{assemblyInfo}\"");
 
             if (outputName != null)
