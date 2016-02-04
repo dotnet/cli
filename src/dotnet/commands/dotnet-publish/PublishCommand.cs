@@ -1,19 +1,21 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.DotNet.Cli.Utils;
-using Microsoft.DotNet.ProjectModel;
-using Microsoft.DotNet.ProjectModel.Compilation;
-using NuGet.Frameworks;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Files;
-using Microsoft.DotNet.Tools.Common;
+using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Utilities;
+using Microsoft.DotNet.Tools.Common;
+using Microsoft.Extensions.PlatformAbstractions;
+using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Publish
 {
@@ -154,8 +156,8 @@ namespace Microsoft.DotNet.Tools.Publish
             if (Crossgen)
             {
                 Reporter.Output.WriteLine($"Generating native images for {context.ProjectFile.Name.Bold()}...");
-                
-                foreach (var path in runtimeAssemblies)
+
+                var loopResult = Parallel.ForEach(runtimeAssemblies, (path, state) =>
                 {
                     var crossgenResult = Command.Create("crossgen", new[] { "-platform_assemblies_paths", outputPath, path }, FrameworkConstants.CommonFrameworks.DnxCore50)
                         .WorkingDirectory(outputPath)
@@ -163,8 +165,13 @@ namespace Microsoft.DotNet.Tools.Publish
 
                     if (crossgenResult.ExitCode != 0)
                     {
-                        return false;
+                        state.Stop();
                     }
+                });
+
+                if (!loopResult.IsCompleted)
+                {
+                    return false;
                 }
             }
 
