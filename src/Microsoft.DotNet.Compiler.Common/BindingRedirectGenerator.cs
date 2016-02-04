@@ -109,7 +109,7 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
 
         private static AssemblyRedirect[] CollectRedirects(IEnumerable<LibraryExport> dependencies)
         {
-            var allRuntimeAssemblies = dependencies.SelectMany(d => d.RuntimeAssemblies).Select(GetAssemblyInfo).ToArray();
+            var allRuntimeAssemblies = GetListOfUniqueRefs(dependencies.ToList()).Select(GetAssemblyInfo).ToArray();
             var assemblyLookup = allRuntimeAssemblies.ToDictionary(r => r.Identity.ToLookupKey());
 
             var redirectAssemblies = new HashSet<AssemblyRedirect>();
@@ -134,6 +134,21 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
             }
 
             return redirectAssemblies.ToArray();
+        }
+
+        private static List<LibraryAsset> GetListOfUniqueRefs(List<LibraryExport> dependencies)
+        {
+            var result = new List<LibraryAsset>();
+            foreach (var dependency in dependencies)
+            {
+                // Select runtime assemblies when there's no other dependency that actually owns them.
+                result.AddRange(
+                    dependency.RuntimeAssemblies.Where(r => !dependencies.Any(
+                            d => dependency != d && d.CompilationAssemblies.Any(c => c.Name == r.Name)))
+                );
+            }
+
+            return result;
         }
 
         private static AssemblyReferenceInfo GetAssemblyInfo(LibraryAsset arg)
