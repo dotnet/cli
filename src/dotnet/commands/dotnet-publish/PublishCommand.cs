@@ -157,19 +157,15 @@ namespace Microsoft.DotNet.Tools.Publish
             {
                 Reporter.Output.WriteLine($"Generating native images for {context.ProjectFile.Name.Bold()}...");
 
-                var loopResult = Parallel.ForEach(runtimeAssemblies, (path, state) =>
+                var results = runtimeAssemblies.AsParallel().Select(path =>
                 {
                     var crossgenResult = Command.Create("crossgen", new[] { "-platform_assemblies_paths", outputPath, path }, FrameworkConstants.CommonFrameworks.DnxCore50)
                         .WorkingDirectory(outputPath)
                         .Execute();
-
-                    if (crossgenResult.ExitCode != 0)
-                    {
-                        state.Stop();
-                    }
+                    return crossgenResult.ExitCode == 0;
                 });
 
-                if (!loopResult.IsCompleted)
+                if (!results.All(r => r))
                 {
                     return false;
                 }
