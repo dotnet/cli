@@ -27,6 +27,7 @@ namespace Microsoft.DotNet.Tools.Publish
             var configuration = app.Option("-c|--configuration <CONFIGURATION>", "Configuration under which to build", CommandOptionType.SingleValue);
             var projectPath = app.Argument("<PROJECT>", "The project to publish, defaults to the current directory. Can be a path to a project.json or a project directory");
             var nativeSubdirectories = app.Option("--native-subdirectory", "Temporary mechanism to include subdirectories from native assets of dependency packages in output", CommandOptionType.NoValue);
+            var crossgen = app.Option("-c|--crossgen", "Compiles the publish output to native", CommandOptionType.NoValue);
 
             app.OnExecute(() =>
             {
@@ -39,6 +40,7 @@ namespace Microsoft.DotNet.Tools.Publish
                 publish.Configuration = configuration.Value() ?? Constants.DefaultConfiguration;
                 publish.NativeSubdirectories = nativeSubdirectories.HasValue();
                 publish.ProjectPath = projectPath.Value;
+                publish.Crossgen = crossgen.HasValue();
 
                 if (string.IsNullOrEmpty(publish.ProjectPath))
                 {

@@ -26,6 +26,7 @@ namespace Microsoft.DotNet.Tools.Publish
         public string Framework { get; set; }
         public string Runtime { get; set; }
         public bool NativeSubdirectories { get; set; }
+        public bool Crossgen { get; set; }
         public NuGetFramework NugetFramework { get; set; }
         public IEnumerable<ProjectContext> ProjectContexts { get; set; }
 
@@ -85,7 +86,7 @@ namespace Microsoft.DotNet.Tools.Publish
             Reporter.Output.WriteLine($"Publishing {context.RootProject.Identity.Name.Yellow()} for {context.TargetFramework.DotNetFrameworkName.Yellow()}/{context.RuntimeIdentifier.Yellow()}");
 
             var options = context.ProjectFile.GetCompilerOptions(context.TargetFramework, configuration);
-            
+
             if (string.IsNullOrEmpty(outputPath))
             {
                 outputPath = context.GetOutputPaths(configuration, buildBasePath, outputPath).RuntimeOutputPath;
@@ -132,9 +133,13 @@ namespace Microsoft.DotNet.Tools.Publish
             // Use a library exporter to collect publish assets
             var exporter = context.CreateExporter(configuration);
 
+            var runtimeAssemblies = new List<string>();
+
             foreach (var export in exporter.GetAllExports())
             {
                 Reporter.Verbose.WriteLine($"Publishing {export.Library.Identity.ToString().Green().Bold()} ...");
+
+                runtimeAssemblies.AddRange(export.RuntimeAssemblies.Select(r => Path.GetFileName(r.ResolvedPath)));
 
                 PublishFiles(export.RuntimeAssemblies, outputPath, nativeSubdirectories: false);
                 PublishFiles(export.NativeLibraries, outputPath, nativeSubdirectories);
@@ -143,6 +148,23 @@ namespace Microsoft.DotNet.Tools.Publish
                 if (options.PreserveCompilationContext.GetValueOrDefault())
                 {
                     PublishRefs(export, outputPath);
+                }
+            }
+
+            if (Crossgen)
+            {
+                Reporter.Output.WriteLine($"Generating native images for {context.ProjectFile.Name.Bold()}...");
+                
+                foreach (var path in runtimeAssemblies)
+                {
+                    var crossgenResult = Command.Create("crossgen", new[] { "-platform_assemblies_paths", outputPath, path }, FrameworkConstants.CommonFrameworks.DnxCore50)
+                        .WorkingDirectory(outputPath)
+                        .Execute();
+
+                    if (crossgenResult.ExitCode != 0)
+                    {
+                        return false;
+                    }
                 }
             }
 
@@ -227,7 +249,7 @@ namespace Microsoft.DotNet.Tools.Publish
                 {
                     Directory.CreateDirectory(destinationDirectory);
                 }
-                
+
                 File.Copy(file.ResolvedPath, Path.Combine(destinationDirectory, Path.GetFileName(file.ResolvedPath)), overwrite: true);
             }
         }

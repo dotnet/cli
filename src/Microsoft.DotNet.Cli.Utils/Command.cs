@@ -40,9 +40,9 @@ namespace Microsoft.DotNet.Cli.Utils
             ResolutionStrategy = commandSpec.ResolutionStrategy;
         }
 
-        public static Command CreateDotNet(string commandName, IEnumerable<string> args, NuGetFramework framework = null, bool useComSpec = false)
+        public static Command CreateDotNet(string commandName, IEnumerable<string> args, NuGetFramework framework = null, string runtimeIdentifer = null, bool useComSpec = false)
         {
-            return Create("dotnet", new[] { commandName }.Concat(args), framework, useComSpec);
+            return Create("dotnet", new[] { commandName }.Concat(args), framework, runtimeIdentifer, useComSpec);
         }
 
         /// <summary>
@@ -55,9 +55,9 @@ namespace Microsoft.DotNet.Cli.Utils
         /// <param name="args"></param>
         /// <param name="framework"></param>
         /// <returns></returns>
-        public static Command Create(string commandName, IEnumerable<string> args, NuGetFramework framework = null, bool useComSpec = false)
+        public static Command Create(string commandName, IEnumerable<string> args, NuGetFramework framework = null, string runtimeIdentifer = null, bool useComSpec = false)
         {
-            var commandSpec = CommandResolver.TryResolveCommandSpec(commandName, args, framework, useComSpec);
+            var commandSpec = CommandResolver.TryResolveCommandSpec(commandName, args, framework, runtimeIdentifer, useComSpec);
 
             if (commandSpec == null)
             {

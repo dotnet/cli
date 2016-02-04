@@ -13,10 +13,10 @@ namespace Microsoft.DotNet.Cli.Utils
 {
     internal static class CommandResolver
     {
-        public static CommandSpec TryResolveCommandSpec(string commandName, IEnumerable<string> args, NuGetFramework framework = null, bool useComSpec = false)
+        public static CommandSpec TryResolveCommandSpec(string commandName, IEnumerable<string> args, NuGetFramework framework = null, string runtimeIdentifier = null, bool useComSpec = false)
         {
             return ResolveFromRootedCommand(commandName, args, useComSpec) ??
-                   ResolveFromProjectDependencies(commandName, args, framework, useComSpec) ??
+                   ResolveFromProjectDependencies(commandName, args, framework, runtimeIdentifier, useComSpec) ??
                    ResolveFromProjectTools(commandName, args, useComSpec) ??
                    ResolveFromAppBase(commandName, args, useComSpec) ??
                    ResolveFromPath(commandName, args, useComSpec);
@@ -58,11 +58,11 @@ namespace Microsoft.DotNet.Cli.Utils
         }
 
         public static CommandSpec ResolveFromProjectDependencies(string commandName, IEnumerable<string> args,
-            NuGetFramework framework, bool useComSpec = false)
+            NuGetFramework framework, string runtimeIdentifier, bool useComSpec = false)
         {
             if (framework == null) return null;
 
-            var projectContext = GetProjectContext(framework);
+            var projectContext = GetProjectContext(framework, runtimeIdentifier);
 
             if (projectContext == null) return null;
 
@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.Cli.Utils
             return ConfigureCommandFromPackage(commandName, args, commandPackage, projectContext, depsPath, useComSpec);
         }
 
-        private static ProjectContext GetProjectContext(NuGetFramework framework)
+        private static ProjectContext GetProjectContext(NuGetFramework framework, string runtimeIdentifier = null)
         {
             var projectRootPath = Directory.GetCurrentDirectory();
 
@@ -84,8 +84,12 @@ namespace Microsoft.DotNet.Cli.Utils
                 return null;
             }
 
-            var projectContext = ProjectContext.Create(projectRootPath, framework, PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
-            return projectContext;
+            if (string.IsNullOrEmpty(runtimeIdentifier))
+            {
+                return ProjectContext.Create(projectRootPath, framework);
+            }
+
+            return ProjectContext.Create(projectRootPath, framework, new[] { runtimeIdentifier });
         }
 
         private static PackageDescription GetCommandPackage(ProjectContext projectContext, string commandName)
