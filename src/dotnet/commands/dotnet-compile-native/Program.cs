@@ -2,11 +2,13 @@
 using System.IO;
 using Microsoft.DotNet.Cli.Utils;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Microsoft.DotNet.Tools.Compiler.Native
 {
     public class CompileNativeCommand
     {
+        private const string McgInteropAssemblySuffix = ".mcginterop.dll";
         public static int Run(string[] args)
         {
             DebugHelper.HandleDebugSwitch(ref args);
@@ -49,10 +51,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
                     {
                         return exitCode;
                     }
-
-                    string interopAssemblyPath = Path.Combine(Path.GetDirectoryName(config.InputManagedAssemblyPath), "Interop");
-                    string inputAssemblyName = Path.GetFileNameWithoutExtension(config.InputManagedAssemblyPath);
-                    config.AddReference(Path.Combine(interopAssemblyPath, inputAssemblyName + ".mcginterop.dll"));
+                    CompileMcgGeneratedCode(config);
                 }
 
                 var nativeCompiler = NativeCompiler.Create(config);
@@ -82,35 +81,76 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
             mcgArgs.Add("--outputpath");
             mcgArgs.Add(outPath);
 
-            var ilSdkPath = Path.Combine(config.IlcSdkPath, "sdk");
-            foreach (string refPath in Directory.EnumerateFiles(ilSdkPath, "*.dll"))
-            {
+            var ilSdkPath = Path.Combine(config.IlcSdkPath, "sdk");        
+                
+            mcgArgs.Add("--r");
+            mcgArgs.Add(Path.Combine(ilSdkPath,"System.Private.Interop.dll"));
+            mcgArgs.Add("--r");
+            mcgArgs.Add(Path.Combine(ilSdkPath, "System.Private.CoreLib.dll"));
+            mcgArgs.Add("--r");
+            mcgArgs.Add(Path.Combine(config.AppDepSDKPath, "System.Runtime.Handles.dll"));
+            mcgArgs.Add("--r");
+            mcgArgs.Add(Path.Combine(config.AppDepSDKPath, "System.Runtime.dll"));
 
-                mcgArgs.Add("--r");
-                mcgArgs.Add(refPath);
-            }
-
-            foreach (string refPath in Directory.EnumerateFiles(config.AppDepSDKPath, "*.dll"))
-            {
-                // System.Runtime.Extensions define an internal type called System.Runtime.InteropServices.Marshal which 
-                // conflicts with Marshal from S.P.Interop , we don't need System.Runtime.Extensions anyways,skip it.
-                if (refPath.Contains("System.Runtime.Extensions.dll")) continue;
-
-                mcgArgs.Add("--r");
-                mcgArgs.Add(refPath);
-            }
 
             // Write Response File
             var rsp = Path.Combine(config.IntermediateDirectory, $"dotnet-compile-mcg.rsp");
             File.WriteAllLines(rsp, mcgArgs);
 
-            var result = Command.Create("dotnet-mcg", new string[] {"--rsp", $"{rsp}" })
+            var corerun = Path.Combine(AppContext.BaseDirectory, Constants.HostExecutableName);
+            var mcgExe = Path.Combine(AppContext.BaseDirectory, "mcg.exe");
+
+            List<string> args = new List<string>();
+            args.Add(mcgExe);
+            args.AddRange(new string[] { "--rsp", $"{rsp}" });
+
+
+            var result = Command.Create(corerun, args.ToArray())
                                 .ForwardStdErr()
                                 .ForwardStdOut()
                                 .Execute();
-
-            // Add interop assembly to project context 
+            
             return result.ExitCode;
+        }
+
+        private static int CompileMcgGeneratedCode(NativeCompileSettings config)
+        {
+            List<string> cscArgs = new List<string>();
+            string mcgOutPath = Path.Combine(Path.GetDirectoryName(config.InputManagedAssemblyPath), "Interop");
+            cscArgs.AddRange(Directory.EnumerateFiles(mcgOutPath, "*.cs"));
+
+            var ilSdkPath = Path.Combine(config.IlcSdkPath, "sdk");
+            cscArgs.AddRange(Directory.EnumerateFiles(ilSdkPath, "*.dll").Select(r => $"--reference:{r}"));
+
+            cscArgs.AddRange(Directory.EnumerateFiles(config.AppDepSDKPath, "*.dll").Select(r => $"--reference:{r}"));
+
+            cscArgs.Add("--reference");
+            cscArgs.Add(config.InputManagedAssemblyPath);
+
+
+            var interopAssemblyPath = Path.Combine(mcgOutPath, Path.GetFileNameWithoutExtension(config.InputManagedAssemblyPath));
+            interopAssemblyPath += McgInteropAssemblySuffix;
+
+            cscArgs.Add("--out");
+            cscArgs.Add(interopAssemblyPath);
+
+            cscArgs.Add("--temp-output");
+            cscArgs.Add(config.IntermediateDirectory);
+
+            cscArgs.Add("--define");
+            cscArgs.Add("DEBUG");
+
+            cscArgs.Add("--emit-entry-point");
+            cscArgs.Add("False");
+
+            cscArgs.Add("--file-version");
+            cscArgs.Add("1.0.0.0");
+
+            cscArgs.Add("--version");
+            cscArgs.Add("1.0.0.0");
+
+            config.AddReference(interopAssemblyPath);
+            return Microsoft.DotNet.Tools.Compiler.Csc.CompileCscCommand.Run(cscArgs.ToArray());
         }
 
         private static string[] ParseResponseFile(string rspPath)
