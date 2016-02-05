@@ -7,7 +7,8 @@
 dotnet \-\- general driver for running the command\-line commands
 .SH SYNOPSIS
 .PP
-dotnet [\-\-version] [\-\-help] [\-\-verbose] < command > [< args >]
+dotnet [\-\-version] [\-\-rid] [\-\-help] [\-\-verbose] < command > [<
+args >]
 .SH DESCRIPTION
 .PP
 dotnet is a generic driver for the CLI toolchain.
@@ -33,6 +34,14 @@ Enable\ verbose\ output.
 .nf
 \f[C]
 Print\ out\ the\ version\ of\ the\ CLI\ tooling
+\f[]
+.fi
+.PP
+\f[C]\-\-rid\f[]
+.IP
+.nf
+\f[C]
+Print\ out\ the\ default\ runtime\ identifier\ of\ the\ CLI\ tooling
 \f[]
 .fi
 .PP

@@ -8,7 +8,7 @@ dotnet -- general driver for running the command-line commands
 
 # SYNOPSIS
 
-dotnet [--version] [--help] [--verbose] < command > [< args >]
+dotnet [--version] [--rid] [--help] [--verbose] < command > [< args >]
 
 # DESCRIPTION
 dotnet is a generic driver for the CLI toolchain. Invoked on its own, it will give out brief usage instructions. 
@@ -24,6 +24,10 @@ Each specific feature is implemented as a command. In order to use the feature, 
 `--version`
 
     Print out the version of the CLI tooling
+
+`--rid`
+
+    Print out the default runtime identifier of the CLI tooling
 
 `-h, --help`
 

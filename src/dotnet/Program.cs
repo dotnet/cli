@@ -36,6 +36,7 @@ Arguments:
 Common Options (passed before the command):
   -v|--verbose  Enable verbose output
   --version     Display .NET CLI Version Info
+  --rid         Display the default runtime identifier
 
 Common Commands:
   new           Initialize a basic .NET project
@@ -87,6 +88,11 @@ Common Commands:
                 else if (IsArg(args[lastArg], "version"))
                 {
                     PrintVersionInfo();
+                    return 0;
+                }
+                else if (IsArg(args[lastArg], "rid"))
+                {
+                    PrintRuntimeIdentifier();
                     return 0;
                 }
                 else if (IsArg(args[lastArg], "h", "help"))
@@ -196,6 +202,11 @@ Common Commands:
             Reporter.Output.WriteLine($" OS Version:  {runtimeEnvironment.OperatingSystemVersion}");
             Reporter.Output.WriteLine($" OS Platform: {runtimeEnvironment.OperatingSystemPlatform}");
             Reporter.Output.WriteLine($" Runtime Id:  {runtimeEnvironment.GetRuntimeIdentifier()}");
+        }
+
+        private static void PrintRuntimeIdentifier()
+        {
+            Reporter.Output.WriteLine(PlatformServices.Default.Runtime.GetRuntimeIdentifier());
         }
 
         private static bool IsArg(string candidate, string longName)
