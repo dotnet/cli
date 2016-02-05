@@ -82,7 +82,7 @@ $REPOROOT/scripts/build/fix-mode-flags.sh
 
 if [ ! -f "$OUTPUT_DIR/bin/csc.ni.exe" ]; then
     info "Crossgenning Roslyn compiler ..."
-    $REPOROOT/scripts/crossgen/crossgen_roslyn.sh "$OUTPUT_DIR/bin"
+    $REPOROOT/scripts/crossgen/crossgen_roslyn.sh "$OUTPUT_DIR/bin" > /dev/null 2>&1
 fi
 
 # Make OUTPUT_DIR Folder Accessible
