@@ -4,8 +4,8 @@
         "emitEntryPoint": true
     },
     "dependencies": {
-        "NETStandard.Library": "1.0.0-rc2-23727",
-        "Microsoft.DotNet.AppDep":"1.0.5-*"
+        "NETStandard.Library": "1.0.0-rc2-23728",
+        "Microsoft.DotNet.AppDep":"1.0.5-prerelease-00001"
     },
     "frameworks": {
         "dnxcore50": { }
