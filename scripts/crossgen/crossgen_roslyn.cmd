@@ -3,6 +3,8 @@
 REM Copyright (c) .NET Foundation and contributors. All rights reserved.
 REM Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+if %SKIP_CROSSGEN% EQU 0 goto skip
+
 REM Get absolute path
 pushd %1
 set BIN_DIR=%CD%\bin
@@ -49,5 +51,9 @@ goto end
 popd
 echo Crossgen failed...
 exit /B 1
+
+:skip
+echo Skipping Crossgen
+goto end
 
 :end
