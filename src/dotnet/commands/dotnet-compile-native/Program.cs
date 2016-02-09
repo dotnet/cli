@@ -8,7 +8,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
 {
     public class CompileNativeCommand
     {
-        private const string McgInteropAssemblySuffix = ".mcginterop.dll";
+        private const string McgInteropAssemblySuffix = ".McgInterop.dll";
         public static int Run(string[] args)
         {
             DebugHelper.HandleDebugSwitch(ref args);
