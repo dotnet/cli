@@ -5,21 +5,9 @@
     },
     "dependencies": {
         "NETStandard.Library": "1.0.0-rc2-23727",
-        
-        "Microsoft.DotNet.Cli.Utils": {
-            "type": "build",
-            "version": "1.0.0-*"
-        },
-        "Microsoft.Extensions.CommandLineUtils.Sources": {
-            "type": "build",
-            "version": "1.0.0-*"
-        },                
-        "Microsoft.DotNet.Compiler.Common": "1.0.0-*",
         "Microsoft.DotNet.Mcg": "1.0.0-prerelease-0003"
     },
     "frameworks": {
-        "dnxcore50": {
-            "imports": "portable-net45+win8"
-        }
+        "dnxcore50": { }
     }
 }
