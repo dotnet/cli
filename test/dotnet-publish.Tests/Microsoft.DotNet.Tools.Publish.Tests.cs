@@ -31,211 +31,253 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
                     new object[] { "", PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier(), "", "" },
                     new object[] { "", "", "Release", "" },
                     new object[] { "", "", "", "some/dir"},
-                    new object[] { "", "", "", "some/dir/with spaces" }, 
+                    new object[] { "", "", "", "some/dir/with spaces" },
                     new object[] { "dnxcore50", PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier(), "Debug", "some/dir" },
                 };
             }
         }
 
-        [Theory]
-        [MemberData("PublishOptions")]
-        public void PublishOptionsTest(string framework, string runtime, string config, string outputDir)
-        {
-            // create unique directories in the 'temp' folder
-            var root = Temp.CreateDirectory();
+        //[Theory]
+        //[MemberData("PublishOptions")]
+        //public void PublishOptionsTest(string framework, string runtime, string config, string outputDir)
+        //{
+        //    // create unique directories in the 'temp' folder
+        //    var root = Temp.CreateDirectory();
 
-            var testAppDir = root.CreateDirectory("TestApp");
-            var testLibDir = root.CreateDirectory("TestLibrary");
+        //    var testAppDir = root.CreateDirectory("TestApp");
+        //    var testLibDir = root.CreateDirectory("TestLibrary");
 
-            //copy projects to the temp dir
-            CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestApp"), testAppDir);
-            CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestLibrary"), testLibDir);
+        //    //copy projects to the temp dir
+        //    CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestApp"), testAppDir);
+        //    CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestLibrary"), testLibDir);
 
-            // run publish
-            outputDir = string.IsNullOrEmpty(outputDir) ? "" : Path.Combine(root.Path, outputDir);
-            var testProject = GetProjectPath(testAppDir);
-            var publishCommand = new PublishCommand(testProject, output: outputDir);
-            publishCommand.Execute().Should().Pass();
+        //    // run publish
+        //    outputDir = string.IsNullOrEmpty(outputDir) ? "" : Path.Combine(root.Path, outputDir);
+        //    var testProject = GetProjectPath(testAppDir);
+        //    var publishCommand = new PublishCommand(testProject, output: outputDir);
+        //    publishCommand.Execute().Should().Pass();
 
-            // verify the output executable generated
-            var publishedDir = publishCommand.GetOutputDirectory();
-            var outputExe = publishCommand.GetOutputExecutable();
-            var outputPdb = Path.ChangeExtension(outputExe, "pdb");
+        //    // verify the output executable generated
+        //    var publishedDir = publishCommand.GetOutputDirectory();
+        //    var outputExe = publishCommand.GetOutputExecutable();
+        //    var outputPdb = Path.ChangeExtension(outputExe, "pdb");
 
-            // lets make sure that the output exe is runnable
-            var outputExePath = Path.Combine(publishedDir.FullName, publishCommand.GetOutputExecutable());
-            var command = new TestCommand(outputExePath);
-            command.Execute("").Should().ExitWith(100);
+        //    // lets make sure that the output exe is runnable
+        //    var outputExePath = Path.Combine(publishedDir.FullName, publishCommand.GetOutputExecutable());
+        //    var command = new TestCommand(outputExePath);
+        //    command.Execute("").Should().ExitWith(100);
 
-            // the pdb should also be published
-            publishedDir.Should().HaveFile(outputPdb);
-        }
+        //    // the pdb should also be published
+        //    publishedDir.Should().HaveFile(outputPdb);
+        //}
 
-        [Fact]
-        public void ProjectWithContentsTest()
-        {
-            // create unique directories in the 'temp' folder
-            var testDir = Temp.CreateDirectory();
+        //[Fact]
+        //public void ProjectWithContentsTest()
+        //{
+        //    // create unique directories in the 'temp' folder
+        //    var testDir = Temp.CreateDirectory();
 
-            var testAppDir = Path.Combine(_testProjectsRoot, "TestAppWithContents");
+        //    var testAppDir = Path.Combine(_testProjectsRoot, "TestAppWithContents");
 
-            // copy projects to the temp dir
-            CopyProjectToTempDir(testAppDir, testDir);
+        //    // copy projects to the temp dir
+        //    CopyProjectToTempDir(testAppDir, testDir);
 
-            // run publish
-            var testProject = GetProjectPath(testDir);
-            var publishCommand = new PublishCommand(testProject);
-            publishCommand.Execute().Should().Pass();
+        //    // run publish
+        //    var testProject = GetProjectPath(testDir);
+        //    var publishCommand = new PublishCommand(testProject);
+        //    publishCommand.Execute().Should().Pass();
 
-            // make sure that the output dir has the content files
-            publishCommand.GetOutputDirectory().Should().HaveFile("testcontentfile.txt");
-        }
+        //    // make sure that the output dir has the content files
+        //    publishCommand.GetOutputDirectory().Should().HaveFile("testcontentfile.txt");
+        //}
 
-        [Fact]
-        public void FailWhenNoRestoreTest()
-        {
-            // create unique directories in the 'temp' folder
-            var root = Temp.CreateDirectory();
+        //[Fact]
+        //public void FailWhenNoRestoreTest()
+        //{
+        //    // create unique directories in the 'temp' folder
+        //    var root = Temp.CreateDirectory();
 
-            var testAppDir = root.CreateDirectory("TestApp");
-            var testLibDir = root.CreateDirectory("TestLibrary");
+        //    var testAppDir = root.CreateDirectory("TestApp");
+        //    var testLibDir = root.CreateDirectory("TestLibrary");
 
-            // copy projects to the temp dir
-            CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestApp"), testAppDir);
-            CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestLibrary"), testLibDir);
+        //    // copy projects to the temp dir
+        //    CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestApp"), testAppDir);
+        //    CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestLibrary"), testLibDir);
 
-            File.Delete(Path.Combine(testAppDir.Path, "project.lock.json"));
-            File.Delete(Path.Combine(testLibDir.Path, "project.lock.json"));
+        //    File.Delete(Path.Combine(testAppDir.Path, "project.lock.json"));
+        //    File.Delete(Path.Combine(testLibDir.Path, "project.lock.json"));
 
-            var testProject = GetProjectPath(testAppDir);
-            var publishCommand = new PublishCommand(testProject);
-            publishCommand.Execute().Should().Fail();
-        }
+        //    var testProject = GetProjectPath(testAppDir);
+        //    var publishCommand = new PublishCommand(testProject);
+        //    publishCommand.Execute().Should().Fail();
+        //}
 
-        [Fact]
-        public void LibraryPublishTest()
-        {
-            // create unique directories in the 'temp' folder
-            var root = Temp.CreateDirectory();
+        //[Fact]
+        //public void LibraryPublishTest()
+        //{
+        //    // create unique directories in the 'temp' folder
+        //    var root = Temp.CreateDirectory();
 
-            var testLibDir = root.CreateDirectory("TestLibrary");
+        //    var testLibDir = root.CreateDirectory("TestLibrary");
 
-            //copy projects to the temp dir
-            CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestLibrary"), testLibDir);
+        //    //copy projects to the temp dir
+        //    CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestLibrary"), testLibDir);
 
-            var testProject = GetProjectPath(testLibDir);
-            var publishCommand = new PublishCommand(testProject);
-            publishCommand.Execute().Should().Pass();
+        //    var testProject = GetProjectPath(testLibDir);
+        //    var publishCommand = new PublishCommand(testProject);
+        //    publishCommand.Execute().Should().Pass();
 
-            publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibrary.exe");
-            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibrary.dll");
-            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibrary.pdb");
-            // dependencies should also be copied
-            publishCommand.GetOutputDirectory().Should().HaveFile("System.Runtime.dll");
-        }
+        //    publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibrary.exe");
+        //    publishCommand.GetOutputDirectory().Should().HaveFile("TestLibrary.dll");
+        //    publishCommand.GetOutputDirectory().Should().HaveFile("TestLibrary.pdb");
+        //    // dependencies should also be copied
+        //    publishCommand.GetOutputDirectory().Should().HaveFile("System.Runtime.dll");
+        //}
+
+        //[WindowsOnlyFact]
+        //public void TestLibraryBindingRedirectGeneration()
+        //{
+        //    // Set up Test Staging in Temporary Directory
+        //    var root = Temp.CreateDirectory();
+        //    root.CopyDirectory(Path.Combine(_testProjectsRoot, "TestBindingRedirectGeneration"));
+
+        //    var testProjectsRootDir = Path.Combine(root.Path, "TestBindingRedirectGeneration");
+        //    var greaterTestLibDir = Path.Combine(testProjectsRootDir, "TestLibraryGreater");
+        //    var lesserTestLibDir = Path.Combine(testProjectsRootDir, "TestLibraryLesser");
+
+        //    var lesserTestProject = Path.Combine(lesserTestLibDir, "project.json");
+        //    var publishCommand = new PublishCommand(lesserTestProject, "net451");
+        //    publishCommand.Execute().Should().Pass();
+
+        //    publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.dll");
+        //    publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.pdb");
+        //    publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.dll.config");
+        //    publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibraryLesser.deps");
+
+        //    // dependencies should also be copied
+        //    publishCommand.GetOutputDirectory().Should().HaveFile("Newtonsoft.Json.dll");
+        //    publishCommand.GetOutputDirectory().Delete(true);
+
+        //    publishCommand = new PublishCommand(lesserTestProject, "dnxcore50", PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier());
+        //    publishCommand.Execute().Should().Pass();
+
+        //    publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.dll");
+        //    publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.pdb");
+        //    publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibraryLesser.dll.config");
+        //    publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.deps");
+
+        //    // dependencies should also be copied
+        //    publishCommand.GetOutputDirectory().Should().HaveFile("Newtonsoft.Json.dll");
+        //}
 
         [WindowsOnlyFact]
-        public void TestLibraryBindingRedirectGeneration()
+        public void TestAppGeneratesCorrectBindings()
         {
-            // Set up Test Staging in Temporary Directory
-            var root = Temp.CreateDirectory();
-            root.CopyDirectory(Path.Combine(_testProjectsRoot, "TestBindingRedirectGeneration"));
-
-            var testProjectsRootDir = Path.Combine(root.Path, "TestBindingRedirectGeneration");
-            var greaterTestLibDir = Path.Combine(testProjectsRootDir, "TestLibraryGreater");
-            var lesserTestLibDir = Path.Combine(testProjectsRootDir, "TestLibraryLesser");
-
-            var lesserTestProject = Path.Combine(lesserTestLibDir, "project.json");
-            var publishCommand = new PublishCommand(lesserTestProject, "net451");
-            publishCommand.Execute().Should().Pass();
-
-            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.dll");
-            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.pdb");
-            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.dll.config");
-            publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibraryLesser.deps"); 
-
-            // dependencies should also be copied
-            publishCommand.GetOutputDirectory().Should().HaveFile("Newtonsoft.Json.dll");
-            publishCommand.GetOutputDirectory().Delete(true);
-
-            publishCommand = new PublishCommand(lesserTestProject, "dnxcore50", PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier());
-            publishCommand.Execute().Should().Pass();
-
-            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.dll");
-            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.pdb");
-            publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibraryLesser.dll.config");
-            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.deps"); 
-
-            // dependencies should also be copied
-            publishCommand.GetOutputDirectory().Should().HaveFile("Newtonsoft.Json.dll");
-        }
-
-        [Fact]
-        public void RefsPublishTest()
-        {
-            // create unique directories in the 'temp' folder
+            var framework = "net461";
             var root = Temp.CreateDirectory();
 
-            var testAppDir = root.CreateDirectory("TestAppCompilationContext");
-            var testLibDir = root.CreateDirectory("TestLibrary");
+            var projectsRoot = root.CreateDirectory("TestBindingsRedirectsGeneration2");
+            var referencedLibDir = projectsRoot.CreateDirectory("ReferencedLibrary");
+            var testLibRootDir = projectsRoot.CreateDirectory("TestLibrary");
+            var referencedLibDirV1 = testLibRootDir.CreateDirectory("ReferencedLibrary");
+            var testLibDir = testLibRootDir.CreateDirectory("TestLibrary");
+            var testAppDir = projectsRoot.CreateDirectory("TestApp");
 
-            // copy projects to the temp dir
-            CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestAppCompilationContext"), testAppDir);
-            CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestLibrary"), testLibDir);
+            CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestBindingsRedirectsGeneration2", "ReferencedLibrary"), referencedLibDir);
+            CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestBindingsRedirectsGeneration2", "TestLibrary", "TestLibrary"), testLibDir);
+            CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestBindingsRedirectsGeneration2", "TestLibrary", "ReferencedLibrary"), referencedLibDirV1);
+            CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestBindingsRedirectsGeneration2", "TestApp"), testAppDir);
+            CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestBindingsRedirectsGeneration2"), projectsRoot);
 
-            var testProject = GetProjectPath(testAppDir);
-            var publishCommand = new PublishCommand(testProject);
-            publishCommand.Execute().Should().Pass();
+            new BuildCommand(GetProjectPath(referencedLibDir)).Execute();
+            new BuildCommand(GetProjectPath(referencedLibDirV1),
+                output: Path.Combine(referencedLibDirV1.Path, "artifacts"),
+                framework: framework).Execute();
+            new BuildCommand(GetProjectPath(testLibDir)).Execute();
 
-            publishCommand.GetOutputDirectory().Should().HaveFile("TestAppCompilationContext.dll");
-            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibrary.dll");
+            new PackCommand(GetProjectPath(referencedLibDir),
+                output: Path.Combine(projectsRoot.Path, @"packages"))
+                .Execute();
+            new PackCommand(GetProjectPath(testLibDir),
+                output: Path.Combine(projectsRoot.Path, @"packages"))
+                .Execute();
 
-            var refsDirectory = new DirectoryInfo(Path.Combine(publishCommand.GetOutputDirectory().FullName, "refs"));
-            // Should have compilation time assemblies
-            refsDirectory.Should().HaveFile("System.IO.dll");
-            // Libraries in which lib==ref should be deduped
-            refsDirectory.Should().NotHaveFile("TestLibrary.dll");
+            var buildOutputPath = Path.Combine(testAppDir.Path, "artifacts");
+            var appBuildCommand = new BuildCommand(GetProjectPath(testAppDir),
+                output: buildOutputPath,
+                framework: framework);
+            appBuildCommand.Execute().Should().Pass();
+
+            new DirectoryInfo(buildOutputPath)
+                .Should().HaveFile(appBuildCommand.GetOutputExecutableName() + ".config");
         }
 
+        //[Fact]
+        //public void RefsPublishTest()
+        //{
+        //    // create unique directories in the 'temp' folder
+        //    var root = Temp.CreateDirectory();
 
-        [Fact]
-        public void CompilationFailedTest()
-        {
-            var testDir = Temp.CreateDirectory();
+        //    var testAppDir = root.CreateDirectory("TestAppCompilationContext");
+        //    var testLibDir = root.CreateDirectory("TestLibrary");
 
-            var compileFailDir = Path.Combine(_testProjectsRoot, "CompileFail");
+        //    // copy projects to the temp dir
+        //    CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestAppCompilationContext"), testAppDir);
+        //    CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestLibrary"), testLibDir);
 
-            CopyProjectToTempDir(compileFailDir, testDir);
+        //    var testProject = GetProjectPath(testAppDir);
+        //    var publishCommand = new PublishCommand(testProject);
+        //    publishCommand.Execute().Should().Pass();
 
-            var testProject = GetProjectPath(testDir);
-            var publishCommand = new PublishCommand(testProject);
+        //    publishCommand.GetOutputDirectory().Should().HaveFile("TestAppCompilationContext.dll");
+        //    publishCommand.GetOutputDirectory().Should().HaveFile("TestLibrary.dll");
 
-            publishCommand.Execute().Should().Fail();
-        }
+        //    var refsDirectory = new DirectoryInfo(Path.Combine(publishCommand.GetOutputDirectory().FullName, "refs"));
+        //    // Should have compilation time assemblies
+        //    refsDirectory.Should().HaveFile("System.IO.dll");
+        //    // Libraries in which lib==ref should be deduped
+        //    refsDirectory.Should().NotHaveFile("TestLibrary.dll");
+        //}
 
-        [Fact]
-        [ActiveIssue(982)]
-        public void PublishScriptsRun()
-        {
-            // create unique directories in the 'temp' folder
-            var root = Temp.CreateDirectory();
 
-            var testAppDir = root.CreateDirectory("TestApp");
-            var testLibDir = root.CreateDirectory("TestLibrary");
+        //[Fact]
+        //public void CompilationFailedTest()
+        //{
+        //    var testDir = Temp.CreateDirectory();
 
-            //copy projects to the temp dir
-            CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestApp"), testAppDir);
-            CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestLibrary"), testLibDir);
+        //    var compileFailDir = Path.Combine(_testProjectsRoot, "CompileFail");
 
-            // run publish
-            var testProject = GetProjectPath(testAppDir);
-            var publishCommand = new PublishCommand(testProject);
+        //    CopyProjectToTempDir(compileFailDir, testDir);
 
-            var result = publishCommand.ExecuteWithCapturedOutput();
+        //    var testProject = GetProjectPath(testDir);
+        //    var publishCommand = new PublishCommand(testProject);
 
-            result.Should().StdOutMatchPattern("\nprepublish_output( \\?[^%]+\\?){5}.+\npostpublish_output( \\?[^%]+\\?){5}", RegexOptions.Singleline);
-            result.Should().Pass();
-        }
+        //    publishCommand.Execute().Should().Fail();
+        //}
+
+        //[Fact]
+        //[ActiveIssue(982)]
+        //public void PublishScriptsRun()
+        //{
+        //    // create unique directories in the 'temp' folder
+        //    var root = Temp.CreateDirectory();
+
+        //    var testAppDir = root.CreateDirectory("TestApp");
+        //    var testLibDir = root.CreateDirectory("TestLibrary");
+
+        //    //copy projects to the temp dir
+        //    CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestApp"), testAppDir);
+        //    CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestLibrary"), testLibDir);
+
+        //    // run publish
+        //    var testProject = GetProjectPath(testAppDir);
+        //    var publishCommand = new PublishCommand(testProject);
+
+        //    var result = publishCommand.ExecuteWithCapturedOutput();
+
+        //    result.Should().StdOutMatchPattern("\nprepublish_output( \\?[^%]+\\?){5}.+\npostpublish_output( \\?[^%]+\\?){5}", RegexOptions.Singleline);
+        //    result.Should().Pass();
+        //}
 
         private void CopyProjectToTempDir(string projectDir, TempDirectory tempDir)
         {
