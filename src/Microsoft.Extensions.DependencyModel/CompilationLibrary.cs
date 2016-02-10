@@ -30,51 +30,71 @@ namespace Microsoft.Extensions.DependencyModel
             var entryAssembly = _entryAssembly.Value;
 
             string basePath;
-            string fullName;
 
             var appBase = Path.GetDirectoryName(entryAssembly.Location);
             var refsDir = Path.Combine(appBase, "refs");
+
             var hasRefs = Directory.Exists(refsDir);
             var isProject = string.Equals(LibraryType, "project", StringComparison.OrdinalIgnoreCase);
-
+            // 1. Try searching for package in package cache for non-project references
+            if (!isProject && TryResolvePackageCache(out basePath))
+            {
+                return ResolveAssembliesFromPackagePath(basePath);
+            }
+            // 2. Try searching localy if refs folder availible
             if (hasRefs || isProject)
             {
-                foreach (var assembly in Assemblies)
+                var directories = new List<string>()
                 {
-                    var assemblyFile = Path.GetFileName(assembly);
-                    if (hasRefs && TryResolveAssemblyFile(refsDir, assemblyFile, out fullName))
-                    {
-                        yield return fullName;
-                    }
-                    else if (TryResolveAssemblyFile(appBase, assemblyFile, out fullName))
-                    {
-                        yield return fullName;
-                    }
-                    else
-                    {
-                        var errorMessage = $"Can not find assembly file {assemblyFile} at '{appBase}'";
-                        if (hasRefs)
-                        {
-                            errorMessage += $", '{refsDir}'";
-                        }
-                        throw new InvalidOperationException(errorMessage);
-                    }
+                    appBase
+                };
+
+                if (hasRefs)
+                {
+                    directories.Add(refsDir);
                 }
-                yield break;
+                return ResolveAssembliesFromDirectories(directories.ToArray());
             }
-            else if (TryResolvePackagePath(out basePath))
+            // 3. Try searching in package directory
+            if (TryResolvePackagePath(out basePath))
             {
-                foreach (var assembly in Assemblies)
-                {
-                    if (!TryResolveAssemblyFile(basePath, assembly, out fullName))
-                    {
-                        throw new InvalidOperationException($"Can not find assembly file at '{fullName}'");
-                    }
-                    yield return fullName;
-                }
-                yield break;
+                return ResolveAssembliesFromPackagePath(basePath);
             }
+
             throw new InvalidOperationException($"Can not find compilation library location for package '{PackageName}'");
+        }
+
+        private IEnumerable<string> ResolveAssembliesFromDirectories(string[] directories)
+        {
+            foreach (var assembly in Assemblies)
+            {
+                var assemblyFile = Path.GetFileName(assembly);
+                foreach (var directory in directories)
+                {
+                    string fullName;
+                    if (TryResolveAssemblyFile(directory, assemblyFile, out fullName))
+                    {
+                        yield return fullName;
+                        break;
+                    }
+
+                    var errorMessage = $"Can not find assembly file {assemblyFile} at '{string.Join(",", directories)}'";
+                    throw new InvalidOperationException(errorMessage);
+                }
+            }
+        }
+
+        private IEnumerable<string> ResolveAssembliesFromPackagePath(string basePath)
+        {
+            foreach (var assembly in Assemblies)
+            {
+                string fullName;
+                if (!TryResolveAssemblyFile(basePath, assembly, out fullName))
+                {
+                    throw new InvalidOperationException($"Can not find assembly file at '{fullName}'");
+                }
+                yield return fullName;
+            }
         }
 
         private bool TryResolveAssemblyFile(string basePath, string assemblyPath, out string fullName)
@@ -89,7 +109,19 @@ namespace Microsoft.Extensions.DependencyModel
 
         private bool TryResolvePackagePath(out string packagePath)
         {
-            packagePath = null;
+            packagePath = string.Empty;
+
+            if (!string.IsNullOrEmpty(_nugetPackages) &&
+                TryResolvePackagePath(_nugetPackages, out packagePath))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private bool TryResolvePackageCache(out string packagePath)
+        {
+            packagePath = string.Empty;
 
             if (!string.IsNullOrEmpty(_packageCache))
             {
@@ -111,11 +143,6 @@ namespace Microsoft.Extensions.DependencyModel
                         return true;
                     }
                 }
-            }
-            if (!string.IsNullOrEmpty(_nugetPackages) &&
-                TryResolvePackagePath(_nugetPackages, out packagePath))
-            {
-                return true;
             }
             return false;
         }
