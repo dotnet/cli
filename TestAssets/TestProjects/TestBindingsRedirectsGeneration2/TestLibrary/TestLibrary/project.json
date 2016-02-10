@@ -14,6 +14,6 @@
         }
 	},
     "packInclude": {
-        "lib/net461/": "../ReferencedLibrary/bin/Debug/net461/ReferencedLibrary.dll"
+        "lib/net461/": "../ReferencedLibrary/artifacts/ReferencedLibrary.dll"
     }
 }
