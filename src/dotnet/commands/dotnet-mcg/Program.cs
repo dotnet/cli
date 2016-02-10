@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Mcg
     public class McgCommand
     {        
         private readonly static string HostExecutableName = "corerun" + Constants.ExeSuffix;
-        private readonly static string McgBinaryName = "mcg.exe"; 
+        private readonly static string McgBinaryName = "Mcg.exe"; 
 
         private static string[] ParseResponseFile(string rspPath)
         {
