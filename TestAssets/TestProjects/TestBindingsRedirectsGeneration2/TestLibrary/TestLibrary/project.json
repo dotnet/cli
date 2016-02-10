@@ -1,0 +1,19 @@
+{
+    "version": "1.0.0",
+	"dependencies": {
+	    "ReferencedLibrary": { "type": "build", "target": "project" }
+	},
+    "compilationOptions": {
+        "keyFile": "../../key.snk"
+    },
+	"frameworks": {
+	    "net461": {
+            "frameworkAssemblies": {
+                "System.Runtime": ""
+            }
+        }
+	},
+    "packInclude": {
+        "lib/net461/": "../ReferencedLibrary/bin/Debug/net461/ReferencedLibrary.dll"
+    }
+}
