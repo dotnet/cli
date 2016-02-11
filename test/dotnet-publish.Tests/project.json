@@ -17,10 +17,7 @@
 
   "frameworks": {
     "dnxcore50": {
-      "imports": "portable-net45+win8",
-      "dependencies": {
-        "System.Diagnostics.Debug": "4.0.11-beta-23516"
-      }
+      "imports": "portable-net45+win8"
     }
   },
 
