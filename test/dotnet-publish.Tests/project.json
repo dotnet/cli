@@ -17,7 +17,10 @@
 
   "frameworks": {
     "dnxcore50": {
-      "imports": "portable-net45+win8"
+      "imports": "portable-net45+win8",
+      "dependencies": {
+        "System.Diagnostics.Debug": "4.0.11-beta-23516"
+      }
     }
   },
 
@@ -26,7 +29,6 @@
     "../../TestAssets/TestProjects/TestLibrary/**/*",
     "../../TestAssets/TestProjects/CompileFail/**/*",
     "../../TestAssets/TestProjects/TestBindingRedirectGeneration/**/*",
-    "../../TestAssets/TestProjects/TestBindingsRedirectsGeneration2/**/*",
     "../../TestAssets/TestProjects/TestAppCompilationContext/**/*",
     "../../TestAssets/TestProjects/TestAppWithContents/**/*"
   ],

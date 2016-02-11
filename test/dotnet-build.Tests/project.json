@@ -29,6 +29,7 @@
     "../../TestAssets/TestProjects/TestProjectWithResource/**/*",
     "../../TestAssets/TestProjects/TestLibraryWithAppDependency/**/*",
     "../../TestAssets/TestProjects/TestAppWithTransitiveAppDependency/**/*",
+    "../../TestAssets/TestProjects/TestBindingsRedirectsGeneration2/**/*",
     "../../TestAssets/TestProjects/global.json"
   ],
 
