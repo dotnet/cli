@@ -1,19 +1,21 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.DotNet.Cli.Utils;
-using Microsoft.DotNet.ProjectModel;
-using Microsoft.DotNet.ProjectModel.Compilation;
-using NuGet.Frameworks;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Files;
-using Microsoft.DotNet.Tools.Common;
+using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Utilities;
+using Microsoft.DotNet.Tools.Common;
+using Microsoft.Extensions.PlatformAbstractions;
+using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Publish
 {
@@ -26,6 +28,7 @@ namespace Microsoft.DotNet.Tools.Publish
         public string Framework { get; set; }
         public string Runtime { get; set; }
         public bool NativeSubdirectories { get; set; }
+        public bool Crossgen { get; set; }
         public NuGetFramework NugetFramework { get; set; }
         public IEnumerable<ProjectContext> ProjectContexts { get; set; }
 
@@ -85,7 +88,7 @@ namespace Microsoft.DotNet.Tools.Publish
             Reporter.Output.WriteLine($"Publishing {context.RootProject.Identity.Name.Yellow()} for {context.TargetFramework.DotNetFrameworkName.Yellow()}/{context.RuntimeIdentifier.Yellow()}");
 
             var options = context.ProjectFile.GetCompilerOptions(context.TargetFramework, configuration);
-            
+
             if (string.IsNullOrEmpty(outputPath))
             {
                 outputPath = context.GetOutputPaths(configuration, buildBasePath, outputPath).RuntimeOutputPath;
@@ -132,9 +135,13 @@ namespace Microsoft.DotNet.Tools.Publish
             // Use a library exporter to collect publish assets
             var exporter = context.CreateExporter(configuration);
 
+            var runtimeAssemblies = new List<string>();
+
             foreach (var export in exporter.GetAllExports())
             {
                 Reporter.Verbose.WriteLine($"Publishing {export.Library.Identity.ToString().Green().Bold()} ...");
+
+                runtimeAssemblies.AddRange(export.RuntimeAssemblies.Select(r => Path.GetFileName(r.ResolvedPath)));
 
                 PublishFiles(export.RuntimeAssemblies, outputPath, nativeSubdirectories: false);
                 PublishFiles(export.NativeLibraries, outputPath, nativeSubdirectories);
@@ -143,6 +150,25 @@ namespace Microsoft.DotNet.Tools.Publish
                 if (options.PreserveCompilationContext.GetValueOrDefault())
                 {
                     PublishRefs(export, outputPath);
+                }
+            }
+
+            if (Crossgen)
+            {
+                Reporter.Output.WriteLine($"Generating native images for {context.ProjectFile.Name.Bold()}...");
+
+                var results = runtimeAssemblies.AsParallel().Select(path =>
+                {
+                    var crossgenResult = Command.Create("crossgen", new[] { "-platform_assemblies_paths", outputPath, path }, FrameworkConstants.CommonFrameworks.DnxCore50)
+                        .WorkingDirectory(outputPath)
+                        .Execute();
+                    return crossgenResult.ExitCode == 0;
+                });
+
+                if (!results.All(r => r))
+                {
+                    Reporter.Error.WriteLine("Generating native images failed.");
+                    return false;
                 }
             }
 
@@ -227,7 +253,7 @@ namespace Microsoft.DotNet.Tools.Publish
                 {
                     Directory.CreateDirectory(destinationDirectory);
                 }
-                
+
                 File.Copy(file.ResolvedPath, Path.Combine(destinationDirectory, Path.GetFileName(file.ResolvedPath)), overwrite: true);
             }
         }
