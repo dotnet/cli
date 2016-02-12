@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli.Utils.CommandParsing;
 using Microsoft.DotNet.ProjectModel;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
     public static class ScriptExecutor
     {
-        public static Command CreateCommandForScript(Project project, string scriptCommandLine, IDictionary<string, string> variables)
+        public static ICommand CreateCommandForScript(Project project, string scriptCommandLine, IDictionary<string, string> variables)
         {
             return CreateCommandForScript(project, scriptCommandLine, WrapVariableDictionary(variables));
         }
 
-        public static Command CreateCommandForScript(Project project, string scriptCommandLine, Func<string, string> getVariable)
+        public static ICommand CreateCommandForScript(Project project, string scriptCommandLine, Func<string, string> getVariable)
         {
             // Preserve quotation marks around arguments since command is about to be passed to a shell. May need
             // the quotes to ensure the shell groups arguments correctly.
@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.Cli.Utils
 
             var useComSpec = false;
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (PlatformServices.Default.Runtime.OperatingSystemPlatform == Platform.Windows)
             {
                 // Only forward slashes are used in script blocks. Replace with backslashes to correctly
                 // locate the script. The directory separator is platform-specific.
@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.Cli.Utils
                 var comSpec = Environment.GetEnvironmentVariable("ComSpec");
                 if (!string.IsNullOrEmpty(comSpec))
                 {
-                    useComSpec=true;
+                    useComSpec = true;
 
                     scriptArguments = new string[] { comSpec }
                         .Concat(scriptArguments)
