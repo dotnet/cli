@@ -7,7 +7,7 @@
     "dependencies": {
     "System.Reflection.Metadata": "1.2.0-rc2-23811",
 
-        "NuGet.Packaging": "3.4.0-beta-583",
+        "NuGet.Packaging": "3.4.0-beta-618",
         "Microsoft.Extensions.FileSystemGlobbing": "1.0.0-rc2-15996",
         "Microsoft.Extensions.JsonParser.Sources": {
             "type": "build",
