@@ -29,6 +29,7 @@ namespace Microsoft.DotNet.Tools.Run
                     syntax.DefineOption("f|framework", ref runCmd.Framework, "Compile a specific framework");
                     syntax.DefineOption("c|configuration", ref runCmd.Configuration, "Configuration under which to build");
                     syntax.DefineOption("p|project", ref runCmd.Project, "The path to the project to run (defaults to the current directory). Can be a path to a project.json or a project directory");
+                    syntax.DefineOption("pf|pid-file", ref runCmd.PidFile, "A file that contains the process id of the executed application");
 
                     syntax.DefineOption("h|help", ref help, "Help for compile native.");
 

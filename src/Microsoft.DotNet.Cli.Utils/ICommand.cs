@@ -12,6 +12,8 @@ namespace Microsoft.DotNet.Cli.Utils
 
         ICommand WorkingDirectory(string projectDirectory);
 
+        ICommand PidFile(string file);
+
         ICommand EnvironmentVariable(string name, string value);
 
         ICommand CaptureStdOut();

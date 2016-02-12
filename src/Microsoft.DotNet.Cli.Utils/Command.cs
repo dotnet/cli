@@ -20,6 +20,8 @@ namespace Microsoft.DotNet.Cli.Utils
 
         private bool _running = false;
 
+        private string _pidFile;
+
         private Command(CommandSpec commandSpec)
         {
             var psi = new ProcessStartInfo
@@ -101,6 +103,11 @@ namespace Microsoft.DotNet.Cli.Utils
             _process.Start();
 
             Reporter.Verbose.WriteLine($"Process ID: {_process.Id}");
+            if (!string.IsNullOrEmpty(_pidFile))
+            {
+                Reporter.Verbose.WriteLine($"Process ID (PID) file: {_pidFile}");
+                File.WriteAllText(_pidFile, _process.Id.ToString());
+            }
 
             var threadOut = _stdOut.BeginRead(_process.StandardOutput);
             var threadErr = _stdErr.BeginRead(_process.StandardError);
@@ -133,6 +140,12 @@ namespace Microsoft.DotNet.Cli.Utils
         public ICommand WorkingDirectory(string projectDirectory)
         {
             _process.StartInfo.WorkingDirectory = projectDirectory;
+            return this;
+        }
+
+        public ICommand PidFile(string file)
+        {
+            _pidFile = file;
             return this;
         }
 
