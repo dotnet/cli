@@ -18,6 +18,7 @@ namespace Microsoft.DotNet.Tools.Run
         public string Framework = null;
         public string Configuration = null;
         public string Project = null;
+        public string PidFile = null;
         public IReadOnlyList<string> Args = null;
 
         ProjectContext _context;
@@ -150,6 +151,7 @@ namespace Microsoft.DotNet.Tools.Run
                 .ForwardStdOut()
                 .ForwardStdErr()
                 .EnvironmentVariable("DOTNET_HOME", dotnetHome)
+                .PidFile(PidFile)
                 .Execute()
                 .ExitCode;
 
