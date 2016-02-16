@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.CommandLine;
+using System.Linq;
 
 namespace Microsoft.DotNet.Tools.Compiler.Native
 {
@@ -15,7 +16,8 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
             BuildConfiguration? buildConfiguration = null;
             string mode = null;
             NativeIntermediateMode? nativeMode = null;
-            string ilcArgs = null;
+            IReadOnlyList<string> ilcArgs = Array.Empty<string>();
+            IEnumerable<string> unquotIlcArgs = Array.Empty<string>();
             string ilcPath = null;
             string ilcSdkPath = null;
             string appDepSdk = null;
@@ -27,7 +29,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
             bool enableInterop = false;
 
             IReadOnlyList<string> references = Array.Empty<string>();
-            IReadOnlyList<string> linklib = Array.Empty<string>();            
+            IReadOnlyList<string> linklib = Array.Empty<string>();
 
             try
             {
@@ -47,7 +49,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
                         "Use to specify Managed DLL references of the app.");
 
                     // Custom Extensibility Points to support CoreRT workflow TODO better descriptions
-                    syntax.DefineOption("ilcargs", ref ilcArgs, "Use to specify custom arguments for the IL Compiler.");
+                    syntax.DefineOptionList("ilcarg", ref ilcArgs, "Use to specify custom arguments for the IL Compiler.");
                     syntax.DefineOption("ilcpath", ref ilcPath, "Use to specify a custom build of IL Compiler.");
                     syntax.DefineOption("ilcsdkpath", ref ilcSdkPath, "Use to specify a custom build of IL Compiler SDK");
 
@@ -70,7 +72,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
                         "The managed input assembly to compile to native.");
 
                     helpText = syntax.GetHelpText();
-                    
+
                     if (string.IsNullOrWhiteSpace(inputAssembly))
                     {
                         syntax.ReportError("Input Assembly is a required parameter.");
@@ -102,6 +104,15 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
                             help = true;
                         }
                     }
+
+                    unquotIlcArgs = ilcArgs.Select(s =>
+                    {
+                        if (!s.StartsWith("\"") || !s.EndsWith("\""))
+                        {
+                            throw new ArgumentSyntaxException("--ilcarg must be specified in double quotes");
+                        }
+                        return s.Substring(1, s.Length - 2);
+                    });
                 });
             }
             catch (ArgumentSyntaxException exception)
@@ -133,7 +144,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
                 BuildConfiguration = buildConfiguration,
                 NativeMode = nativeMode,
                 ReferencePaths = references,
-                IlcArgs = ilcArgs,
+                IlcArgs = unquotIlcArgs,
                 IlcPath = ilcPath,
                 IlcSdkPath = ilcSdkPath,
                 LinkLibPaths = linklib,

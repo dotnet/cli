@@ -21,7 +21,6 @@ namespace Microsoft.DotNet.Tools.Restore
     {
         private static readonly string DefaultRid = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
 
-
         public static int Run(string[] args)
         {
             DebugHelper.HandleDebugSwitch(ref args);
@@ -173,14 +172,14 @@ namespace Microsoft.DotNet.Tools.Restore
                 Path.GetDirectoryName(toolDescription.Target.RuntimeAssemblies.First().Path),
                 toolDescription.Identity.Name + FileNameSuffixes.Deps);
 
-            var calculator = context.GetOutputPathCalculator(context.ProjectDirectory);
-            var executable = new Executable(context, calculator);
+            var calculator = context.GetOutputPaths(Constants.DefaultConfiguration, buidBasePath: null, outputPath: context.ProjectDirectory);
+            var executable = new Executable(context, calculator, context.CreateExporter(Constants.DefaultConfiguration));
 
-            executable.MakeCompilationOutputRunnable(Constants.DefaultConfiguration);
+            executable.MakeCompilationOutputRunnable();
 
             if (File.Exists(depsPath)) File.Delete(depsPath);
 
-            File.Move(Path.Combine(calculator.GetOutputDirectoryPath(Constants.DefaultConfiguration), "bin" + FileNameSuffixes.Deps), depsPath);
+            File.Move(Path.Combine(calculator.RuntimeOutputPath, "bin" + FileNameSuffixes.Deps), depsPath);
         }
 
         private static bool RestoreToolToPath(LibraryRange tooldep, IEnumerable<string> args, string tempPath, bool quiet)
@@ -204,7 +203,9 @@ namespace Microsoft.DotNet.Tools.Restore
             sb.AppendLine("    \"frameworks\": {");
             foreach (var framework in frameworks)
             {
-                sb.AppendLine($"        \"{framework}\": {{}}");
+                var importsStatement = "\"imports\": \"portable-net452+win81\"";
+                
+                sb.AppendLine($"        \"{framework}\": {{ {importsStatement} }}");
             }
             sb.AppendLine("    }");
             sb.AppendLine("}");

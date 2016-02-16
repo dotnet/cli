@@ -23,9 +23,9 @@ namespace Microsoft.DotNet.Tools.Build
         public static readonly string[] KnownCompilers = { "csc", "vbc", "fsc" };
 
         private readonly ProjectContext _rootProject;
+        private readonly ProjectDependenciesFacade _rootProjectDependencies;
         private readonly BuilderCommandApp _args;
         private readonly IncrementalPreconditions _preconditions;
-        private readonly ProjectDependenciesFacade _dependencies;
 
         public bool IsSafeForIncrementalCompilation => !_preconditions.PreconditionsDetected();
 
@@ -37,14 +37,8 @@ namespace Microsoft.DotNet.Tools.Build
             // and then reasoning which ones to get from args and which ones from fields.
             _args = (BuilderCommandApp)args.ShallowCopy();
 
-            // Set up Output Paths. They are unique per each CompileContext
-            var outputPathCalculator = _rootProject.GetOutputPathCalculator(_args.OutputValue);
-            _args.OutputValue = outputPathCalculator.BaseCompilationOutputPath;
-            _args.IntermediateValue =
-                outputPathCalculator.GetIntermediateOutputDirectoryPath(_args.ConfigValue, _args.IntermediateValue);
-
             // Set up dependencies
-            _dependencies = new ProjectDependenciesFacade(_rootProject, _args.ConfigValue);
+            _rootProjectDependencies = new ProjectDependenciesFacade(_rootProject, _args.ConfigValue);
 
             // gather preconditions
             _preconditions = GatherIncrementalPreconditions();
@@ -54,17 +48,36 @@ namespace Microsoft.DotNet.Tools.Build
         {
             CreateOutputDirectories();
 
-            // compile dependencies
-            foreach (var dependency in Sort(_dependencies.ProjectDependenciesWithSources))
-            {
-                if (incremental)
-                {
-                    var dependencyProjectContext = ProjectContext.Create(dependency.Path, dependency.Framework);
+            return CompileDendencies(incremental) && CompileRootProject(incremental);
+        }
 
-                    if (!DependencyNeedsRebuilding(dependencyProjectContext, new ProjectDependenciesFacade(dependencyProjectContext, _args.ConfigValue)))
-                    {
-                        continue;
-                    }
+        private bool CompileRootProject(bool incremental)
+        {
+            if (incremental && !NeedsRebuilding(_rootProject, _rootProjectDependencies))
+            {
+                // todo: what if the previous build had errors / warnings and nothing changed? Need to propagate them in case of incremental
+                return true;
+            }
+
+            var success = InvokeCompileOnRootProject();
+
+            PrintSummary(success);
+
+            return success;
+        }
+
+        private bool CompileDendencies(bool incremental)
+        {
+            if (_args.ShouldSkipDependencies)
+            {
+                return true;
+            }
+
+            foreach (var dependency in Sort(_rootProjectDependencies.ProjectDependenciesWithSources))
+            {
+                if (incremental && !DependencyNeedsRebuilding(dependency))
+                {
+                    continue;
                 }
 
                 if (!InvokeCompileOnDependency(dependency))
@@ -73,33 +86,18 @@ namespace Microsoft.DotNet.Tools.Build
                 }
             }
 
-            if (incremental && !NeedsRebuilding(_rootProject, _dependencies))
-            {
-                // todo: what if the previous build had errors / warnings and nothing changed? Need to propagate them in case of incremental
-                return true;
-            }
-
-            // compile project
-            var success = InvokeCompileOnRootProject();
-
-            PrintSummary(success);
-
-            return success;
+            return true;
         }
 
-        private bool DependencyNeedsRebuilding(ProjectContext project, ProjectDependenciesFacade dependencies)
+        private bool DependencyNeedsRebuilding(ProjectDescription dependency)
         {
-            return NeedsRebuilding(project, dependencies, buildOutputPath: null, intermediateOutputPath: null);
+            var dependencyProjectContext = ProjectContext.Create(dependency.Path, dependency.Framework, new[] { _rootProject.RuntimeIdentifier });
+            return NeedsRebuilding(dependencyProjectContext, new ProjectDependenciesFacade(dependencyProjectContext, _args.ConfigValue));
         }
 
         private bool NeedsRebuilding(ProjectContext project, ProjectDependenciesFacade dependencies)
         {
-            return NeedsRebuilding(project, dependencies, _args.OutputValue, _args.IntermediateValue);
-        }
-
-        private bool NeedsRebuilding(ProjectContext project, ProjectDependenciesFacade dependencies, string buildOutputPath, string intermediateOutputPath)
-        {
-            var compilerIO = GetCompileIO(project, _args.ConfigValue, buildOutputPath, intermediateOutputPath, dependencies);
+            var compilerIO = GetCompileIO(project, _args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue, dependencies, project == _rootProject);
 
             // rebuild if empty inputs / outputs
             if (!(compilerIO.Outputs.Any() && compilerIO.Inputs.Any()))
@@ -130,7 +128,7 @@ namespace Microsoft.DotNet.Tools.Build
             }
 
             // find inputs that are older than the earliest output
-            var newInputs = compilerIO.Inputs.FindAll(p => File.GetLastWriteTimeUtc(p) > minDateUtc);
+            var newInputs = compilerIO.Inputs.FindAll(p => File.GetLastWriteTimeUtc(p) >= minDateUtc);
 
             if (!newInputs.Any())
             {
@@ -191,15 +189,21 @@ namespace Microsoft.DotNet.Tools.Build
 
         private void CreateOutputDirectories()
         {
-            Directory.CreateDirectory(_args.OutputValue);
-            Directory.CreateDirectory(_args.IntermediateValue);
+            if (!string.IsNullOrEmpty(_args.OutputValue))
+            {
+                Directory.CreateDirectory(_args.OutputValue);
+            }
+            if (!string.IsNullOrEmpty(_args.BuildBasePathValue))
+            {
+                Directory.CreateDirectory(_args.BuildBasePathValue);
+            }
         }
 
         private IncrementalPreconditions GatherIncrementalPreconditions()
         {
-            var preconditions = new IncrementalPreconditions(_args.BuildProfileValue);
+            var preconditions = new IncrementalPreconditions(_args.ShouldPrintIncrementalPreconditions);
 
-            if (_args.ForceUnsafeValue)
+            if (_args.ShouldNotUseIncrementality)
             {
                 preconditions.AddForceUnsafePrecondition();
             }
@@ -219,11 +223,16 @@ namespace Microsoft.DotNet.Tools.Build
         // check the entire project tree that needs to be compiled, duplicated for each framework
         private List<ProjectContext> GetProjectsToCheck()
         {
+            if (_args.ShouldSkipDependencies)
+            {
+                return new List<ProjectContext>(1) { _rootProject };
+            }
+
             // include initial root project
-            var contextsToCheck = new List<ProjectContext>(1 + _dependencies.ProjectDependenciesWithSources.Count) { _rootProject };
+            var contextsToCheck = new List<ProjectContext>(1 + _rootProjectDependencies.ProjectDependenciesWithSources.Count) { _rootProject };
 
             // convert ProjectDescription to ProjectContext
-            var dependencyContexts = _dependencies.ProjectDependenciesWithSources.Select
+            var dependencyContexts = _rootProjectDependencies.ProjectDependenciesWithSources.Select
                 (keyValuePair => ProjectContext.Create(keyValuePair.Value.Path, keyValuePair.Value.Framework));
 
             contextsToCheck.AddRange(dependencyContexts);
@@ -280,13 +289,16 @@ namespace Microsoft.DotNet.Tools.Build
             args.Add("--configuration");
             args.Add(_args.ConfigValue);
             args.Add(projectDependency.Project.ProjectDirectory);
-            
-            var compileResult = Command.CreateDotNet("compile", args)
-                .ForwardStdOut()
-                .ForwardStdErr()
-                .Execute();
 
-            return compileResult.ExitCode == 0;
+            if (!string.IsNullOrWhiteSpace(_args.BuildBasePathValue))
+            {
+                args.Add("--build-base-path");
+                args.Add(_args.BuildBasePathValue);
+            }
+
+            var compileResult = CommpileCommand.Run(args.ToArray());
+
+            return compileResult == 0;
         }
 
         private bool InvokeCompileOnRootProject()
@@ -297,10 +309,18 @@ namespace Microsoft.DotNet.Tools.Build
             args.Add(_rootProject.TargetFramework.ToString());            
             args.Add("--configuration");
             args.Add(_args.ConfigValue);
-            args.Add("--output");
-            args.Add(_args.OutputValue);
-            args.Add("--temp-output");
-            args.Add(_args.IntermediateValue);
+
+            if (!string.IsNullOrEmpty(_args.OutputValue))
+            {
+                args.Add("--output");
+                args.Add(_args.OutputValue);
+            }
+
+            if (!string.IsNullOrEmpty(_args.BuildBasePathValue))
+            {
+                args.Add("--build-base-path");
+                args.Add(_args.BuildBasePathValue);
+            }
 
             //native args
             if (_args.IsNativeValue)
@@ -319,10 +339,10 @@ namespace Microsoft.DotNet.Tools.Build
                 args.Add(_args.ArchValue);
             }
 
-            if (!string.IsNullOrWhiteSpace(_args.IlcArgsValue))
+            foreach (var ilcArg in _args.IlcArgsValue)
             {
-                args.Add("--ilcargs");
-                args.Add(_args.IlcArgsValue);
+                args.Add("--ilcarg");
+                args.Add(ilcArg);
             }
 
             if (!string.IsNullOrWhiteSpace(_args.IlcPathValue))
@@ -339,45 +359,77 @@ namespace Microsoft.DotNet.Tools.Build
 
             args.Add(_rootProject.ProjectDirectory);
 
-            var compileResult = Command.CreateDotNet("compile", args)
-                .ForwardStdOut()
-                .ForwardStdErr()
-                .Execute();
+            var compileResult = CommpileCommand.Run(args.ToArray());
 
-            var succeeded = compileResult.ExitCode == 0;
+            var succeeded = compileResult == 0;
 
             if (succeeded)
             {
-                MakeRunnableIfNecessary();
-            }            
-            
-            return succeeded;
-        }
-
-        private void MakeRunnableIfNecessary()
-        {
-            var compilationOptions = CompilerUtil.ResolveCompilationOptions(_rootProject, _args.ConfigValue);
-
-            // TODO: Make this opt in via another mechanism
-            var makeRunnable = compilationOptions.EmitEntryPoint.GetValueOrDefault() ||
-                               _rootProject.IsTestProject();
-
-            if (makeRunnable)
-            {
-                var outputPathCalculator = _rootProject.GetOutputPathCalculator(_args.OutputValue);
-                var rids = new List<string>();
-                if (string.IsNullOrEmpty(_args.RuntimeValue))
+                if (_rootProject.ProjectFile.HasRuntimeOutput(_args.ConfigValue))
                 {
-                    rids.AddRange(PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
+                    MakeRunnable();
                 }
                 else
                 {
-                    rids.Add(_args.RuntimeValue);
+                    CopyCompilationOutput();
                 }
+            }
 
-                var runtimeContext = ProjectContext.Create(_rootProject.ProjectDirectory, _rootProject.TargetFramework, rids);
-                var executable = new Executable(runtimeContext, outputPathCalculator);
-                executable.MakeCompilationOutputRunnable(_args.ConfigValue);
+            return succeeded;
+        }
+
+        private void CopyCompilationOutput()
+        {
+            if (!string.IsNullOrEmpty(_args.OutputValue))
+            {
+                var calculator = _rootProject.GetOutputPaths(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
+                var dest = calculator.RuntimeOutputPath;
+                var source = calculator.CompilationOutputPath;
+                foreach (var file in calculator.CompilationFiles.All())
+                {
+                    var destFileName = file.Replace(source, dest);
+                    var directoryName = Path.GetDirectoryName(destFileName);
+                    if (!Directory.Exists(directoryName))
+                    {
+                        Directory.CreateDirectory(directoryName);
+                    }
+                    File.Copy(file, destFileName, true);
+                }
+            }
+        }
+
+        private void MakeRunnable()
+        {
+            var outputPaths = _rootProject.GetOutputPaths(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
+            var libraryExporter = _rootProject.CreateExporter(_args.ConfigValue, _args.BuildBasePathValue);
+            var executable = new Executable(_rootProject, outputPaths, libraryExporter);
+            executable.MakeCompilationOutputRunnable();
+            
+            PatchMscorlibNextToCoreClr(_rootProject, _args.ConfigValue);
+        }
+
+        // Workaround: CoreCLR packaging doesn't include side by side mscorlib, so copy it at build
+        // time. See: https://github.com/dotnet/cli/issues/1374
+        private static void PatchMscorlibNextToCoreClr(ProjectContext context, string config)
+        {
+            {
+                foreach (var exp in context.CreateExporter(config).GetAllExports())
+                {
+                    var coreclrLib = exp.NativeLibraries.FirstOrDefault(nLib =>
+                            string.Equals(Constants.LibCoreClrFileName, nLib.Name));
+                    if (string.IsNullOrEmpty(coreclrLib.ResolvedPath))
+                    {
+                        continue;
+                    }
+                    var coreclrDir = Path.GetDirectoryName(coreclrLib.ResolvedPath);
+                    if (File.Exists(Path.Combine(coreclrDir, "mscorlib.dll")) ||
+                        File.Exists(Path.Combine(coreclrDir, "mscorlib.ni.dll")))
+                    {
+                        continue;
+                    }
+                    var mscorlibFile = exp.RuntimeAssemblies.FirstOrDefault(r => r.Name.Equals("mscorlib") || r.Name.Equals("mscorlib.ni")).ResolvedPath;
+                    File.Copy(mscorlibFile, Path.Combine(coreclrDir, Path.GetFileName(mscorlibFile)), overwrite: true);
+                }
             }
         }
 
@@ -423,18 +475,11 @@ namespace Microsoft.DotNet.Tools.Build
         // computes all the inputs and outputs that would be used in the compilation of a project
         // ensures that all paths are files
         // ensures no missing inputs
-        public static CompilerIO GetCompileIO(
-            ProjectContext project,
-            string buildConfiguration,
-            string outputPath,
-            string intermediaryOutputPath,
-            ProjectDependenciesFacade dependencies)
+        public static CompilerIO GetCompileIO(ProjectContext project, string buildConfiguration, string buildBasePath, string outputPath, ProjectDependenciesFacade dependencies, bool isRootProject)
         {
             var compilerIO = new CompilerIO(new List<string>(), new List<string>());
-            var calculator = project.GetOutputPathCalculator(outputPath);
-            var binariesOutputPath = calculator.GetOutputDirectoryPath(buildConfiguration);
-            intermediaryOutputPath = calculator.GetIntermediateOutputDirectoryPath(buildConfiguration, intermediaryOutputPath);
-
+            var calculator = project.GetOutputPaths(buildConfiguration, buildBasePath, outputPath);
+            var binariesOutputPath = calculator.CompilationOutputPath;
 
             // input: project.json
             compilerIO.Inputs.Add(project.ProjectFile.ProjectFilePath);
@@ -449,20 +494,25 @@ namespace Microsoft.DotNet.Tools.Build
             // input: dependencies
             AddDependencies(dependencies, compilerIO);
 
+            var allOutputPath = new List<string>(calculator.CompilationFiles.All());
+            if (isRootProject && project.ProjectFile.HasRuntimeOutput(buildConfiguration))
+            {
+                allOutputPath.AddRange(calculator.RuntimeFiles.All());
+            }
             // output: compiler outputs
-            foreach (var path in calculator.GetBuildOutputs(buildConfiguration))
+            foreach (var path in allOutputPath)
             {
                 compilerIO.Outputs.Add(path);
             }
-            
+
             // input compilation options files
             AddCompilationOptions(project, buildConfiguration, compilerIO);
 
-            // input / output: resources without culture
-            AddCultureResources(project, intermediaryOutputPath, compilerIO);
-
             // input / output: resources with culture
-            AddNonCultureResources(project, binariesOutputPath, compilerIO);
+            AddNonCultureResources(project, calculator.IntermediateOutputDirectoryPath, compilerIO);
+
+            // input / output: resources without culture
+            AddCultureResources(project, binariesOutputPath, compilerIO);
 
             return compilerIO;
         }

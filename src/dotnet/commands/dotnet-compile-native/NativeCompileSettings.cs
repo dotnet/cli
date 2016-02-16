@@ -19,8 +19,8 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
         private string _outputDirectory;
         private string _intermediateDirectory;
         private string _logPath;
-        private string _ilcArgs;
-        private readonly List<string> _referencePaths;
+        private IEnumerable<string> _ilcArgs;
+        private readonly Dictionary<string, string> _referencePaths;
         private readonly List<string> _linkLibPaths;
         private string _cppCompilerFlags;
 
@@ -82,12 +82,12 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
         {
             get
             {
-                return _referencePaths;
+                return _referencePaths.Values;
             }            
         }
 
         // Optional Customization Points (Can be null)
-        public string IlcArgs
+        public IEnumerable<string> IlcArgs
         {
             get { return _ilcArgs; }
             set { _ilcArgs = value; }
@@ -169,8 +169,11 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
             BuildType = DefaultBuiltType;
             NativeMode = DefaultNativeModel;
             AppDepSDKPath = Path.Combine(AppContext.BaseDirectory, "appdepsdk");            
-
-            _referencePaths = new List<string>(Directory.EnumerateFiles(AppDepSDKPath, "*.dll"));
+            _referencePaths = new Dictionary<string, string>();
+            foreach (var file in Directory.EnumerateFiles(AppDepSDKPath, "*.dll"))
+            {
+                _referencePaths.Add(Path.GetFileName(file), file);
+            }
         }
 
         public static NativeCompileSettings Default
@@ -199,7 +202,12 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
 
         public void AddReference(string reference)
         {
-            _referencePaths.Add(Path.GetFullPath(reference));
+            var path = Path.GetFullPath(reference);
+            var simpleName = Path.GetFileName(path);
+            if (!_referencePaths.ContainsKey(simpleName))
+            {
+                _referencePaths.Add(simpleName, path);
+            }
         }
 
         public void AddLinkLibPath(string linkLibPath)

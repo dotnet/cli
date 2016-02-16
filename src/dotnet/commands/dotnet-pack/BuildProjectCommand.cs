@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.Tools.Pack
         private readonly Project _project;
         private readonly ArtifactPathsCalculator _artifactPathsCalculator;
 
-        private readonly string _intermediateOutputPath;
+        private readonly string _buildBasePath;
         private readonly string _configuration;
 
         private bool SkipBuild => _artifactPathsCalculator.CompiledArtifactsPathSet;
@@ -22,12 +22,12 @@ namespace Microsoft.DotNet.Tools.Pack
         public BuildProjectCommand(
             Project project, 
             ArtifactPathsCalculator artifactPathsCalculator, 
-            string intermediateOutputPath, 
+            string buildBasePath, 
             string configuration)
         {
             _project = project;
             _artifactPathsCalculator = artifactPathsCalculator;
-            _intermediateOutputPath = intermediateOutputPath;
+            _buildBasePath = buildBasePath;
             _configuration = configuration;
         }
 
@@ -44,26 +44,17 @@ namespace Microsoft.DotNet.Tools.Pack
                 argsBuilder.Add("--configuration");
                 argsBuilder.Add($"{_configuration}");
 
-                if (_artifactPathsCalculator.PackageOutputPathSet)
+                if (!string.IsNullOrEmpty(_buildBasePath))
                 {
-                    argsBuilder.Add("--output");
-                    argsBuilder.Add($"{_artifactPathsCalculator.PackageOutputPathParameter}");
-                }
-
-                if (!string.IsNullOrEmpty(_intermediateOutputPath))
-                {
-                    argsBuilder.Add("--temp-output");
-                    argsBuilder.Add($"{_intermediateOutputPath}");
+                    argsBuilder.Add("--build-base-path");
+                    argsBuilder.Add($"{_buildBasePath}");
                 }
 
                 argsBuilder.Add($"{_project.ProjectFilePath}");
 
-                var result = Command.CreateDotNet("build", argsBuilder)
-                       .ForwardStdOut()
-                       .ForwardStdErr()
-                       .Execute();
+                var result = Build.BuildCommand.Run(argsBuilder.ToArray());
 
-                return result.ExitCode;
+                return result;
             }
 
             return 0;

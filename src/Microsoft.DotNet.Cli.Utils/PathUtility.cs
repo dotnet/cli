@@ -3,7 +3,7 @@
 
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Microsoft.DotNet.Tools.Common
 {
@@ -70,13 +70,22 @@ namespace Microsoft.DotNet.Tools.Common
         /// </summary>
         public static string GetRelativePath(string path1, string path2)
         {
-            return GetRelativePath(path1, path2, Path.DirectorySeparatorChar);
+            return GetRelativePath(path1, path2, Path.DirectorySeparatorChar, true);
+        }
+
+        /// <summary>
+        /// Returns path2 relative to path1, with Path.DirectorySeparatorChar as separator but ignoring directory 
+        /// traversals.
+        /// </summary>
+        public static string GetRelativePathIgnoringDirectoryTraversals(string path1, string path2)
+        {
+            return GetRelativePath(path1, path2, Path.DirectorySeparatorChar, false);
         }
 
         /// <summary>
         /// Returns path2 relative to path1, with given path separator
         /// </summary>
-        public static string GetRelativePath(string path1, string path2, char separator)
+        public static string GetRelativePath(string path1, string path2, char separator, bool includeDirectoryTraversals)
         {
             if (string.IsNullOrEmpty(path1))
             {
@@ -89,7 +98,7 @@ namespace Microsoft.DotNet.Tools.Common
             }
 
             StringComparison compare;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (PlatformServices.Default.Runtime.OperatingSystemPlatform == Platform.Windows)
             {
                 compare = StringComparison.OrdinalIgnoreCase;
                 // check if paths are on the same volume
@@ -138,10 +147,14 @@ namespace Microsoft.DotNet.Tools.Common
                 return path;
             }
 
-            for (var i = index; len1 > i; ++i)
+            if (includeDirectoryTraversals)
             {
-                path += ".." + separator;
+                for (var i = index; len1 > i; ++i)
+                {
+                    path += ".." + separator;
+                }
             }
+
             for (var i = index; len2 - 1 > i; ++i)
             {
                 path += path2Segments[i] + separator;
@@ -203,7 +216,7 @@ namespace Microsoft.DotNet.Tools.Common
         {
             var comparison = StringComparison.Ordinal;
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (PlatformServices.Default.Runtime.OperatingSystemPlatform == Platform.Windows)
             {
                 comparison = StringComparison.OrdinalIgnoreCase;
             }

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
+using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Run
@@ -16,7 +17,6 @@ namespace Microsoft.DotNet.Tools.Run
     {
         public string Framework = null;
         public string Configuration = null;
-        public bool PreserveTemporary = false;
         public string Project = null;
         public IReadOnlyList<string> Args = null;
 
@@ -60,15 +60,27 @@ namespace Microsoft.DotNet.Tools.Run
                 Configuration = Constants.DefaultConfiguration;
             }
 
-            var contexts = ProjectContext.CreateContextForEachFramework(Project);
+            var rids = PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers();
             if (Framework == null)
             {
-                _context = contexts.First();
+                var defaultFrameworks = new[]
+                {
+                    FrameworkConstants.FrameworkIdentifiers.DnxCore,
+                    FrameworkConstants.FrameworkIdentifiers.NetStandardApp,
+                };
+
+                var contexts = ProjectContext.CreateContextForEachFramework(Project, null, rids);
+                _context = contexts.FirstOrDefault(c =>
+                    defaultFrameworks.Contains(c.TargetFramework.Framework) && !string.IsNullOrEmpty(c.RuntimeIdentifier));
+
+                if (_context == null)
+                {
+                    throw new InvalidOperationException($"Couldn't find default target with framework: {string.Join(",", defaultFrameworks)}");
+                }
             }
             else
             {
-                var fx = NuGetFramework.Parse(Framework);
-                _context = contexts.FirstOrDefault(c => c.TargetFramework.Equals(fx));
+                _context = ProjectContext.Create(Project, NuGetFramework.Parse(Framework), rids);
             }
 
             if (Args == null)
@@ -85,34 +97,23 @@ namespace Microsoft.DotNet.Tools.Run
         {
             CalculateDefaultsForNonAssigned();
 
-            // Create a temporary directory under the project root
-            // REVIEW: MAX_PATH?
-            var tempDir = Path.Combine(_context.ProjectDirectory, "bin", ".dotnetrun", Guid.NewGuid().ToString("N"));
-
             // Compile to that directory
-            var result = Command.CreateDotNet($"build", new []
-                {
-                    $"--output",
-                    $"{tempDir}",
-                    $"--temp-output",
-                    $"{tempDir}",
-                    $"--framework",
-                    $"{_context.TargetFramework}",
-                    $"--configuration",
-                    $"{Configuration}",
-                    $"{_context.ProjectFile.ProjectDirectory}"
-                })
-                .ForwardStdOut(onlyIfVerbose: true)
-                .ForwardStdErr()
-                .Execute();
-
-            if (result.ExitCode != 0)
+            var result = Build.BuildCommand.Run(new[]
             {
-                return result.ExitCode;
+                $"--framework",
+                $"{_context.TargetFramework}",
+                $"--configuration",
+                Configuration,
+                $"{_context.ProjectFile.ProjectDirectory}"
+            });
+
+            if (result != 0)
+            {
+                return result;
             }
 
             // Now launch the output and give it the results
-            var outputName = _context.GetOutputPathCalculator(tempDir).GetExecutablePath(Configuration);
+            var outputName = _context.GetOutputPaths(Configuration).RuntimeFiles.Executable;
 
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -133,30 +134,26 @@ namespace Microsoft.DotNet.Tools.Run
             }
 
             // Locate the runtime
-            string runtime = Environment.GetEnvironmentVariable("DOTNET_HOME");
-            if (string.IsNullOrEmpty(runtime))
+            string dotnetHome = Environment.GetEnvironmentVariable("DOTNET_HOME");
+            if (string.IsNullOrEmpty(dotnetHome))
             {
                 // Use the runtime deployed with the tools, if present
-                var candidate = Path.Combine(AppContext.BaseDirectory, "..", "runtime");
+                var candidateBase = Path.Combine(AppContext.BaseDirectory, "..");
+                var candidate = Path.Combine(candidateBase, "runtime/coreclr");
                 if (File.Exists(Path.Combine(candidate, Constants.LibCoreClrName)))
                 {
-                    runtime = Path.GetFullPath(candidate);
+                    dotnetHome = Path.GetFullPath(candidateBase);
                 }
             }
 
             result = Command.Create(outputName, _args)
                 .ForwardStdOut()
                 .ForwardStdErr()
-                .EnvironmentVariable("DOTNET_HOME", runtime)
-                .Execute();
+                .EnvironmentVariable("DOTNET_HOME", dotnetHome)
+                .Execute()
+                .ExitCode;
 
-            // Clean up
-            if (!PreserveTemporary)
-            {
-                Directory.Delete(tempDir, recursive: true);
-            }
-
-            return result.ExitCode;
+            return result;
         }
 
         private static int RunInteractive(string scriptName)

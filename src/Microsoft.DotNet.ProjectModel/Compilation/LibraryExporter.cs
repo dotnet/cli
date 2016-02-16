@@ -16,9 +16,17 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
     public class LibraryExporter
     {
         private readonly string _configuration;
+        private readonly string _runtime;
         private readonly ProjectDescription _rootProject;
+        private readonly string _buildBasePath;
+        private readonly string _solutionRootPath;
 
-        public LibraryExporter(ProjectDescription rootProject, LibraryManager manager, string configuration)
+        public LibraryExporter(ProjectDescription rootProject,
+            LibraryManager manager,
+            string configuration,
+            string runtime,
+            string buildBasePath,
+            string solutionRootPath)
         {
             if (string.IsNullOrEmpty(configuration))
             {
@@ -27,6 +35,9 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
 
             LibraryManager = manager;
             _configuration = configuration;
+            _runtime = runtime;
+            _buildBasePath = buildBasePath;
+            _solutionRootPath = solutionRootPath;
             _rootProject = rootProject;
         }
 
@@ -111,12 +122,24 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         }
 
         /// <summary>
-        /// Create a LibraryExport from LibraryDescription. 
-        /// 
+        /// Create a LibraryExport from LibraryDescription.
+        ///
         /// When the library is not resolved the LibraryExport is created nevertheless.
         /// </summary>
         private LibraryExport GetExport(LibraryDescription library)
         {
+            if (!library.Resolved)
+            {
+                // For a unresolved project reference returns a export with empty asset.
+                return new LibraryExport(library: library,
+                                         compileAssemblies: Enumerable.Empty<LibraryAsset>(),
+                                         sourceReferences: Enumerable.Empty<string>(),
+                                         nativeLibraries: Enumerable.Empty<LibraryAsset>(),
+                                         runtimeAssets: Enumerable.Empty<LibraryAsset>(),
+                                         runtimeAssemblies: EmptyArray<LibraryAsset>.Value,
+                                         analyzers: EmptyArray<AnalyzerReference>.Value);
+            }
+
             if (Equals(LibraryType.Package, library.Identity.Type))
             {
                 return ExportPackage((PackageDescription)library);
@@ -151,25 +174,13 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             var analyzers = GetAnalyzerReferences(package);
 
             return new LibraryExport(package, compileAssemblies,
-                sourceReferences, runtimeAssemblies, Array.Empty<string>(), nativeLibraries, analyzers);
+                sourceReferences, runtimeAssemblies, EmptyArray<LibraryAsset>.Value, nativeLibraries, analyzers);
         }
 
         private LibraryExport ExportProject(ProjectDescription project)
         {
-            if (!project.Resolved)
-            {
-                // For a unresolved project reference returns a export with empty asset.
-                return new LibraryExport(library: project,
-                                         compileAssemblies: Enumerable.Empty<LibraryAsset>(),
-                                         sourceReferences: Enumerable.Empty<string>(),
-                                         nativeLibraries: Enumerable.Empty<LibraryAsset>(),
-                                         runtimeAssets: Enumerable.Empty<string>(),
-                                         runtimeAssemblies: Array.Empty<LibraryAsset>(),
-                                         analyzers: Array.Empty<AnalyzerReference>());
-            }
-
             var compileAssemblies = new List<LibraryAsset>();
-            var runtimeAssets = new List<string>();
+            var runtimeAssets = new List<LibraryAsset>();
             var sourceReferences = new List<string>();
 
             if (!string.IsNullOrEmpty(project.TargetFrameworkInfo?.AssemblyPath))
@@ -184,22 +195,24 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                     Path.GetFullPath(Path.Combine(project.Project.ProjectDirectory, assemblyPath)));
 
                 compileAssemblies.Add(compileAsset);
-                runtimeAssets.Add(pdbPath);
+                runtimeAssets.Add(new LibraryAsset(Path.GetFileName(pdbPath), Path.GetFileName(pdbPath), pdbPath));
             }
             else if (project.Project.Files.SourceFiles.Any())
             {
-                var outputCalculator = project.GetOutputPathCalculator();
-                var assemblyPath = outputCalculator.GetAssemblyPath(_configuration);
+                var outputPaths = project.GetOutputPaths(_buildBasePath, _solutionRootPath, _configuration, _runtime);
+                var files = outputPaths.CompilationFiles;
+
+                var assemblyPath = files.Assembly;
                 compileAssemblies.Add(new LibraryAsset(project.Identity.Name, null, assemblyPath));
 
-                foreach (var path in outputCalculator.GetBuildOutputs(_configuration))
+                foreach (var path in files.All())
                 {
                     if (string.Equals(assemblyPath, path))
                     {
                         continue;
                     }
 
-                    runtimeAssets.Add(path);
+                    runtimeAssets.Add(new LibraryAsset(Path.GetFileName(path), path.Replace(files.BasePath, string.Empty), path));
                 }
             }
 
@@ -213,7 +226,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             // just the same as compileAssemblies and nativeLibraries are empty
             // Also no support for analyzer projects
             return new LibraryExport(project, compileAssemblies, sourceReferences,
-                compileAssemblies, runtimeAssets, Array.Empty<LibraryAsset>(), Array.Empty<AnalyzerReference>());
+                compileAssemblies, runtimeAssets, EmptyArray<LibraryAsset>.Value, EmptyArray<AnalyzerReference>.Value);
         }
 
         private static string ResolvePath(Project project, string configuration, string path)
@@ -237,13 +250,13 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             return new LibraryExport(
                 library,
                 string.IsNullOrEmpty(library.Path) ?
-                    Array.Empty<LibraryAsset>() :
+                    EmptyArray<LibraryAsset>.Value :
                     new[] { new LibraryAsset(library.Identity.Name, library.Path, library.Path) },
-                Array.Empty<string>(),
-                Array.Empty<LibraryAsset>(),
-                Array.Empty<string>(),
-                Array.Empty<LibraryAsset>(),
-                Array.Empty<AnalyzerReference>());
+                EmptyArray<string>.Value,
+                EmptyArray<LibraryAsset>.Value,
+                EmptyArray<LibraryAsset>.Value,
+                EmptyArray<LibraryAsset>.Value,
+                EmptyArray<AnalyzerReference>.Value);
         }
 
         private IEnumerable<string> GetSharedSources(PackageDescription package)
