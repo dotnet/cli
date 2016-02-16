@@ -108,7 +108,7 @@ function UploadBinaries($zipFile)
     }
 
     # update the version file
-    $versionFile = Convert-Path $PSScriptRoot\..\..\artifacts\win7-x64\stage2\.version
+    $versionFile = Convert-Path $PSScriptRoot\..\..\artifacts\$env:RID\stage2\.version
     $versionBlob = "$env:CHANNEL/dnvm/latest.win.version"
 
     if(-Not (UploadFile $versionBlob $versionFile))
@@ -142,7 +142,7 @@ function UploadInstallers($installerFile)
 
 function UploadVersionBadge($badgeFile)
 {
-    $fileName = "windows_$Configuration_$([System.IO.Path]::GetFileName($badgeFile))"
+    $fileName = "windows_$($Configuration)_$([System.IO.Path]::GetFileName($badgeFile))"
     
     Write-Host "Uploading the version badge to Latest"
     UploadFile "$env:CHANNEL/Binaries/Latest/$fileName" $badgeFile
