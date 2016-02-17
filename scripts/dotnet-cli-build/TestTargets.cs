@@ -22,11 +22,13 @@ namespace Microsoft.DotNet.Cli.Build
         public static readonly string[] TestProjects = new[]
         {
             "EndToEnd",
+            "dotnet.Tests",
             "dotnet-publish.Tests",
             "dotnet-compile.Tests",
             "dotnet-compile.UnitTests",
             "dotnet-build.Tests",
             "dotnet-pack.Tests",
+            "dotnet-resgen.Tests",
             "Microsoft.DotNet.Cli.Utils.Tests",
             "Microsoft.DotNet.Compiler.Common.Tests",
             "Microsoft.Extensions.DependencyModel.Tests",
@@ -36,11 +38,17 @@ namespace Microsoft.DotNet.Cli.Build
         [Target(nameof(PrepareTargets.Init), nameof(SetupTests), nameof(RestoreTests), nameof(BuildTests), nameof(RunTests), nameof(ValidateDependencies))]
         public static BuildTargetResult Test(BuildTargetContext c) => c.Success();
 
-        [Target(nameof(RestoreTestPrerequisites), nameof(BuildTestPrerequisites))]
+        [Target(nameof(SetupTestPackages), nameof(SetupTestProjects))]
         public static BuildTargetResult SetupTests(BuildTargetContext c) => c.Success();
+        
+        [Target(nameof(RestoreTestAssetPackages), nameof(BuildTestAssetPackages))]
+        public static BuildTargetResult SetupTestPackages(BuildTargetContext c) => c.Success();
+
+        [Target(nameof(RestoreTestAssetProjects), nameof(BuildTestAssetProjects))]
+        public static BuildTargetResult SetupTestProjects(BuildTargetContext c) => c.Success();
 
         [Target]
-        public static BuildTargetResult RestoreTestPrerequisites(BuildTargetContext c)
+        public static BuildTargetResult RestoreTestAssetPackages(BuildTargetContext c)
         {
             CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "src"));
             CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "test"));
@@ -48,7 +56,23 @@ namespace Microsoft.DotNet.Cli.Build
             CleanNuGetTempCache();
 
             var dotnet = DotNetCli.Stage2;
-            dotnet.Restore().WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets")).Execute().EnsureSuccessful();
+            dotnet.Restore().WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages")).Execute().EnsureSuccessful();
+
+            return c.Success();
+        }
+        
+        [Target]
+        public static BuildTargetResult RestoreTestAssetProjects(BuildTargetContext c)
+        {
+            CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "src"));
+            CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "test"));
+
+            CleanNuGetTempCache();
+
+            var dotnet = DotNetCli.Stage2;
+            dotnet.Restore("--fallbacksource", Dirs.TestPackages)
+                .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects"))
+                .Execute().EnsureSuccessful();
 
             // The 'testapp' directory contains intentionally-unresolved dependencies, so don't check for success. Also, suppress the output
             dotnet.Restore().WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "testapp")).CaptureStdErr().CaptureStdOut().Execute();
@@ -57,14 +81,7 @@ namespace Microsoft.DotNet.Cli.Build
         }
 
         [Target]
-        public static BuildTargetResult BuildTestPrerequisites(BuildTargetContext c)
-        {
-            BuildTestAssetPackages(c);
-            BuildTestAssetProjects(c);
-            return c.Success();
-        }
-
-        public static void BuildTestAssetPackages(BuildTargetContext c)
+        public static BuildTargetResult BuildTestAssetPackages(BuildTargetContext c)
         {
             var dotnet = DotNetCli.Stage2;
 
@@ -80,9 +97,12 @@ namespace Microsoft.DotNet.Cli.Build
                     .Execute()
                     .EnsureSuccessful();
             }
+            
+            return c.Success();
         }
 
-        public static void BuildTestAssetProjects(BuildTargetContext c)
+        [Target]
+        public static BuildTargetResult BuildTestAssetProjects(BuildTargetContext c)
         {
             var dotnet = DotNetCli.Stage2;
             string testProjectsRoot = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects");
@@ -98,6 +118,8 @@ namespace Microsoft.DotNet.Cli.Build
                     .Execute()
                     .EnsureSuccessful();
             }
+            
+            return c.Success();
         }
 
         [Target]
@@ -129,7 +151,7 @@ namespace Microsoft.DotNet.Cli.Build
             return c.Success();
         }
 
-        [Target(nameof(RunXUnitTests), nameof(RunPackageCommandTests))]
+        [Target(nameof(RunXUnitTests))]
         public static BuildTargetResult RunTests(BuildTargetContext c) => c.Success();
 
         [Target]
@@ -168,40 +190,6 @@ namespace Microsoft.DotNet.Cli.Build
                     c.Error($"{project} failed");
                 }
                 return c.Failed("Tests failed!");
-            }
-
-            return c.Success();
-        }
-
-        [Target]
-        public static BuildTargetResult RunPackageCommandTests(BuildTargetContext c)
-        {
-            var dotnet = DotNetCli.Stage2;
-            var consumers = Path.Combine(c.BuildContext.BuildDirectory, "test", "PackagedCommands", "Consumers");
-
-            // Compile the consumer apps
-            foreach (var dir in Directory.EnumerateDirectories(consumers))
-            {
-                dotnet.Build().WorkingDirectory(dir).Execute().EnsureSuccessful();
-            }
-
-            // Test the apps
-            foreach (var dir in Directory.EnumerateDirectories(consumers))
-            {
-                var result = dotnet.Exec("hello").WorkingDirectory(dir)
-                    .ForwardStdErr()
-                    .ForwardStdOut()
-                    .CaptureStdOut()
-                    .CaptureStdErr()
-                    .Execute();
-                result.EnsureSuccessful();
-                if (!string.Equals("Hello", result.StdOut.Trim(), StringComparison.Ordinal))
-                {
-                    var testName = Path.GetFileName(dir);
-                    c.Error($"Packaged Commands Test '{testName}' failed");
-                    c.Error($"  Expected 'Hello', but got: '{result.StdOut.Trim()}'");
-                    return c.Failed($"Packaged Commands Test failed '{testName}'");
-                }
             }
 
             return c.Success();
