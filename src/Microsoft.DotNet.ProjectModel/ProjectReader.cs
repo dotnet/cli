@@ -577,14 +577,16 @@ namespace Microsoft.DotNet.ProjectModel
 
         private static string MakeDefaultTargetFrameworkDefine(NuGetFramework targetFramework)
         {
-            var shortName = targetFramework.GetTwoDigitShortFolderName();
+            var candidateName = targetFramework.GetTwoDigitShortFolderName().ToUpperInvariant();
 
-            if (targetFramework.IsPCL)
+            if (targetFramework.IsPCL && string.IsNullOrWhiteSpace(targetFramework.Profile))
             {
                 return null;
             }
-
-            var candidateName = shortName.ToUpperInvariant();
+            else
+            {
+                candidateName = $"{FrameworkConstants.FrameworkIdentifiers.Portable.TrimStart('.')}_{targetFramework.Profile}".ToUpperInvariant();
+            }
 
             // Replace '-', '.', and '+' in the candidate name with '_' because TFMs with profiles use those (like "net40-client")
             // and we want them representable as defines (i.e. "NET40_CLIENT")
