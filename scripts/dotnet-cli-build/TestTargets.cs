@@ -31,6 +31,7 @@ namespace Microsoft.DotNet.Cli.Build
             "dotnet-resgen.Tests",
             "Microsoft.DotNet.Cli.Utils.Tests",
             "Microsoft.DotNet.Compiler.Common.Tests",
+            "Microsoft.DotNet.ProjectModel.Tests",
             "Microsoft.Extensions.DependencyModel.Tests",
             "ArgumentForwardingTests"
         };
@@ -179,7 +180,7 @@ namespace Microsoft.DotNet.Cli.Build
             var failingTests = new List<string>();
             foreach (var project in TestProjects)
             {
-                c.Info("Running tests in: {project}");
+                c.Info($"Running tests in: {project}");
                 var result = dotnet.Test("-xml", $"{project}-testResults.xml", "-notrait", "category=failing")
                     .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "test", project))
                     .Environment(vsvars)
