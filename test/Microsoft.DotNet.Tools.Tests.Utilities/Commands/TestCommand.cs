@@ -6,7 +6,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-
 namespace Microsoft.DotNet.Tools.Test.Utilities
 {
     public class TestCommand
@@ -24,7 +23,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             if (!Path.IsPathRooted(_command))
             {
                 _command = Env.GetCommandPath(_command) ??
-                           Env.GetCommandPathFromAppBase(AppContext.BaseDirectory, _command);
+                           Env.GetCommandPathFromRootPath(AppContext.BaseDirectory, _command);
             }
 
             Console.WriteLine($"Executing - {_command} {args}");
@@ -43,7 +42,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             Console.WriteLine($"Executing (Captured Output) - {_command} {args}");
 
             var commandPath = Env.GetCommandPath(_command, ".exe", ".cmd", "") ??
-                Env.GetCommandPathFromAppBase(AppContext.BaseDirectory, _command, ".exe", ".cmd", "");
+                Env.GetCommandPathFromRootPath(AppContext.BaseDirectory, _command, ".exe", ".cmd", "");
                 
             var stdOut = new StreamForwarder();
             var stdErr = new StreamForwarder();

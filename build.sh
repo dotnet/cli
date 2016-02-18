@@ -16,26 +16,40 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-source "$DIR/scripts/common/_common.sh"
-source "$REPOROOT/scripts/build/process-args.sh"
+# Some things depend on HOME and it may not be set. We should fix those things, but until then, we just patch a value in
+if [ -z "$HOME" ]; then
+    export HOME=$DIR/artifacts/home
 
-# splitting build from package is required to work around dotnet/coreclr#2215
-# once that is fixed, we should remove the NOPACKAGE flag and do the full build either in
-# or out of docker.
-if [ ! -z "$BUILD_IN_DOCKER" ]; then
-    export BUILD_COMMAND=". /opt/code/scripts/build/process-args.sh $@ ; . /opt/code/scripts/build/build.sh"
-    $REPOROOT/scripts/docker/dockerbuild.sh
-else
-    $REPOROOT/scripts/build/build.sh
+    [ ! -d "$HOME" ] || rm -Rf $HOME
+    mkdir -p $HOME
 fi
 
-if [ ! -z "$NOPACKAGE" ]; then
-    header "Skipping packaging"
+args=( "$@" )
+
+while [[ $# > 0 ]]; do
+    lowerI="$(echo $1 | awk '{print tolower($0)}')"
+    case $lowerI in
+        --docker)
+            export BUILD_IN_DOCKER=1
+            export DOCKER_IMAGENAME=$2
+            # remove docker args
+            args=( "${args[@]/$1}" )
+            args=( "${args[@]/$2}" )
+            shift
+            ;;
+        *)
+    esac
+    shift
+done
+
+# $args array may have empty elements in it.
+# The easiest way to remove them is to cast to string and back to array.
+temp="${args[@]}"
+args=($temp)
+
+# Check if we need to build in docker
+if [ ! -z "$BUILD_IN_DOCKER" ]; then
+    $DIR/scripts/dockerbuild.sh "${args[@]}"
 else
-    if [ ! -z "$PACKAGE_IN_DOCKER" ]; then
-        export BUILD_COMMAND="/opt/code/scripts/package/package.sh"
-        $REPOROOT/scripts/docker/dockerbuild.sh
-    else
-        $REPOROOT/scripts/package/package.sh
-    fi
+    $DIR/scripts/run-build.sh "${args[@]}"
 fi

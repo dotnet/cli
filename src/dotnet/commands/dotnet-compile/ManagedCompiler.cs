@@ -72,8 +72,8 @@ namespace Microsoft.DotNet.Tools.Compiler
             // Assemble args
             var compilerArgs = new List<string>()
             {
-                $"--temp-output:\"{intermediateOutputPath}\"",
-                $"--out:\"{outputName}\""
+                $"--temp-output:{intermediateOutputPath}",
+                $"--out:{outputName}"
             };
 
             var compilationOptions = CompilerUtil.ResolveCompilationOptions(context, args.ConfigValue);
@@ -90,15 +90,15 @@ namespace Microsoft.DotNet.Tools.Compiler
             foreach (var dependency in dependencies)
             {
                 references.AddRange(dependency.CompilationAssemblies.Select(r => r.ResolvedPath));
-                compilerArgs.AddRange(dependency.SourceReferences.Select(s => $"\"{s}\""));
+                compilerArgs.AddRange(dependency.SourceReferences.Select(s => $"{s}"));
 
                 // Add analyzer references
                 compilerArgs.AddRange(dependency.AnalyzerReferences
                     .Where(a => a.AnalyzerLanguage == languageId)
-                    .Select(a => $"--analyzer:\"{a.AssemblyPath}\""));
+                    .Select(a => $"--analyzer:{a.AssemblyPath}"));
             }
 
-            compilerArgs.AddRange(references.Select(r => $"--reference:\"{r}\""));
+            compilerArgs.AddRange(references.Select(r => $"--reference:{r}"));
 
             if (compilationOptions.PreserveCompilationContext == true)
             {
@@ -115,7 +115,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                     writer.Write(dependencyContext, fileStream);
                 }
 
-                compilerArgs.Add($"--resource:\"{depsJsonFile},{context.ProjectFile.Name}.deps.json\"");
+                compilerArgs.Add($"--resource:{depsJsonFile},{context.ProjectFile.Name}.deps.json");
             }
 
             if (!AddNonCultureResources(context.ProjectFile, compilerArgs, intermediateOutputPath))
@@ -135,18 +135,22 @@ namespace Microsoft.DotNet.Tools.Compiler
             // Run pre-compile event
             var contextVariables = new Dictionary<string, string>()
             {
-                { "compile:TargetFramework", context.TargetFramework.DotNetFrameworkName },
+                { "compile:TargetFramework", context.TargetFramework.GetShortFolderName() },
+                { "compile:FullTargetFramework", context.TargetFramework.DotNetFrameworkName },
                 { "compile:Configuration", args.ConfigValue },
                 { "compile:OutputFile", outputName },
                 { "compile:OutputDir", outputPath.TrimEnd('\\', '/') },
                 { "compile:ResponseFile", rsp }
             };
 
-            if (!string.IsNullOrEmpty(context.RuntimeIdentifier))
+            if (context.ProjectFile.HasRuntimeOutput(args.ConfigValue))
             {
+                var runtimeContext = context.CreateRuntimeContext(args.GetRuntimes());
+                var runtimeOutputPath = runtimeContext.GetOutputPaths(args.ConfigValue, args.BuildBasePathValue, args.OutputValue);
+
                 contextVariables.Add(
                     "compile:RuntimeOutputDir",
-                    outputPaths.RuntimeOutputPath.TrimEnd('\\', '/'));
+                    runtimeOutputPath.RuntimeOutputPath.TrimEnd('\\', '/'));
             }
 
             _scriptRunner.RunScripts(context, ScriptNames.PreCompile, contextVariables);

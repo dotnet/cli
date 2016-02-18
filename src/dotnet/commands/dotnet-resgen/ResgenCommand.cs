@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.Tools.Resgen
 
         public int Execute()
         {
-            var intputResourceFiles = Args.Select(ParseInputFile).ToArray();
+            var inputResourceFiles = Args.Select(ParseInputFile).ToArray();
             var outputResourceFile = ResourceFile.Create(OutputFileName);
 
             switch (outputResourceFile.Type)
@@ -33,22 +33,23 @@ namespace Microsoft.DotNet.Tools.Resgen
                             AssemblyVersion = AssemblyVersion,
                         };
 
-                        ResourceAssemblyGenerator.Generate(intputResourceFiles,
+                        ResourceAssemblyGenerator.Generate(inputResourceFiles,
                             outputStream,
                             metadata,
                             Path.GetFileNameWithoutExtension(outputResourceFile.File.Name),
-                            CompilationReferences.ToArray());
+                            CompilationReferences.ToArray()
+                            );
                     }
                     break;
                 case ResourceFileType.Resources:
                     using (var outputStream = outputResourceFile.File.Create())
                     {
-                        if (intputResourceFiles.Length > 1)
+                        if (inputResourceFiles.Length > 1)
                         {
                             Reporter.Error.WriteLine("Only one input file required when generating .resource output");
                             return 1;
                         }
-                        ResourcesFileGenerator.Generate(intputResourceFiles.Single().Resource, outputStream);
+                        ResourcesFileGenerator.Generate(inputResourceFiles.Single().Resource, outputStream);
                     }
                     break;
                 default:
@@ -61,13 +62,13 @@ namespace Microsoft.DotNet.Tools.Resgen
 
         private static ResourceSource ParseInputFile(string arg)
         {
-            var seperatorIndex = arg.IndexOf(',');
+            var separatorIndex = arg.IndexOf(',');
             string name;
             string metadataName;
-            if (seperatorIndex > 0)
+            if (separatorIndex > 0)
             {
-                name = arg.Substring(0, seperatorIndex);
-                metadataName = arg.Substring(seperatorIndex + 1);
+                name = arg.Substring(0, separatorIndex);
+                metadataName = arg.Substring(separatorIndex + 1);
             }
             else
             {

@@ -6,8 +6,7 @@
 
     "Microsoft.DotNet.Tools.Tests.Utilities": { "target": "project" },
     "Microsoft.DotNet.Cli.Utils": {
-      "target": "project",
-      "type": "build"
+      "target": "project"
     },
 
     "xunit": "2.1.0",
@@ -19,19 +18,6 @@
       "imports": "portable-net45+win8"
     }
   },
-
-  "content": [
-    "../../TestAssets/TestProjects/TestApp/**/*",
-    "../../TestAssets/TestProjects/TestLibrary/**/*",
-    "../../TestAssets/TestProjects/TestSimpleIncrementalApp/*",
-    "../../TestAssets/TestProjects/TestProjectToProjectDependencies/**/*",
-    "../../TestAssets/TestProjects/TestProjectWithCultureSpecificResource/**/*",
-    "../../TestAssets/TestProjects/TestProjectWithResource/**/*",
-    "../../TestAssets/TestProjects/TestLibraryWithAppDependency/**/*",
-    "../../TestAssets/TestProjects/TestAppWithTransitiveAppDependency/**/*",
-    "../../TestAssets/TestProjects/TestBindingsRedirectsGeneration2/**/*",
-    "../../TestAssets/TestProjects/global.json"
-  ],
 
   "testRunner": "xunit"
 }

@@ -18,9 +18,9 @@ namespace Microsoft.DotNet.Cli.Utils
 
         ICommand CaptureStdErr();
 
-        ICommand ForwardStdOut(TextWriter to = null, bool onlyIfVerbose = false);
+        ICommand ForwardStdOut(TextWriter to = null, bool onlyIfVerbose = false, bool ansiPassThrough = true);
 
-        ICommand ForwardStdErr(TextWriter to = null, bool onlyIfVerbose = false);
+        ICommand ForwardStdErr(TextWriter to = null, bool onlyIfVerbose = false, bool ansiPassThrough = true);
 
         ICommand OnOutputLine(Action<string> handler);
 
@@ -29,5 +29,7 @@ namespace Microsoft.DotNet.Cli.Utils
         CommandResolutionStrategy ResolutionStrategy { get; }
 
         string CommandName { get; }
+
+        string CommandArgs { get; }
     }
 }

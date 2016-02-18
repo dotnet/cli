@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
         private static readonly string s_expectedOutput = "Hello World!" + Environment.NewLine;
         private static readonly string s_testdirName = "e2etestroot";
         private static readonly string s_outputdirName = "test space/bin";
-        
+
         private static string RestoredTestProjectDirectory { get; set; }
 
         private string Rid { get; set; }
@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
         {
             Console.WriteLine("Dummy Entrypoint.");
         }
-       
+
         public EndToEndTest()
         {
             TestInstanceSetup();
@@ -81,7 +81,6 @@ namespace Microsoft.DotNet.Tests.EndToEnd
         }
 
         [Fact]
-        [ActiveIssue(712, PlatformID.Windows | PlatformID.OSX | PlatformID.Linux)]
         public void TestDotnetBuildNativeRyuJit()
         {
             if(IsCentOS())
@@ -170,6 +169,20 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             TestExecutable(OutputDirectory, publishCommand.GetOutputExecutable(), s_expectedOutput);    
         }
 
+        [Fact]
+        public void TestDotnetHelp()
+        {
+            var helpCommand = new HelpCommand();
+            helpCommand.Execute().Should().Pass();
+        }
+
+        [Fact]
+        public void TestDotnetHelpBuild()
+        {
+            var helpCommand = new HelpCommand();
+            helpCommand.Execute("build").Should().Pass();
+        }
+
         private void TestInstanceSetup()
         {
             var root = Temp.CreateDirectory();
@@ -192,7 +205,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             {
                 Directory.Delete(RestoredTestProjectDirectory, true);
             }
-            catch(Exception e) {}
+            catch(Exception) {}
 
             Directory.CreateDirectory(RestoredTestProjectDirectory);
 

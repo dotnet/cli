@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 {
                     var arguments = new[]
                     {
-                        resgenFile.InputFile,
+                        $"{resgenFile.InputFile}",
                         $"-o:{resgenFile.OutputFile}",
                         $"-v:{project.Version.Version}"
                     };
@@ -71,11 +71,11 @@ namespace Microsoft.DotNet.Tools.Compiler
                         return false;
                     }
 
-                    compilerArgs.Add($"--resource:\"{resgenFile.OutputFile},{Path.GetFileName(resgenFile.MetadataName)}\"");
+                    compilerArgs.Add($"--resource:\"{resgenFile.OutputFile}\",{Path.GetFileName(resgenFile.MetadataName)}");
                 }
                 else
                 {
-                    compilerArgs.Add($"--resource:\"{resgenFile.InputFile},{Path.GetFileName(resgenFile.MetadataName)}\"");
+                    compilerArgs.Add($"--resource:\"{resgenFile.InputFile}\",{Path.GetFileName(resgenFile.MetadataName)}");
                 }
             }
 

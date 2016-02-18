@@ -5,8 +5,7 @@
     "NETStandard.Library": "1.0.0-rc2-23811",
 
     "Microsoft.DotNet.Cli.Utils": {
-      "target": "project",
-      "type": "build"
+      "target": "project"
     },
 
     "dotnet": { "target": "project" },
@@ -25,9 +24,7 @@
   },
 
   "content": [
-    "../../TestAssets/TestProjects/TestLibrary/*",
-    "../../TestAssets/TestProjects/TestApp/*",
-    "../../TestAssets/TestProjects/global.json"
+    "../../TestAssets/TestProjects/TestAppWithLibrary/**/*"
   ],
 
   "testRunner": "xunit"
