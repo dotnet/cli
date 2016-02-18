@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.Cli.Build
     public class CompileTargets
     {
         public static readonly string CoreCLRVersion = "1.0.1-rc2-23811";
-        public static readonly string AppDepSdkVersion = "1.0.6-prerelease-00001";
+        public static readonly string AppDepSdkVersion = "1.0.6-prerelease-00003";
 
         public static readonly List<string> AssembliesToCrossGen = GetAssembliesToCrossGen();
 
@@ -157,11 +157,14 @@ namespace Microsoft.DotNet.Cli.Build
 
             var configuration = c.BuildContext.Get<string>("Configuration");
             var binDir = Path.Combine(outputDir, "bin");
+            var buildVesion = c.BuildContext.Get<BuildVersion>("BuildVersion");
 
             Mkdirp(binDir);
 
             foreach (var project in ProjectsToPublish)
             {
+                // TODO: Use the flag once we get a full build round tripped
+                // --version-suffix buildVesion.VersionSuffix
                 dotnet.Publish(
                     "--native-subdirectory",
                     "--output",
@@ -169,6 +172,7 @@ namespace Microsoft.DotNet.Cli.Build
                     "--configuration",
                     configuration,
                     Path.Combine(c.BuildContext.BuildDirectory, "src", project))
+                    .Environment("DOTNET_BUILD_VERSION", buildVesion.VersionSuffix)
                     .Execute()
                     .EnsureSuccessful();
             }
@@ -210,7 +214,7 @@ namespace Microsoft.DotNet.Cli.Build
             }
 
             // Generate .version file
-            var version = c.BuildContext.Get<BuildVersion>("BuildVersion").SimpleVersion;
+            var version = buildVesion.SimpleVersion;
             var content = $@"{c.BuildContext["CommitHash"]}{Environment.NewLine}{version}{Environment.NewLine}";
             File.WriteAllText(Path.Combine(outputDir, ".version"), content);
 
