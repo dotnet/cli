@@ -110,8 +110,9 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
         private static AssemblyRedirect[] CollectRedirects(IEnumerable<LibraryExport> dependencies)
         {
             var dependenciesList = dependencies.ToList();
-            var allRuntimeAssemblies = dependenciesList.SelectMany(d => d.RuntimeAssemblies).Select(GetAssemblyInfo).ToArray();
-            var assemblyLookup = GetListOfUniqueRefs(dependenciesList).Select(GetAssemblyInfo).ToDictionary(r => r.Identity.ToLookupKey());
+            var assemblyInfoCache = new Dictionary<string, AssemblyReferenceInfo>();
+            var allRuntimeAssemblies = dependenciesList.SelectMany(d => d.RuntimeAssemblies).Select(a => GetAssemblyInfo(a, assemblyInfoCache)).ToArray();
+            var assemblyLookup = GetListOfUniqueRefs(dependenciesList).Select(a => GetAssemblyInfo(a, assemblyInfoCache)).ToDictionary(r => r.Identity.ToLookupKey());
 
             var redirectAssemblies = new HashSet<AssemblyRedirect>();
             foreach (var assemblyReferenceInfo in allRuntimeAssemblies)
@@ -177,8 +178,14 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
             return result;
         }
 
-        private static AssemblyReferenceInfo GetAssemblyInfo(LibraryAsset arg)
+        private static AssemblyReferenceInfo GetAssemblyInfo(LibraryAsset arg, Dictionary<string, AssemblyReferenceInfo> assemblyInfoCache)
         {
+            AssemblyReferenceInfo result;
+            if (assemblyInfoCache.TryGetValue(arg.ResolvedPath, out result))
+            {
+                return result;
+            }
+
             using (var peReader = new PEReader(File.OpenRead(arg.ResolvedPath)))
             {
                 var metadataReader = peReader.GetMetadataReader();
@@ -205,7 +212,10 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
                     ));
                 }
 
-                return new AssemblyReferenceInfo(identity, references.ToArray());
+                result = new AssemblyReferenceInfo(identity, references.ToArray());
+                assemblyInfoCache.Add(arg.ResolvedPath, result);
+
+                return result;
             }
         }
 
