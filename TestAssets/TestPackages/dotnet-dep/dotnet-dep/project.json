@@ -1,0 +1,26 @@
+{
+    "version": "1.0.0",
+    "dependencies": {
+        "dotnet-base": {
+            "type": "default",
+            "target": "project"
+        }
+    },
+    "compilationOptions": {
+        "keyFile": "../key.snk"
+    },
+    "frameworks": {
+        "net461": {
+            "frameworkAssemblies": {
+            }
+        },
+        "dnxcore50": {
+            "imports": "portable-net45+wp80+win8",
+            "dependencies": {
+            }
+        }
+    },
+    "packInclude": {
+        "lib/net461/": "../artifacts/dotnet-base.dll"
+    }
+}
