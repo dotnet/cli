@@ -1,13 +1,14 @@
 {
     "version": "1.0.0",
     "dependencies": {
-        "ReferencedLibrary": { "type": "default", "target": "package", "version": "2.0.0" },
-        "TestLibrary": { "type": "default", "target": "package", "version": "1.0.0" }
+        "dotnet-base": { "type": "default", "target": "package", "version": "2.0.0" },
+        "dotnet-dep": { "type": "default", "target": "package", "version": "1.0.0" }
     },
     "compilationOptions": {
         "emitEntryPoint": true
     },
     "frameworks": {
+		"dnxcore50": {},
         "net461": {
             "frameworkAssemblies": {
                 "System.Runtime": ""
