@@ -69,8 +69,9 @@ If you are in Windows, make sure that you run the above command inside the *VS 2
 
 For more details, please refer to the [documentation](https://github.com/dotnet/corert/tree/master/Documentation).
 
-Building from source
+Building .Net CLI from source
 --------------------
+See the [developer guide](https://github.com/dotnet/cli/blob/master/Documentation/developer-guide.md).
 
 If you are building from source, take note that the build depends on NuGet packages hosted on Myget, so if it is down, the build may fail. If that happens, you can always see the [Myget status page](http://status.myget.org/) for more info. 
 
