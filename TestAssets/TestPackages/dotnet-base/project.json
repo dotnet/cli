@@ -1,19 +1,17 @@
 {
     "version": "2.0.0",
     "dependencies": {
+        "NETStandard.Library": "1.0.0-rc2-23811"
     },
     "compilationOptions": {
-      "keyFile": "key.snk"  
+        "keyFile": "key.snk"
     },
-	"frameworks": {
-	   "net461": {
-           "frameworkAssemblies": {
-           }
-       },
-	   "dnxcore50": {
-            "imports" : "portable-net45+wp80+win8",
+    "frameworks": {
+        "net461": {},
+        "dnxcore50": {
+            "imports": "portable-net45+wp80+win8",
             "dependencies": {
             }
         }
-	}
+    }
 }
