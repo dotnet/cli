@@ -41,8 +41,8 @@ Any file with the suffix `.dll` in the same folder as the managed application be
 
 Only assemblies listed in the dependencies file can be resolved from a package cache. To resolve those assemblies, two environment variables are used:
 
-* `DOTNET_PACKAGES` - The primary package cache. If not set, defaults to `$HOME/.nuget/packages` on Unix or `%LOCALAPPDATA%\NuGet\Packages` (TBD) on Windows. **NOTE**: Currently the host uses different folders as we are still coordinating with NuGet to get the directories right (there are compat considerations). Currently we always use `$HOME/.dnx/packages`(Unix)/`%USERPROFILE%\.dnx\packages`(Win).
-* `DOTNET_PACKAGES_CACHE` - The secondary cache. This is used by shared hosters (such as Azure) to provide a cache of pre-downloaded common packages on a faster disk. If not set, it is not used.
+* `DOTNET_PACKAGES` - The primary package cache. If not set, defaults to `$HOME/.nuget/packages` on Unix or `%LOCALAPPDATA%\NuGet\Packages` (TBD) on Windows. **NOTE**: Currently the host uses different folders as we are still coordinating with NuGet to get the directories right (there are compatability considerations). Currently we always use `$HOME/.dnx/packages`(Unix)/`%USERPROFILE%\.dnx\packages`(Win).
+* `DOTNET_PACKAGES_CACHE` - The secondary cache. This is used by shared hosts (such as Azure) to provide a cache of pre-downloaded common packages on a faster disk. If not set, it is not used.
 
 Given the Package ID, Package Version, Package Hash and Asset Relative Path provided in the runtime configuration file, **and the assembly is not serviced** (see the full resolution algorithm below) resolution proceeds as follows (Unix-style paths will be used for convenience but these variables and paths all apply to Windows as well):
 
@@ -56,7 +56,7 @@ During host start-up, the host identifies if a runtime configuration file is pre
 
 A runtime configuration file is **not** required to successfully launch an application, but without it, all the dependent assemblies must be located within the same folder as the application. Also, since servicing is performed on the basis of packages, an application without a runtime configuration file file cannot use the servicing index to override the location of assemblies.
 
-The host looks for the `.deps` file in the Application Base with the file name `[AssemblyName].deps`. The path to the deps file can be overriden by specifying `--depsfile:{path to deps file}` as the first parameter to the application.
+The host looks for the `.deps` file in the Application Base with the file name `[AssemblyName].deps`. The path to the deps file can be overridden by specifying `--depsfile:{path to deps file}` as the first parameter to the application.
 
 Given the set of assembly names, the host performs the following resolution. In some steps, the Package ID/Version/Relative Path data is required. This is only available if the assembly was listed in the deps file. If the assembly comes from the app-local folder, these resolution steps are skipped.
 
@@ -76,16 +76,18 @@ Satellite Assemblies (assemblies containing only embedded resources used in plac
 
 ## Runtime Resolution
 
-Runtime resolution is controlled by two environment variables:
+Runtime resolution is controlled by these environment variables:
 
 * `DOTNET_RUNTIME_SERVICING` -> Global override for runtime
-* `DOTNET_HOME` -> Default location for runtime
+* `DOTNET_PACKAGES_CACHE` -> Secondary cache
+* `DOTNET_PACKAGES` -> Package restore location
 
 The runtime is located by searching the following paths in order, where `APP_BASE` refers to the directory containing the managed application assembly and `LIBCORECLR` refers to the platform-specific name for the CoreCLR library (`libcoreclr.so` on Unix, `libcoreclr.dylib` on Mac OS X, `coreclr.dll` on Windows). The first path that matches is used as the path to load the CoreCLR from.
 
 * `$DOTNET_RUNTIME_SERVICING/runtime/coreclr/LIBCORECLR`
+* `$DOTNET_PACKAGES_CACHE/<Package Id>/<Package Version>/runtimes/<RID>/native/LICORECLR`
 * `APP_BASE/LIBCORECLR`
-* `$DOTNET_HOME/runtime/coreclr/LIBCORECLR`
+* `$DOTNET_PACKAGES/<Package Id>/<Package Version>/runtimes/<RID>/native/LIBCORECLR`
 * On Unix:
     * `/usr/local/share/dotnet/runtime/coreclr/LIBCORECLR` [1]
     * `/usr/share/dotnet/runtime/coreclr/LIBCORECLR`

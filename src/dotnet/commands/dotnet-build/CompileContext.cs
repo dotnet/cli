@@ -284,8 +284,8 @@ namespace Microsoft.DotNet.Tools.Build
             var args = new List<string>();
 
             args.Add("--framework");
-            args.Add($"{projectDependency.Framework}");                       
-            
+            args.Add($"{projectDependency.Framework}");
+
             args.Add("--configuration");
             args.Add(_args.ConfigValue);
             args.Add(projectDependency.Project.ProjectDirectory);
@@ -294,6 +294,12 @@ namespace Microsoft.DotNet.Tools.Build
             {
                 args.Add("--runtime");
                 args.Add(_args.RuntimeValue);
+            }
+
+            if (!string.IsNullOrEmpty(_args.VersionSuffixValue))
+            {
+                args.Add("--version-suffix");
+                args.Add(_args.VersionSuffixValue);
             }
 
             if (!string.IsNullOrWhiteSpace(_args.BuildBasePathValue))
@@ -312,7 +318,7 @@ namespace Microsoft.DotNet.Tools.Build
             // todo: add methods to CompilerCommandApp to generate the arg string?
             var args = new List<string>();
             args.Add("--framework");
-            args.Add(_rootProject.TargetFramework.ToString());            
+            args.Add(_rootProject.TargetFramework.ToString());
             args.Add("--configuration");
             args.Add(_args.ConfigValue);
 
@@ -326,6 +332,12 @@ namespace Microsoft.DotNet.Tools.Build
             {
                 args.Add("--output");
                 args.Add(_args.OutputValue);
+            }
+
+            if (!string.IsNullOrEmpty(_args.VersionSuffixValue))
+            {
+                args.Add("--version-suffix");
+                args.Add(_args.VersionSuffixValue);
             }
 
             if (!string.IsNullOrEmpty(_args.BuildBasePathValue))
@@ -381,32 +393,29 @@ namespace Microsoft.DotNet.Tools.Build
                 {
                     MakeRunnable();
                 }
-                else
+                else if (!string.IsNullOrEmpty(_args.OutputValue))
                 {
-                    CopyCompilationOutput();
+                    var outputPaths = _rootProject.GetOutputPaths(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
+                    CopyCompilationOutput(outputPaths);
                 }
             }
 
             return succeeded;
         }
 
-        private void CopyCompilationOutput()
+        private void CopyCompilationOutput(OutputPaths outputPaths)
         {
-            if (!string.IsNullOrEmpty(_args.OutputValue))
+            var dest = outputPaths.RuntimeOutputPath;
+            var source = outputPaths.CompilationOutputPath;
+            foreach (var file in outputPaths.CompilationFiles.All())
             {
-                var calculator = _rootProject.GetOutputPaths(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
-                var dest = calculator.RuntimeOutputPath;
-                var source = calculator.CompilationOutputPath;
-                foreach (var file in calculator.CompilationFiles.All())
+                var destFileName = file.Replace(source, dest);
+                var directoryName = Path.GetDirectoryName(destFileName);
+                if (!Directory.Exists(directoryName))
                 {
-                    var destFileName = file.Replace(source, dest);
-                    var directoryName = Path.GetDirectoryName(destFileName);
-                    if (!Directory.Exists(directoryName))
-                    {
-                        Directory.CreateDirectory(directoryName);
-                    }
-                    File.Copy(file, destFileName, true);
+                    Directory.CreateDirectory(directoryName);
                 }
+                File.Copy(file, destFileName, true);
             }
         }
 
@@ -415,6 +424,7 @@ namespace Microsoft.DotNet.Tools.Build
             var runtimeContext = _rootProject.CreateRuntimeContext(_args.GetRuntimes());
             var outputPaths = runtimeContext.GetOutputPaths(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
             var libraryExporter = runtimeContext.CreateExporter(_args.ConfigValue, _args.BuildBasePathValue);
+            CopyCompilationOutput(outputPaths);
             var executable = new Executable(runtimeContext, outputPaths, libraryExporter);
             executable.MakeCompilationOutputRunnable();
 
