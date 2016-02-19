@@ -17,7 +17,12 @@ In order to build .NET Command Line Interface, you need the following installed 
 
 1. CMake (available from https://cmake.org/) is required to build the native host `corehost`. Make sure to add it to the PATH.
 2. git (available from http://www.git-scm.com/) on the PATH.
-3. clang (available from http://clang.llvm.org) on the PATH.
+3. clang 3.5 (available from http://clang.llvm.org) on the PATH.
+
+On Ubuntu 14.04 you can install all of these dependencies via apt-get
+```
+developer@linux:~$ sudo apt-get install cmake llvm-3.5 clang-3.5 git
+```
 
 ### For OS X
 
