@@ -19,14 +19,22 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         public void TestAppGeneratesCorrectBindings()
         {
             var testInstance = TestAssetsManager.CreateTestInstance(_projectName).WithLockFiles();
+
             string framework = "net461";
             string configuration = "Release";
 
-            string root = testInstance.TestRoot;
+            string appRoot = Path.Combine(testInstance.TestRoot, "test-app");
+            string packagesPath = Path.Combine(testInstance.TestRoot, "packages");
 
-            var buildOutputRoot = Path.Combine(testInstance.TestRoot, "bin", configuration, framework);
+            new PackCommand(GetProjectPath(Path.Combine(testInstance.TestRoot, "dotnet-base")), output: packagesPath).Execute();
+            new PackCommand(GetProjectPath(Path.Combine(testInstance.TestRoot, "dotnet-dep", "dotnet-base")), output: packagesPath).Execute();
+            new PackCommand(GetProjectPath(Path.Combine(testInstance.TestRoot, "dotnet-dep", "dotnet-dep")), output: packagesPath).Execute();
+
+            var restore = new RestoreCommand().Execute($"{GetProjectPath(appRoot)} --fallbacksource {packagesPath}");
+
+            var buildOutputRoot = Path.Combine(appRoot, "bin", configuration, framework);
             var buildCommand = new BuildCommand(
-                projectPath: GetProjectPath(testInstance.TestRoot),
+                projectPath: GetProjectPath(appRoot),
                 configuration: configuration,
                 framework: framework);
             var result = buildCommand.ExecuteWithCapturedOutput();
