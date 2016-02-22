@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using FluentAssertions;
+using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
 
 namespace Microsoft.DotNet.Tools.Builder.Tests
@@ -8,7 +9,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
     public class BindingRedirectsTest : TestBase
     {
         private readonly string _testProjectsRoot;
-        private readonly string _projectName = "TestBindingsRedirectsGeneration2";
+        private readonly string _projectName = "TestBindingRedirectGeneration2";
 
         public BindingRedirectsTest()
         {
@@ -18,7 +19,8 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         [WindowsOnlyFact]
         public void TestAppGeneratesCorrectBindings()
         {
-            var testInstance = TestAssetsManager.CreateTestInstance(_projectName).WithLockFiles();
+            var assetsManager = GetAssetsManager();
+            var testInstance = assetsManager.CreateTestInstance(_projectName).WithLockFiles();
 
             string framework = "net461";
             string configuration = "Release";
@@ -55,6 +57,12 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         private string GetProjectPath(string projectDir)
         {
             return Path.Combine(projectDir, "project.json");
+        }
+
+        private TestAssetsManager GetAssetsManager()
+        {
+            string assetsRoot = Path.Combine(RepoRoot, "TestAssets", "TestProjectsNoBuild");
+            return new TestAssetsManager(assetsRoot);
         }
     }
 }
