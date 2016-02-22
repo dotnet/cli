@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using FluentAssertions;
 using Microsoft.DotNet.Tools.Test.Utilities;
 
 namespace Microsoft.DotNet.Tools.Builder.Tests
@@ -19,22 +20,28 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         {
             var testInstance = TestAssetsManager.CreateTestInstance(_projectName).WithLockFiles();
             string framework = "net461";
+            string configuration = "Release";
+
             string root = testInstance.TestRoot;
 
-            var buildOutputPath = Path.Combine(testInstance.TestRoot, "artifacts");
+            var buildOutputRoot = Path.Combine(testInstance.TestRoot, "bin", configuration, framework);
             var buildCommand = new BuildCommand(
                 projectPath: GetProjectPath(testInstance.TestRoot),
-                output: buildOutputPath,
+                configuration: configuration,
                 framework: framework);
-            buildCommand.Execute().Should().Pass();
+            var result = buildCommand.ExecuteWithCapturedOutput();
+            result.Should().Pass();
 
             var appConfigFileName = buildCommand.GetOutputExecutableName() + ".config";
-            new DirectoryInfo(buildOutputPath).Should().HaveFile(appConfigFileName);
+            var appConfigFiles = new DirectoryInfo(buildOutputRoot).GetFiles(appConfigFileName, SearchOption.AllDirectories);
+            appConfigFiles.Should().HaveCount(c => c > 0);
 
-            new AppConfig(Path.Combine(buildOutputPath, appConfigFileName))
-                .Should().BindRedirect("dotnet-base", "b570ffd6752684c6")
-                .From("1.0.0.0")
-                .To("2.0.0.0");
+            foreach (var f in appConfigFiles)
+            {
+                new AppConfig(f.FullName).Should().BindRedirect("dotnet-base", "b570ffd6752684c6")
+                    .From("1.0.0.0")
+                    .To("2.0.0.0");
+            }
         }
 
         private string GetProjectPath(string projectDir)
