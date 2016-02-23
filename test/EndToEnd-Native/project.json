@@ -23,7 +23,7 @@
   },
   
   "tools": {
-      "dotnet-compile-native":{ "target": "package" }
+      "dotnet-compile-native":{ "target": "package", "version": "1.0.0-*"}
   },
 
   "testRunner": "xunit"
