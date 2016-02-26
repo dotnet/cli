@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Csc
 
                     syntax.DefineOptionList("resource", ref resources, "Resources to embed");
 
-                    syntax.DefineOption("h|help", ref help, "Help for compile native.");
+                    syntax.DefineOption("h|help", ref help, "Help for compile.");
 
                     syntax.DefineParameterList("source-files", ref sources, "Compilation sources");
 

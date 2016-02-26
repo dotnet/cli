@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Microsoft.DotNet.Tests.EndToEnd
 {
-    public class EndToEndTest : TestBase
+    public class EndToEndNativeTest : TestBase
     {
         private static readonly string s_expectedOutput = "Hello World!" + Environment.NewLine;
         private static readonly string s_testdirName = "e2etestroot";
@@ -24,9 +24,9 @@ namespace Microsoft.DotNet.Tests.EndToEnd
         private string TestProject { get; set; }
         private string OutputDirectory { get; set; }
 
-        static EndToEndTest()
+        static EndToEndNativeTest()
         {
-            EndToEndTest.SetupStaticTestProject();
+            EndToEndNativeTest.SetupStaticTestProject();
         }
 
         public static void Main()
@@ -34,95 +34,64 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             Console.WriteLine("Dummy Entrypoint.");
         }
 
-        public EndToEndTest()
+        public EndToEndNativeTest()
         {
             TestInstanceSetup();
         }
         
+
         [Fact]
-        public void TestDotnetBuild()
+        public void TestDotnetBuildNativeRyuJit()
         {
+            if(IsCentOS())
+            {
+                Console.WriteLine("Skipping native compilation tests on CentOS - https://github.com/dotnet/cli/issues/453");
+                return;
+            }
+
+            if (IsWinX86())
+            {
+                Console.WriteLine("Skipping native compilation tests on Windows x86 - https://github.com/dotnet/cli/issues/1550");
+                return;
+            }
+
             var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: DefaultFramework);
 
-            buildCommand.Execute().Should().Pass();
+            var compileNativeCommand = new CompileNativeCommand(TestProject, output: OutputDirectory, framework: DefaultFramework);
 
-            TestOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
+            buildCommand.Execute().Should().Pass();
+            
+            compileNativeCommand.Execute().Should().Pass();
+
+            TestNativeOutputExecutable(OutputDirectory, compileNativeCommand.GetOutputExecutableName(), s_expectedOutput);
         }
 
         [Fact]
-        public void TestDotnetIncrementalBuild()
+        public void TestDotnetBuildNativeCpp()
         {
-            // first build
+            if(IsCentOS())
+            {
+                Console.WriteLine("Skipping native compilation tests on CentOS - https://github.com/dotnet/cli/issues/453");
+                return;
+            }
+
+            if (IsWinX86())
+            {
+                Console.WriteLine("Skipping native compilation tests on Windows x86 - https://github.com/dotnet/cli/issues/1550");
+                return;
+            }
+
             var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: DefaultFramework);
+                
+            var compileNativeCommand = new CompileNativeCommand(TestProject, output: OutputDirectory, nativeCppMode: true, framework: DefaultFramework);
+
             buildCommand.Execute().Should().Pass();
-            TestOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
+            
+            compileNativeCommand.Execute().Should().Pass();
 
-            var binariesOutputDirectory = GetCompilationOutputPath(OutputDirectory, false);
-            var latestWriteTimeFirstBuild = GetLastWriteTimeUtcOfDirectoryFiles(
-                binariesOutputDirectory);
-
-            // second build; should get skipped (incremental because no inputs changed)
-            buildCommand.Execute().Should().Pass();
-            TestOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
-
-            var latestWriteTimeUtcSecondBuild = GetLastWriteTimeUtcOfDirectoryFiles(
-                binariesOutputDirectory);
-            Assert.Equal(latestWriteTimeFirstBuild, latestWriteTimeUtcSecondBuild);
-
-            TouchSourceFileInDirectory(TestDirectory);
-
-            // third build; should get compiled because the source file got touched
-            buildCommand.Execute().Should().Pass();
-            TestOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
-
-            var latestWriteTimeUtcThirdBuild = GetLastWriteTimeUtcOfDirectoryFiles(
-                binariesOutputDirectory);
-            Assert.NotEqual(latestWriteTimeUtcSecondBuild, latestWriteTimeUtcThirdBuild);
-        }
-
-        [Fact]
-        public void TestDotnetRun()
-        {
-            var runCommand = new RunCommand(TestProject);
-
-            runCommand.Execute()
-                .Should()
-                .Pass();
+            TestNativeOutputExecutable(OutputDirectory, compileNativeCommand.GetOutputExecutableName(), s_expectedOutput);
         }
         
-        [Fact]
-        public void TestDotnetPack()
-        {
-            var packCommand = new PackCommand(TestDirectory, output: OutputDirectory);
-
-            packCommand.Execute()
-                .Should()
-                .Pass();
-        }
-
-        [Fact]
-        public void TestDotnetPublish()
-        {
-            var publishCommand = new PublishCommand(TestProject, output: OutputDirectory);
-            publishCommand.Execute().Should().Pass();
-
-            TestExecutable(OutputDirectory, publishCommand.GetOutputExecutable(), s_expectedOutput);    
-        }
-
-        [Fact]
-        public void TestDotnetHelp()
-        {
-            var helpCommand = new HelpCommand();
-            helpCommand.Execute().Should().Pass();
-        }
-
-        [Fact]
-        public void TestDotnetHelpBuild()
-        {
-            var helpCommand = new HelpCommand();
-            helpCommand.Execute("build").Should().Pass();
-        }
-
         private void TestInstanceSetup()
         {
             var root = Temp.CreateDirectory();

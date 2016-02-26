@@ -18,10 +18,16 @@ namespace Microsoft.DotNet.Cli.Build
             "dotnet-hello/v1/dotnet-hello",
             "dotnet-hello/v2/dotnet-hello"
         };
+        
+        public static readonly string[] ProductPackageProjects = new[]
+        {
+            "dotnet-compile-native"
+        };
 
         public static readonly string[] TestProjects = new[]
         {
             "EndToEnd",
+            "EndToEnd-Native",
             "dotnet.Tests",
             "dotnet-publish.Tests",
             "dotnet-compile.Tests",
@@ -45,7 +51,7 @@ namespace Microsoft.DotNet.Cli.Build
         [Target(nameof(SetupTestPackages), nameof(SetupTestProjects))]
         public static BuildTargetResult SetupTests(BuildTargetContext c) => c.Success();
         
-        [Target(nameof(RestoreTestAssetPackages), nameof(BuildTestAssetPackages))]
+        [Target(nameof(SetupTestProductPackages), nameof(RestoreTestAssetPackages), nameof(BuildTestAssetPackages))]
         public static BuildTargetResult SetupTestPackages(BuildTargetContext c) => c.Success();
 
         [Target(nameof(RestoreTestAssetProjects), nameof(BuildTestAssetProjects))]
@@ -91,17 +97,32 @@ namespace Microsoft.DotNet.Cli.Build
             return c.Success();
         }
 
-        [Target(nameof(CleanTestPackages))]
+        [Target(nameof(CleanTestPackageSource), nameof(CleanTestPackages))]
         public static BuildTargetResult BuildTestAssetPackages(BuildTargetContext c)
         {
             var dotnet = DotNetCli.Stage2;
 
-            Rmdir(Dirs.TestPackages);
-            Mkdirp(Dirs.TestPackages);
-
             foreach (var relativePath in TestPackageProjects)
             {
                 var fullPath = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages", relativePath.Replace('/', Path.DirectorySeparatorChar));
+                c.Info($"Packing: {fullPath}");
+                dotnet.Pack("--output", Dirs.TestPackages)
+                    .WorkingDirectory(fullPath)
+                    .Execute()
+                    .EnsureSuccessful();
+            }
+            
+            return c.Success();
+        }
+
+        [Target(nameof(CleanTestPackageSource))]
+        public static BuildTargetResult SetupTestProductPackages(BuildTargetContext c)
+        {
+            var dotnet = DotNetCli.Stage2;
+            
+            foreach (var relativePath in ProductPackageProjects)
+            {
+                var fullPath = Path.Combine(c.BuildContext.BuildDirectory, "src", relativePath.Replace('/', Path.DirectorySeparatorChar));
                 c.Info($"Packing: {fullPath}");
                 dotnet.Pack("--output", Dirs.TestPackages)
                     .WorkingDirectory(fullPath)
@@ -116,6 +137,16 @@ namespace Microsoft.DotNet.Cli.Build
         public static BuildTargetResult CleanTestPackages(BuildTargetContext c)
         {
             Rmdir(Path.Combine(Dirs.NuGetPackages, "dotnet-hello"));
+            Rmdir(Path.Combine(Dirs.NuGetPackages, "dotnet-compile-native"));
+            
+            return c.Success();
+        }
+        
+        [Target]
+        public static BuildTargetResult CleanTestPackageSource(BuildTargetContext c)
+        {
+            Rmdir(Dirs.TestPackages);
+            Mkdirp(Dirs.TestPackages);
             
             return c.Success();
         }
