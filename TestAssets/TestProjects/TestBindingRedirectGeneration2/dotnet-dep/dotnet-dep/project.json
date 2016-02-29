@@ -10,10 +10,9 @@
         "keyFile": "../key.snk"
     },
     "frameworks": {
-        "net461": {},
-        "dnxcore50": {}
+        "net451": {}
     },
     "packInclude": {
-        "lib/net461/": "../artifacts/dotnet-base.dll"
+        "lib/net451/": "../artifacts/dotnet-base.dll"
     }
 }

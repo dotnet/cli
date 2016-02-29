@@ -1,8 +1,5 @@
 {
     "version": "1.0.0",
-    "dependencies": {
-        "NETStandard.Library": "1.0.0-rc2-23811"
-    },
     "compilationOptions": {
         "keyFile": "../key.snk"
     },
@@ -10,7 +7,6 @@
         "postcompile": "scripts/batchcopy %compile:OutputDir% ../artifacts"
     },
     "frameworks": {
-        "net461": {},
-        "dnxcore50": {}
+        "net451": {}
     }
 }

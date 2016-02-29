@@ -19,18 +19,24 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         [WindowsOnlyFact]
         public void TestAppGeneratesCorrectBindings()
         {
-            var assetsManager = GetAssetsManager();
-            var testInstance = assetsManager.CreateTestInstance(_projectName).WithLockFiles();
+            var testInstance = TestAssetsManager.CreateTestInstance(_projectName).WithLockFiles();
 
-            string framework = "net461";
+            string framework = "net451";
             string configuration = "Release";
 
             string appRoot = Path.Combine(testInstance.TestRoot, "test-app");
             string packagesPath = Path.Combine(testInstance.TestRoot, "packages");
+            string dotnetBase = Path.Combine(testInstance.TestRoot, "dotnet-base");
+            string dotnetDepBase = Path.Combine(testInstance.TestRoot, "dotnet-dep", "dotnet-base");
+            string dotnetDep = Path.Combine(testInstance.TestRoot, "dotnet-dep", "dotnet-dep");
 
-            new PackCommand(GetProjectPath(Path.Combine(testInstance.TestRoot, "dotnet-base")), output: packagesPath).Execute();
-            new PackCommand(GetProjectPath(Path.Combine(testInstance.TestRoot, "dotnet-dep", "dotnet-base")), output: packagesPath).Execute();
-            new PackCommand(GetProjectPath(Path.Combine(testInstance.TestRoot, "dotnet-dep", "dotnet-dep")), output: packagesPath).Execute();
+            new RestoreCommand().Execute($"{GetProjectPath(dotnetBase)}");
+            new RestoreCommand().Execute($"{GetProjectPath(dotnetDepBase)}");
+            new RestoreCommand().Execute($"{GetProjectPath(dotnetDep)}");
+
+            new PackCommand(GetProjectPath(dotnetBase), output: packagesPath).Execute();
+            new PackCommand(GetProjectPath(dotnetDepBase), output: packagesPath).Execute();
+            new PackCommand(GetProjectPath(dotnetDep), output: packagesPath).Execute();
 
             var restore = new RestoreCommand().Execute($"{GetProjectPath(appRoot)} --fallbacksource {packagesPath}");
 
@@ -57,12 +63,6 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         private string GetProjectPath(string projectDir)
         {
             return Path.Combine(projectDir, "project.json");
-        }
-
-        private TestAssetsManager GetAssetsManager()
-        {
-            string assetsRoot = Path.Combine(RepoRoot, "TestAssets", "TestProjectsNoBuild");
-            return new TestAssetsManager(assetsRoot);
         }
     }
 }

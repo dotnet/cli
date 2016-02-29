@@ -181,9 +181,6 @@ namespace Microsoft.DotNet.Cli.Build
             Mkdirp(testProjectsDir);
             CopyRecursive(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects"), testProjectsDir);
 
-            // These projects should not be restored/built by the Restore/BuildTestAssetProjects. Test methods will handle these separately.
-            CopyRecursive(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjectsNoBuild"), testProjectsDir);
-
             // Run the tests and set the VS vars in the environment when running them
             var failingTests = new List<string>();
             foreach (var project in TestProjects)

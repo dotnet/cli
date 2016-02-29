@@ -8,10 +8,6 @@
         "emitEntryPoint": true
     },
     "frameworks": {
-		"dnxcore50": {},
-        "net461": {
-            "frameworkAssemblies": {
-            }
-        }
+        "net451": {}
     }
 }
