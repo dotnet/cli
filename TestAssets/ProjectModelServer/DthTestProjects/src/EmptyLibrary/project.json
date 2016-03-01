@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0-*",
+  "dependencies": { },
+  "frameworks": {
+    "dnxcore50": {
+      "dependencies":{
+        "System.Runtime": "4.0.21-*"
+      }
+    }
+  }
+}
