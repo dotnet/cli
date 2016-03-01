@@ -4,12 +4,10 @@
 using System;
 using System.IO;
 using System.Linq;
-using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
-using Microsoft.DotNet.TestFramework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
