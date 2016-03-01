@@ -122,10 +122,6 @@ namespace Microsoft.DotNet.ProjectModel.Server
             }
             catch (Exception ex)
             {
-                // TODO: review error handing logic
-
-                _log.LogError($"Error occurred: {ex}");
-
                 var error = new ErrorMessage
                 {
                     Message = ex.Message
