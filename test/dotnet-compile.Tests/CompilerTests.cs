@@ -3,7 +3,10 @@
 
 using System;
 using System.IO;
+using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
+using FluentAssertions;
 using Xunit;
 
 namespace Microsoft.DotNet.Tools.Compiler.Tests
@@ -104,6 +107,64 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             var buildCommand = new BuildCommand(testProject);
 
             buildCommand.Execute().Should().Pass();
+        }
+
+        [Fact]
+        public void ContentFilesAreCopied()
+        {
+            var testInstance = TestAssetsManager.CreateTestInstance("TestAppWithContentPackage")
+                                                .WithLockFiles();
+
+            var root = testInstance.TestRoot;
+
+            // run compile
+            var outputDir = Path.Combine(root, "bin");
+            var testProject = ProjectUtils.GetProjectJson(root, "TestAppWithContentPackage");
+            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultFramework);
+            var result = buildCommand.ExecuteWithCapturedOutput();
+            result.Should().Pass();
+
+            result = Command.Create(Path.Combine(outputDir, buildCommand.GetOutputExecutableName()), new string [0])
+                .CaptureStdErr()
+                .CaptureStdOut()
+                .Execute();
+            result.Should().Pass();
+
+            // verify the output xml file
+            new DirectoryInfo(outputDir).Sub("scripts").Should()
+                .Exist()
+                .And.HaveFile("run.cmd");
+            new DirectoryInfo(outputDir).Should()
+                .HaveFile("config.xml");
+            // verify embedded resources
+            result.StdOut.Should().Contain("TestAppWithContentPackage.dnf.png");
+            result.StdOut.Should().Contain("TestAppWithContentPackage.ui.png");
+            // verify 'all' language files not included
+            result.StdOut.Should().NotContain("TestAppWithContentPackage.dnf_all.png");
+            result.StdOut.Should().NotContain("TestAppWithContentPackage.ui_all.png");
+            // verify classes
+            result.StdOut.Should().Contain("TestAppWithContentPackage.Foo");
+            result.StdOut.Should().Contain("MyNamespace.Util");
+        }
+
+        [Fact]
+        public void EmbeddedDependencyContextIsValidOnBuild()
+        {
+            var testProjectPath = Path.Combine(RepoRoot, "TestAssets", "TestProjects", "DependencyContextValidator", "TestApp");
+            var testProject = Path.Combine(testProjectPath, "project.json");
+
+            var runCommand = new RunCommand(testProject);
+            runCommand.Execute().Should().Pass();
+        }
+
+        [Fact]
+        public void DepsDependencyContextIsValidOnBuild()
+        {
+                var testProjectPath = Path.Combine(RepoRoot, "TestAssets", "TestProjects", "DependencyContextValidator", "TestAppDeps");
+                var testProject = Path.Combine(testProjectPath, "project.json");
+
+                var runCommand = new RunCommand(testProject);
+                runCommand.Execute().Should().Pass();
         }
 
         private void CopyProjectToTempDir(string projectDir, TempDirectory tempDir)

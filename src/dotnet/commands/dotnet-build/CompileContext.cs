@@ -255,7 +255,7 @@ namespace Microsoft.DotNet.Tools.Build
 
         private void CollectCompilerNamePreconditions(ProjectContext project, IncrementalPreconditions preconditions)
         {
-            var projectCompiler = CompilerUtil.ResolveCompilerName(project);
+            var projectCompiler = project.ProjectFile.CompilerName;
 
             if (!KnownCompilers.Any(knownCompiler => knownCompiler.Equals(projectCompiler, StringComparison.Ordinal)))
             {
@@ -355,6 +355,12 @@ namespace Microsoft.DotNet.Tools.Build
             if (_args.IsCppModeValue)
             {
                 args.Add("--cpp");
+            }
+
+            if (!string.IsNullOrWhiteSpace(_args.CppCompilerFlagsValue))
+            {
+                args.Add("--cppcompilerflags");
+                args.Add(_args.CppCompilerFlagsValue);
             }
 
             if (!string.IsNullOrWhiteSpace(_args.ArchValue))
