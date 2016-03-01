@@ -36,6 +36,17 @@ namespace Microsoft.DotNet.Tools.Restore
             var quiet = args.Any(s => s.Equals("--quiet", StringComparison.OrdinalIgnoreCase));
             args = args.Where(s => !s.Equals("--quiet", StringComparison.OrdinalIgnoreCase)).ToArray();
 
+            // NuGet disabled RID inference, but we need it back for now, while we implement the rest of the portable app stuff.
+            // Re-enabling it like this won't mess with our ability to support the other scenarios, it just means we're restoring more than we need for now.
+            // This **will** mean we are ignoring the RIDs provided in the project.json, if any, though.
+            if(!args.Contains("--runtime", StringComparer.OrdinalIgnoreCase))
+            {
+                args = Enumerable.Concat(
+                        args,
+                        PlatformServices.Default.Runtime.GetOverrideRestoreRuntimeIdentifiers().SelectMany(s => new [] { "--runtime", s })
+                    ).ToArray();
+            }
+
             app.OnExecute(() =>
             {
                 try
