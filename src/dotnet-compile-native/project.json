@@ -6,9 +6,19 @@
     "dependencies": {
         "System.CommandLine": "0.1.0-e160119-1",
 
-        "Microsoft.DotNet.ProjectModel": "1.0.0-*",
-        "Microsoft.DotNet.Compiler.Common": "1.0.0-*",
-        "Microsoft.DotNet.Cli.Utils": "1.0.0-*",
+        "Microsoft.DotNet.ProjectModel": {
+            "version": "1.0.0-beta-*",
+            "target": "package"
+        },
+        "Microsoft.DotNet.Compiler.Common": {
+            "version": "1.0.0-beta-*",
+            "target": "project",
+            "type": "build"
+        },
+        "Microsoft.DotNet.Cli.Utils": {
+            "version": "1.0.0-beta-*",
+            "target": "package"
+        },
         "Microsoft.DotNet.ILCompiler.SDK": "1.0.6-prerelease-00003",
 
         "Microsoft.Extensions.Logging": "1.0.0-rc2-16040",
@@ -26,7 +36,6 @@
             "version": "1.0.0-rc2-16453",
             "type": "build"
         },
-        "Microsoft.Extensions.Testing.Abstractions": "1.0.0-*",
         "Microsoft.NETCore.ConsoleHost": "1.0.0-rc2-23811",
         "Microsoft.NETCore.TestHost": "1.0.0-rc2-23811",
         "NETStandard.Library": "1.0.0-rc2-23811",

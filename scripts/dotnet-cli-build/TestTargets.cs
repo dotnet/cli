@@ -13,15 +13,11 @@ namespace Microsoft.DotNet.Cli.Build
 {
     public class TestTargets
     {
-        public static readonly string[] TestPackageProjects = new[]
+        public static readonly dynamic[] PackageProjects = new[]
         {
-            "dotnet-hello/v1/dotnet-hello",
-            "dotnet-hello/v2/dotnet-hello"
-        };
-        
-        public static readonly string[] ProductPackageProjects = new[]
-        {
-            "dotnet-compile-native"
+            new { Name = "dotnet-hello", Path = "TestAssets/TestPackages/dotnet-hello/v1/dotnet-hello", IsApplicable = new Func<bool>(() => true) },
+            new { Name = "dotnet-hello", Path = "TestAssets/TestPackages/dotnet-hello/v2/dotnet-hello", IsApplicable = new Func<bool>(() => true) },
+            new { Name = "dotnet-compile-native", Path = "src/dotnet-compile-native", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) }
         };
 
         public static readonly string[] TestProjects = new[]
@@ -51,7 +47,7 @@ namespace Microsoft.DotNet.Cli.Build
         [Target(nameof(SetupTestPackages), nameof(SetupTestProjects))]
         public static BuildTargetResult SetupTests(BuildTargetContext c) => c.Success();
         
-        [Target(nameof(SetupTestProductPackages), nameof(RestoreTestAssetPackages), nameof(BuildTestAssetPackages))]
+        [Target(nameof(RestoreTestAssetPackages), nameof(BuildTestAssetPackages))]
         public static BuildTargetResult SetupTestPackages(BuildTargetContext c) => c.Success();
 
         [Target(nameof(RestoreTestAssetProjects), nameof(BuildTestAssetProjects))]
@@ -66,7 +62,9 @@ namespace Microsoft.DotNet.Cli.Build
             CleanNuGetTempCache();
 
             var dotnet = DotNetCli.Stage2;
-            dotnet.Restore().WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages")).Execute().EnsureSuccessful();
+            dotnet.Restore()
+                .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages"))
+                .Execute().EnsureSuccessful();
 
             return c.Success();
         }
@@ -102,27 +100,9 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var dotnet = DotNetCli.Stage2;
 
-            foreach (var relativePath in TestPackageProjects)
+            foreach (var relativePath in PackageProjects.Where(p => p.IsApplicable).Select(p => p.Path))
             {
-                var fullPath = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages", relativePath.Replace('/', Path.DirectorySeparatorChar));
-                c.Info($"Packing: {fullPath}");
-                dotnet.Pack("--output", Dirs.TestPackages)
-                    .WorkingDirectory(fullPath)
-                    .Execute()
-                    .EnsureSuccessful();
-            }
-            
-            return c.Success();
-        }
-
-        [Target(nameof(CleanTestPackageSource))]
-        public static BuildTargetResult SetupTestProductPackages(BuildTargetContext c)
-        {
-            var dotnet = DotNetCli.Stage2;
-            
-            foreach (var relativePath in ProductPackageProjects)
-            {
-                var fullPath = Path.Combine(c.BuildContext.BuildDirectory, "src", relativePath.Replace('/', Path.DirectorySeparatorChar));
+                var fullPath = Path.Combine(c.BuildContext.BuildDirectory, relativePath.Replace('/', Path.DirectorySeparatorChar));
                 c.Info($"Packing: {fullPath}");
                 dotnet.Pack("--output", Dirs.TestPackages)
                     .WorkingDirectory(fullPath)
@@ -136,8 +116,10 @@ namespace Microsoft.DotNet.Cli.Build
         [Target]
         public static BuildTargetResult CleanTestPackages(BuildTargetContext c)
         {
-            Rmdir(Path.Combine(Dirs.NuGetPackages, "dotnet-hello"));
-            Rmdir(Path.Combine(Dirs.NuGetPackages, "dotnet-compile-native"));
+            foreach (var packageName in PackageProjects.Where(p => p.IsApplicable).Select(p => p.Name))
+            {
+                Rmdir(Path.Combine(Dirs.NuGetPackages, packageName));
+            }
             
             return c.Success();
         }
