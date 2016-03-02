@@ -3,6 +3,7 @@
     "compilationOptions": {
         "keyFile": "../../tools/Key.snk"
     },
+    "compile" : "../Shared/*.cs",
     "description": "Types to model a .NET Project",
     "dependencies": {
         "System.Reflection.Metadata": "1.2.0-rc2-23901",

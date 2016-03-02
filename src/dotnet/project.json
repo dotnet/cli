@@ -3,6 +3,7 @@
     "compilationOptions": {
         "emitEntryPoint": true
     },
+    "compile" : "../Shared/*.cs",
     "compileExclude": [ 
         "commands/dotnet-new/CSharp_Console/**", 
         "commands/dotnet-new/FSharp_Console/**" 

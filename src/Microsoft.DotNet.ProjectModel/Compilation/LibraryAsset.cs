@@ -10,7 +10,7 @@ using Microsoft.Extensions.Internal;
 
 namespace Microsoft.DotNet.ProjectModel.Compilation
 {
-    public struct LibraryAsset
+    public struct LibraryAsset : IEquatable<LibraryAsset>
     {
         public string Name { get; }
         public string RelativePath { get; }

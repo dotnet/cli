@@ -1,4 +1,5 @@
 {
+  "compile" : "../Shared/*.cs",
   "dependencies": {
     "dotnet": { "target": "project" },
     "Microsoft.DotNet.ProjectModel": { "target": "project" },
