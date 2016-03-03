@@ -83,15 +83,18 @@ namespace Microsoft.DotNet.Cli.Build
             foreach (var project in projects)
             {
                 c.Info($"Restoring: {project}");
-                dotnet.Restore("--fallbacksource", Dirs.TestPackages)
+            dotnet.Restore("--fallbacksource", Dirs.TestPackages)
                     .WorkingDirectory(Path.GetDirectoryName(project))
-                    .Execute().EnsureSuccessful();
+                .Execute().EnsureSuccessful();
             }
 
             // The 'ProjectModelServer' directory contains intentionally-unresolved dependencies, so don't check for success. Also, suppress the output
-            dotnet.Restore().WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectModelServer"))
-                .CaptureStdErr()
-                .CaptureStdOut()
+            dotnet.Restore()
+                .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectModelServer", "DthTestProjects"))
+                .Execute();
+                
+            dotnet.Restore()
+                .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectModelServer", "DthUpdateSearchPathSample"))
                 .Execute();
 
             return c.Success();
