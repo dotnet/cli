@@ -25,7 +25,7 @@ Additionally each build should update `latest` [version descriptors](#version-de
 
 ## Windows output
 
-Nuget - WIP
+Nuget - WIP, this should include versioning scheme
 
 | `<Extension>` | Description |
 | --- | :--- |
@@ -42,7 +42,7 @@ Nuget - WIP
 
 ## Ubuntu output
 
-Debian feed - WIP
+Debian feed - WIP, this should include versioning scheme
 
 | `<Extension>` | Description |
 | --- | :--- |
@@ -61,7 +61,47 @@ WIP
 - Should <Version> include channel name to avoid situation where you have two files on your computer and latest file might have lower version than the newest?
 
 # Obtaining dotnet
+
 ## Installation scripts
+
+Installation script is a shell script which lets customers install dotnet.
+
+For Windows we are using PowerShell script (install-dotnet.ps1).
+For any other OS we are using bash script (install-dotnet.sh)
+
+WIP: Exact script action description.
+
+### Script arguments description
+
+| PowerShell script | Bash script | Default | Description |
+| --- | --- | --- | --- |
+| -Channel | WIP | production | Which [channel](#channels) to install from. Possible values: `future`, `preview`, `production` |
+| -Version | WIP | `global.json` or `latest` | |
+| -InstallDir | WIP | Windows: `%LocalAppData%\Microsoft\.dotnet` | Path to where install dotnet. Note that binaries will be placed directly in a given directory. |
+| -Architecture | WIP | auto | Possible values: `auto`, `x64`, `x86`. `auto` refers to currently running OS architecture. |
+| -DebugSymbols | WIP | `<not set>` | If switch present, installation will include debug symbol |
+| -DryRun | WIP | `<not set>` | If switch present, installation will not be performed and instead deterministic invocation with specific version and zip location will be displayed. |
+| -NoPath | WIP | `<not set>` | If switch present the script will not set PATH environmental variable for the current process. |
+| -Verbose | WIP | `<not set>` | If switch present displays diagnostics information. |
+| -AzureFeed | WIP | `https://dotnetcli.blob.core.windows.net/dotnet` | Azure feed URL. |
+
+### Script location
+WIP: permanent link for obtaining latest version
+WIP: versioning description
+Newest version of the scripts can be found in the repository under following directory:
+```
+https://github.com/dotnet/cli/tree/rel/1.0.0/scripts/obtain
+```
+
+Older version of the script can be obtained using:
+```
+https://github.com/dotnet/cli/blob/<commit_hash>/scripts/obtain
+```
+
+## Getting started page
+WIP
+
+## Repo landing page
 WIP
 
 # Version descriptors
