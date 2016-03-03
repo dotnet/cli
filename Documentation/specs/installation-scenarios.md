@@ -1,6 +1,7 @@
 # Build output
 ## Notes
 This section describes placeholders used inside URLs provided later.
+
 | Placeholder | Description |
 | --- | --- |
 | `<Channel>` | `(nightly|preview|production)`. TODO: more info |
@@ -9,7 +10,7 @@ This section describes placeholders used inside URLs provided later.
 | `<LowestSupportedOSVersion>` | Lowest supported OS Version |
 | `<Architecture>` | Processor architecture related to binaries produced |
 | `<Extension>` | File extension. This will be described in more details later for each OS separately. |
-| `<OSID>` | Abbreviation for: <OSName>.<LowestSupportedOSVersion>.<Architecture> |
+| `<OSID>` | Abbreviation for: `<OSName>.<LowestSupportedOSVersion>.<Architecture>` |
 | `<VersionPointer>` | `(latest|lkg)` |
 
 ## Build Outputs
