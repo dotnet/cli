@@ -28,7 +28,7 @@ Additionally each build should update `latest` [version descriptors](#version-de
 Nuget - WIP
 
 | `<Extension>` | Description |
-| --- | --- |
+| --- | :--- |
 | exe | Installer bundle. It should be used by end customers |
 | msi | Installer package. It should be used by customers wanting to include cli as part of their setup |
 | zip | Packed binaries. It is used by [installation script](#installation-scripts) |
@@ -36,7 +36,7 @@ Nuget - WIP
 ## OSX output
 
 | `<Extension>` | Description |
-| --- | --- |
+| --- | :--- |
 | pkg | WIP |
 | tar.gz | Packed binaries. It is used by [installation script](#installation-scripts) |
 
@@ -45,7 +45,7 @@ Nuget - WIP
 Debian feed - WIP
 
 | `<Extension>` | Description |
-| --- | --- |
+| --- | :--- |
 | tar.gz | Packed binaries. It is used by [installation script](#installation-scripts) |
 
 ## RedHat/CentOS output
@@ -69,8 +69,10 @@ WIP
 Version pointers represent URLs to the latest and Last Known Good (LKG) builds.
 Specific URLs TBD. This will be something similar to following:
 ```
-<domain>/
+<Domain>/dotnet/<Channel>/<VersionPointer>.<OSID>.version
 ```
+
+`<Domain>` TBD
 
 ## Version files
 Version files can be found in multiple places:
