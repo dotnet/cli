@@ -2,14 +2,14 @@
 This section describes placeholders used inside this spec.
 
 | Placeholder | Description |
-| --- | --- |
-| `<Channel>` | `(nightly|preview|production)`. TODO: more info |
+| ---: | :--- |
+| `<Channel>` | `(future|preview|production)`. [See more info](#channels) |
 | `<Version>` | 4-part-number version |
 | `<OSName>`  | `(win|ubuntu|rhel|osx|debian)` - code for OS name |
 | `<LowestSupportedOSVersion>` | Lowest supported OS Version |
 | `<Architecture>` | Processor architecture related to binaries produced |
 | `<Extension>` | File extension. This will be described in more details later for each OS separately. |
-| `<OSID>` | Abbreviation for: `<OSName>.<LowestSupportedOSVersion>.<Architecture>` |
+| `<OSID>` | Abbreviation for: `<OSName><LowestSupportedOSVersion>.<Architecture>`. More info [OSID]{#osid} |
 | `<VersionPointer>` | `(latest|lkg)` |
 | `<ExecutableExtension>` | Executable extension including dot specific to OS (can be empty string) |
 | `<CommitHash>` | Commit hash related to state of repository from where build with specific `<Version>` was build |
@@ -46,7 +46,13 @@ WIP
 ## Questions
 - Should <Version> include channel name to avoid situation where you have two files on your computer and latest file might have lower version than the newest?
 
-# Version pointers
+# Version descriptors
+## Version pointers
+Version pointers represent URLs to the latest and Last Known Good (LKG) builds.
+Specific URLs TBD. This will be something similar to following:
+```
+<domain>/
+```
 
 ## Version files
 Version files can be found in multiple places:
@@ -69,6 +75,8 @@ https://dotnetcli.blob.core.windows.net/dotnet/<Channel>/<VersionPointer>.<OSID>
 # Package content
 Currently package is required to contain two files:
 - .version - [version file](#version-file)
+- dotnet<ExecutableExtension> - entry point for all dotnet commands
+
 ## Disk Layout
 ```
 .\
@@ -76,3 +84,26 @@ Currently package is required to contain two files:
     bin\
         dotnet<ExecutableExtension>
 ```
+
+# Channels
+Currently we have 3 channels which gives us idea about stability and quality of product.
+
+## Github branches relation
+
+| Channel name | Github branch | Description |
+| --- | --- | --- |
+| future | master | Branch with |
+| preview | rel/1.0.0 | Branch which is being stabilized. Most of the bugs and gaps are known. No new features expected on the branch. |
+| production | N/A, prod? | Most stable branch |
+
+Each branch on each successful build produces packages described in [build output](#build-output).
+
+# OSID
+* This requires more discussion *
+OSID represents abbreviation for:
+```
+<OSName><LowestSupportedOSVersion>.<Architecture>
+```
+This gives us flexibility to easily create new binaries when OS makes a breaking change without creating confusing names.
+Example names would be:
+win7.x64 - currently we ship api-ms-*.dll which are irrelevant on higher Windows version we could possibly create slightly smaller package without them for win8.x64 - this currently is no issue as the files are fairly small but it is a good example on easiness of the process. In example if some of the dotnet cli files will be shipped with OS (who knows?) or Windows decides to do some breaking changes we could easily create new version.
