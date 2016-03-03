@@ -102,7 +102,7 @@ namespace Microsoft.DotNet.Tools.Build
             // rebuild if empty inputs / outputs
             if (!(compilerIO.Outputs.Any() && compilerIO.Inputs.Any()))
             {
-                Reporter.Output.WriteLine($"Project {project.GetDisplayName()} will be compiled because it either has empty inputs or outputs");
+                Reporter.Verbose.WriteLine($"Project {project.GetDisplayName()} will be compiled because it either has empty inputs or outputs");
                 return true;
             }
 
@@ -132,11 +132,11 @@ namespace Microsoft.DotNet.Tools.Build
 
             if (!newInputs.Any())
             {
-                Reporter.Output.WriteLine($"Project {project.GetDisplayName()} was previously compiled. Skipping compilation.");
+                Reporter.Verbose.WriteLine($"Project {project.GetDisplayName()} was previously compiled. Skipping compilation.");
                 return false;
             }
 
-            Reporter.Output.WriteLine($"Project {project.GetDisplayName()} will be compiled because some of its inputs were newer than its oldest output.");
+            Reporter.Verbose.WriteLine($"Project {project.GetDisplayName()} will be compiled because some of its inputs were newer than its oldest output.");
             Reporter.Verbose.WriteLine();
             Reporter.Verbose.WriteLine($" Oldest output item:");
             Reporter.Verbose.WriteLine($"  {minDateUtc.ToLocalTime()}: {minOutputPath}");
