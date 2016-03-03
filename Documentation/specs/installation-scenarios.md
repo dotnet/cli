@@ -9,7 +9,7 @@ This section describes placeholders used inside this spec.
 | `<LowestSupportedOSVersion>` | Lowest supported OS Version |
 | `<Architecture>` | Processor architecture related to binaries produced |
 | `<Extension>` | File extension. This will be described in more details later for each OS separately. |
-| `<OSID>` | Abbreviation for: `<OSName><LowestSupportedOSVersion>.<Architecture>`. More info [OSID]{#osid} |
+| `<OSID>` | Abbreviation for: `<OSName><LowestSupportedOSVersion>.<Architecture>`. [See more info](#osid) |
 | `<VersionPointer>` | `(latest|lkg)` |
 | `<ExecutableExtension>` | Executable extension including dot specific to OS (can be empty string) |
 | `<CommitHash>` | Commit hash related to state of repository from where build with specific `<Version>` was build |
@@ -21,23 +21,37 @@ https://dotnetcli.blob.core.windows.net/dotnet/<Channel>/<Version>/dotnet.<OSID>
 ```
 Content of the package should contain binaries which layout will be described later.
 
-Additionally each build should update `latest` [version pointer](#version-pointers) and version badge
-Latest/LKG information:
-- [Version file](#version-files): `https://dotnetcli.blob.core.windows.net/dotnet/<Channel>/<VersionPointer>.<OSID>.version`
+Additionally each build should update `latest` [version descriptors](#version-descriptors)
 
-TODO: permanent links
+## Windows output
 
+Nuget - WIP
 
-## Windows outputs
+| `<Extension>` | Description |
+| --- | --- |
+| exe | Installer bundle. It should be used by end customers |
+| msi | Installer package. It should be used by customers wanting to include cli as part of their setup |
+| zip | Packed binaries. It is used by [installation script](#installation-scripts) |
+
+## OSX output
+
+| `<Extension>` | Description |
+| --- | --- |
+| pkg | WIP |
+| tar.gz | Packed binaries. It is used by [installation script](#installation-scripts) |
+
+## Ubuntu output
+
+Debian feed - WIP
+
+| `<Extension>` | Description |
+| --- | --- |
+| tar.gz | Packed binaries. It is used by [installation script](#installation-scripts) |
+
+## RedHat/CentOS output
 WIP
 
-## Ubuntu outputs
-WIP
-
-## RedHat/CentOS outputs
-WIP
-
-## Debian outputs
+## Debian output
 WIP
 
 ## Example build output links
@@ -45,6 +59,10 @@ WIP
 
 ## Questions
 - Should <Version> include channel name to avoid situation where you have two files on your computer and latest file might have lower version than the newest?
+
+# Obtaining dotnet
+## Installation scripts
+WIP
 
 # Version descriptors
 ## Version pointers
@@ -59,6 +77,11 @@ Version files can be found in multiple places:
 - Package: relative path inside the package ./.version
 - Latest/LKG version file: WIP
 
+URL:
+```
+https://dotnetcli.blob.core.windows.net/dotnet/<Channel>/<VersionPointer>.<OSID>.version
+```
+
 ### File content
 Each version file contains two lines describing the build:
 ```
@@ -71,6 +94,9 @@ Version badge (SVG) is an image with textual representation of `<Version>`. It c
 ```
 https://dotnetcli.blob.core.windows.net/dotnet/<Channel>/<VersionPointer>.<OSID>.svg
 ```
+
+## Questions/gaps
+- Version Pointer links should be permanent and hosted on a separate domain
 
 # Package content
 Currently package is required to contain two files:
@@ -99,7 +125,9 @@ Currently we have 3 channels which gives us idea about stability and quality of 
 Each branch on each successful build produces packages described in [build output](#build-output).
 
 # OSID
-* This requires more discussion *
+
+**This requires more discussion**
+
 OSID represents abbreviation for:
 ```
 <OSName><LowestSupportedOSVersion>.<Architecture>
