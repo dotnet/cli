@@ -1,0 +1,12 @@
+{
+    "version": "1.0.0",
+    "compilationOptions": {
+        "keyFile": "../key.snk"
+    },
+    "scripts": {
+        "postcompile": "scripts/batchcopy %compile:OutputDir% ../artifacts"
+    },
+    "frameworks": {
+        "net451": {}
+    }
+}

@@ -125,7 +125,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.dll");
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.pdb");
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.dll.config");
-            publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibraryLesser.deps");
+            publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibraryLesser.deps"); 
 
             // dependencies should also be copied
             publishCommand.GetOutputDirectory().Should().HaveFile("Newtonsoft.Json.dll");
@@ -137,7 +137,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.dll");
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.pdb");
             publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibraryLesser.dll.config");
-            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.deps");
+            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.deps"); 
 
             // dependencies should also be copied
             publishCommand.GetOutputDirectory().Should().HaveFile("Newtonsoft.Json.dll");

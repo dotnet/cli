@@ -1,0 +1,13 @@
+{
+    "version": "1.0.0",
+    "dependencies": {
+        "dotnet-base": { "type": "default", "target": "package", "version": "2.0.0" },
+        "dotnet-dep": { "type": "default", "target": "package", "version": "1.0.0" }
+    },
+    "compilationOptions": {
+        "emitEntryPoint": true
+    },
+    "frameworks": {
+        "net451": {}
+    }
+}

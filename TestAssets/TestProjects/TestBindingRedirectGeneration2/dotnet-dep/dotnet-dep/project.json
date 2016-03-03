@@ -1,0 +1,18 @@
+{
+    "version": "1.0.0",
+    "dependencies": {
+        "dotnet-base": {
+            "type": "default",
+            "target": "project"
+        }
+    },
+    "compilationOptions": {
+        "keyFile": "../key.snk"
+    },
+    "frameworks": {
+        "net451": {}
+    },
+    "packInclude": {
+        "lib/net451/": "../artifacts/dotnet-base.dll"
+    }
+}
