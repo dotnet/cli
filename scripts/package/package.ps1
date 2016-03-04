@@ -11,10 +11,10 @@ header "Generating zip package"
 _ "$RepoRoot\scripts\package\package-zip.ps1"
 
 header "Generating dotnet MSI"
-_ "$RepoRoot\packaging\windows\generatemsi.ps1" @("$Stage2Dir")
+_ "$RepoRoot\packaging\cli\windows\generatemsi.ps1" @("$Stage2Dir")
 
 header "Generating NuGet packages"
-_ "$RepoRoot\packaging\nuget\package.ps1" @("$Stage2Dir\bin", "$env:VersionSuffix")
+_ "$RepoRoot\packaging\cli\nuget\package.ps1" @("$Stage2Dir\bin", "$env:VersionSuffix")
 
 header "Generating version badge"
 $VersionBadge = "$RepoRoot\resources\images\version_badge.svg"

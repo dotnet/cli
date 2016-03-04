@@ -5,7 +5,7 @@ param(
     [Parameter(Mandatory=$true)][string]$inputDir
 )
 
-. "$PSScriptRoot\..\..\scripts\common\_common.ps1"
+. "$PSScriptRoot\..\..\..\scripts\common\_common.ps1"
 
 $DotnetMSIOutput = ""
 $DotnetBundleOutput = ""
@@ -63,11 +63,11 @@ function RunCandle
     pushd "$WixRoot"
 
     Write-Host Running candle..
-    $AuthWsxRoot =  Join-Path $RepoRoot "packaging\windows"
+    $AuthWsxRoot =  Join-Path $RepoRoot "packaging\cli\windows"
 
     .\candle.exe -nologo `
         -dDotnetSrc="$inputDir" `
-        -dMicrosoftEula="$RepoRoot\packaging\osx\resources\en.lproj\eula.rtf" `
+        -dMicrosoftEula="$RepoRoot\packaging\cli\osx\resources\en.lproj\eula.rtf" `
         -dBuildVersion="$env:DOTNET_MSI_VERSION" `
         -dDisplayVersion="$env:DOTNET_CLI_VERSION" `
         -dReleaseSuffix="$env:ReleaseSuffix" `
@@ -127,11 +127,11 @@ function RunCandleForBundle
     pushd "$WixRoot"
 
     Write-Host Running candle for bundle..
-    $AuthWsxRoot =  Join-Path $RepoRoot "packaging\windows"
+    $AuthWsxRoot =  Join-Path $RepoRoot "packaging\cli\windows"
 
     .\candle.exe -nologo `
         -dDotnetSrc="$inputDir" `
-        -dMicrosoftEula="$RepoRoot\packaging\osx\resources\en.lproj\eula.rtf" `
+        -dMicrosoftEula="$RepoRoot\packaging\cli\osx\resources\en.lproj\eula.rtf" `
         -dBuildVersion="$env:DOTNET_MSI_VERSION" `
         -dDisplayVersion="$env:DOTNET_CLI_VERSION" `
         -dReleaseSuffix="$env:ReleaseSuffix" `
@@ -158,7 +158,7 @@ function RunLightForBundle
     pushd "$WixRoot"
 
     Write-Host Running light for bundle..
-    $AuthWsxRoot =  Join-Path $RepoRoot "packaging\windows"
+    $AuthWsxRoot =  Join-Path $RepoRoot "packaging\cli\windows"
 
     .\light.exe -nologo `
         -cultures:en-us `
@@ -246,7 +246,7 @@ Write-Host -ForegroundColor Green "Successfully created dotnet bundle - $DotnetB
 
 _ $RepoRoot\test\Installer\testmsi.ps1 @("$DotnetMSIOutput")
 
-$PublishScript = Join-Path $PSScriptRoot "..\..\scripts\publish\publish.ps1"
+$PublishScript = Join-Path $RepoRoot "scripts\publish\publish.ps1"
 & $PublishScript -file $DotnetBundleOutput
 
 exit $LastExitCode
