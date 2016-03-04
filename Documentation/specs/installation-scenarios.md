@@ -13,7 +13,7 @@ This section describes placeholders used inside this spec.
 | `<VersionPointer>` | `(latest|lkg)` |
 | `<ExecutableExtension>` | Executable extension including dot specific to OS (can be empty string) |
 | `<CommitHash>` | Commit hash related to state of repository from where build with specific `<Version>` was build |
-| `<DebianPackageName>` | Name of the debian package |
+| `<DebianPackageName>` | Name of the debian package. [See more info](#debian-feed-relation) |
 
 # Build Output
 Each official, successful build should create and upload packages to location described by following URL:
@@ -34,6 +34,13 @@ Nuget - WIP, this should include versioning scheme
 | msi | Installer package. It should be used by customers wanting to include cli as part of their setup |
 | zip | Packed binaries. It is used by [installation script](#installation-scripts) |
 
+### Including dotnet cli installer as part of your bundle
+
+In order to install dotnet cli with other installer you need an MSI package. To get MSI, download exe bundle and extract it using `dark` tool which is part of [WiX Toolset](http://wixtoolset.org):
+```
+dark.exe -x <FolderWhereToExtract> <InstallerPath>
+```
+
 ## OSX output
 
 | `<Extension>` | Description |
@@ -45,8 +52,8 @@ Nuget - WIP, this should include versioning scheme
 
 | `<Extension>` | Description |
 | --- | :--- |
-| tar.gz | Packed binaries. It is used by [installation script](#installation-scripts) |
 | deb | Debian package. This package is being pushed to a [debian feed](#debian-feed) |
+| tar.gz | Packed binaries. It is used by [installation script](#installation-scripts) |
 
 ## RedHat/CentOS output
 WIP
@@ -75,15 +82,15 @@ WIP: Exact script action description.
 
 | PowerShell script | Bash script | Default | Description |
 | --- | --- | --- | --- |
-| -Channel | WIP | production | Which [channel](#channels) to install from. Possible values: `future`, `preview`, `production` |
-| -Version | WIP | `global.json` or `latest` | |
-| -InstallDir | WIP | Windows: `%LocalAppData%\Microsoft\.dotnet` | Path to where install dotnet. Note that binaries will be placed directly in a given directory. |
-| -Architecture | WIP | auto | Possible values: `auto`, `x64`, `x86`. `auto` refers to currently running OS architecture. |
-| -DebugSymbols | WIP | `<not set>` | If switch present, installation will include debug symbol |
-| -DryRun | WIP | `<not set>` | If switch present, installation will not be performed and instead deterministic invocation with specific version and zip location will be displayed. |
-| -NoPath | WIP | `<not set>` | If switch present the script will not set PATH environmental variable for the current process. |
-| -Verbose | WIP | `<not set>` | If switch present displays diagnostics information. |
-| -AzureFeed | WIP | `https://dotnetcli.blob.core.windows.net/dotnet` | Azure feed URL. |
+| -Channel | --channel | production | Which [channel](#channels) to install from. Possible values: `future`, `preview`, `production` |
+| -Version | --version | `global.json` or `latest` | |
+| -InstallDir | --prefix | Windows: `%LocalAppData%\Microsoft\.dotnet` | Path to where install dotnet. Note that binaries will be placed directly in a given directory. |
+| -Architecture | --architecture | auto | Possible values: `auto`, `x64`, `x86`. `auto` refers to currently running OS architecture. |
+| -DebugSymbols | --debug-symbols | `<not set>` | If switch present, installation will include debug symbol |
+| -DryRun | --dry-run | `<not set>` | If switch present, installation will not be performed and instead deterministic invocation with specific version and zip location will be displayed. |
+| -NoPath | --no-path | `<not set>` | If switch present the script will not set PATH environmental variable for the current process. |
+| -Verbose | --verbose | `<not set>` | If switch present displays diagnostics information. |
+| -AzureFeed | --azure-feed | See description | Azure feed URL, default: `https://dotnetcli.blob.core.windows.net/dotnet` |
 
 ### Script location
 WIP: permanent link for obtaining latest version
