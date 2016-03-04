@@ -13,6 +13,7 @@ This section describes placeholders used inside this spec.
 | `<VersionPointer>` | `(latest|lkg)` |
 | `<ExecutableExtension>` | Executable extension including dot specific to OS (can be empty string) |
 | `<CommitHash>` | Commit hash related to state of repository from where build with specific `<Version>` was build |
+| `<DebianPackageName>` | Name of the debian package |
 
 # Build Output
 Each official, successful build should create and upload packages to location described by following URL:
@@ -42,11 +43,10 @@ Nuget - WIP, this should include versioning scheme
 
 ## Ubuntu output
 
-Debian feed - WIP, this should include versioning scheme
-
 | `<Extension>` | Description |
 | --- | :--- |
 | tar.gz | Packed binaries. It is used by [installation script](#installation-scripts) |
+| deb | Debian package. This package is being pushed to a [debian feed](#debian-feed) |
 
 ## RedHat/CentOS output
 WIP
@@ -154,26 +154,66 @@ Currently package is required to contain two files:
 ```
 
 # Channels
-Currently we have 3 channels which gives us idea about stability and quality of product.
+Currently we have 3 channels which gives us idea about stability and quality of our product.
+
+| Channel name | Description |
+| :---: | :--- |
+| future | This channel can contain new features which may not be fully complete. This is usually most unstable channel. |
+| preview | This channel is in the process of stablization. Most of the bugs and gaps are known. No new features expected. |
+| production | This is the most stable channel. Features and gaps are known. No breaking changes can be expected. This channel will only be producing new versions on hotfixes. |
 
 ## Github branches relation
 
-| Channel name | Github branch | Description |
-| --- | --- | --- |
-| future | master | Branch with |
-| preview | rel/1.0.0 | Branch which is being stabilized. Most of the bugs and gaps are known. No new features expected on the branch. |
-| production | N/A, prod? | Most stable branch |
+Each branch on each successful build produces packages described in [build output](#build-output). Mapping between branches and channel name can be found in the table below:
 
-Each branch on each successful build produces packages described in [build output](#build-output).
+| Channel name | Github branch |
+| :---: | :--- |
+| future | master |
+| preview | rel/1.0.0 |
+| production | N/A, prod? |
+
+## Debian feed relation
+
+After each successful build package is being pushed to the debian feed. More information on debian feed can be found [here](#debian-feed).
+
+| Channel name | `<DebianPackageName>` |
+| :---: | :--- |
+| future | dotnet-future |
+| preview | dotnet-preview |
+| production | dotnet |
+
+## Questions
+- What is the bar for triggering hotfix?
 
 # OSID
-
-**This requires more discussion**
 
 OSID represents abbreviation for:
 ```
 <OSName><LowestSupportedOSVersion>.<Architecture>
 ```
-This gives us flexibility to easily create new binaries when OS makes a breaking change without creating confusing names.
-Example names would be:
-win7.x64 - currently we ship api-ms-*.dll which are irrelevant on higher Windows version we could possibly create slightly smaller package without them for win8.x64 - this currently is no issue as the files are fairly small but it is a good example on easiness of the process. In example if some of the dotnet cli files will be shipped with OS (who knows?) or Windows decides to do some breaking changes we could easily create new version.
+This naming scheme gives us flexibility to easily create new binaries when OS makes a breaking change without creating confusing names.
+
+In example, we currently put `api-ms-*.dll` files in our binaries. Those files are not needed on Windows 8 and higher. When using name `win7.x64` we can easily decide to get rid of `api-ms-*.dll` in the newest packages and simply call new version `win8.x64` which would mean that from Windows 8 forward those are recommended binaries (there is currently no issue with those files and this should be only treated as an example).
+
+# Debian feed
+
+Newest binaries in debian feed may be delayed due to external issues by up to 24h.
+
+## Obtaining binaries
+
+Add debian feed:
+```
+sudo sh -c 'echo "deb [arch=amd64] http://apt-mo.trafficmanager.net/repos/dotnet/ trusty main" > /etc/apt/sources.list.d/dotnetdev.list'
+
+sudo apt-key adv --keyserver apt-mo.trafficmanager.net --recv-keys 417A0893
+
+sudo apt-get update
+```
+
+Install:
+```
+sudo apt-get install <DebianPackageName>=<Version>
+```
+
+## Questions
+- Is debian version compatible with `<Version>` or does it require additional revision number, i.e.: `1.0.0.001598-1`?
