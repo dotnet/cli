@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.Cli.Utils
                    ResolveFromAppBase(commandName, args) ??
                    ResolveFromPath(commandName, args);
         }
-        
+
         public static CommandSpec TryResolveScriptCommandSpec(string commandName, IEnumerable<string> args, Project project, string[] inferredExtensionList)
         {
             return ResolveFromRootedCommand(commandName, args) ??
@@ -34,7 +34,7 @@ namespace Microsoft.DotNet.Cli.Utils
                    ResolveFromAppBase(commandName, args) ??
                    ResolveFromPath(commandName, args);
         }
-        
+
 
         private static CommandSpec ResolveFromPath(string commandName, IEnumerable<string> args)
         {
@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.Cli.Utils
                 ? null
                 : CreateCommandSpecPreferringExe(commandName, args, commandPath, CommandResolutionStrategy.BaseDirectory);
         }
-        
+
         private static CommandSpec ResolveFromProjectPath(string commandName, IEnumerable<string> args, Project project, string[] inferredExtensionList)
         {
             var commandPath = Env.GetCommandPathFromRootPath(project.ProjectDirectory, commandName, inferredExtensionList);
@@ -144,7 +144,7 @@ namespace Microsoft.DotNet.Cli.Utils
                 return null;
             }
 
-            var lockFile = LockFileReader.Read(lockPath);
+            var lockFile = CachedLockFileReader.Read(lockPath);
 
             var lib = lockFile.PackageLibraries.FirstOrDefault(l => l.Name == commandName);
             var packageDir = new VersionFolderPathResolver(context.PackagesDirectory)
@@ -221,7 +221,7 @@ namespace Microsoft.DotNet.Cli.Utils
             CommandResolutionStrategy resolutionStrategy)
         {
             var useComSpec = false;
-            
+
             if (PlatformServices.Default.Runtime.OperatingSystemPlatform == Platform.Windows &&
                 Path.GetExtension(commandPath).Equals(".cmd", StringComparison.OrdinalIgnoreCase))
             {
@@ -255,7 +255,7 @@ namespace Microsoft.DotNet.Cli.Utils
             CommandResolutionStrategy resolutionStrategy)
         {
             var comSpec = Environment.GetEnvironmentVariable("ComSpec");
-            
+
             // Handle the case where ComSpec is already the command
             if (command.Equals(comSpec, StringComparison.OrdinalIgnoreCase))
             {
