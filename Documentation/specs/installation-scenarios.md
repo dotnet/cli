@@ -217,3 +217,4 @@ sudo apt-get install <DebianPackageName>=<Version>
 
 ## Questions
 - Is debian version compatible with `<Version>` or does it require additional revision number, i.e.: `1.0.0.001598-1`?
+- How to differentiate between Debian package for Debian and Debian package for Ubuntu?
