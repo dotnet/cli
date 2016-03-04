@@ -31,7 +31,6 @@ Nuget - WIP, this should include versioning scheme
 | `<Extension>` | Description |
 | --- | :--- |
 | exe | Installer bundle. It should be used by end customers |
-| msi | Installer package. It should be used by customers wanting to include cli as part of their setup |
 | zip | Packed binaries. It is used by [installation script](#installation-scripts) |
 
 ### Including dotnet cli installer as part of your bundle
@@ -188,6 +187,9 @@ After each successful build package is being pushed to the debian feed. More inf
 | future | dotnet-future |
 | preview | dotnet-preview |
 | production | dotnet |
+
+## Nuget semantic version suffix relation
+WIP
 
 ## Questions
 - What is the bar for triggering hotfix?
