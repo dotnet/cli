@@ -427,7 +427,7 @@ namespace Microsoft.DotNet.ProjectModel
         {
             var projectLockJsonPath = Path.Combine(projectDir, LockFile.FileName);
             return File.Exists(projectLockJsonPath) ?
-                        CachedLockFileReader.Read(Path.Combine(projectDir, LockFile.FileName)) :
+                        LockFileReaderCache.Default.Read(Path.Combine(projectDir, LockFile.FileName)) :
                         null;
         }
 

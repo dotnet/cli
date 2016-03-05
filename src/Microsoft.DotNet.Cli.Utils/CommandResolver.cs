@@ -102,7 +102,7 @@ namespace Microsoft.DotNet.Cli.Utils
                 return null;
             }
 
-            var projectContext = ProjectContext.Create(projectRootPath, framework, PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
+            var projectContext = ProjectContextCache.Default.Create(projectRootPath, framework, PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
             return projectContext;
         }
 
@@ -144,7 +144,7 @@ namespace Microsoft.DotNet.Cli.Utils
                 return null;
             }
 
-            var lockFile = CachedLockFileReader.Read(lockPath);
+            var lockFile = LockFileReaderCache.Default.Read(lockPath);
 
             var lib = lockFile.PackageLibraries.FirstOrDefault(l => l.Name == commandName);
             var packageDir = new VersionFolderPathResolver(context.PackagesDirectory)

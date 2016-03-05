@@ -5,11 +5,13 @@ using System.Collections.Generic;
 
 namespace Microsoft.DotNet.ProjectModel.Graph
 {
-    public static class CachedLockFileReader
+    public class LockFileReaderCache
     {
-        private static readonly Dictionary<string, LockFile> _cache = new Dictionary<string, LockFile>();
+        public static LockFileReaderCache Default { get; } = new LockFileReaderCache();
 
-        public static LockFile Read(string lockFilePath)
+        private readonly Dictionary<string, LockFile> _cache = new Dictionary<string, LockFile>();
+
+        public LockFile Read(string lockFilePath)
         {
             lock (_cache)
             {

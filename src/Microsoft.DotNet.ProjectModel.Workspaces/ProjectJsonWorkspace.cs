@@ -92,7 +92,7 @@ namespace Microsoft.DotNet.ProjectModel.Workspaces
                 var projectDependency = dependency.Library as ProjectDescription;
                 if (projectDependency != null)
                 {
-                    var projectDependencyContext = ProjectContext.Create(projectDependency.Project.ProjectFilePath, projectDependency.Framework);
+                    var projectDependencyContext = ProjectContextCache.Default.Create(projectDependency.Project.ProjectFilePath, projectDependency.Framework);
 
                     var id = AddProject(projectDependencyContext);
 
