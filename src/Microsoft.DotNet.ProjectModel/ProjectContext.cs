@@ -73,7 +73,6 @@ namespace Microsoft.DotNet.ProjectModel
         /// </summary>
         public static ProjectContext Create(string projectPath, NuGetFramework framework, IEnumerable<string> runtimeIdentifiers)
         {
-            Console.WriteLine($"{projectPath} {framework} {string.Join(",", runtimeIdentifiers)}");
             if (projectPath.EndsWith(Project.FileName))
             {
                 projectPath = Path.GetDirectoryName(projectPath);
