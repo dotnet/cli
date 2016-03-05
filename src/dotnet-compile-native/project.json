@@ -7,19 +7,20 @@
         "System.CommandLine": "0.1.0-e160119-1",
 
         "Microsoft.DotNet.ProjectModel": {
-            "version": "1.0.0-beta-*",
-            "target": "package"
+            "version": "1.0.0-*"
         },
         "Microsoft.DotNet.Compiler.Common": {
-            "version": "1.0.0-beta-*",
-            "target": "project",
-            "type": "build"
+            "version": "1.0.0-*"
         },
         "Microsoft.DotNet.Cli.Utils": {
-            "version": "1.0.0-beta-*",
-            "target": "package"
+            "version": "1.0.0-*"
         },
+        "Microsoft.Extensions.DependencyModel": {
+            "version": "1.0.0-*"
+        },
+        
         "Microsoft.DotNet.ILCompiler.SDK": "1.0.6-prerelease-00003",
+        "Microsoft.DotNet.AppDep":"1.0.6-prerelease-00003",
 
         "Microsoft.Extensions.Logging": "1.0.0-rc2-16040",
         "Microsoft.Extensions.Logging.Console": "1.0.0-rc2-16040",
@@ -36,23 +37,14 @@
             "version": "1.0.0-rc2-16453",
             "type": "build"
         },
-        "Microsoft.NETCore.ConsoleHost": "1.0.0-rc2-23811",
-        "Microsoft.NETCore.TestHost": "1.0.0-rc2-23811",
-        "NETStandard.Library": "1.0.0-rc2-23811",
-        "System.Reflection.Metadata": "1.3.0-beta-23811",
-        "System.Diagnostics.TextWriterTraceListener": "4.0.0-rc2-23811",
-        "System.Diagnostics.TraceSource": "4.0.0-rc2-23811",
-        "System.Linq.Expressions": "4.0.11-rc2-23811",
-        "System.Xml.XDocument": "4.0.11-rc2-23811",
-        "System.Resources.ReaderWriter": "4.0.0-rc2-23811",
-        "System.Net.Sockets": "4.1.0-rc2-23811",
-        "System.IO.Compression.ZipFile": "4.0.1-rc2-23811",
-        "System.Threading.ThreadPool": "4.0.10-rc2-23811",
-        "System.Runtime.Serialization.Primitives": "4.1.0-rc2-23811"
+        "NETStandard.Library": "1.0.0-rc2-23901"
     },
     "frameworks": {
-        "dnxcore50": {
-            "imports": "portable-net45+win8"
+        "netstandardapp1.5": {
+            "imports": [
+                "dnxcore50",
+                "portable-net45+win8"
+            ]
         }
     }
 }

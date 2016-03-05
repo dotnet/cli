@@ -158,16 +158,16 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
 
         private NativeCompileSettings()
         {
+            var pathResolver = new NativeSdkPathResolver();
+            
             _linkLibPaths = new List<string>();
             
-            IlcPath = AppContext.BaseDirectory;
-
-            // By default, ILC SDK Path is assumed to be the same folder as ILC path
-            IlcSdkPath = IlcPath;
+            IlcPath = pathResolver.IlcRootPath;
+            IlcSdkPath = pathResolver.IlcSdkRootPath;
             Architecture = DefaultArchitectureMode;
             BuildType = DefaultBuiltType;
             NativeMode = DefaultNativeModel;
-            AppDepSDKPath = Path.Combine(AppContext.BaseDirectory, "appdepsdk");            
+            AppDepSDKPath = pathResolver.AppDepsRootPath;            
             _referencePaths = new Dictionary<string, string>();
             foreach (var file in Directory.EnumerateFiles(AppDepSDKPath, "*.dll"))
             {

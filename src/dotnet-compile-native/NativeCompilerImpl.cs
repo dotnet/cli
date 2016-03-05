@@ -34,6 +34,11 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
                 .Select(r => r.ResolvedPath)
                 .ToList();
 
+            references.AddRange(exports.SelectMany(export => export.NativeLibraries)
+                                       .Select(r => r.ResolvedPath));
+
+            
+
             // Setup native args.
             var nativeArgs = new List<string>();
 

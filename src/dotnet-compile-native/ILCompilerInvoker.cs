@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -78,9 +79,8 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
             var intermediateDirectory = config.IntermediateDirectory;
             var rsp = Path.Combine(intermediateDirectory, "dotnet-compile-native-ilc.rsp");
             File.WriteAllLines(rsp, Args, Encoding.UTF8);
-
-            var hostPath = Path.Combine(config.IlcPath, HostExeName);
-            var result = Command.Create(hostPath, new string[] { ilcExePath, "@" + $"{rsp}" })
+            
+            var result = Command.Create(CoreHost.HostExePath, new string[] { ilcExePath, $"--depsfile:{Path.Combine(AppContext.BaseDirectory, "dotnet-compile-native.deps")}", "@" + $"{rsp}" })
                 .ForwardStdErr()
                 .ForwardStdOut()
                 .Execute();

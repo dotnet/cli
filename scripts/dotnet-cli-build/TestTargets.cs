@@ -100,7 +100,7 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var dotnet = DotNetCli.Stage2;
 
-            foreach (var relativePath in PackageProjects.Where(p => p.IsApplicable).Select(p => p.Path))
+            foreach (var relativePath in PackageProjects.Where(p => p.IsApplicable()).Select(p => p.Path))
             {
                 var fullPath = Path.Combine(c.BuildContext.BuildDirectory, relativePath.Replace('/', Path.DirectorySeparatorChar));
                 c.Info($"Packing: {fullPath}");
@@ -116,7 +116,7 @@ namespace Microsoft.DotNet.Cli.Build
         [Target]
         public static BuildTargetResult CleanTestPackages(BuildTargetContext c)
         {
-            foreach (var packageName in PackageProjects.Where(p => p.IsApplicable).Select(p => p.Name))
+            foreach (var packageName in PackageProjects.Where(p => p.IsApplicable()).Select(p => p.Name))
             {
                 Rmdir(Path.Combine(Dirs.NuGetPackages, packageName));
             }
