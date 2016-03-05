@@ -7,13 +7,21 @@ using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Resolution;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using FluentAssertions;
+using NuGet.Frameworks;
+using NuGet.Versioning;
 using Xunit;
 
 namespace Microsoft.DotNet.ProjectModel.Tests
 {
     public class LibraryExporterPackageTests
     {
+        private const string PackageName = "PackageName";
+        private const string PackageType = "PackageName";
+        private NuGetVersion PackageVersion = new NuGetVersion(1, 2, 3);
         private const string PackagePath = "PackagePath";
+        private const string PackageHash = "Hash";
+        private const bool PackageServiceable = true;
+        private NuGetFramework PackageFramework = NuGetFramework.UnsupportedFramework;
 
         private LibraryExport ExportSingle(LibraryDescription description = null)
         {
@@ -48,8 +56,8 @@ namespace Microsoft.DotNet.ProjectModel.Tests
         private PackageDescription CreateDescription(LockFileTargetLibrary target = null, LockFilePackageLibrary package = null)
         {
             return new PackageDescription(PackagePath,
-                package ?? new LockFilePackageLibrary(),
-                target ?? new LockFileTargetLibrary(),
+                package ?? new LockFilePackageLibrary(PackageName, PackageVersion, PackageServiceable, PackageHash, new string[] { }),
+                target ?? new LockFileTargetLibrary(PackageName, PackageType, PackageFramework, PackageVersion),
                 new List<LibraryRange>(), compatible: true, resolved: true);
         }
 
@@ -57,13 +65,9 @@ namespace Microsoft.DotNet.ProjectModel.Tests
         private void ExportsPackageNativeLibraries()
         {
             var description = CreateDescription(
-                new LockFileTargetLibrary()
-                {
-                    NativeLibraries = new List<LockFileItem>()
-                    {
-                        { new LockFileItem() { Path = "lib/Native.so" } }
-                    }
-                });
+                new LockFileTargetLibrary(PackageName, PackageType, PackageFramework, PackageVersion,
+                    nativeLibraries: new LockFileItem[] {  "lib/Native.so" }
+                ));
 
             var result = ExportSingle(description);
             result.NativeLibraries.Should().HaveCount(1);
@@ -79,13 +83,9 @@ namespace Microsoft.DotNet.ProjectModel.Tests
         private void ExportsPackageCompilationAssebmlies()
         {
             var description = CreateDescription(
-                new LockFileTargetLibrary()
-                {
-                    CompileTimeAssemblies = new List<LockFileItem>()
-                    {
-                        { new LockFileItem() { Path = "ref/Native.dll" } }
-                    }
-                });
+                new LockFileTargetLibrary(PackageName, PackageType, PackageFramework, PackageVersion,
+                    compileTimeAssemblies: new LockFileItem[] { "ref/Native.dll" }
+                    ));
 
             var result = ExportSingle(description);
             result.CompilationAssemblies.Should().HaveCount(1);
@@ -101,13 +101,9 @@ namespace Microsoft.DotNet.ProjectModel.Tests
         private void ExportsPackageRuntimeAssebmlies()
         {
             var description = CreateDescription(
-                new LockFileTargetLibrary()
-                {
-                    RuntimeAssemblies = new List<LockFileItem>()
-                    {
-                        { new LockFileItem() { Path = "ref/Native.dll" } }
-                    }
-                });
+                new LockFileTargetLibrary(PackageName, PackageType, PackageFramework, PackageVersion,
+                    runtimeAssemblies: new LockFileItem[] {"ref/Native.dll"}
+                    ));
 
             var result = ExportSingle(description);
             result.RuntimeAssemblies.Should().HaveCount(1);
@@ -123,13 +119,13 @@ namespace Microsoft.DotNet.ProjectModel.Tests
         private void ExportsSources()
         {
             var description = CreateDescription(
-               package: new LockFilePackageLibrary()
-               {
-                   Files = new List<string>()
-                   {
-                      Path.Combine("shared", "file.cs")
-                   }
-               });
+               package: new LockFilePackageLibrary(
+                   PackageName,
+                   PackageVersion,
+                   PackageServiceable,
+                   PackageHash,
+                   new [] { Path.Combine("shared", "file.cs") }
+               ));
 
             var result = ExportSingle(description);
             result.SourceReferences.Should().HaveCount(1);
@@ -145,9 +141,8 @@ namespace Microsoft.DotNet.ProjectModel.Tests
         private void ExportsCopyToOutputContentFiles()
         {
             var description = CreateDescription(
-                new LockFileTargetLibrary()
-                {
-                    ContentFiles = new List<LockFileContentFile>()
+                new LockFileTargetLibrary(PackageName, PackageType, PackageFramework, PackageVersion,
+                    contentFiles: new LockFileContentFile[]
                     {
                         new LockFileContentFile()
                         {
@@ -157,7 +152,7 @@ namespace Microsoft.DotNet.ProjectModel.Tests
                             PPOutputPath = "something"
                         }
                     }
-                });
+                ));
 
             var result = ExportSingle(description);
             result.RuntimeAssets.Should().HaveCount(1);
@@ -173,9 +168,8 @@ namespace Microsoft.DotNet.ProjectModel.Tests
         private void ExportsResourceContentFiles()
         {
             var description = CreateDescription(
-                new LockFileTargetLibrary()
-                {
-                    ContentFiles = new List<LockFileContentFile>()
+                new LockFileTargetLibrary(PackageName, PackageType, PackageFramework, PackageVersion,
+                    contentFiles: new LockFileContentFile[]
                     {
                         new LockFileContentFile()
                         {
@@ -184,7 +178,7 @@ namespace Microsoft.DotNet.ProjectModel.Tests
                             PPOutputPath = "something"
                         }
                     }
-                });
+                ));
 
             var result = ExportSingle(description);
             result.EmbeddedResources.Should().HaveCount(1);
@@ -199,9 +193,8 @@ namespace Microsoft.DotNet.ProjectModel.Tests
         private void ExportsCompileContentFiles()
         {
             var description = CreateDescription(
-                new LockFileTargetLibrary()
-                {
-                    ContentFiles = new List<LockFileContentFile>()
+                new LockFileTargetLibrary(PackageName, PackageType, PackageFramework, PackageVersion,
+                    contentFiles: new LockFileContentFile[]
                     {
                         new LockFileContentFile()
                         {
@@ -210,7 +203,7 @@ namespace Microsoft.DotNet.ProjectModel.Tests
                             PPOutputPath = "something"
                         }
                     }
-                });
+                ));
 
             var result = ExportSingle(description);
             result.SourceReferences.Should().HaveCount(1);
@@ -227,9 +220,8 @@ namespace Microsoft.DotNet.ProjectModel.Tests
         private void SelectsContentFilesOfProjectCodeLanguage()
         {
             var description = CreateDescription(
-                new LockFileTargetLibrary()
-                {
-                    ContentFiles = new List<LockFileContentFile>()
+                new LockFileTargetLibrary(PackageName, PackageType, PackageFramework, PackageVersion,
+                    contentFiles: new LockFileContentFile[]
                     {
                             new LockFileContentFile()
                             {
@@ -252,7 +244,7 @@ namespace Microsoft.DotNet.ProjectModel.Tests
                                 PPOutputPath = "something",
                             }
                     }
-                });
+                ));
 
             var result = ExportSingle(description);
             result.SourceReferences.Should().HaveCount(1);
@@ -267,9 +259,8 @@ namespace Microsoft.DotNet.ProjectModel.Tests
         private void SelectsContentFilesWithNoLanguageIfProjectLanguageNotMathed()
         {
             var description = CreateDescription(
-                new LockFileTargetLibrary()
-                {
-                    ContentFiles = new List<LockFileContentFile>()
+                new LockFileTargetLibrary(PackageName, PackageType, PackageFramework, PackageVersion,
+                    contentFiles: new List<LockFileContentFile>()
                     {
                             new LockFileContentFile()
                             {
@@ -285,7 +276,7 @@ namespace Microsoft.DotNet.ProjectModel.Tests
                                 PPOutputPath = "something",
                             }
                     }
-                });
+                ));
 
             var result = ExportSingle(description);
             result.SourceReferences.Should().HaveCount(1);

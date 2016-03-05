@@ -15,19 +15,26 @@ namespace Microsoft.DotNet.ProjectModel.Tests
         public void GetDescriptionShouldNotModifyTarget()
         {
             var provider = new PackageDependencyProvider("/foo/packages", new FrameworkReferenceResolver("/foo/references"));
-            var package = new LockFilePackageLibrary();
-            package.Name = "Something";
-            package.Version = NuGetVersion.Parse("1.0.0");
-            package.Files.Add("lib/dotnet/_._");
-            package.Files.Add("runtimes/any/native/Microsoft.CSharp.CurrentVersion.targets");
+            var package = new LockFilePackageLibrary(
+                "Something",
+                NuGetVersion.Parse("1.0.0"),
+                true,
+                "Hash",
+                new[]
+                {
+                    "lib/dotnet/_._",
+                    "runtimes/any/native/Microsoft.CSharp.CurrentVersion.targets"
+                });
 
-            var target = new LockFileTargetLibrary();
-            target.Name = "Something";
-            target.Version = package.Version;
-
-            target.RuntimeAssemblies.Add("lib/dotnet/_._");
-            target.CompileTimeAssemblies.Add("lib/dotnet/_._");
-            target.NativeLibraries.Add("runtimes/any/native/Microsoft.CSharp.CurrentVersion.targets");
+            var target = new LockFileTargetLibrary(
+                name: "Something",
+                version: package.Version,
+                targetFramework: NuGetFramework.UnsupportedFramework,
+                type: "package",
+                runtimeAssemblies: new LockFileItem[] { "lib/dotnet/_._"},
+                compileTimeAssemblies: new LockFileItem[] {"lib/dotnet/_._"},
+                nativeLibraries: new LockFileItem[] {"runtimes/any/native/Microsoft.CSharp.CurrentVersion.targets"}
+                );
 
             var p1 = provider.GetDescription(NuGetFramework.Parse("netstandardapp1.5"), package, target);
             var p2 = provider.GetDescription(NuGetFramework.Parse("netstandardapp1.5"), package, target);
