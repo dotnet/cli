@@ -13,11 +13,11 @@ using NuGet.Frameworks;
 
 // This class is responsible with defining the arguments for the Compile verb.
 // It knows how to interpret them and set default values
-namespace Microsoft.DotNet.Tools.Compiler
+namespace Microsoft.DotNet.Tools.Compiler.Native
 {
-    public delegate bool OnExecute(List<ProjectContext> contexts, CompilerCommandApp compilerCommand);
+    public delegate bool OnExecute(List<ProjectContext> contexts, NativeCompilerCommandApp nativeCompilerCommand);
 
-    public class CompilerCommandApp
+    public class NativeCompilerCommandApp
     {
         private readonly CommandLineApplication _app;
 
@@ -29,6 +29,14 @@ namespace Microsoft.DotNet.Tools.Compiler
         private CommandOption _versionSuffixOption;
         private CommandOption _configurationOption;
         private CommandArgument _projectArgument;
+        private CommandOption _nativeOption;
+        private CommandOption _archOption;
+        private CommandOption _ilcArgsOption;
+        private CommandOption _ilcPathOption;
+        private CommandOption _ilcSdkPathOption;
+        private CommandOption _appDepSdkPathOption;
+        private CommandOption _cppModeOption;
+        private CommandOption _cppCompilerFlagsOption;
 
         // resolved values for the options and arguments
         public string ProjectPathValue { get; set; }
@@ -37,11 +45,19 @@ namespace Microsoft.DotNet.Tools.Compiler
         public string RuntimeValue { get; set; }
         public string VersionSuffixValue { get; set; }
         public string ConfigValue { get; set; }
+        public bool IsNativeValue { get; set; }
+        public string ArchValue { get; set; }
+        public IEnumerable<string> IlcArgsValue { get; set; }
+        public string IlcPathValue { get; set; }
+        public string IlcSdkPathValue { get; set; }
+        public bool IsCppModeValue { get; set; }
+        public string AppDepSdkPathValue { get; set; }
+        public string CppCompilerFlagsValue { get; set; }
 
         // workaround: CommandLineApplication is internal therefore I cannot make _app protected so baseclasses can add their own params
         private readonly Dictionary<string, CommandOption> baseClassOptions;
 
-        public CompilerCommandApp(string name, string fullName, string description)
+        public NativeCompilerCommandApp(string name, string fullName, string description)
         {
             _app = new CommandLineApplication
             {
@@ -66,6 +82,16 @@ namespace Microsoft.DotNet.Tools.Compiler
             _runtimeOption = _app.Option("-r|--runtime <RUNTIME_IDENTIFIER>", "Target runtime to publish for", CommandOptionType.SingleValue);
             _versionSuffixOption = _app.Option("--version-suffix <VERSION_SUFFIX>", "Defines what `*` should be replaced with in version field in project.json", CommandOptionType.SingleValue);
             _projectArgument = _app.Argument("<PROJECT>", "The project to compile, defaults to the current directory. Can be a path to a project.json or a project directory");
+
+            // Native Args
+            _nativeOption = _app.Option("-n|--native", "Compiles source to native machine code.", CommandOptionType.NoValue);
+            _archOption = _app.Option("-a|--arch <ARCH>", "The architecture for which to compile. x64 only currently supported.", CommandOptionType.SingleValue);
+            _ilcArgsOption = _app.Option("--ilcarg <ARG>", "Command line option to be passed directly to ILCompiler.", CommandOptionType.MultipleValue);
+            _ilcPathOption = _app.Option("--ilcpath <PATH>", "Path to the folder containing custom built ILCompiler.", CommandOptionType.SingleValue);
+            _ilcSdkPathOption = _app.Option("--ilcsdkpath <PATH>", "Path to the folder containing ILCompiler application dependencies.", CommandOptionType.SingleValue);
+            _appDepSdkPathOption = _app.Option("--appdepsdkpath <PATH>", "Path to the folder containing ILCompiler application dependencies.", CommandOptionType.SingleValue);
+            _cppModeOption = _app.Option("--cpp", "Flag to do native compilation with C++ code generator.", CommandOptionType.NoValue);
+            _cppCompilerFlagsOption = _app.Option("--cppcompilerflags <flags>", "Additional flags to be passed to the native compiler.", CommandOptionType.SingleValue);
         }
 
         public int Execute(OnExecute execute, string[] args)
@@ -84,6 +110,15 @@ namespace Microsoft.DotNet.Tools.Compiler
                 ConfigValue = _configurationOption.Value() ?? Constants.DefaultConfiguration;
                 RuntimeValue = _runtimeOption.Value();
                 VersionSuffixValue = _versionSuffixOption.Value();
+
+                IsNativeValue = _nativeOption.HasValue();
+                ArchValue = _archOption.Value();
+                IlcArgsValue = _ilcArgsOption.HasValue() ? _ilcArgsOption.Values : Enumerable.Empty<string>();
+                IlcPathValue = _ilcPathOption.Value();
+                IlcSdkPathValue = _ilcSdkPathOption.Value();
+                AppDepSdkPathValue = _appDepSdkPathOption.Value();
+                IsCppModeValue = _cppModeOption.HasValue();
+                CppCompilerFlagsValue = _cppCompilerFlagsOption.Value();
 
                 IEnumerable<ProjectContext> contexts;
                 
@@ -125,9 +160,9 @@ namespace Microsoft.DotNet.Tools.Compiler
             return _app.Execute(args);
         }
 
-        public CompilerCommandApp ShallowCopy()
+        public NativeCompilerCommandApp ShallowCopy()
         {
-            return (CompilerCommandApp)MemberwiseClone();
+            return (NativeCompilerCommandApp)MemberwiseClone();
         }
 
         // CommandOptionType is internal. Cannot pass it as argument. Therefore the method name encodes the option type.

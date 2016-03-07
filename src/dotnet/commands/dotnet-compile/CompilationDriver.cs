@@ -8,13 +8,11 @@ namespace Microsoft.DotNet.Tools.Compiler
 {
     public class CompilationDriver
     {
-        private readonly ICompiler _managedCompiler;
-        private readonly ICompiler _nativeCompiler;
+        private readonly IManagedCompiler _managedCompiler;
 
-        public CompilationDriver(ICompiler managedCompiler, ICompiler nativeCompiler)
+        public CompilationDriver(IManagedCompiler managedCompiler)
         {
             _managedCompiler = managedCompiler;
-            _nativeCompiler = nativeCompiler;
         }
 
         public bool Compile(IEnumerable<ProjectContext> contexts, CompilerCommandApp args)
@@ -24,11 +22,6 @@ namespace Microsoft.DotNet.Tools.Compiler
             foreach (var context in contexts)
             {
                 success &= _managedCompiler.Compile(context, args);
-                if (args.IsNativeValue && success)
-                {
-                    var runtimeContext = context.CreateRuntimeContext(args.GetRuntimes());
-                    success &= _nativeCompiler.Compile(runtimeContext, args);
-                }
             }
 
             return success;

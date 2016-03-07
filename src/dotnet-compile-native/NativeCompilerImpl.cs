@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
@@ -6,11 +6,11 @@ using System.IO;
 using System.Linq;
 using Microsoft.DotNet.ProjectModel;
 
-namespace Microsoft.DotNet.Tools.Compiler
+namespace Microsoft.DotNet.Tools.Compiler.Native
 {
-    public class NativeCompiler : Compiler
+    public class NativeCompilerImpl
     {
-        public override bool Compile(ProjectContext context, CompilerCommandApp args)
+        public bool Compile(ProjectContext context, NativeCompilerCommandApp args)
         {
             var outputPaths = context.GetOutputPaths(args.ConfigValue, args.BuildBasePathValue, args.OutputValue);
             var outputPath = outputPaths.RuntimeOutputPath;
@@ -33,6 +33,11 @@ namespace Microsoft.DotNet.Tools.Compiler
                 .SelectMany(export => export.RuntimeAssemblies)
                 .Select(r => r.ResolvedPath)
                 .ToList();
+
+            references.AddRange(exports.SelectMany(export => export.NativeLibraries)
+                                       .Select(r => r.ResolvedPath));
+
+            
 
             // Setup native args.
             var nativeArgs = new List<string>();

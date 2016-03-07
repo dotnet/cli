@@ -5,7 +5,7 @@ using Microsoft.DotNet.ProjectModel;
 
 namespace Microsoft.DotNet.Tools.Compiler
 {
-    public interface ICompiler
+    public interface IManagedCompiler
     {
         bool Compile(ProjectContext context, CompilerCommandApp args);
     }

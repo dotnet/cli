@@ -13,7 +13,7 @@ using Microsoft.DotNet.ProjectModel.Resources;
 
 namespace Microsoft.DotNet.Tools.Compiler
 {
-    public abstract class Compiler : ICompiler
+    public abstract class Compiler : IManagedCompiler
     {
         public abstract bool Compile(ProjectContext context, CompilerCommandApp args);
 

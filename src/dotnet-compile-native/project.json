@@ -1,0 +1,50 @@
+{
+    "version": "1.0.0-*",
+    "compilationOptions": {
+        "emitEntryPoint": true
+    },
+    "dependencies": {
+        "System.CommandLine": "0.1.0-e160119-1",
+
+        "Microsoft.DotNet.ProjectModel": {
+            "version": "1.0.0-*"
+        },
+        "Microsoft.DotNet.Compiler.Common": {
+            "version": "1.0.0-*"
+        },
+        "Microsoft.DotNet.Cli.Utils": {
+            "version": "1.0.0-*"
+        },
+        "Microsoft.Extensions.DependencyModel": {
+            "version": "1.0.0-*"
+        },
+        
+        "Microsoft.DotNet.ILCompiler.SDK": "1.0.6-prerelease-00003",
+        "Microsoft.DotNet.AppDep":"1.0.6-prerelease-00003",
+
+        "Microsoft.Extensions.Logging": "1.0.0-rc2-16040",
+        "Microsoft.Extensions.Logging.Console": "1.0.0-rc2-16040",
+        "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc2-16537",
+        "Microsoft.Extensions.CommandLineUtils.Sources": {
+            "type": "build",
+            "version": "1.0.0-rc2-16453"
+        },
+        "Microsoft.Dnx.Runtime.CommandParsing.Sources": {
+            "version": "1.0.0-rc2-16453",
+            "type": "build"
+        },
+        "Microsoft.Dnx.Runtime.Sources": {
+            "version": "1.0.0-rc2-16453",
+            "type": "build"
+        },
+        "NETStandard.Library": "1.0.0-rc2-23901"
+    },
+    "frameworks": {
+        "netstandardapp1.5": {
+            "imports": [
+                "dnxcore50",
+                "portable-net45+win8"
+            ]
+        }
+    }
+}

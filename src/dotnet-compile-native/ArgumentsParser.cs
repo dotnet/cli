@@ -36,8 +36,8 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
                 {
                     syntax.HandleHelp = false;
                     syntax.HandleErrors = false;
-
-                    syntax.DefineOption("output", ref outputDirectory, "Output Directory for native executable.");
+                    
+                    syntax.DefineOption("o|output", ref outputDirectory, "Output Directory for native executable.");
                     syntax.DefineOption("temp-output", ref temporaryOutputDirectory, "Directory for intermediate files.");
 
                     syntax.DefineOption("configuration", ref configuration,

@@ -107,10 +107,43 @@ namespace Microsoft.DotNet.Tools.Restore
 
         private static void RestoreTools(Project project, RestoreTask restoreTask, bool quiet)
         {
+            var success = true;
+            
             foreach (var tooldep in project.Tools)
             {
-                RestoreTool(tooldep, restoreTask, quiet);
+                if(IsValidToolDep(tooldep))
+                {
+                    RestoreTool(tooldep, restoreTask, quiet);
+                }
+                else
+                {
+                    success = false;
+                }
             }
+            
+            if (!success)
+            {
+                throw new InvalidOperationException("Some tools failed to restore");
+            }
+        }
+
+        private static bool IsValidToolDep(LibraryRange tooldep)
+        {
+            if (String.IsNullOrWhiteSpace(tooldep.Name))
+            {
+                Console.WriteLine($"Tool dependency must specify package name.");
+                
+                return false;
+            }
+            
+            if (tooldep.VersionRange == null)
+            {
+                Console.WriteLine($"Tool dependency '{tooldep.Name}' must specify a package version");
+                
+                return false;
+            }
+            
+            return true;
         }
 
         private static void RestoreTool(LibraryRange tooldep, RestoreTask restoreTask, bool quiet)

@@ -18,8 +18,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 var commandFactory = new DotNetCommandFactory();
                 var scriptRunner = new ScriptRunner();
                 var managedCompiler = new ManagedCompiler(scriptRunner, commandFactory);
-                var nativeCompiler = new NativeCompiler();
-                var compilationDriver = new CompilationDriver(managedCompiler, nativeCompiler);
+                var compilationDriver = new CompilationDriver(managedCompiler);
 
                 var compilerCommandArgs = new CompilerCommandApp("dotnet compile", ".NET Compiler", "Compiler for the .NET Platform");
 

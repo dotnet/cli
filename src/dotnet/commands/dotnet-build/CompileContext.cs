@@ -346,47 +346,6 @@ namespace Microsoft.DotNet.Tools.Build
                 args.Add(_args.BuildBasePathValue);
             }
 
-            //native args
-            if (_args.IsNativeValue)
-            {
-                args.Add("--native");
-            }
-
-            if (_args.IsCppModeValue)
-            {
-                args.Add("--cpp");
-            }
-
-            if (!string.IsNullOrWhiteSpace(_args.CppCompilerFlagsValue))
-            {
-                args.Add("--cppcompilerflags");
-                args.Add(_args.CppCompilerFlagsValue);
-            }
-
-            if (!string.IsNullOrWhiteSpace(_args.ArchValue))
-            {
-                args.Add("--arch");
-                args.Add(_args.ArchValue);
-            }
-
-            foreach (var ilcArg in _args.IlcArgsValue)
-            {
-                args.Add("--ilcarg");
-                args.Add(ilcArg);
-            }
-
-            if (!string.IsNullOrWhiteSpace(_args.IlcPathValue))
-            {
-                args.Add("--ilcpath");
-                args.Add(_args.IlcPathValue);
-            }
-
-            if (!string.IsNullOrWhiteSpace(_args.IlcSdkPathValue))
-            {
-                args.Add("--ilcsdkpath");
-                args.Add(_args.IlcSdkPathValue);
-            }
-
             args.Add(_rootProject.ProjectDirectory);
 
             var compileResult = CommpileCommand.Run(args.ToArray());

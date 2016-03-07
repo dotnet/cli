@@ -8,7 +8,7 @@ using Microsoft.DotNet.ProjectModel;
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
 {
-    public sealed class BuildCommand : TestCommand
+    public sealed class CompileNativeCommand : TestCommand
     {
         private Project _project;
         private string _projectPath;
@@ -18,9 +18,12 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         private string _framework;
         private string _versionSuffix;
         private bool _noHost;
-        private bool _buildProfile;
-        private bool _noIncremental;
-        private bool _noDependencies;
+        private string _architecture;
+        private string _ilcArgs;
+        private string _ilcPath;
+        private string _appDepSDKPath;
+        private bool _nativeCppMode;
+        private string _cppCompilerFlags;
 
         private string OutputOption
         {
@@ -81,37 +84,67 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             }
         }
 
-        private string BuildProfile
+        private string ArchitectureOption
         {
             get
             {
-                return _buildProfile ?
-                    "--build-profile" :
-                    "";
+                return _architecture == string.Empty ?
+                                           "" :
+                                           $"--arch {_architecture}";
             }
         }
 
-        private string NoIncremental
+        private string IlcArgsOption
         {
             get
             {
-                return _noIncremental ?
-                    "--no-incremental" :
-                    "";
+                return _ilcArgs == string.Empty ?
+                                           "" :
+                                           $"--ilcargs {_ilcArgs}";
             }
         }
 
-        private string NoDependencies
+        private string IlcPathOption
         {
             get
             {
-                return _noDependencies ?
-                    "--no-dependencies" :
-                    "";
+                return _ilcPath == string.Empty ?
+                                           "" :
+                                           $"--ilcpath {_ilcPath}";
             }
         }
 
-        public BuildCommand(
+        private string AppDepSDKPathOption
+        {
+            get
+            {
+                return _appDepSDKPath == string.Empty ?
+                                           "" :
+                                           $"--appdepsdkpath {_appDepSDKPath}";
+            }
+        }
+
+        private string NativeCppModeOption
+        {
+            get
+            {
+                return _nativeCppMode ?
+                        "--cpp" :
+                        "";
+            }
+        }
+
+        private string CppCompilerFlagsOption
+        {
+            get
+            {
+                return _cppCompilerFlags == string.Empty ?
+                                           "" :
+                                           $"--cppcompilerflags {_cppCompilerFlags}";
+            }
+        }
+
+        public CompileNativeCommand(
             string projectPath,
             string output="",
             string buidBasePath="",
@@ -119,6 +152,12 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             string framework="",
             string versionSuffix="",
             bool noHost=false,
+            string architecture="",
+            string ilcArgs="",
+            string ilcPath="",
+            string appDepSDKPath="",
+            bool nativeCppMode=false,
+            string cppCompilerFlags="",
             bool buildProfile=true,
             bool noIncremental=false,
             bool noDependencies=false
@@ -134,20 +173,23 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             _versionSuffix = versionSuffix;
             _framework = framework;
             _noHost = noHost;
-            _buildProfile = buildProfile;
-            _noIncremental = noIncremental;
-            _noDependencies = noDependencies;
+            _architecture = architecture;
+            _ilcArgs = ilcArgs;
+            _ilcPath = ilcPath;
+            _appDepSDKPath = appDepSDKPath;
+            _nativeCppMode = nativeCppMode;
+            _cppCompilerFlags = cppCompilerFlags;
         }
 
         public override CommandResult Execute(string args = "")
         {
-            args = $"--verbose build {BuildArgs()} {args}";
+            args = $"--verbose compile-native {BuildArgs()} {args}";
             return base.Execute(args);
         }
 
         public override CommandResult ExecuteWithCapturedOutput(string args = "")
         {
-            args = $"--verbose build {BuildArgs()} {args}";
+            args = $"--verbose compile-native {BuildArgs()} {args}";
             return base.ExecuteWithCapturedOutput(args);
         }
 
@@ -160,7 +202,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         private string BuildArgs()
         {
-            return $"{BuildProfile} {NoDependencies} {NoIncremental} \"{_projectPath}\" {OutputOption} {BuildBasePathOption} {ConfigurationOption} {FrameworkOption} {VersionSuffixOption} {NoHostOption}";
+            return $"\"{_projectPath}\" {OutputOption} {BuildBasePathOption} {ConfigurationOption} {FrameworkOption} {VersionSuffixOption} {NoHostOption} {ArchitectureOption} {IlcArgsOption} {IlcPathOption} {AppDepSDKPathOption} {NativeCppModeOption} {CppCompilerFlagsOption}";
         }
     }
 }

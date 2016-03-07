@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.Tools.Resgen
                     syntax.DefineOption("o|output", ref resgenCommand.OutputFileName, "Output file name");
                     syntax.DefineOption("c|culture", ref resgenCommand.AssemblyCulture, "Ouput assembly culture");
                     syntax.DefineOption("v|version", ref resgenCommand.AssemblyVersion, "Ouput assembly version");
-                    syntax.DefineOption("h|help", ref help, "Help for compile native.");
+                    syntax.DefineOption("h|help", ref help, "Help for resgen.");
 
                     syntax.DefineOptionList("r", ref resgenCommand.CompilationReferences, "Compilation references");
                     syntax.DefineParameterList("args", ref resgenCommand.Args, "Input files");
