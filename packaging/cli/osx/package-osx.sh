@@ -12,7 +12,7 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-source "$DIR/../../scripts/common/_common.sh"
+source "$DIR/../../../scripts/common/_common.sh"
 
 if [ -z "$DOTNET_CLI_VERSION" ]; then
     echo "Provide a version number (DOTNET_CLI_VERSION) $DOTNET_CLI_VERSION" && exit 1

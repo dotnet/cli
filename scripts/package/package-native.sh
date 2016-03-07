@@ -21,5 +21,5 @@ if [[ "$OSNAME" == "ubuntu" ]]; then
     $REPOROOT/scripts/package/package-debian.sh
 elif [[ "$OSNAME" == "osx" ]]; then
     # Create OSX PKG
-    $REPOROOT/packaging/osx/package-osx.sh
+    $REPOROOT/packaging/cli/osx/package-osx.sh
 fi

@@ -23,7 +23,7 @@ if [ "$OSNAME" != "ubuntu" ]; then
     exit 1
 fi
 
-PACKAGING_ROOT="$REPOROOT/packaging/debian"
+PACKAGING_ROOT="$REPOROOT/packaging/cli/debian"
 PACKAGING_TOOL_DIR="$REPOROOT/tools/DebianPackageTool"
 
 OUTPUT_DIR="$REPOROOT/artifacts"
