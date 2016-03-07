@@ -252,7 +252,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
         private static Command RunFsc(List<string> fscArgs)
         {
             var fscExe = Environment.GetEnvironmentVariable("DOTNET_FSC_PATH")
-                      ?? Path.Combine(AppContext.BaseDirectory, "fsc" + Constants.ExeSuffix);
+                      ?? Path.Combine(AppContext.BaseDirectory, "fsc.exe");
 
             var exec = Environment.GetEnvironmentVariable("DOTNET_FSC_EXEC")?.ToUpper() ?? "COREHOST";
 
