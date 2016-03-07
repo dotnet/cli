@@ -13,6 +13,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Host.Mef;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.DotNet.Cli.Compiler.Common;
+using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel.Compilation;
 using NuGet.Frameworks;
 
@@ -92,7 +93,7 @@ namespace Microsoft.DotNet.ProjectModel.Workspaces
                 var projectDependency = dependency.Library as ProjectDescription;
                 if (projectDependency != null)
                 {
-                    var projectDependencyContext = ProjectContext.Create(projectDependency.Project.ProjectFilePath, projectDependency.Framework);
+                    var projectDependencyContext = DotNetProjectCache.ProjectContextCache.Create(projectDependency.Project.ProjectFilePath, projectDependency.Framework);
 
                     var id = AddProject(projectDependencyContext);
 

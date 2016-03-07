@@ -149,7 +149,7 @@ namespace Microsoft.DotNet.Tools.Restore
 
         private static void CreateDepsInPackageCache(LibraryRange toolLibrary, string projectPath)
         {
-            var context = ProjectContext.Create(projectPath,
+            var context = DotNetProjectCache.ProjectContextCache.Create(projectPath,
                 FrameworkConstants.CommonFrameworks.NetStandardApp15, new[] { DefaultRid });
 
             var toolDescription = context.LibraryManager.GetLibraries()

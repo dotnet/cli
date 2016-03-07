@@ -53,25 +53,26 @@ namespace Microsoft.DotNet.ProjectModel.Graph
             catch
             {
                 // Ran into parsing errors, mark it as unlocked and out-of-date
-                return new LockFile(lockFilePath)
+                return new LockFileBuilder()
                 {
                     Version = int.MinValue
-                };
+                }.Build();
             }
         }
 
         private static LockFile ReadLockFile(string lockFilePath, JsonObject cursor)
         {
-            var lockFile = new LockFile(lockFilePath);
+            var lockFile = new LockFileBuilder();
+            lockFile.LockFilePath = lockFilePath;
             lockFile.Version = ReadInt(cursor, "version", defaultValue: int.MinValue);
             lockFile.Targets = ReadObject(cursor.ValueAsJsonObject("targets"), ReadTarget);
             lockFile.ProjectFileDependencyGroups = ReadObject(cursor.ValueAsJsonObject("projectFileDependencyGroups"), ReadProjectFileDependencyGroup);
             ReadLibrary(cursor.ValueAsJsonObject("libraries"), lockFile);
 
-            return lockFile;
+            return lockFile.Build();
         }
 
-        private static void ReadLibrary(JsonObject json, LockFile lockFile)
+        private static void ReadLibrary(JsonObject json, LockFileBuilder lockFile)
         {
             if (json == null)
             {
@@ -94,23 +95,17 @@ namespace Microsoft.DotNet.ProjectModel.Graph
 
                 if (type == null || string.Equals(type, "package", StringComparison.OrdinalIgnoreCase))
                 {
-                    lockFile.PackageLibraries.Add(new LockFilePackageLibrary
-                    {
-                        Name = name,
-                        Version = version,
-                        IsServiceable = ReadBool(value, "serviceable", defaultValue: false),
-                        Sha512 = ReadString(value.Value("sha512")),
-                        Files = ReadPathArray(value.Value("files"), ReadString)
-                    });
+                    lockFile.PackageLibraries.Add(new LockFilePackageLibrary(
+                        name,
+                        version,
+                        ReadBool(value, "serviceable", defaultValue: false),
+                        ReadString(value.Value("sha512")),
+                        ReadPathArray(value.Value("files"), ReadString)
+                    ));
                 }
                 else if (type == "project")
                 {
-                    lockFile.ProjectLibraries.Add(new LockFileProjectLibrary
-                    {
-                        Name = name,
-                        Version = version,
-                        Path = ReadString(value.Value("path"))
-                    });
+                    lockFile.ProjectLibraries.Add(new LockFileProjectLibrary(name, version, ReadString(value.Value("path"))));
                 }
             }
         }
@@ -144,30 +139,34 @@ namespace Microsoft.DotNet.ProjectModel.Graph
                 throw FileFormatException.Create("The value type is not an object.", json);
             }
 
-            var library = new LockFileTargetLibrary();
-
             var parts = property.Split(new[] { '/' }, 2);
-            library.Name = parts[0];
+            var name = parts[0];
+            NuGetVersion version = null;
             if (parts.Length == 2)
             {
-                library.Version = NuGetVersion.Parse(parts[1]);
+                version = NuGetVersion.Parse(parts[1]);
             }
 
-            library.Type = jobject.ValueAsString("type");
             var framework = jobject.ValueAsString("framework");
+            NuGetFramework targetFramework = null;
             if (framework != null)
             {
-                library.TargetFramework = NuGetFramework.Parse(framework);
+                targetFramework = NuGetFramework.Parse(framework);
             }
 
-            library.Dependencies = ReadObject(jobject.ValueAsJsonObject("dependencies"), ReadPackageDependency);
-            library.FrameworkAssemblies = new HashSet<string>(ReadArray(jobject.Value("frameworkAssemblies"), ReadFrameworkAssemblyReference), StringComparer.OrdinalIgnoreCase);
-            library.RuntimeAssemblies = ReadObject(jobject.ValueAsJsonObject("runtime"), ReadFileItem);
-            library.CompileTimeAssemblies = ReadObject(jobject.ValueAsJsonObject("compile"), ReadFileItem);
-            library.ResourceAssemblies = ReadObject(jobject.ValueAsJsonObject("resource"), ReadFileItem);
-            library.NativeLibraries = ReadObject(jobject.ValueAsJsonObject("native"), ReadFileItem);
-            library.ContentFiles = ReadObject(jobject.ValueAsJsonObject("contentFiles"), ReadContentFile);
-            return library;
+            return new LockFileTargetLibrary(
+                name: name,
+                type: jobject.ValueAsString("type"),
+                version: version,
+                targetFramework: targetFramework,
+                dependencies: ReadObject(jobject.ValueAsJsonObject("dependencies"), ReadPackageDependency),
+                frameworkAssemblies: new HashSet<string>(ReadArray(jobject.Value("frameworkAssemblies"), ReadFrameworkAssemblyReference), StringComparer.OrdinalIgnoreCase),
+                runtimeAssemblies: ReadObject(jobject.ValueAsJsonObject("runtime"), ReadFileItem),
+                compileTimeAssemblies: ReadObject(jobject.ValueAsJsonObject("compile"), ReadFileItem),
+                resourceAssemblies: ReadObject(jobject.ValueAsJsonObject("resource"), ReadFileItem),
+                nativeLibraries: ReadObject(jobject.ValueAsJsonObject("native"), ReadFileItem),
+                contentFiles: ReadObject(jobject.ValueAsJsonObject("contentFiles"), ReadContentFile)
+                );
         }
 
         private static LockFileContentFile ReadContentFile(string property, JsonValue json)
@@ -216,7 +215,7 @@ namespace Microsoft.DotNet.ProjectModel.Graph
 
         private static LockFileItem ReadFileItem(string property, JsonValue json)
         {
-            var item = new LockFileItem { Path = PathUtility.GetPathWithDirectorySeparator(property) };
+            var item = new LockFileItem(PathUtility.GetPathWithDirectorySeparator(property));
             var jobject = json as JsonObject;
 
             if (jobject != null)

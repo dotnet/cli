@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NuGet.Frameworks;
 using NuGet.Packaging.Core;
 using NuGet.Versioning;
@@ -11,26 +12,51 @@ namespace Microsoft.DotNet.ProjectModel.Graph
 {
     public class LockFileTargetLibrary
     {
-        public string Name { get; set; }
+        public LockFileTargetLibrary(string name,
+            string type,
+            NuGetFramework targetFramework,
+            NuGetVersion version,
+            IEnumerable<PackageDependency> dependencies = null,
+            IEnumerable<string> frameworkAssemblies = null,
+            IEnumerable<LockFileItem> runtimeAssemblies = null,
+            IEnumerable<LockFileItem> compileTimeAssemblies = null,
+            IEnumerable<LockFileItem> resourceAssemblies = null,
+            IEnumerable<LockFileItem> nativeLibraries = null,
+            IEnumerable<LockFileContentFile> contentFiles = null)
+        {
+            Name = name;
+            Type = type;
+            TargetFramework = targetFramework;
+            Version = version;
+            Dependencies = dependencies?.ToArray() ?? new PackageDependency[] {};
+            FrameworkAssemblies = frameworkAssemblies?.ToArray() ?? new string[] {};
+            RuntimeAssemblies = runtimeAssemblies?.ToArray() ?? new LockFileItem[] { };
+            CompileTimeAssemblies = compileTimeAssemblies?.ToArray() ?? new LockFileItem[] { };
+            ResourceAssemblies = resourceAssemblies?.ToArray() ?? new LockFileItem[] { };
+            NativeLibraries = nativeLibraries?.ToArray() ?? new LockFileItem[] { };
+            ContentFiles = contentFiles?.ToArray() ?? new LockFileContentFile[] { };
+        }
 
-        public string Type { get; set; }
+        public string Name { get; }
 
-        public NuGetFramework TargetFramework { get; set; }
+        public string Type { get;  }
 
-        public NuGetVersion Version { get; set; }
+        public NuGetFramework TargetFramework { get; }
 
-        public IList<PackageDependency> Dependencies { get; set; } = new List<PackageDependency>();
+        public NuGetVersion Version { get; }
 
-        public ISet<string> FrameworkAssemblies { get; set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        public IReadOnlyList<PackageDependency> Dependencies { get; }
 
-        public IList<LockFileItem> RuntimeAssemblies { get; set; } = new List<LockFileItem>();
+        public IReadOnlyList<string> FrameworkAssemblies { get; }
 
-        public IList<LockFileItem> CompileTimeAssemblies { get; set; } = new List<LockFileItem>();
+        public IReadOnlyList<LockFileItem> RuntimeAssemblies { get; }
 
-        public IList<LockFileItem> ResourceAssemblies { get; set; } = new List<LockFileItem>();
+        public IReadOnlyList<LockFileItem> CompileTimeAssemblies { get; }
 
-        public IList<LockFileItem> NativeLibraries { get; set; } = new List<LockFileItem>();
+        public IReadOnlyList<LockFileItem> ResourceAssemblies { get; }
 
-        public IList<LockFileContentFile> ContentFiles { get; set; } = new List<LockFileContentFile>();
+        public IReadOnlyList<LockFileItem> NativeLibraries { get; }
+
+        public IReadOnlyList<LockFileContentFile> ContentFiles { get; }
     }
 }

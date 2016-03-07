@@ -38,10 +38,10 @@ namespace Microsoft.DotNet.ProjectModel
 
         private ProjectReaderSettings Settings { get; set; } = ProjectReaderSettings.ReadFromEnvironment();
 
-        public ProjectContextBuilder()
+        public ProjectContextBuilder(Func<string, LockFile> lockFileResolver = null)
         {
             ProjectResolver = ResolveProject;
-            LockFileResolver = ResolveLockFile;
+            LockFileResolver = lockFileResolver ?? ResolveLockFile;
         }
 
         public ProjectContextBuilder WithLockFile(LockFile lockFile)
@@ -274,7 +274,7 @@ namespace Microsoft.DotNet.ProjectModel
             {
                 var library = pair.Value;
 
-                // The System.* packages provide placeholders on any non netstandard platform 
+                // The System.* packages provide placeholders on any non netstandard platform
                 // To make them work seamlessly on those platforms, we fill the gap with a reference
                 // assembly (if available)
                 var package = library as PackageDescription;
@@ -323,7 +323,7 @@ namespace Microsoft.DotNet.ProjectModel
                         }
                         else if (!libraries.TryGetValue(new LibraryKey(dependency.Name, LibraryType.ReferenceAssembly), out dependencyDescription))
                         {
-                            // a dependency which type is unspecified fails to match, then try to find a 
+                            // a dependency which type is unspecified fails to match, then try to find a
                             // reference assembly type dependency
                             dependencyDescription = UnresolvedDependencyProvider.GetDescription(dependency, TargetFramework);
                             libraries[key] = dependencyDescription;
@@ -462,7 +462,7 @@ namespace Microsoft.DotNet.ProjectModel
 
                 return combiner.CombinedHash;
             }
-            
+
             public override string ToString()
             {
                 return Name + " " + LibraryType;

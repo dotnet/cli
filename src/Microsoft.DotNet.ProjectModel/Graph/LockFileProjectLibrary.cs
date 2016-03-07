@@ -7,10 +7,17 @@ namespace Microsoft.DotNet.ProjectModel.Graph
 {
     public class LockFileProjectLibrary
     {
-        public string Name { get; set; }
+        public LockFileProjectLibrary(string name, NuGetVersion version, string path)
+        {
+            Name = name;
+            Version = version;
+            Path = path;
+        }
 
-        public NuGetVersion Version { get; set; }
+        public string Name { get; }
 
-        public string Path { get; set; }
+        public NuGetVersion Version { get; }
+
+        public string Path { get; }
     }
 }

@@ -17,15 +17,26 @@ namespace Microsoft.DotNet.ProjectModel.Graph
 
         public string LockFilePath { get; }
 
-        public int Version { get; set; }
-        public IList<ProjectFileDependencyGroup> ProjectFileDependencyGroups { get; set; } = new List<ProjectFileDependencyGroup>();
-        public IList<LockFilePackageLibrary> PackageLibraries { get; set; } = new List<LockFilePackageLibrary>();
-        public IList<LockFileProjectLibrary> ProjectLibraries { get; set; } = new List<LockFileProjectLibrary>();
-        public IList<LockFileTarget> Targets { get; set; } = new List<LockFileTarget>();
+        public int Version { get; }
+        public IReadOnlyList<ProjectFileDependencyGroup> ProjectFileDependencyGroups { get; }
+        public IReadOnlyList<LockFilePackageLibrary> PackageLibraries { get; }
+        public IReadOnlyList<LockFileProjectLibrary> ProjectLibraries { get; }
+        public IReadOnlyList<LockFileTarget> Targets { get; }
 
-        public LockFile(string lockFilePath)
+        public LockFile(string lockFilePath = null,
+            int? version = null,
+            IEnumerable<ProjectFileDependencyGroup> projectFileDependencyGroups = null,
+            IEnumerable<LockFilePackageLibrary> packageLibraries = null,
+            IEnumerable<LockFileProjectLibrary> projectLibraries = null,
+            IEnumerable<LockFileTarget> targets = null)
         {
             LockFilePath = lockFilePath;
+            Version = version ?? CurrentVersion;
+            ProjectFileDependencyGroups = projectFileDependencyGroups?.ToArray() ?? new ProjectFileDependencyGroup[] {};
+            PackageLibraries = packageLibraries?.ToArray() ?? new LockFilePackageLibrary[] { };
+            ProjectLibraries = projectLibraries?.ToArray() ?? new LockFileProjectLibrary[] { };
+            Targets = targets?.ToArray() ?? new LockFileTarget[] { };
+
         }
 
         public bool IsValidForProject(Project project)
