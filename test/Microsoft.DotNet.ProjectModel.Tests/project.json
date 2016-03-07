@@ -1,5 +1,6 @@
 {
   "version": "1.0.0-*",
+  "compile" : "../Shared/*.cs",
   "dependencies": {
     "NETStandard.Library": "1.0.0-rc2-23901",
     "System.IO.Compression": "4.1.0-rc2-23901",

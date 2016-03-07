@@ -4,10 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.DotNet.Utilities;
 
 namespace Microsoft.DotNet.ProjectModel
 {
-    public class CommonCompilerOptions
+    public sealed class CommonCompilerOptions : IEquatable<CommonCompilerOptions>
     {
         public IEnumerable<string> Defines { get; set; }
 
@@ -41,7 +42,11 @@ namespace Microsoft.DotNet.ProjectModel
 
         public override bool Equals(object obj)
         {
-            var other = obj as CommonCompilerOptions;
+            return Equals(obj as CommonCompilerOptions);
+        }
+
+        public bool Equals(CommonCompilerOptions other)
+        {
             return other != null &&
                    LanguageVersion == other.LanguageVersion &&
                    Platform == other.Platform &&
@@ -65,7 +70,17 @@ namespace Microsoft.DotNet.ProjectModel
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return
+                Hash.Combine(LanguageVersion ?? string.Empty,
+                Hash.Combine(Platform ?? string.Empty,
+                Hash.Combine(AllowUnsafe ?? false,
+                Hash.Combine(WarningsAsErrors ?? false,
+                Hash.Combine(Optimize ?? false,
+                Hash.Combine(KeyFile ?? string.Empty,
+                Hash.Combine(DelaySign ?? false,
+                Hash.Combine(PublicSign ?? false,
+                Hash.Combine(EmitEntryPoint ?? false,
+                Hash.Combine(GenerateXmlDocumentation ?? false, (PreserveCompilationContext ?? false).GetHashCode()))))))))));
         }
 
         private static IEnumerable<string> Combine(IEnumerable<string> @new, IEnumerable<string> old)

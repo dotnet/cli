@@ -1,9 +1,10 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+using System;
 
 namespace Microsoft.DotNet.ProjectModel
 {
-    public class AnalyzerOptions
+    public sealed class AnalyzerOptions : IEquatable<AnalyzerOptions>
     {
         /// <summary>
         /// The identifier indicating the project language as defined by NuGet.
@@ -15,7 +16,7 @@ namespace Microsoft.DotNet.ProjectModel
 
         public static bool operator ==(AnalyzerOptions left, AnalyzerOptions right)
         {
-            return left.LanguageId == right.LanguageId;
+            return object.Equals(left, right);
         }
 
         public static bool operator !=(AnalyzerOptions left, AnalyzerOptions right)
@@ -25,18 +26,22 @@ namespace Microsoft.DotNet.ProjectModel
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            return Equals(obj as AnalyzerOptions);
+        }
+
+        public bool Equals(AnalyzerOptions options)
+        {
+            if (options == null)
             {
                 return false;
             }
 
-            var options = obj as AnalyzerOptions;
-            return obj != null && (this == options);
+            return LanguageId == options.LanguageId;
         }
 
         public override int GetHashCode()
         {
-            return LanguageId.GetHashCode();
+            return LanguageId?.GetHashCode() ?? 0;
         }
     }
 }
