@@ -66,7 +66,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                                                             .AssertJArrayCount(2)
                                                             .Select(f => f["ShortName"].Value<string>());
 
-                Assert.Contains("dnxcore50", frameworkShortNames);
+                Assert.Contains("netstandardapp1.5", frameworkShortNames);
                 Assert.Contains("dnx451", frameworkShortNames);
             }
         }
@@ -335,6 +335,31 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                 messages.ContainsMessage(MessageTypes.Error)
                         .Single().Payload.AsJObject()
                         .AssertProperty<string>("Path", v => v.Contains("InvalidGlobalJson"));
+            }
+        }
+        
+        [Fact]
+        public void RecoverFromGlobalError()
+        {
+            var testProject = _testAssetsManager.CreateTestInstance("EmptyConsoleApp")
+                                                .WithLockFiles()
+                                                .TestRoot;
+                                                
+            using (var server = new DthTestServer(_loggerFactory))
+            using (var client = new DthTestClient(server))
+            {
+                var projectFile = Path.Combine(testProject, Project.FileName);
+                var content = File.ReadAllText(projectFile);
+                File.WriteAllText(projectFile, content + "}");
+                
+                client.Initialize(testProject);
+                var messages = client.DrainAllMessages();
+                messages.ContainsMessage(MessageTypes.Error);
+                
+                File.WriteAllText(projectFile, content);
+                client.SendPayLoad(testProject, MessageTypes.FilesChanged);
+                messages = client.DrainAllMessages();
+                messages.AssertDoesNotContain(MessageTypes.Error);
             }
         }
     }
