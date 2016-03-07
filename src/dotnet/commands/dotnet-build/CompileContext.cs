@@ -91,7 +91,7 @@ namespace Microsoft.DotNet.Tools.Build
 
         private bool DependencyNeedsRebuilding(ProjectDescription dependency)
         {
-            var dependencyProjectContext = ProjectContextCache.Default.Create(dependency.Path, dependency.Framework, new[] { _rootProject.RuntimeIdentifier });
+            var dependencyProjectContext = DotNetProjectCache.ProjectContextCache.Create(dependency.Path, dependency.Framework, new[] { _rootProject.RuntimeIdentifier });
             return NeedsRebuilding(dependencyProjectContext, new ProjectDependenciesFacade(dependencyProjectContext, _args.ConfigValue));
         }
 
@@ -233,7 +233,7 @@ namespace Microsoft.DotNet.Tools.Build
 
             // convert ProjectDescription to ProjectContext
             var dependencyContexts = _rootProjectDependencies.ProjectDependenciesWithSources.Select
-                (keyValuePair => ProjectContextCache.Default.Create(keyValuePair.Value.Path, keyValuePair.Value.Framework));
+                (keyValuePair => DotNetProjectCache.ProjectContextCache.Create(keyValuePair.Value.Path, keyValuePair.Value.Framework));
 
             contextsToCheck.AddRange(dependencyContexts);
 

@@ -3,14 +3,21 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Microsoft.DotNet.ProjectModel.Graph;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.ProjectModel
 {
     public class ProjectContextCache
     {
-        public static ProjectContextCache Default { get; } = new ProjectContextCache();
+        private readonly LockFileReaderCache _lockFileReaderCache;
+
+        public ProjectContextCache(LockFileReaderCache lockFileReaderCache)
+        {
+            _lockFileReaderCache = lockFileReaderCache;
+        }
 
         private readonly Dictionary<Tuple<string, string, string>, ProjectContext> _cache = new Dictionary<Tuple<string, string, string>, ProjectContext>();
 
@@ -24,11 +31,23 @@ namespace Microsoft.DotNet.ProjectModel
                 ProjectContext projectContext;
                 if (!_cache.TryGetValue(key, out projectContext))
                 {
-                    projectContext = ProjectContext.Create(projectPath, framework, runtimeIdentifiers);
+                    projectContext = new ProjectContextBuilder(ResolveLockFileFromCache)
+                           .WithProjectDirectory(projectPath)
+                           .WithTargetFramework(framework)
+                           .WithRuntimeIdentifiers(runtimeIdentifiers)
+                           .Build();
+
                     _cache.Add(key, projectContext);
                 }
                 return projectContext;
             }
+        }
+        private LockFile ResolveLockFileFromCache(string projectDir)
+        {
+            var projectLockJsonPath = Path.Combine(projectDir, LockFile.FileName);
+            return File.Exists(projectLockJsonPath) ?
+                        _lockFileReaderCache.Read(Path.Combine(projectDir, LockFile.FileName)) :
+                        null;
         }
     }
 }

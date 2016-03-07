@@ -7,8 +7,6 @@ namespace Microsoft.DotNet.ProjectModel.Graph
 {
     public class LockFileReaderCache
     {
-        public static LockFileReaderCache Default { get; } = new LockFileReaderCache();
-
         private readonly Dictionary<string, LockFile> _cache = new Dictionary<string, LockFile>();
 
         public LockFile Read(string lockFilePath)

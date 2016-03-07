@@ -92,7 +92,7 @@ namespace Microsoft.DotNet.Tools.Run
             }
             else
             {
-                _context = ProjectContextCache.Default.Create(Project, NuGetFramework.Parse(Framework), rids);
+                _context = DotNetProjectCache.ProjectContextCache.Create(Project, NuGetFramework.Parse(Framework), rids);
             }
 
             if (Args == null)

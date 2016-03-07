@@ -38,10 +38,10 @@ namespace Microsoft.DotNet.ProjectModel
 
         private ProjectReaderSettings Settings { get; set; } = ProjectReaderSettings.ReadFromEnvironment();
 
-        public ProjectContextBuilder()
+        public ProjectContextBuilder(Func<string, LockFile> lockFileResolver = null)
         {
             ProjectResolver = ResolveProject;
-            LockFileResolver = ResolveLockFile;
+            LockFileResolver = lockFileResolver ?? ResolveLockFile;
         }
 
         public ProjectContextBuilder WithLockFile(LockFile lockFile)
@@ -427,7 +427,7 @@ namespace Microsoft.DotNet.ProjectModel
         {
             var projectLockJsonPath = Path.Combine(projectDir, LockFile.FileName);
             return File.Exists(projectLockJsonPath) ?
-                        LockFileReaderCache.Default.Read(Path.Combine(projectDir, LockFile.FileName)) :
+                        LockFileReader.Read(Path.Combine(projectDir, LockFile.FileName)) :
                         null;
         }
 
