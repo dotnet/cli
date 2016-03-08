@@ -14,11 +14,16 @@
     "System.Xml.XDocument": "4.0.11-rc2-23901",
     "Microsoft.DotNet.Cli.Build.Framework": "1.0.0-*",
     "NuGet.Versioning": "3.4.0-beta-632",
-    "Newtonsoft.Json": "7.0.1"
+    "Newtonsoft.Json": "7.0.1",
+    "Octokit": "0.18.0",
+    "Microsoft.Net.Http": "2.2.29"
   },
   "frameworks": {
     "netstandardapp1.5": {
-      "imports": "dnxcore50"
+      "imports": [
+        "dnxcore50",
+        "portable-net45"
+      ]
     }
   }
 }
