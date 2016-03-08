@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
                 .Exist().And
                 .HaveFiles(new[]
                 {
-                    "BuildTestPortableProject.deps"
+                    "BuildTestPortableProject.deps",
                     "BuildTestPortableProject.dll",
                     "BuildTestPortableProject.pdb"
                 });
