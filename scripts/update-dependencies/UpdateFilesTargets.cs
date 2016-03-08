@@ -1,20 +1,19 @@
-﻿using Microsoft.DotNet.Cli.Build.Framework;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NuGet.Versioning;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using Microsoft.DotNet.Cli.Build.Framework;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NuGet.Versioning;
 
 namespace Microsoft.DotNet.Scripts
 {
     public static class UpdateFilesTargets
     {
         private static HttpClient s_client = new HttpClient();
-
 
         [Target(nameof(GetDependencies), nameof(ReplaceVersions))]
         public static BuildTargetResult UpdateFiles(BuildTargetContext c) => c.Success();
