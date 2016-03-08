@@ -18,12 +18,30 @@ namespace Microsoft.DotNet.Scripts
                 .Execute()
                 .EnsureSuccessful();
 
-            Cmd("git", "commit", "-m", "Updating dependencies")
+            string userName = Environment.GetEnvironmentVariable("GITHUB_USER");
+            if (string.IsNullOrEmpty(userName))
+            {
+                return c.Failed("Can't find GITHUB_USER");
+            }
+
+            string email = Environment.GetEnvironmentVariable("GITHUB_EMAIL");
+            if (string.IsNullOrEmpty(email))
+            {
+                return c.Failed("Can't find GITHUB_EMAIL");
+            }
+
+            string password = Environment.GetEnvironmentVariable("GITHUB_PASSWORD");
+            if (string.IsNullOrEmpty(password))
+            {
+                return c.Failed("Can't find GITHUB_PASSWORD");
+            }
+
+            Cmd("git", "commit", "-m", "Updating dependencies", "--author", $"{userName} <{email}>")
                 .Execute()
                 .EnsureSuccessful();
 
             string remoteBranchName = $"UpdateDependencies-{DateTime.UtcNow.ToString("yyyyMMdd-hhmmss")}";
-            Cmd("git", "push", "https://github.com/eerhardt/cli.git", $"HEAD:{remoteBranchName}")
+            Cmd("git", "push", $"https://{userName}:{password}@github.com/eerhardt/cli.git", $"HEAD:{remoteBranchName}")
                 .Execute()
                 .EnsureSuccessful();
 
