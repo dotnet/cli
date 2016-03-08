@@ -60,7 +60,7 @@ namespace Microsoft.DotNet.Cli.Build
             CleanNuGetTempCache();
 
             var dotnet = DotNetCli.Stage2;
-            dotnet.Restore().WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages")).Execute().EnsureSuccessful();
+            dotnet.Restore("--verbosity", "Verbose").WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages")).Execute().EnsureSuccessful();
 
             return c.Success();
         }
@@ -75,16 +75,16 @@ namespace Microsoft.DotNet.Cli.Build
 
             var dotnet = DotNetCli.Stage2;
                 
-            dotnet.Restore("--fallbacksource", Dirs.TestPackages)
+            dotnet.Restore("--verbosity", "Verbose", "--fallbacksource", Dirs.TestPackages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects"))
                 .Execute().EnsureSuccessful();
                 
             // The 'ProjectModelServer' directory contains intentionally-unresolved dependencies, so don't check for success. Also, suppress the output
-            dotnet.Restore()
+            dotnet.Restore("--verbosity", "Verbose")
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectModelServer", "DthTestProjects"))
                 .Execute();
                 
-            dotnet.Restore()
+            dotnet.Restore("--verbosity", "Verbose")
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectModelServer", "DthUpdateSearchPathSample"))
                 .Execute();
 
@@ -148,7 +148,7 @@ namespace Microsoft.DotNet.Cli.Build
             CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "test"));
 
             CleanNuGetTempCache();
-            DotNetCli.Stage2.Restore("--fallbacksource", Dirs.TestPackages)
+            DotNetCli.Stage2.Restore("--verbosity", "Verbose", "--fallbacksource", Dirs.TestPackages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "test"))
                 .Execute()
                 .EnsureSuccessful();
