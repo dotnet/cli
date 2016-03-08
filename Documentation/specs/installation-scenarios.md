@@ -84,7 +84,7 @@ WIP: Exact script action description.
 | -Channel | --channel | production | Which [channel](#channels) to install from. Possible values: `future`, `preview`, `production` |
 | -Version | --version | `global.json` or `latest` | |
 | -InstallDir | --prefix | Windows: `%LocalAppData%\Microsoft\.dotnet` | Path to where install dotnet. Note that binaries will be placed directly in a given directory. |
-| -Architecture | --architecture | auto | Possible values: `auto`, `x64`, `x86`. `auto` refers to currently running OS architecture. |
+| -Architecture | ~~--architecture~~ | auto | Possible values: `auto`, `x64`, `x86`. `auto` refers to currently running OS architecture. This switch is currently not supported in bash scripts. |
 | -DebugSymbols | --debug-symbols | `<not set>` | If switch present, installation will include debug symbol |
 | -DryRun | --dry-run | `<not set>` | If switch present, installation will not be performed and instead deterministic invocation with specific version and zip location will be displayed. |
 | -NoPath | --no-path | `<not set>` | If switch present the script will not set PATH environmental variable for the current process. |
