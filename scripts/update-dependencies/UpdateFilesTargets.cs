@@ -29,6 +29,7 @@ namespace Microsoft.DotNet.Scripts
             }
 
             string coreFxLkgVersion = s_client.GetStringAsync("https://raw.githubusercontent.com/eerhardt/versions/master/corefx/release/1.0.0-rc2/LKG.txt").Result;
+            coreFxLkgVersion = coreFxLkgVersion.Trim();
 
             // TODO: the NuGet ID Regex should go in here
             dependencyVersions.Add("CoreFxVersion", coreFxLkgVersion);
