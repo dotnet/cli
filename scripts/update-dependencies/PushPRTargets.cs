@@ -46,13 +46,31 @@ namespace Microsoft.DotNet.Scripts
                 return c.Failed("Can't find GITHUB_PASSWORD");
             }
 
+            string remoteUrl = "github.com/eerhardt/cli.git"; // TODO: should be parameterized. this will eventually be "dotnet-bot/cli.git"
             string remoteBranchName = $"UpdateDependencies{DateTime.UtcNow.ToString("yyyyMMddhhmmss")}";
-            Cmd("git", "push", $"https://{userName}:{password}@github.com/eerhardt/cli.git", $"HEAD:refs/heads/{remoteBranchName}")
-                .QuietBuildReporter()  // we don't want secrets showing up in our logs
-                .CaptureStdErr() // git push will write to StdErr upon success, disable that
-                .CaptureStdOut()
-                .Execute()
-                .EnsureSuccessful();
+            string refSpec = $"HEAD:refs/heads/{remoteBranchName}";
+
+            string logMessage = $"git push https://{remoteUrl} {refSpec}";
+            BuildReporter.BeginSection("EXEC", logMessage);
+
+            CommandResult pushResult =
+                Cmd("git", "push", $"https://{userName}:{password}@{remoteUrl}", refSpec)
+                    .QuietBuildReporter()  // we don't want secrets showing up in our logs
+                    .CaptureStdErr() // git push will write to StdErr upon success, disable that
+                    .CaptureStdOut()
+                    .Execute();
+
+            var message = logMessage + $" exited with {pushResult.ExitCode}";
+            if (pushResult.ExitCode == 0)
+            {
+                BuildReporter.EndSection("EXEC", message.Green(), success: true);
+            }
+            else
+            {
+                BuildReporter.EndSection("EXEC", message.Red().Bold(), success: false);
+            }
+
+            pushResult.EnsureSuccessful();
 
             c.SetRemoteBranchName(remoteBranchName);
 
@@ -74,7 +92,8 @@ namespace Microsoft.DotNet.Scripts
             }
             gitHub.Credentials = new Credentials(password);
 
-            gitHub.PullRequest.Create("eerhardt" /*_config.GitHubUpstreamOwner*/, "cli" /*_config.GitHubProject*/, prInfo).Wait();
+            PullRequest createdPR = gitHub.PullRequest.Create("eerhardt" /*_config.GitHubUpstreamOwner*/, "cli" /*_config.GitHubProject*/, prInfo).Result;
+            c.Info($"Created Pull Request: {createdPR.HtmlUrl}");
 
             return c.Success();
         }
