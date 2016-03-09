@@ -34,15 +34,17 @@ namespace Microsoft.DotNet.Scripts
                 return c.Failed("Can't find GITHUB_EMAIL");
             }
 
+            Cmd("git", "commit", "-m", PullRequestTitle, "--author", $"{userName} <{email}>")
+                .EnvironmentVariable("GIT_COMMITTER_NAME", userName)
+                .EnvironmentVariable("GIT_COMMITTER_EMAIL", email)
+                .Execute()
+                .EnsureSuccessful();
+
             string password = Environment.GetEnvironmentVariable("GITHUB_PASSWORD");
             if (string.IsNullOrEmpty(password))
             {
                 return c.Failed("Can't find GITHUB_PASSWORD");
             }
-
-            Cmd("git", "commit", "-m", PullRequestTitle, "--author", $"{userName} <{email}>")
-                .Execute()
-                .EnsureSuccessful();
 
             string remoteBranchName = $"UpdateDependencies{DateTime.UtcNow.ToString("yyyyMMddhhmmss")}";
             Cmd("git", "push", $"https://{userName}:{password}@github.com/eerhardt/cli.git", $"HEAD:refs/heads/{remoteBranchName}")
