@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.Scripts
                 .EnsureSuccessful();
 
             string remoteBranchName = $"UpdateDependencies{DateTime.UtcNow.ToString("yyyyMMddhhmmss")}";
-            Cmd("git", "push", $"https://{userName}:{password}@github.com/eerhardt/cli.git", $"HEAD:{remoteBranchName}")
+            Cmd("git", "push", $"https://{userName}:{password}@github.com/eerhardt/cli.git", $"HEAD:refs/heads/{remoteBranchName}")
                 .Execute()
                 .EnsureSuccessful();
 
