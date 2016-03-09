@@ -21,26 +21,34 @@ namespace Microsoft.DotNet.Scripts
         [Target]
         public static BuildTargetResult GetDependencies(BuildTargetContext c)
         {
-            Dictionary<string, string> dependencyVersions = c.BuildContext.Get<Dictionary<string, string>>("DependencyVersions");
-            if (dependencyVersions == null)
-            {
-                dependencyVersions = new Dictionary<string, string>();
-                c.BuildContext["DependencyVersions"] = dependencyVersions;
-            }
-
             string coreFxLkgVersion = s_client.GetStringAsync("https://raw.githubusercontent.com/eerhardt/versions/master/corefx/release/1.0.0-rc2/LKG.txt").Result;
             coreFxLkgVersion = coreFxLkgVersion.Trim();
 
-            // TODO: the NuGet ID Regex should go in here
-            dependencyVersions.Add("CoreFxVersion", coreFxLkgVersion);
+            const string coreFxVersionPattern = @"^(?i)((System\..*)|(NETStandard\.Library)|(Microsoft\.CSharp)|(Microsoft\.NETCore.*)|(Microsoft\.TargetingPack\.Private\.(CoreCLR|NETNative))|(Microsoft\.Win32\..*)|(Microsoft\.VisualBasic))$";
+
+            List<DependencyInfo> dependencyInfos = c.GetDependencyInfo();
+            dependencyInfos.Add(new DependencyInfo() { IdPattern = coreFxVersionPattern, NewReleaseVersion = coreFxLkgVersion });
 
             return c.Success();
+        }
+
+        private static List<DependencyInfo> GetDependencyInfo(this BuildTargetContext c)
+        {
+            const string propertyName = "DependencyInfo";
+            List<DependencyInfo> dependencyInfos = c.BuildContext.Get<List<DependencyInfo>>(propertyName);
+            if (dependencyInfos == null)
+            {
+                dependencyInfos = new List<DependencyInfo>();
+                c.BuildContext[propertyName] = dependencyInfos;
+            }
+
+            return dependencyInfos;
         }
 
         [Target]
         public static BuildTargetResult ReplaceVersions(BuildTargetContext c)
         {
-            Dictionary<string, string> dependencyVersions = c.BuildContext.Get<Dictionary<string, string>>("DependencyVersions");
+            List<DependencyInfo> dependencyInfos = c.GetDependencyInfo();
 
             string currentDirectory = Directory.GetCurrentDirectory();
             JObject projectRoot;
@@ -57,7 +65,7 @@ namespace Microsoft.DotNet.Scripts
                 }
 
                 bool changedAnyPackage = FindAllDependencyProperties(projectRoot)
-                    .Select(package => VisitPackage(package, dependencyVersions))
+                    .Select(package => VisitPackage(package, dependencyInfos))
                     .ToArray()
                     .Any(shouldWrite => shouldWrite);
 
@@ -71,51 +79,52 @@ namespace Microsoft.DotNet.Scripts
             return c.Success();
         }
 
-        private static bool VisitPackage(JProperty package, Dictionary<string, string> newDependencyVersions)
+        private static bool VisitPackage(JProperty package, List<DependencyInfo> dependencyInfos)
         {
-            const string coreFxVersionPattern = @"^(?i)((System\..*)|(NETStandard\.Library)|(Microsoft\.CSharp)|(Microsoft\.NETCore.*)|(Microsoft\.TargetingPack\.Private\.(CoreCLR|NETNative))|(Microsoft\.Win32\..*)|(Microsoft\.VisualBasic))$";
-
             string id = package.Name;
-            if (Regex.IsMatch(id, coreFxVersionPattern))
+            foreach (DependencyInfo dependencyInfo in dependencyInfos)
             {
-                string version;
-                if (package.Value is JObject)
+                if (Regex.IsMatch(id, dependencyInfo.IdPattern))
                 {
-                    version = package.Value["version"].Value<string>();
-                }
-                else if (package.Value is JValue)
-                {
-                    version = package.Value.ToString();
-                }
-                else
-                {
-                    throw new Exception($"package project.json version {package}");
-                }
-
-                VersionRange dependencyVersionRange = VersionRange.Parse(version);
-                NuGetVersion dependencyVersion = dependencyVersionRange.MinVersion;
-
-                string coreFxVersion = newDependencyVersions["CoreFxVersion"];
-
-                if (!string.IsNullOrEmpty(dependencyVersion.Release) && dependencyVersion.Release != coreFxVersion)
-                {
-                    string newVersion = new NuGetVersion(
-                                   dependencyVersion.Major,
-                                   dependencyVersion.Minor,
-                                   dependencyVersion.Patch,
-                                   coreFxVersion,
-                                   dependencyVersion.Metadata).ToNormalizedString();
-
+                    string version;
                     if (package.Value is JObject)
                     {
-                        package.Value["version"] = newVersion;
+                        version = package.Value["version"].Value<string>();
+                    }
+                    else if (package.Value is JValue)
+                    {
+                        version = package.Value.ToString();
                     }
                     else
                     {
-                        package.Value = newVersion;
+                        throw new Exception($"package project.json version {package}");
                     }
 
-                    return true;
+                    VersionRange dependencyVersionRange = VersionRange.Parse(version);
+                    NuGetVersion dependencyVersion = dependencyVersionRange.MinVersion;
+
+                    string newReleaseVersion = dependencyInfo.NewReleaseVersion;
+
+                    if (!string.IsNullOrEmpty(dependencyVersion.Release) && dependencyVersion.Release != newReleaseVersion)
+                    {
+                        string newVersion = new NuGetVersion(
+                            dependencyVersion.Major,
+                            dependencyVersion.Minor,
+                            dependencyVersion.Patch,
+                            newReleaseVersion,
+                            dependencyVersion.Metadata).ToNormalizedString();
+
+                        if (package.Value is JObject)
+                        {
+                            package.Value["version"] = newVersion;
+                        }
+                        else
+                        {
+                            package.Value = newVersion;
+                        }
+
+                        return true;
+                    }
                 }
             }
 
@@ -148,6 +157,12 @@ namespace Microsoft.DotNet.Scripts
                 .Where(property => property.Name == "dependencies")
                 .Select(property => property.Value)
                 .SelectMany(o => o.Children<JProperty>());
+        }
+
+        private class DependencyInfo
+        {
+            public string IdPattern { get; set; }
+            public string NewReleaseVersion { get; set; }
         }
     }
 }
