@@ -1,16 +1,12 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
+using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.ProjectModel;
+using Microsoft.Extensions.PlatformAbstractions;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using Microsoft.DotNet.Cli.Utils;
-using Microsoft.DotNet.ProjectModel;
-using Microsoft.DotNet.Tools.Test.Utilities;
-using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
 {
@@ -18,14 +14,15 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
     {
         private const string PublishSubfolderName = "publish";
 
-        private Project _project;
-        private string _path;
-        private string _framework;
-        private string _runtime;
-        private string _config;
-        private string _output;
+        private readonly Project _project;
+        private readonly string _path;
+        private readonly string _framework;
+        private readonly string _runtime;
+        private readonly string _config;
+        private readonly string _output;
+        private readonly bool _forcePortable;
 
-        public PublishCommand(string projectPath, string framework="", string runtime="", string output="", string config="")
+        public PublishCommand(string projectPath, string framework = "", string runtime = "", string output = "", string config = "", bool forcePortable = false)
             : base("dotnet")
         {
             _path = projectPath;
@@ -34,9 +31,10 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             _runtime = runtime;
             _output = output;
             _config = config;
+            _forcePortable = forcePortable;
         }
 
-        public override CommandResult Execute(string args="")
+        public override CommandResult Execute(string args = "")
         {
             args = $"publish {BuildArgs()} {args}";
             return base.Execute(args);
@@ -48,13 +46,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             return base.ExecuteWithCapturedOutput(args);
         }
 
-        public string ProjectName
-        {
-            get
-            {
-                return _project.Name;
-            }
-        }
+        public string ProjectName => _project.Name;
 
         private string BuildRelativeOutputPath()
         {
@@ -62,10 +54,15 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             string config = string.IsNullOrEmpty(_config) ? "Debug" : _config;
             string framework = string.IsNullOrEmpty(_framework) ?
                 _project.GetTargetFrameworks().First().FrameworkName.GetShortFolderName() : _framework;
-            string runtime = string.IsNullOrEmpty(_runtime) ? PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier() : _runtime;
-            string output = Path.Combine(config, framework, runtime, PublishSubfolderName);
-
-            return output;
+            if (!_forcePortable)
+            {
+                string runtime = string.IsNullOrEmpty(_runtime) ? PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier() : _runtime;
+                return Path.Combine(config, framework, runtime, PublishSubfolderName);
+            }
+            else
+            {
+                return Path.Combine(config, framework, PublishSubfolderName);
+            }
         }
 
         public DirectoryInfo GetOutputDirectory()
@@ -88,27 +85,13 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         private string BuildArgs()
         {
-            return $"{_path} {GetFrameworkOption()} {GetRuntimeOption()} {GetOutputOption()} {GetConfigOption()}";
+            return $"{_path} {GetPortableOption()} {GetFrameworkOption()} {GetRuntimeOption()} {GetOutputOption()} {GetConfigOption()}";
         }
 
-        private string GetFrameworkOption()
-        {
-            return string.IsNullOrEmpty(_framework) ? "" : $"-f {_framework}";
-        }
-
-        private string GetRuntimeOption()
-        {
-            return string.IsNullOrEmpty(_runtime) ? "" : $"-r {_runtime}";
-        }
-
-        private string GetOutputOption()
-        {
-            return string.IsNullOrEmpty(_output) ? "" : $"-o \"{_output}\"";
-        }
-
-        private string GetConfigOption()
-        {
-            return string.IsNullOrEmpty(_config) ? "" : $"-c {_output}";
-        }
+        private string GetPortableOption() => _forcePortable ? "--portable" : "";
+        private string GetFrameworkOption() => string.IsNullOrEmpty(_framework) ? "" : $"-f {_framework}";
+        private string GetRuntimeOption() => string.IsNullOrEmpty(_runtime) ? "" : $"-r {_runtime}";
+        private string GetOutputOption() => string.IsNullOrEmpty(_output) ? "" : $"-o \"{_output}\"";
+        private string GetConfigOption() => string.IsNullOrEmpty(_config) ? "" : $"-c {_output}";
     }
 }
