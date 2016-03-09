@@ -46,7 +46,8 @@ namespace Microsoft.DotNet.Scripts
 
             string remoteBranchName = $"UpdateDependencies{DateTime.UtcNow.ToString("yyyyMMddhhmmss")}";
             Cmd("git", "push", $"https://{userName}:{password}@github.com/eerhardt/cli.git", $"HEAD:refs/heads/{remoteBranchName}")
-                .CaptureStdErr()
+                .QuietBuildReporter()  // we don't want secrets showing up in our logs
+                .CaptureStdErr() // git push will write to StdErr upon success, disable that
                 .CaptureStdOut()
                 .Execute()
                 .EnsureSuccessful();
