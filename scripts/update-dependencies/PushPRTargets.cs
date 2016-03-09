@@ -62,7 +62,7 @@ namespace Microsoft.DotNet.Scripts
         {
             string remoteBranchName = c.GetRemoteBranchName();
 
-            NewPullRequest prInfo = new NewPullRequest(PullRequestTitle, "eerhardt"/*_config.GitHubOriginOwner*/ + ":" + remoteBranchName, "rel/1.0.0" /*_config.GitHubUpstreamDestinationBranch*/);
+            NewPullRequest prInfo = new NewPullRequest(PullRequestTitle, "eerhardt"/*_config.GitHubOriginOwner*/ + ":" + remoteBranchName, "eerhardt/Test" /*_config.GitHubUpstreamDestinationBranch*/);
             GitHubClient gitHub = new GitHubClient(new ProductHeaderValue("dotnetDependencyUpdater"));
 
             string password = Environment.GetEnvironmentVariable("GITHUB_PASSWORD");
