@@ -85,13 +85,13 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         private string BuildArgs()
         {
-            return $"{_path} {GetPortableOption()} {GetFrameworkOption()} {GetRuntimeOption()} {GetOutputOption()} {GetConfigOption()}";
+            return $"{_path} {PortableOption} {FrameworkOption} {RuntimeOption} {OutputOption} {ConfigOption}";
         }
 
-        private string GetPortableOption() => _forcePortable ? "--portable" : "";
-        private string GetFrameworkOption() => string.IsNullOrEmpty(_framework) ? "" : $"-f {_framework}";
-        private string GetRuntimeOption() => string.IsNullOrEmpty(_runtime) ? "" : $"-r {_runtime}";
-        private string GetOutputOption() => string.IsNullOrEmpty(_output) ? "" : $"-o \"{_output}\"";
-        private string GetConfigOption() => string.IsNullOrEmpty(_config) ? "" : $"-c {_output}";
+        private string PortableOption => _forcePortable ? "--portable" : "";
+        private string FrameworkOption => string.IsNullOrEmpty(_framework) ? "" : $"-f {_framework}";
+        private string RuntimeOption => string.IsNullOrEmpty(_runtime) ? "" : $"-r {_runtime}";
+        private string OutputOption => string.IsNullOrEmpty(_output) ? "" : $"-o \"{_output}\"";
+        private string ConfigOption => string.IsNullOrEmpty(_config) ? "" : $"-c {_output}";
     }
 }
