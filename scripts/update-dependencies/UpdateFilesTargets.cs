@@ -24,10 +24,16 @@ namespace Microsoft.DotNet.Scripts
             string coreFxLkgVersion = s_client.GetStringAsync("https://raw.githubusercontent.com/eerhardt/versions/master/corefx/release/1.0.0-rc2/LKG.txt").Result;
             coreFxLkgVersion = coreFxLkgVersion.Trim();
 
-            const string coreFxVersionPattern = @"^(?i)((System\..*)|(NETStandard\.Library)|(Microsoft\.CSharp)|(Microsoft\.NETCore.*)|(Microsoft\.TargetingPack\.Private\.(CoreCLR|NETNative))|(Microsoft\.Win32\..*)|(Microsoft\.VisualBasic))$";
+            const string coreFxIdPattern = @"^(?i)((System\..*)|(NETStandard\.Library)|(Microsoft\.CSharp)|(Microsoft\.NETCore.*)|(Microsoft\.TargetingPack\.Private\.(CoreCLR|NETNative))|(Microsoft\.Win32\..*)|(Microsoft\.VisualBasic))$";
+            const string coreFxIdExclusionPattern = @"System.CommandLine";
 
             List<DependencyInfo> dependencyInfos = c.GetDependencyInfo();
-            dependencyInfos.Add(new DependencyInfo() { IdPattern = coreFxVersionPattern, NewReleaseVersion = coreFxLkgVersion });
+            dependencyInfos.Add(new DependencyInfo()
+            {
+                IdPattern = coreFxIdPattern,
+                IdExclusionPattern = coreFxIdExclusionPattern,
+                NewReleaseVersion = coreFxLkgVersion
+            });
 
             return c.Success();
         }
@@ -60,7 +66,7 @@ namespace Microsoft.DotNet.Scripts
                 }
                 catch (Exception e)
                 {
-                    c.Warn($"Non-fatal exception occurred reading '{projectJsonFile}'. Exception: {e}. ");
+                    c.Warn($"Non-fatal exception occurred reading '{projectJsonFile}'. Skipping file. Exception: {e}. ");
                     continue;
                 }
 
@@ -86,44 +92,47 @@ namespace Microsoft.DotNet.Scripts
             {
                 if (Regex.IsMatch(id, dependencyInfo.IdPattern))
                 {
-                    string version;
-                    if (package.Value is JObject)
+                    if (string.IsNullOrEmpty(dependencyInfo.IdExclusionPattern) || !Regex.IsMatch(id, dependencyInfo.IdExclusionPattern))
                     {
-                        version = package.Value["version"].Value<string>();
-                    }
-                    else if (package.Value is JValue)
-                    {
-                        version = package.Value.ToString();
-                    }
-                    else
-                    {
-                        throw new Exception($"package project.json version {package}");
-                    }
-
-                    VersionRange dependencyVersionRange = VersionRange.Parse(version);
-                    NuGetVersion dependencyVersion = dependencyVersionRange.MinVersion;
-
-                    string newReleaseVersion = dependencyInfo.NewReleaseVersion;
-
-                    if (!string.IsNullOrEmpty(dependencyVersion.Release) && dependencyVersion.Release != newReleaseVersion)
-                    {
-                        string newVersion = new NuGetVersion(
-                            dependencyVersion.Major,
-                            dependencyVersion.Minor,
-                            dependencyVersion.Patch,
-                            newReleaseVersion,
-                            dependencyVersion.Metadata).ToNormalizedString();
-
+                        string version;
                         if (package.Value is JObject)
                         {
-                            package.Value["version"] = newVersion;
+                            version = package.Value["version"].Value<string>();
+                        }
+                        else if (package.Value is JValue)
+                        {
+                            version = package.Value.ToString();
                         }
                         else
                         {
-                            package.Value = newVersion;
+                            throw new Exception($"package project.json version {package}");
                         }
 
-                        return true;
+                        VersionRange dependencyVersionRange = VersionRange.Parse(version);
+                        NuGetVersion dependencyVersion = dependencyVersionRange.MinVersion;
+
+                        string newReleaseVersion = dependencyInfo.NewReleaseVersion;
+
+                        if (!string.IsNullOrEmpty(dependencyVersion.Release) && dependencyVersion.Release != newReleaseVersion)
+                        {
+                            string newVersion = new NuGetVersion(
+                                dependencyVersion.Major,
+                                dependencyVersion.Minor,
+                                dependencyVersion.Patch,
+                                newReleaseVersion,
+                                dependencyVersion.Metadata).ToNormalizedString();
+
+                            if (package.Value is JObject)
+                            {
+                                package.Value["version"] = newVersion;
+                            }
+                            else
+                            {
+                                package.Value = newVersion;
+                            }
+
+                            return true;
+                        }
                     }
                 }
             }
@@ -162,6 +171,7 @@ namespace Microsoft.DotNet.Scripts
         private class DependencyInfo
         {
             public string IdPattern { get; set; }
+            public string IdExclusionPattern { get; set; }
             public string NewReleaseVersion { get; set; }
         }
     }
