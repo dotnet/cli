@@ -3,16 +3,23 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.DependencyModel.Resolution;
 
 namespace Microsoft.Extensions.DependencyModel
 {
     public class CompilationLibrary : Library
     {
-        public CompilationLibrary(string libraryType, string packageName, string version, string hash, string[] assemblies, Dependency[] dependencies, bool serviceable)
-            : base(libraryType, packageName, version, hash,  dependencies, serviceable)
+        public CompilationLibrary(string type,
+            string name,
+            string version,
+            string hash,
+            IEnumerable<string> assemblies,
+            IEnumerable<Dependency> dependencies,
+            bool serviceable)
+            : base(type, name, version, hash,  dependencies, serviceable)
         {
-            Assemblies = assemblies;
+            Assemblies = assemblies.ToArray();
         }
 
         public IReadOnlyList<string> Assemblies { get; }
@@ -30,7 +37,7 @@ namespace Microsoft.Extensions.DependencyModel
             var assemblies = new List<string>();
             if (!DefaultResolver.TryResolveAssemblyPaths(this, assemblies))
             {
-                throw new InvalidOperationException($"Can not find compilation library location for package '{PackageName}'");
+                throw new InvalidOperationException($"Can not find compilation library location for package '{Name}'");
             }
             return assemblies;
         }
