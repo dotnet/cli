@@ -41,13 +41,6 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             "TestLibrary" + FileNameSuffixes.DotNet.DynamicLib,
             "TestLibrary" + FileNameSuffixes.DotNet.ProgramDatabase
         };
-        private readonly string[] _libBuildFiles = new []
-        {
-            "TestLibrary" + FileNameSuffixes.DotNet.DynamicLib,
-            "TestLibrary" + FileNameSuffixes.DotNet.ProgramDatabase,
-            "TestLibrary" + FileNameSuffixes.Deps,
-            "TestLibrary" + FileNameSuffixes.DepsJson,
-        };
 
         private void GetProjectInfo(string testRoot)
         {
@@ -98,23 +91,6 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             libdebug.Should().Exist().And.HaveFiles(_libCompileFiles);
             appdebug.Should().Exist().And.HaveFiles(_appCompileFiles);
             appruntime.Should().Exist().And.HaveFiles(_runtimeFiles);
-        }
-
-        [Fact]
-        public void LibraryBuilds_ShouldHaveDepsFile()
-        {
-            var testInstance = TestAssetsManager.CreateTestInstance("TestAppWithLibrary")
-                                                .WithLockFiles();
-            GetProjectInfo(testInstance.TestRoot);
-
-            new BuildCommand(GetProjectPath(_testLibDirInfo), framework: DefaultFramework)
-                .ExecuteWithCapturedOutput().Should().Pass();
-
-            var libdebug = _rootDirInfo.Sub(FormatPath("TestLibrary/bin/debug/{fw}/{rid}", DefaultFramework, _runtime));
-
-            libdebug.Should().Exist();
-            libdebug.Should().HaveFiles(_libBuildFiles);
-            libdebug.Should().NotHaveFile("TestLibrary" + FileNameSuffixes.DotNet.Exe);
         }
 
         [Fact]
