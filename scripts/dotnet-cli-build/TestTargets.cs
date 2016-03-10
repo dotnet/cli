@@ -94,6 +94,8 @@ namespace Microsoft.DotNet.Cli.Build
         [Target(nameof(CleanTestPackages))]
         public static BuildTargetResult BuildTestAssetPackages(BuildTargetContext c)
         {
+            CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages"));
+
             var dotnet = DotNetCli.Stage2;
 
             Rmdir(Dirs.TestPackages);
@@ -123,6 +125,8 @@ namespace Microsoft.DotNet.Cli.Build
         [Target]
         public static BuildTargetResult BuildTestAssetProjects(BuildTargetContext c)
         {
+            CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects"));
+
             var dotnet = DotNetCli.Stage2;
             var nobuildFileName = ".noautobuild";
             string testProjectsRoot = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects");
