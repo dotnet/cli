@@ -178,13 +178,9 @@ namespace Microsoft.DotNet.Tools.Publish
                 }
             }
 
-            // Publish the deps files too
-            PublishFiles(
-                new[] {
-                    outputPaths.RuntimeFiles.Deps,
-                    outputPaths.RuntimeFiles.DepsJson
-                },
-                outputPath);
+            // Get the output paths used by the call to `dotnet build` above (since we didn't pass `--output`, they will be different from
+            // our current output paths)
+            PublishDeps(context, buildBasePath, outputPath, configuration);
 
             var contentFiles = new ContentFiles(context);
             contentFiles.StructuredCopyTo(outputPath);
@@ -201,6 +197,17 @@ namespace Microsoft.DotNet.Tools.Publish
             Reporter.Output.WriteLine($"Published to {outputPath}".Green().Bold());
 
             return true;
+        }
+
+        private static void PublishDeps(ProjectContext context, string buildBasePath, string outputPath, string configuration)
+        {
+            var buildOutputPaths = context.GetOutputPaths(configuration, buildBasePath);
+            PublishFiles(
+                new[] {
+                    buildOutputPaths.RuntimeFiles.Deps,
+                    buildOutputPaths.RuntimeFiles.DepsJson
+                },
+                outputPath);
         }
 
         private static void PublishRefs(LibraryExport export, string outputPath)
