@@ -167,7 +167,23 @@ namespace Microsoft.DotNet.ProjectModel.Graph
             library.ResourceAssemblies = ReadObject(jobject.ValueAsJsonObject("resource"), ReadFileItem);
             library.NativeLibraries = ReadObject(jobject.ValueAsJsonObject("native"), ReadFileItem);
             library.ContentFiles = ReadObject(jobject.ValueAsJsonObject("contentFiles"), ReadContentFile);
+            library.RuntimeTargets = ReadObject(jobject.ValueAsJsonObject("runtimeTargets"), ReadRuntimeTarget);
             return library;
+        }
+
+        private static LockFileRuntimeTarget ReadRuntimeTarget(string property, JsonValue json)
+        {
+            var jsonObject = json as JsonObject;
+            if (jsonObject == null)
+            {
+                throw FileFormatException.Create("The value type is not an object.", json);
+            }
+
+            return new LockFileRuntimeTarget(
+                path: property,
+                runtime: jsonObject.ValueAsString("rid"),
+                assetType: jsonObject.ValueAsString("assetType")
+                );
         }
 
         private static LockFileContentFile ReadContentFile(string property, JsonValue json)

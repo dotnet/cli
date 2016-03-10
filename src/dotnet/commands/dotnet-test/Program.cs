@@ -102,12 +102,19 @@ namespace Microsoft.DotNet.Tools.Test
             var commandArgs = new List<string> { GetAssemblyUnderTest(projectContext, configuration, outputPath) };
             commandArgs.AddRange(app.RemainingArguments);
 
-            return Command.Create(
+            var commandFactory = 
+                new ProjectDependenciesCommandFactory(
+                    projectContext.TargetFramework, 
+                    configuration, 
+                    outputPath,
+                    projectContext.ProjectDirectory);
+            
+
+            return commandFactory.Create(
                     $"dotnet-{GetCommandName(testRunner)}",
                     commandArgs,
                     projectContext.TargetFramework,
-                    configuration: configuration,
-                    outputPath: outputPath)
+                    configuration)
                 .ForwardStdErr()
                 .ForwardStdOut()
                 .Execute()
@@ -151,7 +158,7 @@ namespace Microsoft.DotNet.Tools.Test
             string outputPath)
         {
             var reportingChannelFactory = new ReportingChannelFactory();
-            var adapterChannel = reportingChannelFactory.CreateChannelWithPort(port);
+            var adapterChannel = reportingChannelFactory.CreateAdapterChannel(port);
 
             try
             {
@@ -160,14 +167,19 @@ namespace Microsoft.DotNet.Tools.Test
                 using (var dotnetTest = new DotnetTest(messages, assemblyUnderTest))
                 {
                     var commandFactory = 
-                        new FixedPathCommandFactory(projectContext.TargetFramework, configuration, outputPath);
+                        new ProjectDependenciesCommandFactory(
+                            projectContext.TargetFramework, 
+                            configuration, 
+                            outputPath,
+                            projectContext.ProjectDirectory);
+                        
                     var testRunnerFactory = new TestRunnerFactory(GetCommandName(testRunner), commandFactory);
 
                     dotnetTest
                         .AddNonSpecificMessageHandlers(messages, adapterChannel)
                         .AddTestDiscoveryMessageHandlers(adapterChannel, reportingChannelFactory, testRunnerFactory)
                         .AddTestRunMessageHandlers(adapterChannel, reportingChannelFactory, testRunnerFactory)
-                        .AddTestRunnnersMessageHandlers(adapterChannel);
+                        .AddTestRunnnersMessageHandlers(adapterChannel, reportingChannelFactory);
 
                     dotnetTest.StartListeningTo(adapterChannel);
 

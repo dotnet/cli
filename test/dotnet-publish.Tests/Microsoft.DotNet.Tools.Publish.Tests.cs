@@ -125,7 +125,8 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.dll");
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.pdb");
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.dll.config");
-            publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibraryLesser.deps"); 
+            publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibraryLesser.deps");
+            publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibraryLesser.deps.json");
 
             // dependencies should also be copied
             publishCommand.GetOutputDirectory().Should().HaveFile("Newtonsoft.Json.dll");
@@ -137,7 +138,8 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.dll");
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.pdb");
             publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibraryLesser.dll.config");
-            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.deps"); 
+            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.deps");
+            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.deps.json");
 
             // dependencies should also be copied
             publishCommand.GetOutputDirectory().Should().HaveFile("Newtonsoft.Json.dll");
@@ -188,7 +190,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             var publishCommand = new PublishCommand(testProject);
             var result = publishCommand.ExecuteWithCapturedOutput();
 
-            result.Should().StdOutMatchPattern("\nprepublish_output( \\?[^%]+\\?){5}.+\npostpublish_output( \\?[^%]+\\?){5}", RegexOptions.Singleline);
+            result.Should().HaveStdOutMatching("\nprepublish_output( \\?[^%]+\\?){5}.+\npostpublish_output( \\?[^%]+\\?){5}", RegexOptions.Singleline);
             result.Should().Pass();
         }
     }

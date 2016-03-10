@@ -14,6 +14,8 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
+source "$DIR/common/_prettyprint.sh"
+
 while [[ $# > 0 ]]; do
     lowerI="$(echo $1 | awk '{print tolower($0)}')"
     case $lowerI in
@@ -82,7 +84,8 @@ done < "$DIR/../branchinfo.txt"
 [ -d $DOTNET_INSTALL_DIR ] || mkdir -p $DOTNET_INSTALL_DIR
 
 # Ensure the latest stage0 is installed
-$DIR/obtain/install.sh --channel $RELEASE_SUFFIX
+export CHANNEL=$RELEASE_SUFFIX
+$DIR/obtain/install.sh --channel $CHANNEL
 
 # Put stage 0 on the PATH (for this shell only)
 PATH="$DOTNET_INSTALL_DIR/bin:$PATH"
