@@ -29,6 +29,13 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             publishResult.Should().Pass();
 
             var publishDir = publishCommand.GetOutputDirectory();
+            publishDir.Should().HaveFiles(new[]
+            {
+                "TestAppWithRuntimeTargets.dll",
+                "TestAppWithRuntimeTargets.deps",
+                "TestAppWithRuntimeTargets.deps.json"
+            });
+
             var runtimesOutput = publishDir.Sub("runtimes");
 
             runtimesOutput.Should().Exist();

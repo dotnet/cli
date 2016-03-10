@@ -178,13 +178,21 @@ namespace Microsoft.DotNet.Tools.Publish
                 }
             }
 
+            // Publish the deps files too
+            PublishFiles(
+                new[] {
+                    outputPaths.RuntimeFiles.Deps,
+                    outputPaths.RuntimeFiles.DepsJson
+                },
+                outputPath);
+
             var contentFiles = new ContentFiles(context);
             contentFiles.StructuredCopyTo(outputPath);
 
             // Publish a host if this is an application
-            if (options.EmitEntryPoint.GetValueOrDefault())
+            if (options.EmitEntryPoint.GetValueOrDefault() && !string.IsNullOrEmpty(context.RuntimeIdentifier))
             {
-                Reporter.Verbose.WriteLine($"Making {context.ProjectFile.Name.Cyan()} runnable ...");
+                Reporter.Verbose.WriteLine($"Copying native host to output to create fully standalone output.");
                 PublishHost(context, outputPath);
             }
 
