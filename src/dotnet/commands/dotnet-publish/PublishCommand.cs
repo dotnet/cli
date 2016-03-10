@@ -201,13 +201,16 @@ namespace Microsoft.DotNet.Tools.Publish
 
         private static void PublishDeps(ProjectContext context, string buildBasePath, string outputPath, string configuration)
         {
-            var buildOutputPaths = context.GetOutputPaths(configuration, buildBasePath);
-            PublishFiles(
-                new[] {
-                    buildOutputPaths.RuntimeFiles.Deps,
-                    buildOutputPaths.RuntimeFiles.DepsJson
-                },
-                outputPath);
+            if (!context.TargetFramework.IsDesktop())
+            {
+                var buildOutputPaths = context.GetOutputPaths(configuration, buildBasePath);
+                PublishFiles(
+                    new[] {
+                        buildOutputPaths.RuntimeFiles.Deps,
+                        buildOutputPaths.RuntimeFiles.DepsJson
+                    },
+                    outputPath);
+            }
         }
 
         private static void PublishRefs(LibraryExport export, string outputPath)

@@ -141,9 +141,7 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
             {
                 writer.Write(dependencyContext, fileStream);
             }
-
         }
-
 
         public void GenerateBindingRedirects(LibraryExporter exporter)
         {

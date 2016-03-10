@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.Cli.Build
 
         [Target(nameof(SetupTestPackages), nameof(SetupTestProjects))]
         public static BuildTargetResult SetupTests(BuildTargetContext c) => c.Success();
-        
+
         [Target(nameof(RestoreTestAssetPackages), nameof(BuildTestAssetPackages))]
         public static BuildTargetResult SetupTestPackages(BuildTargetContext c) => c.Success();
 
@@ -64,7 +64,7 @@ namespace Microsoft.DotNet.Cli.Build
 
             return c.Success();
         }
-        
+
         [Target]
         public static BuildTargetResult RestoreTestAssetProjects(BuildTargetContext c)
         {
@@ -74,16 +74,16 @@ namespace Microsoft.DotNet.Cli.Build
             CleanNuGetTempCache();
 
             var dotnet = DotNetCli.Stage2;
-                
+
             dotnet.Restore("--fallbacksource", Dirs.TestPackages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects"))
                 .Execute().EnsureSuccessful();
-                
+
             // The 'ProjectModelServer' directory contains intentionally-unresolved dependencies, so don't check for success. Also, suppress the output
             dotnet.Restore()
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectModelServer", "DthTestProjects"))
                 .Execute();
-                
+
             dotnet.Restore()
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectModelServer", "DthUpdateSearchPathSample"))
                 .Execute();
@@ -110,15 +110,15 @@ namespace Microsoft.DotNet.Cli.Build
                     .Execute()
                     .EnsureSuccessful();
             }
-            
+
             return c.Success();
         }
-        
+
         [Target]
         public static BuildTargetResult CleanTestPackages(BuildTargetContext c)
         {
             Rmdir(Path.Combine(Dirs.NuGetPackages, "dotnet-hello"));
-            
+
             return c.Success();
         }
 
@@ -141,7 +141,7 @@ namespace Microsoft.DotNet.Cli.Build
                     .Execute()
                     .EnsureSuccessful();
             }
-            
+
             return c.Success();
         }
 
