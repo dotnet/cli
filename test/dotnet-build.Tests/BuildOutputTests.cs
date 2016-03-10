@@ -39,7 +39,14 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         private readonly string[] _libCompileFiles =
         {
             "TestLibrary" + FileNameSuffixes.DotNet.DynamicLib,
+            "TestLibrary" + FileNameSuffixes.DotNet.ProgramDatabase
+        };
+        private readonly string[] _libBuildFiles = new []
+        {
+            "TestLibrary" + FileNameSuffixes.DotNet.DynamicLib,
             "TestLibrary" + FileNameSuffixes.DotNet.ProgramDatabase,
+            "TestLibrary" + FileNameSuffixes.Deps,
+            "TestLibrary" + FileNameSuffixes.DepsJson,
         };
 
         private void GetProjectInfo(string testRoot)
@@ -94,6 +101,23 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         }
 
         [Fact]
+        public void LibraryBuilds_ShouldHaveDepsFile()
+        {
+            var testInstance = TestAssetsManager.CreateTestInstance("TestAppWithLibrary")
+                                                .WithLockFiles();
+            GetProjectInfo(testInstance.TestRoot);
+
+            new BuildCommand(GetProjectPath(_testLibDirInfo), framework: DefaultFramework)
+                .ExecuteWithCapturedOutput().Should().Pass();
+
+            var libdebug = _rootDirInfo.Sub(FormatPath("TestLibrary/bin/debug/{fw}/{rid}", DefaultFramework, _runtime));
+
+            libdebug.Should().Exist();
+            libdebug.Should().HaveFiles(_libBuildFiles);
+            libdebug.Should().NotHaveFile("TestLibrary" + FileNameSuffixes.DotNet.Exe);
+        }
+
+        [Fact]
         public void SettingVersionInEnvironment_ShouldStampAssemblyInfoInOutputAssembly()
         {
             var testInstance = TestAssetsManager.CreateTestInstance("TestLibraryWithConfiguration")
@@ -114,7 +138,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             fileVersion.Should().NotBeNull();
             fileVersion.Should().BeEquivalentTo("1.0.0.345");
         }
-        
+
         [Fact]
         public void SettingVersionSuffixFlag_ShouldStampAssemblyInfoInOutputAssembly()
         {
