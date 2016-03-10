@@ -71,7 +71,8 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
         {
             WriteDepsFileAndCopyProjectDependencies(_exporter);
 
-            if (!string.IsNullOrEmpty(_context.RuntimeIdentifier))
+            var emitEntryPoint = _context.ProjectFile.GetCompilerOptions(_context.TargetFramework, _configuration).EmitEntryPoint ?? false;
+            if (emitEntryPoint && !string.IsNullOrEmpty(_context.RuntimeIdentifier))
             {
                 // TODO: Pick a host based on the RID
                 CoreHost.CopyTo(_runtimeOutputPath, _context.ProjectFile.Name + Constants.ExeSuffix);
@@ -141,9 +142,7 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
             {
                 writer.Write(dependencyContext, fileStream);
             }
-
         }
-
 
         public void GenerateBindingRedirects(LibraryExporter exporter)
         {

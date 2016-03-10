@@ -395,7 +395,15 @@ namespace Microsoft.DotNet.Tools.Build
 
             if (succeeded)
             {
-                MakeRunnable();
+                if (_rootProject.ProjectFile.HasRuntimeOutput(_args.ConfigValue))
+                {
+                    MakeRunnable();
+                }
+                else if (!string.IsNullOrEmpty(_args.OutputValue))
+                {
+                    var outputPaths = _rootProject.GetOutputPaths(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
+                    CopyCompilationOutput(outputPaths);
+                }
             }
 
             return succeeded;
@@ -420,7 +428,7 @@ namespace Microsoft.DotNet.Tools.Build
         private void MakeRunnable()
         {
             var runtimeContext = _rootProject.CreateRuntimeContext(_args.GetRuntimes());
-            if(_args.PortableMode)
+            if (_args.PortableMode)
             {
                 // HACK: Force the use of the portable target
                 runtimeContext = _rootProject;
@@ -436,6 +444,7 @@ namespace Microsoft.DotNet.Tools.Build
                 CopyCompilationOutput(outputPaths);
             }
 
+            var options = runtimeContext.ProjectFile.GetCompilerOptions(runtimeContext.TargetFramework, _args.ConfigValue);
             var executable = new Executable(runtimeContext, outputPaths, libraryExporter, _args.ConfigValue);
             executable.MakeCompilationOutputRunnable();
 
