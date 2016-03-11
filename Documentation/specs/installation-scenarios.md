@@ -31,7 +31,8 @@ Nuget - WIP, this should include versioning scheme
 | `<Extension>` | Description |
 | --- | :--- |
 | exe | Installer bundle. It should be used by end customers |
-| zip | Packed binaries. It is used by [installation script](#installation-scripts) |
+| zip | Packed binaries. Used by [installation script](#installation-scripts) |
+| symbols.zip | Packed binaries with included symbols. See [symbol packages](#symbol-packages) |
 
 ### Including dotnet cli installer as part of your bundle
 
@@ -45,20 +46,30 @@ dark.exe -x <FolderWhereToExtract> <InstallerPath>
 | `<Extension>` | Description |
 | --- | :--- |
 | pkg | WIP |
-| tar.gz | Packed binaries. It is used by [installation script](#installation-scripts) |
+| tar.gz | Packed binaries. Used by [installation script](#installation-scripts) |
+| symbols.tar.gz | Packed binaries with included symbols. See [symbol packages](#symbol-packages) |
 
 ## Ubuntu output
 
 | `<Extension>` | Description |
 | --- | :--- |
 | deb | Debian package. This package is being pushed to a [debian feed](#debian-feed) |
-| tar.gz | Packed binaries. It is used by [installation script](#installation-scripts) |
+| tar.gz | Packed binaries. Used by [installation script](#installation-scripts) |
+| symbols.tar.gz | Packed binaries with included symbols. See [symbol packages](#symbol-packages) |
 
 ## RedHat/CentOS output
-WIP
+
+| `<Extension>` | Description |
+| --- | :--- |
+| tar.gz | Packed binaries. Used by [installation script](#installation-scripts) |
+| symbols.tar.gz | Packed binaries with included symbols. See [symbol packages](#symbol-packages) |
 
 ## Debian output
-WIP
+
+| `<Extension>` | Description |
+| --- | :--- |
+| tar.gz | Packed binaries. Used by [installation script](#installation-scripts) |
+| symbols.tar.gz | Packed binaries with included symbols. See [symbol packages](#symbol-packages) |
 
 ## Example build output links
 WIP
@@ -227,3 +238,6 @@ sudo apt-get install <DebianPackageName>=<Version>
 ## Questions
 - Is debian version compatible with `<Version>` or does it require additional revision number, i.e.: `1.0.0.001598-1`?
 - How to differentiate between Debian package for Debian and Debian package for Ubuntu?
+- 
+# Symbol packages
+WIP
