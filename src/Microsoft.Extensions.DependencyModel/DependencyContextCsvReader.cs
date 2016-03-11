@@ -42,22 +42,26 @@ namespace Microsoft.Extensions.DependencyModel
             {
                 var identity = packageGroup.Key;
                 runtimeLibraries.Add(new RuntimeLibrary(
-                    libraryType: identity.Item1,
-                    packageName: identity.Item2,
+                    type: identity.Item1,
+                    name: identity.Item2,
                     version: identity.Item3,
                     hash: identity.Item4,
-                    assemblies: packageGroup.Select(l => l.AssetPath).ToArray(),
-                    dependencies: new Dependency[] { },
+                    assemblies: packageGroup.Select(l => RuntimeAssembly.Create(l.AssetPath)),
+                    resourceAssemblies: Enumerable.Empty<ResourceAssembly>(),
+                    subTargets: Enumerable.Empty<RuntimeTarget>(),
+                    dependencies: Enumerable.Empty<Dependency>(),
                     serviceable: false
                     ));
             }
 
             return new DependencyContext(
-                target: string.Empty,
+                targetFramework: string.Empty,
                 runtime: string.Empty,
+                isPortable: false,
                 compilationOptions: CompilationOptions.Default,
-                compileLibraries: new CompilationLibrary[] {},
-                runtimeLibraries: runtimeLibraries.ToArray());
+                compileLibraries: Enumerable.Empty<CompilationLibrary>(),
+                runtimeLibraries: runtimeLibraries.ToArray(),
+                runtimeGraph: Enumerable.Empty<KeyValuePair<string, string[]>>());
         }
 
         private Tuple<string, string, string, string> PackageIdentity(DepsFileLine line)

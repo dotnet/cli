@@ -16,10 +16,11 @@
                 }
             }
         },
-        "dnxcore50": {
-            "imports": "portable-net45+win8",
+        "netstandard1.3": {
+            "imports": "dnxcore50",
             "dependencies": {
-                "NETStandard.Library": "1.0.0-rc2-23811"
+                "NETStandard.Library": "1.0.0-rc2-23901",
+                "System.Diagnostics.Process": "4.1.0-rc2-23901"
             }
         }
     }

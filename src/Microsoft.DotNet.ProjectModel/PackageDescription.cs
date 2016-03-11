@@ -16,14 +16,15 @@ namespace Microsoft.DotNet.ProjectModel
             LockFilePackageLibrary package,
             LockFileTargetLibrary lockFileLibrary,
             IEnumerable<LibraryRange> dependencies,
-            bool compatible)
+            bool compatible,
+            bool resolved)
             : base(
                   new LibraryIdentity(package.Name, package.Version, LibraryType.Package),
                   "sha512-" + package.Sha512,
                   path,
                   dependencies: dependencies,
                   framework: null,
-                  resolved: compatible,
+                  resolved: resolved,
                   compatible: compatible)
         {
             Library = package;
@@ -31,7 +32,7 @@ namespace Microsoft.DotNet.ProjectModel
         }
 
         private LockFileTargetLibrary Target { get; }
-        
+
         public LockFilePackageLibrary Library { get; }
 
         public IEnumerable<LockFileItem> RuntimeAssemblies => FilterPlaceholders(Target.RuntimeAssemblies);
@@ -43,6 +44,8 @@ namespace Microsoft.DotNet.ProjectModel
         public IEnumerable<LockFileItem> NativeLibraries => Target.NativeLibraries;
 
         public IEnumerable<LockFileContentFile> ContentFiles => Target.ContentFiles;
+
+        public IEnumerable<LockFileRuntimeTarget> RuntimeTargets => Target.RuntimeTargets;
 
         private IEnumerable<LockFileItem> FilterPlaceholders(IList<LockFileItem> items)
         {

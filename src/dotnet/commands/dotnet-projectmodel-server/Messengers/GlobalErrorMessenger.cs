@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using Microsoft.DotNet.ProjectModel.Server.Models;
 
 namespace Microsoft.DotNet.ProjectModel.Server.Messengers
 {
@@ -16,9 +17,22 @@ namespace Microsoft.DotNet.ProjectModel.Server.Messengers
             return remote != null && Equals(local.GlobalErrorMessage, remote.GlobalErrorMessage);
         }
 
-        protected override object CreatePayload(ProjectSnapshot local)
+        protected override void SendPayload(ProjectSnapshot local, Action<object> send)
         {
-            return local.GlobalErrorMessage;
+            if (local.GlobalErrorMessage != null)
+            {
+                send(local.GlobalErrorMessage);
+            }
+            else
+            {
+                send(new ErrorMessage
+                {
+                    Message = null,
+                    Path = null,
+                    Line = -1,
+                    Column = -1
+                });
+            }
         }
 
         protected override void SetValue(ProjectSnapshot local, ProjectSnapshot remote)

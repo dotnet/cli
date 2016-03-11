@@ -30,12 +30,12 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
                 return new[]
                 {
                     new object[] { "1", "", "", "", "" },
-                    new object[] { "2", "dnxcore50", "", "", "" },
+                    new object[] { "2", "netstandardapp1.5", "", "", "" },
                     new object[] { "3", "", PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier(), "", "" },
                     new object[] { "4", "", "", "Release", "" },
                     new object[] { "5", "", "", "", "some/dir"},
                     new object[] { "6", "", "", "", "some/dir/with spaces" },
-                    new object[] { "7", "dnxcore50", PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier(), "Debug", "some/dir" },
+                    new object[] { "7", "netstandardapp1.5", PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier(), "Debug", "some/dir" },
                 };
             }
         }
@@ -126,18 +126,20 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.pdb");
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.dll.config");
             publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibraryLesser.deps");
+            publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibraryLesser.deps.json");
 
             // dependencies should also be copied
             publishCommand.GetOutputDirectory().Should().HaveFile("Newtonsoft.Json.dll");
             publishCommand.GetOutputDirectory().Delete(true);
 
-            publishCommand = new PublishCommand(lesserTestProject, "dnxcore50", PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier());
+            publishCommand = new PublishCommand(lesserTestProject, "netstandardapp1.5", PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier());
             publishCommand.Execute().Should().Pass();
 
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.dll");
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.pdb");
             publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibraryLesser.dll.config");
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.deps");
+            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.deps.json");
 
             // dependencies should also be copied
             publishCommand.GetOutputDirectory().Should().HaveFile("Newtonsoft.Json.dll");
@@ -188,7 +190,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             var publishCommand = new PublishCommand(testProject);
             var result = publishCommand.ExecuteWithCapturedOutput();
 
-            result.Should().StdOutMatchPattern("\nprepublish_output( \\?[^%]+\\?){5}.+\npostpublish_output( \\?[^%]+\\?){5}", RegexOptions.Singleline);
+            result.Should().HaveStdOutMatching("\nprepublish_output( \\?[^%]+\\?){5}.+\npostpublish_output( \\?[^%]+\\?){5}", RegexOptions.Singleline);
             result.Should().Pass();
         }
     }

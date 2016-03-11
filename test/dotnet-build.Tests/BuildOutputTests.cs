@@ -27,6 +27,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             "TestApp" + FileNameSuffixes.DotNet.ProgramDatabase,
             "TestApp" + FileNameSuffixes.CurrentPlatform.Exe,
             "TestApp" + FileNameSuffixes.Deps,
+            "TestApp" + FileNameSuffixes.DepsJson,
             "TestLibrary" + FileNameSuffixes.DotNet.DynamicLib,
             "TestLibrary" + FileNameSuffixes.DotNet.ProgramDatabase
         };
@@ -134,7 +135,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 //        [InlineData("net20", false, true)]
 //        [InlineData("net40", true, true)]
 //        [InlineData("net461", true, true)]
-        [InlineData("dnxcore50", true, false)]
+        [InlineData("netstandardapp1.5", true, false)]
         public void MultipleFrameworks_ShouldHaveValidTargetFrameworkAttribute(string frameworkName, bool shouldHaveTargetFrameworkAttribute, bool windowsOnly)
         {
             var framework = NuGetFramework.Parse(frameworkName);
