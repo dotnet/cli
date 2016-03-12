@@ -13,11 +13,20 @@ namespace Microsoft.DotNet.Cli.Build
 {
     public class TestTargets
     {
-        public static readonly string[] TestPackageProjects = new[]
+        public static readonly TestPackage[] TestPackageProjects = new[]
         {
-            "dotnet-hello/v1/dotnet-hello",
-            "dotnet-hello/v2/dotnet-hello",
-            "dotnet-portable"
+            new TestPackage 
+            { 
+                Name = "dotnet-hello", 
+                Path = "TestAssets/TestPackages/dotnet-hello/v1/dotnet-hello",
+                IsApplicable = () => true
+            },
+            new TestPackage 
+            { 
+                Name = "dotnet-hello", 
+                Path = "TestAssets/TestPackages/dotnet-hello/v2/dotnet-hello",
+                IsApplicable = () => true
+            }
         };
 
         public static readonly string[] TestProjects = new[]
@@ -27,6 +36,7 @@ namespace Microsoft.DotNet.Cli.Build
             "dotnet-publish.Tests",
             "dotnet-compile.Tests",
             "dotnet-compile.UnitTests",
+            "dotnet-compile-fsc.Tests",
             "dotnet-build.Tests",
             "dotnet-pack.Tests",
             "dotnet-projectmodel-server.Tests",
@@ -47,7 +57,7 @@ namespace Microsoft.DotNet.Cli.Build
         [Target(nameof(SetupTestPackages), nameof(SetupTestProjects))]
         public static BuildTargetResult SetupTests(BuildTargetContext c) => c.Success();
 
-        [Target(nameof(RestoreTestAssetPackages), nameof(BuildTestAssetPackages))]
+        [Target(nameof(RestoreTestAssetPackages), nameof(BuildTestPackages))]
         public static BuildTargetResult SetupTestPackages(BuildTargetContext c) => c.Success();
 
         [Target(nameof(RestoreTestAssetProjects), nameof(BuildTestAssetProjects))]
@@ -77,7 +87,7 @@ namespace Microsoft.DotNet.Cli.Build
 
             var dotnet = DotNetCli.Stage2;
 
-            dotnet.Restore("--verbosity", "verbose", "--disable-parallel", "--fallbacksource", Dirs.TestPackages)
+            dotnet.Restore("--verbosity", "verbose", "--disable-parallel", "--fallbacksource", Dirs.TestPackages, "--fallbacksource", Dirs.Packages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects"))
                 .Execute().EnsureSuccessful();
 
@@ -93,8 +103,8 @@ namespace Microsoft.DotNet.Cli.Build
             return c.Success();
         }
 
-        [Target(nameof(CleanTestPackages))]
-        public static BuildTargetResult BuildTestAssetPackages(BuildTargetContext c)
+        [Target(nameof(CleanProductPackages), nameof(CleanTestPackages), nameof(CleanTestPackageSource))]
+        public static BuildTargetResult BuildTestPackages(BuildTargetContext c)
         {
             CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages"));
 
@@ -103,10 +113,11 @@ namespace Microsoft.DotNet.Cli.Build
             Rmdir(Dirs.TestPackages);
             Mkdirp(Dirs.TestPackages);
 
-            foreach (var relativePath in TestPackageProjects)
+            foreach (var relativePath in TestPackageProjects.Where(p => p.IsApplicable()).Select(p => p.Path))
             {
-                var fullPath = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages", relativePath.Replace('/', Path.DirectorySeparatorChar));
+                var fullPath = Path.Combine(c.BuildContext.BuildDirectory, relativePath.Replace('/', Path.DirectorySeparatorChar));
                 c.Info($"Packing: {fullPath}");
+
                 dotnet.Pack("--output", Dirs.TestPackages)
                     .WorkingDirectory(fullPath)
                     .Execute()
@@ -117,10 +128,33 @@ namespace Microsoft.DotNet.Cli.Build
         }
 
         [Target]
+        public static BuildTargetResult CleanProductPackages(BuildTargetContext c)
+        {
+            foreach (var packageName in PackageTargets.ProjectsToPack)
+            {
+                Rmdir(Path.Combine(Dirs.NuGetPackages, packageName));
+            }
+
+            return c.Success();
+        }
+        
+        [Target]
         public static BuildTargetResult CleanTestPackages(BuildTargetContext c)
         {
-            Rmdir(Path.Combine(Dirs.NuGetPackages, "dotnet-hello"));
+            foreach (var packageName in TestPackageProjects.Where(p => p.IsApplicable()).Select(p => p.Name))
+            {
+                Rmdir(Path.Combine(Dirs.NuGetPackages, packageName));
+            }
 
+            return c.Success();
+        }
+
+        [Target]
+        public static BuildTargetResult CleanTestPackageSource(BuildTargetContext c)
+        {
+            Rmdir(Dirs.TestPackages);
+            Mkdirp(Dirs.TestPackages);
+            
             return c.Success();
         }
 
