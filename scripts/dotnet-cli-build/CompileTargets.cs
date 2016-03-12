@@ -35,16 +35,6 @@ namespace Microsoft.DotNet.Cli.Build
             "README.md"
         };
 
-        public static readonly string[] ProjectsToPack = new[]
-        {
-            "Microsoft.DotNet.Cli.Utils",
-            "Microsoft.DotNet.ProjectModel",
-            "Microsoft.DotNet.ProjectModel.Loader",
-            "Microsoft.DotNet.ProjectModel.Workspaces",
-            "Microsoft.Extensions.DependencyModel",
-            "Microsoft.Extensions.Testing.Abstractions"
-        };
-
         public const string SharedFrameworkName = "Microsoft.NETCore.App";
 
         private static string CoreHostBaseName => $"corehost{Constants.ExeSuffix}";
@@ -195,22 +185,23 @@ namespace Microsoft.DotNet.Cli.Build
                 return result;
             }
 
-            // Build projects that are packed in NuGet packages, but only on Windows
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (CurrentPlatform.IsWindows)
             {
+                // build projects for nuget packages
                 var packagingOutputDir = Path.Combine(Dirs.Stage2Compilation, "forPackaging");
                 Mkdirp(packagingOutputDir);
-                foreach (var project in ProjectsToPack)
+                foreach (var project in PackageTargets.ProjectsToPack)
                 {
                     // Just build them, we'll pack later
-                    DotNetCli.Stage1.Build(
+                    var packBuildResult = DotNetCli.Stage1.Build(
                         "--build-base-path",
                         packagingOutputDir,
                         "--configuration",
                         configuration,
                         Path.Combine(c.BuildContext.BuildDirectory, "src", project))
-                        .Execute()
-                        .EnsureSuccessful();
+                        .Execute();
+
+                    packBuildResult.EnsureSuccessful();
                 }
             }
 
