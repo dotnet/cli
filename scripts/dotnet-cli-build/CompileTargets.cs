@@ -35,16 +35,6 @@ namespace Microsoft.DotNet.Cli.Build
             "README.md"
         };
 
-        public static readonly string[] ProjectsToPack = new[]
-        {
-            "Microsoft.DotNet.Cli.Utils",
-            "Microsoft.DotNet.ProjectModel",
-            "Microsoft.DotNet.ProjectModel.Loader",
-            "Microsoft.DotNet.ProjectModel.Workspaces",
-            "Microsoft.Extensions.DependencyModel",
-            "Microsoft.Extensions.Testing.Abstractions"
-        };
-
         public const string SharedFrameworkName = "Microsoft.NETCore.App";
 
         private static string CoreHostBaseName => $"corehost{Constants.ExeSuffix}";
@@ -195,23 +185,27 @@ namespace Microsoft.DotNet.Cli.Build
                 return result;
             }
 
-            // Build projects that are packed in NuGet packages, but only on Windows
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            // build projects for nuget packages
+            var packagingOutputDir = Path.Combine(Dirs.Stage2Compilation, "forPackaging");
+            Mkdirp(packagingOutputDir);
+            foreach (var project in PackageTargets.ProjectsToPack)
             {
-                var packagingOutputDir = Path.Combine(Dirs.Stage2Compilation, "forPackaging");
-                Mkdirp(packagingOutputDir);
-                foreach (var project in ProjectsToPack)
+                // Just build them, we'll pack later
+                var packBuildResult = DotNetCli.Stage1.Build(
+                    "--build-base-path",
+                    packagingOutputDir,
+                    "--configuration",
+                    configuration,
+                    Path.Combine(c.BuildContext.BuildDirectory, "src", project))
+                    .Execute();
+
+                // On Non-Windows these packages aren't published and are used for testing
+                // Net451 targets will also cause a failure, so let's ignore them for now
+                if (CurrentPlatform.IsWindows)
                 {
-                    // Just build them, we'll pack later
-                    DotNetCli.Stage1.Build(
-                        "--build-base-path",
-                        packagingOutputDir,
-                        "--configuration",
-                        configuration,
-                        Path.Combine(c.BuildContext.BuildDirectory, "src", project))
-                        .Execute()
-                        .EnsureSuccessful();
+                    packBuildResult.EnsureSuccessful();
                 }
+                
             }
 
             return c.Success();
