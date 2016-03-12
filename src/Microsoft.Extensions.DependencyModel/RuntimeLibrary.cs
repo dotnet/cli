@@ -41,8 +41,14 @@ namespace Microsoft.Extensions.DependencyModel
             Assemblies = assemblies.ToArray();
             ResourceAssemblies = resourceAssemblies.ToArray();
             RuntimeTargets = subTargets.ToArray();
-            NativeLibraries = nativeLibraries.ToArray();
+
+            if (nativeLibraries != null)
+            {
+                NativeLibraries = nativeLibraries.ToArray();    
+            }            
         }
+
+        public IReadOnlyList<string> NativeAssets { get; }
 
         public IReadOnlyList<RuntimeAssembly> Assemblies { get; }
 
