@@ -67,7 +67,7 @@ namespace Microsoft.DotNet.Tests
                 CommandResult result = new HelloCommand().ExecuteWithCapturedOutput();
 
                 result.StdOut.Should().Contain("No executable found matching command");
-                result.Should().NotPass();
+                result.Should().Fail();
             }
             finally
             {
