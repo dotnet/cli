@@ -1,4 +1,4 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -16,85 +16,25 @@ using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Compiler.Fsc
 {
-    public class CompileFscCommand
+    public class FSharpCompilationDriver
     {
-        private const int ExitFailed = 1;
-
-        public static int Run(string[] args)
+        public int Compile(CompileFscCommandApp compileFscCommandApp)
         {
-            DebugHelper.HandleDebugSwitch(ref args);
-
-            CommonCompilerOptions commonOptions = null;
-            AssemblyInfoOptions assemblyInfoOptions = null;
-            string tempOutDir = null;
-            IReadOnlyList<string> references = Array.Empty<string>();
-            IReadOnlyList<string> resources = Array.Empty<string>();
-            IReadOnlyList<string> sources = Array.Empty<string>();
-            string outputName = null;
-            var help = false;
-            var returnCode = 0;
-            string helpText = null;
-
-            try
-            {
-                ArgumentSyntax.Parse(args, syntax =>
-                {
-                    syntax.HandleHelp = false;
-                    syntax.HandleErrors = false;
-
-                    commonOptions = CommonCompilerOptionsExtensions.Parse(syntax);
-
-                    assemblyInfoOptions = AssemblyInfoOptions.Parse(syntax);
-
-                    syntax.DefineOption("temp-output", ref tempOutDir, "Compilation temporary directory");
-
-                    syntax.DefineOption("out", ref outputName, "Name of the output assembly");
-
-                    syntax.DefineOptionList("reference", ref references, "Path to a compiler metadata reference");
-
-                    syntax.DefineOptionList("resource", ref resources, "Resources to embed");
-
-                    syntax.DefineOption("h|help", ref help, "Help for compile native.");
-
-                    syntax.DefineParameterList("source-files", ref sources, "Compilation sources");
-
-                    helpText = syntax.GetHelpText();
-
-                    if (tempOutDir == null)
-                    {
-                        syntax.ReportError("Option '--temp-output' is required");
-                    }
-                });
-            }
-            catch (ArgumentSyntaxException exception)
-            {
-                Console.Error.WriteLine(exception.Message);
-                help = true;
-                returnCode = ExitFailed;
-            }
-
-            if (help)
-            {
-                Console.WriteLine(helpText);
-
-                return returnCode;
-            }
-
-            var translated = TranslateCommonOptions(commonOptions, outputName);
+            var translated = TranslateCommonOptions(compileFscCommandApp.CommonOptions, compileFscCommandApp.OutputName);
 
             var allArgs = new List<string>(translated);
             allArgs.AddRange(GetDefaultOptions());
 
             // Generate assembly info
-            var assemblyInfo = Path.Combine(tempOutDir, $"dotnet-compile.assemblyinfo.fs");
-            File.WriteAllText(assemblyInfo, AssemblyInfoFileGenerator.GenerateFSharp(assemblyInfoOptions));
+            var assemblyInfo = Path.Combine(compileFscCommandApp.TempOutDir, $"dotnet-compile.assemblyinfo.fs");
+            File.WriteAllText(assemblyInfo, AssemblyInfoFileGenerator.GenerateFSharp(compileFscCommandApp.AssemblyInfoOptions));
             allArgs.Add($"{assemblyInfo}");
 
-            bool targetNetCore = commonOptions.Defines.Contains("DNXCORE50");
+            bool targetNetCore = compileFscCommandApp.CommonOptions.Defines.Contains("NETSTANDARDAPP1_5");
 
             //HACK fsc raise error FS0208 if target exe doesnt have extension .exe
-            bool hackFS0208 = targetNetCore && commonOptions.EmitEntryPoint == true;
-            string originalOutputName = outputName;
+            bool hackFS0208 = targetNetCore && compileFscCommandApp.CommonOptions.EmitEntryPoint == true;
+            string outputName = compileFscCommandApp.OutputName;
 
             if (outputName != null)
             {
@@ -112,11 +52,11 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
                 allArgs.Add("--targetprofile:netcore");
             }
 
-            allArgs.AddRange(references.Select(r => $"-r:{r}"));
-            allArgs.AddRange(resources.Select(resource => $"--resource:{resource}"));
-            allArgs.AddRange(sources.Select(s => $"{s}"));
+            allArgs.AddRange(compileFscCommandApp.References.OrEmptyIfNull().Select(r => $"-r:{r}"));
+            allArgs.AddRange(compileFscCommandApp.Resources.OrEmptyIfNull().Select(resource => $"--resource:{resource}"));
+            allArgs.AddRange(compileFscCommandApp.Sources.OrEmptyIfNull().Select(s => $"{s}"));
 
-            var rsp = Path.Combine(tempOutDir, "dotnet-compile-fsc.rsp");
+            var rsp = Path.Combine(compileFscCommandApp.TempOutDir, "dotnet-compile-fsc.rsp");
             File.WriteAllLines(rsp, allArgs, Encoding.UTF8);
 
             // Execute FSC!
@@ -129,9 +69,9 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
 
             if (hackFS0208 && File.Exists(outputName))
             {
-                if (File.Exists(originalOutputName))
-                    File.Delete(originalOutputName);
-                File.Move(outputName, originalOutputName);
+                if (File.Exists(compileFscCommandApp.OutputName))
+                    File.Delete(compileFscCommandApp.OutputName);
+                File.Move(outputName, compileFscCommandApp.OutputName);
             }
 
             //HACK dotnet build require a pdb (crash without), fsc atm cant generate a portable pdb, so an empty pdb is created
@@ -145,7 +85,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
         }
 
         // TODO: Review if this is the place for default options
-        private static IEnumerable<string> GetDefaultOptions()
+        private IEnumerable<string> GetDefaultOptions()
         {
             var args = new List<string>()
             {
@@ -162,7 +102,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             return args;
         }
 
-        private static IEnumerable<string> TranslateCommonOptions(CommonCompilerOptions options, string outputName)
+        private IEnumerable<string> TranslateCommonOptions(CommonCompilerOptions options, string outputName)
         {
             List<string> commonArgs = new List<string>();
 
@@ -240,16 +180,20 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             return commonArgs;
         }
 
-        private static Command RunFsc(List<string> fscArgs)
+        private Command RunFsc(List<string> fscArgs)
         {
-            var corerun = Path.Combine(AppContext.BaseDirectory, Constants.HostExecutableName);
-            var fscExe = Path.Combine(AppContext.BaseDirectory, "fsc.exe");
+            var depsResolver = new DepsCommandResolver();
+
+            var corehost = CoreHost.HostExePath;
+            var fscExe = depsResolver.FscExePath;
 
             List<string> args = new List<string>();
             args.Add(fscExe);
+            args.Add("--depsfile:" + Path.Combine(AppContext.BaseDirectory, "dotnet-compile-fsc.deps"));
+
             args.AddRange(fscArgs);
             
-            return Command.Create(corerun, args.ToArray());
+            return Command.Create(corehost, args.ToArray());
         }
     }
 }
