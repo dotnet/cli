@@ -12,6 +12,7 @@ using System.Text;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.ProjectModel.Resolution;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Compiler.Fsc
@@ -19,8 +20,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
     public class CompileFscCommand
     {
         private const int ExitFailed = 1;
-
-        public static int Run(string[] args)
+        public static int Main(string[] args)
         {
             DebugHelper.HandleDebugSwitch(ref args);
 
@@ -80,7 +80,6 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
                 return returnCode;
             }
 
-
             // TODO less hacky
             bool targetNetCore = 
                 commonOptions.Defines.Contains("DNXCORE50") ||
@@ -92,7 +91,8 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
 
             //HACK fsc raise error FS0208 if target exe doesnt have extension .exe
             bool hackFS0208 = targetNetCore && commonOptions.EmitEntryPoint == true;
-            string originalOutputName = outputName;
+
+            var originalOutputName = outputName;
 
             if (outputName != null)
             {
@@ -192,6 +192,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
 
             if (commonOptions.AllowUnsafe == true)
             {
+                // what?
             }
 
             if (commonOptions.WarningsAsErrors == true)
@@ -212,6 +213,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
 
             if (commonOptions.PublicSign == true)
             {
+                // pass
             }
 
             if (commonOptions.AdditionalArguments != null)
@@ -227,13 +229,13 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             //source files + assemblyInfo
             allArgs.AddRange(GetSourceFiles(sources, assemblyInfo).ToArray());
 
-            //TODO check the switch enabled in fsproj in RELEASE and DEBUG configuration 
+            //TODO check the switch enabled in fsproj in RELEASE and DEBUG configuration
 
             var rsp = Path.Combine(tempOutDir, "dotnet-compile-fsc.rsp");
             File.WriteAllLines(rsp, allArgs, Encoding.UTF8);
 
             // Execute FSC!
-            var result = RunFsc(new List<string> { $"@{rsp}" })
+            var result = RunFsc(new List<string> { $"@{rsp}" }, tempOutDir)
                 .ForwardStdErr()
                 .ForwardStdOut()
                 .Execute();
@@ -257,26 +259,6 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             return result.ExitCode;
         }
 
-        private static Command RunFsc(List<string> fscArgs)
-        {
-            var fscExe = Environment.GetEnvironmentVariable("DOTNET_FSC_PATH")
-                      ?? Path.Combine(AppContext.BaseDirectory, "fsc.exe");
-
-            var exec = Environment.GetEnvironmentVariable("DOTNET_FSC_EXEC")?.ToUpper() ?? "COREHOST";
-
-            switch (exec)
-            {
-                case "RUN":
-                    return Command.Create(fscExe, fscArgs.ToArray());
-
-                case "COREHOST":
-                default:
-                    var corehost = Path.Combine(AppContext.BaseDirectory, Constants.HostExecutableName);
-                    return Command.Create(corehost, new[] { fscExe }.Concat(fscArgs).ToArray());
-            }
-
-        }
-
         // The assembly info must be in the last minus 1 position because:
         // - assemblyInfo should be in the end to override attributes
         // - assemblyInfo cannot be in the last position, because last file contains the main
@@ -295,5 +277,48 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
 
             yield return sourceFiles.Last();
         }
+
+        private static Command RunFsc(List<string> fscArgs, string temp)
+        {
+            var fscEnvExe = Environment.GetEnvironmentVariable("DOTNET_FSC_PATH");
+            var exec = Environment.GetEnvironmentVariable("DOTNET_FSC_EXEC")?.ToUpper() ?? "COREHOST";
+            
+            var muxer = new Muxer();
+
+            if (fscEnvExe != null)
+            {
+                switch (exec)
+                {
+                    case "RUN":
+                        return Command.Create(fscEnvExe, fscArgs.ToArray());
+
+                    case "COREHOST":
+                    default:
+                        var host = muxer.MuxerPath;
+                        return Command.Create(host, new[] { fscEnvExe }.Concat(fscArgs).ToArray());
+                }
+            }
+            else
+            {
+                return ResolveFsc(fscArgs, temp);
+            }
+        }
+
+        private static Command ResolveFsc(List<string> fscArgs, string temp)
+        {
+            var depsFile = Path.Combine(AppContext.BaseDirectory, "dotnet-compile-fsc" + FileNameSuffixes.DepsJson);
+            var runtimeConfigFile = Path.Combine(AppContext.BaseDirectory, "dotnet-compile-fsc" + FileNameSuffixes.RuntimeConfigJson);
+            var nugetPackagesRoot = PackageDependencyProvider.ResolvePackagesPath(null, null);
+
+            var commandFactory = new DepsJsonCommandFactory(
+                    depsFile, 
+                    runtimeConfigFile,
+                    nugetPackagesRoot,
+                    temp
+                );
+
+            return (Command) commandFactory.Create("fsc", fscArgs);
+        }
     }
 }
+
