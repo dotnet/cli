@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.DotNet.Cli.Build.Framework;
 using Newtonsoft.Json;
@@ -30,6 +31,7 @@ namespace Microsoft.DotNet.Scripts
             List<DependencyInfo> dependencyInfos = c.GetDependencyInfo();
             dependencyInfos.Add(new DependencyInfo()
             {
+                Name = "CoreFX",
                 IdPattern = coreFxIdPattern,
                 IdExclusionPattern = coreFxIdExclusionPattern,
                 NewReleaseVersion = coreFxLkgVersion
@@ -51,14 +53,20 @@ namespace Microsoft.DotNet.Scripts
             return dependencyInfos;
         }
 
+        [Target(nameof(ReplaceProjectJson), nameof(ReplaceCrossGen))]
+        public static BuildTargetResult ReplaceVersions(BuildTargetContext c) => c.Success();
+
         [Target]
-        public static BuildTargetResult ReplaceVersions(BuildTargetContext c)
+        public static BuildTargetResult ReplaceProjectJson(BuildTargetContext c)
         {
             List<DependencyInfo> dependencyInfos = c.GetDependencyInfo();
 
-            string currentDirectory = Directory.GetCurrentDirectory();
+            IEnumerable<string> projectJsonFiles = Enumerable.Union(
+                Directory.GetFiles(Dirs.RepoRoot, "project.json", SearchOption.AllDirectories),
+                Directory.GetFiles(Path.Combine(Dirs.RepoRoot, @"src\dotnet\commands\dotnet-new"), "project.json.template", SearchOption.AllDirectories));
+
             JObject projectRoot;
-            foreach (string projectJsonFile in Directory.GetFiles(currentDirectory, "project.json", SearchOption.AllDirectories))
+            foreach (string projectJsonFile in projectJsonFiles)
             {
                 try
                 {
@@ -71,7 +79,7 @@ namespace Microsoft.DotNet.Scripts
                 }
 
                 bool changedAnyPackage = FindAllDependencyProperties(projectRoot)
-                    .Select(package => VisitPackage(package, dependencyInfos))
+                    .Select(dependencyProperty => ReplaceDependencyVersion(dependencyProperty, dependencyInfos))
                     .ToArray()
                     .Any(shouldWrite => shouldWrite);
 
@@ -85,9 +93,9 @@ namespace Microsoft.DotNet.Scripts
             return c.Success();
         }
 
-        private static bool VisitPackage(JProperty package, List<DependencyInfo> dependencyInfos)
+        private static bool ReplaceDependencyVersion(JProperty dependencyProperty, List<DependencyInfo> dependencyInfos)
         {
-            string id = package.Name;
+            string id = dependencyProperty.Name;
             foreach (DependencyInfo dependencyInfo in dependencyInfos)
             {
                 if (Regex.IsMatch(id, dependencyInfo.IdPattern))
@@ -95,17 +103,17 @@ namespace Microsoft.DotNet.Scripts
                     if (string.IsNullOrEmpty(dependencyInfo.IdExclusionPattern) || !Regex.IsMatch(id, dependencyInfo.IdExclusionPattern))
                     {
                         string version;
-                        if (package.Value is JObject)
+                        if (dependencyProperty.Value is JObject)
                         {
-                            version = package.Value["version"].Value<string>();
+                            version = dependencyProperty.Value["version"].Value<string>();
                         }
-                        else if (package.Value is JValue)
+                        else if (dependencyProperty.Value is JValue)
                         {
-                            version = package.Value.ToString();
+                            version = dependencyProperty.Value.ToString();
                         }
                         else
                         {
-                            throw new Exception($"package project.json version {package}");
+                            throw new Exception($"Invalid package project.json version {dependencyProperty}");
                         }
 
                         VersionRange dependencyVersionRange = VersionRange.Parse(version);
@@ -122,13 +130,13 @@ namespace Microsoft.DotNet.Scripts
                                 newReleaseVersion,
                                 dependencyVersion.Metadata).ToNormalizedString();
 
-                            if (package.Value is JObject)
+                            if (dependencyProperty.Value is JObject)
                             {
-                                package.Value["version"] = newVersion;
+                                dependencyProperty.Value["version"] = newVersion;
                             }
                             else
                             {
-                                package.Value = newVersion;
+                                dependencyProperty.Value = newVersion;
                             }
 
                             return true;
@@ -170,9 +178,25 @@ namespace Microsoft.DotNet.Scripts
 
         private class DependencyInfo
         {
+            public string Name { get; set; }
             public string IdPattern { get; set; }
             public string IdExclusionPattern { get; set; }
             public string NewReleaseVersion { get; set; }
+        }
+
+        [Target]
+        public static BuildTargetResult ReplaceCrossGen(BuildTargetContext c)
+        {
+            DependencyInfo coreFXInfo = c.GetDependencyInfo().Single(d => d.Name == "CoreFX");
+
+            string compileTargetsPath = Path.Combine(Dirs.RepoRoot, @"scripts\dotnet-cli-build\CompileTargets.cs");
+            string compileTargetsContent = File.ReadAllText(compileTargetsPath);
+
+            compileTargetsContent = Regex.Replace(compileTargetsContent, @"rc2-\d+", coreFXInfo.NewReleaseVersion);
+
+            File.WriteAllText(compileTargetsPath, compileTargetsContent, Encoding.UTF8);
+
+            return c.Success();
         }
     }
 }
