@@ -79,7 +79,7 @@ namespace Microsoft.DotNet.Cli.Build
             string testProjectsRoot = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects");
             var projects = Directory.GetFiles(testProjectsRoot, "project.json", SearchOption.AllDirectories)
                                     .Where(p => !File.Exists(Path.Combine(Path.GetDirectoryName(p), norestoreFileName)));
-
+                
             foreach (var project in projects)
             {
                 c.Info($"Restoring: {project}");
@@ -87,7 +87,7 @@ namespace Microsoft.DotNet.Cli.Build
                     .WorkingDirectory(Path.GetDirectoryName(project))
                 .Execute().EnsureSuccessful();
             }
-
+                
             // The 'ProjectModelServer' directory contains intentionally-unresolved dependencies, so don't check for success. Also, suppress the output
             dotnet.Restore()
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectModelServer", "DthTestProjects"))
@@ -103,6 +103,8 @@ namespace Microsoft.DotNet.Cli.Build
         [Target(nameof(CleanTestPackages))]
         public static BuildTargetResult BuildTestAssetPackages(BuildTargetContext c)
         {
+            CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages"));
+
             var dotnet = DotNetCli.Stage2;
 
             Rmdir(Dirs.TestPackages);
@@ -132,6 +134,8 @@ namespace Microsoft.DotNet.Cli.Build
         [Target]
         public static BuildTargetResult BuildTestAssetProjects(BuildTargetContext c)
         {
+            CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects"));
+
             var dotnet = DotNetCli.Stage2;
             var nobuildFileName = ".noautobuild";
             string testProjectsRoot = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects");
@@ -302,7 +306,6 @@ set");
             }
             
             c.Verbose("Finish Collecting Visual Studio Environment Variables");
-            
             return vars;
         }
     }
