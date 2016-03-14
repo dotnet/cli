@@ -154,7 +154,7 @@ namespace Microsoft.DotNet.Cli.Build
         {
             Rmdir(Dirs.TestPackages);
             Mkdirp(Dirs.TestPackages);
-            
+
             return c.Success();
         }
 

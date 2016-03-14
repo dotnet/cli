@@ -11,6 +11,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
         private string _packageRoot = PackageDependencyProvider.ResolvePackagesPath(null, null);  
         private readonly string _fscExePath;
         private readonly string _depsFilePath;
+        private readonly string _copyDestPath;
  
         public string FscExePath { get { return _fscExePath; } }
         public string DepsFilePath { get { return _depsFilePath; } }
@@ -18,9 +19,9 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
         public DepsCommandResolver()  
         {  
             var depsName = "dotnet-compile-fsc.deps";
-            var _depsFilePath = Path.Combine(AppContext.BaseDirectory, depsName);
+            var originalDepsFilePath = Path.Combine(AppContext.BaseDirectory, depsName);
 
-            using (var stream = File.OpenRead(_depsFilePath))  
+            using (var stream = File.OpenRead(originalDepsFilePath))  
             {  
                 var depsReader = new DependencyContextCsvReader();  
                 var deps = depsReader.Read(stream);  
@@ -29,23 +30,36 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
                 
                 var fscCopyLocalAssets = fscPackageLibrary.NativeAssets;
 
+                var temp = Path.GetTempPath();
+                var _copyDestPath = Path.Combine(temp, Guid.NewGuid().ToString());
+                Directory.CreateDirectory(_copyDestPath);
+                
+
                 foreach (var asset in fscCopyLocalAssets)
                 {   
                     var assetPath = Path.Combine(_packageRoot, fscPackageLibrary.Name, fscPackageLibrary.Version, asset);
-                    var destPath = Path.Combine(AppContext.BaseDirectory, Path.GetFileName(asset));
-                    try 
-                    {
-                        File.Copy(assetPath,destPath);
-                    }
-                    catch {}
+                    var destPath = Path.Combine(_copyDestPath, Path.GetFileName(asset));
+                    
+                    File.Copy(assetPath,destPath);
                 }
 
-                var fscFileName = Path.GetFileName(
-                        fscCopyLocalAssets
-                            .FirstOrDefault(p => Path.GetFileNameWithoutExtension(p) == "fsc"));
+                _depsFilePath = Path.Combine(_copyDestPath, Path.GetFileName(originalDepsFilePath));
+                File.Copy(originalDepsFilePath, _depsFilePath);
 
-                _fscExePath = Path.Combine(AppContext.BaseDirectory, fscFileName);
+                var fscFileName = Path.GetFileName(
+                    fscCopyLocalAssets.FirstOrDefault(p => Path.GetFileNameWithoutExtension(p) == "fsc"));
+            
+                _fscExePath = Path.Combine(_copyDestPath, fscFileName);
             }
+        }
+
+        public void Cleanup()
+        {
+            try
+            {
+                Directory.Delete(_copyDestPath, true);
+            }
+            catch { }
         }
     }
 }

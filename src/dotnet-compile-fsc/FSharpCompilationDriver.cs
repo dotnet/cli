@@ -60,10 +60,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             File.WriteAllLines(rsp, allArgs, Encoding.UTF8);
 
             // Execute FSC!
-            var result = RunFsc(allArgs)
-                .ForwardStdErr()
-                .ForwardStdOut()
-                .Execute();
+            var result = RunFsc(allArgs);
 
             bool successFsc = result.ExitCode == 0;
 
@@ -180,7 +177,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             return commonArgs;
         }
 
-        private Command RunFsc(List<string> fscArgs)
+        private CommandResult RunFsc(List<string> fscArgs)
         {
             var depsResolver = new DepsCommandResolver();
 
@@ -189,11 +186,19 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
 
             List<string> args = new List<string>();
             args.Add(fscExe);
-            args.Add("--depsfile:" + Path.Combine(AppContext.BaseDirectory, "dotnet-compile-fsc.deps"));
+            args.Add("--depsfile:" + depsResolver.DepsFilePath);
 
             args.AddRange(fscArgs);
             
-            return Command.Create(corehost, args.ToArray());
+            var result = Command
+                .Create(corehost, args.ToArray())
+                .ForwardStdErr()
+                .ForwardStdOut()
+                .Execute();
+
+            depsResolver.Cleanup();
+
+            return result;
         }
     }
 }
