@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
                 var fscCopyLocalAssets = fscPackageLibrary.NativeAssets;
 
                 var temp = Path.GetTempPath();
-                var _copyDestPath = Path.Combine(temp, Guid.NewGuid().ToString());
+                _copyDestPath = Path.Combine(temp, Guid.NewGuid().ToString());
                 Directory.CreateDirectory(_copyDestPath);
                 
 

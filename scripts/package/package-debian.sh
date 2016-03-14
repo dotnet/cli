@@ -163,10 +163,6 @@ test_debian_package(){
     
     install_bats
     run_package_integrity_tests
-
-    install_debian_package
-    run_e2e_test
-    remove_debian_package
 }
 
 install_bats() {
@@ -174,30 +170,11 @@ install_bats() {
     git clone https://github.com/sstephenson/bats.git $TEST_STAGE_DIR
 }
 
-install_debian_package() {
-    sudo dpkg -i $DEBIAN_FILE
-}
-
-remove_debian_package() {
-    sudo dpkg -r $DOTNET_DEB_PACKAGE_NAME
-}
-
 run_package_integrity_tests() {
     # Set LAST_VERSION_URL to enable upgrade tests
     export LAST_VERSION_URL="$PREVIOUS_VERSION_URL"
 
     $TEST_STAGE_DIR/bin/bats $PACKAGE_OUTPUT_DIR/test_package.bats
-}
-
-run_e2e_test(){
-    local dotnet_path="/usr/bin/dotnet"
-
-    header "Running EndToEnd Tests against debian package using ${dotnet_path}"
-    
-    # Won't affect outer functions
-    cd $REPOROOT/test/EndToEnd
-    $dotnet_path build
-    $dotnet_path test -xml $TEST_STAGE_DIR/debian-endtoend-testResults.xml
 }
 
 execute_build
