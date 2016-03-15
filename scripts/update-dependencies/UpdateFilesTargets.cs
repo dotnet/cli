@@ -43,8 +43,14 @@ namespace Microsoft.DotNet.Scripts
         private static List<DependencyInfo> GetDependencyInfo(this BuildTargetContext c)
         {
             const string propertyName = "DependencyInfo";
-            List<DependencyInfo> dependencyInfos = c.BuildContext.Get<List<DependencyInfo>>(propertyName);
-            if (dependencyInfos == null)
+
+            List<DependencyInfo> dependencyInfos;
+            object dependencyInfosObj;
+            if (c.BuildContext.Properties.TryGetValue(propertyName, out dependencyInfosObj))
+            {
+                dependencyInfos = (List<DependencyInfo>)dependencyInfosObj;
+            }
+            else
             {
                 dependencyInfos = new List<DependencyInfo>();
                 c.BuildContext[propertyName] = dependencyInfos;
