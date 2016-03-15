@@ -173,7 +173,7 @@ namespace Microsoft.DotNet.Cli.Build
         }
 
         [Target]
-        [Environment("CROSSGEN_SHAREDFRAMEWORK", "1", "true")]
+        [Environment("DONT_CROSSGEN_SHAREDFRAMEWORK", null, "0", "false")]
         public static BuildTargetResult CrossGenAllManagedAssemblies(BuildTargetContext c)
         {
             string pathToAssemblies = c.BuildContext.Get<string>("SharedFrameworkNameAndVersionRoot");
