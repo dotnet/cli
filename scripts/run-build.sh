@@ -88,6 +88,7 @@ export CHANNEL=$RELEASE_SUFFIX
 $DIR/obtain/install.sh --channel $CHANNEL
 
 # Put stage 0 on the PATH (for this shell only)
+OLDPATH="$PATH"
 PATH="$DOTNET_INSTALL_DIR/bin:$PATH"
 
 # Increases the file descriptors limit for this bash. It prevents an issue we were hitting during restore
@@ -109,6 +110,7 @@ echo "Restoring Build Script projects..."
 echo "Compiling Build Scripts..."
 dotnet publish "$DIR/dotnet-cli-build" -o "$DIR/dotnet-cli-build/bin" --framework netstandardapp1.5
 
+PATH="$OLDPATH"
 # Run the builder
 echo "Invoking Build Scripts..."
 echo "Configuration: $CONFIGURATION"
