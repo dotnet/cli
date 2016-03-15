@@ -139,9 +139,14 @@ bool deps_json_t::perform_rid_fallback(rid_specific_assets_t* portable_assets, c
         assert(!matched_rid.empty());
         for (auto iter = package.second.begin(); iter != package.second.end(); /* */)
         {
-            iter = (iter->first != matched_rid)
-                 ? package.second.erase(iter)
-                 : iter++;
+           if (iter->first != matched_rid)
+           {
+                   iter = package.second.erase(iter);
+           }
+           else
+           {
+                   iter++;
+           }
         }
     }
     return true;
@@ -225,9 +230,21 @@ bool deps_json_t::load_portable(const json_value& json, const pal::string_t& tar
         return rid_assets.count(package) || non_rid_assets.count(package);
     };
     auto get_relpaths = [&rid_assets, &non_rid_assets](const pal::string_t& package, int type_index) -> const std::vector<pal::string_t>& {
-        return (rid_assets.count(package))
-            ? rid_assets[package].begin()->second[type_index]
-            : non_rid_assets[package][type_index];
+       // HACK:      v - memory leak
+       auto assets = new std::vector<pal::string_t>();
+       if (rid_assets.count(package))
+       {
+               assets->insert(assets->end(),
+                       rid_assets[package].begin()->second[type_index].begin(),
+                       rid_assets[package].begin()->second[type_index].end());
+       }
+       if (non_rid_assets.count(package))
+       {
+               assets->insert(assets->end(),
+                       non_rid_assets[package][type_index].begin(),
+                       non_rid_assets[package][type_index].end());
+       }
+       return *assets;
     };
 
     reconcile_libraries_with_targets(json, package_exists, get_relpaths);
