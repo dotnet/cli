@@ -22,6 +22,11 @@ namespace Microsoft.DotNet.Cli.Build
         private const string DotnetHostFxrBaseName = "hostfxr";
         private const string HostPolicyBaseName = "hostpolicy";
 
+        private static readonly HashSet<string> crossgenSkippedAssemblies = new HashSet<string>()
+        {
+            "Microsoft.CodeAnalysis.dll"
+        };
+
         [Target(nameof(PackageSharedFramework), nameof(CrossGenAllManagedAssemblies))]
         public static BuildTargetResult PublishSharedFramework(BuildTargetContext c)
         {
@@ -177,7 +182,7 @@ namespace Microsoft.DotNet.Cli.Build
             {
                 string fileName = Path.GetFileName(file);
 
-                if (fileName == "mscorlib.dll" || fileName == "mscorlib.ni.dll" || !HasMetadata(file))
+                if (fileName == "mscorlib.dll" || fileName == "mscorlib.ni.dll" || !HasMetadata(file) || crossgenSkippedAssemblies.Contains(fileName))
                 {
                     continue;
                 }
