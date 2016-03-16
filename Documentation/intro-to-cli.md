@@ -21,7 +21,7 @@ We've been using [DNX](http://blogs.msdn.com/b/dotnet/archive/2015/04/29/net-ann
 
 The DNX services will be offered as a hosting option available to apps. You can opt to use a host that offers one or more of these services, like file change watching or NuGet package servicing. You can also opt to use a shared framework, to ease deployment of dependencies and for performance reasons. Some of this is still being designed and isn't yet implemented.
 
-ASP.NET 5 will transition to the new tools for RC2. This is already in progress. There will be a smooth transition from DNX to these new .NET Core components.
+ASP.NET Core will transition to the new tools for RC2. This is already in progress. There will be a smooth transition from DNX to these new .NET Core components.
 
 Experience 
 ==========
