@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Extensions.DependencyModel
 {
-    public class DependencyContextJsonReader
+    public class DependencyContextJsonReader: IDependencyContextReader
     {
         public DependencyContext Read(Stream stream)
         {
@@ -79,18 +79,16 @@ namespace Microsoft.Extensions.DependencyModel
                 );
         }
 
-        private IEnumerable<KeyValuePair<string, string[]>> ReadRuntimeGraph(JObject runtimes)
+        private IEnumerable<RuntimeFallbacks> ReadRuntimeGraph(JObject runtimes)
         {
             if (runtimes == null)
             {
                 yield break;
             }
 
-            var targets = runtimes.Children();
-            var runtime = (JProperty)targets.Single();
-            foreach (var pair in (JObject)runtime.Value)
+            foreach (var pair in runtimes)
             {
-                yield return new KeyValuePair<string, string[]>(pair.Key, pair.Value.Values<string>().ToArray());
+                yield return new RuntimeFallbacks(pair.Key, pair.Value.Values<string>().ToArray());
             }
         }
 
