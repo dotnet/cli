@@ -3,13 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NuGet.Frameworks;
 using NuGet.Packaging.Core;
 using NuGet.Versioning;
 
 namespace Microsoft.DotNet.ProjectModel.Graph
 {
-    public class LockFileTargetLibrary
+    public class LockFileTargetLibrary : IMergeable<LockFileTargetLibrary>
     {
         public string Name { get; set; }
 
@@ -34,5 +35,50 @@ namespace Microsoft.DotNet.ProjectModel.Graph
         public IList<LockFileContentFile> ContentFiles { get; set; } = new List<LockFileContentFile>();
 
         public IList<LockFileRuntimeTarget> RuntimeTargets { get; set; } = new List<LockFileRuntimeTarget>();
+
+        public void MergeWith(LockFileTargetLibrary m)
+        {
+            TargetFramework = TargetFramework ?? m.TargetFramework;
+
+            if (Dependencies == null || !Dependencies.Any())
+            {
+                Dependencies = m.Dependencies;
+            }
+
+            if (FrameworkAssemblies == null || !FrameworkAssemblies.Any())
+            {
+                FrameworkAssemblies = m.FrameworkAssemblies;
+            }
+
+            if (RuntimeAssemblies == null || !RuntimeAssemblies.Any())
+            {
+                RuntimeAssemblies = m.RuntimeAssemblies;
+            }
+
+            if (CompileTimeAssemblies == null || !CompileTimeAssemblies.Any())
+            {
+                CompileTimeAssemblies = m.CompileTimeAssemblies;
+            }
+
+            if (ResourceAssemblies == null || !ResourceAssemblies.Any())
+            {
+                ResourceAssemblies = m.ResourceAssemblies;
+            }
+
+            if (NativeLibraries == null || !NativeLibraries.Any())
+            {
+                NativeLibraries = m.NativeLibraries;
+            }
+
+            if (ContentFiles == null || !ContentFiles.Any())
+            {
+                ContentFiles = m.ContentFiles;
+            }
+
+            if (RuntimeTargets == null || !RuntimeTargets.Any())
+            {
+                RuntimeTargets = m.RuntimeTargets;
+            }
+        }
     }
 }

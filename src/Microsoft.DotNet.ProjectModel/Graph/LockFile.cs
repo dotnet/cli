@@ -4,13 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Microsoft.DotNet.ProjectModel.Utilities;
-using NuGet.Versioning;
 
 namespace Microsoft.DotNet.ProjectModel.Graph
 {
-    public class LockFile
+    public class LockFile : IMergeable<LockFile>
     {
         public static readonly int CurrentVersion = 2;
         public static readonly string FileName = "project.lock.json";
@@ -86,6 +83,19 @@ namespace Microsoft.DotNet.ProjectModel.Graph
 
             message = null;
             return true;
+        }
+
+        public void MergeWith(LockFile fragmentLockFile)
+        {
+            if (Version != fragmentLockFile.Version)
+            {
+                throw new ArgumentException($"Cannot merge master lock file {LockFilePath} with fragment lock file {fragmentLockFile.LockFilePath} due to missmatching versions");
+            }
+
+            Targets.MergeWith(fragmentLockFile.Targets, l => l.TargetFramework.DotNetFrameworkName + l.RuntimeIdentifier);
+            ProjectLibraries.MergeWith(fragmentLockFile.ProjectLibraries, pl => pl.Name + pl.Version);
+            PackageLibraries.MergeWith(fragmentLockFile.PackageLibraries, pl => pl.Name + pl.Version);
+            ProjectFileDependencyGroups.MergeWith(fragmentLockFile.ProjectFileDependencyGroups, pdg => pdg.FrameworkName?.DotNetFrameworkName ?? "");
         }
     }
 }
