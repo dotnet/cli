@@ -64,7 +64,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
                     newArgs += " " + args;
                 }
                 args = newArgs;
-                executable = "dotnet";
+                executable = "corehost";
             }
 
             if (!Path.IsPathRooted(executable))
