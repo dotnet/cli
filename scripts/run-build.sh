@@ -13,6 +13,7 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
   [[ "$SOURCE" != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+OLDPATH="$PATH"
 
 source "$DIR/common/_prettyprint.sh"
 
@@ -88,7 +89,6 @@ export CHANNEL=$RELEASE_SUFFIX
 $DIR/obtain/install.sh --channel $CHANNEL
 
 # Put stage 0 on the PATH (for this shell only)
-OLDPATH="$PATH"
 PATH="$DOTNET_INSTALL_DIR/bin:$PATH"
 
 # Increases the file descriptors limit for this bash. It prevents an issue we were hitting during restore
