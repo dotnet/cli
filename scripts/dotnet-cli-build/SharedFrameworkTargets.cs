@@ -24,7 +24,9 @@ namespace Microsoft.DotNet.Cli.Build
 
         private static readonly HashSet<string> crossgenSkippedAssemblies = new HashSet<string>()
         {
-            "Microsoft.CodeAnalysis.dll"
+            "Microsoft.CodeAnalysis.dll",
+            "System.Collections.Immutable.dll",
+            "System.ObjectModel.dll"
         };
 
         [Target(nameof(PackageSharedFramework), nameof(CrossGenAllManagedAssemblies))]
@@ -195,10 +197,13 @@ namespace Microsoft.DotNet.Cli.Build
                 // we need to be able to look at the project.lock.json file and figure out what version of Microsoft.NETCore.Runtime.CoreCLR
                 // was used, and then select that version.
                 ExecSilent(Crossgen.GetCrossgenPathForVersion(CompileTargets.CoreCLRVersion),
-                    "-readytorun", "-in", file, "-out", tempPathName, "-platform_assemblies_paths", pathToAssemblies);                  
-
-                File.Delete(file);
-                File.Move(tempPathName, file);
+                    "-FragileNonVersionable", "-in", file, "-out", tempPathName, "-platform_assemblies_paths", pathToAssemblies);
+            }
+            foreach (var file in Directory.EnumerateFiles(pathToAssemblies, "*.readytorun"))
+            {
+                string original = Path.ChangeExtension(file, "dll");
+                File.Delete(original);
+                File.Move(file, original);
             }
 
             return c.Success();
