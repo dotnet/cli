@@ -131,12 +131,13 @@ bool deps_json_t::perform_rid_fallback(rid_specific_assets_t* portable_assets, c
             });
             if (iter == fallback_rids.end() || (*iter).empty())
             {
-                trace::error(_X("Did not find a matching fallback rid for package %s for the host rid %s"), package.first.c_str(), host_rid.c_str());
-                return false;
+                trace::verbose(_X("Did not find a matching fallback rid for package %s for the host rid %s"), package.first.c_str(), host_rid.c_str());
             }
-            matched_rid = *iter;
+            else
+            {
+                matched_rid = *iter;
+            }
         }
-        assert(!matched_rid.empty());
         for (auto iter = package.second.begin(); iter != package.second.end(); /* */)
         {
             if (iter->first != matched_rid)
@@ -226,27 +227,20 @@ bool deps_json_t::load_portable(const json_value& json, const pal::string_t& tar
         return false;
     }
 
-    std::vector<pal::string_t> merged;
     auto package_exists = [&rid_assets, &non_rid_assets](const pal::string_t& package) -> bool {
         return rid_assets.count(package) || non_rid_assets.count(package);
     };
-    auto get_relpaths = [&rid_assets, &non_rid_assets, &merged](const pal::string_t& package, int type_index) -> const std::vector<pal::string_t>& {
-        if (rid_assets.count(package) && non_rid_assets.count(package))
+    std::vector<pal::string_t> empty;
+    auto get_relpaths = [&rid_assets, &non_rid_assets, &empty](const pal::string_t& package, int type_index) -> const std::vector<pal::string_t>& {
+        if (rid_assets.count(package))
         {
-            const std::vector<pal::string_t>& rel1 = rid_assets[package].begin()->second[type_index];
-            const std::vector<pal::string_t>& rel2 = non_rid_assets[package][type_index];
-            merged.clear();
-            merged.reserve(rel1.size() + rel2.size());
-            merged.insert(merged.end(), rel1.begin(), rel1.end());
-            merged.insert(merged.end(), rel2.begin(), rel2.end());
-            return merged;
+            return rid_assets[package].begin()->second[type_index];
         }
-        else
+        if (non_rid_assets.count(package))
         {
-            return rid_assets.count(package)
-                ? rid_assets[package].begin()->second[type_index]
-                : non_rid_assets[package][type_index];
+            return non_rid_assets[package][type_index];
         }
+        return empty;
     };
 
     reconcile_libraries_with_targets(json, package_exists, get_relpaths);
