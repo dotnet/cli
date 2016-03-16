@@ -110,7 +110,7 @@ echo "Restoring Build Script projects..."
 echo "Compiling Build Scripts..."
 dotnet publish "$DIR/dotnet-cli-build" -o "$DIR/dotnet-cli-build/bin" --framework netstandardapp1.5
 
-PATH="$OLDPATH"
+export PATH="$OLDPATH"
 # Run the builder
 echo "Invoking Build Scripts..."
 echo "Configuration: $CONFIGURATION"
