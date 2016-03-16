@@ -190,14 +190,19 @@ run_package_integrity_tests() {
 }
 
 run_e2e_test(){
-    local dotnet_path="/usr/bin/dotnet"
+    local dotnet_path="/usr/bin/"
 
     header "Running EndToEnd Tests against debian package using ${dotnet_path}"
     
+    local old_path=$PATH
+    export PATH=$dotnet_path:$PATH
+    
     # Won't affect outer functions
     cd $REPOROOT/test/EndToEnd
-    $dotnet_path build
-    $dotnet_path test -xml $TEST_STAGE_DIR/debian-endtoend-testResults.xml
+    dotnet build
+    dotnet test -xml $TEST_STAGE_DIR/debian-endtoend-testResults.xml
+    
+    export PATH=$old_path
 }
 
 execute_build

@@ -103,7 +103,7 @@ create_debian_package(){
 }
 
 test_debian_package(){
-    header "Testing debian package"
+    header "Testing debian Shared Host package"
 
     install_bats
     run_package_integrity_tests
