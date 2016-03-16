@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,6 +22,9 @@ namespace Microsoft.DotNet.Scripts
         [Target(nameof(GetDependencies), nameof(ReplaceVersions))]
         public static BuildTargetResult UpdateFiles(BuildTargetContext c) => c.Success();
 
+        /// <summary>
+        /// Gets all the dependency information and puts it in the build properties.
+        /// </summary>
         [Target]
         public static BuildTargetResult GetDependencies(BuildTargetContext c)
         {
@@ -62,6 +68,9 @@ namespace Microsoft.DotNet.Scripts
         [Target(nameof(ReplaceProjectJson), nameof(ReplaceCrossGen))]
         public static BuildTargetResult ReplaceVersions(BuildTargetContext c) => c.Success();
 
+        /// <summary>
+        /// Replaces all the dependency versions in the project.json files.
+        /// </summary>
         [Target]
         public static BuildTargetResult ReplaceProjectJson(BuildTargetContext c)
         {
@@ -99,6 +108,9 @@ namespace Microsoft.DotNet.Scripts
             return c.Success();
         }
 
+        /// <summary>
+        /// Replaces the single dependency with the updated version, if it matches any of the dependencies that need to be updated.
+        /// </summary>
         private static bool ReplaceDependencyVersion(JProperty dependencyProperty, List<DependencyInfo> dependencyInfos)
         {
             string id = dependencyProperty.Name;
@@ -190,6 +202,9 @@ namespace Microsoft.DotNet.Scripts
             public string NewReleaseVersion { get; set; }
         }
 
+        /// <summary>
+        /// Replaces version number that is hard-coded in the CrossGen script.
+        /// </summary>
         [Target]
         public static BuildTargetResult ReplaceCrossGen(BuildTargetContext c)
         {
@@ -198,7 +213,17 @@ namespace Microsoft.DotNet.Scripts
             string compileTargetsPath = Path.Combine(Dirs.RepoRoot, @"scripts\dotnet-cli-build\CompileTargets.cs");
             string compileTargetsContent = File.ReadAllText(compileTargetsPath);
 
-            compileTargetsContent = Regex.Replace(compileTargetsContent, @"rc2-\d+", coreFXInfo.NewReleaseVersion);
+            Regex regex = new Regex(@"CoreCLRVersion = ""(?<version>\d.\d.\d)-(?<release>.*)"";");
+            compileTargetsContent = regex.Replace(compileTargetsContent, m =>
+            {
+                string replacedValue = m.Value;
+                Group releaseGroup = m.Groups["release"];
+
+                replacedValue = replacedValue.Remove(releaseGroup.Index - m.Index, releaseGroup.Length);
+                replacedValue = replacedValue.Insert(releaseGroup.Index - m.Index, coreFXInfo.NewReleaseVersion);
+
+                return replacedValue;
+            });
 
             File.WriteAllText(compileTargetsPath, compileTargetsContent, Encoding.UTF8);
 
