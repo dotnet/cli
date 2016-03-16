@@ -12,10 +12,13 @@ namespace Microsoft.DotNet.ProjectModel.Graph
         public NuGetVersion Version { get; set; }
 
         public string Path { get; set; }
+
+        public string MSBuildProjectPath { get; set; }
+
         public void MergeWith(LockFileProjectLibrary m)
         {
             Path = Path ?? m.Path;
-            BuildTimeDependency = BuildTimeDependency ?? m.BuildTimeDependency;
+            MSBuildProjectPath = MSBuildProjectPath ?? m.MSBuildProjectPath;
         }
     }
 }

@@ -355,8 +355,10 @@ namespace Microsoft.DotNet.ProjectModel
 
                     if (projectLibrary != null)
                     {
-                        var path = Path.GetFullPath(Path.Combine(ProjectDirectory, projectLibrary.Path));
-                        description = projectDependencyProvider.GetDescription(library.Name, path, library, ProjectResolver);
+                        var projectPath = projectLibrary.Path ?? projectLibrary.MSBuildProjectPath;
+                        var fullProjectPath = Path.GetFullPath(Path.Combine(ProjectDirectory, projectPath));
+
+                        description = projectDependencyProvider.GetDescription(library.Name, fullProjectPath, library, ProjectResolver);
                     }
 
                     type = LibraryType.Project;
