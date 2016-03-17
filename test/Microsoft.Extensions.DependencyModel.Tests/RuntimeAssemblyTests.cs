@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Xunit;
 
 namespace Microsoft.Extensions.DependencyModel.Tests
@@ -13,15 +8,15 @@ namespace Microsoft.Extensions.DependencyModel.Tests
         [Fact]
         public void UsesFileNameAsAssemblyNameInCreate()
         {
-            var assembly = RuntimeAssembly.Create("path/to/System.Collections.dll");
-            assembly.Name.Name.Should().Be("System.Collections");
+            var assembly = RuntimeAsset.Create("path/to/System.Collections.dll");
+            assembly.Name.Should().Be("System.Collections");
         }
 
         [Fact]
         public void TrimsDotNiFromDllNames()
         {
-            var assembly = RuntimeAssembly.Create("path/to/System.Collections.ni.dll");
-            assembly.Name.Name.Should().Be("System.Collections");
+            var assembly = RuntimeAsset.Create("path/to/System.Collections.ni.dll");
+            assembly.Name.Should().Be("System.Collections");
         }
     }
 }

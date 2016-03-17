@@ -6,6 +6,7 @@ using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Microsoft.Extensions.DependencyModel
 {
@@ -85,6 +86,14 @@ namespace Microsoft.Extensions.DependencyModel
                 );
         }
 
+        public IEnumerable<RuntimeAsset> ResolveNativeAssets() => ResolveNativeAssets(PlatformServices.Default.Runtime.GetRuntimeIdentifier());
+
+        public IEnumerable<RuntimeAsset> ResolveNativeAssets(string runtimeIdentifier) => ResolveAssets(runtimeIdentifier, a => a.NativeLibraryGroups);
+
+        public IEnumerable<RuntimeAsset> ResolveRuntimeAssets() => ResolveRuntimeAssets(PlatformServices.Default.Runtime.GetRuntimeIdentifier());
+
+        public IEnumerable<RuntimeAsset> ResolveRuntimeAssets(string runtimeIdentifier) => ResolveAssets(runtimeIdentifier, a => a.RuntimeAssemblyGroups);
+
         private static DependencyContext LoadDefault()
         {
             return DependencyContextLoader.Default.Load(Assembly.GetEntryAssembly());
@@ -95,7 +104,7 @@ namespace Microsoft.Extensions.DependencyModel
             return DependencyContextLoader.Default.Load(assembly);
         }
 
-        private class LibraryMergeEqualityComparer<T>: IEqualityComparer<T> where T:Library
+        private class LibraryMergeEqualityComparer<T> : IEqualityComparer<T> where T : Library
         {
             public bool Equals(T x, T y)
             {
@@ -106,6 +115,28 @@ namespace Microsoft.Extensions.DependencyModel
             {
                 return obj.Name.GetHashCode();
             }
+        }
+
+        private IEnumerable<RuntimeAsset> ResolveAssets(string runtimeIdentifier, Func<RuntimeLibrary, IEnumerable<RuntimeAssetGroup>> groupSelector)
+        {
+            var fallbacks = RuntimeGraph.FirstOrDefault(f => f.Runtime == runtimeIdentifier);
+            var rids = Enumerable.Concat(new[] { runtimeIdentifier }, fallbacks?.Fallbacks ?? Enumerable.Empty<string>());
+            return RuntimeLibraries.SelectMany(l => SelectAssets(rids, groupSelector(l)));
+        }
+
+        private IEnumerable<RuntimeAsset> SelectAssets(IEnumerable<string> rids, IEnumerable<RuntimeAssetGroup> groups)
+        {
+            foreach (var rid in rids)
+            {
+                var group = groups.FirstOrDefault(g => g.Runtime == rid);
+                if (group != null)
+                {
+                    return group.Assets;
+                }
+            }
+
+            // Return the RID-agnostic group
+            return groups.GetGroup(string.Empty);
         }
     }
 }

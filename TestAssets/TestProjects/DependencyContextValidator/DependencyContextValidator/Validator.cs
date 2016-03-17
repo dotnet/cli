@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace Microsoft.Extensions.DependencyModel
 {
@@ -54,9 +55,9 @@ namespace Microsoft.Extensions.DependencyModel
             foreach (var runtimeLibrary in context.RuntimeLibraries)
             {
                 CheckMetadata(runtimeLibrary);
-                foreach (var runtimeAssembly in runtimeLibrary.Assemblies)
+                foreach (var runtimeAssembly in runtimeLibrary.RuntimeAssemblyGroups.GetGroup(string.Empty))
                 {
-                    var assembly = Assembly.Load(runtimeAssembly.Name);
+                    var assembly = Assembly.Load(new AssemblyName(runtimeAssembly.Name));
                 }
             }
 

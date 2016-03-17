@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.Tools.Compiler
     public class PackageGenerator
     {
         protected ArtifactPathsCalculator ArtifactPathsCalculator { get; }
-        
+
         protected Project Project { get; }
 
         protected string Configuration { get; }
@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             ArtifactPathsCalculator = artifactPathsCalculator;
             Project = project;
             Configuration = configuration;
-        }        
+        }
 
         public bool BuildPackage(IEnumerable<ProjectContext> contexts, List<DiagnosticMessage> packDiagnostics)
         {
@@ -258,7 +258,7 @@ namespace Microsoft.DotNet.Tools.Compiler
 
             foreach (var dependency in project.Dependencies)
             {
-                if (!dependency.HasFlag(LibraryDependencyTypeFlag.BecomesNupkgDependency))
+                if (dependency.Type.Equals(LibraryDependencyType.Build))
                 {
                     continue;
                 }
