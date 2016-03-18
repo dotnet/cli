@@ -14,8 +14,6 @@
 #include "corehost.h"
 #include "policy_load.h"
 
-typedef web::json::value json_value;
-
 pal::string_t fx_muxer_t::resolve_fx_dir(const pal::string_t& muxer_dir, runtime_config_t* runtime)
 {
     trace::verbose(_X("--- Resolving FX directory from muxer dir [%s]"), muxer_dir.c_str());
