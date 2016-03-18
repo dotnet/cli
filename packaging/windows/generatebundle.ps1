@@ -5,6 +5,7 @@ param(
     [Parameter(Mandatory=$true)][string]$CLISDKMSIFile,
     [Parameter(Mandatory=$true)][string]$SharedFxMSIFile,
     [Parameter(Mandatory=$true)][string]$SharedHostMSIFile,
+    [Parameter(Mandatory=$true)][string]$CrtRedistributableFile,
     [Parameter(Mandatory=$true)][string]$DotnetBundleOutput,
     [Parameter(Mandatory=$true)][string]$WixRoot,
     [Parameter(Mandatory=$true)][string]$DotnetMSIVersion,
@@ -33,6 +34,7 @@ function RunCandleForBundle
         -dCLISDKMsiSourcePath="$CLISDKMSIFile" `
         -dSharedFXMsiSourcePath="$SharedFxMSIFile" `
         -dSharedHostMsiSourcePath="$SharedHostMSIFile" `
+        -dCrtRedistributableSourcePath="$CrtRedistributableFile" `
         -arch "$Architecture" `
         -ext WixBalExtension.dll `
         -ext WixUtilExtension.dll `

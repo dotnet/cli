@@ -16,12 +16,21 @@ namespace Microsoft.DotNet.Cli.Build
         private const string ENGINE = "engine.exe";
 
         private const string WixVersion = "3.10.2";
+        private const string CrtVersion = "14.0.23506.0";
 
         private static string WixRoot
         {
             get
             {
                 return Path.Combine(Dirs.Output, $"WixTools.{WixVersion}");
+            }
+        }
+
+        private static string CrtRedistributablePath
+        {
+            get
+            {
+                return Path.Combine(Dirs.Output, "Crt", $"VC_redist.{Arch}.{CrtVersion}.exe");
             }
         }
 
@@ -60,6 +69,20 @@ namespace Microsoft.DotNet.Cli.Build
             ZipFile.ExtractToDirectory(Path.Combine(WixRoot, "WixTools.zip"), WixRoot);
         }
 
+        private static void AcquireCrt(BuildTargetContext c)
+        {
+            if (File.Exists(CrtRedistributablePath))
+            {
+                return;
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(CrtRedistributablePath));
+
+            c.Info($"Downloading VC_redist.{Arch}.{CrtVersion}.exe..");
+
+            DownloadFile($"https://dotnetcli.blob.core.windows.net/build/vc/{Arch}/VC_redist.{Arch}.{CrtVersion}.exe", CrtRedistributablePath);
+        }
+
         private static void DownloadFile(string uri, string destinationPath)
         {
             using (var httpClient = new HttpClient())
@@ -90,6 +113,7 @@ namespace Microsoft.DotNet.Cli.Build
             Channel = c.BuildContext.Get<string>("Channel");
 
             AcquireWix(c);
+            AcquireCrt(c);
             return c.Success();
         }
 
@@ -168,7 +192,7 @@ namespace Microsoft.DotNet.Cli.Build
         {
             Cmd("powershell", "-NoProfile", "-NoLogo",
                 Path.Combine(Dirs.RepoRoot, "packaging", "windows", "generatebundle.ps1"),
-                SdkMsi, SharedFrameworkMsi, SharedHostMsi, SdkBundle, WixRoot, MsiVersion, CliVersion, Arch, Channel)
+                SdkMsi, SharedFrameworkMsi, SharedHostMsi, CrtRedistributablePath, SdkBundle, WixRoot, MsiVersion, CliVersion, Arch, Channel)
                     .EnvironmentVariable("Stage2Dir", Dirs.Stage2)
                     .Execute()
                     .EnsureSuccessful();
