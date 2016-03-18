@@ -4,11 +4,14 @@
     "emitEntryPoint": true
   },
   "dependencies": {
-    "Microsoft.NETCore.App": "1.0.0-rc2-23911"
+    "Microsoft.NETCore.App": "1.0.0-rc2-23918"
   },
   "frameworks": {
     "netstandard1.5": {
-      "imports": [ "portable-net45+win8", "dnxcore50" ]
+      "imports": [
+        "portable-net45+win8",
+        "dnxcore50"
+      ]
     }
   }
 }
