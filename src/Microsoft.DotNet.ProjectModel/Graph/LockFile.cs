@@ -11,6 +11,7 @@ namespace Microsoft.DotNet.ProjectModel.Graph
     {
         public static readonly int CurrentVersion = 2;
         public static readonly string FileName = "project.lock.json";
+        public static readonly string FragmentFileName = "project.fragment.lock.json";
 
         public string LockFilePath { get; }
 

@@ -15,13 +15,13 @@ namespace Microsoft.DotNet.ProjectModel.Graph
 {
     public static class LockFileReader
     {
-        public static LockFile Read(string lockFilePath)
+        public static LockFile Read(string lockFilePath, bool mergeWithFragment = true)
         {
             using (var stream = ResilientFileStreamOpener.OpenFile(lockFilePath))
             {
                 try
                 {
-                    return Read(lockFilePath, stream);
+                    return Read(lockFilePath, stream, mergeWithFragment);
                 }
                 catch (FileFormatException ex)
                 {
@@ -34,21 +34,26 @@ namespace Microsoft.DotNet.ProjectModel.Graph
             }
         }
 
-        public static LockFile Read(string lockFilePath, Stream stream)
+        public static LockFile Read(string lockFilePath, Stream stream, bool mergeWithFragment = true)
         {
             try
             {
                 var reader = new StreamReader(stream);
                 var jobject = JsonDeserializer.Deserialize(reader) as JsonObject;
 
-                if (jobject != null)
-                {
-                    return ReadLockFile(lockFilePath, jobject);
-                }
-                else
+                if (jobject == null)
                 {
                     throw new InvalidDataException();
                 }
+
+                var masterLockFile = ReadLockFile(lockFilePath, jobject);
+
+                if (mergeWithFragment)
+                {
+                    MergeFragment(masterLockFile);
+                }
+
+                return masterLockFile;
             }
             catch
             {
@@ -58,6 +63,23 @@ namespace Microsoft.DotNet.ProjectModel.Graph
                     Version = int.MinValue
                 };
             }
+        }
+
+        private static void MergeFragment(LockFile masterLockFile)
+        {
+            var fragmentLockFilePath = GetFragmentFilePath(masterLockFile.LockFilePath);
+
+            if (File.Exists(fragmentLockFilePath))
+            {
+                var fragmentLockFile = Read(fragmentLockFilePath, false);
+                masterLockFile.MergeWith(fragmentLockFile);
+            }
+        }
+
+        private static string GetFragmentFilePath(string masterLockFilePath)
+        {
+            var parentDirectory = Directory.GetParent(masterLockFilePath).FullName;
+            return Path.Combine(parentDirectory, LockFile.FragmentFileName);
         }
 
         private static LockFile ReadLockFile(string lockFilePath, JsonObject cursor)
