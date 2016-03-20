@@ -19,6 +19,8 @@ namespace Microsoft.DotNet.ProjectModel.Graph
 
         public IList<string> Files { get; set; } = new List<string>();
 
+        public string MSBuildProject { get; set; }
+
         public void MergeWith(LockFilePackageLibrary m)
         {
             // a package gets completely replaced

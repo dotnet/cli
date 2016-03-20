@@ -116,14 +116,32 @@ namespace Microsoft.DotNet.ProjectModel.Graph
 
                 if (type == null || string.Equals(type, "package", StringComparison.OrdinalIgnoreCase))
                 {
-                    lockFile.PackageLibraries.Add(new LockFilePackageLibrary
+
+                    var msbuildProject = value.Value("msbuildProject");
+                    LockFilePackageLibrary packageLibrary;
+
+                    if (msbuildProject == null)
                     {
-                        Name = name,
-                        Version = version,
-                        IsServiceable = ReadBool(value, "serviceable", defaultValue: false),
-                        Sha512 = ReadString(value.Value("sha512")),
-                        Files = ReadPathArray(value.Value("files"), ReadString)
-                    });
+                        packageLibrary = new LockFilePackageLibrary
+                        {
+                            Name = name,
+                            Version = version,
+                            IsServiceable = ReadBool(value, "serviceable", defaultValue: false),
+                            Sha512 = ReadString(value.Value("sha512")),
+                            Files = ReadPathArray(value.Value("files"), ReadString)
+                        };
+                    }
+                    else
+                    {
+                        packageLibrary = new LockFilePackageLibrary
+                        {
+                            Name = name,
+                            Version = version,
+                            MSBuildProject = ReadString(msbuildProject)
+                        };
+                    }
+
+                    lockFile.PackageLibraries.Add(packageLibrary);
                 }
                 else if (type == "project")
                 {
@@ -136,8 +154,8 @@ namespace Microsoft.DotNet.ProjectModel.Graph
                     var pathValue = value.Value("path");
                     projectLibrary.Path = pathValue == null ? null : ReadString(pathValue);
 
-                    var buildTimeDependencyValue = value.Value("msbuildProject");
-                    projectLibrary.MSBuildProjectPath = buildTimeDependencyValue == null ? null : ReadString(buildTimeDependencyValue);
+                    //var msbuildProject = value.Value("msbuildProject");
+                    //projectLibrary.MSBuildProjectPath = msbuildProject == null ? null : ReadString(msbuildProject);
 
                     lockFile.ProjectLibraries.Add(projectLibrary);
                 }
