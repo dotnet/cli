@@ -4,20 +4,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.ProjectModel.Graph;
-using Microsoft.DotNet.ProjectModel.Compilation;
+using NuGet.ProjectModel;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
     public interface IPackagedCommandSpecFactory
     {
         CommandSpec CreateCommandSpecFromLibrary(
-            LockFilePackageLibrary library,
+            LockFileLibrary library,
             string commandName,
             IEnumerable<string> commandArguments,
             IEnumerable<string> allowedExtensions,
             string nugetPackagesRoot,
             CommandResolutionStrategy commandResolutionStrategy,
             string depsFilePath);
-        
     }
 }

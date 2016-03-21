@@ -8,6 +8,8 @@ using System.IO;
 using System.Linq;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Utilities;
+using NuGet.ProjectModel;
+using NuGet.LibraryModel;
 
 namespace Microsoft.DotNet.ProjectModel
 {
@@ -199,19 +201,19 @@ namespace Microsoft.DotNet.ProjectModel
             {
                 currentEntry.Reset();
 
-                if (!File.Exists(Path.Combine(projectDirectory, LockFile.FileName)))
+                if (!File.Exists(Path.Combine(projectDirectory, LockFileFormat.LockFileName)))
                 {
                     return currentEntry;
                 }
                 else
                 {
-                    currentEntry.FilePath = Path.Combine(projectDirectory, LockFile.FileName);
+                    currentEntry.FilePath = Path.Combine(projectDirectory, LockFileFormat.LockFileName);
 
                     using (var fs = ResilientFileStreamOpener.OpenFile(currentEntry.FilePath, retry: 2))
                     {
                         try
                         {
-                            currentEntry.Model = LockFileReader.Read(currentEntry.FilePath, fs);
+                            currentEntry.Model = new LockFileFormat().Read(fs, currentEntry.FilePath);
                             currentEntry.UpdateLastWriteTimeUtc();
                         }
                         catch (FileFormatException ex)
@@ -266,7 +268,7 @@ namespace Microsoft.DotNet.ProjectModel
                 currentEntry.ProjectFilePath = project.ProjectFilePath;
                 currentEntry.LastProjectFileWriteTimeUtc = File.GetLastWriteTimeUtc(currentEntry.ProjectFilePath);
 
-                var lockFilePath = Path.Combine(project.ProjectDirectory, LockFile.FileName);
+                var lockFilePath = Path.Combine(project.ProjectDirectory, LockFileFormat.LockFileName);
                 if (File.Exists(lockFilePath))
                 {
                     currentEntry.LockFilePath = lockFilePath;

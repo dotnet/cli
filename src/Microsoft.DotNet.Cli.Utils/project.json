@@ -2,7 +2,7 @@
   "version": "1.0.0-*",
   "compilationOptions": {
     "keyFile": "../../tools/Key.snk",
-    "warningsAsErrors": true
+    "warningsAsErrors": false
   },
   "dependencies": {
     "Microsoft.DotNet.ProjectModel": "1.0.0-*",

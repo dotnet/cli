@@ -7,7 +7,7 @@ using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
-using NuGet.Packaging;
+using NuGet.ProjectModel;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
@@ -92,7 +92,7 @@ namespace Microsoft.DotNet.Cli.Utils
         }
 
         private CommandSpec ResolveFromDependencyLibraries(
-            IEnumerable<LockFilePackageLibrary> dependencyLibraries,
+            IEnumerable<LockFileLibrary> dependencyLibraries,
             string depsFilePath,
             string commandName,
             IEnumerable<string> allowedExtensions,
@@ -119,7 +119,7 @@ namespace Microsoft.DotNet.Cli.Utils
         }
 
         private CommandSpec ResolveFromDependencyLibrary(
-            LockFilePackageLibrary dependencyLibrary,
+            LockFileLibrary dependencyLibrary,
             string depsFilePath,
             string commandName,
             IEnumerable<string> allowedExtensions,
@@ -136,7 +136,7 @@ namespace Microsoft.DotNet.Cli.Utils
                         depsFilePath);
         }
 
-        private IEnumerable<LockFilePackageLibrary> GetAllDependencyLibraries(
+        private IEnumerable<LockFileLibrary> GetAllDependencyLibraries(
             ProjectContext projectContext)
         {
             return projectContext.LibraryManager.GetLibraries()

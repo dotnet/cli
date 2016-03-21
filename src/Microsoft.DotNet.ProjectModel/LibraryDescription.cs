@@ -7,6 +7,8 @@ using System.Linq;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.Extensions.Internal;
 using NuGet.Frameworks;
+using NuGet.ProjectModel;
+using NuGet.LibraryModel;
 
 namespace Microsoft.DotNet.ProjectModel
 {
@@ -19,7 +21,7 @@ namespace Microsoft.DotNet.ProjectModel
             LibraryIdentity identity,
             string hash,
             string path,
-            IEnumerable<LibraryRange> dependencies,
+            IEnumerable<ProjectLibraryDependency> dependencies,
             NuGetFramework framework,
             bool resolved,
             bool compatible)
@@ -27,7 +29,7 @@ namespace Microsoft.DotNet.ProjectModel
             Path = path;
             Identity = identity;
             Hash = hash;
-            Dependencies = dependencies ?? Enumerable.Empty<LibraryRange>();
+            Dependencies = dependencies ?? Enumerable.Empty<ProjectLibraryDependency>();
             Framework = framework;
             Resolved = resolved;
             Compatible = compatible;
@@ -35,10 +37,10 @@ namespace Microsoft.DotNet.ProjectModel
 
         public LibraryIdentity Identity { get; }
         public string Hash { get; }
-        public HashSet<LibraryRange> RequestedRanges { get; } = new HashSet<LibraryRange>(new LibraryRangeEqualityComparer());
+        public HashSet<ProjectLibraryDependency> RequestedRanges { get; } = new HashSet<ProjectLibraryDependency>(new LibraryRangeEqualityComparer());
         public List<LibraryDescription> Parents { get; } = new List<LibraryDescription>();
         public string Path { get; }
-        public IEnumerable<LibraryRange> Dependencies { get; }
+        public IEnumerable<ProjectLibraryDependency> Dependencies { get; }
         public bool Compatible { get; }
 
         public NuGetFramework Framework { get; set; }
@@ -51,9 +53,9 @@ namespace Microsoft.DotNet.ProjectModel
 
         // For diagnostics, we don't want to duplicate requested dependencies so we 
         // dedupe dependencies defined in project.json
-        private class LibraryRangeEqualityComparer : IEqualityComparer<LibraryRange>
+        private class LibraryRangeEqualityComparer : IEqualityComparer<ProjectLibraryDependency>
         {
-            public bool Equals(LibraryRange x, LibraryRange y)
+            public bool Equals(ProjectLibraryDependency x, ProjectLibraryDependency y)
             {
                 return x.Equals(y) &&
                     x.SourceColumn == y.SourceColumn &&
@@ -61,7 +63,7 @@ namespace Microsoft.DotNet.ProjectModel
                     string.Equals(x.SourceFilePath, y.SourceFilePath, StringComparison.Ordinal);
             }
 
-            public int GetHashCode(LibraryRange obj)
+            public int GetHashCode(ProjectLibraryDependency obj)
             {
                 var combiner = HashCodeCombiner.Start();
                 combiner.Add(obj);

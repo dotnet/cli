@@ -9,13 +9,14 @@ using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
 using NuGet.Packaging;
+using NuGet.ProjectModel;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
     public class PackagedCommandSpecFactory : IPackagedCommandSpecFactory
     {
         public CommandSpec CreateCommandSpecFromLibrary(
-            LockFilePackageLibrary library,
+            LockFileLibrary library,
             string commandName,
             IEnumerable<string> commandArguments,
             IEnumerable<string> allowedExtensions,
@@ -50,7 +51,7 @@ namespace Microsoft.DotNet.Cli.Utils
                 isPortable);
         }
 
-        private string GetPackageDirectoryFullPath(LockFilePackageLibrary library, string nugetPackagesRoot)
+        private string GetPackageDirectoryFullPath(LockFileLibrary library, string nugetPackagesRoot)
         {
             var packageDirectory = new VersionFolderPathResolver(nugetPackagesRoot)
                 .GetInstallPath(library.Name, library.Version);
@@ -59,7 +60,7 @@ namespace Microsoft.DotNet.Cli.Utils
         }
 
         private string GetCommandFileRelativePath(
-            LockFilePackageLibrary library, 
+            LockFileLibrary library, 
             string commandName, 
             IEnumerable<string> allowedExtensions)
         {
