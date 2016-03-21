@@ -313,7 +313,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
         {
             return new PackageDescription(
                 "PATH",
-                new LockFilePackageLibrary()
+                new LockFileLibrary()
                 {
                     Files = new string[] { },
                     IsServiceable = servicable ?? false,

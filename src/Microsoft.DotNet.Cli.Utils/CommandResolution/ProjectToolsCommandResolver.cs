@@ -76,7 +76,7 @@ namespace Microsoft.DotNet.Cli.Utils
         }
 
         private CommandSpec ResolveCommandSpecFromAllToolLibraries(
-            IEnumerable<LibraryRange> toolsLibraries,
+            IEnumerable<ProjectLibraryDependency> toolsLibraries,
             string commandName,
             IEnumerable<string> args,
             ProjectContext projectContext)
@@ -95,7 +95,7 @@ namespace Microsoft.DotNet.Cli.Utils
         }
 
         private CommandSpec ResolveCommandSpecFromToolLibrary(
-            LibraryRange toolLibrary,
+            ProjectLibraryDependency toolLibrary,
             string commandName,
             IEnumerable<string> args,
             ProjectContext projectContext)

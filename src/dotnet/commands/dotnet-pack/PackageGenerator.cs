@@ -16,6 +16,8 @@ using NuGet;
 using NuGet.Frameworks;
 using NuGet.Packaging.Core;
 using NuGet.Versioning;
+using NuGet.ProjectModel;
+using NuGet.LibraryModel;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.ProjectModel.Resources;
 using Microsoft.DotNet.Tools.Pack;
@@ -272,13 +274,13 @@ namespace Microsoft.DotNet.Tools.Compiler
                     continue;
                 }
 
-                if (dependencyDescription.Identity.Type == LibraryType.Project &&
+                if (dependencyDescription.Identity.Type == LibraryTypes.Project &&
                     ((ProjectDescription)dependencyDescription).Project.EmbedInteropTypes)
                 {
                     continue;
                 }
 
-                if (dependency.Target == LibraryType.ReferenceAssembly)
+                if (dependency.LibraryRange.TypeConstraint == LibraryDependencyTarget.Reference)
                 {
                     PackageBuilder.FrameworkAssemblies.Add(new FrameworkAssemblyReference(dependency.Name, new[] { context.TargetFramework }));
 
@@ -288,14 +290,14 @@ namespace Microsoft.DotNet.Tools.Compiler
                 {
                     VersionRange dependencyVersion = null;
 
-                    if (dependency.VersionRange == null ||
-                        dependency.VersionRange.IsFloating)
+                    if (dependency.LibraryRange.VersionRange == null ||
+                        dependency.LibraryRange.VersionRange.IsFloating)
                     {
                         dependencyVersion = new VersionRange(dependencyDescription.Identity.Version);
                     }
                     else
                     {
-                        dependencyVersion = dependency.VersionRange;
+                        dependencyVersion = dependency.LibraryRange.VersionRange;
                     }
 
                     Reporter.Verbose.WriteLine($"Adding dependency {dependency.Name.Yellow()} {VersionUtility.RenderVersion(dependencyVersion).Yellow()}");

@@ -10,6 +10,7 @@ using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Resolution;
 using Microsoft.DotNet.ProjectModel.Utilities;
 using NuGet.Frameworks;
+using NuGet.LibraryModel;
 
 namespace Microsoft.Extensions.DependencyModel
 {
@@ -95,11 +96,7 @@ namespace Microsoft.Extensions.DependencyModel
             foreach (var libraryDependency in export.Library.Dependencies)
             {
                 // skip build time dependencies
-                if (!libraryDependency.Type.HasFlag(
-                        LibraryDependencyTypeFlag.MainReference |
-                        LibraryDependencyTypeFlag.MainExport |
-                        LibraryDependencyTypeFlag.RuntimeComponent |
-                        LibraryDependencyTypeFlag.BecomesNupkgDependency))
+                if (libraryDependency.Type == LibraryDependencyType.Build)
                 {
                     continue;
                 }
@@ -112,7 +109,7 @@ namespace Microsoft.Extensions.DependencyModel
             }
 
             IEnumerable<string> assemblies;
-            if (type == LibraryType.ReferenceAssembly)
+            if (type == LibraryType.Reference)
             {
                 assemblies = ResolveReferenceAssembliesPath(libraryAssets);
             }

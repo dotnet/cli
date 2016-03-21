@@ -9,6 +9,7 @@ using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Resolution;
 using NuGet.Frameworks;
+using NuGet.ProjectModel;
 
 namespace Microsoft.DotNet.ProjectModel
 {

@@ -14,6 +14,7 @@ using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.Extensions.DependencyModel;
 using NuGet.Frameworks;
+using NuGet.LibraryModel;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 

@@ -6,16 +6,16 @@ using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.ProjectModel
 {
-    public class ProjectFileDependencyGroup
-    {
-        public ProjectFileDependencyGroup(NuGetFramework frameworkName, IEnumerable<string> dependencies)
-        {
-            FrameworkName = frameworkName;
-            Dependencies = dependencies;
-        }
+    //public class ProjectFileDependencyGroup
+    //{
+    //    public ProjectFileDependencyGroup(NuGetFramework frameworkName, IEnumerable<string> dependencies)
+    //    {
+    //        FrameworkName = frameworkName;
+    //        Dependencies = dependencies;
+    //    }
 
-        public NuGetFramework FrameworkName { get; }
+    //    public NuGetFramework FrameworkName { get; }
 
-        public IEnumerable<string> Dependencies { get; }
-    }
+    //    public IEnumerable<string> Dependencies { get; }
+    //}
 }

@@ -2,6 +2,8 @@
 using System.IO;
 using System.Linq;
 using Microsoft.DotNet.ProjectModel.Graph;
+using NuGet.ProjectModel;
+using NuGet.LibraryModel;
 
 namespace Microsoft.DotNet.ProjectModel.Server.Helpers
 {
@@ -35,7 +37,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Helpers
 
         private static DiagnosticMessage Validate(LibraryDescription library,
                                                   HashSet<string> projectCandidates,
-                                                  Dictionary<string, LibraryRange> rootDependencies)
+                                                  Dictionary<string, ProjectLibraryDependency> rootDependencies)
         {
             if (!library.Resolved || projectCandidates == null)
             {
@@ -44,8 +46,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Helpers
 
             var foundCandidate = projectCandidates.Contains(library.Identity.Name);
 
-            if ((library.Identity.Type == LibraryType.Project && !foundCandidate) ||
-                (library.Identity.Type == LibraryType.Package && foundCandidate))
+            if ((library.Identity.Type == LibraryTypes.Project && !foundCandidate) ||
+                (library.Identity.Type == LibraryTypes.Package && foundCandidate))
             {
                 library.Resolved = false;
 
