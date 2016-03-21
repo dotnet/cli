@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         {
             Name = name;
             RelativePath = relativePath;
-            ResolvedPath = resolvedPath;
+            ResolvedPath = relativePath;
             Transform = transform;
         }
 
@@ -47,10 +47,18 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             combiner.Add(ResolvedPath);
             return combiner.CombinedHash;
         }
+        public static LibraryAsset Create(string name, string relativePath, string path, Action<Stream, Stream> transform = null)
+        {
+            return new LibraryAsset(
+                    name,
+                    relativePath != null ? PathUtility.GetPathWithDirectorySeparator(relativePath) : null,
+                    path != null ? PathUtility.GetPathWithDirectorySeparator(path) : null,
+                    transform);
+        }
 
         public static LibraryAsset CreateFromRelativePath(string basePath, string relativePath, Action<Stream, Stream> transform = null)
         {
-            return new LibraryAsset(
+            return Create(
                     Path.GetFileNameWithoutExtension(relativePath),
                     relativePath,
                     Path.Combine(basePath, relativePath),
@@ -61,7 +69,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         {
             var relativePath = absolutePath.Replace(PathUtility.EnsureTrailingSlash(basePath), string.Empty);
 
-            return new LibraryAsset(
+            return Create(
                     Path.GetFileNameWithoutExtension(relativePath),
                     relativePath,
                     absolutePath,

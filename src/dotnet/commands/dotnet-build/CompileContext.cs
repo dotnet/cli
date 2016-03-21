@@ -545,7 +545,7 @@ namespace Microsoft.DotNet.Tools.Build
                 throw new InvalidOperationException(errorMessage);
             }
 
-            compilerIO.Inputs.Add(project.LockFile.LockFilePath);
+            compilerIO.Inputs.Add(project.LockFile.Path);
         }
 
         private static void AddDependencies(ProjectDependenciesFacade dependencies, CompilerIO compilerIO)

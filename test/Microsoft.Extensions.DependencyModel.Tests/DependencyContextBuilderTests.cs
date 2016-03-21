@@ -9,7 +9,9 @@ using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Graph;
 using NuGet.Frameworks;
 using NuGet.Versioning;
+using NuGet.ProjectModel;
 using Xunit;
+using NuGet.LibraryModel;
 
 namespace Microsoft.Extensions.DependencyModel.Tests
 {
@@ -120,10 +122,9 @@ namespace Microsoft.Extensions.DependencyModel.Tests
                         version: new NuGetVersion(1, 2, 3),
                         dependencies: new[]
                         {
-                            new LibraryRange("System.Collections",
+                        new ProjectLibraryDependency(new LibraryRange("System.Collections",
                                 new VersionRange(new NuGetVersion(2, 1, 2)),
-                                LibraryType.ReferenceAssembly,
-                                LibraryDependencyType.Default)
+                            LibraryDependencyTarget.Reference))
                         }),
                     resourceAssemblies: new[]
                     {
@@ -169,7 +170,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             lib.NativeLibraryGroups.GetRuntimeAssets("win8-x64").Should().OnlyContain(l => l == "win8-x64/Pack.Age.native.dll");
 
             var asm = context.RuntimeLibraries.Should().Contain(l => l.Name == "System.Collections").Subject;
-            asm.Type.Should().Be("referenceassembly");
+            asm.Type.Should().Be("reference");
             asm.Version.Should().Be("3.3.3");
             asm.Hash.Should().BeEmpty();
             asm.Dependencies.Should().BeEmpty();
@@ -184,14 +185,12 @@ namespace Microsoft.Extensions.DependencyModel.Tests
                 Export(PackageDescription("Pack.Age",
                     dependencies: new[]
                     {
-                        new LibraryRange("System.Collections",
+                        new ProjectLibraryDependency(new LibraryRange("System.Collections",
                             new VersionRange(new NuGetVersion(2, 0, 0)),
-                            LibraryType.ReferenceAssembly,
-                            LibraryDependencyType.Default),
-                        new LibraryRange("System.Collections",
+                            LibraryDependencyTarget.Reference)),
+                        new ProjectLibraryDependency(new LibraryRange("System.Collections",
                             new VersionRange(new NuGetVersion(2, 1, 2)),
-                            LibraryType.Package,
-                            LibraryDependencyType.Default)
+                            LibraryDependencyTarget.Package))
                     })
                     ),
                 Export(ReferenceAssemblyDescription("System.Collections",
@@ -216,10 +215,9 @@ namespace Microsoft.Extensions.DependencyModel.Tests
                     version: new NuGetVersion(1, 2, 3),
                     dependencies: new[]
                     {
-                        new LibraryRange("System.Collections",
+                        new ProjectLibraryDependency(new LibraryRange("System.Collections",
                             new VersionRange(new NuGetVersion(2, 1, 2)),
-                            LibraryType.ReferenceAssembly,
-                            LibraryDependencyType.Default)
+                            LibraryDependencyTarget.Reference))
                     }),
                     compilationAssemblies: new[]
                     {
@@ -245,7 +243,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             lib.Assemblies.Should().OnlyContain(a => a == "lib/Pack.Age.dll");
 
             var asm = context.CompileLibraries.Should().Contain(l => l.Name == "System.Collections").Subject;
-            asm.Type.Should().Be("referenceassembly");
+            asm.Type.Should().Be("reference");
             asm.Version.Should().Be("3.3.3");
             asm.Hash.Should().BeEmpty();
             asm.Dependencies.Should().BeEmpty();
@@ -277,10 +275,12 @@ namespace Microsoft.Extensions.DependencyModel.Tests
                 Export(PackageDescription("Pack.Age",
                     dependencies: new[]
                     {
-                        new LibraryRange("System.Collections",
+                        new ProjectLibraryDependency(new LibraryRange("System.Collections",
                             new VersionRange(new NuGetVersion(2, 1, 2)),
-                            LibraryType.ReferenceAssembly,
-                            LibraryDependencyType.Build)
+                            LibraryDependencyTarget.Reference))
+                        {
+                            Type = LibraryDependencyType.Build
+                        }
                     })
                     ),
                 Export(ReferenceAssemblyDescription("System.Collections",
@@ -323,12 +323,12 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             string name = null,
             NuGetVersion version = null,
             string hash = null,
-            IEnumerable<LibraryRange> dependencies = null,
+            IEnumerable<ProjectLibraryDependency> dependencies = null,
             bool? servicable = null)
         {
             return new PackageDescription(
                 "PATH",
-                new LockFilePackageLibrary()
+                new LockFileLibrary()
                 {
                     Files = new string[] { },
                     IsServiceable = servicable ?? false,
@@ -337,7 +337,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
                     Sha512 = hash ?? _defaultHash
                 },
                 new LockFileTargetLibrary(),
-                dependencies ?? Enumerable.Empty<LibraryRange>(),
+                dependencies ?? Enumerable.Empty<ProjectLibraryDependency>(),
                 true,
                 true);
         }
@@ -345,18 +345,17 @@ namespace Microsoft.Extensions.DependencyModel.Tests
         private ProjectDescription ProjectDescription(
             string name = null,
             NuGetVersion version = null,
-            IEnumerable<LibraryRange> dependencies = null)
+            IEnumerable<ProjectLibraryDependency> dependencies = null)
         {
             return new ProjectDescription(
                 new LibraryRange(
                     name ?? _defaultName,
                     new VersionRange(version ?? _defaultVersion),
-                    LibraryType.Project,
-                    LibraryDependencyType.Default
+                    LibraryDependencyTarget.Project
                     ),
                 new Project(),
-                dependencies ?? Enumerable.Empty<LibraryRange>(),
-                new TargetFrameworkInformation(),
+                dependencies ?? Enumerable.Empty<ProjectLibraryDependency>(),
+                new Microsoft.DotNet.ProjectModel.TargetFrameworkInformation(),
                 true);
         }
 
@@ -368,10 +367,10 @@ namespace Microsoft.Extensions.DependencyModel.Tests
                 new LibraryIdentity(
                     name ?? _defaultName,
                     version ?? _defaultVersion,
-                    LibraryType.ReferenceAssembly),
+                    LibraryType.Reference),
                 string.Empty, // Framework assemblies don't have hashes
                 "PATH",
-                Enumerable.Empty<LibraryRange>(),
+                Enumerable.Empty<ProjectLibraryDependency>(),
                 _defaultFramework,
                 true,
                 true);
