@@ -8,6 +8,8 @@ using Microsoft.DotNet.ProjectModel.Graph;
 using NuGet;
 using NuGet.Frameworks;
 using NuGet.Versioning;
+using NuGet.LibraryModel;
+using Library = Microsoft.Extensions.DependencyModel.Library;
 
 namespace Microsoft.DotNet.ProjectModel.Resolution
 {
@@ -20,15 +22,16 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
 
         private FrameworkReferenceResolver FrameworkResolver { get; set; }
 
-        public LibraryDescription GetDescription(LibraryRange libraryRange, NuGetFramework targetFramework)
+        public LibraryDescription GetDescription(ProjectLibraryDependency dependency, NuGetFramework targetFramework)
         {
-            if (!LibraryType.ReferenceAssembly.CanSatisfyConstraint(libraryRange.Target))
+            // FIX ME
+            if (!dependency.LibraryRange.TypeConstraintAllows(LibraryDependencyTarget.Reference))
             {
                 return null;
             }
 
-            var name = libraryRange.Name;
-            var version = libraryRange.VersionRange?.MinVersion;
+            var name = dependency.Name;
+            var version = dependency.LibraryRange.VersionRange?.MinVersion;
 
             string path;
             Version assemblyVersion;
@@ -39,13 +42,30 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
             }
 
             return new LibraryDescription(
-                new LibraryIdentity(libraryRange.Name, new NuGetVersion(assemblyVersion), LibraryType.ReferenceAssembly),
+                new LibraryIdentity(dependency.Name, new NuGetVersion(assemblyVersion), LibraryType.Reference),
                 string.Empty, // Framework assemblies don't have hashes
                 path,
-                Enumerable.Empty<LibraryRange>(),
+                Enumerable.Empty<ProjectLibraryDependency>(),
                 targetFramework,
                 resolved: true,
                 compatible: true);
+        }
+
+        public bool CanSatisfyConstraint(LibraryType type, LibraryType constraint)
+        {
+            // Reference assemblies must be explicitly asked for
+            if (Equals(LibraryType.Reference, constraint))
+            {
+                return Equals(LibraryType.Reference, this);
+            }
+            else if (Equals(constraint, LibraryType.Unresolved))
+            {
+                return true;
+            }
+            else
+            {
+                return type == constraint;
+            }
         }
     }
 }

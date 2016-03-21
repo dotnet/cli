@@ -9,6 +9,8 @@ using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Resolution;
 using Microsoft.DotNet.Tools.Test.Utilities;
+using NuGet.ProjectModel;
+using NuGet.LibraryModel;
 using FluentAssertions;
 using Xunit;
 

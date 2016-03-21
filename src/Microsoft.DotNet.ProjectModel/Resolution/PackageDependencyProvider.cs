@@ -10,6 +10,8 @@ using System.Reflection.PortableExecutable;
 using Microsoft.DotNet.ProjectModel.Graph;
 using NuGet.Frameworks;
 using NuGet.Packaging;
+using NuGet.ProjectModel;
+using NuGet.LibraryModel;
 
 namespace Microsoft.DotNet.ProjectModel.Resolution
 {
@@ -24,7 +26,7 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
             _frameworkReferenceResolver = frameworkReferenceResolver;
         }
 
-        public PackageDescription GetDescription(NuGetFramework targetFramework, LockFilePackageLibrary package, LockFileTargetLibrary targetLibrary)
+        public PackageDescription GetDescription(NuGetFramework targetFramework, LockFileLibrary package, LockFileTargetLibrary targetLibrary)
         {
             // If a NuGet dependency is supposed to provide assemblies but there is no assembly compatible with
             // current target framework, we should mark this dependency as unresolved
@@ -37,7 +39,7 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                 targetLibrary.RuntimeAssemblies.Any() ||
                 !containsAssembly;
 
-            var dependencies = new List<LibraryRange>(targetLibrary.Dependencies.Count + targetLibrary.FrameworkAssemblies.Count);
+            var dependencies = new List<ProjectLibraryDependency>(targetLibrary.Dependencies.Count + targetLibrary.FrameworkAssemblies.Count);
             PopulateDependencies(dependencies, targetLibrary, targetFramework);
 
             var path = _packagePathResolver.GetInstallPath(package.Name, package.Version);
@@ -61,13 +63,13 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
             return packageDescription;
         }
 
-        private void PopulateLegacyPortableDependencies(NuGetFramework targetFramework, List<LibraryRange> dependencies, string packagePath, LockFileTargetLibrary targetLibrary)
+        private void PopulateLegacyPortableDependencies(NuGetFramework targetFramework, List<ProjectLibraryDependency> dependencies, string packagePath, LockFileTargetLibrary targetLibrary)
         {
             var seen = new HashSet<string>();
 
             foreach (var assembly in targetLibrary.CompileTimeAssemblies)
             {
-                if (IsPlaceholderFile(assembly))
+                if (IsPlaceholderFile(assembly.Path))
                 {
                     continue;
                 }
@@ -100,9 +102,8 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                         // framework assembly dependency
                         if (_frameworkReferenceResolver.TryGetAssembly(dependency, targetFramework, out path, out version))
                         {
-                            dependencies.Add(new LibraryRange(dependency,
-                                LibraryType.ReferenceAssembly,
-                                LibraryDependencyType.Build));
+                            dependencies.Add(new ProjectLibraryDependency(new LibraryRange(dependency,
+                                LibraryDependencyTarget.Reference)));
                         }
                     }
                 }
@@ -125,17 +126,16 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
         }
 
         private void PopulateDependencies(
-            List<LibraryRange> dependencies,
+            List<ProjectLibraryDependency> dependencies,
             LockFileTargetLibrary targetLibrary,
             NuGetFramework targetFramework)
         {
             foreach (var dependency in targetLibrary.Dependencies)
             {
-                dependencies.Add(new LibraryRange(
+                dependencies.Add(new ProjectLibraryDependency(new LibraryRange(
                     dependency.Id,
                     dependency.VersionRange,
-                    LibraryType.Unspecified,
-                    LibraryDependencyType.Default));
+                    LibraryDependencyTarget.All)));
             }
 
             if (!targetFramework.IsPackageBased)
@@ -143,10 +143,9 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                 // Only add framework assemblies for non-package based frameworks.
                 foreach (var frameworkAssembly in targetLibrary.FrameworkAssemblies)
                 {
-                    dependencies.Add(new LibraryRange(
+                    dependencies.Add(new ProjectLibraryDependency(new LibraryRange(
                         frameworkAssembly,
-                        LibraryType.ReferenceAssembly,
-                        LibraryDependencyType.Default));
+                        LibraryDependencyTarget.Reference)));
                 }
             }
         }

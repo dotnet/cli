@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Utilities;
 using NuGet.Versioning;
+using NuGet.LibraryModel;
 
 namespace Microsoft.DotNet.ProjectModel.Resolution
 {
@@ -52,7 +53,7 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                         foreach (var range in library.RequestedRanges)
                         {
                             errorCode = ErrorCodes.NU1001;
-                            message = $"The dependency {FormatLibraryRange(range)} could not be resolved.";
+                            message = $"The dependency {FormatLibraryRange(range.LibraryRange)} could not be resolved.";
 
                             AddDiagnostics(messages, library, message, DiagnosticMessageSeverity.Error, errorCode);
                         }
@@ -77,7 +78,7 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                             items = new List<DependencyItem>();
                             dependencies[dependency.Name] = items;
                         }
-                        items.Add(new DependencyItem(dependency, library));
+                        items.Add(new DependencyItem(dependency.LibraryRange, library));
                     }
 
                     foreach (var range in library.RequestedRanges)
@@ -95,7 +96,7 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                             continue;
                         }
 
-                        if (range.VersionRange == null)
+                        if (range.LibraryRange.VersionRange == null)
                         {
                             // TODO: Show errors/warnings for things without versions
                             continue;
@@ -107,12 +108,12 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                         // then report a warning
                         // Case 1: Non floating version and the minimum doesn't match what was specified
                         // Case 2: Floating version that fell outside of the range
-                        if ((!range.VersionRange.IsFloating &&
-                             range.VersionRange.MinVersion != library.Identity.Version) ||
-                            (range.VersionRange.IsFloating &&
-                             !range.VersionRange.Float.Satisfies(library.Identity.Version)))
+                        if ((!range.LibraryRange.VersionRange.IsFloating &&
+                             range.LibraryRange.VersionRange.MinVersion != library.Identity.Version) ||
+                            (range.LibraryRange.VersionRange.IsFloating &&
+                             !range.LibraryRange.VersionRange.Float.Satisfies(library.Identity.Version)))
                         {
-                            var message = $"Dependency specified was {FormatLibraryRange(range)} but ended up with {library.Identity}.";
+                            var message = $"Dependency specified was {FormatLibraryRange(range.LibraryRange)} but ended up with {library.Identity}.";
 
                             messages.Add(
                             new DiagnosticMessage(
@@ -214,7 +215,7 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
             }
         }
 
-        private IEnumerable<LibraryRange> GetRangesWithSourceLocations(LibraryDescription library)
+        private IEnumerable<ProjectLibraryDependency> GetRangesWithSourceLocations(LibraryDescription library)
         {
             foreach (var range in library.RequestedRanges)
             {
@@ -247,10 +248,10 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
 
         private struct LibraryItem
         {
-            public LibraryRange RequestedRange { get; private set; }
+            public ProjectLibraryDependency RequestedRange { get; private set; }
             public LibraryDescription Library { get; private set; }
 
-            public LibraryItem(LibraryRange requestedRange, LibraryDescription library)
+            public LibraryItem(ProjectLibraryDependency requestedRange, LibraryDescription library)
             {
                 RequestedRange = requestedRange;
                 Library = library;

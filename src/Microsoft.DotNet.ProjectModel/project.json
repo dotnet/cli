@@ -7,6 +7,9 @@
   "dependencies": {
     "System.Reflection.Metadata": "1.2.0-rc2-23911",
     "NuGet.Packaging": "3.4.0-rtm-0763",
+    "NuGet.ProjectModel": {
+      "target": "project"
+    },
     "Microsoft.Extensions.FileSystemGlobbing": "1.0.0-rc2-15996",
     "Microsoft.Extensions.JsonParser.Sources": {
       "type": "build",
