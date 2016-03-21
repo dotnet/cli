@@ -6,7 +6,8 @@
 param(
    [string]$Channel="beta",
    [string]$version="Latest",
-   [string]$Architecture="x64"
+   [string]$Architecture="x64",
+   [string]$InstallDir=$env:DOTNET_INSTALL_DIR
 )
 
 $ErrorActionPreference="Stop"
@@ -26,7 +27,6 @@ function say($str)
     Write-Host "dotnet_install: $str"
 }
 
-$InstallDir = $env:DOTNET_INSTALL_DIR
 if (!$InstallDir) {
     $InstallDir = "$env:LocalAppData\Microsoft\dotnet"
 }
