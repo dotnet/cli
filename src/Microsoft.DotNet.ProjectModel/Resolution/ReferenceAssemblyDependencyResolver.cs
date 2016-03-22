@@ -49,22 +49,5 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                 resolved: true,
                 compatible: true);
         }
-
-        public bool CanSatisfyConstraint(LibraryType type, LibraryType constraint)
-        {
-            // Reference assemblies must be explicitly asked for
-            if (Equals(LibraryType.Reference, constraint))
-            {
-                return Equals(LibraryType.Reference, this);
-            }
-            else if (Equals(constraint, LibraryType.Unresolved))
-            {
-                return true;
-            }
-            else
-            {
-                return type == constraint;
-            }
-        }
     }
 }
