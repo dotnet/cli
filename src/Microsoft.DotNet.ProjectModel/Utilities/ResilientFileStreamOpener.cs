@@ -36,8 +36,7 @@ namespace Microsoft.DotNet.ProjectModel.Utilities
                     }
                     else
                     {
-                        // TODO: Fix ME
-                        //Thread.Sleep(500);
+                        Thread.Sleep(500);
                     }
                 }
             }
