@@ -21,8 +21,14 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         public LibraryAsset(string name, string relativePath, string resolvedPath, Action<Stream, Stream> transform = null)
         {
             Name = name;
-            RelativePath = relativePath;
-            ResolvedPath = resolvedPath;
+            RelativePath = !string.IsNullOrEmpty(relativePath)
+                ? PathUtility.GetPathWithDirectorySeparator(relativePath)
+                : relativePath;
+
+            ResolvedPath = !string.IsNullOrEmpty(resolvedPath)
+                ? PathUtility.GetPathWithDirectorySeparator(resolvedPath)
+                : relativePath;
+
             Transform = transform;
         }
 

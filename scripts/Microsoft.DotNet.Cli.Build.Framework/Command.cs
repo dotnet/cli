@@ -290,12 +290,17 @@ namespace Microsoft.DotNet.Cli.Build.Framework
 
         private string FormatProcessInfo(ProcessStartInfo info)
         {
-            if (string.IsNullOrWhiteSpace(info.Arguments))
+            var result = info.FileName;
+            if (!string.IsNullOrWhiteSpace(info.Arguments))
             {
-                return info.FileName;
+                result += " " + info.Arguments;
+            }
+            if (!string.IsNullOrWhiteSpace(info.WorkingDirectory))
+            {
+                result += " [" + info.WorkingDirectory + "]";
             }
 
-            return info.FileName + " " + info.Arguments;
+            return result;
         }
 
         private void ReportExecBegin()

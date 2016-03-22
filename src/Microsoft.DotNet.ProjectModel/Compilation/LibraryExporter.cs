@@ -338,7 +338,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             return package
                 .Library
                 .Files
-                .Where(path => path.StartsWith("shared" + Path.DirectorySeparatorChar))
+                .Where(path => path.StartsWith("shared" + LockFile.DirectorySeparatorChar))
                 .Select(path => LibraryAsset.CreateFromRelativePath(package.Path, path));
         }
 
@@ -347,7 +347,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             var analyzers = package
                 .Library
                 .Files
-                .Where(path => path.StartsWith("analyzers" + Path.DirectorySeparatorChar) &&
+                .Where(path => path.StartsWith("analyzers" + LockFile.DirectorySeparatorChar) &&
                                path.EndsWith(".dll"));
 
             var analyzerRefs = new List<AnalyzerReference>();

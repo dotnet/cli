@@ -83,48 +83,6 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "update-dependencies", "scri
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.DotNet.Cli.Utils.Tests", "test\Microsoft.DotNet.Cli.Utils.Tests\Microsoft.DotNet.Cli.Utils.Tests.xproj", "{09C52F96-EFDD-4448-95EC-6D362DD60BAA}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.Common", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.Common\NuGet.Common.xproj", "{98BEE375-A5A0-4FC2-9B7A-25DB41C8045D}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.Configuration", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.Configuration\NuGet.Configuration.xproj", "{E3EF26E1-80A7-4573-B3A4-1D4B0042616E}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.DependencyResolver.Core", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.DependencyResolver.Core\NuGet.DependencyResolver.Core.xproj", "{CF8E1753-EE98-410F-BB4B-6624B19C6B64}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.Frameworks", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.Frameworks\NuGet.Frameworks.xproj", "{9A9A9F26-597A-4FA6-A4F1-415063484D9C}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.LibraryModel", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.LibraryModel\NuGet.LibraryModel.xproj", "{13883E8E-7DE1-4EDD-8E4A-C5357BA8CD81}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.Logging", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.Logging\NuGet.Logging.xproj", "{C1C5B715-CD4C-44C2-B074-BA638612AC2F}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.Packaging", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.Packaging\NuGet.Packaging.xproj", "{BD6BBC90-60BE-4E7D-8458-91E9CDA66ABE}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.Packaging.Core", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.Packaging.Core\NuGet.Packaging.Core.xproj", "{D65583E4-8084-466A-BA4B-55A797EA047B}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.Packaging.Core.Types", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.Packaging.Core.Types\NuGet.Packaging.Core.Types.xproj", "{46275450-3B62-4E89-8F7E-3FE2EE8513D2}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.Shared", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.Shared\NuGet.Shared.xproj", "{CA92BD12-5500-4809-B998-F6ECDD9DD79B}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.Versioning", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.Versioning\NuGet.Versioning.xproj", "{24E62AB7-64E4-4975-9417-883559D1BC19}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.Protocol.Core.Types", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.Protocol.Core.Types\NuGet.Protocol.Core.Types.xproj", "{37C02980-2278-4494-8FF7-208D8078C21E}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.Protocol.Core.v3", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.Protocol.Core.v3\NuGet.Protocol.Core.v3.xproj", "{020F4C88-3A5C-4B89-9868-089E867CC223}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.Repositories", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.Repositories\NuGet.Repositories.xproj", "{24DE9E2C-4ADC-48E6-ADF0-1E2B00596ECD}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.RuntimeModel", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.RuntimeModel\NuGet.RuntimeModel.xproj", "{79FA1E82-C09B-4F6E-B4E0-CF0F8AE5D365}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.ProjectModel", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.ProjectModel\NuGet.ProjectModel.xproj", "{F013E43F-B6D5-4F59-ACF0-EECEC2C794F5}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.Client", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.Client\NuGet.Client.xproj", "{BA3543A8-874C-4F42-8757-C7EF7D17C8EE}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.CommandLine.XPlat", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.CommandLine.XPlat\NuGet.CommandLine.XPlat.xproj", "{ECEA066F-F40D-4397-B2CE-8CA24AC22638}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.Commands", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.Commands\NuGet.Commands.xproj", "{567E8582-0E73-4A34-A7D3-ED9486415523}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.ContentModel", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.ContentModel\NuGet.ContentModel.xproj", "{6CA365CF-221D-4E7A-99B2-162AAC486D24}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NuGet.DependencyResolver", "..\..\nuget\NuGet.Client\src\NuGet.Core\NuGet.DependencyResolver\NuGet.DependencyResolver.xproj", "{002AE92E-01E5-4A38-996B-731A7A048D58}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pm", "pm", "{E159479F-4757-4F91-B86F-0A13AA73EC63}"
 EndProject
 Global

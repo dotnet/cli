@@ -46,8 +46,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Helpers
 
             var foundCandidate = projectCandidates.Contains(library.Identity.Name);
 
-            if ((library.Identity.Type == LibraryTypes.Project && !foundCandidate) ||
-                (library.Identity.Type == LibraryTypes.Package && foundCandidate))
+            if ((library.Identity.Type == LibraryType.Project && !foundCandidate) ||
+                (library.Identity.Type == LibraryType.Package && foundCandidate))
             {
                 library.Resolved = false;
 

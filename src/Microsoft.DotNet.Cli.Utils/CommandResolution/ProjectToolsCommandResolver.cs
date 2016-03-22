@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.DotNet.ProjectModel;
-using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.PlatformAbstractions;
@@ -12,8 +11,8 @@ using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.ProjectModel;
 
-using LockFile = Microsoft.DotNet.ProjectModel.Graph.LockFile;
 using FileFormatException = Microsoft.DotNet.ProjectModel.FileFormatException;
+using NuGet.LibraryModel;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
@@ -83,7 +82,7 @@ namespace Microsoft.DotNet.Cli.Utils
         {
             foreach (var toolLibrary in toolsLibraries)
             {
-                var commandSpec = ResolveCommandSpecFromToolLibrary(toolLibrary, commandName, args, projectContext);
+                var commandSpec = ResolveCommandSpecFromToolLibrary(toolLibrary.LibraryRange, commandName, args, projectContext);
 
                 if (commandSpec != null)
                 {
@@ -95,7 +94,7 @@ namespace Microsoft.DotNet.Cli.Utils
         }
 
         private CommandSpec ResolveCommandSpecFromToolLibrary(
-            ProjectLibraryDependency toolLibrary,
+            LibraryRange toolLibrary,
             string commandName,
             IEnumerable<string> args,
             ProjectContext projectContext)
@@ -103,9 +102,9 @@ namespace Microsoft.DotNet.Cli.Utils
             var nugetPackagesRoot = projectContext.PackagesDirectory;
 
             var lockFile = GetToolLockFile(toolLibrary, nugetPackagesRoot);
-            var lockFilePackageLibrary = lockFile.PackageLibraries.FirstOrDefault(l => l.Name == toolLibrary.Name);
+            var lockFilePackageLibrary = lockFile.Libraries.FirstOrDefault(l => l.Name == toolLibrary.Name);
 
-            var depsFileRoot = Path.GetDirectoryName(lockFile.LockFilePath);
+            var depsFileRoot = Path.GetDirectoryName(lockFile.Path);
             var depsFilePath = GetToolDepsFilePath(toolLibrary, lockFile, depsFileRoot);
 
             var toolProjectContext = new ProjectContextBuilder()
@@ -140,7 +139,7 @@ namespace Microsoft.DotNet.Cli.Utils
 
             try
             {
-                lockFile = LockFileReader.Read(lockFilePath);
+                lockFile = new LockFileFormat().Read(lockFilePath);
             }
             catch (FileFormatException ex)
             {

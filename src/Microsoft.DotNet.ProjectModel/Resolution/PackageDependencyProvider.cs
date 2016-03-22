@@ -31,8 +31,8 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
             // If a NuGet dependency is supposed to provide assemblies but there is no assembly compatible with
             // current target framework, we should mark this dependency as unresolved
             var containsAssembly = package.Files
-                .Any(x => x.StartsWith($"ref{Path.DirectorySeparatorChar}") ||
-                    x.StartsWith($"lib{Path.DirectorySeparatorChar}"));
+                .Any(x => x.StartsWith($"ref{LockFile.DirectorySeparatorChar}") ||
+                    x.StartsWith($"lib{LockFile.DirectorySeparatorChar}"));
 
             var compatible = targetLibrary.FrameworkAssemblies.Any() ||
                 targetLibrary.CompileTimeAssemblies.Any() ||
@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                 }
 
                 // (ref/lib)/{tfm}/{assembly}
-                var pathParts = assembly.Path.Split(Path.DirectorySeparatorChar);
+                var pathParts = assembly.Path.Split(LockFile.DirectorySeparatorChar);
 
                 if (pathParts.Length != 3)
                 {

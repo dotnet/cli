@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyModel;
 using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.Versioning;
+using NuGet.LibraryModel;
 using Microsoft.DotNet.ProjectModel.Graph;
 
 namespace RuntimeGraphGenerator

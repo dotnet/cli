@@ -10,12 +10,12 @@ namespace Microsoft.DotNet.ProjectModel.Server.Helpers
         public static string GetUniqueName(this LibraryDescription library)
         {
             var identity = library.Identity;
-            return identity.Type != LibraryType.ReferenceAssembly ? identity.Name : $"fx/{identity.Name}";
+            return identity.Type != LibraryType.Reference? identity.Name : $"fx/{identity.Name}";
         }
 
         public static string GetUniqueName(this LibraryRange range)
         {
-            return range.Target != LibraryType.ReferenceAssembly ? range.Name : $"fx/{range.Name}";
+            return range.TypeConstraintAllows(LibraryDependencyTarget.Reference) ? range.Name : $"fx/{range.Name}";
         }
     }
 }

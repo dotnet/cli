@@ -274,7 +274,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                     continue;
                 }
 
-                if (dependencyDescription.Identity.Type == LibraryTypes.Project &&
+                if (dependencyDescription.Identity.Type == LibraryType.Project &&
                     ((ProjectDescription)dependencyDescription).Project.EmbedInteropTypes)
                 {
                     continue;

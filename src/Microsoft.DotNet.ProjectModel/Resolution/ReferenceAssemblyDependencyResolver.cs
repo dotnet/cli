@@ -24,7 +24,6 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
 
         public LibraryDescription GetDescription(ProjectLibraryDependency dependency, NuGetFramework targetFramework)
         {
-            // FIX ME
             if (!dependency.LibraryRange.TypeConstraintAllows(LibraryDependencyTarget.Reference))
             {
                 return null;

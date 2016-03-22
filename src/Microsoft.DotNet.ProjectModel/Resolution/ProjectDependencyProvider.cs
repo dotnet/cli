@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
 
             if (targetFramework != null && targetFramework.IsDesktop())
             {
-                dependencies.Add(new ProjectLibraryDependency(new LibraryRange("mscorlib", null, LibraryDependencyTarget.Reference)));
+                dependencies.Add(new ProjectLibraryDependency(new LibraryRange("mscorlib", LibraryDependencyTarget.Reference)));
 
                 dependencies.Add(new ProjectLibraryDependency(new LibraryRange("System", LibraryDependencyTarget.Reference)));
 
