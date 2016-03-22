@@ -500,7 +500,7 @@ namespace Microsoft.DotNet.ProjectModel
                 project.ProjectFilePath,
                 frameworkAssemblies,
                 frameworkValue,
-                "kl",
+                "frameworkAssemblies",
                 isGacOrFrameworkReference: true);
 
             frameworkDependencies.AddRange(frameworkAssemblies);

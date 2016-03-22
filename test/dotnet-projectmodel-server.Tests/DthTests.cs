@@ -6,13 +6,13 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NuGet.ProjectModel;
 using Xunit;
 
 namespace Microsoft.DotNet.ProjectModel.Server.Tests
@@ -382,7 +382,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             using (var server = new DthTestServer(_loggerFactory))
             using (var client = new DthTestClient(server, _loggerFactory))
             {
-                var lockFilePath = Path.Combine(testProject, LockFile.FileName);
+                var lockFilePath = Path.Combine(testProject, LockFileFormat.LockFileName);
                 var lockFileContent = File.ReadAllText(lockFilePath);
                 var fs = new FileStream(lockFilePath, FileMode.Create, FileAccess.Write, FileShare.None);
 
