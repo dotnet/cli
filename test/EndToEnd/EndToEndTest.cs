@@ -8,11 +8,13 @@ using System.Runtime.InteropServices;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Microsoft.Extensions.PlatformAbstractions;
 using Xunit;
+using System.Diagnostics;
 
 namespace Microsoft.DotNet.Tests.EndToEnd
 {
     public class EndToEndTest : TestBase
     {
+        private static readonly string NetStandardTfm = "netstandard1.5";
         private static readonly string s_expectedOutput = "Hello World!" + Environment.NewLine;
         private static readonly string s_testdirName = "e2etestroot";
         private static readonly string s_outputdirName = "test space/bin";
@@ -42,20 +44,20 @@ namespace Microsoft.DotNet.Tests.EndToEnd
         [Fact]
         public void TestDotnetBuild()
         {
-            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: DefaultFramework);
+            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: NetStandardTfm);
 
             buildCommand.Execute().Should().Pass();
 
-            TestOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
+            TestOutputExecutable(OutputDirectory, buildCommand.GetPortableOutputName(), s_expectedOutput);
         }
 
         [Fact]
         public void TestDotnetIncrementalBuild()
         {
             // first build
-            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: DefaultFramework);
+            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: NetStandardTfm);
             buildCommand.Execute().Should().Pass();
-            TestOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
+            TestOutputExecutable(OutputDirectory, buildCommand.GetPortableOutputName(), s_expectedOutput);
 
             var binariesOutputDirectory = GetCompilationOutputPath(OutputDirectory, false);
             var latestWriteTimeFirstBuild = GetLastWriteTimeUtcOfDirectoryFiles(
@@ -63,7 +65,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 
             // second build; should get skipped (incremental because no inputs changed)
             buildCommand.Execute().Should().Pass();
-            TestOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
+            TestOutputExecutable(OutputDirectory, buildCommand.GetPortableOutputName(), s_expectedOutput);
 
             var latestWriteTimeUtcSecondBuild = GetLastWriteTimeUtcOfDirectoryFiles(
                 binariesOutputDirectory);
@@ -73,53 +75,53 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 
             // third build; should get compiled because the source file got touched
             buildCommand.Execute().Should().Pass();
-            TestOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
+            TestOutputExecutable(OutputDirectory, buildCommand.GetPortableOutputName(), s_expectedOutput);
 
             var latestWriteTimeUtcThirdBuild = GetLastWriteTimeUtcOfDirectoryFiles(
                 binariesOutputDirectory);
             Assert.NotEqual(latestWriteTimeUtcSecondBuild, latestWriteTimeUtcThirdBuild);
         }
 
-        [Fact]
+        [Fact(Skip = "Native compilation isn't shipping in 1.0 and we're moving it out anyway")]
         public void TestDotnetBuildNativeRyuJit()
         {
-            if(!IsNativeCompilationSupported())
+            if (!IsNativeCompilationSupported())
             {
                 return;
             }
 
-            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, framework: DefaultFramework);
+            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, framework: NetStandardTfm);
 
             buildCommand.Execute().Should().Pass();
 
             TestNativeOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
         }
 
-        [Fact]
+        [Fact(Skip = "Native compilation isn't shipping in 1.0 and we're moving it out anyway")]
         public void TestDotnetBuildNativeCpp()
         {
-            if(!IsNativeCompilationSupported())
-            {   
+            if (!IsNativeCompilationSupported())
+            {
                 return;
             }
 
-            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, nativeCppMode: true, framework: DefaultFramework);
+            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, nativeCppMode: true, framework: NetStandardTfm);
 
             buildCommand.Execute().Should().Pass();
 
             TestNativeOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
         }
 
-        [Fact]
+        [Fact(Skip = "Native compilation isn't shipping in 1.0 and we're moving it out anyway")]
         public void TestDotnetCompileNativeCppIncremental()
         {
-            if(!IsNativeCompilationSupported())
-            {   
+            if (!IsNativeCompilationSupported())
+            {
                 return;
             }
 
             // first build
-            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, nativeCppMode: true, framework: DefaultFramework);
+            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, nativeCppMode: true, framework: NetStandardTfm);
             var binariesOutputDirectory = GetCompilationOutputPath(OutputDirectory, false);
 
             buildCommand.Execute().Should().Pass();
@@ -163,7 +165,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             var publishCommand = new PublishCommand(TestProject, output: OutputDirectory);
             publishCommand.Execute().Should().Pass();
 
-            TestExecutable(OutputDirectory, publishCommand.GetOutputExecutable(), s_expectedOutput);    
+            TestExecutable(OutputDirectory, publishCommand.GetPortableOutputName(), s_expectedOutput);    
         }
 
         [Fact]
@@ -224,6 +226,10 @@ namespace Microsoft.DotNet.Tests.EndToEnd
                 case "centos":
                 case "rhel":
                     Console.WriteLine("Skipping native compilation tests on CentOS/RHEL - https://github.com/dotnet/cli/issues/453");
+                    isSupported = false;
+                    break;
+                case "debian":
+                    Console.WriteLine("Skipping native compilation tests on Debian - https://github.com/dotnet/cli/issues/1666");
                     isSupported = false;
                     break;
                 case "windows":

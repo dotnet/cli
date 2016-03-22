@@ -64,15 +64,15 @@ if (!(Test-Path $env:DOTNET_INSTALL_DIR))
 
 # Install a stage 0
 Write-Host "Installing .NET Core CLI Stage 0 from beta channel"
-& "$PSScriptRoot\obtain\install.ps1" -Channel $env:CHANNEL -Architecture $Architecture
+& "$PSScriptRoot\obtain\install.ps1" -Channel $env:CHANNEL -Architecture $Architecture -Verbose
 
 # Put the stage0 on the path
-$env:PATH = "$env:DOTNET_INSTALL_DIR\cli\bin;$env:PATH"
+$env:PATH = "$env:DOTNET_INSTALL_DIR;$env:PATH"
 
 # Restore the build scripts
 Write-Host "Restoring Build Script projects..."
 pushd $PSScriptRoot
-dotnet restore
+dotnet restore --disable-parallel
 if($LASTEXITCODE -ne 0) { throw "Failed to restore" }
 popd
 

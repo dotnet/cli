@@ -4,6 +4,9 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Microsoft.Extensions.Logging;
@@ -18,7 +21,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
     {
         private readonly TestAssetsManager _testAssetsManager;
         private readonly ILoggerFactory _loggerFactory;
-        
+
         public DthTests()
         {
             _loggerFactory = new LoggerFactory();
@@ -32,11 +35,15 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             {
                 _loggerFactory.AddConsole(LogLevel.Information);
             }
-            else
+            else if (testVerbose == "0")
             {
                 _loggerFactory.AddConsole(LogLevel.Warning);
             }
-            
+            else
+            {
+                _loggerFactory.AddConsole(LogLevel.Error);
+            }
+
             _testAssetsManager = new TestAssetsManager(
                 Path.Combine(RepoRoot, "TestAssets", "ProjectModelServer", "DthTestProjects", "src"));
         }
@@ -48,7 +55,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             Assert.NotNull(projectPath);
 
             using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server))
+            using (var client = new DthTestClient(server, _loggerFactory))
             {
                 client.Initialize(projectPath);
 
@@ -78,7 +85,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
         public void DthStartup_ProtocolNegotiation(int requestVersion, int expectVersion)
         {
             using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server))
+            using (var client = new DthTestClient(server, _loggerFactory))
             {
                 client.SetProtocolVersion(requestVersion);
 
@@ -93,7 +100,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
         public void DthStartup_ProtocolNegotiation_ZeroIsNoAllowed()
         {
             using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server))
+            using (var client = new DthTestClient(server, _loggerFactory))
             {
                 client.SetProtocolVersion(0);
 
@@ -118,12 +125,12 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                 Console.WriteLine("Test is skipped on Linux");
                 return;
             }
-            
+
             var projectPath = Path.Combine(_testAssetsManager.AssetsRoot, testProjectName);
             Assert.NotNull(projectPath);
 
             using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server))
+            using (var client = new DthTestClient(server, _loggerFactory))
             {
                 client.Initialize(projectPath);
 
@@ -177,7 +184,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
         public void DthNegative_BrokenProjectPathInLockFile()
         {
             using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server))
+            using (var client = new DthTestClient(server, _loggerFactory))
             {
                 // After restore the project is copied to another place so that
                 // the relative path in project lock file is invalid.
@@ -211,7 +218,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             Assert.True(Directory.Exists(projectPath));
 
             using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server))
+            using (var client = new DthTestClient(server, _loggerFactory))
             {
                 var testProject = Path.Combine(projectPath, "home", "src", "MainProject");
 
@@ -268,7 +275,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             var projectPath = _testAssetsManager.CreateTestInstance("EmptyConsoleApp").TestRoot;
 
             using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server))
+            using (var client = new DthTestClient(server, _loggerFactory))
             {
                 client.Initialize(projectPath);
                 var messages = client.DrainAllMessages();
@@ -292,9 +299,9 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             var testAssetsPath = Path.Combine(RepoRoot, "TestAssets", "ProjectModelServer");
             var assetsManager = new TestAssetsManager(testAssetsPath);
             var testSource = assetsManager.CreateTestInstance("IncorrectProjectJson").TestRoot;
-            
+
             using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server))
+            using (var client = new DthTestClient(server, _loggerFactory))
             {
                 client.Initialize(Path.Combine(_testAssetsManager.AssetsRoot, "EmptyLibrary"));
                 client.Initialize(testSource);
@@ -327,7 +334,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             var testSource = assetsManager.CreateTestInstance("IncorrectGlobalJson");
 
             using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server))
+            using (var client = new DthTestClient(server, _loggerFactory))
             {
                 client.Initialize(Path.Combine(testSource.TestRoot, "src", "Project1"));
 
@@ -337,29 +344,72 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                         .AssertProperty<string>("Path", v => v.Contains("InvalidGlobalJson"));
             }
         }
-        
+
         [Fact]
         public void RecoverFromGlobalError()
         {
             var testProject = _testAssetsManager.CreateTestInstance("EmptyConsoleApp")
                                                 .WithLockFiles()
                                                 .TestRoot;
-                                                
+
             using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server))
+            using (var client = new DthTestClient(server, _loggerFactory))
             {
                 var projectFile = Path.Combine(testProject, Project.FileName);
                 var content = File.ReadAllText(projectFile);
                 File.WriteAllText(projectFile, content + "}");
-                
+
                 client.Initialize(testProject);
                 var messages = client.DrainAllMessages();
                 messages.ContainsMessage(MessageTypes.Error);
-                
+
                 File.WriteAllText(projectFile, content);
                 client.SendPayLoad(testProject, MessageTypes.FilesChanged);
-                messages = client.DrainAllMessages();
-                messages.AssertDoesNotContain(MessageTypes.Error);
+                var clearError = client.DrainTillFirst(MessageTypes.Error);
+                clearError.Payload.AsJObject().AssertProperty("Message", null as string);
+            }
+        }
+
+        [Theory]
+        [InlineData(500, true)]
+        [InlineData(3000, false)]
+        public void WaitForLockFileReleased(int occupyFileFor, bool expectSuccess)
+        {
+            var testProject = _testAssetsManager.CreateTestInstance("EmptyConsoleApp")
+                                                .WithLockFiles()
+                                                .TestRoot;
+
+            using (var server = new DthTestServer(_loggerFactory))
+            using (var client = new DthTestClient(server, _loggerFactory))
+            {
+                var lockFilePath = Path.Combine(testProject, LockFile.FileName);
+                var lockFileContent = File.ReadAllText(lockFilePath);
+                var fs = new FileStream(lockFilePath, FileMode.Create, FileAccess.Write, FileShare.None);
+
+                // Test the platform
+                // A sharing violation is expected in following code. Otherwise the FileSteam is not implemented correctly.
+                Assert.ThrowsAny<IOException>(() =>
+                {
+                    new FileStream(lockFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                });
+
+                var task = Task.Run(() =>
+                {
+                    // WorkspaceContext will try to open the lock file for 3 times with 500 ms interval in between.
+                    Thread.Sleep(occupyFileFor);
+                    fs.Dispose();
+                });
+
+                client.Initialize(testProject);
+                var messages = client.DrainAllMessages();
+                if (expectSuccess)
+                {
+                    messages.AssertDoesNotContain(MessageTypes.Error);
+                }
+                else
+                {
+                    messages.ContainsMessage(MessageTypes.Error);
+                }
             }
         }
     }

@@ -11,9 +11,6 @@ namespace Microsoft.Extensions.DependencyModel
 {
     public class DependencyContext
     {
-        private const string DepsResourceSufix = ".deps.json";
-        private const string DepsFileExtension = ".deps";
-
         private static readonly Lazy<DependencyContext> _defaultContext = new Lazy<DependencyContext>(LoadDefault);
 
         public DependencyContext(string targetFramework,
@@ -22,15 +19,11 @@ namespace Microsoft.Extensions.DependencyModel
             CompilationOptions compilationOptions,
             IEnumerable<CompilationLibrary> compileLibraries,
             IEnumerable<RuntimeLibrary> runtimeLibraries,
-            IEnumerable<KeyValuePair<string, string[]>> runtimeGraph)
+            IEnumerable<RuntimeFallbacks> runtimeGraph)
         {
-            if (targetFramework == null)
+            if (string.IsNullOrEmpty(targetFramework))
             {
-                throw new ArgumentNullException(nameof(targetFramework));
-            }
-            if (runtime == null)
-            {
-                throw new ArgumentNullException(nameof(runtime));
+                throw new ArgumentException(nameof(targetFramework));
             }
             if (compilationOptions == null)
             {
@@ -72,39 +65,47 @@ namespace Microsoft.Extensions.DependencyModel
 
         public IReadOnlyList<RuntimeLibrary> RuntimeLibraries { get; }
 
-        public IReadOnlyList<KeyValuePair<string, string[]>> RuntimeGraph { get; }
+        public IReadOnlyList<RuntimeFallbacks> RuntimeGraph { get; }
+
+        public DependencyContext Merge(DependencyContext other)
+        {
+            if (other == null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            return new DependencyContext(
+                TargetFramework,
+                Runtime,
+                IsPortable,
+                CompilationOptions,
+                CompileLibraries.Union(other.CompileLibraries, new LibraryMergeEqualityComparer<CompilationLibrary>()),
+                RuntimeLibraries.Union(other.RuntimeLibraries, new LibraryMergeEqualityComparer<RuntimeLibrary>()),
+                RuntimeGraph.Union(other.RuntimeGraph)
+                );
+        }
 
         private static DependencyContext LoadDefault()
         {
-            var entryAssembly = Assembly.GetEntryAssembly();
-            return Load(entryAssembly);
+            return DependencyContextLoader.Default.Load(Assembly.GetEntryAssembly());
         }
 
         public static DependencyContext Load(Assembly assembly)
         {
-            if (assembly == null)
+            return DependencyContextLoader.Default.Load(assembly);
+        }
+
+        private class LibraryMergeEqualityComparer<T>: IEqualityComparer<T> where T:Library
+        {
+            public bool Equals(T x, T y)
             {
-                throw new ArgumentNullException(nameof(assembly));
+                return string.Equals(x.Name, y.Name, StringComparison.Ordinal);
             }
 
-            using (var stream = assembly.GetManifestResourceStream(assembly.GetName().Name + DepsResourceSufix))
+            public int GetHashCode(T obj)
             {
-                if (stream != null)
-                {
-                    return new DependencyContextJsonReader().Read(stream);
-                }
+                return obj.Name.GetHashCode();
             }
-
-            var depsFile = Path.ChangeExtension(assembly.Location, DepsFileExtension);
-            if (File.Exists(depsFile))
-            {
-                using (var stream = File.OpenRead(depsFile))
-                {
-                    return new DependencyContextCsvReader().Read(stream);
-                }
-            }
-
-            return null;
         }
     }
 }

@@ -112,7 +112,6 @@ namespace Microsoft.DotNet.Cli
                 ["publish"] = PublishCommand.Run,
                 ["repl"] = ReplCommand.Run,
                 ["restore"] = RestoreCommand.Run,
-                ["resgen"] = ResgenCommand.Run,
                 ["run"] = RunCommand.Run,
                 ["test"] = TestCommand.Run
             };
@@ -161,7 +160,7 @@ namespace Microsoft.DotNet.Cli
         private static string GetCommitSha()
         {
             // The CLI ships with a .version file that stores the commit information
-            var versionFile = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", ".version"));
+            var versionFile = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, ".version"));
             
             if (File.Exists(versionFile))
             {

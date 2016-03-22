@@ -29,6 +29,7 @@ namespace Microsoft.Extensions.DependencyModel
         public DependencyContext Build(CommonCompilerOptions compilerOptions,
             IEnumerable<LibraryExport> compilationExports,
             IEnumerable<LibraryExport> runtimeExports,
+            bool portable,
             NuGetFramework target,
             string runtime)
         {
@@ -44,14 +45,17 @@ namespace Microsoft.Extensions.DependencyModel
                 .Select(identity => new Dependency(identity.Name, identity.Version.ToString()))
                 .ToDictionary(dependency => dependency.Name);
 
+            var compilationOptions = compilerOptions != null
+                ? GetCompilationOptions(compilerOptions)
+                : CompilationOptions.Default;
             return new DependencyContext(
                 target.DotNetFrameworkName,
                 runtime,
-                false,
-                GetCompilationOptions(compilerOptions),
+                portable,
+                compilationOptions,
                 GetLibraries(compilationExports, dependencyLookup, runtime: false).Cast<CompilationLibrary>(),
                 GetLibraries(runtimeExports, dependencyLookup, runtime: true).Cast<RuntimeLibrary>(),
-                new KeyValuePair<string, string[]>[0]);
+                new RuntimeFallbacks[] {});
         }
 
         private static CompilationOptions GetCompilationOptions(CommonCompilerOptions compilerOptions)
@@ -84,7 +88,7 @@ namespace Microsoft.Extensions.DependencyModel
             var type = export.Library.Identity.Type;
 
             var serviceable = (export.Library as PackageDescription)?.Library.IsServiceable ?? false;
-            var libraryDependencies = new List<Dependency>();
+            var libraryDependencies = new HashSet<Dependency>();
 
             var libraryAssets = runtime ? export.RuntimeAssemblies : export.CompilationAssemblies;
 
@@ -125,6 +129,7 @@ namespace Microsoft.Extensions.DependencyModel
                     export.Library.Identity.Version.ToString(),
                     export.Library.Hash,
                     assemblies.Select(RuntimeAssembly.Create),
+                    export.NativeLibraries.Select(l => l.RelativePath),
                     export.ResourceAssemblies.Select(CreateResourceAssembly),
                     export.RuntimeTargets.Select(CreateRuntimeTarget),
                     libraryDependencies,

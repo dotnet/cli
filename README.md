@@ -18,18 +18,22 @@ If you don't find your issue, please file one! However, given that this is a ver
 Build Status
 ------------
 
-|Ubuntu 14.04 |Windows |Mac OS X |CentOS 7.1 |
-|:------:|:------:|:------:|:------:|
-|![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/601/badge)|![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/602/badge)|![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/600/badge) |![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/597/badge) |
+|Ubuntu 14.04 |Windows x64 |Windows x86 |Mac OS X |CentOS 7.1 |RHEL 7.2 |
+|:------:|:------:|:------:|:------:|:------:|:------:|
+|![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/601/badge)|![](https://mseng.visualstudio.com/DefaultCollection/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3022/badge)|![](https://mseng.visualstudio.com/DefaultCollection/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3071/badge)|![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/600/badge) |![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/597/badge) |![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/897/badge) |
 
 Installers
 ----------
 
-|         |Ubuntu 14.04 |Windows |Mac OS X |CentOS 7.1 |
-|---------|:------:|:------:|:------:|:------:|
-|**Version**|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/ubuntu_Release_version_badge.svg?nocache)|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/windows_Release_version_badge.svg?nocache)|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/osx_Release_version_badge.svg?nocache)|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/centos_Release_version_badge.svg?nocache)|
-|**Installers**|[Download Debian Package](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-ubuntu-x64.latest.deb)|[Download Msi](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-win-x64.latest.exe)|[Download Pkg](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-osx-x64.latest.pkg) |N/A |
-|**Binaries**|[Download tar file](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-ubuntu-x64.latest.tar.gz)|[Download zip file](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-win-x64.latest.zip)|[Download tar file](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-osx-x64.latest.tar.gz) |[Download tar file](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-centos-x64.latest.tar.gz) |
+|         |Version |Installers|Binaries|
+|---------|:------:|:------:|:------:|
+|**Windows x64**|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/Windows_x64_Release_version_badge.svg)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-dev-win-x64.latest.exe)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-dev-win-x64.latest.zip)|
+|**Windows x86**|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/Windows_x86_Release_version_badge.svg)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-dev-win-x86.latest.exe)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-dev-win-x86.latest.zip)|
+|**Ubuntu 14.04**|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/Ubuntu_x64_Release_version_badge.svg)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-ubuntu-x64.latest.deb)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-dev-ubuntu-x64.latest.tar.gz)|
+|**Mac OS X**|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/OSX_x64_Release_version_badge.svg)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-dev-osx-x64.latest.pkg)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-dev-osx-x64.latest.tar.gz)|
+|**CentOS 7.1**|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/CentOS_x64_Release_version_badge.svg)|N/A |[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-dev-centos-x64.latest.tar.gz)|
+|**RHEL 7.2**|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/RHEL_x64_Release_version_badge.svg)|N/A |[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-dev-rhel-x64.latest.tar.gz) |
+
 
 Interested in .NET Core + ASP.NET Core 1.0 RC1 bits?
 ----------------------------------------------------

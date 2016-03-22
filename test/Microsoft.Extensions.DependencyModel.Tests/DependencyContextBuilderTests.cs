@@ -24,14 +24,16 @@ namespace Microsoft.Extensions.DependencyModel.Tests
         public DependencyContext Build(CommonCompilerOptions compilerOptions = null,
             IEnumerable<LibraryExport> compilationExports = null,
             IEnumerable<LibraryExport> runtimeExports = null,
+            bool portable = false,
             NuGetFramework target = null,
             string runtime = null)
         {
             _defaultFramework = NuGetFramework.Parse("net451");
             return new DependencyContextBuilder(_referenceAssembliesPath).Build(
-                compilerOptions ?? new CommonCompilerOptions(),
+                compilerOptions,
                 compilationExports ?? new LibraryExport[] { },
                 runtimeExports ?? new LibraryExport[] {},
+                portable,
                 target ?? _defaultFramework,
                 runtime ?? string.Empty);
         }
@@ -42,7 +44,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             var context = Build(new CommonCompilerOptions()
             {
                 AllowUnsafe = true,
-                Defines = new[] {"Define", "D"},
+                Defines = new[] { "Define", "D" },
                 DelaySign = true,
                 EmitEntryPoint = true,
                 GenerateXmlDocumentation = true,
@@ -66,6 +68,23 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             context.CompilationOptions.KeyFile.Should().Be("Key.snk");
             context.CompilationOptions.LanguageVersion.Should().Be("C#8");
             context.CompilationOptions.Platform.Should().Be("Platform");
+        }
+
+
+        [Fact]
+        public void AlowsNullCompilationOptions()
+        {
+            var context = Build(compilerOptions: null);
+
+            context.CompilationOptions.Should().Be(CompilationOptions.Default);
+        }
+
+        [Fact]
+        public void SetsPortableFlag()
+        {
+            var context = Build(portable: true);
+
+            context.IsPortable.Should().BeTrue();
         }
 
         [Fact]
@@ -155,6 +174,34 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             asm.Assemblies.Should().OnlyContain(l => l.Path == "System.Collections.dll");
         }
 
+        [Fact]
+        public void FiltersDuplicatedDependencies()
+        {
+            var context = Build(runtimeExports: new[]
+              {
+                Export(PackageDescription("Pack.Age",
+                    dependencies: new[]
+                    {
+                        new LibraryRange("System.Collections",
+                            new VersionRange(new NuGetVersion(2, 0, 0)),
+                            LibraryType.ReferenceAssembly,
+                            LibraryDependencyType.Default),
+                        new LibraryRange("System.Collections",
+                            new VersionRange(new NuGetVersion(2, 1, 2)),
+                            LibraryType.Package,
+                            LibraryDependencyType.Default)
+                    })
+                    ),
+                Export(ReferenceAssemblyDescription("System.Collections",
+                    version: new NuGetVersion(2, 0, 0)))
+            });
+
+            context.RuntimeLibraries.Should().HaveCount(2);
+
+            var lib = context.RuntimeLibraries.Should().Contain(l => l.Name == "Pack.Age").Subject;
+            lib.Dependencies.Should().HaveCount(1);
+            lib.Dependencies.Should().OnlyContain(l => l.Name == "System.Collections" && l.Version == "2.0.0");
+        }
 
         [Fact]
         public void FillsCompileLibraryProperties()

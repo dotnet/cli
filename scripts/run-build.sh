@@ -84,10 +84,11 @@ done < "$DIR/../branchinfo.txt"
 [ -d $DOTNET_INSTALL_DIR ] || mkdir -p $DOTNET_INSTALL_DIR
 
 # Ensure the latest stage0 is installed
-$DIR/obtain/install.sh --channel $RELEASE_SUFFIX
+export CHANNEL=$RELEASE_SUFFIX
+$DIR/obtain/install.sh --channel $CHANNEL --verbose
 
 # Put stage 0 on the PATH (for this shell only)
-PATH="$DOTNET_INSTALL_DIR/bin:$PATH"
+PATH="$DOTNET_INSTALL_DIR:$PATH"
 
 # Increases the file descriptors limit for this bash. It prevents an issue we were hitting during restore
 FILE_DESCRIPTOR_LIMIT=$( ulimit -n )
@@ -101,7 +102,7 @@ fi
 echo "Restoring Build Script projects..."
 (
     cd $DIR
-    dotnet restore
+    dotnet restore --disable-parallel
 )
 
 # Build the builder
@@ -113,7 +114,7 @@ echo "Invoking Build Scripts..."
 echo "Configuration: $CONFIGURATION"
 
 if [ -f "$DIR/dotnet-cli-build/bin/dotnet-cli-build" ]; then
-    $DIR/dotnet-cli-build/bin/dotnet-cli-build "${targets[@]}"
+    $DIR/dotnet-cli-build/bin/dotnet-cli-build ${targets[@]}
     exit $?
 else
     # We're on an older CLI. This is temporary while Ubuntu and CentOS VSO builds are stalled.

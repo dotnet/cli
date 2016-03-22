@@ -4,12 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
 using static Microsoft.DotNet.Cli.Build.FS;
 using static Microsoft.DotNet.Cli.Build.Utils;
 using static Microsoft.DotNet.Cli.Build.Framework.BuildHelpers;
+using System.Text.RegularExpressions;
 
 namespace Microsoft.DotNet.Cli.Build
 {
@@ -21,17 +23,17 @@ namespace Microsoft.DotNet.Cli.Build
         [Target(nameof(CheckPrereqCmakePresent), nameof(CheckPlatformDependencies))]
         public static BuildTargetResult CheckPrereqs(BuildTargetContext c) => c.Success();
 
-        [Target(nameof(CheckCoreclrPlatformDependencies),  nameof(CheckInstallerBuildPlatformDependencies))]
+        [Target(nameof(CheckCoreclrPlatformDependencies), nameof(CheckInstallerBuildPlatformDependencies))]
         public static BuildTargetResult CheckPlatformDependencies(BuildTargetContext c) => c.Success();
 
-        [Target(nameof(CheckUbuntuCoreclrAndCoreFxDependencies),  nameof(CheckCentOSCoreclrAndCoreFxDependencies))]
+        [Target(nameof(CheckUbuntuCoreclrAndCoreFxDependencies), nameof(CheckCentOSCoreclrAndCoreFxDependencies))]
         public static BuildTargetResult CheckCoreclrPlatformDependencies(BuildTargetContext c) => c.Success();
 
         [Target(nameof(CheckUbuntuDebianPackageBuildDependencies))]
         public static BuildTargetResult CheckInstallerBuildPlatformDependencies(BuildTargetContext c) => c.Success();
 
         // All major targets will depend on this in order to ensure variables are set up right if they are run independently
-        [Target(nameof(GenerateVersions), nameof(CheckPrereqs), nameof(LocateStage0))]
+        [Target(nameof(GenerateVersions), nameof(CheckPrereqs), nameof(LocateStage0), nameof(ExpectedBuildArtifacts))]
         public static BuildTargetResult Init(BuildTargetContext c)
         {
             var runtimeInfo = PlatformServices.Default.Runtime;
@@ -44,6 +46,8 @@ namespace Microsoft.DotNet.Cli.Build
             }
 
             c.BuildContext["Configuration"] = configEnv;
+            c.BuildContext["Channel"] = Environment.GetEnvironmentVariable("CHANNEL");
+            c.BuildContext["SharedFrameworkNugetVersion"] = GetVersionFromProjectJson(Path.Combine(Dirs.RepoRoot, "src", "sharedframework", "framework", "project.json"));
 
             c.Info($"Building {c.BuildContext["Configuration"]} to: {Dirs.Output}");
             c.Info("Build Environment:");
@@ -98,8 +102,31 @@ namespace Microsoft.DotNet.Cli.Build
             }
 
             // Identify the version
-            var version = File.ReadAllLines(Path.Combine(stage0, "..", ".version"));
+            string versionFile = Directory.GetFiles(stage0, ".version", SearchOption.AllDirectories).FirstOrDefault();
+
+            if (string.IsNullOrEmpty(versionFile))
+            {
+                throw new Exception($"'.version' file not found in '{stage0}' folder");
+            }
+
+            var version = File.ReadAllLines(versionFile);
             c.Info($"Using Stage 0 Version: {version[1]}");
+
+            return c.Success();
+        }
+
+        [Target]
+        public static BuildTargetResult ExpectedBuildArtifacts(BuildTargetContext c)
+        {
+            var config = Environment.GetEnvironmentVariable("CONFIGURATION");
+            var versionBadgeName = $"{CurrentPlatform.Current}_{CurrentArchitecture.Current}_{config}_version_badge.svg";
+            c.BuildContext["VersionBadge"] = Path.Combine(Dirs.Output, versionBadgeName);
+
+            AddInstallerArtifactToContext(c, "dotnet-sdk", "Sdk");
+            AddInstallerArtifactToContext(c, "dotnet-host", "SharedHost");
+            AddInstallerArtifactToContext(c, "dotnet-sharedframework", "SharedFramework");
+            AddInstallerArtifactToContext(c, "dotnet-dev", "CombinedFrameworkSDKHost");
+            AddInstallerArtifactToContext(c, "dotnet", "CombinedFrameworkHost");
 
             return c.Success();
         }
@@ -175,8 +202,8 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var dotnet = DotNetCli.Stage0;
 
-            dotnet.Restore().WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "src")).Execute().EnsureSuccessful();
-            dotnet.Restore().WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "tools")).Execute().EnsureSuccessful();
+            dotnet.Restore("--verbosity", "verbose", "--disable-parallel").WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "src")).Execute().EnsureSuccessful();
+            dotnet.Restore("--verbosity", "verbose", "--disable-parallel").WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "tools")).Execute().EnsureSuccessful();
 
             return c.Success();
         }
@@ -244,7 +271,7 @@ namespace Microsoft.DotNet.Cli.Build
         public static BuildTargetResult CheckCentOSCoreclrAndCoreFxDependencies(BuildTargetContext c)
         {
             var errorMessageBuilder = new StringBuilder();
-            
+
             foreach (var package in PackageDependencies.CentosCoreclrAndCoreFxDependencies)
             {
                 if (!YumDependencyUtility.PackageIsInstalled(package))
@@ -298,6 +325,23 @@ cmake is required to build the native host 'corehost'";
             return c.Success();
         }
 
+        private static string GetVersionFromProjectJson(string pathToProjectJson)
+        {
+            Regex r = new Regex($"\"{Regex.Escape(Monikers.SharedFrameworkName)}\"\\s*:\\s*\"(?'version'[^\"]*)\"");
+
+            foreach (var line in File.ReadAllLines(pathToProjectJson))
+            {
+                var m = r.Match(line);
+
+                if (m.Success)
+                {
+                    return m.Groups["version"].Value;
+                }
+            }
+
+            throw new InvalidOperationException("Unable to match the version name from " + pathToProjectJson);
+        }
+
         private static bool AptPackageIsInstalled(string packageName)
         {
             var result = Command.Create("dpkg", "-s", packageName)
@@ -324,6 +368,36 @@ cmake is required to build the native host 'corehost'";
                 }
             }
             return dict;
+        }
+
+        private static void AddInstallerArtifactToContext(BuildTargetContext c, string artifactPrefix, string contextPrefix)
+        {
+            var productName = Monikers.GetProductMoniker(c, artifactPrefix);
+
+            var extension = CurrentPlatform.IsWindows ? ".zip" : ".tar.gz";
+            c.BuildContext[contextPrefix + "CompressedFile"] = Path.Combine(Dirs.Packages, productName + extension);
+
+            string installer = "";
+            switch (CurrentPlatform.Current)
+            {
+                case BuildPlatform.Windows:
+                    installer = productName + ".exe";
+                    break;
+                case BuildPlatform.OSX:
+                    installer = productName + ".pkg";
+                    break;
+                case BuildPlatform.Ubuntu:
+                    installer = productName + ".deb";
+                    break;
+                default:
+                    break;
+            }
+
+            if (!string.IsNullOrEmpty(installer))
+            {
+                c.BuildContext[contextPrefix + "InstallerFile"] = Path.Combine(Dirs.Packages, installer);
+            }
+
         }
     }
 }

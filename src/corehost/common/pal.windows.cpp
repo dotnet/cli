@@ -11,10 +11,21 @@
 
 static std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> g_converter;
 
+pal::string_t pal::to_lower(const pal::string_t& in)
+{
+    pal::string_t ret = in;
+    std::transform(ret.begin(), ret.end(), ret.begin(), ::towlower);
+    return ret;
+}
+
+pal::string_t pal::to_string(int value)
+{
+    return std::to_wstring(value);
+}
+
 bool pal::find_coreclr(pal::string_t* recv)
 {
     pal::string_t candidate;
-    pal::string_t test;
 
     // Try %LocalAppData%\dotnet
     if (pal::getenv(_X("LocalAppData"), &candidate)) {
@@ -27,7 +38,48 @@ bool pal::find_coreclr(pal::string_t* recv)
         }
     }
 
-    // TODO: Try somewhere in Program Files, see https://github.com/dotnet/cli/issues/249
+
+    // Try %ProgramFiles%. Note this works for both x86 and x64/wow64 as per:
+    // https://msdn.microsoft.com/en-us/library/windows/desktop/aa384274(v=vs.85).aspx
+
+    // candidate.clear(); getenv clears it.
+    if (pal::getenv(_X("ProgramFiles"), &candidate)) {
+        append_path(&candidate, _X("dotnet"));
+        append_path(&candidate, _X("bin"));
+        if (coreclr_exists_in_dir(candidate)) {
+            recv->assign(candidate);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+bool pal::getcwd(pal::string_t* recv)
+{
+    recv->clear();
+
+    pal::char_t buf[MAX_PATH];
+    DWORD result = GetCurrentDirectoryW(MAX_PATH, buf);
+    if (result < MAX_PATH)
+    {
+        recv->assign(buf);
+        return true;
+    }
+    else if (result != 0)
+    {
+        std::vector<pal::char_t> str;
+        str.resize(result);
+        result = GetCurrentDirectoryW(str.size(), str.data());
+        assert(result <= str.size());
+        if (result != 0)
+        {
+            recv->assign(str.data());
+            return true;
+        }
+    }
+    assert(result == 0);
+    trace::error(_X("Failed to obtain working directory, HRESULT: 0x%X"), HRESULT_FROM_WIN32(GetLastError()));
     return false;
 }
 
