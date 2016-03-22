@@ -31,6 +31,7 @@ namespace Microsoft.DotNet.Cli.Build
             var debFile = c.BuildContext.Get<string>("SdkInstallerFile");
             var manPagesDir = Path.Combine(Dirs.RepoRoot, "Documentation", "manpages");
             var previousVersionURL = $"https://dotnetcli.blob.core.windows.net/dotnet/{channel}/Installers/Latest/dotnet-ubuntu-x64.latest.deb";
+            var sdkPublishRoot = c.BuildContext.Get<string>("CLISDKRoot");
 
             var objRoot = Path.Combine(Dirs.Output, "obj", "debian", "sdk");
 
@@ -43,7 +44,7 @@ namespace Microsoft.DotNet.Cli.Build
 
             Cmd(Path.Combine(Dirs.RepoRoot, "scripts", "package", "package-debian.sh"),
                 "-v", version, 
-                "-i", Dirs.Stage2, 
+                "-i", sdkPublishRoot, 
                 "-o", debFile, 
                 "-p", packageName, 
                 "-m", manPagesDir, 
