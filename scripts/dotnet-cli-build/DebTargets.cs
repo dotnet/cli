@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.Cli.Build
         public static BuildTargetResult GenerateSdkDeb(BuildTargetContext c)
         {
             var channel = c.BuildContext.Get<string>("Channel").ToLower();
-            var packageName = Monikers.GetDebianPackageName(c);
+            //var packageName = Monikers.GetDebianPackageName(c);
             var version = c.BuildContext.Get<BuildVersion>("BuildVersion").SimpleVersion;
             var debFile = c.BuildContext.Get<string>("SdkInstallerFile");
             var manPagesDir = Path.Combine(Dirs.RepoRoot, "Documentation", "manpages");
@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.Cli.Build
                 "-v", version, 
                 "-i", sdkPublishRoot, 
                 "-o", debFile, 
-                "-p", packageName, 
+                // "-p", packageName, 
                 "-m", manPagesDir, 
                 "--framework-debian-package-name", sharedFxDebianPackageName,
                 "--framework-nuget-name", Monikers.SharedFrameworkName,
