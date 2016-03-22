@@ -15,13 +15,13 @@ namespace Microsoft.DotNet.ProjectModel.Graph
 {
     public static class LockFileReader
     {
-        public static LockFile Read(string lockFilePath)
+        public static LockFile Read(string lockFilePath, bool mergeWithFragment = true)
         {
             using (var stream = ResilientFileStreamOpener.OpenFile(lockFilePath))
             {
                 try
                 {
-                    return Read(lockFilePath, stream);
+                    return Read(lockFilePath, stream, mergeWithFragment);
                 }
                 catch (FileFormatException ex)
                 {
@@ -34,21 +34,26 @@ namespace Microsoft.DotNet.ProjectModel.Graph
             }
         }
 
-        public static LockFile Read(string lockFilePath, Stream stream)
+        public static LockFile Read(string lockFilePath, Stream stream, bool mergeWithFragment = true)
         {
             try
             {
                 var reader = new StreamReader(stream);
                 var jobject = JsonDeserializer.Deserialize(reader) as JsonObject;
 
-                if (jobject != null)
-                {
-                    return ReadLockFile(lockFilePath, jobject);
-                }
-                else
+                if (jobject == null)
                 {
                     throw new InvalidDataException();
                 }
+
+                var masterLockFile = ReadLockFile(lockFilePath, jobject);
+
+                if (mergeWithFragment)
+                {
+                    MergeFragment(masterLockFile);
+                }
+
+                return masterLockFile;
             }
             catch
             {
@@ -58,6 +63,23 @@ namespace Microsoft.DotNet.ProjectModel.Graph
                     Version = int.MinValue
                 };
             }
+        }
+
+        private static void MergeFragment(LockFile masterLockFile)
+        {
+            var fragmentLockFilePath = GetFragmentFilePath(masterLockFile.LockFilePath);
+
+            if (File.Exists(fragmentLockFilePath))
+            {
+                var fragmentLockFile = Read(fragmentLockFilePath, false);
+                masterLockFile.MergeWith(fragmentLockFile);
+            }
+        }
+
+        private static string GetFragmentFilePath(string masterLockFilePath)
+        {
+            var parentDirectory = Directory.GetParent(masterLockFilePath).FullName;
+            return Path.Combine(parentDirectory, LockFile.FragmentFileName);
         }
 
         private static LockFile ReadLockFile(string lockFilePath, JsonObject cursor)
@@ -94,23 +116,48 @@ namespace Microsoft.DotNet.ProjectModel.Graph
 
                 if (type == null || string.Equals(type, "package", StringComparison.OrdinalIgnoreCase))
                 {
-                    lockFile.PackageLibraries.Add(new LockFilePackageLibrary
+
+                    var msbuildProject = value.Value("msbuildProject");
+                    LockFilePackageLibrary packageLibrary;
+
+                    if (msbuildProject == null)
                     {
-                        Name = name,
-                        Version = version,
-                        IsServiceable = ReadBool(value, "serviceable", defaultValue: false),
-                        Sha512 = ReadString(value.Value("sha512")),
-                        Files = ReadPathArray(value.Value("files"), ReadString)
-                    });
+                        packageLibrary = new LockFilePackageLibrary
+                        {
+                            Name = name,
+                            Version = version,
+                            IsServiceable = ReadBool(value, "serviceable", defaultValue: false),
+                            Sha512 = ReadString(value.Value("sha512")),
+                            Files = ReadPathArray(value.Value("files"), ReadString)
+                        };
+                    }
+                    else
+                    {
+                        packageLibrary = new LockFilePackageLibrary
+                        {
+                            Name = name,
+                            Version = version,
+                            MSBuildProject = ReadString(msbuildProject)
+                        };
+                    }
+
+                    lockFile.PackageLibraries.Add(packageLibrary);
                 }
                 else if (type == "project")
                 {
-                    lockFile.ProjectLibraries.Add(new LockFileProjectLibrary
+                    var projectLibrary = new LockFileProjectLibrary
                     {
                         Name = name,
-                        Version = version,
-                        Path = ReadString(value.Value("path"))
-                    });
+                        Version = version
+                    };
+
+                    var pathValue = value.Value("path");
+                    projectLibrary.Path = pathValue == null ? null : ReadString(pathValue);
+
+                    //var msbuildProject = value.Value("msbuildProject");
+                    //projectLibrary.MSBuildProjectPath = msbuildProject == null ? null : ReadString(msbuildProject);
+
+                    lockFile.ProjectLibraries.Add(projectLibrary);
                 }
             }
         }

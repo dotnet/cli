@@ -342,7 +342,7 @@ namespace Microsoft.DotNet.ProjectModel
             }
         }
 
-        private void ScanLibraries(LockFileTarget target, LockFileLookup lockFileLookup, Dictionary<LibraryKey, LibraryDescription> libraries, PackageDependencyProvider packageResolver, ProjectDependencyProvider projectDependencyProvider)
+        private void ScanLibraries(LockFileTarget target, LockFileLookup lockFileLookup, Dictionary<LibraryKey, LibraryDescription> libraries, PackageDependencyProvider packageDependencyProvider, ProjectDependencyProvider projectDependencyProvider)
         {
             foreach (var library in target.Libraries)
             {
@@ -355,8 +355,10 @@ namespace Microsoft.DotNet.ProjectModel
 
                     if (projectLibrary != null)
                     {
-                        var path = Path.GetFullPath(Path.Combine(ProjectDirectory, projectLibrary.Path));
-                        description = projectDependencyProvider.GetDescription(library.Name, path, library, ProjectResolver);
+                        var projectPath = projectLibrary.Path ?? projectLibrary.MSBuildProjectPath;
+                        var fullProjectPath = Path.GetFullPath(Path.Combine(ProjectDirectory, projectPath));
+
+                        description = projectDependencyProvider.GetDescription(library.Name, fullProjectPath, library, ProjectResolver);
                     }
 
                     type = LibraryType.Project;
@@ -367,7 +369,7 @@ namespace Microsoft.DotNet.ProjectModel
 
                     if (packageEntry != null)
                     {
-                        description = packageResolver.GetDescription(TargetFramework, packageEntry, library);
+                        description = packageDependencyProvider.GetDescription(TargetFramework, packageEntry, library);
                     }
 
                     type = LibraryType.Package;

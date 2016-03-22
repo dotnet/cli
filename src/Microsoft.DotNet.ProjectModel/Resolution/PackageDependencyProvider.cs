@@ -26,6 +26,44 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
 
         public PackageDescription GetDescription(NuGetFramework targetFramework, LockFilePackageLibrary package, LockFileTargetLibrary targetLibrary)
         {
+
+            return package.MSBuildProject == null ?
+                GetNugetPackageDescription(targetFramework, package, targetLibrary) :
+                GetMSBuildProjectDescription(targetFramework, package, targetLibrary);
+        }
+
+        private PackageDescription GetMSBuildProjectDescription(NuGetFramework targetFramework, LockFilePackageLibrary package, LockFileTargetLibrary targetLibrary)
+        {
+            var compatible = targetLibrary.FrameworkAssemblies.Any() ||
+                targetLibrary.CompileTimeAssemblies.Any() ||
+                targetLibrary.RuntimeAssemblies.Any();
+
+            var dependencies = new List<LibraryRange>(targetLibrary.Dependencies.Count + targetLibrary.FrameworkAssemblies.Count);
+            PopulateDependencies(dependencies, targetLibrary, targetFramework);
+
+            var path = Directory.GetParent(package.MSBuildProject).FullName;
+            var exists = Directory.Exists(path);
+
+            if (exists)
+            {
+                // If the package's compile time assemblies is for a portable profile then, read the assembly metadata
+                // and turn System.* references into reference assembly dependencies
+                PopulateLegacyPortableDependencies(targetFramework, dependencies, path, targetLibrary);
+            }
+
+            var packageDescription = new PackageDescription(
+                path,
+                package,
+                targetLibrary,
+                dependencies,
+                compatible,
+                resolved: compatible && exists);
+
+            return packageDescription;
+        }
+
+        private PackageDescription GetNugetPackageDescription(NuGetFramework targetFramework, LockFilePackageLibrary package, LockFileTargetLibrary targetLibrary)
+        {
             // If a NuGet dependency is supposed to provide assemblies but there is no assembly compatible with
             // current target framework, we should mark this dependency as unresolved
             var containsAssembly = package.Files

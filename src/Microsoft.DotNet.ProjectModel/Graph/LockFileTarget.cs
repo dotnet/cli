@@ -6,12 +6,17 @@ using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.ProjectModel.Graph
 {
-    public class LockFileTarget
+    public class LockFileTarget : IMergeable<LockFileTarget>
     {
         public NuGetFramework TargetFramework { get; set; }
 
         public string RuntimeIdentifier { get; set; }
 
         public IList<LockFileTargetLibrary> Libraries { get; set; } = new List<LockFileTargetLibrary>();
+
+        public void MergeWith(LockFileTarget m)
+        {
+            Libraries.MergeWith(m.Libraries, l => l.Name);
+        }
     }
 }
