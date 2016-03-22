@@ -21,5 +21,4 @@
             "imports": ["dnxcore50", "netstandard1.3"]
         }
     }
-  }
 }

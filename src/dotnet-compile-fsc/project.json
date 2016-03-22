@@ -5,6 +5,7 @@
     },
 
     "dependencies": {
+        "Microsoft.NETCore.App": "1.0.0-rc2-23911",
         "Microsoft.FSharp.Compiler.netcore": "1.0.0-alpha-1603146",
 
         "NuGet.CommandLine.XPlat": "3.4.0-beta-632",
@@ -12,12 +13,10 @@
 
         "Microsoft.DotNet.ProjectModel": "1.0.0-*",
         "Microsoft.DotNet.Compiler.Common": "1.0.0-*",
-        "Microsoft.DotNet.Cli.Utils": "1.0.0-*",
-
-        "NETStandard.Library": "1.0.0-rc2-23901",
+        "Microsoft.DotNet.Cli.Utils": "1.0.0-*"
     },
     "frameworks": {
-        "netstandardapp1.5": {
+        "netstandard1.5": {
             "imports": [
                 "dnxcore50",
                 "portable-net45+win8",
