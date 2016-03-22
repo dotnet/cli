@@ -64,6 +64,10 @@ parseargs(){
             PREVIOUS_VERSION_URL=$2
             shift
             ;;
+        --framework-debian-package-name)
+            SHARED_FRAMEWORK_DEBIAN_PACKAGE_NAME=$2
+            shift
+            ;;
         --framework-nuget-name)
             SHARED_FRAMEWORK_NUGET_NAME=$2
             shift
@@ -121,7 +125,7 @@ parseargs(){
 
 }
 
-parseargs $@
+parseargs "$@"
 
 PACKAGING_ROOT="$REPOROOT/packaging/debian"
 PACKAGING_TOOL_DIR="$REPOROOT/tools/DebianPackageTool"
@@ -180,6 +184,7 @@ create_debian_package(){
 update_debian_json()
 {
     header "Updating debian.json file"
+    sed -i "s/%SHARED_FRAMEWORK_DEBIAN_PACKAGE_NAME%/$SHARED_FRAMEWORK_DEBIAN_PACKAGE_NAME/g" "$PACKAGE_LAYOUT_DIR"/debian_config.json
     sed -i "s/%SHARED_FRAMEWORK_NUGET_NAME%/$SHARED_FRAMEWORK_NUGET_NAME/g" "$PACKAGE_LAYOUT_DIR"/debian_config.json
     sed -i "s/%SHARED_FRAMEWORK_NUGET_VERSION%/$SHARED_FRAMEWORK_NUGET_VERSION/g" "$PACKAGE_LAYOUT_DIR"/debian_config.json
     sed -i "s/%SDK_NUGET_VERSION%/$DOTNET_CLI_VERSION/g" "$PACKAGE_LAYOUT_DIR"/debian_config.json

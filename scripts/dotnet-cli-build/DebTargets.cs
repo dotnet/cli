@@ -32,6 +32,7 @@ namespace Microsoft.DotNet.Cli.Build
             var manPagesDir = Path.Combine(Dirs.RepoRoot, "Documentation", "manpages");
             var previousVersionURL = $"https://dotnetcli.blob.core.windows.net/dotnet/{channel}/Installers/Latest/dotnet-ubuntu-x64.latest.deb";
             var sdkPublishRoot = c.BuildContext.Get<string>("CLISDKRoot");
+            var sharedFxDebianPackageName = Monikers.GetDebianSharedFrameworkPackageName(c);
 
             var objRoot = Path.Combine(Dirs.Output, "obj", "debian", "sdk");
 
@@ -48,6 +49,7 @@ namespace Microsoft.DotNet.Cli.Build
                 "-o", debFile, 
                 "-p", packageName, 
                 "-m", manPagesDir, 
+                "--framework-debian-package-name", sharedFxDebianPackageName,
                 "--framework-nuget-name", Monikers.SharedFrameworkName,
                 "--framework-nuget-version", c.BuildContext.Get<string>("SharedFrameworkNugetVersion"),
                 "--previous-version-url", previousVersionURL, 
