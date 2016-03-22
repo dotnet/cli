@@ -204,7 +204,8 @@ install_bats() {
 
 run_package_integrity_tests() {
     # Set LAST_VERSION_URL to enable upgrade tests
-    export LAST_VERSION_URL="$PREVIOUS_VERSION_URL"
+    # Temporarily disable last version until we have one with shared fx
+    # export LAST_VERSION_URL="$PREVIOUS_VERSION_URL"
 
     $TEST_STAGE_DIR/bin/bats $PACKAGE_OUTPUT_DIR/test_package.bats
 }
