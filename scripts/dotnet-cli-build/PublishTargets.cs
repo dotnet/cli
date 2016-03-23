@@ -47,6 +47,7 @@ namespace Microsoft.DotNet.Cli.Build
         [Target(
             nameof(PublishTargets.PublishVersionBadge),
             nameof(PublishTargets.PublishSdkInstallerFile),
+            nameof(PublishTargets.PublishSharedFxInstallerFile),            
             nameof(PublishTargets.PublishDebFilesToDebianRepo),
             nameof(PublishTargets.PublishCombinedFrameworkSDKHostFile),
             nameof(PublishTargets.PublishCombinedFrameworkHostFile),
@@ -73,6 +74,20 @@ namespace Microsoft.DotNet.Cli.Build
         public static BuildTargetResult PublishSdkInstallerFile(BuildTargetContext c)
         {
             var installerFile = c.BuildContext.Get<string>("CombinedFrameworkSDKHostInstallerFile");
+            var installerFileBlob = $"{Channel}/Installers/{Version}/{Path.GetFileName(installerFile)}";
+            var latestInstallerFile = installerFile.Replace(Version, "latest");
+            var latestInstallerFileBlob = $"{Channel}/Installers/Latest/{Path.GetFileName(latestInstallerFile)}";
+
+            PublishFileAzure(installerFileBlob, installerFile);
+            PublishFileAzure(latestInstallerFileBlob, installerFile);
+            return c.Success();
+        }
+
+        [Target]
+        [BuildPlatforms(BuildPlatform.Windows, BuildPlatform.OSX)]//, BuildPlatform.Ubuntu)]
+        public static BuildTargetResult PublishSharedFxInstallerFile(BuildTargetContext c)
+        {
+            var installerFile = c.BuildContext.Get<string>("CombinedFrameworkHostInstallerFile");
             var installerFileBlob = $"{Channel}/Installers/{Version}/{Path.GetFileName(installerFile)}";
             var latestInstallerFile = installerFile.Replace(Version, "latest");
             var latestInstallerFileBlob = $"{Channel}/Installers/Latest/{Path.GetFileName(latestInstallerFile)}";
@@ -235,17 +250,6 @@ namespace Microsoft.DotNet.Cli.Build
 
             PublishFileAzure(compressedFileBlob, compressedFile);
             PublishFileAzure(latestCompressedFileBlob, compressedFile);
-            return c.Success();
-        }
-
-        private static BuildTargetResult PublishFile(BuildTargetContext c, string file)
-        {
-            var env = PackageTargets.GetCommonEnvVars(c);
-            Cmd("powershell", "-NoProfile", "-NoLogo",
-                Path.Combine(Dirs.RepoRoot, "scripts", "publish", "publish.ps1"), file)
-                    .Environment(env)
-                    .Execute()
-                    .EnsureSuccessful();
             return c.Success();
         }
 
