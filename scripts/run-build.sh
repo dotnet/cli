@@ -85,7 +85,7 @@ done < "$DIR/../branchinfo.txt"
 
 # Ensure the latest stage0 is installed
 export CHANNEL=$RELEASE_SUFFIX
-$DIR/obtain/install.sh --channel $CHANNEL
+# $DIR/obtain/install.sh --channel $CHANNEL
 
 # Put stage 0 on the PATH (for this shell only)
 PATH="$DOTNET_INSTALL_DIR/cli:$PATH"

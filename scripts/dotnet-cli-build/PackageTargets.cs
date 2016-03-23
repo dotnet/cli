@@ -189,11 +189,6 @@ namespace Microsoft.DotNet.Cli.Build
             var configuration = c.BuildContext.Get<string>("Configuration");
 
             var env = GetCommonEnvVars(c);
-<<<<<<< HEAD
-            Cmd("powershell", "-NoProfile", "-NoLogo",
-                Path.Combine(Dirs.RepoRoot, "packaging", "nuget", "package.ps1"), Dirs.Stage2, versionSuffix)
-                    .Environment(env)
-=======
             var dotnet = DotNetCli.Stage2;
 
             var packagingBuildBasePath = Path.Combine(Dirs.Stage2Compilation, "forPackaging");
@@ -212,7 +207,6 @@ namespace Microsoft.DotNet.Cli.Build
                     "--output", Dirs.PackagesIntermediate, 
                     "--configuration", configuration, 
                     "--version-suffix", versionSuffix)
->>>>>>> 9449c7f... Package Targets execute before TestTargets. Use Generated Nuget Packages in TestTargets. Generate Nuget packages on all platforms, and in C#
                     .Execute()
                     .EnsureSuccessful();
             }

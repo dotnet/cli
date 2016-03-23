@@ -179,26 +179,30 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
 
         private CommandResult RunFsc(List<string> fscArgs)
         {
-            var depsResolver = new DepsCommandResolver();
-
-            var corehost = CoreHost.HostExePath;
-            var fscExe = depsResolver.FscExePath;
-
-            List<string> args = new List<string>();
-            args.Add(fscExe);
-            args.Add("--depsfile:" + depsResolver.DepsFilePath);
-
-            args.AddRange(fscArgs);
+            var fscCommandSpec = ResolveFsc(fscArgs);
             
             var result = Command
-                .Create(corehost, args.ToArray())
+                .Create(fscCommandSpec)
                 .ForwardStdErr()
                 .ForwardStdOut()
                 .Execute();
 
-            depsResolver.Cleanup();
-
             return result;
+        }
+
+        private CommandSpec ResolveFsc(List<string> fscArgs)
+        {
+            var depsResolver = new DepsJsonCommandResolver();
+            var myDepsFile = Path.Combine(AppContext.BaseDirectory, "dotnet-compile-fsc.deps.json");
+
+            var commandResolverArgs = new CommandResolverArguments()
+            {
+                CommandName = "dotnet-compile-fsc",
+                CommandArguments = fscArgs,
+                DepsJsonFile = myDepsFile
+            };
+
+            return depsResolver.Resolve(commandResolverArgs);
         }
     }
 }
