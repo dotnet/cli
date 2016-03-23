@@ -109,26 +109,25 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
 
         private static AssemblyRedirect[] CollectRedirects(IEnumerable<LibraryExport> dependencies)
         {
-            var allRuntimeAssemblies = dependencies.SelectMany(d => d.RuntimeAssemblies).Select(GetAssemblyInfo).ToArray();
-            var assemblyLookup = allRuntimeAssemblies.ToDictionary(r => r.Identity.ToLookupKey());
+            var dependenciesList = dependencies.ToList();
+            var assemblyInfoCache = new Dictionary<string, AssemblyReferenceInfo>();
+            var allRuntimeAssemblies = dependenciesList.SelectMany(d => d.RuntimeAssemblies).Select(a => GetAssemblyInfo(a, assemblyInfoCache)).ToArray();
+            var assemblyLookup = GetListOfUniqueRefs(dependenciesList).Select(a => GetAssemblyInfo(a, assemblyInfoCache)).ToDictionary(r => r.Identity.ToLookupKey());
 
             var redirectAssemblies = new HashSet<AssemblyRedirect>();
             foreach (var assemblyReferenceInfo in allRuntimeAssemblies)
             {
+                AssemblyRedirect redirect;
+                if(ProcessAssembly(assemblyReferenceInfo.Identity, assemblyLookup, out redirect))
+                {
+                    redirectAssemblies.Add(redirect);
+                }
+
                 foreach (var referenceIdentity in assemblyReferenceInfo.References)
                 {
-                    AssemblyReferenceInfo targetAssemblyIdentity;
-                    if (assemblyLookup.TryGetValue(referenceIdentity.ToLookupKey(), out targetAssemblyIdentity)
-                        && targetAssemblyIdentity.Identity.Version != referenceIdentity.Version)
+                    if(ProcessAssembly(referenceIdentity, assemblyLookup, out redirect))
                     {
-                        if (targetAssemblyIdentity.Identity.PublicKeyToken != null)
-                        {
-                            redirectAssemblies.Add(new AssemblyRedirect()
-                            {
-                                From = referenceIdentity,
-                                To = targetAssemblyIdentity.Identity
-                            });
-                        }
+                        redirectAssemblies.Add(redirect);
                     }
                 }
             }
@@ -136,8 +135,57 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
             return redirectAssemblies.ToArray();
         }
 
-        private static AssemblyReferenceInfo GetAssemblyInfo(LibraryAsset arg)
+        private static bool ProcessAssembly(AssemblyIdentity referenceIdentity, Dictionary<Tuple<string, string, string>, AssemblyReferenceInfo> assemblyLookup, out AssemblyRedirect result)
         {
+            AssemblyReferenceInfo targetAssemblyIdentity;
+            if (assemblyLookup.TryGetValue(referenceIdentity.ToLookupKey(), out targetAssemblyIdentity)
+                && targetAssemblyIdentity.Identity.Version != referenceIdentity.Version)
+            {
+                if (targetAssemblyIdentity.Identity.PublicKeyToken != null)
+                {
+                    result = new AssemblyRedirect()
+                    {
+                        From = referenceIdentity,
+                        To = targetAssemblyIdentity.Identity
+                    };
+
+                    return true;
+                }
+            }
+
+            result = default(AssemblyRedirect);
+            return false;
+        }
+
+        private static List<LibraryAsset> GetListOfUniqueRefs(List<LibraryExport> dependencies)
+        {
+            var result = new List<LibraryAsset>();
+            foreach (var dependency in dependencies)
+            {
+                // Select runtime assemblies when there's no other dependency that actually owns them.
+                foreach (var assembly in dependency.RuntimeAssemblies)
+                {
+                    if(dependencies.Any(
+                            d => dependency != d && d.CompilationAssemblies.Any(c => c.Name == assembly.Name)))
+                    {
+                        continue;
+                    }
+
+                    result.Add(assembly);
+                }
+            }
+
+            return result;
+        }
+
+        private static AssemblyReferenceInfo GetAssemblyInfo(LibraryAsset arg, Dictionary<string, AssemblyReferenceInfo> assemblyInfoCache)
+        {
+            AssemblyReferenceInfo result;
+            if (assemblyInfoCache.TryGetValue(arg.ResolvedPath, out result))
+            {
+                return result;
+            }
+
             using (var peReader = new PEReader(File.OpenRead(arg.ResolvedPath)))
             {
                 var metadataReader = peReader.GetMetadataReader();
@@ -164,7 +212,10 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
                     ));
                 }
 
-                return new AssemblyReferenceInfo(identity, references.ToArray());
+                result = new AssemblyReferenceInfo(identity, references.ToArray());
+                assemblyInfoCache.Add(arg.ResolvedPath, result);
+
+                return result;
             }
         }
 

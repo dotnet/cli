@@ -70,16 +70,25 @@ namespace Microsoft.DotNet.Cli.Build
         [Target]
         public static BuildTargetResult RestoreTestAssetProjects(BuildTargetContext c)
         {
+            string norestoreFileName = ".noautorestore";
+
             CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "src"));
             CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "test"));
 
             CleanNuGetTempCache();
 
             var dotnet = DotNetCli.Stage2;
+            string testProjectsRoot = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects");
+            var projects = Directory.GetFiles(testProjectsRoot, "project.json", SearchOption.AllDirectories)
+                                    .Where(p => !File.Exists(Path.Combine(Path.GetDirectoryName(p), norestoreFileName)));
 
-            dotnet.Restore("--verbosity", "verbose", "--disable-parallel", "--fallbacksource", Dirs.TestPackages)
-                .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects"))
-                .Execute().EnsureSuccessful();
+            foreach (var project in projects)
+            {
+                c.Info($"Restoring: {project}");
+                dotnet.Restore("--verbosity", "verbose", "--disable-parallel", "--fallbacksource", Dirs.TestPackages)
+                    .WorkingDirectory(Path.GetDirectoryName(project))
+                    .Execute().EnsureSuccessful();
+            }
 
             // The 'ProjectModelServer' directory contains intentionally-unresolved dependencies, so don't check for success. Also, suppress the output
             dotnet.Restore("--verbosity", "verbose", "--disable-parallel")
