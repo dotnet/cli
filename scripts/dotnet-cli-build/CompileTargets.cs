@@ -20,9 +20,7 @@ namespace Microsoft.DotNet.Cli.Build
 
         public static readonly string[] BinariesForCoreHost = new[]
         {
-            "csi",
-            "csc",
-            "vbc"
+            "csc"
         };
 
         public static readonly string[] ProjectsToPublish = new[]
@@ -32,7 +30,7 @@ namespace Microsoft.DotNet.Cli.Build
 
         public static readonly string[] FilesToClean = new[]
         {
-            "README.md"
+            "vbc.exe"
         };
 
         public static readonly string[] ProjectsToPack = new[]
@@ -214,7 +212,29 @@ namespace Microsoft.DotNet.Cli.Build
                 }
             }
 
+            CleanOutputDir(Path.Combine(Dirs.Stage2, "sdk"));
+
             return c.Success();
+        }
+
+        private static void CleanOutputDir(string directory)
+        {
+            foreach(var fileName in FilesToClean)
+            {
+                var files = Directory.EnumerateFiles(directory, fileName, SearchOption.AllDirectories);
+
+                foreach (var file in files)
+                {
+                    FS.Rm(file);
+                }
+            }
+
+            // Clean up all .pdb files
+            var pdbs = Directory.EnumerateFiles(directory, "*.pdb", SearchOption.AllDirectories);
+            foreach (var pdb in pdbs)
+            {
+                FS.Rm(pdb);
+            }
         }
 
         private static void CopySharedHost(string outputDir)
