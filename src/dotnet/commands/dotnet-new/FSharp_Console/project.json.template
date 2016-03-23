@@ -9,7 +9,7 @@
   ],
   "dependencies": {
     "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-160316",
-    "Microsoft.NETCore.App": "1.0.0-rc2-23922"
+    "Microsoft.NETCore.App": "1.0.0-rc2-23923"
   },
   "frameworks": {
     "netstandard1.5": {
