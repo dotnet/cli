@@ -318,8 +318,11 @@ bool deps_json_t::load(bool portable, const pal::string_t& deps_path, const rid_
     {
         const auto json = json_value::parse(file);
 
-        const auto& runtime_target = json.at(_X("runtimeTarget"));
-        const pal::string_t& name = runtime_target.as_string();
+		const auto& runtime_target = json.at(_X("runtimeTarget"));
+
+        const pal::string_t& name = (runtime_target.type() == json_value::value_type::String)?
+			runtime_target.as_string():
+			runtime_target.at(_X("name")).as_string();
 
         return (portable) ? load_portable(json, name, rid_fallback_graph) : load_standalone(json, name);
     }
