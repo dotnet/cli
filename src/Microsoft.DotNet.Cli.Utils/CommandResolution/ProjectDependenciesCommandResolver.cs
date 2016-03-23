@@ -142,7 +142,7 @@ namespace Microsoft.DotNet.Cli.Utils
             return projectContext.LibraryManager.GetLibraries()
                 .Where(l => l.GetType() == typeof(PackageDescription))
                 .Select(l => l as PackageDescription)
-                .Select(p => p.Library);
+                .Select(p => p.PackageLibrary);
         }
 
         private ProjectContext GetProjectContextFromDirectory(string directory, NuGetFramework framework)
