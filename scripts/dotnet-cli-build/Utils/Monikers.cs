@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.Cli.Build
         {
             string osname = GetOSShortName();
             var arch = CurrentArchitecture.Current.ToString();
-            var version = c.BuildContext.Get<BuildVersion>("BuildVersion").SimpleVersion;
+            var version = c.BuildContext.Get<BuildVersion>("BuildVersion").NuGetVersion;
             return $"{artifactPrefix}-{osname}-{arch}.{version}";
         }
 
