@@ -1,12 +1,13 @@
 using System;
 using System.IO;
 using Microsoft.Extensions.PlatformAbstractions;
+using System.Diagnostics;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
     public class Muxer
     {
-            private static readonly string s_muxerName = "dotnet";
+        private static readonly string s_muxerName = "dotnet";
         private static readonly string s_muxerFileName = s_muxerName + Constants.ExeSuffix;
 
         private string _muxerPath;
@@ -15,16 +16,35 @@ namespace Microsoft.DotNet.Cli.Utils
         {
             get
             {
+                if (_muxerPath == null)
+                {
+                    throw new InvalidOperationException("Unable to locate dotnet multiplexer");
+                }
                 return _muxerPath;
             }
         }
 
         public Muxer()
         {
-            if (!TryResolveMuxerFromParentDirectories())
+            if (!TryResolveMuxerFromCurrentProcess())
             {
-                TryResolverMuxerFromPath();
+                if (!TryResolveMuxerFromParentDirectories())
+                {
+                    TryResolverMuxerFromPath();
+                }
             }
+        }
+
+        private bool TryResolveMuxerFromCurrentProcess()
+        {
+            var mainFileName = Process.GetCurrentProcess().MainModule.FileName;
+            var fileName = Path.GetFileNameWithoutExtension(mainFileName);
+            if (fileName == s_muxerName)
+            {
+                _muxerPath = mainFileName;
+                return true;
+            }
+            return false;
         }
 
         private bool TryResolveMuxerFromParentDirectories()
