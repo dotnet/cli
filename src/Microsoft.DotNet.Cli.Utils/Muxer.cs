@@ -1,13 +1,14 @@
 using System;
 using System.IO;
 using Microsoft.Extensions.PlatformAbstractions;
+using System.Diagnostics;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
     public class Muxer
     {
-            private static readonly string s_muxerName = "dotnet";
-        private static readonly string s_muxerFileName = s_muxerName + Constants.ExeSuffix;
+        public static readonly string MuxerName = "dotnet";
+        private static readonly string s_muxerFileName = MuxerName + Constants.ExeSuffix;
 
         private string _muxerPath;
 
@@ -15,16 +16,35 @@ namespace Microsoft.DotNet.Cli.Utils
         {
             get
             {
+                if (_muxerPath == null)
+                {
+                    throw new InvalidOperationException("Unable to locate dotnet multiplexer");
+                }
                 return _muxerPath;
             }
         }
 
         public Muxer()
         {
-            if (!TryResolveMuxerFromParentDirectories())
+            if (!TryResolveMuxerFromCurrentProcess())
             {
-                TryResolverMuxerFromPath();
+                if (!TryResolveMuxerFromParentDirectories())
+                {
+                    TryResolverMuxerFromPath();
+                }
             }
+        }
+
+        private bool TryResolveMuxerFromCurrentProcess()
+        {
+            var mainFileName = Process.GetCurrentProcess().MainModule.FileName;
+            var fileName = Path.GetFileNameWithoutExtension(mainFileName);
+            if (fileName == MuxerName)
+            {
+                _muxerPath = mainFileName;
+                return true;
+            }
+            return false;
         }
 
         private bool TryResolveMuxerFromParentDirectories()
@@ -50,7 +70,7 @@ namespace Microsoft.DotNet.Cli.Utils
 
         private bool TryResolverMuxerFromPath()
         {
-            var muxerPath = Env.GetCommandPath(s_muxerName, Constants.ExeSuffix);
+            var muxerPath = Env.GetCommandPath(MuxerName, Constants.ExeSuffix);
 
             if (muxerPath == null || !File.Exists(muxerPath))
             {
