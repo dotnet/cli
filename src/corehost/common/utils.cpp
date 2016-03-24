@@ -167,6 +167,7 @@ bool parse_known_args(
             return false;
         }
 
+        trace::verbose(_X("Parsed known arg %s = %s"), arg.c_str(), argv[arg_i + 1]);
         (*opts)[arg] = argv[arg_i + 1];
 
         // Increment for both the option and its value.

@@ -205,6 +205,20 @@ SHARED_API int corehost_main(const int argc, const pal::char_t* argv[])
 
     assert(g_init);
 
+    if (trace::is_enabled())
+    {
+        trace::info(_X("--- Invoked policy main = {"));
+        for (int i = 0; i < argc; ++i)
+        {
+            trace::info(_X("%s"), argv[i]);
+        }
+        trace::info(_X("}"));
+
+        trace::info("Host mode: %d", g_init->host_mode());
+        trace::info("Deps file: %s", g_init->deps_file().c_str());
+        trace::info("Probe dir: %s", g_init->probe_dir().c_str());
+    }
+
     // Take care of arguments
     arguments_t args;
     if (!parse_arguments(g_init->deps_file(), g_init->probe_dir(), g_init->host_mode(), argc, argv, &args))
