@@ -5,7 +5,7 @@
     "keyFile": "../../tools/Key.snk"
   },
   "dependencies": {
-    "NETStandard.Library": "1.5.0-rc2-23925",
+    "Microsoft.NETCore.App": "1.0.0-rc2-23925",
     "System.Runtime.Serialization.Primitives": "4.1.1-rc2-23925",
     "System.Collections.Immutable": "1.2.0-rc2-23925",
     "FluentAssertions": "4.0.0",
