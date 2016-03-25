@@ -36,6 +36,8 @@ public:
         if (m_portable)
         {
             m_fx_deps_file = get_fx_deps(fx_dir, config->get_fx_name());
+            trace::verbose(_X("Using %s FX deps file"), m_fx_deps_file.c_str());
+            trace::verbose(_X("Using %s deps file"), m_deps_file.c_str());
             m_fx_deps = std::unique_ptr<deps_json_t>(new deps_json_t(false, m_fx_deps_file));
             m_deps = std::unique_ptr<deps_json_t>(new deps_json_t(true, m_deps_file, m_fx_deps->get_rid_fallback_graph()));
         }
@@ -74,7 +76,7 @@ private:
     static pal::string_t get_fx_deps(const pal::string_t& fx_dir, const pal::string_t& fx_name)
     {
         pal::string_t fx_deps = fx_dir;
-        pal::string_t fx_deps_name = pal::to_lower(fx_name) + _X(".deps.json");
+        pal::string_t fx_deps_name = fx_name + _X(".deps.json");
         append_path(&fx_deps, fx_deps_name.c_str());
         return fx_deps;
     }
@@ -110,7 +112,9 @@ private:
 
     // Map of simple name -> full path of local/fx assemblies populated
     // in priority order of their extensions.
-    std::unordered_map<pal::string_t, pal::string_t> m_sxs_assemblies;
+    typedef std::unordered_map<pal::string_t, pal::string_t> dir_assemblies_t;
+    dir_assemblies_t m_local_assemblies;
+    dir_assemblies_t m_fx_assemblies;
 
     // Special entry for coreclr in the deps entries
     int m_coreclr_index;

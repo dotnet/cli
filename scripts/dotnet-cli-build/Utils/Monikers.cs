@@ -10,11 +10,10 @@ namespace Microsoft.DotNet.Cli.Build
     {
         public const string SharedFrameworkName = "Microsoft.NETCore.App";
 
-        public static string GetProductMoniker(BuildTargetContext c, string artifactPrefix)
+        public static string GetProductMoniker(BuildTargetContext c, string artifactPrefix, string version)
         {
             string osname = GetOSShortName();
             var arch = CurrentArchitecture.Current.ToString();
-            var version = c.BuildContext.Get<BuildVersion>("BuildVersion").SimpleVersion;
             return $"{artifactPrefix}-{osname}-{arch}.{version}";
         }
 
@@ -43,7 +42,7 @@ namespace Microsoft.DotNet.Cli.Build
         public static string GetSdkDebianPackageName(BuildTargetContext c)
         {
             var channel = c.BuildContext.Get<string>("Channel").ToLower();
-            var sharedFrameworkNugetVersion = c.BuildContext.Get<string>("SharedFrameworkNugetVersion");
+            var nugetVersion = c.BuildContext.Get<BuildVersion>("BuildVersion").NuGetVersion;
 
             var packagePrefix = "";
             switch (channel)
@@ -61,7 +60,7 @@ namespace Microsoft.DotNet.Cli.Build
                     throw new Exception($"Unknown channel - {channel}");
             }
 
-            return $"{packagePrefix}-dev-{sharedFrameworkNugetVersion}";
+            return $"{packagePrefix}-dev-{nugetVersion}";
         }
 
         public static string GetDebianSharedFrameworkPackageName(BuildTargetContext c)

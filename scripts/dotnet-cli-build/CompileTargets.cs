@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.Cli.Build
 {
     public class CompileTargets
     {
-        public static readonly string CoreCLRVersion = "1.0.2-rc2-23911";
+        public static readonly string CoreCLRVersion = "1.0.2-rc2-23924";
         public static readonly string AppDepSdkVersion = "1.0.6-prerelease-00003";
         public static readonly bool IsWinx86 = CurrentPlatform.IsWindows && CurrentArchitecture.Isx86;
 
@@ -78,8 +78,7 @@ namespace Microsoft.DotNet.Cli.Build
             var configuration = c.BuildContext.Get<string>("Configuration");
 
             // Run the build
-            string version = DotNetCli.Stage0.Exec("", "--version").CaptureStdOut().Execute().StdOut;
-            string rid = Array.Find<string>(version.Split(Environment.NewLine.ToCharArray()), (e) => e.Contains("Runtime Id:")).Replace("Runtime Id:", "").Trim();
+            string rid = GetRuntimeId();
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 // Why does Windows directly call cmake but Linux/Mac calls "build.sh" in the corehost dir?
@@ -132,6 +131,26 @@ namespace Microsoft.DotNet.Cli.Build
             }
 
             return c.Success();
+        }
+
+        private static string GetRuntimeId()
+        {
+            string info = DotNetCli.Stage0.Exec("", "--info").CaptureStdOut().Execute().StdOut;
+            string rid = Array.Find<string>(info.Split(Environment.NewLine.ToCharArray()), (e) => e.Contains("RID:"))?.Replace("RID:", "").Trim();
+
+            // TODO: when Stage0 is updated with the new --info, remove this legacy check for --version
+            if (string.IsNullOrEmpty(rid))
+            {
+                string version = DotNetCli.Stage0.Exec("", "--version").CaptureStdOut().Execute().StdOut;
+                rid = Array.Find<string>(version.Split(Environment.NewLine.ToCharArray()), (e) => e.Contains("Runtime Id:")).Replace("Runtime Id:", "").Trim();
+            }
+
+            if (string.IsNullOrEmpty(rid))
+            {
+                throw new BuildFailureException("Could not find the Runtime ID from Stage0 --info or --version");
+            }
+
+            return rid;
         }
 
         [Target]
@@ -278,7 +297,8 @@ namespace Microsoft.DotNet.Cli.Build
                 var runtimeGraphGeneratorExe = Path.Combine(runtimeGraphGeneratorOutput, $"{runtimeGraphGeneratorName}{Constants.ExeSuffix}");
 
                 Cmd(runtimeGraphGeneratorExe, "--project", SharedFrameworkSourceRoot, "--deps", destinationDeps, runtimeGraphGeneratorRuntime)
-                    .Execute();
+                    .Execute()
+                    .EnsureSuccessful();
             }
             else
             {
@@ -301,6 +321,11 @@ namespace Microsoft.DotNet.Cli.Build
             }
 
             CrossgenSharedFx(c, SharedFrameworkNameAndVersionRoot);
+
+            // Generate .version file for sharedfx
+            var version = SharedFrameworkNugetVersion;
+            var content = $@"{c.BuildContext["CommitHash"]}{Environment.NewLine}{version}{Environment.NewLine}";
+            File.WriteAllText(Path.Combine(SharedFrameworkNameAndVersionRoot, ".version"), content);
         }
 
         private static BuildTargetResult CompileCliSdk(BuildTargetContext c, DotNetCli dotnet, string outputDir)
@@ -370,7 +395,7 @@ namespace Microsoft.DotNet.Cli.Build
             }
 
             // Generate .version file
-            var version = buildVersion.SimpleVersion;
+            var version = buildVersion.NuGetVersion;
             var content = $@"{c.BuildContext["CommitHash"]}{Environment.NewLine}{version}{Environment.NewLine}";
             File.WriteAllText(Path.Combine(outputDir, ".version"), content);
 
