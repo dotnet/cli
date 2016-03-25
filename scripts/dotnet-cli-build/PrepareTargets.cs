@@ -7,11 +7,10 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-
+using System.Text.RegularExpressions;
+using static Microsoft.DotNet.Cli.Build.Framework.BuildHelpers;
 using static Microsoft.DotNet.Cli.Build.FS;
 using static Microsoft.DotNet.Cli.Build.Utils;
-using static Microsoft.DotNet.Cli.Build.Framework.BuildHelpers;
-using System.Text.RegularExpressions;
 
 namespace Microsoft.DotNet.Cli.Build
 {
@@ -166,25 +165,30 @@ namespace Microsoft.DotNet.Cli.Build
 
             if (ciBuild)
             {
+                DateTime? cacheTime = null;
                 var cacheTimeFile = Path.Combine(Dirs.NuGetPackages, "packageCacheTime.txt");
 
-                DateTime? cacheTime = null;
-                try
+                // Don't load the cache time file if ForceCleanPackages is on, since we don't care
+                // cacheTime will remain null and we'll clean the packages directory.
+                if (!EnvVars.ForceCleanPackages)
                 {
-                    // Read the cache file
-                    if (File.Exists(cacheTimeFile))
+                    try
                     {
-                        var content = File.ReadAllText(cacheTimeFile);
-                        if (!string.IsNullOrEmpty(content))
+                        // Read the cache file
+                        if (File.Exists(cacheTimeFile))
                         {
-                            cacheTime = DateTime.ParseExact("O", content, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+                            var content = File.ReadAllText(cacheTimeFile);
+                            if (!string.IsNullOrEmpty(content))
+                            {
+                                cacheTime = DateTime.ParseExact("O", content, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+                            }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    c.Warn($"Error reading NuGet cache time file, leaving the cache alone");
-                    c.Warn($"Error Detail: {ex.ToString()}");
+                    catch (Exception ex)
+                    {
+                        c.Warn($"Error reading NuGet cache time file, leaving the cache alone");
+                        c.Warn($"Error Detail: {ex.ToString()}");
+                    }
                 }
 
                 if (cacheTime == null || (cacheTime.Value.AddHours(cacheExpiration) < DateTime.UtcNow))
