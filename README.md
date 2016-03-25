@@ -27,7 +27,7 @@ Installers
 |**CentOS 7.1**|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/CentOS_x64_Release_version_badge.svg)|N/A |[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-dev-centos-x64.latest.tar.gz)|[![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/597/badge)](https://devdiv.visualstudio.com/DefaultCollection/DevDiv/_build?definitionId=597)|
 |**RHEL 7.2**|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/RHEL_x64_Release_version_badge.svg)|N/A |[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-dev-rhel-x64.latest.tar.gz) |[![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/897/badge)](https://devdiv.visualstudio.com/DefaultCollection/DevDiv/_build?definitionId=897)|
 
-**Note:** Detailed build status (build history, queues, etc.) can be found by clicking the badges, but is currently only available to Microsoft Employees, as our build infrastructure is internal. We're looking in to options to change this in the future.
+**Note:** Detailed build status (build history, queues, etc.) can be found by clicking the badges, but is currently only available to Microsoft Employees, as our build infrastructure is internal. We are looking into what our options are for making some information about builds public in the future.
 
 Interested in .NET Core + ASP.NET Core 1.0 RC1 bits?
 ----------------------------------------------------
