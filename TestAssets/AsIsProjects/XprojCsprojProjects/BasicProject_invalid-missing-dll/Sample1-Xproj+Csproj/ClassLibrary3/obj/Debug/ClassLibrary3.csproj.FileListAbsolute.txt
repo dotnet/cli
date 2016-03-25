@@ -1,0 +1,5 @@
+C:\Users\micodoba\OneDrive for Business\tests\TestXprojCsproj-master\Sample1-Xproj+Csproj\ClassLibrary3\bin\Debug\ClassLibrary3.dll
+C:\Users\micodoba\OneDrive for Business\tests\TestXprojCsproj-master\Sample1-Xproj+Csproj\ClassLibrary3\bin\Debug\ClassLibrary3.pdb
+C:\Users\micodoba\OneDrive for Business\tests\TestXprojCsproj-master\Sample1-Xproj+Csproj\ClassLibrary3\obj\Debug\ClassLibrary3.csprojResolveAssemblyReference.cache
+C:\Users\micodoba\OneDrive for Business\tests\TestXprojCsproj-master\Sample1-Xproj+Csproj\ClassLibrary3\obj\Debug\ClassLibrary3.dll
+C:\Users\micodoba\OneDrive for Business\tests\TestXprojCsproj-master\Sample1-Xproj+Csproj\ClassLibrary3\obj\Debug\ClassLibrary3.pdb
