@@ -34,7 +34,8 @@ namespace Microsoft.DotNet.Cli.Build
             "Microsoft.Extensions.DependencyModel.Tests",
             "ArgumentForwardingTests",
             "dotnet-test.UnitTests",
-            "dotnet-test.Tests"
+            "dotnet-test.Tests",
+            "Installer/InstallScript"
         };
         
         public static readonly dynamic[] ConditionalTestAssets = new[]
