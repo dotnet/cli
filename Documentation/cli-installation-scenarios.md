@@ -95,21 +95,27 @@ This, however, does have one specific constraint: **newever versions must be ins
 				-system.*.dll  <R2R NI image>
 				-dotnet-hostimpl.dll
 				-dotnet
-				-netcoreapp.deps 
+				-netcoreapp.deps.json 
 			-1.5.0
 				-coreclr.dll
 				-mscorlib.ni.dll <Regular NI image>-
 				-system.*.dll  <R2R NI image>
 				-dotnet-hostimpl.dll
 				-dotnet
-				-netcoreapp.deps 
+				-netcoreapp.deps.json 
 ```	
 
 ## Native dependencies
-.NET Core CLI is built on top of CoreFX and CoreCLR and as such its' dependencies set is defined by the platform that those two combine. Whether or not those dependencies will be installed depends on the installer being used. On Debian, for instance, using `apt-get` will mean that the appropriate dependencies are installed. For OS X using the PKG (installer) dependencies that are not part of OS X will not be installed. So, to summarize: the CLI bundle will not carry native dependencies of CoreFX and CoreCLR with it. 
+.NET Core CLI is built on top of CoreFX and CoreCLR and as such its' dependencies set is defined by the platform that those two combine. Whether or not those dependencies will be installed depends on the installer being used. The table below lists out the installers and whether or not they bring in dependencies. 
+
+| Installer  	| Dependencies Y/N   	|
+|------------	|--------------------	|
+| EXE        	| Y (chains them in) 	|
+| PKG        	| N                  	|
+| apt-get    	| Y                  	|
+| rpm        	| Y                  	| 
 
 A list of dependencies can be found on [dependency list](TBD). 
-
 
 ## Channels
 Channels represent a way for users who are getting the CLI to reason about the stability and quality of the bits they are getting. This is one more way for the user to be fully aware of the state the bits that are being installed are in and to set proper expectations on first use. 
@@ -126,7 +132,7 @@ Below table shows the mapping between the channels, branches and feeds for the D
 
 | Channel    	| Branch    	| Debian feed 	| Debian package name 	| NuGet version 	| NuGet feed                            	|
 |------------	|-----------	|-------------	|---------------------	|---------------	|---------------------------------------	|
-| Future    	| master    	| Development 	| dotnet-Future      	| 1.0.0-dev-*   	| https://dotnet.myget.org/f/dotnet-cli 	|
+| Future    	| master    	| Development 	| dotnet-future      	| 1.0.0-dev-*   	| https://dotnet.myget.org/f/dotnet-cli 	|
 | Preview    	| rel/<ver> 	| Development 	| dotnet              	| 1.0.0-beta-*  	| https://dotnet.myget.org/f/dotnet-cli 	|
 | Production 	| production/<ver> 	| Production  	| dotnet              	| 1.0.0         	| https://api.nuget.org/v3/index.json   	|
 
@@ -212,7 +218,7 @@ The following arguments are needed for the installation script:
 |--------------------------------------	|------------------------------------	|-----------------------	|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
 | --channel                            	| -Channel                           	| "Production"          	| Which channel (i.e. "Future", "preview", "production") to install from.                                                                                                                                                                       	|
 | --version                            	| -Version                           	| global.json or Latest 	| Which version of CLI to install; you need to specify the version as 3-part version (i.e. 1.0.0-13232). If omitted, it will default to the first global.json that contains the sdkVersion property; if that is not present it will use Latest. 	|
-| --prefix                             	| -InstallDir                        	| .dotnet               	| Path to where to install the CLI bundle. The directory is created if it doesn't exist. On Linux/OSX this directory is created in the user home directory (`$HOME`). On Windows, this directory is created in `%LocalAppData%`.                	|
+| --install-dir                             	| -InstallDir                        	| .dotnet               	| Path to where to install the CLI bundle. The directory is created if it doesn't exist. On Linux/OSX this directory is created in the user home directory (`$HOME`). On Windows, this directory is created in `%LocalAppData%`.                	|
 | --debug                              	| -Debug                             	| false                 	| Whether to use the "fat" packages that contain debugging symbols or not.                                                                                                                                                                      	|
 | --no-path                            	| -NoPath                            	| false                 	| Export the prefix/installdir to the path for the current session. This makes CLI tools available immidiately after install.                                                                                                                   	|
 | --shared-runtime                     	| -SharedRuntime                     	| false                 	| Install just the shared runtime bits, not the entire SDK.                                                                                                                                                                                     	|
@@ -271,3 +277,5 @@ Cross-platform IDEs/editors will work in similar way as above. The notification 
 
 ### Visual Studio 
 Visual Studio will not be shipping CLI in-box. However, it will use CLI when installed. The install will be tied into other installs like WET and similar.  The URL that is baked in VS should be an aka.ms URL because it needs to be stable on that end. The other, pointing end, should also be a stable URL/location. 
+
+
