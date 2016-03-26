@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
@@ -15,9 +14,10 @@ using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Compiler.Fsc
 {
-    public class Program
+    public class CompileFscCommand
     {
-        public int Run(string[] args)
+        private const int ExitFailed = 1;
+        public static int Main(string[] args)
         {
             DebugHelper.HandleDebugSwitch(ref args);
 
@@ -87,8 +87,9 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             var allArgs = new List<string>();
 
             //HACK fsc raise error FS0208 if target exe doesnt have extension .exe
-            bool hackFS0208 = targetNetCore && compileFscCommandApp.CommonOptions.EmitEntryPoint == true;
-            string outputName = compileFscCommandApp.OutputName;
+            bool hackFS0208 = targetNetCore && commonOptions.EmitEntryPoint == true;
+
+            var originalOutputName = outputName;
 
             if (outputName != null)
             {
@@ -108,7 +109,9 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
                 allArgs.Add("--debug:pdbonly");
             }
             else
+            {
                 allArgs.Add("--debug-");
+            }
 
             // Default options
             allArgs.Add("--noframework");
@@ -119,6 +122,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             if (commonOptions.Defines != null)
             {
                 allArgs.AddRange(commonOptions.Defines.Select(def => $"--define:{def}"));
+            }
 
             if (commonOptions.GenerateXmlDocumentation == true)
             {
@@ -175,6 +179,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
 
             if (commonOptions.AllowUnsafe == true)
             {
+                // what?
             }
 
             if (commonOptions.WarningsAsErrors == true)
@@ -195,6 +200,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
 
             if (commonOptions.PublicSign == true)
             {
+                // pass
             }
 
             if (commonOptions.AdditionalArguments != null)
@@ -210,7 +216,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             //source files + assemblyInfo
             allArgs.AddRange(GetSourceFiles(sources, assemblyInfo).ToArray());
 
-            //TODO check the switch enabled in fsproj in RELEASE and DEBUG configuration 
+            //TODO check the switch enabled in fsproj in RELEASE and DEBUG configuration
 
             var rsp = Path.Combine(tempOutDir, "dotnet-compile-fsc.rsp");
             File.WriteAllLines(rsp, allArgs, Encoding.UTF8);
@@ -259,12 +265,11 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             yield return sourceFiles.Last();
         }
 
-        private Command RunFsc(List<string> fscArgs)
+        private static Command RunFsc(List<string> fscArgs)
         {
             var fscEnvExe = Environment.GetEnvironmentVariable("DOTNET_FSC_PATH");
             var exec = Environment.GetEnvironmentVariable("DOTNET_FSC_EXEC")?.ToUpper() ?? "COREHOST";
-
-            Command command = null;
+            
             var muxer = new Muxer();
 
             if (fscEnvExe != null)
@@ -287,7 +292,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             }
         }
 
-        private CommandSpec ResolveFsc(List<string> fscArgs)
+        private static CommandSpec ResolveFsc(List<string> fscArgs)
         {
             var depsResolver = new DepsJsonCommandResolver();
             var myDepsFile = Path.Combine(AppContext.BaseDirectory, "dotnet-compile-fsc.deps.json");
