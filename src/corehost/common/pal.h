@@ -165,6 +165,7 @@ namespace pal
     bool get_own_executable_path(string_t* recv);
     bool getenv(const char_t* name, string_t* recv);
     bool get_default_packages_directory(string_t* recv);
+    bool get_default_extensions_directory(string_t* recv);
     bool is_path_rooted(const string_t& path);
 
     int xtoi(const char_t* input);

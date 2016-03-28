@@ -114,5 +114,15 @@ bool parse_arguments(const pal::string_t& deps_path, const pal::string_t& probe_
 
     pal::getenv(_X("DOTNET_PACKAGES_CACHE"), &args.dotnet_packages_cache);
     pal::getenv(_X("DOTNET_EXTENSIONS"), &args.dotnet_extensions);
+
+    if (!args.dotnet_extensions.empty())
+    {
+        pal::realpath(&args.dotnet_extensions);
+    }
+    else
+    {
+        pal::get_default_extensions_directory(&args.dotnet_extensions);
+    }
+
     return true;
 }

@@ -120,61 +120,85 @@ void deps_resolver_t::get_dir_assemblies(
     }
 }
 
-bool try_roll_forward(const deps_entry_t& entry,
+bool deps_resolver_t::try_roll_forward(const deps_entry_t& entry,
     const pal::string_t& probe_dir,
     pal::string_t* candidate)
 {
-    const pal::string_t& lib_ver = entry.library_version;
-    fx_ver_t cur_ver(-1, -1, -1);
-    if (!fx_ver_t::parse(lib_ver, &cur_ver, false))
-    {
-        return false;
-    }
+    trace::verbose(_X("Attempting a roll forward for [%s/%s/%s] in [%s]"), entry.library_name.c_str(), entry.library_version.c_str(), entry.relative_path.c_str(), probe_dir.c_str());
 
+    const pal::string_t& lib_ver = entry.library_version;
+
+    // Extract glob string of the form: 1.0.* from the version 1.0.0-prerelease-00001.
     size_t pat_start = lib_ver.find(_X('.'), lib_ver.find(_X('.')) + 1);
+    pal::string_t maj_min_star = lib_ver.substr(0, pat_start + 1) + _X('*');
 
     pal::string_t path = probe_dir;
     append_path(&path, entry.library_name.c_str());
 
-    pal::string_t maj_min = lib_ver.substr(0, pat_start);
-    maj_min.append(_X(".*"));
+    pal::string_t cache_key = path;
+    append_path(&cache_key, maj_min_star.c_str());
 
-    std::vector<pal::string_t> list;
-    pal::readdir(path, maj_min, &list);
-
-    fx_ver_t max(-1, -1, -1);
-    fx_ver_t tmp(-1, -1, -1);
-    for (const auto& str : list)
+    pal::string_t max_str;
+    if (m_roll_forward_cache.count(cache_key))
     {
-        if (fx_ver_t::parse(str, &tmp, false) && tmp > max)
+        max_str = m_roll_forward_cache[cache_key];
+        trace::verbose(_X("Found cached roll forward version [%s] -> [%s]"), lib_ver.c_str(), max_str.c_str());
+    }
+    else
+    {
+        fx_ver_t max_ver(-1, -1, -1);
+        if (!fx_ver_t::parse(lib_ver, &max_ver, false))
         {
-            max = tmp;
+            trace::verbose(_X("No roll forward as specified version [%s] could not be parsed"), lib_ver.c_str());
+            return false;
         }
-    }
 
-    if (max != fx_ver_t(-1, -1, -1))
+        trace::verbose(_X("Reading roll forward candidates in dir [%s] for version [%s]"), path.c_str(), lib_ver.c_str());
+        std::vector<pal::string_t> list;
+        pal::readdir(path, maj_min_star, &list);
+
+        fx_ver_t ver(-1, -1, -1);
+        for (const auto& str : list)
+        {
+            trace::verbose(_X("Considering roll forward candidate version [%s]"), str.c_str());
+            if (fx_ver_t::parse(str, &ver, false))
+            {
+                max_ver = std::max(ver, max_ver);
+            }
+        }
+        max_str = max_ver.as_str();
+        m_roll_forward_cache[cache_key] = max_str;
+    }
+    trace::verbose(_X("Max roll forward version [%s]"), max_str.c_str());
+
+    append_path(&path, max_str.c_str());
+    if (entry.to_rel_path(path, candidate))
     {
-        pal::string_t max_str = max.as_str();
-        append_path(&path, max_str.c_str());
-        return entry.to_rel_path(path, candidate);
+        trace::verbose(_X("Successfully rolled forward [%s/%s/%s] -> [%s]"), entry.library_name.c_str(), entry.library_version.c_str(), entry.relative_path.c_str(), lib_ver.c_str(), candidate->c_str());
+        return true;
     }
 
-    return false;
+    trace::verbose(_X("Could not roll forward [%s/%s/%s]"), entry.library_name.c_str(), entry.library_version.c_str(), entry.relative_path.c_str());
+    return entry.to_full_path(probe_dir, candidate);
 }
 
-bool probe_entry_in_configs(const deps_entry_t& entry,
+bool deps_resolver_t::probe_entry_in_configs(const deps_entry_t& entry,
     const std::vector<probe_config_t>& probe_configs,
     pal::string_t* candidate)
 {
     candidate->clear();
     for (const auto& config : probe_configs)
     {
+        trace::verbose(_X("Considering entry [%s/%s/%s] and probe dir [%s]"), entry.library_name.c_str(), entry.library_hash.c_str(), entry.relative_path.c_str(), config.probe_dir.c_str());
+
         if (config.only_serviceable_assets && !entry.is_serviceable)
         {
+            trace::verbose(_X("Skipping... non serviceable"));
             continue;
         }
         if (config.only_runtime_assets && pal::strcasecmp(entry.asset_type.c_str(), _X("runtime")) != 0)
         {
+            trace::verbose(_X("Skipping... not runtime asset"));
             continue;
         }
         pal::string_t probe_dir = config.probe_dir;
@@ -182,14 +206,18 @@ bool probe_entry_in_configs(const deps_entry_t& entry,
         if (config.match_hash && entry.to_hash_matched_path(probe_dir, candidate))
         {
             assert(!config.roll_forward);
+            trace::verbose(_X("Matched hash for [%s]"), candidate->c_str());
             return true;
         }
         if (!config.roll_forward && entry.to_full_path(probe_dir, candidate))
         {
+            trace::verbose(_X("Specified no roll forward; matched [%s]"), candidate->c_str());
             return true;
         }
+
         if (config.roll_forward && try_roll_forward(entry, probe_dir, candidate))
         {
+            trace::verbose(_X("Specified roll forward; matched [%s]"), candidate->c_str());
             return true;
         }
 

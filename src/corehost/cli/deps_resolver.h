@@ -98,6 +98,18 @@ private:
         const pal::string_t& dir_name,
         std::unordered_map<pal::string_t, pal::string_t>* dir_assemblies);
 
+    // Probe entry in probe configurations.
+    bool probe_entry_in_configs(
+        const deps_entry_t& entry,
+        const std::vector<probe_config_t>& probe_configs,
+        pal::string_t* candidate);
+
+    // Try auto roll forward, if not return entry in probe dir.
+    bool try_roll_forward(
+        const deps_entry_t& entry,
+        const pal::string_t& probe_dir,
+        pal::string_t* candidate);
+
     // Framework deps file.
     pal::string_t m_fx_dir;
 
@@ -106,6 +118,8 @@ private:
     typedef std::unordered_map<pal::string_t, pal::string_t> dir_assemblies_t;
     dir_assemblies_t m_local_assemblies;
     dir_assemblies_t m_fx_assemblies;
+
+    std::unordered_map<pal::string_t, pal::string_t> m_roll_forward_cache;
 
     // Special entry for coreclr in the deps entries
     int m_coreclr_index;

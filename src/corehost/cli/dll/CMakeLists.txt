@@ -31,8 +31,7 @@ set(SOURCES
     ../coreclr.cpp
     ../deps_resolver.cpp
     ../deps_format.cpp
-    ../deps_entry.cpp
-    ../servicing_index.cpp)
+    ../deps_entry.cpp)
 
 
 if(WIN32)

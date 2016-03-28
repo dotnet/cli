@@ -127,8 +127,26 @@ bool pal::get_default_packages_directory(string_t* recv)
     {
         return false;
     }
-    append_path(&*recv, _X(".nuget"));
-    append_path(&*recv, _X("packages"));
+    append_path(recv, _X(".nuget"));
+    append_path(recv, _X("packages"));
+    return true;
+}
+
+bool pal::get_default_extensions_directory(string_t* recv)
+{
+    recv->clear();
+
+#ifdef _TARGET_X86_
+    // In WOW64 mode, PF maps to PFx86.
+    if (!pal::getenv(_X("ProgramFiles"), recv))
+#elif defined(_TARGET_AMD64_)
+    if (!pal::getenv(_X("ProgramFiles(x86)"), recv))
+#endif
+    {
+        return false;
+    }
+
+    append_path(recv, _X("dotnet_extensions"));
     return true;
 }
 

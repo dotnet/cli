@@ -134,6 +134,14 @@ bool pal::get_default_packages_directory(pal::string_t* recv)
     return true;
 }
 
+bool pal::get_default_extensions_directory(string_t* recv)
+{
+    recv->clear();
+    append_path(recv, _X("opt"));
+    append_path(recv, _X("dotnet_extensions"));
+    return true;
+}
+
 #if defined(__APPLE__)
 bool pal::get_own_executable_path(pal::string_t* recv)
 {
