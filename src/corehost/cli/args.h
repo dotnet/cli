@@ -9,12 +9,32 @@
 #include "trace.h"
 #include "libhost.h"
 
+struct probe_config_t
+{
+    pal::string_t probe_dir;
+    bool match_hash;
+    bool roll_forward;
+    bool only_runtime_assets;
+    bool only_serviceable_assets;
+
+    probe_config_t(const pal::string_t& probe_dir, bool match_hash, bool roll_forward, bool only_serviceable_assets, bool only_runtime_assets)
+        : probe_dir(probe_dir)
+        , match_hash(match_hash)
+        , roll_forward(roll_forward)
+        , only_serviceable_assets(only_serviceable_assets)
+        , only_runtime_assets(only_runtime_assets)
+    {
+        // Cannot roll forward and also match hash.
+        assert(!roll_forward || !match_hash);
+    }
+};
+
 struct arguments_t
 {
     pal::string_t own_path;
     pal::string_t app_dir;
     pal::string_t deps_path;
-    pal::string_t dotnet_servicing;
+    pal::string_t dotnet_extensions;
     pal::string_t probe_dir;
     pal::string_t dotnet_packages_cache;
     pal::string_t managed_application;
@@ -28,8 +48,8 @@ struct arguments_t
     {
         if (trace::is_enabled())
         {
-            trace::verbose(_X("args: own_path=%s app_dir=%s deps=%s servicing=%s probe_dir=%s packages_cache=%s mgd_app=%s"),
-                own_path.c_str(), app_dir.c_str(), deps_path.c_str(), dotnet_servicing.c_str(), probe_dir.c_str(), dotnet_packages_cache.c_str(), managed_application.c_str());
+            trace::verbose(_X("args: own_path=%s app_dir=%s deps=%s extensions=%s probe_dir=%s packages_cache=%s mgd_app=%s"),
+                own_path.c_str(), app_dir.c_str(), deps_path.c_str(), dotnet_extensions.c_str(), probe_dir.c_str(), dotnet_packages_cache.c_str(), managed_application.c_str());
         }
     }
 };

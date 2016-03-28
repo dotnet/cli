@@ -77,7 +77,7 @@ bool hostpolicy_exists_in_svc(pal::string_t* resolved_dir)
 {
 #ifdef COREHOST_PACKAGE_SERVICING
     pal::string_t svc_dir;
-    if (!pal::getenv(_X("DOTNET_SERVICING"), &svc_dir))
+    if (!pal::getenv(_X("DOTNET_EXTENSIONS"), &svc_dir))
     {
         return false;
     }

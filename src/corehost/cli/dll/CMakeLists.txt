@@ -25,6 +25,7 @@ set(SOURCES
     ../json/casablanca/src/json/json_parsing.cpp
     ../json/casablanca/src/json/json_serialization.cpp
     ../json/casablanca/src/utilities/asyncrt_utils.cpp
+    ../fxr/fx_ver.cpp
     ../args.cpp
     ../hostpolicy.cpp
     ../coreclr.cpp

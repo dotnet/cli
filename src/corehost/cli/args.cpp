@@ -13,7 +13,7 @@ arguments_t::arguments_t() :
     app_argc(0),
     app_argv(nullptr),
     dotnet_packages_cache(_X("")),
-    dotnet_servicing(_X("")),
+    dotnet_extensions(_X("")),
     deps_path(_X(""))
 {
 }
@@ -113,6 +113,6 @@ bool parse_arguments(const pal::string_t& deps_path, const pal::string_t& probe_
     }
 
     pal::getenv(_X("DOTNET_PACKAGES_CACHE"), &args.dotnet_packages_cache);
-    pal::getenv(_X("DOTNET_SERVICING"), &args.dotnet_servicing);
+    pal::getenv(_X("DOTNET_EXTENSIONS"), &args.dotnet_extensions);
     return true;
 }

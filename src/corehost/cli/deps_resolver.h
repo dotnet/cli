@@ -7,10 +7,10 @@
 #include <vector>
 
 #include "pal.h"
+#include "args.h"
 #include "trace.h"
 #include "deps_format.h"
 #include "deps_entry.h"
-#include "servicing_index.h"
 #include "runtime_config.h"
 
 // Probe paths to be resolved for ordering
@@ -25,8 +25,7 @@ class deps_resolver_t
 {
 public:
     deps_resolver_t(const pal::string_t& fx_dir, const runtime_config_t* config, const arguments_t& args)
-        : m_svc(args.dotnet_servicing)
-        , m_fx_dir(fx_dir)
+        : m_fx_dir(fx_dir)
         , m_coreclr_index(-1)
         , m_portable(config->get_portable())
         , m_deps(nullptr)
@@ -47,20 +46,17 @@ public:
         }
     }
 
-
     bool valid() { return m_deps->is_valid() && (!m_portable || m_fx_deps->is_valid());  }
 
     bool resolve_probe_paths(
       const pal::string_t& app_dir,
-      const pal::string_t& package_dir,
-      const pal::string_t& package_cache_dir,
       const pal::string_t& clr_dir,
+      const std::vector<probe_config_t>& probe_configs,
       probe_paths_t* probe_paths);
 
     pal::string_t resolve_coreclr_dir(
         const pal::string_t& app_dir,
-        const pal::string_t& package_dir,
-        const pal::string_t& package_cache_dir);
+        const std::vector<probe_config_t>& probe_configs);
 
     const pal::string_t& get_fx_deps_file() const
     {
@@ -84,18 +80,16 @@ private:
     // Resolve order for TPA lookup.
     void resolve_tpa_list(
         const pal::string_t& app_dir,
-        const pal::string_t& package_dir,
-        const pal::string_t& package_cache_dir,
         const pal::string_t& clr_dir,
+        const std::vector<probe_config_t>& probe_configs,
         pal::string_t* output);
 
     // Resolve order for culture and native DLL lookup.
     void resolve_probe_dirs(
         const pal::string_t& asset_type,
         const pal::string_t& app_dir,
-        const pal::string_t& package_dir,
-        const pal::string_t& package_cache_dir,
         const pal::string_t& clr_dir,
+        const std::vector<probe_config_t>& probe_configs,
         pal::string_t* output);
 
     // Populate assemblies from the directory.
@@ -103,9 +97,6 @@ private:
         const pal::string_t& dir,
         const pal::string_t& dir_name,
         std::unordered_map<pal::string_t, pal::string_t>* dir_assemblies);
-
-    // Servicing index to resolve serviced assembly paths.
-    servicing_index_t m_svc;
 
     // Framework deps file.
     pal::string_t m_fx_dir;

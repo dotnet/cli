@@ -228,15 +228,14 @@ bool pal::file_exists(const string_t& path)
     return found;
 }
 
-void pal::readdir(const string_t& path, std::vector<pal::string_t>* list)
+void pal::readdir(const string_t& path, const string_t& pattern, std::vector<pal::string_t>* list)
 {
     assert(list != nullptr);
 
     std::vector<string_t>& files = *list;
 
     string_t search_string(path);
-    search_string.push_back(DIR_SEPARATOR);
-    search_string.push_back(L'*');
+    append_path(&search_string, pattern.c_str());
 
     WIN32_FIND_DATAW data;
     auto handle = ::FindFirstFileW(search_string.c_str(), &data);
@@ -246,4 +245,9 @@ void pal::readdir(const string_t& path, std::vector<pal::string_t>* list)
         files.push_back(filepath);
     } while (::FindNextFileW(handle, &data));
     ::FindClose(handle);
+}
+
+void pal::readdir(const string_t& path, std::vector<pal::string_t>* list)
+{
+    pal::readdir(path, _X("*"), list);
 }

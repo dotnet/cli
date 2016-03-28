@@ -9,6 +9,7 @@
 #include "deps_format.h"
 #include "deps_resolver.h"
 #include "utils.h"
+#include "fx_ver.h"
 
 namespace
 {
@@ -119,6 +120,84 @@ void deps_resolver_t::get_dir_assemblies(
     }
 }
 
+bool try_roll_forward(const deps_entry_t& entry,
+    const pal::string_t& probe_dir,
+    pal::string_t* candidate)
+{
+    const pal::string_t& lib_ver = entry.library_version;
+    fx_ver_t cur_ver(-1, -1, -1);
+    if (!fx_ver_t::parse(lib_ver, &cur_ver, false))
+    {
+        return false;
+    }
+
+    size_t pat_start = lib_ver.find(_X('.'), lib_ver.find(_X('.')) + 1);
+
+    pal::string_t path = probe_dir;
+    append_path(&path, entry.library_name.c_str());
+
+    pal::string_t maj_min = lib_ver.substr(0, pat_start);
+    maj_min.append(_X(".*"));
+
+    std::vector<pal::string_t> list;
+    pal::readdir(path, maj_min, &list);
+
+    fx_ver_t max(-1, -1, -1);
+    fx_ver_t tmp(-1, -1, -1);
+    for (const auto& str : list)
+    {
+        if (fx_ver_t::parse(str, &tmp, false) && tmp > max)
+        {
+            max = tmp;
+        }
+    }
+
+    if (max != fx_ver_t(-1, -1, -1))
+    {
+        pal::string_t max_str = max.as_str();
+        append_path(&path, max_str.c_str());
+        return entry.to_rel_path(path, candidate);
+    }
+
+    return false;
+}
+
+bool probe_entry_in_configs(const deps_entry_t& entry,
+    const std::vector<probe_config_t>& probe_configs,
+    pal::string_t* candidate)
+{
+    candidate->clear();
+    for (const auto& config : probe_configs)
+    {
+        if (config.only_serviceable_assets && !entry.is_serviceable)
+        {
+            continue;
+        }
+        if (config.only_runtime_assets && pal::strcasecmp(entry.asset_type.c_str(), _X("runtime")) != 0)
+        {
+            continue;
+        }
+        pal::string_t probe_dir = config.probe_dir;
+        assert(pal::directory_exists(probe_dir));
+        if (config.match_hash && entry.to_hash_matched_path(probe_dir, candidate))
+        {
+            assert(!config.roll_forward);
+            return true;
+        }
+        if (!config.roll_forward && entry.to_full_path(probe_dir, candidate))
+        {
+            return true;
+        }
+        if (config.roll_forward && try_roll_forward(entry, probe_dir, candidate))
+        {
+            return true;
+        }
+
+        // continue to try next probe config
+    }
+    return false;
+}
+
 // -----------------------------------------------------------------------------
 // Resolve coreclr directory from the deps file.
 //
@@ -128,20 +207,17 @@ void deps_resolver_t::get_dir_assemblies(
 //
 pal::string_t deps_resolver_t::resolve_coreclr_dir(
     const pal::string_t& app_dir,
-    const pal::string_t& package_dir,
-    const pal::string_t& package_cache_dir)
+    const std::vector<probe_config_t>& probe_configs)
 {
     auto process_coreclr = [&]
         (bool is_portable, const pal::string_t& deps_dir, deps_json_t* deps) -> pal::string_t
     {
         pal::string_t candidate;
 
-        // Servicing override.
         if (deps->has_coreclr_entry())
         {
             const deps_entry_t& entry = deps->get_coreclr_entry();
-            trace::verbose(_X("Probing for CoreCLR package=[%s][%s] in servicing"), entry.library_name.c_str(), entry.library_version.c_str());
-            if (entry.is_serviceable && m_svc.find_redirection(entry.library_name, entry.library_version, entry.relative_path, &candidate))
+            if (probe_entry_in_configs(entry, probe_configs, &candidate))
             {
                 return get_directory(candidate);
             }
@@ -149,21 +225,6 @@ pal::string_t deps_resolver_t::resolve_coreclr_dir(
         else
         {
             trace::verbose(_X("Deps has no coreclr entry."));
-        }
-
-        // Package cache.
-        pal::string_t coreclr_cache;
-        if (!package_cache_dir.empty())
-        {
-            if (deps->has_coreclr_entry())
-            {
-                const deps_entry_t& entry = deps->get_coreclr_entry();
-                trace::verbose(_X("Probing for CoreCLR package=[%s][%s] in package cache=[%s]"), entry.library_name.c_str(), entry.library_version.c_str(), package_cache_dir.c_str());
-                if (entry.to_hash_matched_path(package_cache_dir, &coreclr_cache))
-                {
-                    return get_directory(coreclr_cache);
-                }
-            }
         }
 
         // Deps directory: lookup relative path if portable, else look sxs.
@@ -180,39 +241,22 @@ pal::string_t deps_resolver_t::resolve_coreclr_dir(
                 }
             }
         }
-        else
-        {
-            // App main dir or standalone app dir.
-            trace::verbose(_X("Probing for CoreCLR in deps directory=[%s]"), deps_dir.c_str());
-            if (coreclr_exists_in_dir(deps_dir))
-            {
-                return deps_dir;
-            }
-        }
 
-        // Packages dir.
-        pal::string_t coreclr_package;
-        if (!package_dir.empty())
+        // App main dir or standalone app dir.
+        trace::verbose(_X("Probing for CoreCLR in deps directory=[%s]"), deps_dir.c_str());
+        if (coreclr_exists_in_dir(deps_dir))
         {
-            if (deps->has_coreclr_entry())
-            {
-                const deps_entry_t& entry = deps->get_coreclr_entry();
-                trace::verbose(_X("Probing for CoreCLR package=[%s][%s] in packages dir=[%s]"), entry.library_name.c_str(), entry.library_version.c_str(), package_dir.c_str());
-                if (entry.to_full_path(package_dir, &coreclr_package))
-                {
-                    return get_directory(coreclr_package);
-                }
-            }
+            return deps_dir;
         }
 
         return pal::string_t();
     };
 
-    trace::info(_X("--- Starting CoreCLR Proble from app deps.json"));
+    trace::info(_X("--- Starting CoreCLR Probe from app deps.json"));
     pal::string_t clr_dir = process_coreclr(m_portable, app_dir, m_deps.get());
     if (clr_dir.empty() && m_portable)
     {
-        trace::info(_X("--- Starting CoreCLR Proble from FX deps.json"));
+        trace::info(_X("--- Starting CoreCLR Probe from FX deps.json"));
         clr_dir = process_coreclr(false, m_fx_dir, m_fx_deps.get());
     }
     if (!clr_dir.empty())
@@ -252,19 +296,11 @@ pal::string_t deps_resolver_t::resolve_coreclr_dir(
 //
 void deps_resolver_t::resolve_tpa_list(
         const pal::string_t& app_dir,
-        const pal::string_t& package_dir,
-        const pal::string_t& package_cache_dir,
         const pal::string_t& clr_dir,
+        const std::vector<probe_config_t>& probe_configs,
         pal::string_t* output)
 {
     const std::vector<deps_entry_t> empty(0);
-
-    pal::string_t ni_package_cache_dir;
-    if (!package_cache_dir.empty())
-    {
-        ni_package_cache_dir = package_cache_dir;
-        append_path(&ni_package_cache_dir, get_arch());
-    }
 
     // Obtain the local assemblies in the app dir.
     get_dir_assemblies(app_dir, _X("local"), &m_local_assemblies);
@@ -288,19 +324,8 @@ void deps_resolver_t::resolve_tpa_list(
 
         trace::info(_X("Processing TPA for deps entry [%s, %s, %s]"), entry.library_name.c_str(), entry.library_version.c_str(), entry.relative_path.c_str());
 
-        // Is this a serviceable entry and is there an entry in the servicing index?
-        if (entry.is_serviceable && entry.library_type == _X("Package") &&
-                m_svc.find_redirection(entry.library_name, entry.library_version, entry.relative_path, &candidate))
-        {
-            add_tpa_asset(entry.asset_name, candidate, &items, output);
-        }
-        // Is an NI image for this entry present in the secondary package cache?
-        else if (entry.to_hash_matched_path(ni_package_cache_dir, &candidate))
-        {
-            add_tpa_asset(entry.asset_name, candidate, &items, output);
-        }
-        // Is this entry present in the secondary package cache?  (note: no .ni extension)
-        else if (entry.to_hash_matched_path(package_cache_dir, &candidate))
+        // Try to probe from the shared locations.
+        if (probe_entry_in_configs(entry, probe_configs, &candidate))
         {
             add_tpa_asset(entry.asset_name, candidate, &items, output);
         }
@@ -313,11 +338,6 @@ void deps_resolver_t::resolve_tpa_list(
         else if (dir_assemblies.count(entry.asset_name))
         {
             add_tpa_asset(entry.asset_name, dir_assemblies.find(entry.asset_name)->second, &items, output);
-        }
-        // Is this entry present in the package restore dir?
-        else if (!package_dir.empty() && deps->try_ni(entry).to_full_path(package_dir, &candidate))
-        {
-            add_tpa_asset(entry.asset_name, candidate, &items, output);
         }
     };
     
@@ -368,9 +388,8 @@ void deps_resolver_t::resolve_tpa_list(
 void deps_resolver_t::resolve_probe_dirs(
         const pal::string_t& asset_type,
         const pal::string_t& app_dir,
-        const pal::string_t& package_dir,
-        const pal::string_t& package_cache_dir,
         const pal::string_t& clr_dir,
+        const std::vector<probe_config_t>& probe_configs,
         pal::string_t* output)
 {
     assert(asset_type == _X("resources") || asset_type == _X("native"));
@@ -392,36 +411,17 @@ void deps_resolver_t::resolve_probe_dirs(
     const auto& entries = m_deps->get_entries(entry_type);
     const auto& fx_entries = m_portable ? m_fx_deps->get_entries(entry_type) : empty;
 
-    // Fill the "output" with serviced DLL directories if they are serviceable
-    // and have an entry present.
-    auto add_serviced_entry = [&](const deps_entry_t& entry)
-    {
-        pal::string_t redirection_path;
-        if (entry.is_serviceable && entry.library_type == _X("Package") &&
-                m_svc.find_redirection(entry.library_name, entry.library_version, entry.relative_path, &redirection_path))
-        {
-            add_unique_path(asset_type, action(redirection_path), &items, output);
-        }
-    };
-
-    std::for_each(entries.begin(), entries.end(), add_serviced_entry);
-    std::for_each(fx_entries.begin(), fx_entries.end(), add_serviced_entry);
-
     pal::string_t candidate;
 
-    // Take care of the secondary cache path
-    if (!package_cache_dir.empty())
+    auto add_package_cache_entry = [&](const deps_entry_t& entry)
     {
-        auto add_package_cache_entry = [&](const deps_entry_t& entry)
+        if (probe_entry_in_configs(entry, probe_configs, &candidate))
         {
-            if (entry.to_hash_matched_path(package_cache_dir, &candidate))
-            {
-                add_unique_path(asset_type, action(candidate), &items, output);
-            }
-        };
-        std::for_each(entries.begin(), entries.end(), add_package_cache_entry);
-        std::for_each(fx_entries.begin(), fx_entries.end(), add_package_cache_entry);
-    }
+            add_unique_path(asset_type, action(candidate), &items, output);
+        }
+    };
+    std::for_each(entries.begin(), entries.end(), add_package_cache_entry);
+    std::for_each(fx_entries.begin(), fx_entries.end(), add_package_cache_entry);
 
     // For portable path, the app relative directory must be used.
     if (m_portable)
@@ -444,20 +444,6 @@ void deps_resolver_t::resolve_probe_dirs(
         add_unique_path(asset_type, m_fx_dir, &items, output);
     }
 
-    // Take care of the package restore path
-    if (!package_dir.empty())
-    {
-        auto add_packages_entry = [&](const deps_entry_t& entry)
-        {
-            if (entry.asset_type == asset_type && entry.to_full_path(package_dir, &candidate))
-            {
-                add_unique_path(asset_type, action(candidate), &items, output);
-            }
-        };
-        std::for_each(entries.begin(), entries.end(), add_packages_entry);
-        std::for_each(fx_entries.begin(), fx_entries.end(), add_packages_entry);
-    }
-
     // CLR path
     add_unique_path(asset_type, clr_dir, &items, output);
 }
@@ -477,13 +463,12 @@ void deps_resolver_t::resolve_probe_dirs(
 //
 bool deps_resolver_t::resolve_probe_paths(
     const pal::string_t& app_dir,
-    const pal::string_t& package_dir,
-    const pal::string_t& package_cache_dir,
     const pal::string_t& clr_dir,
+    const std::vector<probe_config_t>& probe_configs,
     probe_paths_t* probe_paths)
 {
-    resolve_tpa_list(app_dir, package_dir, package_cache_dir, clr_dir, &probe_paths->tpa);
-    resolve_probe_dirs(_X("native"), app_dir, package_dir, package_cache_dir, clr_dir, &probe_paths->native);
-    resolve_probe_dirs(_X("resources"), app_dir, package_dir, package_cache_dir, clr_dir, &probe_paths->resources);
+    resolve_tpa_list(app_dir, clr_dir, probe_configs, &probe_paths->tpa);
+    resolve_probe_dirs(_X("native"), app_dir, clr_dir, probe_configs, &probe_paths->native);
+    resolve_probe_dirs(_X("resources"), app_dir, clr_dir, probe_configs, &probe_paths->resources);
     return true;
 }
