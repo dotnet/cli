@@ -27,7 +27,7 @@ const deps_entry_t& deps_json_t::try_ni(const deps_entry_t& entry) const
 void deps_json_t::reconcile_libraries_with_targets(
     const json_value& json,
     const std::function<bool(const pal::string_t&)>& library_exists_fn,
-    const std::function<const std::vector<pal::string_t>&(const pal::string_t&, int)>& get_rel_paths_by_asset_type_fn)
+    const std::function<const std::vector<pal::string_t>&(const pal::string_t&, int, bool*)>& get_rel_paths_by_asset_type_fn)
 {
     const auto& libraries = json.at(_X("libraries")).as_object();
     for (const auto& library : libraries)
@@ -52,7 +52,8 @@ void deps_json_t::reconcile_libraries_with_targets(
 
         for (int i = 0; i < s_known_asset_types.size(); ++i)
         {
-            for (const auto& rel_path : get_rel_paths_by_asset_type_fn(library.first, i))
+            bool rid_specific = false;
+            for (const auto& rel_path : get_rel_paths_by_asset_type_fn(library.first, i, &rid_specific))
             {
                 bool ni_dll = false;
                 auto asset_name = get_filename_without_ext(rel_path);
@@ -72,6 +73,7 @@ void deps_json_t::reconcile_libraries_with_targets(
                 entry.asset_type = s_known_asset_types[i];
                 entry.relative_path = rel_path;
                 entry.is_serviceable = serviceable;
+                entry.is_rid_specific = rid_specific;
 
                 // TODO: Deps file does not follow spec. It uses '\\', should use '/'
                 replace_char(&entry.relative_path, _X('\\'), _X('/'));
@@ -243,7 +245,9 @@ bool deps_json_t::load_portable(const json_value& json, const pal::string_t& tar
     };
 
     std::vector<pal::string_t> empty;
-    auto get_relpaths = [&rid_assets, &non_rid_assets, &empty](const pal::string_t& package, int type_index) -> const std::vector<pal::string_t>& {
+    auto get_relpaths = [&rid_assets, &non_rid_assets, &empty](const pal::string_t& package, int type_index, bool* rid_specific) -> const std::vector<pal::string_t>& {
+
+        *rid_specific = false;
 
         // Is there any rid specific assets for this type ("native" or "runtime" or "resources")
         if (rid_assets.count(package) && !rid_assets[package].empty())
@@ -251,6 +255,7 @@ bool deps_json_t::load_portable(const json_value& json, const pal::string_t& tar
             const auto& assets_by_type = rid_assets[package].begin()->second[type_index];
             if (!assets_by_type.empty())
             {
+                *rid_specific = true;
                 return assets_by_type;
             }
 
@@ -283,7 +288,8 @@ bool deps_json_t::load_standalone(const json_value& json, const pal::string_t& t
         return assets.count(package);
     };
 
-    auto get_relpaths = [&assets](const pal::string_t& package, int type_index) -> const std::vector<pal::string_t>& {
+    auto get_relpaths = [&assets](const pal::string_t& package, int type_index, bool* rid_specific) -> const std::vector<pal::string_t>& {
+        *rid_specific = false;
         return assets[package][type_index];
     };
 

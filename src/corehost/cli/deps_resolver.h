@@ -24,17 +24,18 @@ struct probe_paths_t
 class deps_resolver_t
 {
 public:
-    deps_resolver_t(const pal::string_t& fx_dir, const runtime_config_t* config, const arguments_t& args)
-        : m_fx_dir(fx_dir)
+    deps_resolver_t(const corehost_init_t* init, const runtime_config_t& config, const arguments_t& args)
+        : m_fx_dir(init->fx_dir())
+        , m_app_dir(args.app_dir)
         , m_coreclr_index(-1)
-        , m_portable(config->get_portable())
+        , m_portable(config.get_portable())
         , m_deps(nullptr)
         , m_fx_deps(nullptr)
     {
         m_deps_file = args.deps_path;
         if (m_portable)
         {
-            m_fx_deps_file = get_fx_deps(fx_dir, config->get_fx_name());
+            m_fx_deps_file = get_fx_deps(m_fx_dir, config.get_fx_name());
             trace::verbose(_X("Using %s FX deps file"), m_fx_deps_file.c_str());
             trace::verbose(_X("Using %s deps file"), m_deps_file.c_str());
             m_fx_deps = std::unique_ptr<deps_json_t>(new deps_json_t(false, m_fx_deps_file));
@@ -44,19 +45,30 @@ public:
         {
             m_deps = std::unique_ptr<deps_json_t>(new deps_json_t(false, m_deps_file));
         }
+
+        // Packages probe. TODO: Remove the default probe dir support.
+        m_additional_probe = init->probe_dir();
+        if (m_additional_probe.empty() || !pal::directory_exists(m_additional_probe))
+        {
+            (void)pal::get_default_packages_directory(&m_additional_probe);
+        }
+        trace::info(_X("Package directory: %s"), m_additional_probe.empty() ? _X("not specified") : m_additional_probe.c_str());
+
+        setup_probe_config(init, config, args);
     }
 
     bool valid() { return m_deps->is_valid() && (!m_portable || m_fx_deps->is_valid());  }
 
+    void setup_probe_config(
+        const corehost_init_t* init,
+        const runtime_config_t& config,
+        const arguments_t& args);
+
     bool resolve_probe_paths(
-      const pal::string_t& app_dir,
       const pal::string_t& clr_dir,
-      const std::vector<probe_config_t>& probe_configs,
       probe_paths_t* probe_paths);
 
-    pal::string_t resolve_coreclr_dir(
-        const pal::string_t& app_dir,
-        const std::vector<probe_config_t>& probe_configs);
+    pal::string_t resolve_coreclr_dir();
 
     const pal::string_t& get_fx_deps_file() const
     {
@@ -79,17 +91,13 @@ private:
 
     // Resolve order for TPA lookup.
     void resolve_tpa_list(
-        const pal::string_t& app_dir,
         const pal::string_t& clr_dir,
-        const std::vector<probe_config_t>& probe_configs,
         pal::string_t* output);
 
     // Resolve order for culture and native DLL lookup.
     void resolve_probe_dirs(
         const pal::string_t& asset_type,
-        const pal::string_t& app_dir,
         const pal::string_t& clr_dir,
-        const std::vector<probe_config_t>& probe_configs,
         pal::string_t* output);
 
     // Populate assemblies from the directory.
@@ -101,7 +109,6 @@ private:
     // Probe entry in probe configurations.
     bool probe_entry_in_configs(
         const deps_entry_t& entry,
-        const std::vector<probe_config_t>& probe_configs,
         pal::string_t* candidate);
 
     // Try auto roll forward, if not return entry in probe dir.
@@ -112,6 +119,8 @@ private:
 
     // Framework deps file.
     pal::string_t m_fx_dir;
+
+    pal::string_t m_app_dir;
 
     // Map of simple name -> full path of local/fx assemblies populated
     // in priority order of their extensions.
@@ -136,8 +145,13 @@ private:
     // Deps files for the app
     std::unique_ptr<deps_json_t>  m_deps;
 
+    std::vector<probe_config_t> m_probes;
+
     // Is the deps file valid
     bool m_deps_valid;
+
+    // Fallback probe dir
+    pal::string_t m_additional_probe;
 
     // Is the deps file portable app?
     bool m_portable;

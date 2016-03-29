@@ -15,54 +15,10 @@
 
 corehost_init_t* g_init = nullptr;
 
-void setup_probe_config(const corehost_init_t* init,
-    const runtime_config_t& config,
-    const arguments_t& args,
-    std::vector<probe_config_t>* configs)
-{
-    if (pal::directory_exists(args.dotnet_extensions))
-    {
-        pal::string_t ext_ni = args.dotnet_extensions;
-        append_path(&ext_ni, get_arch());
-        if (pal::directory_exists(ext_ni))
-        {
-            // Servicing NGEN probe.
-            configs->push_back(probe_config_t(ext_ni, false, config.get_fx_roll_fwd(), true, true)); // no hash match, roll forward, only serviceable
-        }
-
-        // Servicing normal probe.
-        configs->push_back(probe_config_t(args.dotnet_extensions, false, config.get_fx_roll_fwd(), true, false)); // no hash match, roll forward, only serviceable
-    }
-
-    if (pal::directory_exists(args.dotnet_packages_cache))
-    {
-        pal::string_t ni_packages_cache = args.dotnet_packages_cache;
-        append_path(&ni_packages_cache, get_arch());
-        if (pal::directory_exists(ni_packages_cache))
-        {
-            configs->push_back(probe_config_t(ni_packages_cache, true, false, false, true)); // hash match, no roll forward, non-serviceable also
-        }
-        configs->push_back(probe_config_t(args.dotnet_packages_cache, true, false, false, false)); // hash match, no roll forward, non-serviceable also
-    }
-
-    // Packages probe. TODO: Remove the default probe dir support.
-    pal::string_t packages_dir = init->probe_dir();
-    if (packages_dir.empty() || !pal::directory_exists(packages_dir))
-    {
-        (void)pal::get_default_packages_directory(&packages_dir);
-    }
-    trace::info(_X("Package directory: %s"), packages_dir.empty() ? _X("not specified") : packages_dir.c_str());
-
-    if (pal::directory_exists(packages_dir))
-    {
-        configs->push_back(probe_config_t(packages_dir, false, false, false, false)); // no hash match, no roll forward, non-serviceable also
-    }
-}
-
 int run(const corehost_init_t* init, const runtime_config_t& config, const arguments_t& args)
 {
     // Load the deps resolver
-    deps_resolver_t resolver(init->fx_dir(), &config, args);
+    deps_resolver_t resolver(init, config, args);
 
     if (!resolver.valid())
     {
@@ -70,10 +26,7 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
         return StatusCode::ResolverInitFailure;
     }
 
-    std::vector<probe_config_t> probe_configs;
-    setup_probe_config(init, config, args, &probe_configs);
-
-    pal::string_t clr_path = resolver.resolve_coreclr_dir(args.app_dir, probe_configs);
+    pal::string_t clr_path = resolver.resolve_coreclr_dir();
     if (clr_path.empty() || !pal::realpath(&clr_path))
     {
         trace::error(_X("Could not resolve coreclr path"));
@@ -85,7 +38,7 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
     }
 
     probe_paths_t probe_paths;
-    if (!resolver.resolve_probe_paths(args.app_dir, clr_path, probe_configs, &probe_paths))
+    if (!resolver.resolve_probe_paths(clr_path, &probe_paths))
     {
         return StatusCode::ResolverResolveFailure;
     }
@@ -235,6 +188,11 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
 SHARED_API int corehost_load(corehost_init_t* init)
 {
     g_init = init;
+    if (g_init->version() != corehost_init_t::s_version)
+    {
+        trace::error(_X("The structure of init data has changed, do not know how to interpret it"));
+        return StatusCode::LibHostInitFailure;
+    }
     return 0;
 }
 

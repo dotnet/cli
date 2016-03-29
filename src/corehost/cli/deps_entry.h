@@ -26,6 +26,7 @@ struct deps_entry_t
     pal::string_t asset_name;
     pal::string_t relative_path;
     bool is_serviceable;
+    bool is_rid_specific;
 
     // Given a "base" dir, yield the relative path in the package layout.
     bool to_rel_path(const pal::string_t& base, pal::string_t* str) const;

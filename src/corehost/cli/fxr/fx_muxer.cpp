@@ -262,13 +262,13 @@ int fx_muxer_t::execute(const int argc, const pal::char_t* argv[])
         {
             trace::verbose(_X("Executing as a portable app as per config file [%s]"), config_file.c_str());
             pal::string_t fx_dir = resolve_fx_dir(own_dir, &config);
-            corehost_init_t init(_X(""), _X(""), fx_dir, host_mode_t::muxer, &config);
+            corehost_init_t init(_X(""), config.get_probe_paths(), fx_dir, host_mode_t::muxer, &config);
             return execute_app(fx_dir, &init, argc, argv);
         }
         else
         {
             trace::verbose(_X("Executing as a standlone app as per config file [%s]"), config_file.c_str());
-            corehost_init_t init(_X(""), _X(""), _X(""), host_mode_t::muxer, &config);
+            corehost_init_t init(_X(""), config.get_probe_paths(), _X(""), host_mode_t::muxer, &config);
             return execute_app(get_directory(app_path), &init, argc, argv);
         }
     }
