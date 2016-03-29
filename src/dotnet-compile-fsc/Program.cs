@@ -10,6 +10,7 @@ using System.Text;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.ProjectModel.Resolution;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Compiler.Fsc
@@ -222,7 +223,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             File.WriteAllLines(rsp, allArgs, Encoding.UTF8);
 
             // Execute FSC!
-            var result = RunFsc(new List<string> { $"@{rsp}" })
+            var result = RunFsc(new List<string> { $"@{rsp}" }, tempOutDir)
                 .ForwardStdErr()
                 .ForwardStdOut()
                 .Execute();
@@ -265,7 +266,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             yield return sourceFiles.Last();
         }
 
-        private static Command RunFsc(List<string> fscArgs)
+        private static Command RunFsc(List<string> fscArgs, string temp)
         {
             var fscEnvExe = Environment.GetEnvironmentVariable("DOTNET_FSC_PATH");
             var exec = Environment.GetEnvironmentVariable("DOTNET_FSC_EXEC")?.ToUpper() ?? "COREHOST";
@@ -287,24 +288,24 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             }
             else
             {
-                var fscCommandSpec = ResolveFsc(fscArgs);
-                return Command.Create(fscCommandSpec);
+                return ResolveFsc(fscArgs, temp);
             }
         }
 
-        private static CommandSpec ResolveFsc(List<string> fscArgs)
+        private static Command ResolveFsc(List<string> fscArgs, string temp)
         {
-            var depsResolver = new DepsJsonCommandResolver();
-            var myDepsFile = Path.Combine(AppContext.BaseDirectory, "dotnet-compile-fsc.deps.json");
+            var depsFile = Path.Combine(AppContext.BaseDirectory, "dotnet-compile-fsc" + FileNameSuffixes.DepsJson);
+            var runtimeConfigFile = Path.Combine(AppContext.BaseDirectory, "dotnet-compile-fsc" + FileNameSuffixes.RuntimeConfigJson);
+            var nugetPackagesRoot = PackageDependencyProvider.ResolvePackagesPath(null, null);
 
-            var commandResolverArgs = new CommandResolverArguments()
-            {
-                CommandName = "dotnet-compile-fsc",
-                CommandArguments = fscArgs,
-                DepsJsonFile = myDepsFile
-            };
+            var commandFactory = new DepsJsonCommandFactory(
+                    depsFile, 
+                    runtimeConfigFile,
+                    nugetPackagesRoot,
+                    temp
+                );
 
-            return depsResolver.Resolve(commandResolverArgs);
+            return (Command) commandFactory.Create("fsc", fscArgs);
         }
     }
 }

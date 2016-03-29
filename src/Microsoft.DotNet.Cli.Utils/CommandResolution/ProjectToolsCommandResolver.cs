@@ -52,6 +52,8 @@ namespace Microsoft.DotNet.Cli.Utils
                 commandResolverArguments.CommandName, 
                 commandResolverArguments.CommandArguments.OrEmptyIfNull(),
                 commandResolverArguments.ProjectDirectory);
+
+
         }
 
         private CommandSpec ResolveFromProjectTools(
@@ -105,9 +107,9 @@ namespace Microsoft.DotNet.Cli.Utils
             var lockFile = GetToolLockFile(toolLibrary, nugetPackagesRoot);
             var lockFilePackageLibrary = lockFile.PackageLibraries.FirstOrDefault(l => l.Name == toolLibrary.Name);
 
-            var depsFileRoot = Path.GetDirectoryName(lockFile.LockFilePath);
-            var depsFilePath = GetToolDepsFilePath(toolLibrary, lockFile, depsFileRoot);
-
+            var toolHiveRoot = Path.GetDirectoryName(lockFile.LockFilePath);
+            var depsFilePath = GetToolDepsFilePath(toolLibrary, lockFile, toolHiveRoot);
+            
             var toolProjectContext = new ProjectContextBuilder()
                     .WithLockFile(lockFile)
                     .WithTargetFramework(s_toolPackageFramework.ToString())
@@ -115,7 +117,7 @@ namespace Microsoft.DotNet.Cli.Utils
 
             var exporter = toolProjectContext.CreateExporter(Constants.DefaultConfiguration);
 
-            return _packagedCommandSpecFactory.CreateCommandSpecFromLibrary(
+            var commandSpec = _packagedCommandSpecFactory.CreateCommandSpecFromLibrary(
                     lockFilePackageLibrary,
                     commandName,
                     args,
@@ -123,6 +125,23 @@ namespace Microsoft.DotNet.Cli.Utils
                     projectContext.PackagesDirectory,
                     s_commandResolutionStrategy,
                     depsFilePath);
+
+            if (commandSpec == null)
+            {
+                return null;
+            }
+
+            // So an tool can access it's runtime config via AppContext.BaseDirectory
+            var commandPath = GetCommandPath(
+                lockFilePackageLibrary,
+                commandName,
+                _allowedCommandExtensions,
+                nugetPackagesRoot);
+
+            var runtimeConfigPath = GetToolRuntimeConfigFilePath(commandPath);
+            CopyRuntimeConfigToToolHive(toolHiveRoot, runtimeConfigPath);
+
+            return commandSpec;
         }
 
         private LockFile GetToolLockFile(
@@ -191,6 +210,62 @@ namespace Microsoft.DotNet.Cli.Utils
             EnsureToolJsonDepsFileExists(toolLibrary, toolLockFile, depsJsonPath);
 
             return depsJsonPath;
+        }
+
+        private string GetToolRuntimeConfigFilePath(string commandPath)
+        {
+            var commandName = Path.GetFileNameWithoutExtension(commandPath);
+            var commandDirectory = Path.GetDirectoryName(commandPath);
+
+            return Path.Combine(commandDirectory, commandName + FileNameSuffixes.RuntimeConfigJson);
+        }
+
+        private void CopyRuntimeConfigToToolHive(string toolHiveRoot, string runtimeConfigPath)
+        {
+            var destFile = Path.Combine(
+                toolHiveRoot,
+                Path.GetFileName(runtimeConfigPath));
+
+            if (runtimeConfigPath == null || toolHiveRoot == null)
+            {
+                return;
+            }
+
+            if (!File.Exists(runtimeConfigPath))
+            {
+                Reporter.Verbose.WriteLine($"Runtime config doesn't exist for tool at {runtimeConfigPath}");
+                return;
+            }
+
+            try
+            {
+                if (!File.Exists(destFile))
+                {
+                    File.Copy(runtimeConfigPath, toolHiveRoot);
+                }
+            }
+            catch(Exception e)
+            {
+                Reporter.Error.WriteLine($"Failed to copy runtimeconfig from ${runtimeConfigPath} to ${toolHiveRoot}");
+                throw e;
+            }
+        }
+
+        private string GetCommandPath(
+            LockFilePackageLibrary library, 
+            string commandName, 
+            IEnumerable<string> allowedExtensions,
+            string nugetPackagesRoot)
+        {
+            var packageDirectory = new VersionFolderPathResolver(nugetPackagesRoot)
+                .GetInstallPath(library.Name, library.Version);
+
+            var commandRelativePath = library.Files
+                    .Where(f => Path.GetFileNameWithoutExtension(f) == commandName)
+                    .Where(e => allowedExtensions.Contains(Path.GetExtension(e)))
+                    .FirstOrDefault();
+
+            return Path.Combine(packageDirectory, commandRelativePath);
         }
 
         private void EnsureToolJsonDepsFileExists(

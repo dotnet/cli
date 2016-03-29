@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.Cli.Utils
             return packageDirectory;
         }
 
-        private string GetCommandFileRelativePath(
+        internal string GetCommandFileRelativePath(
             LockFilePackageLibrary library, 
             string commandName, 
             IEnumerable<string> allowedExtensions)
