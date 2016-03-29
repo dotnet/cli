@@ -15,12 +15,6 @@ namespace Microsoft.DotNet.Cli.Build
     {
         public static readonly dynamic[] TestPackageProjects = new[]
         {
-            new { Name = "Microsoft.DotNet.Cli.Utils", IsTool = false, Path = "src/Microsoft.DotNet.Cli.Utils", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) },
-            new { Name = "Microsoft.DotNet.ProjectModel", IsTool = false, Path = "src/Microsoft.DotNet.ProjectModel", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) },
-            new { Name = "Microsoft.DotNet.Compiler.Common", IsTool = false, Path = "src/Microsoft.DotNet.Compiler.Common", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) },
-            new { Name = "Microsoft.Extensions.DependencyModel", IsTool = false, Path = "src/Microsoft.Extensions.DependencyModel", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) },
-            new { Name = "Microsoft.DotNet.Files", IsTool = false, Path = "src/Microsoft.DotNet.Files", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) },
-            new { Name = "Microsoft.DotNet.InternalAbstractions", IsTool = false, Path = "src/Microsoft.DotNet.InternalAbstractions", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) },
             new { Name = "dotnet-dependency-tool-invoker", IsTool = true, Path = "TestAssets/TestPackages/dotnet-dependency-tool-invoker", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) }, 
             new { Name = "dotnet-desktop-and-portable", IsTool = true, Path = "TestAssets/TestPackages/dotnet-desktop-and-portable", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) },
             new { Name = "dotnet-hello", IsTool = true, Path = "TestAssets/TestPackages/dotnet-hello/v1/dotnet-hello", IsApplicable = new Func<bool>(() => true) }, 
@@ -91,7 +85,10 @@ namespace Microsoft.DotNet.Cli.Build
 
             var dotnet = DotNetCli.Stage2;
 
-            dotnet.Restore("--verbosity", "verbose", "--disable-parallel", "--fallbacksource", Dirs.TestPackages, "--fallbacksource", Dirs.Packages)
+            dotnet.Restore("--verbosity", "verbose", 
+                "--disable-parallel", 
+                "--fallbacksource", Dirs.TestPackages,
+                "--fallbacksource", Dirs.Packages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects"))
                 .Execute().EnsureSuccessful();
 
@@ -113,14 +110,17 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var dotnet = DotNetCli.Stage2;
 
-            dotnet.Restore("--verbosity", "verbose", "--disable-parallel", "--fallbacksource", Dirs.TestPackages)
+            dotnet.Restore("--verbosity", "verbose", 
+                "--disable-parallel", 
+                "--fallbacksource", Dirs.TestPackages, 
+                "--fallbacksource", Dirs.Packages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "DesktopTestProjects"))
                 .Execute().EnsureSuccessful();
                 
             return c.Success();
         }
 
-        [Target(nameof(CleanTestPackages))]
+        [Target(nameof(CleanTestPackages), nameof(CleanProductPackages))]
         public static BuildTargetResult BuildTestAssetPackages(BuildTargetContext c)
         {
             CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages"));
