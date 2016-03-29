@@ -41,7 +41,7 @@ namespace Microsoft.Extensions.DependencyModel.Resolution
 
         public bool TryResolveAssemblyPaths(CompilationLibrary library, List<string> assemblies)
         {
-            if (!string.Equals(library.Type, "referenceassembly", StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(library.Type, "reference", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }

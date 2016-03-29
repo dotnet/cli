@@ -8,6 +8,7 @@ using Microsoft.DotNet.ProjectModel.Files;
 using Microsoft.DotNet.ProjectModel.Graph;
 using NuGet.Frameworks;
 using NuGet.Versioning;
+using NuGet.LibraryModel;
 
 namespace Microsoft.DotNet.ProjectModel
 {
@@ -62,9 +63,9 @@ namespace Microsoft.DotNet.ProjectModel
 
         public Version AssemblyFileVersion { get; set; }
 
-        public IList<LibraryRange> Dependencies { get; set; }
+        public IList<ProjectLibraryDependency> Dependencies { get; set; }
 
-        public List<LibraryRange> Tools { get; set; }
+        public List<ProjectLibraryDependency> Tools { get; set; }
 
         public string EntryPoint { get; set; }
 

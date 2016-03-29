@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Graph;
 using NuGet.RuntimeModel;
+using NuGet.LibraryModel;
+using NuGet.ProjectModel;
+using NuGet.RuntimeModel;
 using System.IO;
 using Microsoft.Extensions.DependencyModel;
 

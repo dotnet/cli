@@ -6,6 +6,8 @@ using System.Linq;
 using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Server.Helpers;
+using NuGet.ProjectModel;
+using NuGet.LibraryModel;
 
 namespace Microsoft.DotNet.ProjectModel.Server.Models
 {
@@ -62,10 +64,10 @@ namespace Microsoft.DotNet.ProjectModel.Server.Models
                 Name = library.Identity.Name,
                 DisplayName = library.Identity.Name,
                 Version = library.Identity.Version?.ToNormalizedString(),
-                Type = library.Identity.Type.Value,
+                Type = library.Identity.Type,
                 Resolved = library.Resolved,
                 Path = library.Path,
-                Dependencies = library.Dependencies.Select(dependency => GetDependencyItem(dependency, exportsLookup)),
+                Dependencies = library.Dependencies.Select(dependency => GetDependencyItem(dependency.LibraryRange, exportsLookup)),
                 Errors = diagnostics.Where(d => d.Severity == DiagnosticMessageSeverity.Error)
                                     .Select(d => new DiagnosticMessageView(d)),
                 Warnings = diagnostics.Where(d => d.Severity == DiagnosticMessageSeverity.Warning)

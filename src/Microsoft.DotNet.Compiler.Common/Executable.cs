@@ -14,6 +14,7 @@ using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.Extensions.DependencyModel;
 using NuGet.Frameworks;
+using NuGet.LibraryModel;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 
@@ -21,6 +22,9 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
 {
     public class Executable
     {
+        private static readonly LibraryDependencyType PlatformDependencyType
+            = LibraryDependencyType.Parse(new [] { "platform" });
+
         private readonly ProjectContext _context;
 
         private readonly LibraryExporter _exporter;
@@ -131,7 +135,7 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
                 json.Add("runtimeOptions", runtimeOptions);
 
                 var redistPackage = _context.RootProject.Dependencies
-                    .Where(r => r.Type.Equals(LibraryDependencyType.Platform))
+                    .Where(r => r.Type.Equals(PlatformDependencyType))
                     .ToList();
                 if(redistPackage.Count > 0)
                 {

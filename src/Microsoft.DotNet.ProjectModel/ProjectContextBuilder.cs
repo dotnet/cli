@@ -9,6 +9,8 @@ using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Resolution;
 using Microsoft.Extensions.Internal;
 using NuGet.Frameworks;
+using NuGet.ProjectModel;
+using NuGet.LibraryModel;
 
 namespace Microsoft.DotNet.ProjectModel
 {
@@ -211,7 +213,7 @@ namespace Microsoft.DotNet.ProjectModel
                 diagnostics.Add(new DiagnosticMessage(
                     ErrorCodes.NU1009,
                     $"The expected lock file doesn't exist. Please run \"dotnet restore\" to generate a new lock file.",
-                    Path.Combine(Project.ProjectDirectory, LockFile.FileName),
+                    Path.Combine(Project.ProjectDirectory, LockFileFormat.LockFileName),
                     DiagnosticMessageSeverity.Error));
             }
 
@@ -220,7 +222,7 @@ namespace Microsoft.DotNet.ProjectModel
                 diagnostics.Add(new DiagnosticMessage(
                     ErrorCodes.NU1006,
                     $"{lockFileValidationMessage}. Please run \"dotnet restore\" to generate a new lock file.",
-                    Path.Combine(Project.ProjectDirectory, LockFile.FileName),
+                    Path.Combine(Project.ProjectDirectory, LockFileFormat.LockFileName),
                     DiagnosticMessageSeverity.Warning));
             }
 
@@ -286,7 +288,10 @@ namespace Microsoft.DotNet.ProjectModel
                 var package = library as PackageDescription;
                 if (package != null && package.Resolved && !package.CompileTimeAssemblies.Any())
                 {
-                    var replacement = referenceAssemblyDependencyResolver.GetDescription(new LibraryRange(library.Identity.Name, LibraryType.ReferenceAssembly), TargetFramework);
+                    var replacement = referenceAssemblyDependencyResolver.GetDescription(new ProjectLibraryDependency()
+                    {
+                        LibraryRange = new LibraryRange(library.Identity.Name, null, LibraryDependencyTarget.Reference)
+                    }, TargetFramework);
                     if (replacement?.Resolved == true)
                     {
                         requiresFrameworkAssemblies = true;
@@ -295,7 +300,7 @@ namespace Microsoft.DotNet.ProjectModel
                         libraries.Remove(pair.Key);
 
                         // Insert a reference assembly key if there isn't one
-                        var key = new LibraryKey(replacement.Identity.Name, LibraryType.ReferenceAssembly);
+                        var key = new LibraryKey(replacement.Identity.Name, LibraryDependencyTarget.Reference);
                         if (!libraries.ContainsKey(key))
                         {
                             libraries[key] = replacement;
@@ -310,16 +315,16 @@ namespace Microsoft.DotNet.ProjectModel
                 library.Framework = library.Framework ?? TargetFramework;
                 foreach (var dependency in library.Dependencies)
                 {
-                    var keyType = dependency.Target == LibraryType.ReferenceAssembly ?
-                                  LibraryType.ReferenceAssembly :
-                                  LibraryType.Unspecified;
+                    var keyType = dependency.LibraryRange.TypeConstraint == LibraryDependencyTarget.Reference ?
+                                  LibraryDependencyTarget.Reference :
+                                  LibraryDependencyTarget.All;
 
                     var key = new LibraryKey(dependency.Name, keyType);
 
                     LibraryDescription dependencyDescription;
                     if (!libraries.TryGetValue(key, out dependencyDescription))
                     {
-                        if (keyType == LibraryType.ReferenceAssembly)
+                        if (keyType == LibraryDependencyTarget.Reference)
                         {
                             // a dependency is specified to be reference assembly but fail to match
                             // then add a unresolved dependency
@@ -327,7 +332,7 @@ namespace Microsoft.DotNet.ProjectModel
                                                     UnresolvedDependencyProvider.GetDescription(dependency, TargetFramework);
                             libraries[key] = dependencyDescription;
                         }
-                        else if (!libraries.TryGetValue(new LibraryKey(dependency.Name, LibraryType.ReferenceAssembly), out dependencyDescription))
+                        else if (!libraries.TryGetValue(new LibraryKey(dependency.Name, LibraryDependencyTarget.Reference), out dependencyDescription))
                         {
                             // a dependency which type is unspecified fails to match, then try to find a 
                             // reference assembly type dependency
@@ -347,7 +352,7 @@ namespace Microsoft.DotNet.ProjectModel
             foreach (var library in target.Libraries)
             {
                 LibraryDescription description = null;
-                var type = LibraryType.Unspecified;
+                var type = LibraryDependencyTarget.None;
 
                 if (string.Equals(library.Type, "project"))
                 {
@@ -359,7 +364,7 @@ namespace Microsoft.DotNet.ProjectModel
                         description = projectDependencyProvider.GetDescription(library.Name, path, library, ProjectResolver);
                     }
 
-                    type = LibraryType.Project;
+                    type = LibraryDependencyTarget.Project;
                 }
                 else
                 {
@@ -370,10 +375,10 @@ namespace Microsoft.DotNet.ProjectModel
                         description = packageResolver.GetDescription(TargetFramework, packageEntry, library);
                     }
 
-                    type = LibraryType.Package;
+                    type = LibraryDependencyTarget.Package;
                 }
 
-                description = description ?? UnresolvedDependencyProvider.GetDescription(new LibraryRange(library.Name, type), target.TargetFramework);
+                description = description ?? UnresolvedDependencyProvider.GetDescription(new ProjectLibraryDependency(new LibraryRange(library.Name, type)), target.TargetFramework);
 
                 libraries.Add(new LibraryKey(library.Name), description);
             }
@@ -427,47 +432,47 @@ namespace Microsoft.DotNet.ProjectModel
 
         private static LockFile ResolveLockFile(string projectDir)
         {
-            var projectLockJsonPath = Path.Combine(projectDir, LockFile.FileName);
+            var projectLockJsonPath = Path.Combine(projectDir, LockFileFormat.LockFileName);
             return File.Exists(projectLockJsonPath) ?
-                        LockFileReader.Read(Path.Combine(projectDir, LockFile.FileName)) :
+                        new LockFileFormat().Read(Path.Combine(projectDir, LockFileFormat.LockFileName)) :
                         null;
         }
 
         private struct LibraryKey
         {
-            public LibraryKey(string name) : this(name, LibraryType.Unspecified)
+            public LibraryKey(string name) : this(name, LibraryDependencyTarget.All)
             {
             }
 
-            public LibraryKey(string name, LibraryType libraryType)
+            public LibraryKey(string name, LibraryDependencyTarget target)
             {
                 Name = name;
-                LibraryType = libraryType;
+                Target = target;
             }
 
             public string Name { get; }
-            public LibraryType LibraryType { get; }
+            public LibraryDependencyTarget Target { get; }
 
             public override bool Equals(object obj)
             {
                 var otherKey = (LibraryKey)obj;
 
                 return string.Equals(otherKey.Name, Name, StringComparison.Ordinal) &&
-                    otherKey.LibraryType.Equals(LibraryType);
+                    otherKey.Target.Equals(Target);
             }
 
             public override int GetHashCode()
             {
                 var combiner = new HashCodeCombiner();
                 combiner.Add(Name);
-                combiner.Add(LibraryType);
+                combiner.Add(Target);
 
                 return combiner.CombinedHash;
             }
             
             public override string ToString()
             {
-                return Name + " " + LibraryType;
+                return Name + " " + Target;
             }
         }
     }

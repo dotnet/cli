@@ -5,6 +5,7 @@ using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using NuGet.Frameworks;
 using NuGet.Versioning;
+using NuGet.ProjectModel;
 using Xunit;
 
 namespace Microsoft.DotNet.ProjectModel.Tests
@@ -15,7 +16,8 @@ namespace Microsoft.DotNet.ProjectModel.Tests
         public void GetDescriptionShouldNotModifyTarget()
         {
             var provider = new PackageDependencyProvider("/foo/packages", new FrameworkReferenceResolver("/foo/references"));
-            var package = new LockFilePackageLibrary();
+            var package = new LockFileLibrary();
+            package.Type = "package";
             package.Name = "Something";
             package.Version = NuGetVersion.Parse("1.0.0");
             package.Files.Add("lib/dotnet/_._");

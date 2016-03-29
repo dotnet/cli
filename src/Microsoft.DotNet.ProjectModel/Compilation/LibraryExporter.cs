@@ -8,11 +8,12 @@ using System.IO;
 using System.Linq;
 using Microsoft.DotNet.ProjectModel.Compilation.Preprocessor;
 using Microsoft.DotNet.ProjectModel.Files;
-using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Resolution;
 using Microsoft.DotNet.ProjectModel.Utilities;
 using Microsoft.DotNet.Tools.Compiler;
 using NuGet.Frameworks;
+using NuGet.LibraryModel;
+using NuGet.ProjectModel;
 
 namespace Microsoft.DotNet.ProjectModel.Compilation
 {
@@ -60,14 +61,14 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         /// <returns></returns>
         public IEnumerable<LibraryExport> GetDependencies()
         {
-            return GetDependencies(LibraryType.Unspecified);
+            return GetDependencies(null);
         }
 
         /// <summary>
         /// Gets all exports required by the project, of the specified <see cref="LibraryType"/>, NOT including the project itself
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<LibraryExport> GetDependencies(LibraryType type)
+        public IEnumerable<LibraryExport> GetDependencies(LibraryType? type)
         {
             // Export all but the main project
             return ExportLibraries(library =>
@@ -195,7 +196,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                         }
                         if (contentFile.CopyToOutput)
                         {
-                            builder.AddRuntimeAsset(new LibraryAsset(contentFile.Path, contentFile.OutputPath, fullPath, fileTransform));
+                            builder.AddRuntimeAsset(LibraryAsset.Create(contentFile.Path, contentFile.OutputPath, fullPath, fileTransform));
                         }
                     }
                 }
@@ -244,7 +245,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                 var assemblyPath = ResolvePath(project.Project, _configuration, project.TargetFrameworkInfo.AssemblyPath);
                 var pdbPath = Path.ChangeExtension(assemblyPath, "pdb");
 
-                var compileAsset = new LibraryAsset(
+                var compileAsset = LibraryAsset.Create(
                     project.Project.Name,
                     Path.GetFileName(assemblyPath),
                     assemblyPath);
@@ -253,7 +254,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                 builder.AddRuntimeAssemblyGroup(new LibraryAssetGroup(new[] { compileAsset }));
                 if (File.Exists(pdbPath))
                 {
-                    builder.AddRuntimeAsset(new LibraryAsset(Path.GetFileName(pdbPath), Path.GetFileName(pdbPath), pdbPath));
+                    builder.AddRuntimeAsset(LibraryAsset.Create(Path.GetFileName(pdbPath), Path.GetFileName(pdbPath), pdbPath));
                 }
             }
             else if (project.Project.Files.SourceFiles.Any())
@@ -333,7 +334,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             {
                 builder.WithCompilationAssemblies(new[]
                 {
-                    new LibraryAsset(library.Identity.Name, null, library.Path)
+                    LibraryAsset.Create(library.Identity.Name, null, library.Path)
                 });
             }
             return builder.Build();
@@ -344,7 +345,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             return package
                 .Library
                 .Files
-                .Where(path => path.StartsWith("shared" + Path.DirectorySeparatorChar))
+                .Where(path => path.StartsWith("shared" + LockFile.DirectorySeparatorChar))
                 .Select(path => LibraryAsset.CreateFromRelativePath(package.Path, path));
         }
 
@@ -353,7 +354,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             var analyzers = package
                 .Library
                 .Files
-                .Where(path => path.StartsWith("analyzers" + Path.DirectorySeparatorChar) &&
+                .Where(path => path.StartsWith("analyzers" + LockFile.DirectorySeparatorChar) &&
                                path.EndsWith(".dll"));
 
             var analyzerRefs = new List<AnalyzerReference>();
@@ -425,10 +426,10 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             }
         }
 
-        private static bool LibraryIsOfType(LibraryType type, LibraryDescription library)
+        private static bool LibraryIsOfType(LibraryType? type, LibraryDescription library)
         {
-            return type.Equals(LibraryType.Unspecified) || // No type filter was requested
-                   library.Identity.Type.Equals(type);     // OR, library type matches requested type
+            return type == null || // No type filter was requested
+                   library.Identity.Type == type;     // OR, library type matches requested type
         }
     }
 }

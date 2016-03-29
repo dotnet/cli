@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Resolution;
+using NuGet.ProjectModel;
+using NuGet.LibraryModel;
 
 namespace Microsoft.DotNet.ProjectModel
 {
@@ -13,9 +15,9 @@ namespace Microsoft.DotNet.ProjectModel
     {
         public PackageDescription(
             string path,
-            LockFilePackageLibrary package,
+            LockFileLibrary package,
             LockFileTargetLibrary lockFileLibrary,
-            IEnumerable<LibraryRange> dependencies,
+            IEnumerable<ProjectLibraryDependency> dependencies,
             bool compatible,
             bool resolved)
             : base(
@@ -33,7 +35,7 @@ namespace Microsoft.DotNet.ProjectModel
 
         private LockFileTargetLibrary Target { get; }
 
-        public LockFilePackageLibrary Library { get; }
+        public LockFileLibrary Library { get; }
 
         public IEnumerable<LockFileItem> RuntimeAssemblies => FilterPlaceholders(Target.RuntimeAssemblies);
 
@@ -49,7 +51,7 @@ namespace Microsoft.DotNet.ProjectModel
 
         private IEnumerable<LockFileItem> FilterPlaceholders(IList<LockFileItem> items)
         {
-            return items.Where(a => !PackageDependencyProvider.IsPlaceholderFile(a));
+            return items.Where(a => !PackageDependencyProvider.IsPlaceholderFile(a.Path));
         }
     }
 }

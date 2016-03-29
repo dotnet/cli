@@ -26,7 +26,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
         public static readonly string DefaultHash = DefaultHashAlgoritm + "-" + DefaultHashValue;
 
         public static readonly string ProjectType = "project";
-        public static readonly string ReferenceAssemblyType = "referenceassembly";
+        public static readonly string ReferenceAssemblyType = "reference";
         public static readonly string PackageType = "package";
 
         public static CompilationLibrary Create(
