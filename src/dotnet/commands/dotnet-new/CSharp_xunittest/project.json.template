@@ -3,8 +3,8 @@
 
     "dependencies": {
         "Microsoft.NETCore.App": {
-        "type": "platform",
-        "version": "1.0.0-rc2-23928"
+            "type": "platform",
+            "version": "1.0.0-rc2-23928"
         },
         "System.Runtime.Serialization.Primitives": "4.1.1-rc2-23928",
         "xunit": "2.1.0",
