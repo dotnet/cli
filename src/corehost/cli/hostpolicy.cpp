@@ -18,7 +18,7 @@ corehost_init_t* g_init = nullptr;
 int run(const corehost_init_t* init, const runtime_config_t& config, const arguments_t& args)
 {
     // Load the deps resolver
-    deps_resolver_t resolver(init->fx_dir(), &config, args);
+    deps_resolver_t resolver(init, config, args);
 
     if (!resolver.valid())
     {
@@ -26,15 +26,7 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
         return StatusCode::ResolverInitFailure;
     }
 
-    // Add packages directory
-    pal::string_t packages_dir = init->probe_dir();
-    if (packages_dir.empty() || !pal::directory_exists(packages_dir))
-    {
-        (void)pal::get_default_packages_directory(&packages_dir);
-    }
-    trace::info(_X("Package directory: %s"), packages_dir.empty() ? _X("not specified") : packages_dir.c_str());
-
-    pal::string_t clr_path = resolver.resolve_coreclr_dir(args.app_dir, packages_dir, args.dotnet_packages_cache);
+    pal::string_t clr_path = resolver.resolve_coreclr_dir();
     if (clr_path.empty() || !pal::realpath(&clr_path))
     {
         trace::error(_X("Could not resolve coreclr path"));
@@ -46,7 +38,7 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
     }
 
     probe_paths_t probe_paths;
-    if (!resolver.resolve_probe_paths(args.app_dir, packages_dir, args.dotnet_packages_cache, clr_path, &probe_paths))
+    if (!resolver.resolve_probe_paths(clr_path, &probe_paths))
     {
         return StatusCode::ResolverResolveFailure;
     }
@@ -196,6 +188,11 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
 SHARED_API int corehost_load(corehost_init_t* init)
 {
     g_init = init;
+    if (g_init->version() != corehost_init_t::s_version)
+    {
+        trace::error(_X("The structure of init data has changed, do not know how to interpret it"));
+        return StatusCode::LibHostInitFailure;
+    }
     return 0;
 }
 

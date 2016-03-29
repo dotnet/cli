@@ -262,13 +262,13 @@ int fx_muxer_t::execute(const int argc, const pal::char_t* argv[])
         {
             trace::verbose(_X("Executing as a portable app as per config file [%s]"), config_file.c_str());
             pal::string_t fx_dir = resolve_fx_dir(own_dir, &config);
-            corehost_init_t init(_X(""), _X(""), fx_dir, host_mode_t::muxer, &config);
+            corehost_init_t init(_X(""), config.get_probe_paths(), fx_dir, host_mode_t::muxer, &config);
             return execute_app(fx_dir, &init, argc, argv);
         }
         else
         {
             trace::verbose(_X("Executing as a standlone app as per config file [%s]"), config_file.c_str());
-            corehost_init_t init(_X(""), _X(""), _X(""), host_mode_t::muxer, &config);
+            corehost_init_t init(_X(""), config.get_probe_paths(), _X(""), host_mode_t::muxer, &config);
             return execute_app(get_directory(app_path), &init, argc, argv);
         }
     }
@@ -320,11 +320,12 @@ int fx_muxer_t::execute(const int argc, const pal::char_t* argv[])
                 trace::error(_X("Deps file [%s] specified but doesn't exist"), deps_file.c_str());
                 return StatusCode::InvalidArgFailure;
             }
+            std::vector<pal::string_t> probe_paths = { probe_path };
             if (config.get_portable())
             {
                 trace::verbose(_X("Executing as a portable app as per config file [%s]"), config_file.c_str());
                 pal::string_t fx_dir = resolve_fx_dir(own_dir, &config);
-                corehost_init_t init(deps_file, probe_path, fx_dir, host_mode_t::muxer, &config);
+                corehost_init_t init(deps_file, probe_paths, fx_dir, host_mode_t::muxer, &config);
                 return execute_app(fx_dir, &init, new_argv.size(), new_argv.data());
             }
             else
@@ -333,6 +334,7 @@ int fx_muxer_t::execute(const int argc, const pal::char_t* argv[])
                 pal::string_t impl_dir = get_directory(app_or_deps);
                 if (!library_exists_in_dir(impl_dir, LIBHOSTPOLICY_NAME, nullptr) && !probe_path.empty() && !deps_file.empty())
                 {
+                    // TODO: FIX ME for auto rollforward of hostpolicy
                     deps_json_t deps_json(false, deps_file);
                     pal::string_t candidate = impl_dir;
                     if (!deps_json.has_hostpolicy_entry() ||
@@ -343,7 +345,7 @@ int fx_muxer_t::execute(const int argc, const pal::char_t* argv[])
                     }
                     impl_dir = get_directory(candidate);
                 }
-                corehost_init_t init(deps_file, probe_path, _X(""), host_mode_t::muxer, &config);
+                corehost_init_t init(deps_file, probe_paths, _X(""), host_mode_t::muxer, &config);
                 return execute_app(impl_dir, &init, new_argv.size(), new_argv.data());
             }
         }
@@ -379,13 +381,13 @@ int fx_muxer_t::execute(const int argc, const pal::char_t* argv[])
             {
                 trace::verbose(_X("Executing dotnet.dll as a portable app as per config file [%s]"), config_file.c_str());
                 pal::string_t fx_dir = resolve_fx_dir(own_dir, &config);
-                corehost_init_t init(_X(""), _X(""), fx_dir, host_mode_t::muxer, &config);
+                corehost_init_t init(_X(""), std::vector<pal::string_t>(), fx_dir, host_mode_t::muxer, &config);
                 return execute_app(fx_dir, &init, new_argv.size(), new_argv.data());
             }
             else
             {
                 trace::verbose(_X("Executing dotnet.dll as a standalone app as per config file [%s]"), config_file.c_str());
-                corehost_init_t init(_X(""), _X(""), _X(""), host_mode_t::muxer, &config);
+                corehost_init_t init(_X(""), std::vector<pal::string_t>(), _X(""), host_mode_t::muxer, &config);
                 return execute_app(get_directory(sdk_dotnet), &init, new_argv.size(), new_argv.data());
             }
         }

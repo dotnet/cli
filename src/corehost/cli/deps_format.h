@@ -91,7 +91,7 @@ private:
     void reconcile_libraries_with_targets(
         const json_value& json,
         const std::function<bool(const pal::string_t&)>& library_exists_fn,
-        const std::function<const std::vector<pal::string_t>&(const pal::string_t&, int)>& get_rel_paths_by_asset_type_fn);
+        const std::function<const std::vector<pal::string_t>&(const pal::string_t&, int, bool*)>& get_rel_paths_by_asset_type_fn);
 
     bool perform_rid_fallback(rid_specific_assets_t* portable_assets, const rid_fallback_graph_t& rid_fallback_graph);
 
