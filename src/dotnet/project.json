@@ -5,7 +5,9 @@
   },
   "compileExclude": [
     "commands/dotnet-new/CSharp_Console/**",
-    "commands/dotnet-new/FSharp_Console/**"
+    "commands/dotnet-new/FSharp_Console/**",
+    "commands/dotnet-new/CSharp_Lib/**",
+    "commands/dotnet-new/CSharp_xunittest/**"
   ],
   "resource": [
     "commands/dotnet-new/CSharp_Console/NuGet.Config",
@@ -13,7 +15,13 @@
     "commands/dotnet-new/CSharp_Console/project.json.template",
     "commands/dotnet-new/FSharp_Console/NuGet.config",
     "commands/dotnet-new/FSharp_Console/Program.fs",
-    "commands/dotnet-new/FSharp_Console/project.json.template"
+    "commands/dotnet-new/FSharp_Console/project.json.template",
+    "commands/dotnet-new/CSharp_Lib/NuGet.config",
+    "commands/dotnet-new/CSharp_Lib/Library.cs",
+    "commands/dotnet-new/CSharp_Lib/project.json.template",
+    "commands/dotnet-new/CSharp_xunittest/NuGet.config",
+    "commands/dotnet-new/CSharp_xunittest/Tests.cs",
+    "commands/dotnet-new/CSharp_xunittest/project.json.template"
   ],
   "dependencies": {
     "NuGet.Commands": {

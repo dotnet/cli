@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0-*",
+  "compilationOptions": {
+    "emitEntryPoint": false
+  },
+  "dependencies": {
+    "NETStandard.Library": "1.5.0-rc2-23931"
+  },
+  "frameworks": {
+    "netstandard1.5": {}
+  }
+}
