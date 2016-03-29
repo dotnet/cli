@@ -88,7 +88,7 @@ namespace Microsoft.DotNet.Tools.New
             var dotnetNew = new NewCommand();
             app.OnExecute(() => {
 
-                var csharp = new { Name = "C#", Alias = new[] { "c#", "cs", "csharp" }, TemplatePrefix = "CSharp", Templates = new[] { "Console" } };
+                var csharp = new { Name = "C#", Alias = new[] { "c#", "cs", "csharp" }, TemplatePrefix = "CSharp", Templates = new[] { "Console", "Lib", "xunittest" } };
                 var fsharp = new { Name = "F#", Alias = new[] { "f#", "fs", "fsharp" }, TemplatePrefix = "FSharp", Templates = new[] { "Console" } };
 
                 string languageValue = lang.Value() ?? csharp.Name;
