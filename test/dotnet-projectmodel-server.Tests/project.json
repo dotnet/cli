@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "Microsoft.NETCore.App": "1.0.0-rc2-23925",
+    "Microsoft.NETCore.App": "1.0.0-rc2-23928",
     "dotnet": {
       "target": "project"
     },
