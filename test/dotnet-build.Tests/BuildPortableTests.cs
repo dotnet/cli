@@ -26,7 +26,6 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
                 .Exist().And
                 .HaveFiles(new[]
                 {
-                    "PortableApp.deps",
                     "PortableApp.deps.json",
                     "PortableApp.dll",
                     "PortableApp.pdb"

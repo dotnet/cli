@@ -32,7 +32,6 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             publishDir.Should().HaveFiles(new[]
             {
                 "PortableAppWithNative.dll",
-                "PortableAppWithNative.deps",
                 "PortableAppWithNative.deps.json"
             });
 
@@ -69,7 +68,6 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             publishDir.Should().HaveFiles(new[]
             {
                 "PortableAppWithIntentionalManagedDowngrade.dll",
-                "PortableAppWithIntentionalManagedDowngrade.deps",
                 "PortableAppWithIntentionalManagedDowngrade.deps.json",
                 "System.Linq.dll"
             });
