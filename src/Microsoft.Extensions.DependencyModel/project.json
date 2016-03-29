@@ -19,15 +19,15 @@
       "version": "1.0.0-*"
     },
     "Newtonsoft.Json": "7.0.1",
-    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc2-16537"
+    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc2-20100"
   },
   "frameworks": {
     "net451": {},
     "netstandard1.5": {
       "imports": "dnxcore50",
       "dependencies": {
-        "NETStandard.Library": "1.5.0-rc2-23925",
-        "System.Dynamic.Runtime": "4.0.11-rc2-23925"
+        "NETStandard.Library": "1.5.0-rc2-23928",
+        "System.Dynamic.Runtime": "4.0.11-rc2-23928"
       }
     }
   },
