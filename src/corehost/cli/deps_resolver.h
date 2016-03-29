@@ -47,7 +47,7 @@ public:
         }
 
         // Packages probe. TODO: Remove the default probe dir support.
-        m_additional_probe = init->probe_dir();
+        m_additional_probes = init->probe_paths();
         if (m_additional_probe.empty() || !pal::directory_exists(m_additional_probe))
         {
             (void)pal::get_default_packages_directory(&m_additional_probe);

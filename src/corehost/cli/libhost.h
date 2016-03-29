@@ -25,7 +25,7 @@ public:
     static const int s_version = 0x8002;
 private:
     int m_version;
-    std::vector<const pal::string_t> m_probe_paths;
+    std::vector<pal::string_t> m_probe_paths;
     const pal::string_t m_deps_file;
     const pal::string_t m_fx_dir;
     host_mode_t m_host_mode;
@@ -33,7 +33,7 @@ private:
 public:
     corehost_init_t(
         const pal::string_t& deps_file,
-        const std::vector<const pal::string_t>& probe_paths,
+        const std::vector<pal::string_t>& probe_paths,
         const pal::string_t& fx_dir,
         const host_mode_t mode,
         const runtime_config_t* runtime_config)
@@ -56,9 +56,9 @@ public:
         return m_deps_file;
     }
 
-    const pal::string_t& probe_dir() const
+    const std::vector<pal::string_t>& probe_paths() const
     {
-        return m_probe_path;
+        return m_probe_paths;
     }
 
     const pal::string_t& fx_dir() const
