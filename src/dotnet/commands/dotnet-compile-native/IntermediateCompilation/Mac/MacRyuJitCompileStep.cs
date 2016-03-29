@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
         private IEnumerable<string> CompilerArgs;
 
         // TODO: debug/release support
-        private readonly string [] _cflags = { "-g", "-lstdc++", "-Wno-invalid-offsetof", "-pthread", "-ldl", "-lm", "-liconv" };
+        private readonly string [] _cflags = { "-g", "-lstdc++", "-Wno-invalid-offsetof", "-lpthread", "-ldl", "-lm", "-liconv" };
 
         private readonly string[] _ilcSdkLibs = 
             {
@@ -71,6 +71,13 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
             // ILC SDK Libs
             var ilcSdkLibPath = Path.Combine(config.IlcSdkPath, "sdk");
             argsList.AddRange(_ilcSdkLibs.Select(lib => Path.Combine(ilcSdkLibPath, lib)));
+
+            // Optional linker script
+            var linkerScriptFile = Path.Combine(ilcSdkLibPath, "linkerscript");
+            if (File.Exists(linkerScriptFile))
+            {
+                argsList.Add(linkerScriptFile);
+            }
 
             // AppDep Libs
             var baseAppDepLibPath = Path.Combine(config.AppDepSDKPath, "CPPSdk/osx.10.10", config.Architecture.ToString());

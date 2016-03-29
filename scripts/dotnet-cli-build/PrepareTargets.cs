@@ -4,12 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
 using static Microsoft.DotNet.Cli.Build.FS;
 using static Microsoft.DotNet.Cli.Build.Utils;
 using static Microsoft.DotNet.Cli.Build.Framework.BuildHelpers;
+using System.Text.RegularExpressions;
 
 namespace Microsoft.DotNet.Cli.Build
 {
@@ -80,6 +82,7 @@ namespace Microsoft.DotNet.Cli.Build
             };
             c.BuildContext["BuildVersion"] = buildVersion;
             c.BuildContext["CommitHash"] = commitHash;
+            c.BuildContext["SharedFrameworkNugetVersion"] = GetVersionFromProjectJson(Path.Combine(Dirs.RepoRoot, "src", "sharedframework", "framework", "project.json"));
 
             c.Info($"Building Version: {buildVersion.SimpleVersion} (NuGet Packages: {buildVersion.NuGetVersion})");
             c.Info($"From Commit: {commitHash}");
@@ -99,7 +102,14 @@ namespace Microsoft.DotNet.Cli.Build
             }
 
             // Identify the version
-            var version = File.ReadAllLines(Path.Combine(stage0, "..", ".version"));
+            string versionFile = Directory.GetFiles(stage0, ".version", SearchOption.AllDirectories).FirstOrDefault();
+
+            if (string.IsNullOrEmpty(versionFile))
+            {
+                throw new Exception($"'.version' file not found in '{stage0}' folder");
+            }
+
+            var version = File.ReadAllLines(versionFile);
             c.Info($"Using Stage 0 Version: {version[1]}");
 
             return c.Success();
@@ -108,34 +118,18 @@ namespace Microsoft.DotNet.Cli.Build
         [Target]
         public static BuildTargetResult ExpectedBuildArtifacts(BuildTargetContext c)
         {
-            var productName = Monikers.GetProductMoniker(c);
             var config = Environment.GetEnvironmentVariable("CONFIGURATION");
             var versionBadgeName = $"{CurrentPlatform.Current}_{CurrentArchitecture.Current}_{config}_version_badge.svg";
             c.BuildContext["VersionBadge"] = Path.Combine(Dirs.Output, versionBadgeName);
 
-            var extension = CurrentPlatform.IsWindows ? ".zip" : ".tar.gz";
-            c.BuildContext["CompressedFile"] = Path.Combine(Dirs.Packages, productName + extension);
+            var cliVersion = c.BuildContext.Get<BuildVersion>("BuildVersion").NuGetVersion;
+            var sharedFrameworkVersion = c.BuildContext.Get<string>("SharedFrameworkNugetVersion");
 
-            string installer = "";
-            switch (CurrentPlatform.Current)
-            {
-                case BuildPlatform.Windows:
-                    installer = productName + ".exe";
-                    break;
-                case BuildPlatform.OSX:
-                    installer = productName + ".pkg";
-                    break;
-                case BuildPlatform.Ubuntu:
-                    installer = productName + ".deb";
-                    break;
-                default:
-                    break;
-            }
-
-            if (!string.IsNullOrEmpty(installer))
-            {
-                c.BuildContext["InstallerFile"] = Path.Combine(Dirs.Packages, installer);
-            }
+            AddInstallerArtifactToContext(c, "dotnet-sdk", "Sdk", cliVersion);
+            AddInstallerArtifactToContext(c, "dotnet-host", "SharedHost", cliVersion);
+            AddInstallerArtifactToContext(c, "dotnet-sharedframework", "SharedFramework", sharedFrameworkVersion);
+            AddInstallerArtifactToContext(c, "dotnet-dev", "CombinedFrameworkSDKHost", cliVersion);
+            AddInstallerArtifactToContext(c, "dotnet", "CombinedFrameworkHost", sharedFrameworkVersion);
 
             return c.Success();
         }
@@ -211,8 +205,8 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var dotnet = DotNetCli.Stage0;
 
-            dotnet.Restore().WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "src")).Execute().EnsureSuccessful();
-            dotnet.Restore().WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "tools")).Execute().EnsureSuccessful();
+            dotnet.Restore("--verbosity", "verbose", "--disable-parallel").WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "src")).Execute().EnsureSuccessful();
+            dotnet.Restore("--verbosity", "verbose", "--disable-parallel").WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "tools")).Execute().EnsureSuccessful();
 
             return c.Success();
         }
@@ -334,6 +328,23 @@ cmake is required to build the native host 'corehost'";
             return c.Success();
         }
 
+        private static string GetVersionFromProjectJson(string pathToProjectJson)
+        {
+            Regex r = new Regex($"\"{Regex.Escape(Monikers.SharedFrameworkName)}\"\\s*:\\s*\"(?'version'[^\"]*)\"");
+
+            foreach (var line in File.ReadAllLines(pathToProjectJson))
+            {
+                var m = r.Match(line);
+
+                if (m.Success)
+                {
+                    return m.Groups["version"].Value;
+                }
+            }
+
+            throw new InvalidOperationException("Unable to match the version name from " + pathToProjectJson);
+        }
+
         private static bool AptPackageIsInstalled(string packageName)
         {
             var result = Command.Create("dpkg", "-s", packageName)
@@ -360,6 +371,40 @@ cmake is required to build the native host 'corehost'";
                 }
             }
             return dict;
+        }
+
+        private static void AddInstallerArtifactToContext(
+            BuildTargetContext c, 
+            string artifactPrefix, 
+            string contextPrefix,
+            string version)
+        {
+            var productName = Monikers.GetProductMoniker(c, artifactPrefix, version);
+
+            var extension = CurrentPlatform.IsWindows ? ".zip" : ".tar.gz";
+            c.BuildContext[contextPrefix + "CompressedFile"] = Path.Combine(Dirs.Packages, productName + extension);
+
+            string installer = "";
+            switch (CurrentPlatform.Current)
+            {
+                case BuildPlatform.Windows:
+                    installer = productName + ".exe";
+                    break;
+                case BuildPlatform.OSX:
+                    installer = productName + ".pkg";
+                    break;
+                case BuildPlatform.Ubuntu:
+                    installer = productName + ".deb";
+                    break;
+                default:
+                    break;
+            }
+
+            if (!string.IsNullOrEmpty(installer))
+            {
+                c.BuildContext[contextPrefix + "InstallerFile"] = Path.Combine(Dirs.Packages, installer);
+            }
+
         }
     }
 }

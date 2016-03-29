@@ -14,13 +14,24 @@ include(setup.cmake)
 
 set (CMAKE_CXX_STANDARD 11)
 
+include_directories(..)
 include_directories(../common)
 include_directories(.)
+include_directories(./fxr)
+include_directories(./json/casablanca/include)
 
 # CMake does not recommend using globbing since it messes with the freshness checks
 set(SOURCES
-    ../corehost.cpp
 
+    #deps_format.cpp
+    #./json/casablanca/src/json/json.cpp
+    #./json/casablanca/src/json/json_parsing.cpp
+    #./json/casablanca/src/json/json_serialization.cpp
+    #./json/casablanca/src/utilities/asyncrt_utils.cpp
+
+
+    ./fxr/fx_ver.cpp
+    ../corehost.cpp
     ../common/trace.cpp
     ../common/utils.cpp)
 
@@ -31,7 +42,10 @@ else()
     list(APPEND SOURCES ../common/pal.unix.cpp)
 endif()
 
-add_executable(corehost ${SOURCES})
+add_executable(dotnet ${SOURCES})
+install(TARGETS dotnet DESTINATION bin)
+add_definitions(-D_NO_ASYNCRTIMP)
+add_definitions(-D_NO_PPLXIMP)
 
 # Older CMake doesn't support CMAKE_CXX_STANDARD and GCC/Clang need a switch to enable C++ 11
 if(${CMAKE_CXX_COMPILER_ID} MATCHES "(Clang|GNU)")
@@ -40,7 +54,8 @@ endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     add_definitions(-D__LINUX__)
-    target_link_libraries (corehost "dl" "pthread")
+    target_link_libraries (dotnet "dl" "pthread")
 endif()
 
 add_subdirectory(dll)
+add_subdirectory(fxr)

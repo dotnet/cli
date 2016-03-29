@@ -17,7 +17,8 @@ Arguments:
 
 Common Options (passed before the command):
   -v|--verbose  Enable verbose output
-  --version     Display .NET CLI Version Info
+  --version     Display .NET CLI Version Number
+  --info        Display .NET CLI Info
 
 Common Commands:
   new           Initialize a basic .NET project
@@ -25,6 +26,7 @@ Common Commands:
   build         Builds a .NET project
   publish       Publishes a .NET project for deployment (including the runtime)
   run           Compiles and immediately executes a .NET project
+  test          Executes tests in a test project
   repl          Launch an interactive session (read, eval, print, loop)
   pack          Creates a NuGet package";
         public static readonly string ProductVersion = GetProductVersion();

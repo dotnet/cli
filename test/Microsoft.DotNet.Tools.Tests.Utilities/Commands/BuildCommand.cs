@@ -29,7 +29,6 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         private readonly bool _noIncremental;
         private readonly bool _noDependencies;
         private readonly string _runtime;
-        private readonly bool _forcePortable;
 
         private string OutputOption
         {
@@ -38,16 +37,6 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
                 return _outputDirectory == string.Empty ?
                                            "" :
                                            $"-o \"{_outputDirectory}\"";
-            }
-        }
-
-        private string ForcePortableOption
-        {
-            get
-            {
-                return _forcePortable ?
-                    "--portable" :
-                    string.Empty;
             }
         }
 
@@ -228,9 +217,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             string cppCompilerFlags="",
             bool buildProfile=true,
             bool noIncremental=false,
-            bool noDependencies=false,
-            bool forcePortable=false
-            )
+            bool noDependencies=false)
             : base("dotnet")
         {
             _projectPath = projectPath;
@@ -253,7 +240,6 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             _buildProfile = buildProfile;
             _noIncremental = noIncremental;
             _noDependencies = noDependencies;
-            _forcePortable = forcePortable;
         }
 
         public override CommandResult Execute(string args = "")
@@ -268,16 +254,24 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             return base.ExecuteWithCapturedOutput(args);
         }
 
+        public string GetPortableOutputName()
+        {
+            return $"{_project.Name}.dll";
+        }
+
         public string GetOutputExecutableName()
         {
-            var result = _project.Name;
-            result += RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : "";
-            return result;
+            return _project.Name + GetExecutableExtension();
+        }
+
+        public string GetExecutableExtension()
+        {
+            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : "";
         }
 
         private string BuildArgs()
         {
-            return $"{BuildProfile} {ForcePortableOption} {NoDependencies} {NoIncremental} \"{_projectPath}\" {OutputOption} {BuildBasePathOption} {ConfigurationOption} {FrameworkOption} {RuntimeOption} {VersionSuffixOption} {NoHostOption} {NativeOption} {ArchitectureOption} {IlcArgsOption} {IlcPathOption} {AppDepSDKPathOption} {NativeCppModeOption} {CppCompilerFlagsOption}";
+            return $"{BuildProfile} {NoDependencies} {NoIncremental} \"{_projectPath}\" {OutputOption} {BuildBasePathOption} {ConfigurationOption} {FrameworkOption} {RuntimeOption} {VersionSuffixOption} {NoHostOption} {NativeOption} {ArchitectureOption} {IlcArgsOption} {IlcPathOption} {AppDepSDKPathOption} {NativeCppModeOption} {CppCompilerFlagsOption}";
         }
     }
 }

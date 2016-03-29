@@ -1,27 +1,31 @@
 {
-    "version": "1.0.0-*",
-    "compilationOptions": {
-        "keyFile": "../../tools/Key.snk",
-        "warningsAsErrors": true
-    },
-    "dependencies": {
-        "Microsoft.DotNet.ProjectModel": "1.0.0-*",
-        "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc2-16537"
-    },
-    "frameworks": {
-        "net451": {
-            "frameworkAssemblies": {
-                "System.Runtime": {
-                    "type": "build"
-                }
-            }
-        },
-        "netstandard1.3": {
-            "imports": "dnxcore50",
-            "dependencies": {
-                "NETStandard.Library": "1.0.0-rc2-23901",
-                "System.Diagnostics.Process": "4.1.0-rc2-23901"
-            }
+  "version": "1.0.0-*",
+  "compilationOptions": {
+    "keyFile": "../../tools/Key.snk",
+    "warningsAsErrors": true
+  },
+  "dependencies": {
+    "Microsoft.DotNet.ProjectModel": "1.0.0-*",
+    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc2-20100",
+    "NuGet.Versioning": "3.5.0-beta-1083",
+    "NuGet.Packaging": "3.5.0-beta-1083",
+    "NuGet.Frameworks": "3.5.0-beta-1083",
+    "NuGet.ProjectModel": "3.5.0-beta-1083"
+  },
+  "frameworks": {
+    "net451": {
+      "frameworkAssemblies": {
+        "System.Runtime": {
+          "type": "build"
         }
+      }
+    },
+    "netstandard1.5": {
+      "imports": "dnxcore50",
+      "dependencies": {
+        "NETStandard.Library": "1.5.0-rc2-23928",
+        "System.Diagnostics.Process": "4.1.0-rc2-23928"
+      }
     }
+  }
 }

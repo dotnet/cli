@@ -1,16 +1,20 @@
 {
-    "version": "1.0.0-*",
-    "compilationOptions": {
-        "emitEntryPoint": true
-    },
-
-    "dependencies": {
-        "NETStandard.Library": "1.0.0-rc2-23901"
-    },
-
-    "frameworks": {
-        "netstandardapp1.5": {
-            "imports": "dnxcore50"
-        }
+  "version": "1.0.0-*",
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+  "dependencies": {
+    "Microsoft.NETCore.App": {
+      "type": "platform",
+      "version": "1.0.0-rc2-23928"
     }
+  },
+  "frameworks": {
+    "netstandard1.5": {
+      "imports": [
+        "portable-net45+win8",
+        "dnxcore50"
+      ]
+    }
+  }
 }

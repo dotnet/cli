@@ -38,8 +38,8 @@ namespace Microsoft.DotNet.Cli.Build.Framework
 
             Console.ForegroundColor = 
                 c < 0 ? color :                                   // unknown, just use it
-                _boldRecursion > 0 ? (ConsoleColor)(c & ~Light) : // ensure color is dark
-                (ConsoleColor)(c | Light);                        // ensure color is light
+                _boldRecursion > 0 ? (ConsoleColor)(c | Light) :  // ensure color is light
+                (ConsoleColor)(c & ~Light);                       // ensure color is dark
         }
     
         private void SetBold(bool bold)
@@ -130,7 +130,7 @@ namespace Microsoft.DotNet.Cli.Build.Framework
                                         SetColor(ConsoleColor.Gray);
                                         break;
                                     case 39:
-                                        SetColor(OriginalForegroundColor);
+                                        Console.ForegroundColor = OriginalForegroundColor;
                                         break;
                                 }
                             }

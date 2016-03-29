@@ -14,6 +14,8 @@ using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.Extensions.DependencyModel;
 using NuGet.Frameworks;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Microsoft.Dotnet.Cli.Compiler.Common
 {
@@ -23,13 +25,13 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
 
         private readonly LibraryExporter _exporter;
 
-        private readonly string _configuration;
-
         private readonly OutputPaths _outputPaths;
 
         private readonly string _runtimeOutputPath;
 
         private readonly string _intermediateOutputPath;
+
+        private readonly CommonCompilerOptions _compilerOptions;
 
         public Executable(ProjectContext context, OutputPaths outputPaths, LibraryExporter exporter, string configuration)
         {
@@ -38,7 +40,7 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
             _runtimeOutputPath = outputPaths.RuntimeOutputPath;
             _intermediateOutputPath = outputPaths.IntermediateOutputDirectoryPath;
             _exporter = exporter;
-            _configuration = configuration;
+            _compilerOptions = _context.ProjectFile.GetCompilerOptions(_context.TargetFramework, configuration);
         }
 
         public void MakeCompilationOutputRunnable()
@@ -71,10 +73,11 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
         {
             WriteDepsFileAndCopyProjectDependencies(_exporter);
 
-            if (!string.IsNullOrEmpty(_context.RuntimeIdentifier))
+            var emitEntryPoint = _compilerOptions.EmitEntryPoint ?? false;
+            if (emitEntryPoint && !string.IsNullOrEmpty(_context.RuntimeIdentifier))
             {
                 // TODO: Pick a host based on the RID
-                CoreHost.CopyTo(_runtimeOutputPath, _context.ProjectFile.Name + Constants.ExeSuffix);
+                CoreHost.CopyTo(_runtimeOutputPath, _compilerOptions.OutputName + Constants.ExeSuffix);
             }
         }
 
@@ -88,8 +91,8 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
         {
             foreach (var libraryExport in libraryExports)
             {
-                libraryExport.RuntimeAssemblies.CopyTo(_runtimeOutputPath);
-                libraryExport.NativeLibraries.CopyTo(_runtimeOutputPath);
+                libraryExport.RuntimeAssemblyGroups.GetDefaultAssets().CopyTo(_runtimeOutputPath);
+                libraryExport.NativeLibraryGroups.GetDefaultAssets().CopyTo(_runtimeOutputPath);
             }
         }
 
@@ -106,6 +109,7 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
         private void WriteDepsFileAndCopyProjectDependencies(LibraryExporter exporter)
         {
             WriteDeps(exporter);
+            WriteRuntimeConfig(exporter);
 
             var projectExports = exporter.GetDependencies(LibraryType.Project);
             CopyAssemblies(projectExports);
@@ -115,20 +119,68 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
             CopyAssets(packageExports);
         }
 
+        private void WriteRuntimeConfig(LibraryExporter exporter)
+        {
+            if (!_context.TargetFramework.IsDesktop())
+            {
+                // TODO: Suppress this file if there's nothing to write? RuntimeOutputFiles would have to be updated
+                // in order to prevent breaking incremental compilation...
+
+                var json = new JObject();
+                var runtimeOptions = new JObject();
+                json.Add("runtimeOptions", runtimeOptions);
+
+                var redistPackage = _context.RootProject.Dependencies
+                    .Where(r => r.Type.Equals(LibraryDependencyType.Platform))
+                    .ToList();
+                if(redistPackage.Count > 0)
+                {
+                    if(redistPackage.Count > 1)
+                    {
+                        throw new InvalidOperationException("Multiple packages with type: \"platform\" were specified!");
+                    }
+                    var packageName = redistPackage.Single().Name;
+
+                    var redistExport = exporter.GetAllExports()
+                        .FirstOrDefault(e => e.Library.Identity.Name.Equals(packageName));
+                    if (redistExport == null)
+                    {
+                        throw new InvalidOperationException($"Platform package '{packageName}' was not present in the graph.");
+                    }
+                    else
+                    {
+                        var framework = new JObject(
+                            new JProperty("name", redistExport.Library.Identity.Name),
+                            new JProperty("version", redistExport.Library.Identity.Version.ToNormalizedString()));
+                        runtimeOptions.Add("framework", framework);
+                    }
+                }
+
+                var runtimeConfigJsonFile =
+                    Path.Combine(_runtimeOutputPath, _compilerOptions.OutputName + FileNameSuffixes.RuntimeConfigJson);
+
+                using (var writer = new JsonTextWriter(new StreamWriter(File.Create(runtimeConfigJsonFile))))
+                {
+                    writer.Formatting = Formatting.Indented;
+                    json.WriteTo(writer);
+                }
+            }
+        }
+
         public void WriteDeps(LibraryExporter exporter)
         {
-            var path = Path.Combine(_runtimeOutputPath, _context.ProjectFile.Name + FileNameSuffixes.Deps);
-            CreateDirectoryIfNotExists(path);
-            File.WriteAllLines(path, exporter
+            Directory.CreateDirectory(_runtimeOutputPath);
+
+            var depsFilePath = Path.Combine(_runtimeOutputPath, _compilerOptions.OutputName + FileNameSuffixes.Deps);
+            File.WriteAllLines(depsFilePath, exporter
                 .GetDependencies(LibraryType.Package)
                 .SelectMany(GenerateLines));
 
-            var compilerOptions = _context.ResolveCompilationOptions(_configuration);
-            var includeCompile = compilerOptions.PreserveCompilationContext == true;
+            var includeCompile = _compilerOptions.PreserveCompilationContext == true;
 
             var exports = exporter.GetAllExports().ToArray();
             var dependencyContext = new DependencyContextBuilder().Build(
-                compilerOptions: includeCompile? compilerOptions: null,
+                compilerOptions: includeCompile ? _compilerOptions : null,
                 compilationExports: includeCompile ? exports : null,
                 runtimeExports: exports,
                 portable: string.IsNullOrEmpty(_context.RuntimeIdentifier),
@@ -136,14 +188,12 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
                 runtime: _context.RuntimeIdentifier ?? string.Empty);
 
             var writer = new DependencyContextWriter();
-            var depsJsonFile = Path.Combine(_runtimeOutputPath, _context.ProjectFile.Name + FileNameSuffixes.DepsJson);
-            using (var fileStream = File.Create(depsJsonFile))
+            var depsJsonFilePath = Path.Combine(_runtimeOutputPath, _compilerOptions.OutputName + FileNameSuffixes.DepsJson);
+            using (var fileStream = File.Create(depsJsonFilePath))
             {
                 writer.Write(dependencyContext, fileStream);
             }
-
         }
-
 
         public void GenerateBindingRedirects(LibraryExporter exporter)
         {
@@ -174,17 +224,10 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
             }
         }
 
-
-        private static void CreateDirectoryIfNotExists(string path)
-        {
-            var depsFile = new FileInfo(path);
-            depsFile.Directory.Create();
-        }
-
         private static IEnumerable<string> GenerateLines(LibraryExport export)
         {
-            return GenerateLines(export, export.RuntimeAssemblies, "runtime")
-                .Union(GenerateLines(export, export.NativeLibraries, "native"));
+            return GenerateLines(export, export.RuntimeAssemblyGroups.GetDefaultAssets(), "runtime")
+                .Union(GenerateLines(export, export.NativeLibraryGroups.GetDefaultAssets(), "native"));
         }
 
         private static IEnumerable<string> GenerateLines(LibraryExport export, IEnumerable<LibraryAsset> items, string type)

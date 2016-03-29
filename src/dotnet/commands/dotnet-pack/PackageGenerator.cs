@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.Tools.Compiler
     public class PackageGenerator
     {
         protected ArtifactPathsCalculator ArtifactPathsCalculator { get; }
-        
+
         protected Project Project { get; }
 
         protected string Configuration { get; }
@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             ArtifactPathsCalculator = artifactPathsCalculator;
             Project = project;
             Configuration = configuration;
-        }        
+        }
 
         public bool BuildPackage(IEnumerable<ProjectContext> contexts, List<DiagnosticMessage> packDiagnostics)
         {
@@ -94,6 +94,7 @@ namespace Microsoft.DotNet.Tools.Compiler
 
             TryAddOutputFile(context, inputFolder, outputName);
             TryAddOutputFile(context, inputFolder, $"{Project.Name}.xml");
+            TryAddOutputFile(context, inputFolder, $"{Project.Name}.runtimeconfig.json");
         }
 
         protected virtual bool GeneratePackage(string nupkg, List<DiagnosticMessage> packDiagnostics)
@@ -257,7 +258,7 @@ namespace Microsoft.DotNet.Tools.Compiler
 
             foreach (var dependency in project.Dependencies)
             {
-                if (!dependency.HasFlag(LibraryDependencyTypeFlag.BecomesNupkgDependency))
+                if (dependency.Type.Equals(LibraryDependencyType.Build))
                 {
                     continue;
                 }
@@ -322,7 +323,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             }
 
             return Project.Name + outputExtension;
-        }                
+        }
 
         private static string GetDefaultRootOutputPath(Project project, string outputOptionValue)
         {

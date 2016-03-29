@@ -16,6 +16,14 @@ namespace Microsoft.Extensions.DependencyModel
     {
         public void Write(DependencyContext context, Stream stream)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+            if (stream == null)
+            {
+                throw new ArgumentNullException(nameof(stream));
+            }
             using (var writer = new StreamWriter(stream))
             {
                 using (var jsonWriter = new JsonTextWriter(writer) { Formatting = Formatting.Indented })
@@ -27,7 +35,7 @@ namespace Microsoft.Extensions.DependencyModel
 
         private JObject Write(DependencyContext context)
         {
-            var contextObject =  new JObject(
+            var contextObject = new JObject(
                 new JProperty(DependencyContextStrings.RuntimeTargetPropertyName, WriteRuntimeTargetInfo(context)),
                 new JProperty(DependencyContextStrings.CompilationOptionsPropertName, WriteCompilationOptions(context.CompilationOptions)),
                 new JProperty(DependencyContextStrings.TargetsPropertyName, WriteTargets(context)),
@@ -40,17 +48,24 @@ namespace Microsoft.Extensions.DependencyModel
             return contextObject;
         }
 
-        private string WriteRuntimeTargetInfo(DependencyContext context)
+        private JObject WriteRuntimeTargetInfo(DependencyContext context)
         {
-            return context.IsPortable?
-                context.TargetFramework :
-                context.TargetFramework + DependencyContextStrings.VersionSeperator + context.Runtime;
+            return new JObject(
+                new JProperty(DependencyContextStrings.RuntimeTargetNamePropertyName,
+                    context.Target.IsPortable ?
+                    context.Target.Framework :
+                    context.Target.Framework + DependencyContextStrings.VersionSeperator + context.Target.Runtime
+                ),
+                new JProperty(DependencyContextStrings.RuntimeTargetSignaturePropertyName,
+                    context.Target.RuntimeSignature
+                )
+            );
         }
 
         private JObject WriteRuntimeGraph(DependencyContext context)
         {
             return new JObject(
-                context.RuntimeGraph.Select(g => new JProperty(g.Key, new JArray(g.Value)))
+                context.RuntimeGraph.Select(g => new JProperty(g.Runtime, new JArray(g.Fallbacks)))
                 );
         }
 
@@ -76,25 +91,25 @@ namespace Microsoft.Extensions.DependencyModel
         }
 
         private void AddPropertyIfNotNull<T>(JObject o, string name, T value)
-            {
+        {
             if (value != null)
             {
-                o[name] = value.ToString();
+                o.Add(new JProperty(name, value));
             }
-            }
+        }
 
         private JObject WriteTargets(DependencyContext context)
         {
-            if (context.IsPortable)
+            if (context.Target.IsPortable)
             {
                 return new JObject(
-                    new JProperty(context.TargetFramework, WritePortableTarget(context.RuntimeLibraries, context.CompileLibraries))
+                    new JProperty(context.Target.Framework, WritePortableTarget(context.RuntimeLibraries, context.CompileLibraries))
                     );
             }
 
             return new JObject(
-                new JProperty(context.TargetFramework, WriteTarget(context.CompileLibraries)),
-                new JProperty(context.TargetFramework + DependencyContextStrings.VersionSeperator + context.Runtime,
+                new JProperty(context.Target.Framework, WriteTarget(context.CompileLibraries)),
+                new JProperty(context.Target.Framework + DependencyContextStrings.VersionSeperator + context.Target.Runtime,
                     WriteTarget(context.RuntimeLibraries))
                 );
         }
@@ -147,18 +162,18 @@ namespace Microsoft.Extensions.DependencyModel
                 return;
             }
             libraryObject.Add(new JProperty(DependencyContextStrings.CompileTimeAssembliesKey,
-                 WriteAssemblies(compilationAssemblies))
+                 WriteAssetList(compilationAssemblies))
              );
         }
 
-        private void AddRuntimeAssemblies(JObject libraryObject, IEnumerable<RuntimeAssembly> runtimeAssemblies)
+        private void AddAssets(JObject libraryObject, string key, RuntimeAssetGroup group)
         {
-            if (!runtimeAssemblies.Any())
+            if (group == null || !group.AssetPaths.Any())
             {
                 return;
             }
-            libraryObject.Add(new JProperty(DependencyContextStrings.RuntimeAssembliesKey,
-                       WriteAssemblies(runtimeAssemblies.Select(a => a.Path)))
+            libraryObject.Add(new JProperty(key,
+                       WriteAssetList(group.AssetPaths))
                    );
         }
 
@@ -168,7 +183,7 @@ namespace Microsoft.Extensions.DependencyModel
             {
                 return;
             }
-            libraryObject.Add(
+            libraryObject.AddFirst(
                 new JProperty(DependencyContextStrings.DependenciesPropertyName,
                 new JObject(
                     dependencies.Select(dependency => new JProperty(dependency.Name, dependency.Version))))
@@ -195,8 +210,12 @@ namespace Microsoft.Extensions.DependencyModel
             {
                 var libraryObject = new JObject();
                 AddDependencies(libraryObject, runtimeLibrary.Dependencies);
-                AddRuntimeAssemblies(libraryObject, runtimeLibrary.Assemblies);
+
+                // Add runtime-agnostic assets
+                AddAssets(libraryObject, DependencyContextStrings.RuntimeAssembliesKey, runtimeLibrary.RuntimeAssemblyGroups.GetDefaultGroup());
+                AddAssets(libraryObject, DependencyContextStrings.NativeLibrariesKey, runtimeLibrary.NativeLibraryGroups.GetDefaultGroup());
                 AddResourceAssemblies(libraryObject, runtimeLibrary.ResourceAssemblies);
+
                 return libraryObject;
             }
 
@@ -213,22 +232,24 @@ namespace Microsoft.Extensions.DependencyModel
 
         private JObject WritePortableTargetLibrary(RuntimeLibrary runtimeLibrary, CompilationLibrary compilationLibrary)
         {
-
             var libraryObject = new JObject();
 
             var dependencies = new HashSet<Dependency>();
             if (runtimeLibrary != null)
             {
-
-                if (runtimeLibrary.RuntimeTargets.Any())
-                {
-                    libraryObject.Add(new JProperty(
-                        DependencyContextStrings.RuntimeTargetsPropertyName,
-                        new JObject(runtimeLibrary.RuntimeTargets.SelectMany(WriteRuntimeTarget)))
-                        );
-                }
+                // Add runtime-agnostic assets
+                AddAssets(libraryObject, DependencyContextStrings.RuntimeAssembliesKey, runtimeLibrary.RuntimeAssemblyGroups.GetDefaultGroup());
+                AddAssets(libraryObject, DependencyContextStrings.NativeLibrariesKey, runtimeLibrary.NativeLibraryGroups.GetDefaultGroup());
                 AddResourceAssemblies(libraryObject, runtimeLibrary.ResourceAssemblies);
-                AddRuntimeAssemblies(libraryObject, runtimeLibrary.Assemblies);
+
+                // Add runtime-specific assets
+                var runtimeTargets = new JObject();
+                AddRuntimeSpecificAssetGroups(runtimeTargets, DependencyContextStrings.RuntimeAssetType, runtimeLibrary.RuntimeAssemblyGroups);
+                AddRuntimeSpecificAssetGroups(runtimeTargets, DependencyContextStrings.NativeAssetType, runtimeLibrary.NativeLibraryGroups);
+                if (runtimeTargets.Count > 0)
+                {
+                    libraryObject.Add(DependencyContextStrings.RuntimeTargetsPropertyName, runtimeTargets);
+                }
 
                 dependencies.UnionWith(runtimeLibrary.Dependencies);
             }
@@ -244,37 +265,45 @@ namespace Microsoft.Extensions.DependencyModel
             return libraryObject;
         }
 
-        private IEnumerable<JProperty> WriteRuntimeTarget(RuntimeTarget target)
+        private void AddRuntimeSpecificAssetGroups(JObject runtimeTargets, string assetType, IEnumerable<RuntimeAssetGroup> assetGroups)
         {
-            var runtime = WriteRuntimeTargetAssemblies(
-                target.Assemblies.Select(a => a.Path),
-                target.Runtime,
-                DependencyContextStrings.RuntimeAssetType);
-
-            var native = WriteRuntimeTargetAssemblies(
-                target.NativeLibraries,
-                target.Runtime,
-                DependencyContextStrings.NativeAssetType);
-
-            return runtime.Concat(native);
+            foreach (var group in assetGroups.Where(g => !string.IsNullOrEmpty(g.Runtime)))
+            {
+                if (group.AssetPaths.Any())
+                {
+                    AddRuntimeSpecificAssets(runtimeTargets, group.AssetPaths, group.Runtime, assetType);
+                }
+                else
+                {
+                    // Add a placeholder item
+                    // We need to generate a pseudo-path because there could be multiple different asset groups with placeholders
+                    // Only the last path segment matters, the rest is basically just a GUID.
+                    var pseudoPathFolder = assetType == DependencyContextStrings.RuntimeAssetType ?
+                        "lib" :
+                        "native";
+                    runtimeTargets[$"runtime/{group.Runtime}/{pseudoPathFolder}/_._"] = new JObject(
+                        new JProperty(DependencyContextStrings.RidPropertyName, group.Runtime),
+                        new JProperty(DependencyContextStrings.AssetTypePropertyName, assetType));
+                }
+            }
         }
 
-        private IEnumerable<JProperty> WriteRuntimeTargetAssemblies(IEnumerable<string> assemblies, string runtime, string assetType)
+        private void AddRuntimeSpecificAssets(JObject target, IEnumerable<string> assets, string runtime, string assetType)
         {
-            foreach (var assembly in assemblies)
+            foreach (var asset in assets)
             {
-                yield return new JProperty(NormalizePath(assembly),
+                target.Add(new JProperty(NormalizePath(asset),
                     new JObject(
                         new JProperty(DependencyContextStrings.RidPropertyName, runtime),
                         new JProperty(DependencyContextStrings.AssetTypePropertyName, assetType)
                         )
-                    );
+                    ));
             }
         }
 
-        private JObject WriteAssemblies(IEnumerable<string> assemblies)
+        private JObject WriteAssetList(IEnumerable<string> assetPaths)
         {
-            return new JObject(assemblies.Select(assembly => new JProperty(NormalizePath(assembly), new JObject())));
+            return new JObject(assetPaths.Select(assembly => new JProperty(NormalizePath(assembly), new JObject())));
         }
 
         private JObject WriteLibraries(DependencyContext context)
@@ -283,7 +312,7 @@ namespace Microsoft.Extensions.DependencyModel
                 context.RuntimeLibraries.Cast<Library>().Concat(context.CompileLibraries)
                     .GroupBy(library => library.Name + DependencyContextStrings.VersionSeperator + library.Version);
 
-            return new JObject(allLibraries.Select(libraries=> new JProperty(libraries.Key, WriteLibrary(libraries.First()))));
+            return new JObject(allLibraries.Select(libraries => new JProperty(libraries.Key, WriteLibrary(libraries.First()))));
         }
 
         private JObject WriteLibrary(Library library)

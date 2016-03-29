@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.Tools.Build
         {
             _rootProject = rootProject;
 
-            // Cleaner to clone the args and mutate the clone than have separate CompileContext fields for mutated args 
+            // Cleaner to clone the args and mutate the clone than have separate CompileContext fields for mutated args
             // and then reasoning which ones to get from args and which ones from fields.
             _args = (BuilderCommandApp)args.ShallowCopy();
 
@@ -53,17 +53,23 @@ namespace Microsoft.DotNet.Tools.Build
 
         private bool CompileRootProject(bool incremental)
         {
-            if (incremental && !NeedsRebuilding(_rootProject, _rootProjectDependencies))
+            try
             {
-                // todo: what if the previous build had errors / warnings and nothing changed? Need to propagate them in case of incremental
-                return true;
+                if (incremental && !NeedsRebuilding(_rootProject, _rootProjectDependencies))
+                {
+                    return true;
+                }
+
+                var success = InvokeCompileOnRootProject();
+
+                PrintSummary(success);
+
+                return success;
             }
-
-            var success = InvokeCompileOnRootProject();
-
-            PrintSummary(success);
-
-            return success;
+            finally
+            {
+                StampProjectWithSDKVersion(_rootProject);
+            }
         }
 
         private bool CompileDependencies(bool incremental)
@@ -75,28 +81,37 @@ namespace Microsoft.DotNet.Tools.Build
 
             foreach (var dependency in Sort(_rootProjectDependencies.ProjectDependenciesWithSources))
             {
-                if (incremental && !DependencyNeedsRebuilding(dependency))
-                {
-                    continue;
-                }
+                var dependencyProjectContext = ProjectContext.Create(dependency.Path, dependency.Framework, new[] { _rootProject.RuntimeIdentifier });
 
-                if (!InvokeCompileOnDependency(dependency))
+                try
                 {
-                    return false;
+                    if (incremental && !NeedsRebuilding(dependencyProjectContext, new ProjectDependenciesFacade(dependencyProjectContext, _args.ConfigValue)))
+                    {
+                        continue;
+                    }
+
+                    if (!InvokeCompileOnDependency(dependency))
+                    {
+                        return false;
+                    }
+                }
+                finally
+                {
+                    StampProjectWithSDKVersion(dependencyProjectContext);
                 }
             }
 
             return true;
         }
 
-        private bool DependencyNeedsRebuilding(ProjectDescription dependency)
-        {
-            var dependencyProjectContext = ProjectContext.Create(dependency.Path, dependency.Framework, new[] { _rootProject.RuntimeIdentifier });
-            return NeedsRebuilding(dependencyProjectContext, new ProjectDependenciesFacade(dependencyProjectContext, _args.ConfigValue));
-        }
-
         private bool NeedsRebuilding(ProjectContext project, ProjectDependenciesFacade dependencies)
         {
+            if (CLIChangedSinceLastCompilation(project))
+            {
+                Reporter.Output.WriteLine($"Project {project.GetDisplayName()} will be compiled because the CLI changed");
+                return true;
+            }
+            
             var compilerIO = GetCompileIO(project, dependencies);
 
             // rebuild if empty inputs / outputs
@@ -173,6 +188,48 @@ namespace Microsoft.DotNet.Tools.Build
             Reporter.Verbose.WriteLine(); ;
 
             return true;
+        }
+        
+        private bool CLIChangedSinceLastCompilation(ProjectContext project)
+        {
+            var currentVersionFile = DotnetFiles.VersionFile;
+            var versionFileFromLastCompile = project.GetSDKVersionFile(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
+
+            if (!File.Exists(currentVersionFile))
+            {
+                // this CLI does not have a version file; cannot tell if CLI changed
+                return false;
+            }
+
+            if (!File.Exists(versionFileFromLastCompile))
+            {
+                // this is the first compilation; cannot tell if CLI changed
+                return false;
+            }
+
+            var versionsAreEqual = string.Equals(File.ReadAllText(currentVersionFile), File.ReadAllText(versionFileFromLastCompile), StringComparison.OrdinalIgnoreCase);
+
+            return !versionsAreEqual;
+        }
+
+        private void StampProjectWithSDKVersion(ProjectContext project)
+        {
+            if (File.Exists(DotnetFiles.VersionFile))
+            {
+                var projectVersionFile = project.GetSDKVersionFile(_args.ConfigValue, _args.BuildBasePathValue,_args.OutputValue);
+                var parentDirectory = Path.GetDirectoryName(projectVersionFile);
+
+                if (!Directory.Exists(parentDirectory))
+                {
+                    Directory.CreateDirectory(parentDirectory);
+                }
+
+                File.Copy(DotnetFiles.VersionFile, projectVersionFile, true);
+            }
+            else
+            {
+                Reporter.Verbose.WriteLine($"Project {project.GetDisplayName()} was not stamped with a CLI version because the version file does not exist: {DotnetFiles.VersionFile}");
+            }
         }
 
         private void PrintSummary(bool success)
@@ -255,27 +312,33 @@ namespace Microsoft.DotNet.Tools.Build
 
         private void CollectCompilerNamePreconditions(ProjectContext project, IncrementalPreconditions preconditions)
         {
-            var projectCompiler = project.ProjectFile.CompilerName;
-
-            if (!KnownCompilers.Any(knownCompiler => knownCompiler.Equals(projectCompiler, StringComparison.Ordinal)))
+            if (project.ProjectFile != null)
             {
-                preconditions.AddUnknownCompilerPrecondition(project.ProjectName(), projectCompiler);
+                var projectCompiler = project.ProjectFile.CompilerName;
+
+                if (!KnownCompilers.Any(knownCompiler => knownCompiler.Equals(projectCompiler, StringComparison.Ordinal)))
+                {
+                    preconditions.AddUnknownCompilerPrecondition(project.ProjectName(), projectCompiler);
+                }
             }
         }
 
         private void CollectScriptPreconditions(ProjectContext project, IncrementalPreconditions preconditions)
         {
-            var preCompileScripts = project.ProjectFile.Scripts.GetOrEmpty(ScriptNames.PreCompile);
-            var postCompileScripts = project.ProjectFile.Scripts.GetOrEmpty(ScriptNames.PostCompile);
-
-            if (preCompileScripts.Any())
+            if (project.ProjectFile != null)
             {
-                preconditions.AddPrePostScriptPrecondition(project.ProjectName(), ScriptNames.PreCompile);
-            }
+                var preCompileScripts = project.ProjectFile.Scripts.GetOrEmpty(ScriptNames.PreCompile);
+                var postCompileScripts = project.ProjectFile.Scripts.GetOrEmpty(ScriptNames.PostCompile);
 
-            if (postCompileScripts.Any())
-            {
-                preconditions.AddPrePostScriptPrecondition(project.ProjectName(), ScriptNames.PostCompile);
+                if (preCompileScripts.Any())
+                {
+                    preconditions.AddPrePostScriptPrecondition(project.ProjectName(), ScriptNames.PreCompile);
+                }
+
+                if (postCompileScripts.Any())
+                {
+                    preconditions.AddPrePostScriptPrecondition(project.ProjectName(), ScriptNames.PostCompile);
+                }
             }
         }
 
@@ -308,7 +371,7 @@ namespace Microsoft.DotNet.Tools.Build
                 args.Add(_args.BuildBasePathValue);
             }
 
-            var compileResult = CommpileCommand.Run(args.ToArray());
+            var compileResult = CompileCommand.Run(args.ToArray());
 
             return compileResult == 0;
         }
@@ -389,7 +452,7 @@ namespace Microsoft.DotNet.Tools.Build
 
             args.Add(_rootProject.ProjectDirectory);
 
-            var compileResult = CommpileCommand.Run(args.ToArray());
+            var compileResult = CompileCommand.Run(args.ToArray());
 
             var succeeded = compileResult == 0;
 
@@ -405,6 +468,13 @@ namespace Microsoft.DotNet.Tools.Build
         {
             var dest = outputPaths.RuntimeOutputPath;
             var source = outputPaths.CompilationOutputPath;
+
+            // No need to copy if dest and source are the same
+            if(string.Equals(dest, source, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
             foreach (var file in outputPaths.CompilationFiles.All())
             {
                 var destFileName = file.Replace(source, dest);
@@ -420,51 +490,13 @@ namespace Microsoft.DotNet.Tools.Build
         private void MakeRunnable()
         {
             var runtimeContext = _rootProject.CreateRuntimeContext(_args.GetRuntimes());
-            if(_args.PortableMode)
-            {
-                // HACK: Force the use of the portable target
-                runtimeContext = _rootProject;
-            }
-
             var outputPaths = runtimeContext.GetOutputPaths(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
             var libraryExporter = runtimeContext.CreateExporter(_args.ConfigValue, _args.BuildBasePathValue);
 
-            // If we're building for a specific RID, we need to copy the RID-less compilation output into
-            // the RID-specific output dir
-            if (!string.IsNullOrEmpty(runtimeContext.RuntimeIdentifier))
-            {
-                CopyCompilationOutput(outputPaths);
-            }
+            CopyCompilationOutput(outputPaths);
 
             var executable = new Executable(runtimeContext, outputPaths, libraryExporter, _args.ConfigValue);
             executable.MakeCompilationOutputRunnable();
-
-            PatchMscorlibNextToCoreClr(runtimeContext, _args.ConfigValue);
-        }
-
-        // Workaround: CoreCLR packaging doesn't include side by side mscorlib, so copy it at build
-        // time. See: https://github.com/dotnet/cli/issues/1374
-        private static void PatchMscorlibNextToCoreClr(ProjectContext context, string config)
-        {
-            {
-                foreach (var exp in context.CreateExporter(config).GetAllExports())
-                {
-                    var coreclrLib = exp.NativeLibraries.FirstOrDefault(nLib =>
-                            string.Equals(Constants.LibCoreClrFileName, nLib.Name));
-                    if (string.IsNullOrEmpty(coreclrLib.ResolvedPath))
-                    {
-                        continue;
-                    }
-                    var coreclrDir = Path.GetDirectoryName(coreclrLib.ResolvedPath);
-                    if (File.Exists(Path.Combine(coreclrDir, "mscorlib.dll")) ||
-                        File.Exists(Path.Combine(coreclrDir, "mscorlib.ni.dll")))
-                    {
-                        continue;
-                    }
-                    var mscorlibFile = exp.RuntimeAssemblies.FirstOrDefault(r => r.Name.Equals("mscorlib") || r.Name.Equals("mscorlib.ni")).ResolvedPath;
-                    File.Copy(mscorlibFile, Path.Combine(coreclrDir, Path.GetFileName(mscorlibFile)), overwrite: true);
-                }
-            }
         }
 
         private static ISet<ProjectDescription> Sort(Dictionary<string, ProjectDescription> projects)
@@ -533,12 +565,16 @@ namespace Microsoft.DotNet.Tools.Build
             // input: dependencies
             AddDependencies(dependencies, compilerIO);
 
-            var allOutputPath = new List<string>(calculator.CompilationFiles.All());
+            var allOutputPath = new HashSet<string>(calculator.CompilationFiles.All());
             if (isRootProject && project.ProjectFile.HasRuntimeOutput(buildConfiguration))
             {
                 var runtimeContext = project.CreateRuntimeContext(_args.GetRuntimes());
-                allOutputPath.AddRange(runtimeContext.GetOutputPaths(buildConfiguration, buildBasePath, outputPath).RuntimeFiles.All());
+                foreach (var path in runtimeContext.GetOutputPaths(buildConfiguration, buildBasePath, outputPath).RuntimeFiles.All())
+                {
+                    allOutputPath.Add(path);
+                }
             }
+
             // output: compiler outputs
             foreach (var path in allOutputPath)
             {

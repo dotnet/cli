@@ -2,64 +2,89 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 #include "trace.h"
-#include "pal.h"
 #include "utils.h"
-#include "libhost.h"
+#include "pal.h"
+#include "fx_ver.h"
+#include "error_codes.h"
 
-extern int corehost_main(const int argc, const pal::char_t* argv[]);
+#define LIBFXR_NAME MAKE_LIBNAME("hostfxr")
 
-namespace
+typedef int(*hostfxr_main_fn) (const int argc, const pal::char_t* argv[]);
+
+pal::string_t resolve_fxr_path(const pal::string_t& own_dir)
 {
-enum StatusCode
-{
-    Success                   = 0,
-    CoreHostLibLoadFailure    = 0x41,
-    CoreHostLibMissingFailure = 0x42,
-    CoreHostEntryPointFailure = 0x43,
-    CoreHostCurExeFindFailure = 0x44,
-};
-
-typedef int (*corehost_main_fn) (const int argc, const pal::char_t* argv[]);
-
-// -----------------------------------------------------------------------------
-// Load the corehost library from the path specified
-//
-// Parameters:
-//    lib_dir      - dir path to the corehost library
-//    h_host       - handle to the library which will be kept live
-//    main_fn      - Contains the entrypoint "corehost_main" when returns success.
-//
-// Returns:
-//    Non-zero exit code on failure. "main_fn" contains "corehost_main"
-//    entrypoint on success.
-//
-StatusCode load_host_lib(const pal::string_t& lib_dir, pal::dll_t* h_host, corehost_main_fn* main_fn)
-{
-    pal::string_t host_path = lib_dir;
-    append_path(&host_path, LIBHOST_NAME);
-
-    // Missing library
-    if (!pal::file_exists(host_path))
+    pal::string_t fxr_dir = own_dir;
+    append_path(&fxr_dir, _X("host"));
+    append_path(&fxr_dir, _X("fxr"));
+    if (pal::directory_exists(fxr_dir))
     {
-        return StatusCode::CoreHostLibMissingFailure;
+        trace::info(_X("Reading fx resolver directory=[%s]"), fxr_dir.c_str());
+
+        std::vector<pal::string_t> list;
+        pal::readdir(fxr_dir, &list);
+
+        fx_ver_t max_ver(-1, -1, -1);
+        for (const auto& dir : list)
+        {
+            trace::info(_X("Considering fxr version=[%s]..."), dir.c_str());
+
+            pal::string_t ver = get_filename(dir);
+
+            fx_ver_t fx_ver(-1, -1, -1);
+            if (fx_ver_t::parse(ver, &fx_ver, false))
+            {
+                max_ver = std::max(max_ver, fx_ver);
+            }
+        }
+
+        pal::string_t max_ver_str = max_ver.as_str();
+        append_path(&fxr_dir, max_ver_str.c_str());
+        trace::info(_X("Detected latest fxr version=[%s]..."), fxr_dir.c_str());
+
+        pal::string_t ret_path;
+        if (library_exists_in_dir(fxr_dir, LIBFXR_NAME, &ret_path))
+        {
+            trace::info(_X("Resolved fxr [%s]..."), ret_path.c_str());
+            return ret_path;
+        }
     }
 
-    // Load library
-    if (!pal::load_library(host_path.c_str(), h_host))
+    pal::string_t fxr_path;
+    if (library_exists_in_dir(own_dir, LIBFXR_NAME, &fxr_path))
     {
-        trace::info(_X("Load library of %s failed"), host_path.c_str());
+        trace::info(_X("Resolved fxr [%s]..."), fxr_path.c_str());
+        return fxr_path;
+    }
+    return pal::string_t();
+}
+
+int run(const int argc, const pal::char_t* argv[])
+{
+    pal::string_t own_path;
+    if (!pal::get_own_executable_path(&own_path) || !pal::realpath(&own_path))
+    {
+        trace::error(_X("Failed to locate current executable"));
+        return StatusCode::CoreHostCurExeFindFailure;
+    }
+
+    pal::dll_t fxr;
+
+    pal::string_t own_dir = get_directory(own_path);
+
+    // Load library
+    pal::string_t fxr_path = resolve_fxr_path(own_dir);
+    if (!pal::load_library(fxr_path.c_str(), &fxr))
+    {
+        trace::info(_X("Load library of %s failed"), fxr_path.c_str());
         return StatusCode::CoreHostLibLoadFailure;
     }
 
-    // Obtain entrypoint symbol
-    *main_fn = (corehost_main_fn) pal::get_symbol(*h_host, "corehost_main");
-
-    return (*main_fn != nullptr)
-                ? StatusCode::Success
-                : StatusCode::CoreHostEntryPointFailure;
+    // Obtain entrypoint symbols
+    hostfxr_main_fn main_fn = (hostfxr_main_fn) pal::get_symbol(fxr, "hostfxr_main");
+    int code = main_fn(argc, argv);
+    pal::unload_library(fxr);
+    return code;
 }
-
-}; // end of anonymous namespace
 
 #if defined(_WIN32)
 int __cdecl wmain(const int argc, const pal::char_t* argv[])
@@ -69,56 +94,16 @@ int main(const int argc, const pal::char_t* argv[])
 {
     trace::setup();
 
-    pal::dll_t corehost;
-
-#ifdef COREHOST_PACKAGE_SERVICING
-    // No custom host asked, so load the corehost if serviced first.
-    pal::string_t svc_dir;
-    if (pal::getenv(_X("DOTNET_SERVICING"), &svc_dir))
+    if (trace::is_enabled())
     {
-        pal::string_t path = svc_dir;
-        append_path(&path, COREHOST_PACKAGE_NAME);
-        append_path(&path, COREHOST_PACKAGE_VERSION);
-        append_path(&path, COREHOST_PACKAGE_COREHOST_RELATIVE_DIR);
-
-        corehost_main_fn host_main;
-        StatusCode code = load_host_lib(path, &corehost, &host_main);
-        if (code != StatusCode::Success)
+        trace::info(_X("--- Invoked host main = {"));
+        for (int i = 0; i < argc; ++i)
         {
-            trace::info(_X("Failed to load host library from servicing dir: %s; Status=%08X"), path.c_str(), code);
-            // Ignore all errors for the servicing case, and proceed to the next step.
+            trace::info(_X("%s"), argv[i]);
         }
-        else
-        {
-            trace::info(_X("Calling host entrypoint from library at servicing dir %s"), path.c_str());
-            return host_main(argc, argv);
-        }
-    }
-#endif
-
-    // Get current path to look for the library app locally.
-    pal::string_t own_path;
-    if (!pal::get_own_executable_path(&own_path) || !pal::realpath(&own_path))
-    {
-        trace::error(_X("Failed to locate current executable"));
-        return StatusCode::CoreHostCurExeFindFailure;
+        trace::info(_X("}"));
     }
 
-    // Local load of the corehost library.
-    auto own_dir = get_directory(own_path);
-
-    corehost_main_fn host_main;
-    StatusCode code = load_host_lib(own_dir, &corehost, &host_main);
-    switch (code)
-    {
-    // Success, call the entrypoint.
-    case StatusCode::Success:
-        trace::info(_X("Calling host entrypoint from library at own dir %s"), own_dir.c_str());
-        return host_main(argc, argv);
-
-    // Some other fatal error including StatusCode::CoreHostLibMissingFailure.
-    default:
-        trace::error(_X("Error loading the host library from own dir: %s; Status=%08X"), own_dir.c_str(), code);
-        return code;
-    }
+    return run(argc, argv);
 }
+

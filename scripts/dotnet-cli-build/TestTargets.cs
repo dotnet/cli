@@ -13,10 +13,19 @@ namespace Microsoft.DotNet.Cli.Build
 {
     public class TestTargets
     {
-        public static readonly string[] TestPackageProjects = new[]
+        public static readonly dynamic[] TestPackageProjects = new[]
         {
-            "dotnet-hello/v1/dotnet-hello",
-            "dotnet-hello/v2/dotnet-hello"
+            new { Name = "Microsoft.DotNet.Cli.Utils", IsTool = false, Path = "src/Microsoft.DotNet.Cli.Utils", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) },
+            new { Name = "Microsoft.DotNet.ProjectModel", IsTool = false, Path = "src/Microsoft.DotNet.ProjectModel", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) },
+            new { Name = "Microsoft.DotNet.Compiler.Common", IsTool = false, Path = "src/Microsoft.DotNet.Compiler.Common", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) },
+            new { Name = "Microsoft.Extensions.DependencyModel", IsTool = false, Path = "src/Microsoft.Extensions.DependencyModel", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) },
+            new { Name = "Microsoft.DotNet.Files", IsTool = false, Path = "src/Microsoft.DotNet.Files", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) },
+            new { Name = "Microsoft.DotNet.InternalAbstractions", IsTool = false, Path = "src/Microsoft.DotNet.InternalAbstractions", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) },
+            new { Name = "dotnet-dependency-tool-invoker", IsTool = true, Path = "TestAssets/TestPackages/dotnet-dependency-tool-invoker", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) }, 
+            new { Name = "dotnet-desktop-and-portable", IsTool = true, Path = "TestAssets/TestPackages/dotnet-desktop-and-portable", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) },
+            new { Name = "dotnet-hello", IsTool = true, Path = "TestAssets/TestPackages/dotnet-hello/v1/dotnet-hello", IsApplicable = new Func<bool>(() => true) }, 
+            new { Name = "dotnet-hello", IsTool = true, Path = "TestAssets/TestPackages/dotnet-hello/v2/dotnet-hello", IsApplicable = new Func<bool>(() => true) },
+            new { Name = "dotnet-portable", IsTool = true, Path = "TestAssets/TestPackages/dotnet-portable", IsApplicable = new Func<bool>(() => true) }
         };
 
         public static readonly string[] TestProjects = new[]
@@ -36,7 +45,13 @@ namespace Microsoft.DotNet.Cli.Build
             "Microsoft.DotNet.ProjectModel.Tests",
             "Microsoft.Extensions.DependencyModel.Tests",
             "ArgumentForwardingTests",
-            "dotnet-test.UnitTests"
+            "dotnet-test.UnitTests",
+            "dotnet-test.Tests"
+        };
+        
+        public static readonly dynamic[] ConditionalTestAssets = new[]
+        {
+            new { Path = "AppWithDirectDependencyDesktopAndPortable", Skip = new Func<bool>(() => !CurrentPlatform.IsWindows) } 
         };
 
         [Target(nameof(PrepareTargets.Init), nameof(SetupTests), nameof(RestoreTests), nameof(BuildTests), nameof(RunTests), nameof(ValidateDependencies))]
@@ -44,11 +59,11 @@ namespace Microsoft.DotNet.Cli.Build
 
         [Target(nameof(SetupTestPackages), nameof(SetupTestProjects))]
         public static BuildTargetResult SetupTests(BuildTargetContext c) => c.Success();
-        
+
         [Target(nameof(RestoreTestAssetPackages), nameof(BuildTestAssetPackages))]
         public static BuildTargetResult SetupTestPackages(BuildTargetContext c) => c.Success();
 
-        [Target(nameof(RestoreTestAssetProjects), nameof(BuildTestAssetProjects))]
+        [Target(nameof(RestoreTestAssetProjects), nameof(RestoreDesktopTestAssetProjects), nameof(BuildTestAssetProjects))]
         public static BuildTargetResult SetupTestProjects(BuildTargetContext c) => c.Success();
 
         [Target]
@@ -60,11 +75,11 @@ namespace Microsoft.DotNet.Cli.Build
             CleanNuGetTempCache();
 
             var dotnet = DotNetCli.Stage2;
-            dotnet.Restore().WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages")).Execute().EnsureSuccessful();
+            dotnet.Restore("--verbosity", "verbose", "--disable-parallel").WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages")).Execute().EnsureSuccessful();
 
             return c.Success();
         }
-        
+
         [Target]
         public static BuildTargetResult RestoreTestAssetProjects(BuildTargetContext c)
         {
@@ -74,59 +89,84 @@ namespace Microsoft.DotNet.Cli.Build
             CleanNuGetTempCache();
 
             var dotnet = DotNetCli.Stage2;
-                
-            dotnet.Restore("--fallbacksource", Dirs.TestPackages)
+
+            dotnet.Restore("--verbosity", "verbose", "--disable-parallel", "--fallbacksource", Dirs.TestPackages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects"))
                 .Execute().EnsureSuccessful();
-                
+
             // The 'ProjectModelServer' directory contains intentionally-unresolved dependencies, so don't check for success. Also, suppress the output
-            dotnet.Restore()
+            dotnet.Restore("--verbosity", "verbose", "--disable-parallel")
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectModelServer", "DthTestProjects"))
                 .Execute();
-                
-            dotnet.Restore()
+
+            dotnet.Restore("--verbosity", "verbose", "--disable-parallel")
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectModelServer", "DthUpdateSearchPathSample"))
                 .Execute();
 
             return c.Success();
         }
 
+        [Target]
+        [BuildPlatforms(BuildPlatform.Windows)]
+        public static BuildTargetResult RestoreDesktopTestAssetProjects(BuildTargetContext c)
+        {
+            var dotnet = DotNetCli.Stage2;
+
+            dotnet.Restore("--verbosity", "verbose", "--disable-parallel", "--fallbacksource", Dirs.TestPackages)
+                .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "DesktopTestProjects"))
+                .Execute().EnsureSuccessful();
+                
+            return c.Success();
+        }
+
         [Target(nameof(CleanTestPackages))]
         public static BuildTargetResult BuildTestAssetPackages(BuildTargetContext c)
         {
+            CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages"));
+
             var dotnet = DotNetCli.Stage2;
 
             Rmdir(Dirs.TestPackages);
             Mkdirp(Dirs.TestPackages);
 
-            foreach (var relativePath in TestPackageProjects)
+            foreach (var relativePath in TestPackageProjects.Where(p => p.IsApplicable()).Select(p => p.Path))
             {
-                var fullPath = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages", relativePath.Replace('/', Path.DirectorySeparatorChar));
+                var fullPath = Path.Combine(c.BuildContext.BuildDirectory, relativePath.Replace('/', Path.DirectorySeparatorChar));
                 c.Info($"Packing: {fullPath}");
                 dotnet.Pack("--output", Dirs.TestPackages)
                     .WorkingDirectory(fullPath)
                     .Execute()
                     .EnsureSuccessful();
             }
-            
+
             return c.Success();
         }
-        
+
         [Target]
         public static BuildTargetResult CleanTestPackages(BuildTargetContext c)
         {
-            Rmdir(Path.Combine(Dirs.NuGetPackages, "dotnet-hello"));
-            
+            foreach (var packageProject in TestPackageProjects.Where(p => p.IsApplicable()))
+            {
+                Rmdir(Path.Combine(Dirs.NuGetPackages, packageProject.Name));
+                if(packageProject.IsTool)
+                {
+                    Rmdir(Path.Combine(Dirs.NuGetPackages, ".tools", packageProject.Name));
+                }
+            }            
+
             return c.Success();
         }
 
         [Target]
         public static BuildTargetResult BuildTestAssetProjects(BuildTargetContext c)
         {
+            CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects"));
+
             var dotnet = DotNetCli.Stage2;
             var nobuildFileName = ".noautobuild";
             string testProjectsRoot = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects");
             var projects = Directory.GetFiles(testProjectsRoot, "project.json", SearchOption.AllDirectories)
+                                    .Where(p => !ConditionalTestAssets.Where(s => !s.Skip() && p.EndsWith(Path.Combine(s.Path, "project.json"))).Any())
                                     .Where(p => !File.Exists(Path.Combine(Path.GetDirectoryName(p), nobuildFileName)));
 
             foreach (var project in projects)
@@ -137,7 +177,7 @@ namespace Microsoft.DotNet.Cli.Build
                     .Execute()
                     .EnsureSuccessful();
             }
-            
+
             return c.Success();
         }
 
@@ -148,7 +188,7 @@ namespace Microsoft.DotNet.Cli.Build
             CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "test"));
 
             CleanNuGetTempCache();
-            DotNetCli.Stage2.Restore("--fallbacksource", Dirs.TestPackages)
+            DotNetCli.Stage2.Restore("--verbosity", "verbose", "--disable-parallel", "--fallbacksource", Dirs.TestPackages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "test"))
                 .Execute()
                 .EnsureSuccessful();
@@ -246,7 +286,7 @@ namespace Microsoft.DotNet.Cli.Build
             {
                 return new Dictionary<string, string>();
             }
-            
+
             c.Verbose("Start Collecting Visual Studio Environment Variables");
 
             var vsvarsPath = Path.GetFullPath(Path.Combine(Environment.GetEnvironmentVariable("VS140COMNTOOLS"), "..", "..", "VC"));
@@ -273,14 +313,14 @@ set");
                     File.Delete(temp);
                 }
             }
-            
+
             result.EnsureSuccessful();
-            
+
             var vars = new Dictionary<string, string>();
             foreach (var line in result.StdOut.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
             {
                 var splat = line.Split(new[] { '=' }, 2);
-                
+
                 if (splat.Length == 2)
                 {
                     c.Verbose($"Adding variable '{line}'");
@@ -291,9 +331,8 @@ set");
                     c.Info($"Skipping VS Env Variable. Unknown format: '{line}'");
                 }
             }
-            
+
             c.Verbose("Finish Collecting Visual Studio Environment Variables");
-            
             return vars;
         }
     }

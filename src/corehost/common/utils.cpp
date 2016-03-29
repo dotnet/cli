@@ -4,6 +4,22 @@
 #include "utils.h"
 #include "trace.h"
 
+bool library_exists_in_dir(const pal::string_t& lib_dir, const pal::string_t& lib_name, pal::string_t* p_lib_path)
+{
+    pal::string_t lib_path = lib_dir;
+    append_path(&lib_path, lib_name.c_str());
+
+    if (!pal::file_exists(lib_path))
+    {
+        return false;
+    }
+    if (p_lib_path)
+    {
+        *p_lib_path = lib_path;
+    }
+    return true;
+}
+
 bool coreclr_exists_in_dir(const pal::string_t& candidate)
 {
     pal::string_t test(candidate);
@@ -55,16 +71,49 @@ pal::string_t get_executable(const pal::string_t& filename)
     return result;
 }
 
-pal::string_t get_filename(const pal::string_t& path)
+pal::string_t strip_file_ext(const pal::string_t& path)
 {
-    // Find the last dir separator
-    auto path_sep = path.find_last_of(DIR_SEPARATOR);
-    if (path_sep == pal::string_t::npos)
+    if (path.empty())
     {
-        return pal::string_t(path);
+        return path;
+    }
+    size_t sep_pos = path.rfind(_X("/\\"));
+    size_t dot_pos = path.rfind(_X('.'));
+    if (sep_pos != pal::string_t::npos && sep_pos > dot_pos)
+    {
+	    return path;
+    }
+    return path.substr(0, dot_pos);
+}
+
+pal::string_t get_filename_without_ext(const pal::string_t& path)
+{
+    if (path.empty())
+    {
+        return path;
     }
 
-    return path.substr(path_sep + 1);
+    size_t name_pos = path.find_last_of(_X("/\\"));
+    size_t dot_pos = path.rfind(_X('.'));
+    size_t start_pos = (name_pos == pal::string_t::npos) ? 0 : (name_pos + 1);
+    size_t count = (dot_pos == pal::string_t::npos || dot_pos < start_pos) ? pal::string_t::npos : (dot_pos - start_pos);
+    return path.substr(start_pos, count);
+}
+
+pal::string_t get_filename(const pal::string_t& path)
+{
+    if (path.empty())
+    {
+        return path;
+    }
+
+    auto name_pos = path.find_last_of(DIR_SEPARATOR);
+    if (name_pos == pal::string_t::npos)
+    {
+        return path;
+    }
+
+    return path.substr(name_pos + 1);
 }
 
 pal::string_t get_directory(const pal::string_t& path)
@@ -87,3 +136,52 @@ void replace_char(pal::string_t* path, pal::char_t match, pal::char_t repl)
         (*path)[pos] = repl;
     }
 }
+
+const pal::char_t* get_arch()
+{
+#if _TARGET_AMD64_
+    return _X("x64");
+#elif _TARGET_X86_
+    return _X("x86");
+#elif _TARGET_ARM_
+    return _X("arm");
+#else
+#error "Unknown target"
+#endif
+}
+
+bool parse_known_args(
+    const int argc,
+    const pal::char_t* argv[],
+    const std::vector<pal::string_t>& known_opts,
+    std::unordered_map<pal::string_t, pal::string_t>* opts,
+    int* num_args)
+{
+    int arg_i = *num_args;
+    while (arg_i < argc)
+    {
+        pal::string_t arg = argv[arg_i];
+        if (std::find(known_opts.begin(), known_opts.end(), pal::to_lower(arg)) == known_opts.end())
+        {
+            // Unknown argument.
+            break;
+        }
+
+        // Known argument, so expect one more arg (value) to be present.
+        if (arg_i + 1 >= argc)
+        {
+            return false;
+        }
+
+        trace::verbose(_X("Parsed known arg %s = %s"), arg.c_str(), argv[arg_i + 1]);
+        (*opts)[arg] = argv[arg_i + 1];
+
+        // Increment for both the option and its value.
+        arg_i += 2;
+    }
+
+    *num_args = arg_i;
+
+    return true;
+}
+

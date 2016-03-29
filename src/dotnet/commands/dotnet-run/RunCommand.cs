@@ -84,7 +84,7 @@ namespace Microsoft.DotNet.Tools.Run
                     {
                         throw new InvalidOperationException($"Couldn't find target to run. Possible causes:" + Environment.NewLine +
                             "1. No project.lock.json file or restore failed - run `dotnet restore`" + Environment.NewLine +
-                            $"2. project.lock.json has multiple targets none of which is in default list ({string.Join(", " , defaultFrameworks)})");
+                            $"2. project.lock.json has multiple targets none of which is in default list ({string.Join(", ", defaultFrameworks)})");
                     }
                 }
 
@@ -124,8 +124,15 @@ namespace Microsoft.DotNet.Tools.Run
                 return result;
             }
 
+            // Add Nuget Packages Probing Path
+            var nugetPackagesRoot = _context.PackagesDirectory;
+            var probingPathArg = "--additionalprobingpath";
+            _args.Insert(0, nugetPackagesRoot);
+            _args.Insert(0, probingPathArg);
+
             // Now launch the output and give it the results
-            var outputName = _context.GetOutputPaths(Configuration).RuntimeFiles.Executable;
+            var outputPaths = _context.GetOutputPaths(Configuration);
+            var outputName = outputPaths.RuntimeFiles.Executable;
 
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -145,7 +152,20 @@ namespace Microsoft.DotNet.Tools.Run
                 }
             }
 
-            result = Command.Create(outputName, _args)
+            Command command;
+            if (outputName.EndsWith(FileNameSuffixes.DotNet.DynamicLib, StringComparison.OrdinalIgnoreCase))
+            {
+                // The executable is a ".dll", we need to call it through dotnet.exe
+                var muxer = new Muxer();
+
+                command = Command.Create(muxer.MuxerPath, Enumerable.Concat(new[] { "exec", outputName }, _args));
+            }
+            else
+            {
+                command = Command.Create(outputName, _args);
+            }
+
+            result = command
                 .ForwardStdOut()
                 .ForwardStdErr()
                 .Execute()
@@ -156,7 +176,7 @@ namespace Microsoft.DotNet.Tools.Run
 
         private static int RunInteractive(string scriptName)
         {
-            var command = Command.CreateDotNet($"repl-csi", new [] {scriptName})
+            var command = Command.CreateDotNet($"repl-csi", new[] { scriptName })
                 .ForwardStdOut()
                 .ForwardStdErr();
             var result = command.Execute();
