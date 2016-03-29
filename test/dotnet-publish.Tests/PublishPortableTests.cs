@@ -17,8 +17,9 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             Tuple.Create("win7-x64", "libuv.dll")
         };
 
-        [Fact]
-        public void PortableAppWithRuntimeTargetsIsPublishedCorrectly()
+        private readonly DirectoryInfo _publishDir;
+
+        public PublishPortableTests()
         {
             var testInstance = TestAssetsManager.CreateTestInstance("PortableTests")
                 .WithLockFiles();
@@ -28,8 +29,13 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
 
             publishResult.Should().Pass();
 
-            var publishDir = publishCommand.GetOutputDirectory(portable: true);
-            publishDir.Should().HaveFiles(new[]
+            _publishDir = publishCommand.GetOutputDirectory(portable: true);
+        }
+
+        [Fact]
+        public void PortableAppWithRuntimeTargetsIsPublishedCorrectly()
+        {            
+            _publishDir.Should().HaveFiles(new[]
             {
                 "PortableAppWithNative.dll",
                 "PortableAppWithNative.deps",
@@ -37,9 +43,9 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             });
 
             // Prior to `type:platform` trimming, this would have been published.
-            publishDir.Should().NotHaveFile("System.Linq.dll");
+            _publishDir.Should().NotHaveFile("System.Linq.dll");
 
-            var runtimesOutput = publishDir.Sub("runtimes");
+            var runtimesOutput = _publishDir.Sub("runtimes");
 
             runtimesOutput.Should().Exist();
 
@@ -73,6 +79,12 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
                 "PortableAppWithIntentionalManagedDowngrade.deps.json",
                 "System.Linq.dll"
             });
+        }
+        
+        [Fact]
+        public void PortableAppWithRuntimeTargetsDoesNotHaveRuntimeConfigDevJsonFile()
+        {
+            _publishDir.Should().NotHaveFile("PortableAppWithNative.runtimeconfig.dev.json");
         }
     }
 }

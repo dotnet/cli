@@ -6,8 +6,9 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 {
     public class BuildPortableTests : TestBase
     {
-        [Fact]
-        public void BuildingAPortableProjectProducesDepsFile()
+        private readonly DirectoryInfo _netstandardappOutput;
+        
+        public BuildPortableTests()
         {
             var testInstance = TestAssetsManager.CreateTestInstance("PortableTests")
                 .WithLockFiles();
@@ -20,17 +21,43 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
             var outputBase = new DirectoryInfo(Path.Combine(testInstance.TestRoot, "PortableApp", "bin", "Debug"));
 
-            var netstandardappOutput = outputBase.Sub("netstandard1.5");
-
-            netstandardappOutput.Should()
-                .Exist().And
-                .HaveFiles(new[]
-                {
-                    "PortableApp.deps",
-                    "PortableApp.deps.json",
-                    "PortableApp.dll",
-                    "PortableApp.pdb"
-                });
+            _netstandardappOutput = outputBase.Sub("netstandard1.5");
+        }
+        
+        [Fact]
+        public void BuildingAPortableProjectProducesDepsFile()
+        {
+            _netstandardappOutput.Should().Exist().And.HaveFile("PortableApp.deps");
+        }
+        
+        [Fact]
+        public void BuildingAPortableProjectProducesDepsJsonFile()
+        {
+            _netstandardappOutput.Should().Exist().And.HaveFile("PortableApp.deps.json");
+        }
+        
+        [Fact]
+        public void BuildingAPortableProjectProducesADllFile()
+        {
+            _netstandardappOutput.Should().Exist().And.HaveFile("PortableApp.dll");
+        }
+        
+        [Fact]
+        public void BuildingAPortableProjectProducesAPdbFile()
+        {
+            _netstandardappOutput.Should().Exist().And.HaveFile("PortableApp.pdb");
+        }
+        
+        [Fact]
+        public void BuildingAPortableProjectProducesARuntimeConfigJsonFile()
+        {
+            _netstandardappOutput.Should().Exist().And.HaveFile("PortableApp.runtimeconfig.json");
+        }
+        
+        [Fact]
+        public void BuildingAPortableProjectProducesARuntimeConfigDevJsonFile()
+        {
+            _netstandardappOutput.Should().Exist().And.HaveFile("PortableApp.runtimeconfig.dev.json");
         }
     }
 }
