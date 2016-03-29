@@ -85,8 +85,7 @@ namespace Microsoft.DotNet.Cli.Build
 
             var dotnet = DotNetCli.Stage2;
 
-            dotnet.Restore("--verbosity", "verbose", 
-                "--disable-parallel", 
+            dotnet.Restore("--verbosity", "verbose", "--disable-parallel", 
                 "--fallbacksource", Dirs.TestPackages,
                 "--fallbacksource", Dirs.Packages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects"))
@@ -148,6 +147,17 @@ namespace Microsoft.DotNet.Cli.Build
         public static BuildTargetResult CleanProductPackages(BuildTargetContext c)
         {
             foreach (var packageName in PackageTargets.ProjectsToPack)
+            {
+                Rmdir(Path.Combine(Dirs.NuGetPackages, packageName));
+            }            
+
+            return c.Success();
+        }
+
+        [Target]
+        public static BuildTargetResult CleanTestPackages(BuildTargetContext c)
+        {
+            foreach (var packageProject in TestPackageProjects.Where(p => p.IsApplicable()))
             {
                 Rmdir(Path.Combine(Dirs.NuGetPackages, packageProject.Name));
                 if(packageProject.IsTool)
