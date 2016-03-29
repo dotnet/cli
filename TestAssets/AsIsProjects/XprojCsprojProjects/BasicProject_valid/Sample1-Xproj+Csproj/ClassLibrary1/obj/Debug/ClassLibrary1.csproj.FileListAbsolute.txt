@@ -1,7 +1,0 @@
-C:\Users\micodoba\OneDrive for Business\tests\TestXprojCsproj-master\Sample1-Xproj+Csproj\ClassLibrary1\bin\Debug\ClassLibrary1.dll
-C:\Users\micodoba\OneDrive for Business\tests\TestXprojCsproj-master\Sample1-Xproj+Csproj\ClassLibrary1\bin\Debug\ClassLibrary1.pdb
-C:\Users\micodoba\OneDrive for Business\tests\TestXprojCsproj-master\Sample1-Xproj+Csproj\ClassLibrary1\bin\Debug\Newtonsoft.Json.dll
-C:\Users\micodoba\OneDrive for Business\tests\TestXprojCsproj-master\Sample1-Xproj+Csproj\ClassLibrary1\bin\Debug\Newtonsoft.Json.xml
-C:\Users\micodoba\OneDrive for Business\tests\TestXprojCsproj-master\Sample1-Xproj+Csproj\ClassLibrary1\obj\Debug\ClassLibrary1.csprojResolveAssemblyReference.cache
-C:\Users\micodoba\OneDrive for Business\tests\TestXprojCsproj-master\Sample1-Xproj+Csproj\ClassLibrary1\obj\Debug\ClassLibrary1.dll
-C:\Users\micodoba\OneDrive for Business\tests\TestXprojCsproj-master\Sample1-Xproj+Csproj\ClassLibrary1\obj\Debug\ClassLibrary1.pdb

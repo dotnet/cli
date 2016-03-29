@@ -1,1 +1,0 @@
-C:\Users\micodoba\OneDrive for Business\tests\TestXprojCsproj-master\Sample1-Xproj+Csproj\artifacts\obj\ConsoleApp13\Debug\ConsoleApp13.xprojResolveAssemblyReference.cache
