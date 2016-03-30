@@ -13,13 +13,50 @@ namespace Microsoft.DotNet.Cli.Build
 {
     public class TestTargets
     {
+        private static string s_testPackageBuildVersionSuffix = "<buildversion>";
+
         public static readonly dynamic[] TestPackageProjects = new[]
         {
-            new { Name = "dotnet-dependency-tool-invoker", IsTool = true, Path = "TestAssets/TestPackages/dotnet-dependency-tool-invoker", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) }, 
-            new { Name = "dotnet-desktop-and-portable", IsTool = true, Path = "TestAssets/TestPackages/dotnet-desktop-and-portable", IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows) },
-            new { Name = "dotnet-hello", IsTool = true, Path = "TestAssets/TestPackages/dotnet-hello/v1/dotnet-hello", IsApplicable = new Func<bool>(() => true) }, 
-            new { Name = "dotnet-hello", IsTool = true, Path = "TestAssets/TestPackages/dotnet-hello/v2/dotnet-hello", IsApplicable = new Func<bool>(() => true) },
-            new { Name = "dotnet-portable", IsTool = true, Path = "TestAssets/TestPackages/dotnet-portable", IsApplicable = new Func<bool>(() => true) }
+            new 
+            { 
+                Name = "dotnet-dependency-tool-invoker", 
+                IsTool = true, 
+                Path = "TestAssets/TestPackages/dotnet-dependency-tool-invoker", 
+                IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows), 
+                VersionSuffix = s_testPackageBuildVersionSuffix
+            }, 
+            new 
+            { 
+                Name = "dotnet-desktop-and-portable", 
+                IsTool = true, 
+                Path = "TestAssets/TestPackages/dotnet-desktop-and-portable", 
+                IsApplicable = new Func<bool>(() => CurrentPlatform.IsWindows),
+                VersionSuffix = s_testPackageBuildVersionSuffix
+            },
+            new 
+            { 
+                Name = "dotnet-hello", 
+                IsTool = true, 
+                Path = "TestAssets/TestPackages/dotnet-hello/v1/dotnet-hello", 
+                IsApplicable = new Func<bool>(() => true),
+                VersionSuffix = string.Empty
+            }, 
+            new 
+            { 
+                Name = "dotnet-hello", 
+                IsTool = true, 
+                Path = "TestAssets/TestPackages/dotnet-hello/v2/dotnet-hello", 
+                IsApplicable = new Func<bool>(() => true),
+                VersionSuffix = string.Empty
+            },
+            new 
+            { 
+                Name = "dotnet-portable", 
+                IsTool = true, 
+                Path = "TestAssets/TestPackages/dotnet-portable", 
+                IsApplicable = new Func<bool>(() => true),
+                VersionSuffix = string.Empty
+            }
         };
 
         public static readonly string[] TestProjects = new[]
@@ -136,12 +173,28 @@ namespace Microsoft.DotNet.Cli.Build
             Rmdir(Dirs.TestPackages);
             Mkdirp(Dirs.TestPackages);
 
-            foreach (var relativePath in TestPackageProjects.Where(p => p.IsApplicable()).Select(p => p.Path))
+            foreach (var testPackageProject in TestPackageProjects.Where(p => p.IsApplicable()))
             {
+                var relativePath = testPackageProject.Path;
+
+                var versionSuffix = testPackageProject.VersionSuffix;
+                if (versionSuffix.Equals(s_testPackageBuildVersionSuffix))
+                {
+                    versionSuffix = c.BuildContext.Get<BuildVersion>("BuildVersion").VersionSuffix;
+                }
+                
                 var fullPath = Path.Combine(c.BuildContext.BuildDirectory, relativePath.Replace('/', Path.DirectorySeparatorChar));
                 c.Info($"Packing: {fullPath}");
 
-                dotnet.Pack("--output", Dirs.TestPackages)
+                var dotnetPackArgs = new List<string> { "--output", Dirs.TestPackages };
+
+                if (!string.IsNullOrEmpty(versionSuffix))
+                {
+                    dotnetPackArgs.Add("--version-suffix");
+                    dotnetPackArgs.Add(versionSuffix);
+                }
+
+                dotnet.Pack(dotnetPackArgs.ToArray())
                     .WorkingDirectory(fullPath)
                     .Execute()
                     .EnsureSuccessful();
