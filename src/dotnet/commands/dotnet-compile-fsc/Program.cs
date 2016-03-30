@@ -260,7 +260,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
         private static Command RunFsc(List<string> fscArgs)
         {
             var fscExe = Environment.GetEnvironmentVariable("DOTNET_FSC_PATH")
-                      ?? Path.Combine(AppContext.BaseDirectory, "fsc.exe");
+                      ?? Path.Combine(AppContext.BaseDirectory, "fsc.dll");
 
             var exec = Environment.GetEnvironmentVariable("DOTNET_FSC_EXEC")?.ToUpper() ?? "COREHOST";
 
@@ -271,8 +271,9 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
 
                 case "COREHOST":
                 default:
-                    var corehost = Path.Combine(AppContext.BaseDirectory, Constants.HostExecutableName);
-                    return Command.Create(corehost, new[] { fscExe }.Concat(fscArgs).ToArray());
+                    var muxer = new Muxer();
+                    var host = muxer.MuxerPath;
+                    return Command.Create(host, new[] { "exec", fscExe }.Concat(fscArgs).ToArray());
             }
 
         }
