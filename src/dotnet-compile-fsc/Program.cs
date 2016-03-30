@@ -14,6 +14,7 @@ using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.ProjectModel.Resolution;
 using NuGet.Frameworks;
+using System.Reflection;
 
 namespace Microsoft.DotNet.Tools.Compiler.Fsc
 {
@@ -86,6 +87,11 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
                 commonOptions.Defines.Where(d => d.StartsWith("NETSTANDARDAPP1_")).Any() ||
                 commonOptions.Defines.Where(d => d.StartsWith("NETSTANDARD1_")).Any();
 
+            // Get FSC Path upfront to use it for win32manifest path
+            var fscCommandSpec = ResolveFsc(null, tempOutDir);
+            var fscExeFile = fscCommandSpec.FscExeFile;
+            var fscExeDir = fscCommandSpec.FscExeDir;
+
             // FSC arguments
             var allArgs = new List<string>();
 
@@ -157,7 +163,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             //ok:  --resource:path/to/file,name 
             allArgs.AddRange(resources.Select(resource => $"--resource:{resource.Replace("\"", "")}"));
 
-            allArgs.AddRange(references.Select(r => $"-r:{r}"));
+            allArgs.AddRange(references.Select(r => $"-r:{r}")); // " todo remove
 
             if (commonOptions.EmitEntryPoint != true)
             {
@@ -168,11 +174,9 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
                 allArgs.Add("--target:exe");
 
                 //HACK we need default.win32manifest for exe
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    var win32manifestPath = Path.Combine(AppContext.BaseDirectory, "default.win32manifest");
-                    allArgs.Add($"--win32manifest:{win32manifestPath}");
-                }
+                var win32manifestPath = Path.Combine(fscExeDir, "..", "..", "runtimes", "any", "native", "default.win32manifest");
+                Console.WriteLine($"win32manifest: {win32manifestPath}");
+                allArgs.Add($"--win32manifest:{win32manifestPath}");
             }
 
             if (commonOptions.SuppressWarnings != null)
@@ -300,24 +304,85 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             }
             else
             {
-                return ResolveFsc(fscArgs, temp);
+                var fscCommandSpec =  ResolveFsc(fscArgs, temp)?.Spec;
+                return Command.Create(fscCommandSpec);
             }
         }
 
-        private static Command ResolveFsc(List<string> fscArgs, string temp)
+        private static FscCommandSpec ResolveFsc(List<string> fscArgs, string temp)
         {
-            var depsFile = Path.Combine(AppContext.BaseDirectory, "dotnet-compile-fsc" + FileNameSuffixes.DepsJson);
-            var runtimeConfigFile = Path.Combine(AppContext.BaseDirectory, "dotnet-compile-fsc" + FileNameSuffixes.RuntimeConfigJson);
             var nugetPackagesRoot = PackageDependencyProvider.ResolvePackagesPath(null, null);
+            var depsFile = Path.Combine(AppContext.BaseDirectory, "dotnet-compile-fsc" + FileNameSuffixes.DepsJson);
 
-            var commandFactory = new DepsJsonCommandFactory(
-                    depsFile, 
-                    runtimeConfigFile,
-                    nugetPackagesRoot,
-                    temp
-                );
+            var depsJsonCommandResolver = new DepsJsonCommandResolver(nugetPackagesRoot);
+            var dependencyContext = depsJsonCommandResolver.LoadDependencyContextFromFile(depsFile);
+            var fscPath = depsJsonCommandResolver.GetCommandPathFromDependencyContext("fsc", dependencyContext);
 
-            return (Command) commandFactory.Create("fsc", fscArgs);
+
+            var commandResolverArgs = new CommandResolverArguments()
+            {
+                CommandName = "fsc",
+                CommandArguments = fscArgs,
+                DepsJsonFile = depsFile
+            };
+
+            var fscCommandSpec = depsJsonCommandResolver.Resolve(commandResolverArgs);
+
+            var runtimeConfigFile = Path.Combine(
+                Path.GetDirectoryName(typeof(CompileFscCommand).GetTypeInfo().Assembly.Location)
+                , "dotnet-compile-fsc" + FileNameSuffixes.RuntimeConfigJson);
+
+
+            CopyRuntimeConfigForFscExe(runtimeConfigFile, "fsc", depsFile, nugetPackagesRoot, fscPath);
+
+            return new FscCommandSpec
+            {
+                Spec = fscCommandSpec,
+                FscExeDir = Path.GetDirectoryName(fscPath),
+                FscExeFile = fscPath
+            };
+        }
+
+        private static void CopyRuntimeConfigForFscExe(
+            string runtimeConfigFile,
+            string commandName,
+            string depsJsonFile,
+            string nugetPackagesRoot,
+            string fscPath)
+        {
+            Console.WriteLine($"{runtimeConfigFile}");
+            Console.WriteLine($"{commandName}");
+            Console.WriteLine($"{depsJsonFile}");
+            
+            var newFscRuntimeConfigDir = Path.GetDirectoryName(fscPath);
+            var newFscRuntimeConfigFile = Path.Combine(
+                newFscRuntimeConfigDir, 
+                Path.GetFileNameWithoutExtension(fscPath) + FileNameSuffixes.RuntimeConfigJson);
+        
+            try
+            {
+                if (!File.Exists(newFscRuntimeConfigFile))
+                {
+                    Console.WriteLine($"Writing new fsc runtime config file {newFscRuntimeConfigFile}");
+                    Console.WriteLine($"{runtimeConfigFile}, {newFscRuntimeConfigDir}");
+                    File.Copy(runtimeConfigFile, newFscRuntimeConfigFile);
+                    // File.Move(
+                    // Path.Combine(newFscRuntimeConfigDir, Path.GetFileName(runtimeConfigFile)),
+                    // newFscRuntimeConfigFile);
+                }
+            }
+            catch(Exception e)
+            {
+                Reporter.Error.WriteLine("Failed to copy fsc runtimeconfig.json");
+                throw e;
+            }
+        }
+
+        private class FscCommandSpec
+        {
+            public CommandSpec Spec { get; set; }
+            public string FscExeDir { get; set; }
+            public string FscExeFile { get; set; }
         }
     }
 }
