@@ -85,7 +85,7 @@ bool pal::getcwd(pal::string_t* recv)
 
 bool pal::load_library(const char_t* path, dll_t* dll)
 {
-    *dll = ::LoadLibraryW(path);
+    *dll = ::LoadLibraryExW(path, NULL, LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
     if (*dll == nullptr)
     {
         trace::error(_X("Failed to load the dll from %s, HRESULT: 0x%X"), path, HRESULT_FROM_WIN32(GetLastError()));
