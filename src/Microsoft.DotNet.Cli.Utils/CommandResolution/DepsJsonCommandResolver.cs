@@ -61,14 +61,11 @@ namespace Microsoft.DotNet.Cli.Utils
             IEnumerable<string> commandArgs, 
             string depsJsonFile)
         {
-            Console.WriteLine("depsJson");
-            Console.WriteLine(depsJsonFile);
             var dependencyContext = LoadDependencyContextFromFile(depsJsonFile);
 
             var commandPath = GetCommandPathFromDependencyContext(commandName, dependencyContext);
             if (commandPath == null)
             {
-                Console.WriteLine("NULLLLLLL"); //todo remove
                 return null;
             }
 
