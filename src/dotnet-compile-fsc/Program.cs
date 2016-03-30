@@ -163,7 +163,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             //ok:  --resource:path/to/file,name 
             allArgs.AddRange(resources.Select(resource => $"--resource:{resource.Replace("\"", "")}"));
 
-            allArgs.AddRange(references.Select(r => $"-r:{r}")); // " todo remove
+            allArgs.AddRange(references.Select(r => $"-r:{r}"));
 
             if (commonOptions.EmitEntryPoint != true)
             {
@@ -175,7 +175,6 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
 
                 //HACK we need default.win32manifest for exe
                 var win32manifestPath = Path.Combine(fscExeDir, "..", "..", "runtimes", "any", "native", "default.win32manifest");
-                Console.WriteLine($"win32manifest: {win32manifestPath}");
                 allArgs.Add($"--win32manifest:{win32manifestPath}");
             }
 
@@ -349,11 +348,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             string depsJsonFile,
             string nugetPackagesRoot,
             string fscPath)
-        {
-            Console.WriteLine($"{runtimeConfigFile}");
-            Console.WriteLine($"{commandName}");
-            Console.WriteLine($"{depsJsonFile}");
-            
+        {   
             var newFscRuntimeConfigDir = Path.GetDirectoryName(fscPath);
             var newFscRuntimeConfigFile = Path.Combine(
                 newFscRuntimeConfigDir, 
@@ -363,12 +358,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             {
                 if (!File.Exists(newFscRuntimeConfigFile))
                 {
-                    Console.WriteLine($"Writing new fsc runtime config file {newFscRuntimeConfigFile}");
-                    Console.WriteLine($"{runtimeConfigFile}, {newFscRuntimeConfigDir}");
                     File.Copy(runtimeConfigFile, newFscRuntimeConfigFile);
-                    // File.Move(
-                    // Path.Combine(newFscRuntimeConfigDir, Path.GetFileName(runtimeConfigFile)),
-                    // newFscRuntimeConfigFile);
                 }
             }
             catch(Exception e)
