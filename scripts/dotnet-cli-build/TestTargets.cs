@@ -49,7 +49,14 @@ namespace Microsoft.DotNet.Cli.Build
             new { Path = "AppWithDirectDependencyDesktopAndPortable", Skip = new Func<bool>(() => !CurrentPlatform.IsWindows) } 
         };
 
-        [Target(nameof(PrepareTargets.Init), nameof(SetupTests), nameof(RestoreTests), nameof(BuildTests), nameof(RunTests), nameof(ValidateDependencies))]
+        [Target(
+            nameof(PrepareTargets.Init), 
+            nameof(SetupTests), 
+            nameof(RestoreTests), 
+            nameof(BuildTests), 
+            nameof(RunTests), 
+            nameof(TestInstaller),
+            nameof(ValidateDependencies))]
         public static BuildTargetResult Test(BuildTargetContext c) => c.Success();
 
         [Target(nameof(SetupTestPackages), nameof(SetupTestProjects))]
@@ -346,6 +353,13 @@ set");
 
             c.Verbose("Finish Collecting Visual Studio Environment Variables");
             return vars;
+        }
+        
+        [Target(nameof(DebTargets.TestDebInstaller))]
+        public static BuildTargetResult TestInstaller(BuildTargetContext c)
+
+        {
+            return c.Success();
         }
     }
 }

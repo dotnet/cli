@@ -215,50 +215,6 @@ namespace Microsoft.DotNet.Cli.Utils
             return new CommandSpec(_muxer.MuxerPath, escapedArgString, commandResolutionStrategy);
         }
 
-        // private CommandSpec CreateCommandSpecUsingMuxerIfPortable(
-        //     string commandPath, 
-        //     IEnumerable<string> commandArguments, 
-        //     string depsFilePath,
-        //     CommandResolutionStrategy commandResolutionStrategy,
-        //     string nugetPackagesRoot,
-        //     bool isPortable)
-        // {
-        //     var host = string.Empty;
-        //     var arguments = new List<string>();
-
-        //     if (isPortable)
-        //     {
-        //         var muxer = new Muxer();
-
-        //         host = muxer.MuxerPath;
-        //         if (host == null)
-        //         {
-        //             throw new Exception("Unable to locate dotnet multiplexer");
-        //         }
-
-        //         arguments.Add("exec");
-        //     }
-        //     else
-        //     {
-        //         host = CoreHost.HostExePath;
-        //     }
-
-        //     arguments.Add(commandPath);
-
-        //     if (depsFilePath != null)
-        //     {
-        //         arguments.Add("--depsfile");
-        //         arguments.Add(depsFilePath);
-        //     }
-
-        //     arguments.Add("--additionalprobingpath");
-        //     arguments.Add(nugetPackagesRoot);
-
-        //     arguments.AddRange(commandArguments);
-
-        //     return CreateCommandSpec(host, arguments, commandResolutionStrategy);
-        // }
-
         private bool IsPortableApp(string commandPath)
         {
             var commandDir = Path.GetDirectoryName(commandPath);

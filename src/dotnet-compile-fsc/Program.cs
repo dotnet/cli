@@ -195,7 +195,6 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
 
             if (commonOptions.AllowUnsafe == true)
             {
-                // what?
             }
 
             if (commonOptions.WarningsAsErrors == true)
@@ -216,7 +215,6 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
 
             if (commonOptions.PublicSign == true)
             {
-                // pass
             }
 
             if (commonOptions.AdditionalArguments != null)

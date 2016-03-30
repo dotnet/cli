@@ -52,8 +52,6 @@ namespace Microsoft.DotNet.Cli.Utils
                 commandResolverArguments.CommandName, 
                 commandResolverArguments.CommandArguments.OrEmptyIfNull(),
                 commandResolverArguments.ProjectDirectory);
-
-
         }
 
         private CommandSpec ResolveFromProjectTools(
