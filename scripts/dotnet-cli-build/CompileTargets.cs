@@ -20,6 +20,7 @@ namespace Microsoft.DotNet.Cli.Build
 
         public static readonly string[] BinariesForCoreHost = new[]
         {
+            "fsc",
             "csi",
             "csc",
             "vbc"
@@ -372,12 +373,22 @@ namespace Microsoft.DotNet.Cli.Build
             File.Copy(Path.Combine(Dirs.Corehost, $"{Constants.DynamicLibPrefix}hostpolicy{Constants.DynamicLibSuffix}"), Path.Combine(outputDir, $"{Constants.DynamicLibPrefix}hostpolicy{Constants.DynamicLibSuffix}"), overwrite: true);
             File.Copy(Path.Combine(Dirs.Corehost, $"{Constants.DynamicLibPrefix}hostfxr{Constants.DynamicLibSuffix}"), Path.Combine(outputDir, $"{Constants.DynamicLibPrefix}hostfxr{Constants.DynamicLibSuffix}"), overwrite: true);
 
-            var binaryToCorehostifyOutDir = Path.Combine(outputDir, "runtimes", "any", "native");
             // Corehostify binaries
             foreach (var binaryToCorehostify in BinariesForCoreHost)
             {
                 try
                 {
+                    string binaryToCorehostifyOutDir;
+                    if (binaryToCorehostify == "fsc")
+                    {
+                        //fsc.exe is in the same directory, not in runtimes/any/native subdirectory
+                        binaryToCorehostifyOutDir = outputDir;
+                    }
+                    else
+                    {
+                        binaryToCorehostifyOutDir = Path.Combine(outputDir, "runtimes", "any", "native");
+                    }
+
                     // Yes, it is .exe even on Linux. This is the managed exe we're working with
                     File.Copy(Path.Combine(binaryToCorehostifyOutDir, $"{binaryToCorehostify}.exe"), Path.Combine(outputDir, $"{binaryToCorehostify}.dll"));
                     File.Delete(Path.Combine(binaryToCorehostifyOutDir, $"{binaryToCorehostify}.exe"));
