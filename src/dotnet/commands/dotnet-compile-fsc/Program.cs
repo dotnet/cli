@@ -170,7 +170,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
                 //HACK we need default.win32manifest for exe
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    var win32manifestPath = Path.Combine(AppContext.BaseDirectory, "default.win32manifest");
+                    var win32manifestPath = Path.Combine(AppContext.BaseDirectory, "runtimes", "any", "native", "default.win32manifest");
                     allArgs.Add($"--win32manifest:{win32manifestPath}");
                 }
             }
