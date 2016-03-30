@@ -30,11 +30,6 @@ namespace Microsoft.DotNet.Cli.Utils
         private string _nugetPackageRoot;
         private Muxer _muxer;
 
-        public DepsJsonCommandResolver()
-        {
-            _muxer = new Muxer();
-        }
-
         public DepsJsonCommandResolver(string nugetPackageRoot)
         {
             _muxer = new Muxer();
@@ -70,17 +65,23 @@ namespace Microsoft.DotNet.Cli.Utils
             Console.WriteLine(depsJsonFile);
             var dependencyContext = LoadDependencyContextFromFile(depsJsonFile);
 
-            var commandPath = FindCommandInDependencyContext(commandName, dependencyContext);
+            var commandPath = GetCommandPathFromDependencyContext(commandName, dependencyContext);
             if (commandPath == null)
             {
                 Console.WriteLine("NULLLLLLL"); //todo remove
                 return null;
             }
 
-            return CreateCommandSpecUsingMuxer(commandPath, commandArgs, depsJsonFile);
+            return CreateCommandSpecUsingMuxerIfPortable(
+                commandPath, 
+                commandArgs, 
+                depsJsonFile,
+                CommandResolutionStrategy.DepsFile,
+                _nugetPackageRoot,
+                IsPortableApp(commandPath));
         }
 
-        private DependencyContext LoadDependencyContextFromFile(string depsJsonFile)
+        public DependencyContext LoadDependencyContextFromFile(string depsJsonFile)
         {
             DependencyContext dependencyContext = null;
             DependencyContextJsonReader contextReader = new DependencyContextJsonReader();
@@ -93,7 +94,7 @@ namespace Microsoft.DotNet.Cli.Utils
             return dependencyContext;
         }
 
-        private string FindCommandInDependencyContext(string commandName, DependencyContext dependencyContext)
+        public string GetCommandPathFromDependencyContext(string commandName, DependencyContext dependencyContext)
         {
             var commandCandidates = new List<CommandCandidate>();
 
@@ -194,10 +195,13 @@ namespace Microsoft.DotNet.Cli.Utils
             return null;
         }
 
-        private CommandSpec CreateCommandSpecUsingMuxer(
+        private CommandSpec CreateCommandSpecUsingMuxerIfPortable(
             string commandPath, 
             IEnumerable<string> commandArgs, 
-            string depsJsonFile)
+            string depsJsonFile, 
+            CommandResolutionStrategy commandResolutionStrategy,
+            string nugetPackagesRoot,
+            bool isPortable)
         {
             var depsFileArguments = GetDepsFileArguments(depsJsonFile);
             var additionalProbingPathArguments = GetAdditionalProbingPathArguments();
@@ -211,7 +215,68 @@ namespace Microsoft.DotNet.Cli.Utils
 
             var escapedArgString = ArgumentEscaper.EscapeAndConcatenateArgArrayForProcessStart(muxerArgs);
 
-            return new CommandSpec(_muxer.MuxerPath, escapedArgString, CommandResolutionStrategy.DepsFile);
+            return new CommandSpec(_muxer.MuxerPath, escapedArgString, commandResolutionStrategy);
+        }
+
+        // private CommandSpec CreateCommandSpecUsingMuxerIfPortable(
+        //     string commandPath, 
+        //     IEnumerable<string> commandArguments, 
+        //     string depsFilePath,
+        //     CommandResolutionStrategy commandResolutionStrategy,
+        //     string nugetPackagesRoot,
+        //     bool isPortable)
+        // {
+        //     var host = string.Empty;
+        //     var arguments = new List<string>();
+
+        //     if (isPortable)
+        //     {
+        //         var muxer = new Muxer();
+
+        //         host = muxer.MuxerPath;
+        //         if (host == null)
+        //         {
+        //             throw new Exception("Unable to locate dotnet multiplexer");
+        //         }
+
+        //         arguments.Add("exec");
+        //     }
+        //     else
+        //     {
+        //         host = CoreHost.HostExePath;
+        //     }
+
+        //     arguments.Add(commandPath);
+
+        //     if (depsFilePath != null)
+        //     {
+        //         arguments.Add("--depsfile");
+        //         arguments.Add(depsFilePath);
+        //     }
+
+        //     arguments.Add("--additionalprobingpath");
+        //     arguments.Add(nugetPackagesRoot);
+
+        //     arguments.AddRange(commandArguments);
+
+        //     return CreateCommandSpec(host, arguments, commandResolutionStrategy);
+        // }
+
+        private bool IsPortableApp(string commandPath)
+        {
+            var commandDir = Path.GetDirectoryName(commandPath);
+
+            var runtimeConfigPath = Directory.EnumerateFiles(commandDir)
+                .FirstOrDefault(x => x.EndsWith("runtimeconfig.json"));
+
+            if (runtimeConfigPath == null)
+            {
+                return false;
+            }
+
+            var runtimeConfig = new RuntimeConfig(runtimeConfigPath);
+
+            return runtimeConfig.IsPortable;
         }
 
         private IEnumerable<string> GetDepsFileArguments(string depsJsonFile)
