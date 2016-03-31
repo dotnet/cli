@@ -7,6 +7,5 @@ namespace ClassLibrary
         public void Method1()
         {    
         }
-
     }
 }
