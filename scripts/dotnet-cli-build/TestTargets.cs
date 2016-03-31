@@ -150,7 +150,9 @@ namespace Microsoft.DotNet.Cli.Build
                     fullPath)
                     .Execute();
 
+                var projectJson = Path.Combine(fullPath, "project.json");
                 var dotnetPackArgs = new List<string> { 
+                    projectJson,
                     "--no-build",
                     "--build-base-path", Dirs.TestPackagesBuild,
                     "--output", Dirs.TestPackages 
@@ -163,7 +165,6 @@ namespace Microsoft.DotNet.Cli.Build
                 }
 
                 dotnet.Pack(dotnetPackArgs.ToArray())
-                    .WorkingDirectory(fullPath)
                     .Execute()
                     .EnsureSuccessful();
             }
