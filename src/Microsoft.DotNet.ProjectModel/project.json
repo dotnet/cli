@@ -12,6 +12,8 @@
       "type": "build",
       "version": "1.0.0-rc2-16453"
     },
+    "Newtonsoft.Json": "7.0.1",
+    "System.Runtime.Serialization.Primitives": "4.1.1-rc2-23929",
     "Microsoft.Extensions.HashCodeCombiner.Sources": {
       "type": "build",
       "version": "1.0.0-rc2-16054"
