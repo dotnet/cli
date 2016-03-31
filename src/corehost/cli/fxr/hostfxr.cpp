@@ -77,10 +77,7 @@ int execute_app(
 bool hostpolicy_exists_in_svc(pal::string_t* resolved_dir)
 {
     pal::string_t svc_dir;
-    if (!pal::getenv(_X("DOTNET_EXTENSIONS"), &svc_dir))
-    {
-        pal::get_default_extensions_directory(&svc_dir);
-    }
+    pal::get_default_extensions_directory(&svc_dir);
 
     pal::string_t version = _STRINGIFY(HOST_POLICY_PKG_VER);
 
@@ -100,7 +97,7 @@ bool hostpolicy_exists_in_svc(pal::string_t* resolved_dir)
     append_path(&path, _STRINGIFY(HOST_POLICY_PKG_NAME));
 
     pal::string_t max_ver;
-    try_patch_roll_forward_in_dir(path, lib_ver, &max_ver);
+    try_patch_roll_forward_in_dir(path, lib_ver, &max_ver, false);
     
     append_path(&path, max_ver.c_str());
     append_path(&path, rel_dir.c_str());

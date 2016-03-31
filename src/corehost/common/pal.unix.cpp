@@ -138,7 +138,7 @@ bool pal::get_default_extensions_directory(string_t* recv)
 {
     recv->clear();
     append_path(recv, _X("opt"));
-    append_path(recv, _X("dotnet_extensions"));
+    append_path(recv, _X("dotnetextensions"));
     return true;
 }
 

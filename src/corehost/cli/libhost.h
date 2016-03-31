@@ -83,6 +83,6 @@ public:
 pal::string_t get_runtime_config_from_file(const pal::string_t& file);
 host_mode_t detect_operating_mode(const int argc, const pal::char_t* argv[], pal::string_t* own_dir = nullptr);
 
-void try_patch_roll_forward_in_dir(const pal::string_t& cur_dir, const fx_ver_t& start_ver, pal::string_t* max_str);
+void try_patch_roll_forward_in_dir(const pal::string_t& cur_dir, const fx_ver_t& start_ver, pal::string_t* max_str, bool only_production);
 
 #endif // __LIBHOST_H__

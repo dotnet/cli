@@ -55,7 +55,7 @@ bool runtime_config_t::parse_opts(const json_value& opts)
         }
     }
 
-    auto roll_fwd = opts_obj.find(_X("rollForward"));
+    auto roll_fwd = opts_obj.find(_X("applyPatches"));
     if (roll_fwd != opts_obj.end())
     {
         m_fx_roll_fwd = roll_fwd->second.as_bool();

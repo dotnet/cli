@@ -25,6 +25,8 @@ class deps_resolver_t
 {
 public:
     deps_resolver_t(const corehost_init_t* init, const runtime_config_t& config, const arguments_t& args)
+        // Important: FX dir should come from "init" than "config",
+        //            since the host could be launching from FX dir.
         : m_fx_dir(init->fx_dir())
         , m_app_dir(args.app_dir)
         , m_coreclr_index(-1)
@@ -57,7 +59,7 @@ public:
         const runtime_config_t& config,
         const arguments_t& args);
 
-    void setup_additional_probes(const std::unordered_set<pal::string_t>& probe_paths);
+    void setup_additional_probes(const std::vector<pal::string_t>& probe_paths);
 
     bool resolve_probe_paths(
       const pal::string_t& clr_dir,
@@ -124,6 +126,8 @@ private:
     dir_assemblies_t m_fx_assemblies;
 
     std::unordered_map<pal::string_t, pal::string_t> m_roll_forward_cache;
+
+    pal::string_t m_package_cache;
 
     // Special entry for coreclr in the deps entries
     int m_coreclr_index;

@@ -335,7 +335,6 @@ int fx_muxer_t::execute(const int argc, const pal::char_t* argv[])
                 pal::string_t impl_dir = get_directory(app_or_deps);
                 if (!library_exists_in_dir(impl_dir, LIBHOSTPOLICY_NAME, nullptr) && !probe_path.empty() && !deps_file.empty())
                 {
-                    // TODO: FIX ME for auto rollforward of hostpolicy
                     deps_json_t deps_json(false, deps_file);
                     pal::string_t candidate = impl_dir;
                     if (!deps_json.has_hostpolicy_entry() ||

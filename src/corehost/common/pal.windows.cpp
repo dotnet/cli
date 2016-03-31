@@ -139,6 +139,7 @@ bool pal::get_default_extensions_directory(string_t* recv)
 {
     recv->clear();
 
+    // See https://github.com/dotnet/cli/issues/2179
 #ifdef _TARGET_X86_
     // In WOW64 mode, PF maps to PFx86.
     if (!pal::getenv(_X("ProgramFiles"), recv))
@@ -149,7 +150,7 @@ bool pal::get_default_extensions_directory(string_t* recv)
         return false;
     }
 
-    append_path(recv, _X("dotnet_extensions"));
+    append_path(recv, _X("dotnetextensions"));
     return true;
 }
 

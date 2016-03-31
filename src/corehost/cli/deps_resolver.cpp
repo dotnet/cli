@@ -155,7 +155,7 @@ bool deps_resolver_t::try_roll_forward(const deps_entry_t& entry,
     }
     else
     {
-        try_patch_roll_forward_in_dir(path, cur_ver, &max_str);
+        try_patch_roll_forward_in_dir(path, cur_ver, &max_str, true);
         m_roll_forward_cache[cache_key] = max_str;
     }
 
@@ -206,9 +206,13 @@ void deps_resolver_t::setup_probe_config(
     for (const auto& probe : m_additional_probes)
     {
         // Additional paths
-        assert(pal::directory_exists(probe));
-        // FIXME: When removing additional probes add back config get fx roll fwd.
-        m_probes.push_back(probe_config_t::additional(probe,  false /* config.get_fx_roll_fwd() */));
+        bool roll_fwd = config.get_fx_roll_fwd();
+        if (m_package_cache == probe)
+        {
+            // FIXME: For now, no roll forward for nuget cache. This should come from config runtimeconfig.dev.json.
+            roll_fwd = false;
+        }
+        m_probes.push_back(probe_config_t::additional(probe, roll_fwd));
     }
 
     if (trace::is_enabled())
@@ -221,7 +225,7 @@ void deps_resolver_t::setup_probe_config(
     }
 }
 
-void deps_resolver_t::setup_additional_probes(const std::unordered_set<pal::string_t>& probe_paths)
+void deps_resolver_t::setup_additional_probes(const std::vector<pal::string_t>& probe_paths)
 {
     m_additional_probes.assign(probe_paths.begin(), probe_paths.end());
 
@@ -240,11 +244,11 @@ void deps_resolver_t::setup_additional_probes(const std::unordered_set<pal::stri
     // and setup roll forward to come from the config in setup_probe_config
     if (m_additional_probes.empty())
     {
-        pal::string_t probe_dir;
-        (void)pal::get_default_packages_directory(&probe_dir);
-        if (pal::directory_exists(probe_dir))
+        // FIXME: Remove this function call entirely including the functiond definition.
+        (void)pal::get_default_packages_directory(&m_package_cache);
+        if (pal::directory_exists(m_package_cache))
         {
-            m_additional_probes.push_back(probe_dir);
+            m_additional_probes.push_back(m_package_cache);
         }
     }
 }
@@ -267,7 +271,6 @@ bool deps_resolver_t::probe_entry_in_configs(const deps_entry_t& entry, pal::str
             continue;
         }
         pal::string_t probe_dir = config.probe_dir;
-        assert(pal::directory_exists(probe_dir));
         if (config.match_hash)
         {
             if (entry.to_hash_matched_path(probe_dir, candidate))
@@ -334,6 +337,10 @@ pal::string_t deps_resolver_t::resolve_coreclr_dir()
             {
                 return get_directory(candidate);
             }
+            else if (entry.is_rid_specific && entry.to_rel_path(deps_dir, &candidate))
+            {
+                return get_directory(candidate);
+            }
         }
         else
         {
@@ -350,11 +357,11 @@ pal::string_t deps_resolver_t::resolve_coreclr_dir()
         return pal::string_t();
     };
 
-    trace::info(_X("--- Starting CoreCLR Probe from app deps.json"));
+    trace::info(_X("-- Starting CoreCLR Probe from app deps.json"));
     pal::string_t clr_dir = process_coreclr(m_portable, m_app_dir, m_deps.get());
     if (clr_dir.empty() && m_portable)
     {
-        trace::info(_X("--- Starting CoreCLR Probe from FX deps.json"));
+        trace::info(_X("-- Starting CoreCLR Probe from FX deps.json"));
         clr_dir = process_coreclr(false, m_fx_dir, m_fx_deps.get());
     }
     if (!clr_dir.empty())
@@ -388,7 +395,7 @@ void deps_resolver_t::resolve_tpa_list(
 
     std::set<pal::string_t> items;
 
-    auto process_entry = [&](bool is_portable, deps_json_t* deps, const dir_assemblies_t& dir_assemblies, const deps_entry_t& entry)
+    auto process_entry = [&](const pal::string_t& deps_dir, deps_json_t* deps, const dir_assemblies_t& dir_assemblies, const deps_entry_t& entry)
     {
         if (items.count(entry.asset_name))
         {
@@ -405,7 +412,7 @@ void deps_resolver_t::resolve_tpa_list(
             add_tpa_asset(entry.asset_name, candidate, &items, output);
         }
         // The rid asset should be picked up from app relative subpath.
-        else if (entry.is_rid_specific && deps->try_ni(entry).to_rel_path(m_app_dir, &candidate))
+        else if (entry.is_rid_specific && entry.to_rel_path(deps_dir, &candidate))
         {
             add_tpa_asset(entry.asset_name, candidate, &items, output);
         }
@@ -414,11 +421,16 @@ void deps_resolver_t::resolve_tpa_list(
         {
             add_tpa_asset(entry.asset_name, dir_assemblies.find(entry.asset_name)->second, &items, output);
         }
+        else
+        {
+            // FIXME: Consider this error as a fail fast?
+            trace::verbose(_X("Error: Could not resolve path to assembly: [%s, %s, %s]"), entry.library_name.c_str(), entry.library_version.c_str(), entry.relative_path.c_str());
+        }
     };
     
     const auto& deps_entries = m_deps->get_entries(deps_entry_t::asset_types::runtime);
     std::for_each(deps_entries.begin(), deps_entries.end(), [&](const deps_entry_t& entry) {
-        process_entry(m_portable, m_deps.get(), m_local_assemblies, entry);
+        process_entry(m_app_dir, m_deps.get(), m_local_assemblies, entry);
     });
 
     // Finally, if the deps file wasn't present or has missing entries, then
@@ -430,7 +442,7 @@ void deps_resolver_t::resolve_tpa_list(
 
     const auto& fx_entries = m_portable ? m_fx_deps->get_entries(deps_entry_t::asset_types::runtime) : empty;
     std::for_each(fx_entries.begin(), fx_entries.end(), [&](const deps_entry_t& entry) {
-        process_entry(false, m_fx_deps.get(), m_fx_assemblies, entry);
+        process_entry(m_fx_dir, m_fx_deps.get(), m_fx_assemblies, entry);
     });
 
     for (const auto& kv : m_fx_assemblies)

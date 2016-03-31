@@ -82,7 +82,7 @@ bool parse_arguments(const pal::string_t& deps_path, const std::vector<pal::stri
     pal::string_t deps_file = opts.count(opts_deps_file) ? opts[opts_deps_file] : deps_path;
     if (opts.count(opts_probe_path))
     {
-        args.probe_paths.insert(opts[opts_probe_path]);
+        args.probe_paths.push_back(opts[opts_probe_path]);
     }
 
     if (!deps_file.empty())
@@ -93,7 +93,7 @@ bool parse_arguments(const pal::string_t& deps_path, const std::vector<pal::stri
 
     for (const auto& probe : probe_paths)
     {
-        args.probe_paths.insert(probe);
+        args.probe_paths.push_back(probe);
     }
     
     if (args.deps_path.empty())
@@ -108,17 +108,8 @@ bool parse_arguments(const pal::string_t& deps_path, const std::vector<pal::stri
         args.deps_path.append(_X(".deps.json"));
     }
 
-    pal::getenv(_X("DOTNET_PACKAGES_CACHE"), &args.dotnet_packages_cache);
-    pal::getenv(_X("DOTNET_EXTENSIONS"), &args.dotnet_extensions);
-
-    if (!args.dotnet_extensions.empty())
-    {
-        pal::realpath(&args.dotnet_extensions);
-    }
-    else
-    {
-        pal::get_default_extensions_directory(&args.dotnet_extensions);
-    }
+    pal::getenv(_X("DOTNET_HOSTING_OPTIMIZATION_CACHE"), &args.dotnet_packages_cache);
+    pal::get_default_extensions_directory(&args.dotnet_extensions);
 
     return true;
 }
