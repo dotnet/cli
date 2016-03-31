@@ -110,6 +110,7 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
         {
             WriteDeps(exporter);
             WriteRuntimeConfig(exporter);
+            WriteDevRuntimeConfig(exporter);
 
             var projectExports = exporter.GetDependencies(LibraryType.Project);
             CopyAssemblies(projectExports);
@@ -167,14 +168,38 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
             }
         }
 
+        private void WriteDevRuntimeConfig(LibraryExporter exporter)
+        {
+            if (_context.TargetFramework.IsDesktop())
+            {
+                return;
+            }
+
+            var json = new JObject();
+            var runtimeOptions = new JObject();
+            json.Add("runtimeOptions", runtimeOptions);
+
+            AddAdditionalProbingPaths(runtimeOptions);
+
+            var runtimeConfigDevJsonFile =
+                    Path.Combine(_runtimeOutputPath, _compilerOptions.OutputName + FileNameSuffixes.RuntimeConfigDevJson);
+
+            using (var writer = new JsonTextWriter(new StreamWriter(File.Create(runtimeConfigDevJsonFile))))
+            {
+                writer.Formatting = Formatting.Indented;
+                json.WriteTo(writer);
+            }
+        }
+
+        private void AddAdditionalProbingPaths(JObject runtimeOptions)
+        {
+            var additionalProbingPaths = new JArray(_context.PackagesDirectory);
+            runtimeOptions.Add("additionalProbingPaths", additionalProbingPaths);
+        }
+
         public void WriteDeps(LibraryExporter exporter)
         {
             Directory.CreateDirectory(_runtimeOutputPath);
-
-            var depsFilePath = Path.Combine(_runtimeOutputPath, _compilerOptions.OutputName + FileNameSuffixes.Deps);
-            File.WriteAllLines(depsFilePath, exporter
-                .GetDependencies(LibraryType.Package)
-                .SelectMany(GenerateLines));
 
             var includeCompile = _compilerOptions.PreserveCompilationContext == true;
 
@@ -222,26 +247,6 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
             {
                 appConfig.Save(stream);
             }
-        }
-
-        private static IEnumerable<string> GenerateLines(LibraryExport export)
-        {
-            return GenerateLines(export, export.RuntimeAssemblyGroups.GetDefaultAssets(), "runtime")
-                .Union(GenerateLines(export, export.NativeLibraryGroups.GetDefaultAssets(), "native"));
-        }
-
-        private static IEnumerable<string> GenerateLines(LibraryExport export, IEnumerable<LibraryAsset> items, string type)
-        {
-            return items.Select(i => DepsFormatter.EscapeRow(new[]
-            {
-                export.Library.Identity.Type.Value,
-                export.Library.Identity.Name,
-                export.Library.Identity.Version.ToNormalizedString(),
-                export.Library.Hash,
-                type,
-                i.Name,
-                i.RelativePath
-            }));
         }
     }
 }
