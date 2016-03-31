@@ -51,17 +51,14 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
         return StatusCode::ResolverResolveFailure;
     }
 
-    // TODO: config.get_runtime_properties();
-
     // Build CoreCLR properties
-    const char* property_keys[] = {
+    std::vector<const char*> property_keys = {
         "TRUSTED_PLATFORM_ASSEMBLIES",
         "APP_PATHS",
         "APP_NI_PATHS",
         "NATIVE_DLL_SEARCH_DIRECTORIES",
         "PLATFORM_RESOURCE_ROOTS",
         "AppDomainCompatSwitch",
-        "SERVER_GC",
         // Workaround: mscorlib does not resolve symlinks for AppContext.BaseDirectory dotnet/coreclr/issues/2128
         "APP_CONTEXT_BASE_DIRECTORY",
         "APP_CONTEXT_DEPS_FILES"
@@ -72,13 +69,9 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
     auto native_dirs_cstr = pal::to_stdstring(probe_paths.native);
     auto resources_dirs_cstr = pal::to_stdstring(probe_paths.resources);
 
-    // Workaround for dotnet/cli Issue #488 and #652
-    pal::string_t server_gc;
-    std::string server_gc_cstr = (pal::getenv(_X("COREHOST_SERVER_GC"), &server_gc) && !server_gc.empty()) ? pal::to_stdstring(server_gc) : "0";
-    
     std::string deps = pal::to_stdstring(resolver.get_deps_file() + _X(";") + resolver.get_fx_deps_file());
 
-    const char* property_values[] = {
+    std::vector<const char*> property_values = {
         // TRUSTED_PLATFORM_ASSEMBLIES
         tpa_paths_cstr.c_str(),
         // APP_PATHS
@@ -91,15 +84,25 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
         resources_dirs_cstr.c_str(),
         // AppDomainCompatSwitch
         "UseLatestBehaviorWhenTFMNotSpecified",
-        // SERVER_GC
-        server_gc_cstr.c_str(),
         // APP_CONTEXT_BASE_DIRECTORY
         app_base_cstr.c_str(),
         // APP_CONTEXT_DEPS_FILES,
         deps.c_str(),
     };
 
-    size_t property_size = sizeof(property_keys) / sizeof(property_keys[0]);
+    
+    std::vector<std::string> cfg_keys;
+    std::vector<std::string> cfg_values;
+    config.config_kv(&cfg_keys, &cfg_values);
+
+    for (int i = 0; i < cfg_keys.size(); ++i)
+    {
+        property_keys.push_back(cfg_keys[i].c_str());
+        property_values.push_back(cfg_values[i].c_str());
+    }
+
+    size_t property_size = property_keys.size();
+    assert(property_keys.size() == property_values.size());
 
     // Bind CoreCLR
     if (!coreclr::bind(clr_path))
@@ -129,8 +132,8 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
     auto hr = coreclr::initialize(
         own_path.c_str(),
         "clrhost",
-        property_keys,
-        property_values,
+        property_keys.data(),
+        property_values.data(),
         property_size,
         &host_handle,
         &domain_id);
@@ -202,11 +205,29 @@ SHARED_API int corehost_main(const int argc, const pal::char_t* argv[])
 
     assert(g_init);
 
+    if (trace::is_enabled())
+    {
+        trace::info(_X("--- Invoked policy main = {"));
+        for (int i = 0; i < argc; ++i)
+        {
+            trace::info(_X("%s"), argv[i]);
+        }
+        trace::info(_X("}"));
+
+        trace::info(_X("Host mode: %d"), g_init->host_mode());
+        trace::info(_X("Deps file: %s"), g_init->deps_file().c_str());
+        trace::info(_X("Probe dir: %s"), g_init->probe_dir().c_str());
+    }
+
     // Take care of arguments
     arguments_t args;
     if (!parse_arguments(g_init->deps_file(), g_init->probe_dir(), g_init->host_mode(), argc, argv, &args))
     {
         return StatusCode::LibHostInvalidArgs;
+    }
+    if (trace::is_enabled())
+    {
+        args.print();
     }
 
     if (g_init->runtime_config())
@@ -215,7 +236,8 @@ SHARED_API int corehost_main(const int argc, const pal::char_t* argv[])
     }
     else
     {
-        runtime_config_t config(get_runtime_config_json(args.managed_application));
+        auto config_path = get_runtime_config_from_file(args.managed_application);
+        runtime_config_t config(config_path);
         if (!config.is_valid())
         {
             trace::error(_X("Invalid runtimeconfig.json [%s]"), config.get_path().c_str());

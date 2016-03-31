@@ -13,6 +13,8 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
     {
         protected string _command;
 
+        public string WorkingDirectory { get; set; }
+
         public Dictionary<string, string> Environment { get; } = new Dictionary<string, string>();
 
         public TestCommand(string command)
@@ -25,7 +27,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             var commandPath = _command;
             ResolveCommand(ref commandPath, ref args);
 
-            Console.WriteLine($"Executing - {_command} {args}");
+            Console.WriteLine($"Executing - {commandPath} {args}");
 
             var stdOut = new StreamForwarder();
             var stdErr = new StreamForwarder();
@@ -38,12 +40,12 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         public virtual CommandResult ExecuteWithCapturedOutput(string args = "")
         {
-            Console.WriteLine($"Executing (Captured Output) - {_command} {args}");
-
             var command = _command;
             ResolveCommand(ref command, ref args);
             var commandPath = Env.GetCommandPath(command, ".exe", ".cmd", "") ??
                 Env.GetCommandPathFromRootPath(AppContext.BaseDirectory, command, ".exe", ".cmd", "");
+                
+            Console.WriteLine($"Executing (Captured Output) - {commandPath} {args}");
 
             var stdOut = new StreamForwarder();
             var stdErr = new StreamForwarder();
@@ -53,7 +55,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
             return RunProcess(commandPath, args, stdOut, stdErr);
         }
-
+        
         private void ResolveCommand(ref string executable, ref string args)
         {
             if (executable.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
@@ -64,7 +66,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
                     newArgs += " " + args;
                 }
                 args = newArgs;
-                executable = "corehost";
+                executable = "dotnet";
             }
 
             if (!Path.IsPathRooted(executable))
@@ -89,9 +91,14 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
                 psi.Environment[item.Key] = item.Value;
             }
 
+            if (!string.IsNullOrWhiteSpace(WorkingDirectory))
+            {
+                psi.WorkingDirectory = WorkingDirectory;
+            }
+
             var process = new Process
             {
-                StartInfo = psi,
+                StartInfo = psi
             };
 
             process.EnableRaisingEvents = true;

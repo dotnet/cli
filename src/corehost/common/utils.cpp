@@ -4,6 +4,22 @@
 #include "utils.h"
 #include "trace.h"
 
+bool library_exists_in_dir(const pal::string_t& lib_dir, const pal::string_t& lib_name, pal::string_t* p_lib_path)
+{
+    pal::string_t lib_path = lib_dir;
+    append_path(&lib_path, lib_name.c_str());
+
+    if (!pal::file_exists(lib_path))
+    {
+        return false;
+    }
+    if (p_lib_path)
+    {
+        *p_lib_path = lib_path;
+    }
+    return true;
+}
+
 bool coreclr_exists_in_dir(const pal::string_t& candidate)
 {
     pal::string_t test(candidate);
@@ -61,7 +77,13 @@ pal::string_t strip_file_ext(const pal::string_t& path)
     {
         return path;
     }
-    return path.substr(0, path.rfind(_X('.')));
+    size_t sep_pos = path.rfind(_X("/\\"));
+    size_t dot_pos = path.rfind(_X('.'));
+    if (sep_pos != pal::string_t::npos && sep_pos > dot_pos)
+    {
+	    return path;
+    }
+    return path.substr(0, dot_pos);
 }
 
 pal::string_t get_filename_without_ext(const pal::string_t& path)
@@ -74,7 +96,7 @@ pal::string_t get_filename_without_ext(const pal::string_t& path)
     size_t name_pos = path.find_last_of(_X("/\\"));
     size_t dot_pos = path.rfind(_X('.'));
     size_t start_pos = (name_pos == pal::string_t::npos) ? 0 : (name_pos + 1);
-    size_t count = (dot_pos == pal::string_t::npos) ? pal::string_t::npos : (dot_pos - start_pos);
+    size_t count = (dot_pos == pal::string_t::npos || dot_pos < start_pos) ? pal::string_t::npos : (dot_pos - start_pos);
     return path.substr(start_pos, count);
 }
 
@@ -121,6 +143,8 @@ const pal::char_t* get_arch()
     return _X("x64");
 #elif _TARGET_X86_
     return _X("x86");
+#elif _TARGET_ARM_
+    return _X("arm");
 #else
 #error "Unknown target"
 #endif
@@ -149,6 +173,7 @@ bool parse_known_args(
             return false;
         }
 
+        trace::verbose(_X("Parsed known arg %s = %s"), arg.c_str(), argv[arg_i + 1]);
         (*opts)[arg] = argv[arg_i + 1];
 
         // Increment for both the option and its value.

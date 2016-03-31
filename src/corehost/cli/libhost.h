@@ -4,8 +4,6 @@
 #ifndef __LIBHOST_H__
 #define __LIBHOST_H__
 
-#define LIBHOST_NAME MAKE_LIBNAME("hostpolicy")
-
 enum host_mode_t
 {
     invalid = 0,
@@ -64,7 +62,7 @@ public:
     }
 };
 
-pal::string_t get_runtime_config_json(const pal::string_t& app_path);
+pal::string_t get_runtime_config_from_file(const pal::string_t& file);
 host_mode_t detect_operating_mode(const int argc, const pal::char_t* argv[], pal::string_t* own_dir = nullptr);
 
 #endif // __LIBHOST_H__

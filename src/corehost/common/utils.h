@@ -6,6 +6,8 @@
 
 #include "pal.h"
 
+#define _STRINGIFY(s) _X(s)
+
 bool ends_with(const pal::string_t& value, const pal::string_t& suffix, bool match_case);
 bool starts_with(const pal::string_t& value, const pal::string_t& prefix, bool match_case);
 pal::string_t get_executable(const pal::string_t& filename);
@@ -14,6 +16,7 @@ pal::string_t strip_file_ext(const pal::string_t& path);
 pal::string_t get_filename(const pal::string_t& path);
 pal::string_t get_filename_without_ext(const pal::string_t& path);
 void append_path(pal::string_t* path1, const pal::char_t* path2);
+bool library_exists_in_dir(const pal::string_t& lib_dir, const pal::string_t& lib_name, pal::string_t* p_lib_path);
 bool coreclr_exists_in_dir(const pal::string_t& candidate);
 void replace_char(pal::string_t* path, pal::char_t match, pal::char_t repl);
 const pal::char_t* get_arch();

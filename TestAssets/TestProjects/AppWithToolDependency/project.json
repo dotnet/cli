@@ -4,7 +4,7 @@
     "emitEntryPoint": true
   },
   "dependencies": {
-    "NETStandard.Library": "1.5.0-rc2-23911"
+    "NETStandard.Library": "1.5.0-rc2-23928"
   },
   "frameworks": {
     "netstandardapp1.5": {
@@ -12,8 +12,8 @@
     }
   },
   "tools": {
-    "dotnet-hello": {
-      "version": "2.0.0",
+    "dotnet-portable": {
+      "version": "1.0.0",
       "target": "package"
     }
   }

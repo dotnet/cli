@@ -12,24 +12,96 @@ namespace Microsoft.DotNet.Cli.Build
 {
     public class PkgTargets
     {
-        [Target(nameof(GenerateSdkProductArchive), nameof(GenerateSharedFrameworkProductArchive))]
+        public static string PkgsIntermediateDir { get; set; }
+        public static string SharedHostComponentId { get; set; }
+        public static string SharedFxComponentId { get; set; }
+        public static string SharedFxPkgId { get; set; }
+        public static string SharedFrameworkNugetVersion { get; set; }
+        public static string CLISdkComponentId { get; set; }
+        public static string CLISdkPkgId { get; set; }
+        public static string CLISdkNugetVersion { get; set; }
+
+        [Target]
+        [BuildPlatforms(BuildPlatform.OSX)]
+        public static BuildTargetResult InitPkg(BuildTargetContext c)
+        {
+            PkgsIntermediateDir = Path.Combine(Dirs.Packages, "intermediate");
+            Directory.CreateDirectory(PkgsIntermediateDir);
+
+            var hostVersion = c.BuildContext.Get<BuildVersion>("BuildVersion").ProductionVersion;
+            SharedHostComponentId = $"com.microsoft.dotnet.sharedhost.{hostVersion}.component.osx.x64";
+
+            string sharedFrameworkNugetName = Monikers.SharedFrameworkName;
+            SharedFrameworkNugetVersion = c.BuildContext.Get<string>("SharedFrameworkNugetVersion");
+            SharedFxComponentId = $"com.microsoft.dotnet.sharedframework.{sharedFrameworkNugetName}.{SharedFrameworkNugetVersion}.component.osx.x64";
+            SharedFxPkgId = $"com.microsoft.dotnet.{sharedFrameworkNugetName}.{SharedFrameworkNugetVersion}.osx.x64";
+
+            CLISdkNugetVersion = c.BuildContext.Get<BuildVersion>("BuildVersion").NuGetVersion;
+            CLISdkComponentId = $"com.microsoft.dotnet.dev.{CLISdkNugetVersion}.component.osx.x64";
+            CLISdkPkgId = $"com.microsoft.dotnet.dev.{CLISdkNugetVersion}.osx.x64";
+
+            return c.Success();
+        }
+
+        [Target(nameof(InitPkg), nameof(GenerateSharedFrameworkProductArchive), nameof(GenerateCLISdkProductArchive))]
         [BuildPlatforms(BuildPlatform.OSX)]
         public static BuildTargetResult GeneratePkgs(BuildTargetContext c)
         {
             return c.Success();
         }
 
+        [Target(nameof(GenerateCLISdkPkg))]
+        [BuildPlatforms(BuildPlatform.OSX)]
+        public static BuildTargetResult GenerateCLISdkProductArchive(BuildTargetContext c)
+        {
+            string resourcePath = Path.Combine(Dirs.RepoRoot, "packaging", "osx", "clisdk", "resources");
+            string outFilePath = Path.Combine(Dirs.Packages, c.BuildContext.Get<string>("CombinedFrameworkSDKHostInstallerFile"));
+
+            string inputDistTemplatePath = Path.Combine(
+                Dirs.RepoRoot,
+                "packaging",
+                "osx",
+                "clisdk",
+                "Distribution-Template");
+            string distTemplate = File.ReadAllText(inputDistTemplatePath);
+            string distributionPath = Path.Combine(PkgsIntermediateDir, "CLI-SDK-Formatted-Distribution-Template.xml");
+            string formattedDistContents =
+                distTemplate.Replace("{SharedFxComponentId}", SharedFxComponentId)
+                .Replace("{SharedHostComponentId}", SharedHostComponentId)
+                .Replace("{CLISdkComponentId}", CLISdkComponentId);
+            File.WriteAllText(distributionPath, formattedDistContents);
+
+            Cmd("productbuild",
+                "--version", CLISdkNugetVersion,
+                "--identifier", CLISdkPkgId,
+                "--package-path", PkgsIntermediateDir,
+                "--resources", resourcePath,
+                "--distribution", distributionPath,
+                outFilePath)
+            .Execute()
+            .EnsureSuccessful();
+
+            return c.Success();
+        }
+
         [Target]
         [BuildPlatforms(BuildPlatform.OSX)]
-        public static BuildTargetResult GenerateSdkProductArchive(BuildTargetContext c)
+        public static BuildTargetResult GenerateCLISdkPkg(BuildTargetContext c)
         {
-            var version = c.BuildContext.Get<BuildVersion>("BuildVersion").SimpleVersion;
-            var pkg = c.BuildContext.Get<string>("SdkInstallerFile");
+            string outFilePath = Path.Combine(PkgsIntermediateDir, CLISdkComponentId + ".pkg");
+            string installLocation = "/usr/local/share/dotnet";
+            string scriptsLocation = Path.Combine(Dirs.RepoRoot, "packaging", "osx", "clisdk", "scripts");
 
-            Cmd(Path.Combine(Dirs.RepoRoot, "packaging", "osx", "package-osx.sh"),
-                    "-v", version, "-i", Dirs.Stage2, "-o", pkg)
-                    .Execute()
-                    .EnsureSuccessful();
+            Cmd("pkgbuild",
+                "--root", c.BuildContext.Get<string>("CLISDKRoot"),
+                "--identifier", CLISdkComponentId,
+                "--version", CLISdkNugetVersion,
+                "--install-location", installLocation,
+                "--scripts", scriptsLocation,
+                outFilePath)
+                .Execute()
+                .EnsureSuccessful();
+
             return c.Success();
         }
 
@@ -37,13 +109,8 @@ namespace Microsoft.DotNet.Cli.Build
         [BuildPlatforms(BuildPlatform.OSX)]
         public static BuildTargetResult GenerateSharedFrameworkProductArchive(BuildTargetContext c)
         {
-            string sharedFrameworkNugetName = SharedFrameworkTargets.SharedFrameworkName;
-            string sharedFrameworkNugetVersion = c.BuildContext.Get<string>("SharedFrameworkNugetVersion");
-            string version = c.BuildContext.Get<BuildVersion>("BuildVersion").SimpleVersion;
-            string id = $"com.microsoft.dotnet.sharedframework.{sharedFrameworkNugetName}.{sharedFrameworkNugetVersion}.osx.x64";
-            string packageIntermediatesPath = Path.Combine(Dirs.Output, "obj", "pkg");
-            string resourcePath = Path.Combine(Dirs.RepoRoot, "packaging", "osx", "resources");
-            string outFilePath = Path.Combine(packageIntermediatesPath, id + ".pkg");
+            string resourcePath = Path.Combine(Dirs.RepoRoot, "packaging", "osx", "sharedframework", "resources");
+            string outFilePath = Path.Combine(PkgsIntermediateDir, c.BuildContext.Get<string>("CombinedFrameworkHostInstallerFile"));
 
             string inputDistTemplatePath = Path.Combine(
                 Dirs.RepoRoot,
@@ -52,18 +119,17 @@ namespace Microsoft.DotNet.Cli.Build
                 "sharedframework",
                 "shared-framework-distribution-template.xml");
             string distTemplate = File.ReadAllText(inputDistTemplatePath);
-            string distributionPath = Path.Combine(packageIntermediatesPath, "shared-framework-formatted-distribution.xml");
-            string formattedDistContents = 
-                distTemplate.Replace("{SharedFrameworkNugetVersion}", sharedFrameworkNugetVersion)
-                .Replace("{SharedFrameworkNugetName}", SharedFrameworkTargets.SharedFrameworkName)
-                .Replace("{VERSION}", version);
+            string distributionPath = Path.Combine(PkgsIntermediateDir, "shared-framework-formatted-distribution.xml");
+            string formattedDistContents =
+                distTemplate.Replace("{SharedFxComponentId}", SharedFxComponentId)
+                .Replace("{SharedHostComponentId}", SharedHostComponentId);
             File.WriteAllText(distributionPath, formattedDistContents);
 
             Cmd("productbuild",
-                "--version", version,
-                "--identifier", id,
-                "--package-path", packageIntermediatesPath,
-                "--resources", resourcePath, 
+                "--version", SharedFrameworkNugetVersion,
+                "--identifier", SharedFxPkgId,
+                "--package-path", PkgsIntermediateDir,
+                "--resources", resourcePath,
                 "--distribution", distributionPath,
                 outFilePath)
             .Execute()
@@ -76,19 +142,14 @@ namespace Microsoft.DotNet.Cli.Build
         [BuildPlatforms(BuildPlatform.OSX)]
         public static BuildTargetResult GenerateSharedFrameworkPkg(BuildTargetContext c)
         {
-            string sharedFrameworkNugetName = SharedFrameworkTargets.SharedFrameworkName;
-            string sharedFrameworkNugetVersion = c.BuildContext.Get<string>("SharedFrameworkNugetVersion");
-            Directory.CreateDirectory(Path.Combine(Dirs.Output, "obj", "pkg"));
-            string version = c.BuildContext.Get<BuildVersion>("BuildVersion").SimpleVersion;
-            string id = $"com.microsoft.dotnet.sharedframework.{sharedFrameworkNugetName}.{sharedFrameworkNugetVersion}.component.osx.x64";
-            string outFilePath = Path.Combine(Dirs.Output, "obj", "pkg", id + ".pkg");
+            string outFilePath = Path.Combine(PkgsIntermediateDir, SharedFxComponentId + ".pkg");
             string installLocation = "/usr/local/share/dotnet";
             string scriptsLocation = Path.Combine(Dirs.RepoRoot, "packaging", "osx", "sharedframework", "scripts");
 
             Cmd("pkgbuild",
                 "--root", c.BuildContext.Get<string>("SharedFrameworkPublishRoot"),
-                "--identifier", id,
-                "--version", version,
+                "--identifier", SharedFxComponentId,
+                "--version", SharedFrameworkNugetVersion,
                 "--install-location", installLocation,
                 "--scripts", scriptsLocation,
                 outFilePath)
@@ -102,16 +163,14 @@ namespace Microsoft.DotNet.Cli.Build
         [BuildPlatforms(BuildPlatform.OSX)]
         public static BuildTargetResult GenerateSharedHostPkg(BuildTargetContext c)
         {
-            Directory.CreateDirectory(Path.Combine(Dirs.Output, "obj", "pkg"));
-            string version = c.BuildContext.Get<BuildVersion>("BuildVersion").SimpleVersion;
-            string id = $"com.microsoft.dotnet.sharedhost.osx.x64";
-            string outFilePath = Path.Combine(Dirs.Output, "obj", "pkg", id + ".pkg");
+            string version = c.BuildContext.Get<BuildVersion>("BuildVersion").NuGetVersion;
+            string outFilePath = Path.Combine(PkgsIntermediateDir, SharedHostComponentId + ".pkg");
             string installLocation = "/usr/local/share/dotnet";
             string scriptsLocation = Path.Combine(Dirs.RepoRoot, "packaging", "osx", "sharedhost", "scripts");
 
             Cmd("pkgbuild",
                 "--root", c.BuildContext.Get<string>("SharedHostPublishRoot"),
-                "--identifier", id,
+                "--identifier", SharedHostComponentId,
                 "--version", version,
                 "--install-location", installLocation,
                 "--scripts", scriptsLocation,

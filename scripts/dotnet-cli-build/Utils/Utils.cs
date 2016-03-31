@@ -96,8 +96,25 @@ namespace Microsoft.DotNet.Cli.Build
                     File.SetAttributes(file, FileAttributes.Normal);
                     File.Delete(file);
                 }
-
+                System.Threading.Thread.Sleep(1); 
                 Directory.Delete(path, true);
+            }
+        }
+
+        public static void CopyDirectoryRecursively(string path, string destination, bool keepParentDir = false)
+        {
+            if (keepParentDir)
+            {
+                path = path.TrimEnd(Path.DirectorySeparatorChar);
+                destination = Path.Combine(destination, Path.GetFileName(path));
+                Directory.CreateDirectory(destination);
+            }
+
+            foreach (var file in Directory.GetFiles(path, "*", SearchOption.AllDirectories))
+            {
+                string destFile = file.Replace(path, destination);
+                Directory.CreateDirectory(Path.GetDirectoryName(destFile));
+                File.Copy(file, destFile, true);
             }
         }
     }

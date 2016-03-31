@@ -14,6 +14,8 @@ using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.DotNet.Files;
 using Microsoft.DotNet.Tools.Common;
 using Microsoft.DotNet.ProjectModel.Utilities;
+using Microsoft.DotNet.ProjectModel.Graph;
+using NuGet.Versioning;
 
 namespace Microsoft.DotNet.Tools.Publish
 {
@@ -152,19 +154,21 @@ namespace Microsoft.DotNet.Tools.Publish
             // Use a library exporter to collect publish assets
             var exporter = context.CreateExporter(configuration);
 
-            foreach (var export in exporter.GetAllExports())
+            var isPortable = string.IsNullOrEmpty(context.RuntimeIdentifier);
+
+            // Collect all exports and organize them
+            var exports = exporter.GetAllExports()
+                .Where(e => e.Library.Identity.Type.Equals(LibraryType.Package))
+                .ToDictionary(e => e.Library.Identity.Name);
+            var collectExclusionList = isPortable ? GetExclusionList(context, exports) : new HashSet<string>();
+
+            foreach (var export in exporter.GetAllExports().Where(e => !collectExclusionList.Contains(e.Library.Identity.Name)))
             {
                 Reporter.Verbose.WriteLine($"Publishing {export.Library.Identity.ToString().Green().Bold()} ...");
 
-                PublishFiles(export.RuntimeAssemblies, outputPath, nativeSubdirectories: false, preserveRelativePath: false);
-                PublishFiles(export.NativeLibraries, outputPath, nativeSubdirectories, preserveRelativePath: false);
+                PublishAssetGroups(export.RuntimeAssemblyGroups, outputPath, nativeSubdirectories: false, includeRuntimeGroups: isPortable);
+                PublishAssetGroups(export.NativeLibraryGroups, outputPath, nativeSubdirectories, includeRuntimeGroups: isPortable);
                 export.RuntimeAssets.StructuredCopyTo(outputPath, outputPaths.IntermediateOutputDirectoryPath);
-
-                if (string.IsNullOrEmpty(context.RuntimeIdentifier))
-                {
-                    var assets = export.RuntimeTargets.SelectMany(t => Enumerable.Concat(t.NativeLibraries, t.RuntimeAssemblies));
-                    PublishFiles(assets, outputPath, nativeSubdirectories: false, preserveRelativePath: true);
-                }
 
                 if (options.PreserveCompilationContext.GetValueOrDefault())
                 {
@@ -193,7 +197,7 @@ namespace Microsoft.DotNet.Tools.Publish
             if (options.EmitEntryPoint.GetValueOrDefault() && !string.IsNullOrEmpty(context.RuntimeIdentifier))
             {
                 Reporter.Verbose.WriteLine($"Copying native host to output to create fully standalone output.");
-                PublishHost(context, outputPath);
+                PublishHost(context, outputPath, options);
             }
 
             RunScripts(context, ScriptNames.PostPublish, contextVariables);
@@ -201,6 +205,40 @@ namespace Microsoft.DotNet.Tools.Publish
             Reporter.Output.WriteLine($"Published to {outputPath}".Green().Bold());
 
             return true;
+        }
+
+        private HashSet<string> GetExclusionList(ProjectContext context, Dictionary<string, LibraryExport> exports)
+        {
+            var exclusionList = new HashSet<string>();
+            var redistPackages = context.RootProject.Dependencies
+                .Where(r => r.Type.Equals(LibraryDependencyType.Platform))
+                .ToList();
+            if (redistPackages.Count == 0)
+            {
+                return exclusionList;
+            }
+            else if (redistPackages.Count > 1)
+            {
+                throw new InvalidOperationException("Multiple packages with type: \"platform\" were specified!");
+            }
+            var redistExport = exports[redistPackages[0].Name];
+
+            exclusionList.Add(redistExport.Library.Identity.Name);
+            CollectDependencies(exports, redistExport.Library.Dependencies, exclusionList);
+            return exclusionList;
+        }
+
+        private void CollectDependencies(Dictionary<string, LibraryExport> exports, IEnumerable<LibraryRange> dependencies, HashSet<string> exclusionList)
+        {
+            foreach (var dependency in dependencies)
+            {
+                var export = exports[dependency.Name];
+                if(export.Library.Identity.Version.Equals(dependency.VersionRange.MinVersion))
+                {
+                    exclusionList.Add(export.Library.Identity.Name);
+                    CollectDependencies(exports, export.Library.Dependencies, exclusionList);
+                }
+            }
         }
 
         private static void PublishRefs(LibraryExport export, string outputPath)
@@ -212,7 +250,7 @@ namespace Microsoft.DotNet.Tools.Publish
             }
 
             // Do not copy compilation assembly if it's in runtime assemblies
-            var runtimeAssemblies = new HashSet<LibraryAsset>(export.RuntimeAssemblies);
+            var runtimeAssemblies = new HashSet<LibraryAsset>(export.RuntimeAssemblyGroups.GetDefaultAssets());
             foreach (var compilationAssembly in export.CompilationAssemblies)
             {
                 if (!runtimeAssemblies.Contains(compilationAssembly))
@@ -223,7 +261,7 @@ namespace Microsoft.DotNet.Tools.Publish
             }
         }
 
-        private static int PublishHost(ProjectContext context, string outputPath)
+        private static int PublishHost(ProjectContext context, string outputPath, CommonCompilerOptions compilationOptions)
         {
             if (context.TargetFramework.IsDesktop())
             {
@@ -239,7 +277,9 @@ namespace Microsoft.DotNet.Tools.Publish
                     return 1;
                 }
 
-                var outputBinaryName = binaryName.Equals(Constants.HostExecutableName) ? (context.ProjectFile.Name + Constants.ExeSuffix) : binaryName;
+                var outputBinaryName = binaryName.Equals(Constants.HostExecutableName)
+                    ? compilationOptions.OutputName + Constants.ExeSuffix
+                    : binaryName;
                 var outputBinaryPath = Path.Combine(outputPath, outputBinaryName);
 
                 File.Copy(hostBinaryPath, outputBinaryPath, overwrite: true);
@@ -257,23 +297,26 @@ namespace Microsoft.DotNet.Tools.Publish
             }
         }
 
-        private static void PublishFiles(IEnumerable<LibraryAsset> files, string outputPath, bool nativeSubdirectories, bool preserveRelativePath)
+        private void PublishAssetGroups(IEnumerable<LibraryAssetGroup> groups, string outputPath, bool nativeSubdirectories, bool includeRuntimeGroups)
         {
-            foreach (var file in files)
+            foreach (var group in groups.Where(g => includeRuntimeGroups || string.IsNullOrEmpty(g.Runtime)))
             {
-                var destinationDirectory = DetermineFileDestinationDirectory(file, outputPath, nativeSubdirectories);
-
-                if (preserveRelativePath)
+                foreach (var file in group.Assets)
                 {
-                    destinationDirectory = Path.Combine(destinationDirectory, Path.GetDirectoryName(file.RelativePath));
-                }
+                    var destinationDirectory = DetermineFileDestinationDirectory(file, outputPath, nativeSubdirectories);
 
-                if (!Directory.Exists(destinationDirectory))
-                {
-                    Directory.CreateDirectory(destinationDirectory);
-                }
+                    if (!string.IsNullOrEmpty(group.Runtime))
+                    {
+                        destinationDirectory = Path.Combine(destinationDirectory, Path.GetDirectoryName(file.RelativePath));
+                    }
 
-                File.Copy(file.ResolvedPath, Path.Combine(destinationDirectory, file.FileName), overwrite: true);
+                    if (!Directory.Exists(destinationDirectory))
+                    {
+                        Directory.CreateDirectory(destinationDirectory);
+                    }
+
+                    File.Copy(file.ResolvedPath, Path.Combine(destinationDirectory, file.FileName), overwrite: true);
+                }
             }
         }
 
@@ -341,8 +384,8 @@ namespace Microsoft.DotNet.Tools.Publish
             }
 
             // No RID-specific target found, use the RID-less target and publish portable
-            return allContexts.FirstOrDefault(c => 
-                Equals(c.TargetFramework, f) && 
+            return allContexts.FirstOrDefault(c =>
+                Equals(c.TargetFramework, f) &&
                 string.IsNullOrEmpty(c.RuntimeIdentifier));
         }
 

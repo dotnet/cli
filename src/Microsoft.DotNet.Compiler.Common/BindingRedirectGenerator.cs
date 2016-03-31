@@ -111,7 +111,9 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
         {
             var dependenciesList = dependencies.ToList();
             var assemblyInfoCache = new Dictionary<string, AssemblyReferenceInfo>();
-            var allRuntimeAssemblies = dependenciesList.SelectMany(d => d.RuntimeAssemblies).Select(a => GetAssemblyInfo(a, assemblyInfoCache)).ToArray();
+            var allRuntimeAssemblies = dependenciesList.SelectMany(d => d.RuntimeAssemblyGroups.GetDefaultAssets())
+                .Select(a => GetAssemblyInfo(a, assemblyInfoCache))
+                .ToArray();
             var assemblyLookup = GetListOfUniqueRefs(dependenciesList).Select(a => GetAssemblyInfo(a, assemblyInfoCache)).ToDictionary(r => r.Identity.ToLookupKey());
 
             var redirectAssemblies = new HashSet<AssemblyRedirect>();
@@ -163,7 +165,7 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
             foreach (var dependency in dependencies)
             {
                 // Select runtime assemblies when there's no other dependency that actually owns them.
-                foreach (var assembly in dependency.RuntimeAssemblies)
+                foreach (var assembly in dependency.RuntimeAssemblyGroups.GetDefaultAssets())
                 {
                     if(dependencies.Any(
                             d => dependency != d && d.CompilationAssemblies.Any(c => c.Name == assembly.Name)))
