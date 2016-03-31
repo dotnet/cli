@@ -33,7 +33,7 @@ struct deps_entry_t
 
 
     // Given a "base" dir, yield the filepath within this directory or relative to this directory based on "look_in_base"
-    bool deps_entry_t::to_path(const pal::string_t& base, bool look_in_base, pal::string_t* str) const;
+    bool to_path(const pal::string_t& base, bool look_in_base, pal::string_t* str) const;
 
     // Given a "base" dir, yield the file path within this directory.
     bool to_dir_path(const pal::string_t& base, pal::string_t* str) const;
