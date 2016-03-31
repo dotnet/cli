@@ -6,15 +6,10 @@
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.0-rc2-23928"
+      "version": "1.0.0-rc2-23931"
     }
   },
   "frameworks": {
-    "netstandard1.5": {
-      "imports": [
-        "portable-net45+win8",
-        "dnxcore50"
-      ]
-    }
+    "netstandard1.5": {}
   }
 }

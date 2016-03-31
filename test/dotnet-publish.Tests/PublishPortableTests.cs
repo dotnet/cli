@@ -1,4 +1,5 @@
-﻿using Microsoft.DotNet.Tools.Test.Utilities;
+﻿using Microsoft.DotNet.TestFramework;
+using Microsoft.DotNet.Tools.Test.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,16 +24,11 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             var testInstance = TestAssetsManager.CreateTestInstance("PortableTests")
                 .WithLockFiles();
 
-            var publishCommand = new PublishCommand(Path.Combine(testInstance.TestRoot, "PortableAppWithNative"));
-            var publishResult = publishCommand.Execute();
+            var publishDir = Publish(testInstance);
 
-            publishResult.Should().Pass();
-
-            var publishDir = publishCommand.GetOutputDirectory(portable: true);
             publishDir.Should().HaveFiles(new[]
             {
                 "PortableAppWithNative.dll",
-                "PortableAppWithNative.deps",
                 "PortableAppWithNative.deps.json"
             });
 
@@ -69,10 +65,30 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             publishDir.Should().HaveFiles(new[]
             {
                 "PortableAppWithIntentionalManagedDowngrade.dll",
-                "PortableAppWithIntentionalManagedDowngrade.deps",
                 "PortableAppWithIntentionalManagedDowngrade.deps.json",
                 "System.Linq.dll"
             });
+        }
+
+        [Fact]
+        public void PortableAppWithRuntimeTargetsDoesNotHaveRuntimeConfigDevJsonFile()
+        {
+            var testInstance = TestAssetsManager.CreateTestInstance("PortableTests")
+                .WithLockFiles();
+
+            var publishDir = Publish(testInstance);
+
+            publishDir.Should().NotHaveFile("PortableAppWithNative.runtimeconfig.dev.json");
+        }
+
+        private DirectoryInfo Publish(TestInstance testInstance)
+        {
+            var publishCommand = new PublishCommand(Path.Combine(testInstance.TestRoot, "PortableAppWithNative"));
+            var publishResult = publishCommand.Execute();
+
+            publishResult.Should().Pass();
+
+            return publishCommand.GetOutputDirectory(portable: true);
         }
     }
 }
