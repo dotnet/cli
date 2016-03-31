@@ -426,6 +426,11 @@ namespace Microsoft.DotNet.Tools.Build
                 args.Add(_args.CppCompilerFlagsValue);
             }
 
+            if (_args.IsMultiModuleValue)
+            {
+                args.Add("--multimodule");
+            }
+
             if (!string.IsNullOrWhiteSpace(_args.ArchValue))
             {
                 args.Add("--arch");

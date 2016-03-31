@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
         public string IlcSdkPath { get; set; }
         public string CppCompilerFlags { get; set; }
         public bool EnableInterop { get; set; }
-
+        public bool IsMultiModuleBuild { get; set; }
         public bool IsHelp { get; set; }
         public int ReturnCode { get; set; }
 
@@ -109,6 +109,8 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
             {
                 config.AddLinkLibPath(lib);
             }
+
+            config.IsMultiModuleBuild = IsMultiModuleBuild;
 
             return config;
         }

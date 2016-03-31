@@ -116,6 +116,12 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
             //arch
             argsList.Add($"/MACHINE:{config.Architecture}");
 
+            if (config.IsMultiModuleBuild)
+            {
+                // SDK object file (System.Private.* assemblies)
+                argsList.Add(Path.Combine(config.IlcSdkPath, "sdk", "sdk" + InputExtension));
+            }
+
             //Input Obj file
             var inputFile = DetermineInputFile(config);
             argsList.Add($"{inputFile}");

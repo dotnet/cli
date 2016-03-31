@@ -82,6 +82,12 @@ namespace Microsoft.DotNet.Tools.Compiler
                 nativeArgs.Add("cpp");
             }
 
+            // Multi-module Mode
+            if (args.IsMultiModuleValue)
+            {
+                nativeArgs.Add("--multimodule");
+            }
+
             if (!string.IsNullOrWhiteSpace(args.CppCompilerFlagsValue))
             {
                 nativeArgs.Add("--cppcompilerflags");

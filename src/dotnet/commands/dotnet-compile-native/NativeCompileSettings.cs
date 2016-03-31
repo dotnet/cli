@@ -23,7 +23,8 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
         private readonly Dictionary<string, string> _referencePaths;
         private readonly List<string> _linkLibPaths;
         private string _cppCompilerFlags;
-
+        public bool IsMultiModuleBuild { get; set; }
+        
         public string LogPath
         {
             get { return _logPath; }

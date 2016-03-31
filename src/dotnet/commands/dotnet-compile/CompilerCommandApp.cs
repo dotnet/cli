@@ -38,6 +38,7 @@ namespace Microsoft.DotNet.Tools.Compiler
         private CommandOption _appDepSdkPathOption;
         private CommandOption _cppModeOption;
         private CommandOption _cppCompilerFlagsOption;
+        private CommandOption _isMultiModuleOption;
 
         // resolved values for the options and arguments
         public string ProjectPathValue { get; set; }
@@ -54,6 +55,7 @@ namespace Microsoft.DotNet.Tools.Compiler
         public bool IsCppModeValue { get; set; }
         public string AppDepSdkPathValue { get; set; }
         public string CppCompilerFlagsValue { get; set; }
+        public bool IsMultiModuleValue { get; set; }
 
         // workaround: CommandLineApplication is internal therefore I cannot make _app protected so baseclasses can add their own params
         private readonly Dictionary<string, CommandOption> baseClassOptions;
@@ -93,6 +95,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             _appDepSdkPathOption = _app.Option("--appdepsdkpath <PATH>", "Path to the folder containing ILCompiler application dependencies.", CommandOptionType.SingleValue);
             _cppModeOption = _app.Option("--cpp", "Flag to do native compilation with C++ code generator.", CommandOptionType.NoValue);
             _cppCompilerFlagsOption = _app.Option("--cppcompilerflags <flags>", "Additional flags to be passed to the native compiler.", CommandOptionType.SingleValue);
+            _isMultiModuleOption = _app.Option("--multimodule", "Flag to do native compilation as a set object files that are then linked together.", CommandOptionType.NoValue);
         }
 
         public int Execute(OnExecute execute, string[] args)
@@ -126,6 +129,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 AppDepSdkPathValue = _appDepSdkPathOption.Value();
                 IsCppModeValue = _cppModeOption.HasValue();
                 CppCompilerFlagsValue = _cppCompilerFlagsOption.Value();
+                IsMultiModuleValue = _isMultiModuleOption.HasValue();
 
                 // Set defaults based on the environment
                 var settings = ProjectReaderSettings.ReadFromEnvironment();

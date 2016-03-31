@@ -6,24 +6,24 @@ namespace Microsoft.DotNet.Tools.Compiler.Native
 	{
 		public static NativeCompiler Create(NativeCompileSettings config)
 		{
-			var invoker = new ILCompilerInvoker(config);
+            var msilCompiler = ILCompiler.Create(config);
 			var intCompiler = IntermediateCompiler.Create(config);
-			
-			var nc = new NativeCompiler() 
-			{
-				invoker = invoker, 
-				intermediateCompiler = intCompiler
+
+            var nc = new NativeCompiler()
+            {
+                ilCompiler = msilCompiler,
+                intermediateCompiler = intCompiler
 			};
 			
 			return nc;
 		}
 
-        private ILCompilerInvoker invoker;
+        private ILCompiler ilCompiler;
         private IntermediateCompiler intermediateCompiler;
 
 		public bool CompileToNative(NativeCompileSettings config)
 		{	
-			int result = invoker.Invoke();
+			int result = ilCompiler.Invoke();
             if(result != 0)
             {
                 return false;
