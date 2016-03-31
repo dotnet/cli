@@ -250,7 +250,11 @@ namespace Microsoft.DotNet.Cli.Utils
 
             public string GetAbsoluteCommandPath(string nugetPackageRoot)
             {
-                return Path.Combine(nugetPackageRoot, PackageName, PackageVersion, RelativeCommandPath);
+                return Path.Combine(
+                    nugetPackageRoot.Replace('/', Path.DirectorySeparatorChar), 
+                    PackageName.Replace('/', Path.DirectorySeparatorChar), 
+                    PackageVersion.Replace('/', Path.DirectorySeparatorChar), 
+                    RelativeCommandPath.Replace('/', Path.DirectorySeparatorChar));
             }
         }
     }

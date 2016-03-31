@@ -142,13 +142,32 @@ namespace Microsoft.DotNet.Cli.Build
                 c.Info($"Packing: {fullPath}");
 
                 // build and ignore failure, so net451 fail on non-windows doesn't crash the build
+                var packageBuildFrameworks = new List<string>()
+                {
+                    "netstandard1.5",
+                    "netstandard1.3",
+                    "netstandardapp1.5"
+                };
 
-                Mkdirp(Dirs.TestPackagesBuild);
-                var packBuildResult = DotNetCli.Stage1.Build(
-                    "--build-base-path",
-                    Dirs.TestPackagesBuild,
-                    fullPath)
-                    .Execute();
+                if (CurrentPlatform.IsWindows)
+                {
+                    packageBuildFrameworks.Add("net451");
+                }
+
+                foreach (var packageBuildFramework in packageBuildFrameworks)
+                {
+                    var buildArgs = new List<string>();
+                    buildArgs.Add("-f");
+                    buildArgs.Add(packageBuildFramework);
+                    buildArgs.Add("--build-base-path");
+                    buildArgs.Add(Dirs.TestPackagesBuild);
+                    buildArgs.Add(fullPath);
+
+                    Mkdirp(Dirs.TestPackagesBuild);
+                    var packBuildResult = DotNetCli.Stage1.Build(buildArgs.ToArray())
+                        .Execute();
+                }
+                
 
                 var projectJson = Path.Combine(fullPath, "project.json");
                 var dotnetPackArgs = new List<string> { 
