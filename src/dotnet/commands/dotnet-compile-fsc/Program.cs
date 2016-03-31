@@ -170,7 +170,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
                 //HACK we need default.win32manifest for exe
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    var win32manifestPath = Path.Combine(AppContext.BaseDirectory, "default.win32manifest");
+                    var win32manifestPath = GetDefaultWin32ManifestPath();
                     allArgs.Add($"--win32manifest:{win32manifestPath}");
                 }
             }
@@ -257,10 +257,21 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
             return result.ExitCode;
         }
 
+        private static string GetFscPath()
+        {
+            return Environment.GetEnvironmentVariable("DOTNET_FSC_PATH")
+                   ?? Path.Combine(AppContext.BaseDirectory, "fsc.dll");
+        }
+
+        private static string GetDefaultWin32ManifestPath()
+        {
+            var baseDir = Path.GetDirectoryName(GetFscPath());
+            return Path.Combine(baseDir, "runtimes", "any", "native", "default.win32manifest");
+        }
+
         private static Command RunFsc(List<string> fscArgs)
         {
-            var fscExe = Environment.GetEnvironmentVariable("DOTNET_FSC_PATH")
-                      ?? Path.Combine(AppContext.BaseDirectory, "fsc.exe");
+            var fscExe = GetFscPath();
 
             var exec = Environment.GetEnvironmentVariable("DOTNET_FSC_EXEC")?.ToUpper() ?? "COREHOST";
 
@@ -271,8 +282,9 @@ namespace Microsoft.DotNet.Tools.Compiler.Fsc
 
                 case "COREHOST":
                 default:
-                    var corehost = Path.Combine(AppContext.BaseDirectory, Constants.HostExecutableName);
-                    return Command.Create(corehost, new[] { fscExe }.Concat(fscArgs).ToArray());
+                    var muxer = new Muxer();
+                    var host = muxer.MuxerPath;
+                    return Command.Create(host, new[] { "exec", fscExe }.Concat(fscArgs).ToArray());
             }
 
         }
