@@ -15,6 +15,11 @@ namespace Microsoft.DotNet.ProjectModel.Graph
 {
     public static class LockFileReader
     {        
+        public static LockFile Read(string lockFilePath)
+        {
+            return Read(lockFilePath, designTime: false);
+        }
+
         public static LockFile Read(string lockFilePath, bool designTime)
         {
             using (var stream = ResilientFileStreamOpener.OpenFile(lockFilePath))
@@ -32,6 +37,11 @@ namespace Microsoft.DotNet.ProjectModel.Graph
                     throw FileFormatException.Create(ex, lockFilePath);
                 }
             }
+        }
+
+        public static LockFile Read(string lockFilePath, Stream stream)
+        {
+            return Read(lockFilePath, stream, designTime: false);
         }
 
         public static LockFile Read(string lockFilePath, Stream stream, bool designTime)
