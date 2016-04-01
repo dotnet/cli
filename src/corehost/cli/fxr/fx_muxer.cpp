@@ -257,24 +257,26 @@ int fx_muxer_t::execute(const int argc, const pal::char_t* argv[])
             return StatusCode::LibHostExecModeFailure;
         }
 
-        auto config_file = get_runtime_config_from_file(app_path);
-        runtime_config_t config(config_file);
+        pal::string_t dev_config_file;
+        auto config_file = get_runtime_config_from_file(app_path, &dev_config_file);
+        runtime_config_t config(config_file, dev_config_file);
         if (!config.is_valid())
         {
-            trace::error(_X("Invalid runtimeconfig.json [%s]"), config.get_path().c_str());
+            trace::error(_X("Invalid runtimeconfig.json [%s] [%s]"), config.get_path().c_str(), config.get_dev_path().c_str());
             return StatusCode::InvalidConfigFile;
         }
+        std::vector<pal::string_t> probe_paths(config.get_probe_paths().begin(), config.get_probe_paths().end());
         if (config.get_portable())
         {
             trace::verbose(_X("Executing as a portable app as per config file [%s]"), config_file.c_str());
             pal::string_t fx_dir = resolve_fx_dir(own_dir, &config);
-            corehost_init_t init(_X(""), config.get_probe_paths(), fx_dir, host_mode_t::muxer, &config);
+            corehost_init_t init(_X(""), probe_paths, fx_dir, host_mode_t::muxer, &config);
             return execute_app(fx_dir, &init, argc, argv);
         }
         else
         {
             trace::verbose(_X("Executing as a standlone app as per config file [%s]"), config_file.c_str());
-            corehost_init_t init(_X(""), config.get_probe_paths(), _X(""), host_mode_t::muxer, &config);
+            corehost_init_t init(_X(""), probe_paths, _X(""), host_mode_t::muxer, &config);
             return execute_app(get_directory(app_path), &init, argc, argv);
         }
     }
@@ -286,7 +288,7 @@ int fx_muxer_t::execute(const int argc, const pal::char_t* argv[])
 
             trace::verbose(_X("Exec mode, parsing known args"));
             int num_args = 0;
-            std::unordered_map<pal::string_t, pal::string_t> opts;
+            std::unordered_map<pal::string_t, std::vector<pal::string_t>> opts;
             if (!parse_known_args(argc - 2, &argv[2], known_opts, &opts, &num_args))
             {
                 trace::error(_X("Failed to parse known arguments."));
@@ -307,18 +309,24 @@ int fx_muxer_t::execute(const int argc, const pal::char_t* argv[])
 
             pal::string_t opts_deps_file = _X("--depsfile");
             pal::string_t opts_probe_path = _X("--additionalprobingpath");
-            pal::string_t deps_file = opts.count(opts_deps_file) ? opts[opts_deps_file] : _X("");
-            pal::string_t probe_path = opts.count(opts_probe_path) ? opts[opts_probe_path] : _X("");
+            pal::string_t deps_file = get_last_known_arg(opts, opts_deps_file, _X(""));
+            std::vector<pal::string_t> probe_paths = opts.count(opts_probe_path) ? opts[opts_probe_path] : std::vector<pal::string_t>();
 
             trace::verbose(_X("Current argv is %s"), argv[cur_i]);
 
             pal::string_t app_or_deps = deps_file.empty() ? argv[cur_i] : deps_file;
             pal::string_t no_json = argv[cur_i];
-            auto config_file = get_runtime_config_from_file(no_json);
-            runtime_config_t config(config_file);
+            pal::string_t dev_config_file;
+            auto config_file = get_runtime_config_from_file(no_json, &dev_config_file);
+            runtime_config_t config(config_file, dev_config_file);
+            for (const auto& path : config.get_probe_paths())
+            {
+                probe_paths.push_back(path);
+            }
+
             if (!config.is_valid())
             {
-                trace::error(_X("Invalid runtimeconfig.json [%s]"), config.get_path().c_str());
+                trace::error(_X("Invalid runtimeconfig.json [%s] [%s]"), config.get_path().c_str(), config.get_dev_path().c_str());
                 return StatusCode::InvalidConfigFile;
             }
             if (!deps_file.empty() && !pal::file_exists(deps_file))
@@ -326,7 +334,7 @@ int fx_muxer_t::execute(const int argc, const pal::char_t* argv[])
                 trace::error(_X("Deps file [%s] specified but doesn't exist"), deps_file.c_str());
                 return StatusCode::InvalidArgFailure;
             }
-            std::vector<pal::string_t> probe_paths = { probe_path };
+
             if (config.get_portable())
             {
                 trace::verbose(_X("Executing as a portable app as per config file [%s]"), config_file.c_str());
@@ -338,14 +346,25 @@ int fx_muxer_t::execute(const int argc, const pal::char_t* argv[])
             {
                 trace::verbose(_X("Executing as a standalone app as per config file [%s]"), config_file.c_str());
                 pal::string_t impl_dir = get_directory(app_or_deps);
-                if (!library_exists_in_dir(impl_dir, LIBHOSTPOLICY_NAME, nullptr) && !probe_path.empty() && !deps_file.empty())
+                if (!library_exists_in_dir(impl_dir, LIBHOSTPOLICY_NAME, nullptr) && !probe_paths.empty() && !deps_file.empty())
                 {
-                    deps_json_t deps_json(false, deps_file);
+                    bool found = false;
                     pal::string_t candidate = impl_dir;
-                    if (!deps_json.has_hostpolicy_entry() ||
-                        !deps_json.get_hostpolicy_entry().to_full_path(probe_path, &candidate))
+                    deps_json_t deps_json(false, deps_file);
+                    for (const auto& probe_path : probe_paths)
                     {
-                        trace::error(_X("Policy library either not found in deps [%s] or not found in [%s]"), deps_file.c_str(), probe_path.c_str());
+                        trace::verbose(_X("Considering %s for hostpolicy library"), probe_path.c_str());
+                        if (deps_json.is_valid() &&
+                            deps_json.has_hostpolicy_entry() &&
+                            deps_json.get_hostpolicy_entry().to_full_path(probe_path, &candidate))
+                        {
+                            found = true; // candidate contains the right path.
+                            break;
+                        }
+                    }
+                    if (!found)
+                    {
+                        trace::error(_X("Policy library either not found in deps [%s] or not found in %d probe paths."), deps_file.c_str(), probe_paths.size());
                         return StatusCode::CoreHostLibMissingFailure;
                     }
                     impl_dir = get_directory(candidate);
@@ -379,8 +398,9 @@ int fx_muxer_t::execute(const int argc, const pal::char_t* argv[])
 
             trace::verbose(_X("Using dotnet SDK dll=[%s]"), sdk_dotnet.c_str());
 
-            auto config_file = get_runtime_config_from_file(sdk_dotnet);
-            runtime_config_t config(config_file);
+            pal::string_t dev_config_file;
+            auto config_file = get_runtime_config_from_file(sdk_dotnet, &dev_config_file);
+            runtime_config_t config(config_file, dev_config_file);
 
             if (config.get_portable())
             {
