@@ -106,7 +106,7 @@ pal::string_t fx_muxer_t::resolve_cli_version(const pal::string_t& global_json)
     catch (const web::json::json_exception& je)
     {
         pal::string_t jes = pal::to_palstring(je.what());
-        trace::error(_X("A JSON parsing exception occurred: %s"), jes.c_str());
+        trace::info(_X("A JSON parsing exception occurred: %s"), jes.c_str());
     }
     trace::verbose(_X("CLI version is [%s] in global json file [%s]"), retval.c_str(), global_json.c_str());
     return retval;
@@ -308,7 +308,7 @@ int fx_muxer_t::execute(const int argc, const pal::char_t* argv[])
             trace::verbose(_X("Current argv is %s"), argv[cur_i]);
 
             pal::string_t app_or_deps = deps_file.empty() ? argv[cur_i] : deps_file;
-            pal::string_t no_json = deps_file.empty() ? app_or_deps : strip_file_ext(app_or_deps);
+            pal::string_t no_json = argv[cur_i];
             auto config_file = get_runtime_config_from_file(no_json);
             runtime_config_t config(config_file);
             if (!config.is_valid())
