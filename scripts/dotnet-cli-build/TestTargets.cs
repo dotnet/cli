@@ -19,6 +19,7 @@ namespace Microsoft.DotNet.Cli.Build
         {
             "EndToEnd",
             "dotnet.Tests",
+            "dotnet-muxer.Tests",
             "dotnet-publish.Tests",
             "dotnet-compile.Tests",
             "dotnet-compile.UnitTests",

@@ -7,69 +7,53 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 {
     public class BuildPortableTests : TestBase
     {
-  
+        public static string PortableApp { get; } = "PortableApp";
+        public static string PortableAppRoot { get; } = Path.Combine("PortableTests", PortableApp);
+        public static string KestrelPortableApp { get; } = "KestrelHelloWorldPortable";
 
         [Fact]
-        public void BuildingAPortableProjectProducesDepsJsonFile()
+        public void BuildingPortableAppProducesExpectedArtifacts()
         {
-            var testInstance = TestAssetsManager.CreateTestInstance("PortableTests").WithLockFiles();
+            var testInstance = TestAssetsManager.CreateTestInstance(PortableAppRoot)
+                .WithLockFiles();
 
-            var netstandardappOutput = Build(testInstance);
-
-            netstandardappOutput.Should().Exist().And.HaveFile("PortableApp.deps.json");
+            BuildAndTest(testInstance.TestRoot);
         }
 
         [Fact]
-        public void BuildingAPortableProjectProducesADllFile()
+        public void BuildingKestrelPortableFatAppProducesExpectedArtifacts()
         {
-            var testInstance = TestAssetsManager.CreateTestInstance("PortableTests").WithLockFiles();
+            var testInstance = TestAssetsManager.CreateTestInstance("KestrelHelloWorld")
+                .WithLockFiles();
 
-            var netstandardappOutput = Build(testInstance);
-
-            netstandardappOutput.Should().Exist().And.HaveFile("PortableApp.dll");
+            BuildAndTest(Path.Combine(testInstance.TestRoot, KestrelPortableApp));
         }
 
-        [Fact]
-        public void BuildingAPortableProjectProducesAPdbFile()
+        private static void BuildAndTest(string testRoot)
         {
-            var testInstance = TestAssetsManager.CreateTestInstance("PortableTests").WithLockFiles();
+            string appName = Path.GetFileName(testRoot);
 
-            var netstandardappOutput = Build(testInstance);
 
-            netstandardappOutput.Should().Exist().And.HaveFile("PortableApp.pdb");
-        }
-
-        [Fact]
-        public void BuildingAPortableProjectProducesARuntimeConfigJsonFile()
-        {
-            var testInstance = TestAssetsManager.CreateTestInstance("PortableTests").WithLockFiles();
-
-            var netstandardappOutput = Build(testInstance);
-
-            netstandardappOutput.Should().Exist().And.HaveFile("PortableApp.runtimeconfig.json");
-        }
-
-        [Fact]
-        public void BuildingAPortableProjectProducesARuntimeConfigDevJsonFile()
-        {
-            var testInstance = TestAssetsManager.CreateTestInstance("PortableTests").WithLockFiles();
-
-            var netstandardappOutput = Build(testInstance);
-
-            netstandardappOutput.Should().Exist().And.HaveFile("PortableApp.runtimeconfig.dev.json");
-        }
-
-        private DirectoryInfo Build(TestInstance testInstance)
-        {
             var result = new BuildCommand(
-                projectPath: Path.Combine(testInstance.TestRoot, "PortableApp"))
+                projectPath: testRoot)
                 .ExecuteWithCapturedOutput();
 
             result.Should().Pass();
 
-            var outputBase = new DirectoryInfo(Path.Combine(testInstance.TestRoot, "PortableApp", "bin", "Debug"));
+            var outputBase = new DirectoryInfo(Path.Combine(testRoot, "bin", "Debug"));
 
-            return outputBase.Sub("netstandard1.5");
+            var netstandardappOutput = outputBase.Sub("netstandard1.5");
+
+            netstandardappOutput.Should()
+                .Exist().And
+                .OnlyHaveFiles(new[]
+                {
+                    $"{appName}.deps.json",
+                    $"{appName}.dll",
+                    $"{appName}.pdb",
+                    $"{appName}.runtimeconfig.json",
+                    $"{appName}.runtimeconfig.dev.json"
+                });
         }
     }
 }
