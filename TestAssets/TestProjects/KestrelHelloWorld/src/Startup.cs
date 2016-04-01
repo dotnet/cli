@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -49,6 +50,8 @@ namespace SampleApp
                 context.Response.ContentLength = content.Length;
                 context.Response.ContentType = "text/plain";
                 await context.Response.WriteAsync(content);
+                await Task.Delay(5000);
+                ServerCancellationTokenSource.Cancel();
             });
         }
 

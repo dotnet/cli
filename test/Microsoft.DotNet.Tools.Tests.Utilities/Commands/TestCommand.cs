@@ -76,38 +76,14 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             return RunProcess(commandPath, args, stdOut, stdErr);
         }
 
-        public void Kill(bool killProcessTree = false)
+        public void KillTree()
         {
             if (CurrentProcess == null)
             {
                 throw new InvalidOperationException("No process is available to be killed");
             }
 
-            if (killProcessTree)
-            {
-                KillProcessTree(CurrentProcess);
-            }
-            else
-            {
-                CurrentProcess.Kill();
-            }
-
-            if (!CurrentProcess.HasExited)
-            {
-                throw new Exception($"Unable to kill process - {CurrentProcess.Id}");
-            }
-        }
-
-        private void KillProcessTree(Process process)
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                StartProcess("taskkill", $"/T /F /PID {process.Id}").WaitForExit();
-            }
-            else
-            {
-                StartProcess("sh", $"-c \"kill -9 -$(ps -o pgid= {process.Id} | grep -o '[0-9]*')\"").WaitForExit();
-            }
+            CurrentProcess.KillTree();
         }
 
         private void ResolveCommand(ref string executable, ref string args)

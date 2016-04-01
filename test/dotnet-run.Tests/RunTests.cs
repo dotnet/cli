@@ -93,7 +93,7 @@ namespace Microsoft.DotNet.Tools.Run.Tests
             }
             finally
             {
-                runCommand.Kill(true);
+                runCommand.KillTree();
             }
         }
 
@@ -115,7 +115,7 @@ namespace Microsoft.DotNet.Tools.Run.Tests
             }
             finally
             {
-                runCommand.Kill(true);
+                runCommand.KillTree();
             }
         }
 

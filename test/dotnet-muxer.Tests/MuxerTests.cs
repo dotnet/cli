@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.Tools.Run.Tests
             }
             finally
             {
-                dotnetCommand.Kill(true);
+                dotnetCommand.KillTree();
             }
         }
 
@@ -64,7 +64,7 @@ namespace Microsoft.DotNet.Tools.Run.Tests
             }
             finally
             {
-                dotnetCommand.Kill(true);
+                dotnetCommand.KillTree();
             }
         }
 
@@ -88,7 +88,7 @@ namespace Microsoft.DotNet.Tools.Run.Tests
             }
             finally
             {
-                dotnetCommand.Kill(true);
+                dotnetCommand.KillTree();
             }
         }
 
@@ -112,7 +112,7 @@ namespace Microsoft.DotNet.Tools.Run.Tests
             }
             finally
             {
-                command.Kill(true);
+                command.KillTree();
             }
         }
 
