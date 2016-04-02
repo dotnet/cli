@@ -158,6 +158,7 @@ create_empty_debian_layout(){
     mkdir "$PACKAGE_LAYOUT_DIR/package_root"
     mkdir "$PACKAGE_LAYOUT_DIR/samples"
     mkdir "$PACKAGE_LAYOUT_DIR/docs"
+    mkdir "$PACKAGE_LAYOUT_DIR/DEBIAN"
 }
 
 copy_files_to_debian_layout(){
@@ -171,6 +172,11 @@ copy_files_to_debian_layout(){
 
     # Copy Manpages
     cp -a "$MANPAGE_DIR/sdk/." "$PACKAGE_LAYOUT_DIR/docs"
+
+    # Copy postinstall
+    cp "$PACKAGING_ROOT/postinst" "$PACKAGE_LAYOUT_DIR/$"
+    #cp "$PACKAGING_ROOT/postinst" "PACKAGE_LAYOUT_DIR/package_root"
+    #cp "$PACKAGING_ROOT/postinst" "$PACKAGE_LAYOUT_DIR/DEBIAN/postinst"
 }
 
 create_debian_package(){
