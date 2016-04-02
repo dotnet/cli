@@ -141,7 +141,7 @@ namespace Microsoft.Extensions.DependencyModel
             }
 
             return new CompilationOptions(
-                compilationOptionsObject[DependencyContextStrings.DefinesPropertyName]?.Values<string>() ?? Enumerable.Empty<string>(),
+                compilationOptionsObject[DependencyContextStrings.DefinesPropertyName]?.Values<string>().ToArray() ?? Enumerable.Empty<string>(),
                 compilationOptionsObject[DependencyContextStrings.LanguageVersionPropertyName]?.Value<string>(),
                 compilationOptionsObject[DependencyContextStrings.PlatformPropertyName]?.Value<string>(),
                 compilationOptionsObject[DependencyContextStrings.AllowUnsafePropertyName]?.Value<bool>(),
