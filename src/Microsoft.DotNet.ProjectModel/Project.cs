@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.DotNet.ProjectModel.Files;
 using Microsoft.DotNet.ProjectModel.Graph;
 using NuGet.Frameworks;
@@ -89,6 +90,8 @@ namespace Microsoft.DotNet.ProjectModel
         public IDictionary<string, IEnumerable<string>> Scripts { get; } = new Dictionary<string, IEnumerable<string>>(StringComparer.OrdinalIgnoreCase);
 
         public bool IsTestProject => !string.IsNullOrEmpty(TestRunner);
+
+        public bool IsPortable => Dependencies.Any(d => d.Type.Equals(LibraryDependencyType.Platform));
 
         public IEnumerable<TargetFrameworkInformation> GetTargetFrameworks()
         {
