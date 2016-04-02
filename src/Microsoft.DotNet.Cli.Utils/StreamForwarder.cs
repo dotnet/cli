@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.Cli.Utils
 
         private StringBuilder _builder;
         private StringWriter _capture;
-        private Action<string> _writeLine;
+        private Action<string> _write;
 
         public string CapturedOutput
         {
@@ -32,13 +32,13 @@ namespace Microsoft.DotNet.Cli.Utils
             return this;
         }
 
-        public StreamForwarder ForwardTo(Action<string> writeLine)
+        public StreamForwarder ForwardTo(Action<string> write)
         {
-            ThrowIfNull(writeLine);
+            ThrowIfNull(write);
 
             ThrowIfForwarderSet();
 
-            _writeLine = writeLine;
+            _write = write;
 
             return this;
         }
@@ -68,7 +68,7 @@ namespace Microsoft.DotNet.Cli.Utils
 
                 if (currentCharacter == s_flushBuilderCharacter)
                 {
-                    WriteBuilder();
+                    WriteBuilder(true);
                 }
                 else if (! s_ignoreCharacters.Contains(currentCharacter))
                 {
@@ -78,31 +78,30 @@ namespace Microsoft.DotNet.Cli.Utils
 
             // Flush anything else when the stream is closed
             // Which should only happen if someone used console.Write
-            WriteBuilder();
+            WriteBuilder(false);
         }
 
-        private void WriteBuilder()
+        private void WriteBuilder(bool includeNewLine)
         {
-            if (_builder.Length == 0)
+            if (_builder.Length == 0 && !includeNewLine)
             {
                 return;
             }
 
-            WriteLine(_builder.ToString());
+            if (includeNewLine)
+            {
+                _builder.Append(Environment.NewLine);
+            }
+
+            Write(_builder.ToString());
             _builder.Clear();
         }
 
-        private void WriteLine(string str)
-        { 
-            if (_capture != null)
-            {
-                _capture.WriteLine(str);
-            }
+        private void Write(string str)
+        {
+            _capture?.Write(str);
 
-            if (_writeLine != null)
-            {
-                _writeLine(str);
-            }
+            _write?.Invoke(str);
         }
 
         private void ThrowIfNull(object obj)
@@ -115,7 +114,7 @@ namespace Microsoft.DotNet.Cli.Utils
 
         private void ThrowIfForwarderSet()
         {
-            if (_writeLine != null)
+            if (_write != null)
             {
                 throw new InvalidOperationException("WriteLine forwarder set previously");
             }

@@ -180,7 +180,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                     }
                     else
                     {
-                        Reporter.Error.WriteLine(line);
+                        Reporter.Error.Write(line);
                     }
                 })
                 .OnOutputLine(line =>
@@ -192,7 +192,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                     }
                     else
                     {
-                        Reporter.Output.WriteLine(line);
+                        Reporter.Output.Write(line);
                     }
                 }).Execute();
 

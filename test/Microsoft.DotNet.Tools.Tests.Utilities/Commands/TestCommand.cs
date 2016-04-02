@@ -32,8 +32,8 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             var stdOut = new StreamForwarder();
             var stdErr = new StreamForwarder();
 
-            stdOut.ForwardTo(writeLine: Reporter.Output.WriteLine);
-            stdErr.ForwardTo(writeLine: Reporter.Output.WriteLine);
+            stdOut.ForwardTo(write: Reporter.Output.Write);
+            stdErr.ForwardTo(write: Reporter.Output.Write);
 
             return RunProcess(commandPath, args, stdOut, stdErr);
         }
