@@ -38,16 +38,18 @@ namespace Microsoft.DotNet.Cli.Utils
                 return new[]
                 {
                     new object[] { "123", new string[]{"123"} },
-                    new object[] { "123\n", new string[] {"123"} },
-                    new object[] { "123\r\n", new string[] {"123"} },
+                    new object[] { "123\n", new string[] {"123", ""} },
+                    new object[] { "123\r\n", new string[] {"123", ""} },
                     new object[] { "1234\n5678", new string[] {"1234", "5678"} },
                     new object[] { "1234\r\n5678", new string[] {"1234", "5678"} },
-                    new object[] { "1234\n5678\n", new string[] {"1234", "5678"} },
-                    new object[] { "1234\r\n5678\r\n", new string[] {"1234", "5678"} },
+                    new object[] { "1234\n\n5678", new string[] {"1234", "", "5678"} },
+                    new object[] { "1234\r\n\r\n5678", new string[] {"1234", "", "5678"} },
+                    new object[] { "1234\n5678\n", new string[] {"1234", "5678", ""} },
+                    new object[] { "1234\r\n5678\r\n", new string[] {"1234", "5678", ""} },
                     new object[] { "1234\n5678\nabcdefghijklmnopqrstuvwxyz", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz"} },
                     new object[] { "1234\r\n5678\r\nabcdefghijklmnopqrstuvwxyz", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz"} },
-                    new object[] { "1234\n5678\nabcdefghijklmnopqrstuvwxyz\n", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz"} },
-                    new object[] { "1234\r\n5678\r\nabcdefghijklmnopqrstuvwxyz\r\n", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz"} }
+                    new object[] { "1234\n5678\nabcdefghijklmnopqrstuvwxyz\n", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz", ""} },
+                    new object[] { "1234\r\n5678\r\nabcdefghijklmnopqrstuvwxyz\r\n", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz", ""} }
                 };
             }
         }
