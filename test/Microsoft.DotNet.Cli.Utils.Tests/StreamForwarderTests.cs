@@ -9,14 +9,14 @@ using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
 
-namespace StreamForwarderTests
+namespace Microsoft.DotNet.Cli.Utils.Tests
 {
     public class StreamForwarderTests : TestBase
     {
         private static readonly string s_rid = RuntimeEnvironmentRidExtensions.GetLegacyRestoreRuntimeIdentifier();
         private static readonly string s_testProjectRoot = Path.Combine(AppContext.BaseDirectory, "TestAssets", "TestProjects");
 
-        private TempDirectory _root;
+        private readonly TempDirectory _root;
 
         public static void Main()
         {
@@ -97,6 +97,7 @@ namespace StreamForwarderTests
             TestCapturingAndForwardingHelper(ForwardOptions.WriteLine | ForwardOptions.Capture, inputStr, expectedCaptured, expectedWrites);
         }
 
+        [Flags]
         private enum ForwardOptions
         {
             None = 0x0,
