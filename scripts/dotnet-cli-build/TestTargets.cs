@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.Cli.Build
         [Target(nameof(RestoreTestAssetPackages), nameof(BuildTestAssetPackages))]
         public static BuildTargetResult SetupTestPackages(BuildTargetContext c) => c.Success();
 
-        [Target(nameof(RestoreTestAssetProjects), nameof(RestoreDesktopTestAssetProjects), nameof(BuildTestAssetProjects))]
+        [Target(nameof(RestoreTestAssetProjects), nameof(RestoreDesktopTestAssetProjects), nameof(RestoreCrossPublishTestAssetProjects), nameof(BuildTestAssetProjects))]
         public static BuildTargetResult SetupTestProjects(BuildTargetContext c) => c.Success();
 
         [Target]
@@ -133,6 +133,18 @@ namespace Microsoft.DotNet.Cli.Build
                 "--fallbacksource", Dirs.TestPackages,
                 "--fallbacksource", Dirs.Corehost)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "DesktopTestProjects"))
+                .Execute().EnsureSuccessful();
+                
+            return c.Success();
+        }
+        
+        [Target]
+        public static BuildTargetResult RestoreCrossPublishTestAssetProjects(BuildTargetContext c)
+        {
+            var dotnet = DotNetCli.Stage2;
+
+            dotnet.Restore("--verbosity", "verbose")
+                .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "CrossPublishTestProjects"))
                 .Execute().EnsureSuccessful();
                 
             return c.Success();

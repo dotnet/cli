@@ -77,8 +77,14 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
             if (emitEntryPoint && !string.IsNullOrEmpty(_context.RuntimeIdentifier))
             {
                 // TODO: Pick a host based on the RID
-                CoreHost.CopyTo(_runtimeOutputPath, _compilerOptions.OutputName + Constants.ExeSuffix);
+                CopyHostTo(_runtimeOutputPath, _compilerOptions.OutputName + Constants.ExeSuffix);
+                // CoreHost.CopyTo(_runtimeOutputPath, _compilerOptions.OutputName + Constants.ExeSuffix);
             }
+        }
+
+        private void CopyHostTo(string outputDirectory, string renameHost = "")
+        {
+            
         }
 
         private void CopyContentFiles()

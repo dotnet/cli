@@ -92,6 +92,37 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             publishCommand.Execute().Should().Fail();
         }
 
+        [Theory]
+        [InlineData("ubuntu.14.04-x64", "", "libhostfxr.so", "libcoreclr.so", "libhostpolicy.so")]
+        [InlineData("win7-x64", ".exe", "hostfxr.dll", "coreclr.dll", "hostpolicy.dll")]
+        [InlineData("osx.10.11-x64", "", "libhostfxr.dylib", "libcoreclr.dylib", "libhostpolicy.dylib")]
+        public void CrossPublishingSucceedsAndHasExpectedArtifacts(string rid, string hostExtension, string[] expectedArtifacts)
+        {
+            var testNugetCache = "~/.nuget/packages_cross_publish_test";
+            TestInstance instance = GetTestGroupTestAssetsManager("CrossPublishTestProjects")
+                .CreateTestInstance("StandaloneApp")
+                .WithLockFiles();
+                
+            var testProject = _getProjectJson(instance.TestRoot);
+
+            var restoreCommand = new RestoreCommand();
+            restoreCommand.Environment["NUGET_PACKAGES"] = testNugetCache;
+            restoreCommand.Execute(testProject).Should().Pass();
+
+            var publishCommand = new PublishCommand(testProject, runtime: rid);
+            publishCommand.Environment["NUGET_PACKAGES"] = testNugetCache;
+
+            publishCommand.Execute().Should().Pass();
+
+            var publishedDir = publishCommand.GetOutputDirectory();
+            publishedDir.Should().HaveFile("StandaloneApp"+ hostExtension);
+
+            foreach (var artifact in expectedArtifacts)
+            {
+                publishedDir.Should().HaveFile(artifact);
+            }
+        }
+
         [Fact]
         public void LibraryPublishTest()
         {
