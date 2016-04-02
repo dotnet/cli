@@ -83,11 +83,6 @@ namespace Microsoft.DotNet.Cli.Utils
 
         private void WriteBuilder()
         {
-            if (_builder.Length == 0)
-            {
-                return;
-            }
-
             WriteLine(_builder.ToString());
             _builder.Clear();
         }
