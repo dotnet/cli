@@ -131,20 +131,24 @@ namespace Microsoft.DotNet.Tools.Publish
             var isPortable = string.IsNullOrEmpty(context.RuntimeIdentifier);
 
             // Collect all exports and organize them
-            var exports = exporter.GetAllExports()
+            var packageExports = exporter.GetAllExports()
                 .Where(e => e.Library.Identity.Type.Equals(LibraryType.Package))
                 .ToDictionary(e => e.Library.Identity.Name);
-            var collectExclusionList = isPortable ? GetExclusionList(context, exports) : new HashSet<string>();
+            var collectExclusionList = isPortable ? GetExclusionList(context, packageExports) : new HashSet<string>();
 
-            foreach (var export in exporter.GetAllExports().Where(e => !collectExclusionList.Contains(e.Library.Identity.Name)))
+            var exports = exporter.GetAllExports();
+            foreach (var export in exports.Where(e => !collectExclusionList.Contains(e.Library.Identity.Name)))
             {
                 Reporter.Verbose.WriteLine($"Publishing {export.Library.Identity.ToString().Green().Bold()} ...");
 
                 PublishAssetGroups(export.RuntimeAssemblyGroups, outputPath, nativeSubdirectories: false, includeRuntimeGroups: isPortable);
                 PublishAssetGroups(export.NativeLibraryGroups, outputPath, nativeSubdirectories, includeRuntimeGroups: isPortable);
                 export.RuntimeAssets.StructuredCopyTo(outputPath, outputPaths.IntermediateOutputDirectoryPath);
+            }
 
-                if (options.PreserveCompilationContext.GetValueOrDefault())
+            if (options.PreserveCompilationContext.GetValueOrDefault())
+            {
+                foreach (var export in exports)
                 {
                     PublishRefs(export, outputPath);
                 }
