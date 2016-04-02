@@ -6,6 +6,9 @@ This document outlines the dependencies needed to run .NET Core CLI tools. Most 
 ## Windows dependencies
 On Windows, the only dependency is the VC++ Redistributable. Depending on the version of Windows you are running on, the versions are changing.
 
+> **Note:** these dependencies are chained in the installer, you only need to install them manually if you are using
+> the installer script (`install.sh` or `install.ps1`). 
+
 * Windows 10
     * [Visual C++ Redistributable for Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145)
 * Windows 7 & 8, Windows Server 2008 & 2012
@@ -78,4 +81,4 @@ OS X requires the following libraries and versions installed:
 * libssl 1.1
 
 ## Installing the dependencies
-Please follow the reccomended practices of each operating system in question. For Linux, we reccomend using your package manager such as `apt-get` for Ubuntu and `yum` for CentOS. For OS X and upgrading the libssl, we reccomend using [Homebrew](https://brew.sh/) 
+Please follow the reccomended practices of each operating system in question. For Linux, we reccomend using your package manager such as `apt-get` for Ubuntu and `yum` for CentOS. For OS X and upgrading the libssl, we reccomend using [Homebrew](https://brew.sh/); if you do use it, do not forget the link phase you need to do at the end of install (`brew link openssl --force`). 
