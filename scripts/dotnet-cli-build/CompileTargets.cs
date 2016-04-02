@@ -146,7 +146,7 @@ namespace Microsoft.DotNet.Cli.Build
         [Target(nameof(CompileCoreHost))]
         public static BuildTargetResult PackageCoreHost(BuildTargetContext c)
         {
-            if (!string.Equals(Environment.GetEnvironmentVariable("BUILD_COREHOST_PACKAGES"), "1"))
+            if (string.Equals(Environment.GetEnvironmentVariable("BUILD_COREHOST_PACKAGES"), "0"))
             {
                 return c.Success();
             }
@@ -204,6 +204,8 @@ namespace Microsoft.DotNet.Cli.Build
             {
                 throw new BuildFailureException("Not all corehost nupkgs were successfully created");
             }
+            // Removing the packages directory, so a restore following a build doesn't barf on project.json inside the packages
+            Directory.Delete(Path.Combine(corehostSrcDir, "packaging", "packages"), true);
             return c.Success();
         }
 

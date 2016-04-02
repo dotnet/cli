@@ -51,17 +51,24 @@ if [%__DotNetHostBinDir%]==[] (goto Usage)
 :: Initialize the MSBuild Tools
 call "%__ProjectDir%\init-tools.cmd"
 
-:: Restore dependencies mainly to obtain runtime.json
+:: Setup deps
 pushd "%__ProjectDir%\deps"
-"%__ProjectDir%\Tools\dotnetcli\bin\dotnet.exe" restore --source "https://dotnet.myget.org/F/dotnet-core" --packages "%__ProjectDir%\packages"
+set __RuntimeJsonVersion=1.0.1-rc2-23931
+set __ProjectJsonContents={ "dependencies": { "Microsoft.NETCore.Platforms": "%__RuntimeJsonVersion%" }, "frameworks": { "dnxcore50": { "imports": "portable-net45+win8" } } }
+
+:: Restore deps
+echo %__ProjectJsonContents% > "project.json"
+"%__ProjectDir%\Tools\dotnetcli\dotnet.exe" restore --source "https://dotnet.myget.org/F/dotnet-core" --packages "%__ProjectDir%\packages"
+
+:: Copy runtime.json
+set "__RuntimeJsonFile=%__ProjectDir%\Tools\runtime.json"
+if not exist "%__RuntimeJsonFile%" (copy /y "%__ProjectDir%\packages\Microsoft.NETCore.Platforms\%__RuntimeJsonVersion%\runtime.json" "%__RuntimeJsonFile%")
 popd
 
 :: Clean up existing nupkgs
 if exist "%__ProjectDir%\bin" (rmdir /s /q "%__ProjectDir%\bin")
 
 :: Package the assets using Tools
-
-copy /y "%__DotNetHostBinDir%\corehost.exe" "%__DotNetHostBinDir%\dotnet.exe"
 
 "%__ProjectDir%\Tools\corerun" "%__ProjectDir%\Tools\MSBuild.exe" "%__ProjectDir%\projects\Microsoft.NETCore.DotNetHostPolicy.builds" /p:Platform=%__BuildArch% /p:DotNetHostBinDir=%__DotNetHostBinDir% /p:TargetsWindows=true /p:HostVersion=%__HostVer% /p:HostResolverVersion=%__FxrVer% /p:HostPolicyVersion=%__PolicyVer% /p:BuildNumberMajor=%__BuildMajor% /p:PreReleaseLabel=%__VersionTag% /verbosity:minimal
 if not ERRORLEVEL 0 goto :Error

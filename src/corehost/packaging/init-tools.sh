@@ -1,61 +1,103 @@
 #!/usr/bin/env bash
 
+initDistroName()
+{
+    if [ "$1" == "Linux" ]; then
+        # Detect Distro
+        if [ "$(cat /etc/*-release | grep -cim1 ubuntu)" -eq 1 ]; then
+            export __DistroName=ubuntu
+        elif [ "$(cat /etc/*-release | grep -cim1 centos)" -eq 1 ]; then
+            export __DistroName=centos
+        elif [ "$(cat /etc/*-release | grep -cim1 rhel)" -eq 1 ]; then
+            export __DistroName=rhel
+        elif [ "$(cat /etc/*-release | grep -cim1 debian)" -eq 1 ]; then
+            export __DistroName=debian
+        else
+            export __DistroName=""
+        fi
+    fi
+}
+
 __scriptpath=$(cd "$(dirname "$0")"; pwd -P)
-__init_tools_log=$__scriptpath/init-tools.log
+
+# CI_SPECIFIC - On CI machines, $HOME may not be set. In such a case, create a subfolder and set the variable to set.
+# This is needed by CLI to function.
+if [ -z "$HOME" ]; then
+    if [ ! -d "$__scriptpath/temp_home" ]; then
+        mkdir temp_home
+    fi
+    export HOME=$__scriptpath/temp_home
+    echo "HOME not defined; setting it to $HOME"
+fi
+
 __PACKAGES_DIR=$__scriptpath/packages
 __TOOLRUNTIME_DIR=$__scriptpath/Tools
 __DOTNET_PATH=$__TOOLRUNTIME_DIR/dotnetcli
-__DOTNET_CMD=$__DOTNET_PATH/bin/dotnet
-if [ -z "$__BUILDTOOLS_SOURCE" ]; then __BUILDTOOLS_SOURCE=https://dotnet.myget.org/F/dotnet-buildtools/api/v3/index.json; fi
+__DOTNET_CMD=$__DOTNET_PATH/dotnet
+if [ -z "$__BUILDTOOLS_SOURCE" ]; then __BUILDTOOLS_SOURCE=https://www.myget.org/F/dotnet-buildtools/; fi
 __BUILD_TOOLS_PACKAGE_VERSION=$(cat $__scriptpath/BuildToolsVersion.txt)
 __DOTNET_TOOLS_VERSION=$(cat $__scriptpath/DotnetCLIVersion.txt)
 __BUILD_TOOLS_PATH=$__PACKAGES_DIR/Microsoft.DotNet.BuildTools/$__BUILD_TOOLS_PACKAGE_VERSION/lib
 __PROJECT_JSON_PATH=$__TOOLRUNTIME_DIR/$__BUILD_TOOLS_PACKAGE_VERSION
 __PROJECT_JSON_FILE=$__PROJECT_JSON_PATH/project.json
 __PROJECT_JSON_CONTENTS="{ \"dependencies\": { \"Microsoft.DotNet.BuildTools\": \"$__BUILD_TOOLS_PACKAGE_VERSION\" }, \"frameworks\": { \"dnxcore50\": { } } }"
+__DistroName=""
 
 OSName=$(uname -s)
 case $OSName in
     Darwin)
         OS=OSX
-        __DOTNET_PKG=dotnet-osx-x64
-        ulimit -n 2048
+        __DOTNET_PKG=dotnet-dev-osx-x64
         ;;
 
     Linux)
         OS=Linux
-        source /etc/os-release
-        if [ "$ID" == "centos" -o "$ID" == "rhel" ]; then
-            __DOTNET_PKG=dotnet-centos-x64
-        elif [ "$ID" == "ubuntu" -o "$ID" == "debian" ]; then
-            __DOTNET_PKG=dotnet-ubuntu-x64
-        else
-            echo "Unsupported Linux distribution '$ID' detected. Downloading ubuntu-x64 tools."
-            __DOTNET_PKG=dotnet-ubuntu-x64
-        fi
+        __DOTNET_PKG=dotnet-dev-ubuntu-x64
         ;;
 
     *)
-        echo "Unsupported OS '$OSName' detected. Downloading ubuntu-x64 tools."
+        echo "Unsupported OS $OSName detected. Downloading ubuntu-x64 tools"
         OS=Linux
-        __DOTNET_PKG=dotnet-ubuntu-x64
+        __DOTNET_PKG=dotnet-dev-ubuntu-x64
         ;;
 esac
 
+# Initialize Linux Distribution name and .NET CLI package name.
+
+initDistroName $OS
+if [ "$__DistroName" == "centos" ]; then
+    __DOTNET_PKG=dotnet-dev-centos-x64
+fi
+
+if [ "$__DistroName" == "rhel" ]; then
+    __DOTNET_PKG=dotnet-dev-centos-x64
+fi
+
+# Work around mac build issue 
+if [ "$OS"=="OSX" ]; then
+  echo Raising file open limit - otherwise Mac build may fail
+  echo ulimit -n 2048
+  ulimit -n 2048
+fi
+
+__CLIDownloadURL=https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/${__DOTNET_TOOLS_VERSION}/${__DOTNET_PKG}.${__DOTNET_TOOLS_VERSION}.tar.gz
+echo ".NET CLI will be downloaded from $__CLIDownloadURL"
+echo "Locating $__PROJECT_JSON_FILE to see if we already downloaded .NET CLI tools..." 
+
 if [ ! -e $__PROJECT_JSON_FILE ]; then
+    echo "$__PROJECT_JSON_FILE not found. Proceeding to download .NET CLI tools. " 
     if [ -e $__TOOLRUNTIME_DIR ]; then rm -rf -- $__TOOLRUNTIME_DIR; fi
-    echo "Running: $__scriptpath/init-tools.sh" > $__init_tools_log
+
     if [ ! -e $__DOTNET_PATH ]; then
-        echo "Installing dotnet cli..."
-        __DOTNET_LOCATION="https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/${__DOTNET_TOOLS_VERSION}/${__DOTNET_PKG}.${__DOTNET_TOOLS_VERSION}.tar.gz"
         # curl has HTTPS CA trust-issues less often than wget, so lets try that first.
-        echo "Installing '${__DOTNET_LOCATION}' to '$__DOTNET_PATH/dotnet.tar'" >> $__init_tools_log
         which curl > /dev/null 2> /dev/null
         if [ $? -ne 0 ]; then
-            mkdir -p "$__DOTNET_PATH"
-            wget -q -O $__DOTNET_PATH/dotnet.tar ${__DOTNET_LOCATION}
+          mkdir -p "$__DOTNET_PATH"
+          wget -q -O $__DOTNET_PATH/dotnet.tar $__CLIDownloadURL
+          echo "wget -q -O $__DOTNET_PATH/dotnet.tar $__CLIDownloadURL"
         else
-            curl -sSL --create-dirs -o $__DOTNET_PATH/dotnet.tar ${__DOTNET_LOCATION}
+          curl -sSL --create-dirs -o $__DOTNET_PATH/dotnet.tar $__CLIDownloadURL
+          echo "curl -sSL --create-dirs -o $__DOTNET_PATH/dotnet.tar $__CLIDownloadURL"
         fi
         cd $__DOTNET_PATH
         tar -xf $__DOTNET_PATH/dotnet.tar
@@ -69,20 +111,17 @@ if [ ! -e $__PROJECT_JSON_FILE ]; then
         cd $__scriptpath
     fi
 
-    if [ ! -d "$__PROJECT_JSON_PATH" ]; then mkdir "$__PROJECT_JSON_PATH"; fi
+    mkdir "$__PROJECT_JSON_PATH"
     echo $__PROJECT_JSON_CONTENTS > "$__PROJECT_JSON_FILE"
 
     if [ ! -e $__BUILD_TOOLS_PATH ]; then
-        echo "Restoring BuildTools version $__BUILD_TOOLS_PACKAGE_VERSION..."
-        echo "Running: $__DOTNET_CMD restore \"$__PROJECT_JSON_FILE\" --packages $__PACKAGES_DIR --source $__BUILDTOOLS_SOURCE" >> $__init_tools_log
-        $__DOTNET_CMD restore "$__PROJECT_JSON_FILE" --packages $__PACKAGES_DIR --source $__BUILDTOOLS_SOURCE >> $__init_tools_log
-        if [ ! -e "$__BUILD_TOOLS_PATH/init-tools.sh" ]; then echo "ERROR: Could not restore build tools correctly. See '$__init_tools_log' for more details."; fi
+        $__DOTNET_CMD restore "$__PROJECT_JSON_FILE" --packages $__PACKAGES_DIR --source $__BUILDTOOLS_SOURCE
     fi
 
-    echo "Initializing BuildTools..."
-    echo "Running: $__BUILD_TOOLS_PATH/init-tools.sh $__scriptpath $__DOTNET_CMD $__TOOLRUNTIME_DIR" >> $__init_tools_log
-    $__BUILD_TOOLS_PATH/init-tools.sh $__scriptpath $__DOTNET_CMD $__TOOLRUNTIME_DIR >> $__init_tools_log
-    echo "Done initializing tools."
+    # On ubuntu 14.04, /bin/sh (symbolic link) calls /bin/dash by default.
+    $__BUILD_TOOLS_PATH/init-tools.sh $__scriptpath $__DOTNET_CMD $__TOOLRUNTIME_DIR
+
+    chmod a+x $__TOOLRUNTIME_DIR/corerun
 else
-    echo "Tools are already initialized"
+    echo "$__PROJECT_JSON_FILE found. Skipping .NET CLI installation."   
 fi
