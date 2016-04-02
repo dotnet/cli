@@ -169,8 +169,8 @@ namespace Microsoft.DotNet.Tools.Publish
             // Publish a host if this is an application
             if (options.EmitEntryPoint.GetValueOrDefault() && !string.IsNullOrEmpty(context.RuntimeIdentifier))
             {
-                Reporter.Verbose.WriteLine($"Copying native host to output to create fully standalone output.");
-                PublishHost(context, outputPath, options);
+                Reporter.Verbose.WriteLine($"Renaming native host in output to create fully standalone output.");
+                RenamePublishedHost(context, outputPath, options);
             }
 
             RunScripts(context, ScriptNames.PostPublish, contextVariables);
@@ -268,31 +268,53 @@ namespace Microsoft.DotNet.Tools.Publish
             }
         }
 
-        private static int PublishHost(ProjectContext context, string outputPath, CommonCompilerOptions compilationOptions)
+        private static int RenamePublishedHost(ProjectContext context, string outputPath, CommonCompilerOptions compilationOptions)
         {
             if (context.TargetFramework.IsDesktop())
             {
                 return 0;
             }
 
-            foreach (var binaryName in Constants.HostBinaryNames)
+            var publishedHostFile = ResolvePublishedHostFile(outputPath);
+            if (publishedHostFile == null)
             {
-                var hostBinaryPath = Path.Combine(AppContext.BaseDirectory, binaryName);
-                if (!File.Exists(hostBinaryPath))
-                {
-                    Reporter.Error.WriteLine($"Cannot find {binaryName} in the dotnet directory.".Red());
-                    return 1;
-                }
+                Reporter.Error.WriteLine($"Failed to find host executable in directory: {outputPath}");
+                return 1;
+            }
 
-                var outputBinaryName = binaryName.Equals(Constants.HostExecutableName)
-                    ? compilationOptions.OutputName + Constants.ExeSuffix
-                    : binaryName;
-                var outputBinaryPath = Path.Combine(outputPath, outputBinaryName);
+            var publishedHostExtension = Path.GetExtension(publishedHostFile);
+            var renamedHostName = compilationOptions.OutputName + publishedHostExtension;
+            var renamedHostFile = Path.Combine(outputPath, renamedHostName);
 
-                File.Copy(hostBinaryPath, outputBinaryPath, overwrite: true);
+            try
+            {
+                Reporter.Verbose.WriteLine("renaming published host {publishedHostFile} to {renamedHostFile}");
+                File.Copy(publishedHostFile, renamedHostFile, true);
+                File.Delete(publishedHostFile);
+            }
+            catch (Exception e)
+            {
+                Reporter.Error.WriteLine($"Failed to rename {publishedHostFile} to {renamedHostFile}: {e.Message}");
+                return 1;
             }
 
             return 0;
+        }
+
+        private static string ResolvePublishedHostFile(string outputPath)
+        {
+            var tryExtensions = new string[] { "", ".exe" };
+
+            foreach (var extension in tryExtensions)
+            {
+                var hostFile = Path.Combine(outputPath, Constants.PublishedHostExecutableName + extension);
+                if (File.Exists(hostFile))
+                {
+                    return hostFile;
+                }
+            }
+
+            return null;
         }
 
         private static void PublishFiles(IEnumerable<string> files, string outputPath)
