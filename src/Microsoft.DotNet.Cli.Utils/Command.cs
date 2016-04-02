@@ -199,12 +199,12 @@ namespace Microsoft.DotNet.Cli.Utils
 
                 if (to == null)
                 {
-                    _stdOut.ForwardTo(writeLine: Reporter.Output.WriteLine);
+                    _stdOut.ForwardTo(write: Reporter.Output.Write);
                     EnvironmentVariable(CommandContext.Variables.AnsiPassThru, ansiPassThrough.ToString());
                 }
                 else
                 {
-                    _stdOut.ForwardTo(writeLine: to.WriteLine);
+                    _stdOut.ForwardTo(write: to.Write);
                 }
             }
             return this;
@@ -219,12 +219,12 @@ namespace Microsoft.DotNet.Cli.Utils
 
                 if (to == null)
                 {
-                    _stdErr.ForwardTo(writeLine: Reporter.Error.WriteLine);
+                    _stdErr.ForwardTo(write: Reporter.Error.Write);
                     EnvironmentVariable(CommandContext.Variables.AnsiPassThru, ansiPassThrough.ToString());
                 }
                 else
                 {
-                    _stdErr.ForwardTo(writeLine: to.WriteLine);
+                    _stdErr.ForwardTo(write: to.Write);
                 }
             }
             return this;
@@ -235,7 +235,7 @@ namespace Microsoft.DotNet.Cli.Utils
             ThrowIfRunning();
             EnsureStdOut();
 
-            _stdOut.ForwardTo(writeLine: handler);
+            _stdOut.ForwardTo(write: handler);
             return this;
         }
 
@@ -244,7 +244,7 @@ namespace Microsoft.DotNet.Cli.Utils
             ThrowIfRunning();
             EnsureStdErr();
 
-            _stdErr.ForwardTo(writeLine: handler);
+            _stdErr.ForwardTo(write: handler);
             return this;
         }
 
