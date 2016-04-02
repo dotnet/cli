@@ -16,9 +16,9 @@ namespace Microsoft.DotNet.Tools.Run.Tests
     {
         private const string PortableAppsTestBase = "PortableTests";
         private const string RunTestsBase = "RunTestsApps";
-        private const string KestrelHelloWorldBase = "KestrelHelloWorld";
-        private const string KestrelHelloWorldPortable = "KestrelHelloWorldPortable";
-        private const string KestrelHelloWorldStandalone = "KestrelHelloWorldStandalone";
+        private const string KestrelSampleBase = "KestrelSample";
+        private const string KestrelPortable = "KestrelPortable";
+        private const string KestrelStandalone = "KestrelStandalone";
 
 
         [WindowsOnlyFact]
@@ -76,19 +76,19 @@ namespace Microsoft.DotNet.Tools.Run.Tests
         }
 
         [Fact]
-        public void ItRunsKestrelPortableFatApp()
+        public void ItRunsKestrelPortableApp()
         {
-            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelHelloWorldBase)
+            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelSampleBase)
                                                      .WithLockFiles();
 
             var url = NetworkHelper.GetLocalhostUrlWithFreePort();
             var args = $"{url} {Guid.NewGuid().ToString()}";
-            var runCommand = new RunCommand(Path.Combine(instance.TestRoot, KestrelHelloWorldPortable));
+            var runCommand = new RunCommand(Path.Combine(instance.TestRoot, KestrelPortable));
 
             try
             {
                 runCommand.ExecuteAsync(args);
-                NetworkHelper.IsServerUp(url).Should().BeTrue($"Unable to connect to kestrel server - {KestrelHelloWorldPortable} @ {url}");
+                NetworkHelper.IsServerUp(url).Should().BeTrue($"Unable to connect to kestrel server - {KestrelPortable} @ {url}");
                 NetworkHelper.TestGetRequest(url, args);
             }
             finally
@@ -100,17 +100,17 @@ namespace Microsoft.DotNet.Tools.Run.Tests
         [Fact]
         public void ItRunsKestrelStandaloneApp()
         {
-            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelHelloWorldBase)
+            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelSampleBase)
                                                      .WithLockFiles();
 
             var url = NetworkHelper.GetLocalhostUrlWithFreePort();
             var args = $"{url} {Guid.NewGuid().ToString()}";
-            var runCommand = new RunCommand(Path.Combine(instance.TestRoot, KestrelHelloWorldStandalone));
+            var runCommand = new RunCommand(Path.Combine(instance.TestRoot, KestrelStandalone));
 
             try
             {
                 runCommand.ExecuteAsync(args);
-                NetworkHelper.IsServerUp(url).Should().BeTrue($"Unable to connect to kestrel server - {KestrelHelloWorldStandalone} @ {url}");
+                NetworkHelper.IsServerUp(url).Should().BeTrue($"Unable to connect to kestrel server - {KestrelStandalone} @ {url}");
                 NetworkHelper.TestGetRequest(url, args);
             }
             finally

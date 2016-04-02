@@ -9,7 +9,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
     {
         public static string PortableApp { get; } = "PortableApp";
         public static string PortableAppRoot { get; } = Path.Combine("PortableTests", PortableApp);
-        public static string KestrelPortableApp { get; } = "KestrelHelloWorldPortable";
+        public static string KestrelPortableApp { get; } = "KestrelPortable";
 
         [Fact]
         public void BuildingPortableAppProducesExpectedArtifacts()
@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         [Fact]
         public void BuildingKestrelPortableFatAppProducesExpectedArtifacts()
         {
-            var testInstance = TestAssetsManager.CreateTestInstance("KestrelHelloWorld")
+            var testInstance = TestAssetsManager.CreateTestInstance("KestrelSample")
                 .WithLockFiles();
 
             BuildAndTest(Path.Combine(testInstance.TestRoot, KestrelPortableApp));

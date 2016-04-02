@@ -16,17 +16,17 @@ namespace Microsoft.DotNet.Tools.Run.Tests
 {
     public class MuxerTests : TestBase
     {
-        private const string KestrelHelloWorldBase = "KestrelHelloWorld";
-        private const string KestrelHelloWorldPortable = "KestrelHelloWorldPortable";
-        private const string KestrelHelloWorldStandalone = "KestrelHelloWorldStandalone";
+        private const string KestrelSampleBase = "KestrelSample";
+        private const string KestrelPortable = "KestrelPortable";
+        private const string KestrelStandalone = "KestrelStandalone";
 
         [Fact]
-        public void ItRunsKestrelPortableFatAppAfterBuild()
+        public void ItRunsKestrelPortableAfterBuild()
         {
-            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelHelloWorldBase)
+            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelSampleBase)
                                                      .WithLockFiles();
 
-            var output = Build(Path.Combine(instance.TestRoot, KestrelHelloWorldPortable));
+            var output = Build(Path.Combine(instance.TestRoot, KestrelPortable));
 
             var url = NetworkHelper.GetLocalhostUrlWithFreePort();
             var args = $"{url} {Guid.NewGuid().ToString()}";
@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.Tools.Run.Tests
             try
             {
                 dotnetCommand.ExecuteAsync($"{output} {args}");
-                NetworkHelper.IsServerUp(url).Should().BeTrue($"Unable to connect to kestrel server - {KestrelHelloWorldPortable} @ {url}");
+                NetworkHelper.IsServerUp(url).Should().BeTrue($"Unable to connect to kestrel server - {KestrelPortable} @ {url}");
                 NetworkHelper.TestGetRequest(url, args);
             }
             finally
@@ -45,12 +45,12 @@ namespace Microsoft.DotNet.Tools.Run.Tests
         }
 
         [Fact]
-        public void ItRunsKestrelStandaloneAppAfterBuild()
+        public void ItRunsKestrelStandaloneAfterBuild()
         {
-            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelHelloWorldBase)
+            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelSampleBase)
                                                      .WithLockFiles();
 
-            var output = Build(Path.Combine(instance.TestRoot, KestrelHelloWorldStandalone));
+            var output = Build(Path.Combine(instance.TestRoot, KestrelStandalone));
 
             var url = NetworkHelper.GetLocalhostUrlWithFreePort();
             var args = $"{url} {Guid.NewGuid().ToString()}";
@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.Tools.Run.Tests
             try
             {
                 dotnetCommand.ExecuteAsync($"{output} {args}");
-                NetworkHelper.IsServerUp(url).Should().BeTrue($"Unable to connect to kestrel server - {KestrelHelloWorldStandalone} @ {url}");
+                NetworkHelper.IsServerUp(url).Should().BeTrue($"Unable to connect to kestrel server - {KestrelStandalone} @ {url}");
                 NetworkHelper.TestGetRequest(url, args);
             }
             finally
@@ -69,12 +69,12 @@ namespace Microsoft.DotNet.Tools.Run.Tests
         }
 
         [Fact]
-        public void ItRunsKestrelPortableFatAppAfterPublish()
+        public void ItRunsKestrelPortableAfterPublish()
         {
-            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelHelloWorldBase)
+            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelSampleBase)
                                                      .WithLockFiles();
 
-            var output = Publish(Path.Combine(instance.TestRoot, KestrelHelloWorldPortable), true);
+            var output = Publish(Path.Combine(instance.TestRoot, KestrelPortable), true);
 
             var url = NetworkHelper.GetLocalhostUrlWithFreePort();
             var args = $"{url} {Guid.NewGuid().ToString()}";
@@ -83,7 +83,7 @@ namespace Microsoft.DotNet.Tools.Run.Tests
             try
             {
                 dotnetCommand.ExecuteAsync($"{output} {args}");
-                NetworkHelper.IsServerUp(url).Should().BeTrue($"Unable to connect to kestrel server - {KestrelHelloWorldPortable} @ {url}");
+                NetworkHelper.IsServerUp(url).Should().BeTrue($"Unable to connect to kestrel server - {KestrelPortable} @ {url}");
                 NetworkHelper.TestGetRequest(url, args);
             }
             finally
@@ -93,12 +93,12 @@ namespace Microsoft.DotNet.Tools.Run.Tests
         }
 
         [Fact]
-        public void ItRunsKestrelStandaloneAppAfterPublish()
+        public void ItRunsKestrelStandaloneAfterPublish()
         {
-            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelHelloWorldBase)
+            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelSampleBase)
                                                      .WithLockFiles();
 
-            var output = Publish(Path.Combine(instance.TestRoot, KestrelHelloWorldStandalone), false);
+            var output = Publish(Path.Combine(instance.TestRoot, KestrelStandalone), false);
 
             var url = NetworkHelper.GetLocalhostUrlWithFreePort();
             var args = $"{url} {Guid.NewGuid().ToString()}";
@@ -107,7 +107,7 @@ namespace Microsoft.DotNet.Tools.Run.Tests
             try
             {
                 command.ExecuteAsync($"{args}");
-                NetworkHelper.IsServerUp(url).Should().BeTrue($"Unable to connect to kestrel server - {KestrelHelloWorldStandalone} @ {url}");
+                NetworkHelper.IsServerUp(url).Should().BeTrue($"Unable to connect to kestrel server - {KestrelStandalone} @ {url}");
                 NetworkHelper.TestGetRequest(url, args);
             }
             finally
