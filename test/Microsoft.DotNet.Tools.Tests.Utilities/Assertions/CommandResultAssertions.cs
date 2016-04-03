@@ -90,14 +90,14 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         public AndConstraint<CommandResultAssertions> NotHaveStdOut()
         {
-            Execute.Assertion.ForCondition(string.IsNullOrEmpty(_commandResult.StdOut))
+            Execute.Assertion.ForCondition(string.IsNullOrWhiteSpace(_commandResult.StdOut))
                 .FailWith(AppendDiagnosticsTo($"Expected command to not output to stdout but it was not:"));
             return new AndConstraint<CommandResultAssertions>(this);
         }
 
         public AndConstraint<CommandResultAssertions> NotHaveStdErr()
         {
-            Execute.Assertion.ForCondition(string.IsNullOrEmpty(_commandResult.StdErr))
+            Execute.Assertion.ForCondition(string.IsNullOrWhiteSpace(_commandResult.StdErr))
                 .FailWith(AppendDiagnosticsTo("Expected command to not output to stderr but it was not:"));
             return new AndConstraint<CommandResultAssertions>(this);
         }

@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
     public class EndToEndTest : TestBase
     {
         private static readonly string NetStandardTfm = "netstandard1.5";
-        private static readonly string s_expectedOutput = "Hello World!" + Environment.NewLine;
+        private static readonly string s_expectedOutput = "Hello World!" + Environment.NewLine + Environment.NewLine;
         private static readonly string s_testdirName = "e2etestroot";
         private static readonly string s_outputdirName = "test space/bin";
 
