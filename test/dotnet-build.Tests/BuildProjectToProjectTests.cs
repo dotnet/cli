@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         public ProjectToProjectDependenciesIncrementalTest()
         {
             MainProject = "L0";
-            ExpectedOutput = "L0 L11 L12 L22 L21 L12 L22 " + Environment.NewLine;
+            ExpectedOutput = "L0 L11 L12 L22 L21 L12 L22 " + Environment.NewLine + Environment.NewLine;
 
         }
 

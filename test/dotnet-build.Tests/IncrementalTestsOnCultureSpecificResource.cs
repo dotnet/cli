@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         public IncrementalTestsOnCultureSpecificResource()
         {
             MainProject = "TestProjectWithCultureSpecificResource";
-            ExpectedOutput = "Hello World!" + Environment.NewLine + "Bonjour!" + Environment.NewLine;
+            ExpectedOutput = "Hello World!" + Environment.NewLine + "Bonjour!" + Environment.NewLine + Environment.NewLine;
         }
 
         // Sridhar-MS - temporarily disable the test and investigate why it is failing in CI machine.
