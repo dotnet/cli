@@ -30,7 +30,6 @@ namespace Microsoft.DotNet.ProjectModel.Files
         private PatternGroup _contentPatternsGroup;
         private IDictionary<string, string> _namedResources;
         private IEnumerable<string> _publishExcludePatterns;
-        private IEnumerable<PackIncludeEntry> _packInclude;
 
         private readonly string _projectDirectory;
         private readonly string _projectFilePath;
@@ -78,31 +77,8 @@ namespace Microsoft.DotNet.ProjectModel.Files
 
             _namedResources = NamedResourceReader.ReadNamedResources(_rawProject, _projectFilePath);
 
-            // Files to be packed along with the project
-            var packIncludeJson = _rawProject.ValueAsJsonObject(PackIncludePropertyName);
-            if (packIncludeJson != null)
-            {
-                _packInclude = packIncludeJson
-                    .Keys
-                    .Select(k => new PackIncludeEntry(k, packIncludeJson.Value(k)))
-                    .ToList();
-            }
-            else
-            {
-                _packInclude = new List<PackIncludeEntry>();
-            }
-
             _initialized = true;
             _rawProject = null;
-        }
-
-        public IEnumerable<PackIncludeEntry> PackInclude
-        {
-            get
-            {
-                EnsureInitialized();
-                return _packInclude;
-            }
         }
 
         public IEnumerable<string> SourceFiles

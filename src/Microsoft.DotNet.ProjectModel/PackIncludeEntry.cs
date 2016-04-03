@@ -1,10 +1,11 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.JsonParser.Sources;
 
-namespace Microsoft.DotNet.ProjectModel.Files
+namespace Microsoft.DotNet.ProjectModel
 {
     public class PackIncludeEntry
     {
@@ -25,6 +26,22 @@ namespace Microsoft.DotNet.ProjectModel.Files
             Line = line;
             Column = column;
         }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as PackIncludeEntry;
+            return other != null &&
+                Target == other.Target &&
+                EnumerableEquals(SourceGlobs, other.SourceGlobs);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        private static bool EnumerableEquals(IEnumerable<string> left, IEnumerable<string> right)
+            => Enumerable.SequenceEqual(left ?? EmptyArray<string>.Value, right ?? EmptyArray<string>.Value);
 
         private static string[] ExtractValues(JsonValue json)
         {

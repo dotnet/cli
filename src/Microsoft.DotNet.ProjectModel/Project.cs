@@ -50,11 +50,7 @@ namespace Microsoft.DotNet.ProjectModel
 
         public string Language { get; set; }
 
-        public string ReleaseNotes { get; set; }
-
         public string[] Authors { get; set; }
-
-        public string[] Owners { get; set; }
 
         public bool EmbedInteropTypes { get; set; }
 
@@ -68,21 +64,13 @@ namespace Microsoft.DotNet.ProjectModel
 
         public string EntryPoint { get; set; }
 
-        public string ProjectUrl { get; set; }
-
-        public string LicenseUrl { get; set; }
-
-        public string IconUrl { get; set; }
-
-        public bool RequireLicenseAcceptance { get; set; }
-
-        public string[] Tags { get; set; }
-
-        public string CompilerName { get; set; }
-
         public string TestRunner { get; set; }
 
         public ProjectFilesCollection Files { get; set; }
+
+        public PackOptions PackOptions { get; set; }
+
+        public RuntimeOptions RuntimeOptions { get; set; }
 
         public IDictionary<string, string> Commands { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 

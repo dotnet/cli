@@ -107,9 +107,9 @@ namespace Microsoft.DotNet.Tools.Compiler
                 PackageBuilder.Files.Add(file);
             }
 
-            if (Project.Files.PackInclude != null && Project.Files.PackInclude.Any())
+            if (Project.PackOptions.Include != null && Project.PackOptions.Include.Any())
             {
-                AddPackageFiles(Project.Files.PackInclude, packDiagnostics);
+                AddPackageFiles(Project.PackOptions.Include, packDiagnostics);
             }
 
             // Write the packages as long as we're still in a success state.
@@ -341,7 +341,7 @@ namespace Microsoft.DotNet.Tools.Compiler
         {
             var builder = new PackageBuilder();
             builder.Authors.AddRange(project.Authors);
-            builder.Owners.AddRange(project.Owners);
+            builder.Owners.AddRange(project.PackOptions.Owners);
 
             if (builder.Authors.Count == 0)
             {
@@ -362,24 +362,24 @@ namespace Microsoft.DotNet.Tools.Compiler
             builder.Title = project.Title;
             builder.Summary = project.Summary;
             builder.Copyright = project.Copyright;
-            builder.RequireLicenseAcceptance = project.RequireLicenseAcceptance;
-            builder.ReleaseNotes = project.ReleaseNotes;
+            builder.RequireLicenseAcceptance = project.PackOptions.RequireLicenseAcceptance;
+            builder.ReleaseNotes = project.PackOptions.ReleaseNotes;
             builder.Language = project.Language;
-            builder.Tags.AddRange(project.Tags);
+            builder.Tags.AddRange(project.PackOptions.Tags);
 
-            if (!string.IsNullOrEmpty(project.IconUrl))
+            if (!string.IsNullOrEmpty(project.PackOptions.IconUrl))
             {
-                builder.IconUrl = new Uri(project.IconUrl);
+                builder.IconUrl = new Uri(project.PackOptions.IconUrl);
             }
 
-            if (!string.IsNullOrEmpty(project.ProjectUrl))
+            if (!string.IsNullOrEmpty(project.PackOptions.ProjectUrl))
             {
-                builder.ProjectUrl = new Uri(project.ProjectUrl);
+                builder.ProjectUrl = new Uri(project.PackOptions.ProjectUrl);
             }
 
-            if (!string.IsNullOrEmpty(project.LicenseUrl))
+            if (!string.IsNullOrEmpty(project.PackOptions.LicenseUrl))
             {
-                builder.LicenseUrl = new Uri(project.LicenseUrl);
+                builder.LicenseUrl = new Uri(project.PackOptions.LicenseUrl);
             }
 
             return builder;

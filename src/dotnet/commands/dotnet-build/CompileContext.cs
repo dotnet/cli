@@ -300,7 +300,7 @@ namespace Microsoft.DotNet.Tools.Build
 
         private void CollectCheckPathProbingPreconditions(ProjectContext project, IncrementalPreconditions preconditions)
         {
-            var pathCommands = CompilerUtil.GetCommandsInvokedByCompile(project)
+            var pathCommands = CompilerUtil.GetCommandsInvokedByCompile(project, _args.ConfigValue)
                 .Select(commandName => Command.CreateDotNet(commandName, Enumerable.Empty<string>(), project.TargetFramework))
                 .Where(c => c.ResolutionStrategy.Equals(CommandResolutionStrategy.Path));
 
@@ -314,7 +314,8 @@ namespace Microsoft.DotNet.Tools.Build
         {
             if (project.ProjectFile != null)
             {
-                var projectCompiler = project.ProjectFile.CompilerName;
+                var compilerOptions = project.ProjectFile.GetCompilerOptions(project.TargetFramework, _args.ConfigValue);
+                var projectCompiler = compilerOptions.CompilerName;
 
                 if (!KnownCompilers.Any(knownCompiler => knownCompiler.Equals(projectCompiler, StringComparison.Ordinal)))
                 {

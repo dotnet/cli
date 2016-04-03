@@ -137,7 +137,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             var sourceFiles = CompilerUtil.GetCompilationSources(context);
             compilerArgs.AddRange(sourceFiles);
 
-            var compilerName = context.ProjectFile.CompilerName;
+            var compilerName = compilationOptions.CompilerName;
 
             // Write RSP file
             var rsp = Path.Combine(intermediateOutputPath, $"dotnet-compile.rsp");
