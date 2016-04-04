@@ -16,6 +16,7 @@ namespace Microsoft.DotNet.InstallScripts.Tests
     {
         public static string RepoRoot { get; private set; }
         public static string Shell { get; private set; }
+        public static string ShellArgs { get; private set; }
         public static string InstallScriptPath { get; private set; }
         public static string OSName { get; private set; }
         public static string ZipExtension { get; private set; }
@@ -35,12 +36,14 @@ namespace Microsoft.DotNet.InstallScripts.Tests
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 Shell = "powershell";
+                ShellArgs = "-File ";
                 InstallScriptPath = Path.Combine(RepoRoot, "scripts", "obtain", "install.ps1");
                 ZipExtension = "zip";
             }
             else
             {
                 Shell = "bash";
+                ShellArgs = "";
                 InstallScriptPath = Path.Combine(RepoRoot, "scripts", "obtain", "install.sh");
                 ZipExtension = "tar.gz";
             }
@@ -96,7 +99,7 @@ namespace Microsoft.DotNet.InstallScripts.Tests
         
         private static Process PrepareProcess(string additionalArguments)
         {
-            var arguments = $"-File \"{InstallScriptPath}\" {additionalArguments}";
+            var arguments = $"{ShellArgs}\"{InstallScriptPath}\" {additionalArguments}";
             Process ret = new Process();
             ret.StartInfo.FileName = Shell;
             ret.StartInfo.Arguments = arguments;
