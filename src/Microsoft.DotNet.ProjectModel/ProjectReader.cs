@@ -140,20 +140,9 @@ namespace Microsoft.DotNet.ProjectModel
             project.Copyright = rawProject.ValueAsString("copyright");
             project.Title = rawProject.ValueAsString("title");
             project.EntryPoint = rawProject.ValueAsString("entryPoint");
-            project.ProjectUrl = rawProject.ValueAsString("projectUrl");
-            project.LicenseUrl = rawProject.ValueAsString("licenseUrl");
-            project.IconUrl = rawProject.ValueAsString("iconUrl");
-            project.CompilerName = rawProject.ValueAsString("compilerName") ?? "csc";
             project.TestRunner = rawProject.ValueAsString("testRunner");
-
             project.Authors = rawProject.ValueAsStringArray("authors") ?? EmptyArray<string>.Value;
-            project.Owners = rawProject.ValueAsStringArray("owners") ?? EmptyArray<string>.Value;
-            project.Tags = rawProject.ValueAsStringArray("tags") ?? EmptyArray<string>.Value;
-
             project.Language = rawProject.ValueAsString("language");
-            project.ReleaseNotes = rawProject.ValueAsString("releaseNotes");
-
-            project.RequireLicenseAcceptance = rawProject.ValueAsBoolean("requireLicenseAcceptance", defaultValue: false);
 
             // REVIEW: Move this to the dependencies node?
             project.EmbedInteropTypes = rawProject.ValueAsBoolean("embedInteropTypes", defaultValue: false);
@@ -202,6 +191,9 @@ namespace Microsoft.DotNet.ProjectModel
                         project.ProjectFilePath);
                 }
             }
+
+            project.PackOptions = GetPackOptions(rawProject) ?? new PackOptions();
+            project.RuntimeOptions = GetRuntimeOptions(rawProject) ?? new RuntimeOptions();
 
             BuildTargetFrameworksAndConfigurations(project, rawProject, diagnostics);
 
@@ -576,7 +568,59 @@ namespace Microsoft.DotNet.ProjectModel
                 EmitEntryPoint = rawOptions.ValueAsNullableBoolean("emitEntryPoint"),
                 GenerateXmlDocumentation = rawOptions.ValueAsNullableBoolean("xmlDoc"),
                 PreserveCompilationContext = rawOptions.ValueAsNullableBoolean("preserveCompilationContext"),
-                OutputName = rawOptions.ValueAsString("outputName")
+                OutputName = rawOptions.ValueAsString("outputName"),
+                CompilerName = rawOptions.ValueAsString("compilerName") ?? "csc"
+            };
+        }
+
+        private static PackOptions GetPackOptions(JsonObject rawProject)
+        {
+            var packOptionsObj = rawProject.ValueAsJsonObject("packOptions");
+            if (packOptionsObj == null)
+            {
+                return null;
+            }
+
+            var repository = packOptionsObj.ValueAsJsonObject("repository");
+
+            // Files to be packed along with the project
+            IEnumerable<PackIncludeEntry> packInclude = null;
+            var packIncludeJson = packOptionsObj.ValueAsJsonObject("include");
+            if (packIncludeJson != null)
+            {
+                packInclude = packIncludeJson
+                    .Keys
+                    .Select(k => new PackIncludeEntry(k, packIncludeJson.Value(k)))
+                    .ToList();
+            }
+
+            return new PackOptions
+            {
+                ProjectUrl = packOptionsObj.ValueAsString("projectUrl"),
+                LicenseUrl = packOptionsObj.ValueAsString("licenseUrl"),
+                IconUrl = packOptionsObj.ValueAsString("iconUrl"),
+                Owners = packOptionsObj.ValueAsStringArray("owners") ?? EmptyArray<string>.Value,
+                Tags = packOptionsObj.ValueAsStringArray("tags") ?? EmptyArray<string>.Value,
+                ReleaseNotes = packOptionsObj.ValueAsString("releaseNotes"),
+                RequireLicenseAcceptance = packOptionsObj.ValueAsBoolean("requireLicenseAcceptance", defaultValue: false),
+                RepositoryType = repository?.ValueAsString("type"),
+                RepositoryUrl = repository?.ValueAsString("url"),
+                Include = packInclude ?? new List<PackIncludeEntry>(), 
+            };
+        }
+
+        private static RuntimeOptions GetRuntimeOptions(JsonObject rawProject)
+        {
+            var runtimeOptionsObj = rawProject.ValueAsJsonObject("runtimeOptions");
+            if (runtimeOptionsObj == null)
+            {
+                return null;
+            }
+
+            return new RuntimeOptions
+            {
+                GcServer = runtimeOptionsObj.ValueAsBoolean("gcServer"),
+                GcConcurrent = runtimeOptionsObj.ValueAsBoolean("gcConcurrent"),
             };
         }
 
