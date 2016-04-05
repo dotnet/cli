@@ -4,7 +4,14 @@
 
   <PropertyGroup>
     <Version>1.0.0</Version>
+    <PackagePlatform>AnyCPU</PackagePlatform>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Microsoft.NETCore.DotNetHost\Microsoft.NETCore.DotNetHostPolicy.pkgproj">
+      <TargetFramework>.NETStandard1.0</TargetFramework>
+    </ProjectReference>
+  </ItemGroup>
 
   <Target Name="ReadDependenciesFromProjectJsonFile" BeforeTargets="GetPackageDependencies">
     <ReadLinesFromFile File="$(MSBuildThisFileDirectory)project.json">

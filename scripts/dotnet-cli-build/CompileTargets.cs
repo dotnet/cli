@@ -143,10 +143,6 @@ namespace Microsoft.DotNet.Cli.Build
         [Target(nameof(CompileCoreHost))]
         public static BuildTargetResult PackageCoreHost(BuildTargetContext c)
         {
-//            if (!string.Equals(Environment.GetEnvironmentVariable("BUILD_COREHOST_PACKAGES"), "1"))
-//            {
-//                return c.Success();
-//            }
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
             var versionTag = buildVersion.ReleaseSuffix;
             var buildMajor = buildVersion.CommitCountString;
@@ -194,7 +190,7 @@ namespace Microsoft.DotNet.Cli.Build
             foreach (var file in Directory.GetFiles(Path.Combine(corehostSrcDir, "packaging", "bin", "packages"), "*.nupkg"))
             {
                 var fileName = Path.GetFileName(file);
-                File.Copy(file, Path.Combine(Dirs.Corehost, fileName));
+                File.Copy(file, Path.Combine(Dirs.Corehost, fileName), true);
                 runtimeCount += (fileName.StartsWith("runtime.") ? 1 : 0);
             }
             if (runtimeCount < 3)
