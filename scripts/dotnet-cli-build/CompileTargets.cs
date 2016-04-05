@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.Cli.Build
         private static string HostPolicyVer = "1.0.1";
         private static string HostFxrVer = "1.0.1";
 
-        [Target]
+        [Target(nameof(PrepareTargets.Init))]
         public static BuildTargetResult CompileCoreHost(BuildTargetContext c)
         {
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
