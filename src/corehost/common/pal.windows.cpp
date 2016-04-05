@@ -54,6 +54,24 @@ bool pal::find_coreclr(pal::string_t* recv)
     return false;
 }
 
+void pal::setup_api_sets(const std::unordered_set<pal::string_t>& api_sets)
+{
+    for (const auto& as : api_sets)
+    {
+        DLL_DIRECTORY_COOKIE cookie = ::AddDllDirectory(as.c_str());
+        if (trace::is_enabled())
+        {
+            if (cookie == 0)
+            {
+                trace::warning(_X("Failed to AddDllDirectory [%s], HRESULT: 0x%X"), as.c_str(), HRESULT_FROM_WIN32(GetLastError()));
+            }
+            else
+            {
+                trace::verbose(_X("Expanded DLL search path AddDllDirectory [%s]"), as.c_str());
+            }
+        }
+    }
+}
 
 bool pal::getcwd(pal::string_t* recv)
 {

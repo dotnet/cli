@@ -22,7 +22,7 @@ namespace
 void add_tpa_asset(
     const pal::string_t& asset_name,
     const pal::string_t& asset_path,
-    std::set<pal::string_t>* items,
+    std::unordered_set<pal::string_t>* items,
     pal::string_t* output)
 {
     if (items->count(asset_name))
@@ -48,7 +48,7 @@ void add_tpa_asset(
 void add_unique_path(
     deps_entry_t::asset_types asset_type,
     const pal::string_t& path,
-    std::set<pal::string_t>* existing,
+    std::unordered_set<pal::string_t>* existing,
     pal::string_t* output)
 {
     // Resolve sym links.
@@ -377,7 +377,7 @@ void deps_resolver_t::resolve_tpa_list(
         get_dir_assemblies(m_fx_dir, _X("fx"), &m_fx_assemblies);
     }
 
-    std::set<pal::string_t> items;
+    std::unordered_set<pal::string_t> items;
 
     auto process_entry = [&](const pal::string_t& deps_dir, deps_json_t* deps, const dir_assemblies_t& dir_assemblies, const deps_entry_t& entry)
     {
@@ -474,7 +474,7 @@ void deps_resolver_t::resolve_probe_dirs(
         return get_directory(str);
     };
     std::function<pal::string_t(const pal::string_t&)>& action = is_resources ? resources : native;
-    std::set<pal::string_t> items;
+    std::unordered_set<pal::string_t> items;
 
     std::vector<deps_entry_t> empty(0);
     const auto& entries = m_deps->get_entries(asset_type);
@@ -486,6 +486,16 @@ void deps_resolver_t::resolve_probe_dirs(
     {
         if (probe_entry_in_configs(entry, &candidate))
         {
+            // For standalone apps, on win7, coreclr needs ApiSets which has to be in the DLL search path.
+            if (!m_portable && pal::need_api_sets()
+                    && ends_with(entry.library_name, _X("Microsoft.NETCore.Windows.ApiSets"), false))
+            {
+                const pal::string_t api_sets_dir = action(candidate);
+                if (api_sets_dir != clr_dir)
+                {
+                    m_api_set_paths.insert(api_sets_dir);
+                }
+            }
             add_unique_path(asset_type, action(candidate), &items, output);
         }
     };
