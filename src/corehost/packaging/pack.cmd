@@ -72,6 +72,9 @@ if not ERRORLEVEL 0 goto :Error
 "%__ProjectDir%\Tools\corerun" "%__ProjectDir%\Tools\MSBuild.exe" "%__ProjectDir%\projects\Microsoft.NETCore.DotNetHost.builds" /p:Platform=%__BuildArch% /p:DotNetHostBinDir=%__DotNetHostBinDir% /p:TargetsWindows=true /p:HostVersion=%__HostVer% /p:HostResolverVersion=%__FxrVer% /p:HostPolicyVersion=%__PolicyVer% /p:BuildNumberMajor=%__BuildMajor% /p:PreReleaseLabel=%__VersionTag% /verbosity:minimal
 if not ERRORLEVEL 0 goto :Error
 
+"%__ProjectDir%\Tools\corerun" "%__ProjectDir%\Tools\MSBuild.exe" "%__ProjectDir%\Microsoft.NETCore.App\Microsoft.NETCore.App.pkgproj" /p:Platform=x86 /p:CLIBuildVersion=%__BuildMajor% /verbosity:minimal
+if not ERRORLEVEL 0 goto :Error
+
 exit /b 0
 
 :Usage

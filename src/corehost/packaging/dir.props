@@ -36,7 +36,7 @@
     <HostFullVersion>$(HostVersion)-$(PreReleaseLabel)-$(BuildNumberMajor)</HostFullVersion>
   </PropertyGroup>
 
-  <Target Name="ValidateArgs">
+  <Target Name="ValidateArgs" Condition="'$(CLIBuildVersion)'==''">
     <Error Condition="$(HostPolicyVersion)==''" Text="HostPolicyVersion is undefined" />
     <Error Condition="$(HostResolverVersion)==''" Text="HostResolverVersion is undefined" />
     <Error Condition="$(HostVersion)==''" Text="HostVersion is undefined" />
