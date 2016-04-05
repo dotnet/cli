@@ -84,6 +84,11 @@ bool pal::load_library(const char_t* path, dll_t* dll)
     return true;
 }
 
+void pal::process_native_paths(const std::unordered_set<pal::string_t>& native_lib_files)
+{
+    // TODO: Figure out what is required here to dlopen library dependencies.
+}
+
 pal::proc_t pal::get_symbol(dll_t library, const char* name)
 {
     auto result = dlsym(library, name);

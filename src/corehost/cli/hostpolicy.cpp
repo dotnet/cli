@@ -96,6 +96,9 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
     size_t property_size = property_keys.size();
     assert(property_keys.size() == property_values.size());
 
+    // Make native DLLs loadable.
+    pal::process_native_paths(resolver.get_native_paths());
+
     // Bind CoreCLR
     if (!coreclr::bind(clr_path))
     {

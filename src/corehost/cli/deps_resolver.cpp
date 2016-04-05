@@ -22,7 +22,7 @@ namespace
 void add_tpa_asset(
     const pal::string_t& asset_name,
     const pal::string_t& asset_path,
-    std::set<pal::string_t>* items,
+    std::unordered_set<pal::string_t>* items,
     pal::string_t* output)
 {
     if (items->count(asset_name))
@@ -48,7 +48,7 @@ void add_tpa_asset(
 void add_unique_path(
     deps_entry_t::asset_types asset_type,
     const pal::string_t& path,
-    std::set<pal::string_t>* existing,
+    std::unordered_set<pal::string_t>* existing,
     pal::string_t* output)
 {
     // Resolve sym links.
@@ -377,7 +377,7 @@ void deps_resolver_t::resolve_tpa_list(
         get_dir_assemblies(m_fx_dir, _X("fx"), &m_fx_assemblies);
     }
 
-    std::set<pal::string_t> items;
+    std::unordered_set<pal::string_t> items;
 
     auto process_entry = [&](const pal::string_t& deps_dir, deps_json_t* deps, const dir_assemblies_t& dir_assemblies, const deps_entry_t& entry)
     {
@@ -474,7 +474,7 @@ void deps_resolver_t::resolve_probe_dirs(
         return get_directory(str);
     };
     std::function<pal::string_t(const pal::string_t&)>& action = is_resources ? resources : native;
-    std::set<pal::string_t> items;
+    std::unordered_set<pal::string_t> items;
 
     std::vector<deps_entry_t> empty(0);
     const auto& entries = m_deps->get_entries(asset_type);
@@ -482,15 +482,23 @@ void deps_resolver_t::resolve_probe_dirs(
 
     pal::string_t candidate;
 
-    auto add_package_cache_entry = [&](const deps_entry_t& entry)
+    auto process_native_or_resource = [&](const deps_entry_t& entry)
     {
         if (probe_entry_in_configs(entry, &candidate))
         {
-            add_unique_path(asset_type, action(candidate), &items, output);
+            // For standalone apps, on win7, coreclr needs ApiSets which has to be in the DLL search path.
+            const pal::string_t result_path = action(candidate);
+
+            if (!is_resources)
+            {
+                m_native_paths.insert(pal::needs_native_dir_path() ? candidate : result_path);
+            }
+
+            add_unique_path(asset_type, result_path, &items, output);
         }
     };
-    std::for_each(entries.begin(), entries.end(), add_package_cache_entry);
-    std::for_each(fx_entries.begin(), fx_entries.end(), add_package_cache_entry);
+    std::for_each(entries.begin(), entries.end(), process_native_or_resource);
+    std::for_each(fx_entries.begin(), fx_entries.end(), process_native_or_resource);
 
     // For portable rid specific assets, the app relative directory must be used.
     if (m_portable)
@@ -510,6 +518,7 @@ void deps_resolver_t::resolve_probe_dirs(
     // FX path if present
     if (!m_fx_dir.empty())
     {
+        m_native_paths.insert(m_fx_dir);
         add_unique_path(asset_type, m_fx_dir, &items, output);
     }
 

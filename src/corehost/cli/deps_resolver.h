@@ -76,6 +76,11 @@ public:
     {
         return m_deps_file;
     }
+
+    const std::unordered_set<pal::string_t>& get_native_paths() const
+    {
+        return m_native_paths;
+    }
 private:
 
     static pal::string_t get_fx_deps(const pal::string_t& fx_dir, const pal::string_t& fx_name)
@@ -128,6 +133,9 @@ private:
     std::unordered_map<pal::string_t, pal::string_t> m_roll_forward_cache;
 
     pal::string_t m_package_cache;
+
+    // Special entry for native libraries.
+    std::unordered_set<pal::string_t> m_native_paths;
 
     // Special entry for coreclr in the deps entries
     int m_coreclr_index;

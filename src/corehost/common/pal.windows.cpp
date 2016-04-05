@@ -54,6 +54,25 @@ bool pal::find_coreclr(pal::string_t* recv)
     return false;
 }
 
+void pal::process_native_paths(const std::unordered_set<pal::string_t>& native_dirs)
+{
+    pal::string_t path;
+    (void) getenv(_X("PATH"), &path);
+    for (const auto& nd : native_dirs)
+    {
+        path.push_back(PATH_SEPARATOR);
+        path.append(nd);
+    }
+    // We need this ugly hack, as the PInvoked DLL's static dependencies can come from
+    // some other NATIVE_DLL_SEARCH_DIRECTORIES and not necessarily side by side. However,
+    // CoreCLR.dll loads PInvoke DLLs with LOAD_WITH_ALTERED_SEARCH_PATH. Note that this
+    // option cannot be combined with LOAD_LIBRARY_SEARCH_USER_DIRS, so the AddDllDirectory
+    // doesn't help much in telling CoreCLR where to load the PInvoke DLLs from.
+    // So we resort to modifying the PATH variable on our own hoping Windows loader will do the right thing.
+    trace::verbose(_X("Setting PATH=%s for native libraries"), path.c_str());
+    // Assuming no other thread modified PATH between Get and SetEnvironmentVariableW.
+    ::SetEnvironmentVariableW(_X("PATH"), path.c_str());
+}
 
 bool pal::getcwd(pal::string_t* recv)
 {
