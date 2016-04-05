@@ -86,7 +86,7 @@ done < "$DIR/../branchinfo.txt"
 
 # Ensure the latest stage0 is installed
 export CHANNEL=$RELEASE_SUFFIX
-$DIR/obtain/install.sh --channel $CHANNEL --verbose
+$DIR/obtain/install.sh --channel preview --verbose
 
 # Put stage 0 on the PATH (for this shell only)
 PATH="$DOTNET_INSTALL_DIR:$PATH"
@@ -103,7 +103,7 @@ fi
 echo "Restoring Build Script projects..."
 (
     cd $DIR
-    dotnet restore --disable-parallel --infer-runtimes
+    dotnet restore --infer-runtimes
 )
 
 # Build the builder

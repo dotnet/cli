@@ -123,15 +123,22 @@ void pal::unload_library(dll_t library)
     // No-op. On windows, we pin the library, so it can't be unloaded.
 }
 
-bool pal::get_default_packages_directory(string_t* recv)
+bool pal::get_default_extensions_directory(string_t* recv)
 {
     recv->clear();
-    if (!pal::getenv(_X("USERPROFILE"), recv))
+
+    // See https://github.com/dotnet/cli/issues/2179
+#ifdef _TARGET_X86_
+    // In WOW64 mode, PF maps to PFx86.
+    if (!pal::getenv(_X("ProgramFiles"), recv))
+#elif defined(_TARGET_AMD64_)
+    if (!pal::getenv(_X("ProgramFiles(x86)"), recv))
+#endif
     {
         return false;
     }
-    append_path(&*recv, _X(".nuget"));
-    append_path(&*recv, _X("packages"));
+
+    append_path(recv, _X("dotnetextensions"));
     return true;
 }
 
@@ -231,22 +238,30 @@ bool pal::file_exists(const string_t& path)
     return found;
 }
 
-void pal::readdir(const string_t& path, std::vector<pal::string_t>* list)
+void pal::readdir(const string_t& path, const string_t& pattern, std::vector<pal::string_t>* list)
 {
     assert(list != nullptr);
 
     std::vector<string_t>& files = *list;
 
     string_t search_string(path);
-    search_string.push_back(DIR_SEPARATOR);
-    search_string.push_back(L'*');
+    append_path(&search_string, pattern.c_str());
 
-    WIN32_FIND_DATAW data;
-    auto handle = ::FindFirstFileW(search_string.c_str(), &data);
+    WIN32_FIND_DATAW data = { 0 };
+    auto handle = ::FindFirstFileExW(search_string.c_str(), FindExInfoStandard, &data, FindExSearchNameMatch, NULL, 0);
+    if (handle == INVALID_HANDLE_VALUE)
+    {
+        return;
+    }
     do
     {
         string_t filepath(data.cFileName);
         files.push_back(filepath);
     } while (::FindNextFileW(handle, &data));
     ::FindClose(handle);
+}
+
+void pal::readdir(const string_t& path, std::vector<pal::string_t>* list)
+{
+    pal::readdir(path, _X("*"), list);
 }

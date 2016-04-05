@@ -205,8 +205,8 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var dotnet = DotNetCli.Stage0;
 
-            dotnet.Restore("--verbosity", "verbose", "--disable-parallel").WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "src")).Execute().EnsureSuccessful();
-            dotnet.Restore("--verbosity", "verbose", "--disable-parallel", "--infer-runtimes").WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "tools")).Execute().EnsureSuccessful();
+            dotnet.Restore("--verbosity", "verbose").WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "src")).Execute().EnsureSuccessful();
+            dotnet.Restore("--verbosity", "verbose", "--infer-runtimes").WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "tools")).Execute().EnsureSuccessful();
 
             return c.Success();
         }
@@ -343,17 +343,6 @@ cmake is required to build the native host 'corehost'";
             }
 
             throw new InvalidOperationException("Unable to match the version name from " + pathToProjectJson);
-        }
-
-        private static bool AptPackageIsInstalled(string packageName)
-        {
-            var result = Command.Create("dpkg", "-s", packageName)
-                .CaptureStdOut()
-                .CaptureStdErr()
-                .QuietBuildReporter()
-                .Execute();
-
-            return result.ExitCode == 0;
         }
 
         private static IDictionary<string, string> ReadBranchInfo(BuildTargetContext c, string path)
