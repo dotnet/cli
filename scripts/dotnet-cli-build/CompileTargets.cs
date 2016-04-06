@@ -157,11 +157,11 @@ namespace Microsoft.DotNet.Cli.Build
 
             var version = buildVersion.NuGetVersion;
             var content = $@"{c.BuildContext["CommitHash"]}{Environment.NewLine}{version}{Environment.NewLine}";
-            File.WriteAllText(Path.Combine(c.BuildContext.BuildDirectory, "src", "corehost", "packaging", "version.txt"), content);
-            string corehostSrcDir = Path.Combine(c.BuildContext.BuildDirectory, "src", "corehost");
+            var buildToolsDir = Path.Combine(c.BuildContext.BuildDirectory, "packaging", "buildtools");
+            File.WriteAllText(Path.Combine(buildToolsDir, "version.txt"), content);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                Command.Create(Path.Combine(corehostSrcDir, "packaging", "pack.cmd"))
+                Command.Create(Path.Combine(buildToolsDir, "pack.cmd"))
                     // Workaround to arg escaping adding backslashes for arguments to .cmd scripts.
                     .Environment("__WorkaroundCliCoreHostBuildArch", arch)
                     .Environment("__WorkaroundCliCoreHostBinDir", Dirs.Corehost)
@@ -177,7 +177,7 @@ namespace Microsoft.DotNet.Cli.Build
             }
             else
             {
-                Exec(Path.Combine(corehostSrcDir, "packaging", "pack.sh"),
+                Exec(Path.Combine(buildToolsDir, "pack.sh"),
                     "--arch",
                     "x64",
                     "--hostbindir",
@@ -194,7 +194,7 @@ namespace Microsoft.DotNet.Cli.Build
                     versionTag);
             }
             int runtimeCount = 0;
-            foreach (var file in Directory.GetFiles(Path.Combine(corehostSrcDir, "packaging", "bin", "packages"), "*.nupkg"))
+            foreach (var file in Directory.GetFiles(Path.Combine(buildToolsDir, "bin", "packages"), "*.nupkg"))
             {
                 var fileName = Path.GetFileName(file);
                 File.Copy(file, Path.Combine(Dirs.Corehost, fileName));
@@ -204,8 +204,6 @@ namespace Microsoft.DotNet.Cli.Build
             {
                 throw new BuildFailureException("Not all corehost nupkgs were successfully created");
             }
-            // Removing the packages directory, so a restore following a build doesn't barf on project.json inside the packages
-            Directory.Delete(Path.Combine(corehostSrcDir, "packaging", "packages"), true);
             return c.Success();
         }
 
