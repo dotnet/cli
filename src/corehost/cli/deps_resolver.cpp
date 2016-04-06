@@ -143,8 +143,7 @@ bool deps_resolver_t::try_roll_forward(const deps_entry_t& entry,
     pal::string_t max_str;
     if (cur_ver.is_prerelease())
     {
-        pal::string_t maj_min_pat_star = pal::to_string(cur_ver.get_major()) + _X(".")
-            + pal::to_string(cur_ver.get_minor()) + _X(".") + pal::to_string(cur_ver.get_patch()) + _X("-*");
+        pal::string_t maj_min_pat_star = cur_ver.prerelease_glob();
 
         pal::string_t cache_key = path;
         append_path(&cache_key, maj_min_pat_star.c_str());
@@ -156,15 +155,14 @@ bool deps_resolver_t::try_roll_forward(const deps_entry_t& entry,
         }
         else
         {
-            try_roll_forward_in_dir(path, maj_min_pat_star, cur_ver, &max_str, false, true);
+            try_prerelease_roll_forward_in_dir(path, cur_ver, &max_str);
             m_prerelease_roll_forward_cache[cache_key] = max_str;
         }
     }
     else
     {
         // Extract glob string of the form: 1.0.* from the version 1.0.0-prerelease-00001.
-        pal::string_t maj_min_star = pal::to_string(cur_ver.get_major()) + _X(".")
-            + pal::to_string(cur_ver.get_minor()) + _X(".*");
+        pal::string_t maj_min_star = cur_ver.patch_glob();
 
         pal::string_t cache_key = path;
         append_path(&cache_key, maj_min_star.c_str());
@@ -176,7 +174,7 @@ bool deps_resolver_t::try_roll_forward(const deps_entry_t& entry,
         }
         else
         {
-            try_roll_forward_in_dir(path, maj_min_star, cur_ver, &max_str, true, false);
+            try_patch_roll_forward_in_dir(path, cur_ver, &max_str);
             m_patch_roll_forward_cache[cache_key] = max_str;
         }
     }
