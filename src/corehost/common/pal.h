@@ -100,8 +100,8 @@ namespace pal
     typedef FARPROC proc_t;
 
     inline string_t exe_suffix() { return _X(".exe"); }
-    inline bool need_api_sets() { return true; }
-    void setup_api_sets(const std::unordered_set<pal::string_t>& api_sets);
+    inline bool needs_native_dir_path() { return true; }
+    void process_native_paths(const std::unordered_set<pal::string_t>& native_dir_paths);
 
     pal::string_t to_string(int value);
 
@@ -143,8 +143,8 @@ namespace pal
     typedef void* proc_t;
 
     inline string_t exe_suffix() { return _X(""); }
-    inline bool need_api_sets() { return false; }
-    inline void setup_api_sets(const std::unordered_set<pal::string_t>& api_sets) { }
+    inline bool needs_native_dir_path() { return false; }
+    void process_native_paths(const std::unordered_set<pal::string_t>& native_lib_files);
 
     pal::string_t to_string(int value);
 

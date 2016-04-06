@@ -97,7 +97,7 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
     assert(property_keys.size() == property_values.size());
 
     // Add API sets to the process DLL search
-    pal::setup_api_sets(resolver.get_api_sets());
+    pal::process_native_paths(resolver.get_native_paths());
 
     // Bind CoreCLR
     if (!coreclr::bind(clr_path))

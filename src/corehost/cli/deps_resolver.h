@@ -77,9 +77,9 @@ public:
         return m_deps_file;
     }
 
-    const std::unordered_set<pal::string_t>& get_api_sets() const
+    const std::unordered_set<pal::string_t>& get_native_paths() const
     {
-        return m_api_set_paths;
+        return m_native_paths;
     }
 private:
 
@@ -134,8 +134,8 @@ private:
 
     pal::string_t m_package_cache;
 
-    // Special entry for api-sets
-    std::unordered_set<pal::string_t> m_api_set_paths;
+    // Special entry for native libraries.
+    std::unordered_set<pal::string_t> m_native_paths;
 
     // Special entry for coreclr in the deps entries
     int m_coreclr_index;
