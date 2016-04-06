@@ -487,16 +487,14 @@ void deps_resolver_t::resolve_probe_dirs(
         if (probe_entry_in_configs(entry, &candidate))
         {
             // For standalone apps, on win7, coreclr needs ApiSets which has to be in the DLL search path.
-            if (!m_portable && pal::need_api_sets()
-                    && ends_with(entry.library_name, _X("Microsoft.NETCore.Windows.ApiSets"), false))
+            const pal::string_t result_path = action(candidate);
+
+            if (!is_resources)
             {
-                const pal::string_t api_sets_dir = action(candidate);
-                if (api_sets_dir != clr_dir)
-                {
-                    m_api_set_paths.insert(api_sets_dir);
-                }
+                m_native_paths.insert(pal::preload_native_libs() ? candidate : result_path);
             }
-            add_unique_path(asset_type, action(candidate), &items, output);
+
+            add_unique_path(asset_type, result_path, &items, output);
         }
     };
     std::for_each(entries.begin(), entries.end(), add_package_cache_entry);
@@ -520,6 +518,7 @@ void deps_resolver_t::resolve_probe_dirs(
     // FX path if present
     if (!m_fx_dir.empty())
     {
+        m_api_set_paths.insert(m_fx_dir);
         add_unique_path(asset_type, m_fx_dir, &items, output);
     }
 
