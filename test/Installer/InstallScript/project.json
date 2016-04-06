@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0-*",
+  "dependencies": {
+    "Microsoft.NETCore.App": "1.0.0-rc2-23931",
+    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-rc2-20451",
+    "Microsoft.AspNetCore.Server.Kestrel.Https": "1.0.0-rc2-20451",
+    "Microsoft.AspNetCore.HttpOverrides": "1.0.0-rc2-20451",
+    "Microsoft.AspNetCore.Hosting": "1.0.0-rc2-20451",
+    "Microsoft.Extensions.Logging.Console": "1.0.0-rc2-20451",
+    "Newtonsoft.Json": "8.0.3",
+    "xunit": "2.1.0",
+    "xunit.netcore.extensions": "1.0.0-prerelease-00206",
+    "dotnet-test-xunit": "1.0.0-dev-128011-22"
+  },
+  "frameworks": {
+    "netstandardapp1.5": {
+      "imports": [
+        "dnxcore50",
+        "portable-net451+win8"
+      ]
+    }
+  },
+  "testRunner": "xunit"
+}
