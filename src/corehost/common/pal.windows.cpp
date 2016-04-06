@@ -56,9 +56,16 @@ bool pal::find_coreclr(pal::string_t* recv)
 
 void pal::setup_api_sets(const std::unordered_set<pal::string_t>& api_sets)
 {
+    pal::string_t path;
+    bool update_path = getenv(_X("PATH"), &path);
     for (const auto& as : api_sets)
     {
         DLL_DIRECTORY_COOKIE cookie = ::AddDllDirectory(as.c_str());
+        if (update_path)
+        {
+            path.push_back(PATH_SEPARATOR);
+            path.append(as);
+        }
         if (trace::is_enabled())
         {
             if (cookie == 0)
@@ -70,6 +77,18 @@ void pal::setup_api_sets(const std::unordered_set<pal::string_t>& api_sets)
                 trace::verbose(_X("Expanded DLL search path AddDllDirectory [%s]"), as.c_str());
             }
         }
+    }
+    // We need this ugly hack, as the PInvoked DLL's static dependencies can come from
+    // some other NATIVE_DLL_SEARCH_DIRECTORIES and not necessarily side by side. However,
+    // CoreCLR.dll loads PInvoke DLLs with LOAD_WITH_ALTERED_SEARCH_PATH. Note that this
+    // option cannot be combined with LOAD_LIBRARY_SEARCH_USER_DIRS, so the AddDllDirectory
+    // doesn't help much in telling CoreCLR where to load the PInvoke DLLs from.
+    // So we resort to modifying the PATH variable on our own hoping Windows loader will do the right thing.
+    if (update_path)
+    {
+        trace::verbose(_X("Setting PATH=%s"), path.c_str());
+        // Assuming no other thread modified PATH between Get and SetEnvironmentVariableW.
+        ::SetEnvironmentVariableW(_X("PATH"), path.c_str());
     }
 }
 
