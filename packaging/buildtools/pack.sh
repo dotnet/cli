@@ -98,7 +98,13 @@ fi
 
 # acquire dependencies
 pushd "$__project_dir/deps"
-"$__project_dir/Tools/dotnetcli/bin/dotnet" restore --source "https://dotnet.myget.org/F/dotnet-core" --packages "$__project_dir/packages"
+__runtime_json_version="1.0.1-rc2-23931"
+__project_json_contents="{ \"dependencies\": { \"Microsoft.NETCore.Platforms\": \"$__runtime_json_version\" }, \"frameworks\": { \"dnxcore50\": { \"imports\": \"portable-net45+win8\" } } }"
+echo $__project_json_contents > "project.json"
+"$__project_dir/Tools/dotnetcli/dotnet" restore --source "https://dotnet.myget.org/F/dotnet-core" --packages "$__project_dir/packages"
+if [ ! -f "$__project_dir/Tools/runtime.json" ]; then
+    cp "$__project_dir/packages/Microsoft.NETCore.Platforms/$__runtime_json_version/runtime.json" "$__project_dir/Tools/runtime.json"
+fi
 popd
 
 # cleanup existing packages
@@ -116,12 +122,12 @@ else
     init_distro_name
 fi
 
+# package the assets using tools 
+
 __common_parameters="/p:Platform=$__build_arch /p:DotNetHostBinDir=$__dotnet_host_bin_dir /p:$__targets_param /p:DistroName=$__distro_name /p:HostVersion=$__host_ver /p:HostResolverVersion=$__fxr_ver /p:HostPolicyVersion=$__policy_ver /p:BuildNumberMajor=$__build_major /p:PreReleaseLabel=$__version_tag /verbosity:minimal"
 
 $__corerun $__msbuild $__project_dir/projects/Microsoft.NETCore.DotNetHostPolicy.builds $__common_parameters || exit 1
 $__corerun $__msbuild $__project_dir/projects/Microsoft.NETCore.DotNetHostResolver.builds $__common_parameters || exit 1
 $__corerun $__msbuild $__project_dir/projects/Microsoft.NETCore.DotNetHost.builds $__common_parameters || exit 1
-
-cp -rf "$__project_dir/bin/packages" "$__dotnet_host_bin_dir"
 
 exit 0

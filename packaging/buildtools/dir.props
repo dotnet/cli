@@ -23,7 +23,6 @@
 
   <PropertyGroup>
     <PackageOutputPath>$(PackagesOutDir)</PackageOutputPath>
-    <RuntimeIdGraphDefinitionFile>$(ProjectDir)packages\Microsoft.NETCore.Platforms\1.0.1-rc2-23712\runtime.json</RuntimeIdGraphDefinitionFile>
     <PackageDescriptionFile>$(ProjectDir)projects/descriptions.json</PackageDescriptionFile>
     <PackagePlatform Condition="'$(PackagePlatform)' == ''">$(Platform)</PackagePlatform>
     <PackagePlatform Condition="'$(PackagePlatform)' == 'amd64'">x64</PackagePlatform>
