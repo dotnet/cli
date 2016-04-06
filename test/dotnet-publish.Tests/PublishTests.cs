@@ -104,7 +104,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             var testProject = _getProjectJson(instance.TestRoot, "StandaloneApp");
             var publishCommand = new PublishCommand(testProject, runtime: rid);
 
-            publishCommand.Execute().Should().Succeed();
+            publishCommand.Execute().Should().Pass();
 
             var publishedDir = publishCommand.GetOutputDirectory();
             publishedDir.Should().HaveFile("StandaloneApp"+ hostExtension);
