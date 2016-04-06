@@ -482,22 +482,34 @@ void deps_resolver_t::resolve_probe_dirs(
 
     pal::string_t candidate;
 
+    bool track_api_sets = true;
     auto add_package_cache_entry = [&](const deps_entry_t& entry)
     {
         if (probe_entry_in_configs(entry, &candidate))
         {
             // For standalone apps, on win7, coreclr needs ApiSets which has to be in the DLL search path.
-            const pal::string_t native_dll_dir = action(candidate);
+            const pal::string_t result_dir = action(candidate);
 
-            // Both for standalone and portable apps, get the native DLL directory, as they could come
-            // from servicing or probe paths.
-            m_api_set_paths.insert(native_dll_dir);
+            if (track_api_sets && pal::need_api_sets() &&
+                ends_with(entry.library_name, _X("Microsoft.NETCore.Windows.ApiSets"), false))
+            {
+                // For standalone and portable apps, get the ApiSets DLL directory,
+                // as they could come from servicing or other probe paths.
+                // Note: in portable apps, the API set would come from FX deps
+                // which is actually a standalone deps (rid specific API set).
+                // If the portable app relied on its version of API sets, then
+                // the rid selection fallback would have already been performed
+                // by the host (deps_format.cpp)
+                m_api_set_paths.insert(result_dir);
+            }
 
-            add_unique_path(asset_type, native_dll_dir, &items, output);
+            add_unique_path(asset_type, result_dir, &items, output);
         }
     };
     std::for_each(entries.begin(), entries.end(), add_package_cache_entry);
+    track_api_sets = m_api_set_paths.empty();
     std::for_each(fx_entries.begin(), fx_entries.end(), add_package_cache_entry);
+    track_api_sets = m_api_set_paths.empty();
 
     // For portable rid specific assets, the app relative directory must be used.
     if (m_portable)
@@ -508,16 +520,34 @@ void deps_resolver_t::resolve_probe_dirs(
             {
                 add_unique_path(asset_type, action(candidate), &items, output);
             }
+
+            // App called out an explicit API set dependency.
+            if (track_api_sets && entry.is_rid_specific && pal::need_api_sets() &&
+                ends_with(entry.library_name, _X("Microsoft.NETCore.Windows.ApiSets"), false))
+            {
+                m_api_set_paths.insert(action(candidate));
+            }
         });
     }
+
+    track_api_sets = m_api_set_paths.empty();
 
     // App local path
     add_unique_path(asset_type, m_app_dir, &items, output);
 
+    // If API sets is not found (i.e., empty) in the probe paths above:
+    // 1. For standalone app, do nothing as all are sxs.
+    // 2. For portable app, add FX dir.
+
     // FX path if present
     if (!m_fx_dir.empty())
     {
-        m_api_set_paths.insert(m_fx_dir);
+        // For portable apps, if we didn't find api sets in probe paths
+        // add the FX directory.
+        if (track_api_sets && pal::need_api_sets())
+        {
+            m_api_set_paths.insert(m_fx_dir);
+        }
         add_unique_path(asset_type, m_fx_dir, &items, output);
     }
 
