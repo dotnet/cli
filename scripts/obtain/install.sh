@@ -619,7 +619,7 @@ calculate_vars
 if [ "$dry_run" = true ]; then
     say "Payload URL: $download_link"
     say "Repeatable invocation: ./$(basename $0) --version $specific_version --channel $channel --install-dir $install_dir"
-    return 0
+    exit 0
 fi
 
 check_pre_reqs
