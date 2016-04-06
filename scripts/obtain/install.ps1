@@ -62,6 +62,9 @@ $ErrorActionPreference="Stop"
 $ProgressPreference="SilentlyContinue"
 
 $BinFolderRelativePath=""
+if($Channel.Equals('future',[System.StringComparison]::OrdinalIgnoreCase)){
+    $BinFolderRelativePath = 'bin'
+}
 
 # example path with regex: shared/1.0.0-beta-12345/somepath
 $VersionRegEx="/\d+\.\d+[^/]+/"
@@ -153,8 +156,11 @@ function Get-Download-Links([string]$AzureFeed, [string]$AzureChannel, [string]$
     Say-Invocation $MyInvocation
     
     $ret = @()
-    $files = @("dotnet-dev")
-    
+    $files = @('dotnet')
+    if($AzureChannel.Equals('beta',[System.StringComparison]::OrdinalIgnoreCase)){
+        $files = @('dotnet-dev')
+    }
+
     foreach ($file in $files) {
         $PayloadURL = "$AzureFeed/$AzureChannel/Binaries/$SpecificVersion/$file-win-$CLIArchitecture.$SpecificVersion.zip"
         Say-Verbose "Constructed payload URL: $PayloadURL"
