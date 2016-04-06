@@ -13,14 +13,14 @@
     "Microsoft.DotNet.Compiler.Common": "1.0.0-*",
     "Microsoft.Extensions.CommandLineUtils.Sources": {
       "type": "build",
-      "version": "1.0.0-rc2-16453"
+      "version": "1.0.0-rc2-20221"
     },
     "Microsoft.Dnx.Runtime.CommandParsing.Sources": {
-      "version": "1.0.0-rc2-16453",
+      "version": "1.0.0-rc2-20221",
       "type": "build"
     },
     "Microsoft.Dnx.Runtime.Sources": {
-      "version": "1.0.0-rc2-16453",
+      "version": "1.0.0-rc2-20221",
       "type": "build"
     },
     "System.CommandLine": "0.1.0-e160323-1"
