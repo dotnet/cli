@@ -48,9 +48,9 @@ struct probe_config_t
         , only_runtime_assets(only_runtime_assets)
     {
         // Cannot roll forward and also match hash.
-        assert(!patch_roll_fwd || !match_hash);
+        assert(!is_roll_fwd_set() || !match_hash);
         // Will not roll forward within a deps json.
-        assert(!patch_roll_fwd || probe_deps_json == nullptr);
+        assert(!is_roll_fwd_set() || probe_deps_json == nullptr);
         // Will not do hash match when probing a deps json.
         assert(!match_hash || probe_deps_json == nullptr);
     }
