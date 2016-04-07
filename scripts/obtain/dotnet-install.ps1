@@ -336,4 +336,3 @@ else {
 }
 
 Say "Installation finished"
-Say "WARNING: This script will be deleted in the future. Please use https://github.com/dotnet/cli/tree/rel/1.0.0/scripts/obtain/dotnet-install.ps1 instead."
