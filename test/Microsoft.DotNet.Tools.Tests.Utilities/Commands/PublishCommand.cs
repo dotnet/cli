@@ -19,9 +19,10 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         private readonly string _framework;
         private readonly string _runtime;
         private readonly string _config;
+        private readonly bool _noBuild;
         private readonly string _output;
 
-        public PublishCommand(string projectPath, string framework = "", string runtime = "", string output = "", string config = "", bool forcePortable = false)
+        public PublishCommand(string projectPath, string framework = "", string runtime = "", string output = "", string config = "", bool forcePortable = false, bool noBuild = false)
             : base("dotnet")
         {
             _path = projectPath;
@@ -30,6 +31,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             _runtime = runtime;
             _output = output;
             _config = config;
+            _noBuild = noBuild;
         }
 
         public override CommandResult Execute(string args = "")
@@ -74,21 +76,30 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             return new DirectoryInfo(output);
         }
 
+        public string GetPortableOutputName()
+        {
+            return $"{_project.Name}.dll";
+        }
+
         public string GetOutputExecutable()
         {
-            var result = _project.Name;
-            result += RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : "";
-            return result;
+            return _project.Name + GetExecutableExtension();
+        }
+
+        public string GetExecutableExtension()
+        {
+            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : "";
         }
 
         private string BuildArgs()
         {
-            return $"{_path} {FrameworkOption} {RuntimeOption} {OutputOption} {ConfigOption}";
+            return $"{_path} {FrameworkOption} {RuntimeOption} {OutputOption} {ConfigOption} {NoBuildFlag}";
         }
 
         private string FrameworkOption => string.IsNullOrEmpty(_framework) ? "" : $"-f {_framework}";
         private string RuntimeOption => string.IsNullOrEmpty(_runtime) ? "" : $"-r {_runtime}";
         private string OutputOption => string.IsNullOrEmpty(_output) ? "" : $"-o \"{_output}\"";
         private string ConfigOption => string.IsNullOrEmpty(_config) ? "" : $"-c {_output}";
+        private string NoBuildFlag => _noBuild ? "--no-build" :"";
     }
 }

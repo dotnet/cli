@@ -1,23 +1,30 @@
 {
   "version": "1.0.0-*",
-
+  "compilationOptions": {
+    "keyFile": "../../tools/Key.snk"
+  },
   "dependencies": {
-    "NETStandard.Library": "1.0.0-rc2-23901",
-    "System.IO.Compression": "4.1.0-rc2-23901",
-
     "Microsoft.DotNet.Cli.Utils": {
       "target": "project"
     },
-
-    "dotnet": { "target": "project" },
-    "Microsoft.DotNet.ProjectModel": { "target": "project" },
-
+    "Microsoft.DotNet.Compiler.Common": {
+      "target": "project"
+    },
+    "dotnet": {
+      "target": "project"
+    },
+    "Microsoft.Win32.Registry": {
+      "version": "4.0.0-rc2-23931",
+      "exclude": "Compile"
+    },
+    "Microsoft.DotNet.ProjectModel": {
+      "target": "project"
+    },
     "xunit": "2.1.0",
-    "dotnet-test-xunit": "1.0.0-dev-91790-12",
+    "dotnet-test-xunit": "1.0.0-dev-128011-22",
     "moq.netcore": "4.4.0-beta8",
     "FluentAssertions": "4.2.2"
   },
-
   "frameworks": {
     "netstandardapp1.5": {
       "imports": [
@@ -26,10 +33,8 @@
       ]
     }
   },
-
   "content": [
     "../../TestAssets/TestProjects/TestAppWithLibrary/**/*"
   ],
-
   "testRunner": "xunit"
 }

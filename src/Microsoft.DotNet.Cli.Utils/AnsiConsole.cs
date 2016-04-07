@@ -38,8 +38,8 @@ namespace Microsoft.DotNet.Cli.Utils
 
             Console.ForegroundColor = 
                 c < 0 ? color :                                   // unknown, just use it
-                _boldRecursion > 0 ? (ConsoleColor)(c & ~Light) : // ensure color is dark
-                (ConsoleColor)(c | Light);                        // ensure color is light
+                _boldRecursion > 0 ? (ConsoleColor)(c | Light) :  // ensure color is light
+                (ConsoleColor)(c & ~Light);                       // ensure color is dark
         }
     
         private void SetBold(bool bold)
@@ -66,7 +66,7 @@ namespace Microsoft.DotNet.Cli.Utils
             var escapeScan = 0;
             for (;;)
             {
-                var escapeIndex = message.IndexOf("\x1b[", escapeScan);
+                var escapeIndex = message.IndexOf("\x1b[", escapeScan, StringComparison.Ordinal);
                 if (escapeIndex == -1)
                 {
                     var text = message.Substring(escapeScan);

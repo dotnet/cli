@@ -5,40 +5,28 @@
 #include "args.h"
 #include "trace.h"
 #include "deps_resolver.h"
+#include "fx_muxer.h"
 #include "utils.h"
 #include "coreclr.h"
+#include "cpprest/json.h"
+#include "libhost.h"
+#include "error_codes.h"
 
-enum StatusCode
-{
-    // 0x80 prefix to distinguish from corehost main's error codes.
-    InvalidArgFailure      = 0x81,
-    CoreClrResolveFailure  = 0x82,
-    CoreClrBindFailure     = 0x83,
-    CoreClrInitFailure     = 0x84,
-    CoreClrExeFailure      = 0x85,
-    ResolverInitFailure    = 0x86,
-    ResolverResolveFailure = 0x87,
-};
 
-int run(const arguments_t& args)
+corehost_init_t* g_init = nullptr;
+
+int run(const corehost_init_t* init, const runtime_config_t& config, const arguments_t& args)
 {
     // Load the deps resolver
-    deps_resolver_t resolver(args);
+    deps_resolver_t resolver(init, config, args);
+
     if (!resolver.valid())
     {
         trace::error(_X("Invalid .deps file"));
         return StatusCode::ResolverInitFailure;
     }
 
-    // Add packages directory
-    pal::string_t packages_dir = args.nuget_packages;
-    if (!pal::directory_exists(packages_dir))
-    {
-        (void)pal::get_default_packages_directory(&packages_dir);
-    }
-    trace::info(_X("Package directory: %s"), packages_dir.empty() ? _X("not specified") : packages_dir.c_str());
-
-    pal::string_t clr_path = resolver.resolve_coreclr_dir(args.app_dir, packages_dir, args.dotnet_packages_cache);
+    pal::string_t clr_path = resolver.resolve_coreclr_dir();
     if (clr_path.empty() || !pal::realpath(&clr_path))
     {
         trace::error(_X("Could not resolve coreclr path"));
@@ -50,35 +38,32 @@ int run(const arguments_t& args)
     }
 
     probe_paths_t probe_paths;
-    if (!resolver.resolve_probe_paths(args.app_dir, packages_dir, args.dotnet_packages_cache, clr_path, &probe_paths))
+    if (!resolver.resolve_probe_paths(clr_path, &probe_paths))
     {
         return StatusCode::ResolverResolveFailure;
     }
 
     // Build CoreCLR properties
-    const char* property_keys[] = {
+    std::vector<const char*> property_keys = {
         "TRUSTED_PLATFORM_ASSEMBLIES",
         "APP_PATHS",
         "APP_NI_PATHS",
         "NATIVE_DLL_SEARCH_DIRECTORIES",
         "PLATFORM_RESOURCE_ROOTS",
         "AppDomainCompatSwitch",
-        // TODO: pipe this from corehost.json
-        "SERVER_GC",
         // Workaround: mscorlib does not resolve symlinks for AppContext.BaseDirectory dotnet/coreclr/issues/2128
         "APP_CONTEXT_BASE_DIRECTORY",
+        "APP_CONTEXT_DEPS_FILES"
     };
 
     auto tpa_paths_cstr = pal::to_stdstring(probe_paths.tpa);
     auto app_base_cstr = pal::to_stdstring(args.app_dir);
     auto native_dirs_cstr = pal::to_stdstring(probe_paths.native);
-    auto culture_dirs_cstr = pal::to_stdstring(probe_paths.culture);
+    auto resources_dirs_cstr = pal::to_stdstring(probe_paths.resources);
 
-    // Workaround for dotnet/cli Issue #488 and #652
-    pal::string_t server_gc;
-    std::string server_gc_cstr = (pal::getenv(_X("COREHOST_SERVER_GC"), &server_gc) && !server_gc.empty()) ? pal::to_stdstring(server_gc) : "0";
+    std::string deps = pal::to_stdstring(resolver.get_deps_file() + _X(";") + resolver.get_fx_deps_file());
 
-    const char* property_values[] = {
+    std::vector<const char*> property_values = {
         // TRUSTED_PLATFORM_ASSEMBLIES
         tpa_paths_cstr.c_str(),
         // APP_PATHS
@@ -88,16 +73,31 @@ int run(const arguments_t& args)
         // NATIVE_DLL_SEARCH_DIRECTORIES
         native_dirs_cstr.c_str(),
         // PLATFORM_RESOURCE_ROOTS
-        culture_dirs_cstr.c_str(),
+        resources_dirs_cstr.c_str(),
         // AppDomainCompatSwitch
         "UseLatestBehaviorWhenTFMNotSpecified",
-        // SERVER_GC
-        server_gc_cstr.c_str(),
         // APP_CONTEXT_BASE_DIRECTORY
-        app_base_cstr.c_str()
+        app_base_cstr.c_str(),
+        // APP_CONTEXT_DEPS_FILES,
+        deps.c_str(),
     };
 
-    size_t property_size = sizeof(property_keys) / sizeof(property_keys[0]);
+    
+    std::vector<std::string> cfg_keys;
+    std::vector<std::string> cfg_values;
+    config.config_kv(&cfg_keys, &cfg_values);
+
+    for (int i = 0; i < cfg_keys.size(); ++i)
+    {
+        property_keys.push_back(cfg_keys[i].c_str());
+        property_values.push_back(cfg_values[i].c_str());
+    }
+
+    size_t property_size = property_keys.size();
+    assert(property_keys.size() == property_values.size());
+
+    // Add API sets to the process DLL search
+    pal::setup_api_sets(resolver.get_api_sets());
 
     // Bind CoreCLR
     if (!coreclr::bind(clr_path))
@@ -127,8 +127,8 @@ int run(const arguments_t& args)
     auto hr = coreclr::initialize(
         own_path.c_str(),
         "clrhost",
-        property_keys,
-        property_values,
+        property_keys.data(),
+        property_values.data(),
         property_size,
         &host_handle,
         &domain_id);
@@ -188,16 +188,80 @@ int run(const arguments_t& args)
     return exit_code;
 }
 
+SHARED_API int corehost_load(corehost_init_t* init)
+{
+    g_init = init;
+
+    trace::setup();
+
+    if (g_init->version() != corehost_init_t::s_version)
+    {
+        trace::error(_X("Error loading hostpolicy %s; interface mismatch between hostpolicy [%d] and hostfxr [%d]"),
+                _STRINGIFY(HOST_POLICY_PKG_VER), corehost_init_t::s_version, g_init->version());
+        trace::error(_X("Specifically, the structure of corehost_init_t has changed, do not know how to interpret it"));
+        return StatusCode::LibHostInitFailure;
+    }
+    return 0;
+}
+
 SHARED_API int corehost_main(const int argc, const pal::char_t* argv[])
 {
-    trace::setup();
+    assert(g_init);
+
+    if (trace::is_enabled())
+    {
+        trace::info(_X("--- Invoked policy [%s/%s/%s] main = {"),
+            _STRINGIFY(HOST_POLICY_PKG_NAME),
+            _STRINGIFY(HOST_POLICY_PKG_VER),
+            _STRINGIFY(HOST_POLICY_PKG_REL_DIR));
+
+        for (int i = 0; i < argc; ++i)
+        {
+            trace::info(_X("%s"), argv[i]);
+        }
+        trace::info(_X("}"));
+
+        trace::info(_X("Host mode: %d"), g_init->host_mode());
+        trace::info(_X("Deps file: %s"), g_init->deps_file().c_str());
+        for (const auto& probe : g_init->probe_paths())
+        {
+            trace::info(_X("Additional probe dir: %s"), probe.c_str());
+        }
+    }
 
     // Take care of arguments
     arguments_t args;
-    if (!parse_arguments(argc, argv, args))
+    if (!parse_arguments(g_init->deps_file(), g_init->probe_paths(), g_init->host_mode(), argc, argv, &args))
     {
-        return StatusCode::InvalidArgFailure;
+        return StatusCode::LibHostInvalidArgs;
+    }
+    if (trace::is_enabled())
+    {
+        args.print();
     }
 
-    return run(args);
+    if (g_init->runtime_config())
+    {
+        return run(g_init, *g_init->runtime_config(), args);
+    }
+    else
+    {
+        pal::string_t dev_config_file;
+        auto config_path = get_runtime_config_from_file(args.managed_application, &dev_config_file);
+        runtime_config_t config(config_path, dev_config_file);
+        if (!config.is_valid())
+        {
+            trace::error(_X("Invalid runtimeconfig.json [%s] [%s]"), config.get_path().c_str(), config.get_dev_path().c_str());
+            return StatusCode::InvalidConfigFile;
+        }
+        // TODO: This is ugly. The whole runtime config/probe paths business should all be resolved by and come from the hostfxr.cpp.
+        args.probe_paths.insert(args.probe_paths.end(), config.get_probe_paths().begin(), config.get_probe_paths().end());
+        return run(g_init, config, args);
+    }
+}
+
+SHARED_API int corehost_unload()
+{
+    g_init = nullptr;
+    return 0;
 }

@@ -11,6 +11,8 @@ namespace Microsoft.Extensions.DependencyModel
 
         internal const string RuntimeAssembliesKey = "runtime";
 
+        internal const string NativeLibrariesKey = "native";
+
         internal const string RuntimeTargetPropertyName = "runtimeTarget";
 
         internal const string LibrariesPropertyName = "libraries";
@@ -54,6 +56,8 @@ namespace Microsoft.Extensions.DependencyModel
         internal const string PortablePropertyName = "portable";
 
         internal const string RuntimeTargetNamePropertyName = "name";
+
+        internal const string RuntimeTargetSignaturePropertyName = "signature";
 
         internal const string RuntimesPropertyName = "runtimes";
 

@@ -1,11 +1,11 @@
-﻿{
+{
   "version": "1.0.0-*",
   "compilationOptions": {
-    "emitEntryPoint": true
+    "emitEntryPoint": true,
+    "outputName": "AppWithContentPackage"
   },
-
   "dependencies": {
-    "NETStandard.Library": "1.0.0-rc2-23901",
+    "NETStandard.Library": "1.5.0-rc2-23931",
     "SharedContentA": "1.0.0-*"
   },
   "frameworks": {

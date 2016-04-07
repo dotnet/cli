@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Resolution;
 using Microsoft.Extensions.Internal;
@@ -31,6 +32,8 @@ namespace Microsoft.DotNet.ProjectModel
         private string PackagesDirectory { get; set; }
 
         private string ReferenceAssembliesPath { get; set; }
+        
+        private bool IsDesignTime { get; set; }
 
         private Func<string, Project> ProjectResolver { get; set; }
 
@@ -115,6 +118,12 @@ namespace Microsoft.DotNet.ProjectModel
             Settings = settings;
             return this;
         }
+        
+        public ProjectContextBuilder AsDesignTime()
+        {
+            IsDesignTime = true;
+            return this;
+        }
 
         public IEnumerable<ProjectContext> BuildAllTargets()
         {
@@ -138,9 +147,11 @@ namespace Microsoft.DotNet.ProjectModel
 
         public ProjectContext Build()
         {
+            var diagnostics = new List<DiagnosticMessage>();
+
             ProjectDirectory = Project?.ProjectDirectory ?? ProjectDirectory;
 
-            if (GlobalSettings == null)
+            if (GlobalSettings == null && ProjectDirectory != null)
             {
                 RootDirectory = ProjectRootResolver.ResolveRootDirectory(ProjectDirectory);
 
@@ -157,17 +168,19 @@ namespace Microsoft.DotNet.ProjectModel
             var frameworkReferenceResolver = new FrameworkReferenceResolver(ReferenceAssembliesPath);
 
             LockFileLookup lockFileLookup = null;
-
             EnsureProjectLoaded();
 
-            LockFile = LockFile ?? LockFileResolver(ProjectDirectory);
+            ReadLockFile(diagnostics);
 
             var validLockFile = true;
             string lockFileValidationMessage = null;
 
             if (LockFile != null)
             {
-                validLockFile = LockFile.IsValidForProject(Project, out lockFileValidationMessage);
+                if (Project != null)
+                {
+                    validLockFile = LockFile.IsValidForProject(Project, out lockFileValidationMessage);
+                }
 
                 lockFileLookup = new LockFileLookup(LockFile);
             }
@@ -175,10 +188,14 @@ namespace Microsoft.DotNet.ProjectModel
             var libraries = new Dictionary<LibraryKey, LibraryDescription>();
             var projectResolver = new ProjectDependencyProvider(ProjectResolver);
 
-            var mainProject = projectResolver.GetDescription(TargetFramework, Project, targetLibrary: null);
+            ProjectDescription mainProject = null;
+            if (Project != null)
+            {
+                mainProject = projectResolver.GetDescription(TargetFramework, Project, targetLibrary: null);
 
-            // Add the main project
-            libraries.Add(new LibraryKey(mainProject.Identity.Name), mainProject);
+                // Add the main project
+                libraries.Add(new LibraryKey(mainProject.Identity.Name), mainProject);
+            }
 
             LockFileTarget target = null;
             if (lockFileLookup != null)
@@ -186,8 +203,9 @@ namespace Microsoft.DotNet.ProjectModel
                 target = SelectTarget(LockFile);
                 if (target != null)
                 {
-                    var packageResolver = new PackageDependencyProvider(PackagesDirectory, frameworkReferenceResolver);
-                    ScanLibraries(target, lockFileLookup, libraries, packageResolver, projectResolver);
+                    var nugetPackageResolver = new PackageDependencyProvider(PackagesDirectory, frameworkReferenceResolver);
+                    var msbuildProjectResolver = new MSBuildDependencyProvider(Project, ProjectResolver);
+                    ScanLibraries(target, lockFileLookup, libraries, msbuildProjectResolver, nugetPackageResolver, projectResolver);
                 }
             }
 
@@ -196,8 +214,6 @@ namespace Microsoft.DotNet.ProjectModel
 
             // Resolve the dependencies
             ResolveDependencies(libraries, referenceAssemblyDependencyResolver, out requiresFrameworkAssemblies);
-
-            var diagnostics = new List<DiagnosticMessage>();
 
             // REVIEW: Should this be in NuGet (possibly stored in the lock file?)
             if (LockFile == null)
@@ -251,7 +267,7 @@ namespace Microsoft.DotNet.ProjectModel
             }
 
             // Create a library manager
-            var libraryManager = new LibraryManager(libraries.Values.ToList(), diagnostics, Project.ProjectFilePath);
+            var libraryManager = new LibraryManager(libraries.Values.ToList(), diagnostics, Project?.ProjectFilePath);
 
             return new ProjectContext(
                 GlobalSettings,
@@ -261,6 +277,51 @@ namespace Microsoft.DotNet.ProjectModel
                 PackagesDirectory,
                 libraryManager,
                 LockFile);
+        }
+
+        private void ReadLockFile(ICollection<DiagnosticMessage> diagnostics)
+        {
+            try
+            {
+                LockFile = LockFile ?? LockFileResolver(ProjectDirectory);
+            }
+            catch (FileFormatException e)
+            {
+                var lockFilePath = "";
+                if (LockFile != null)
+                {
+                    lockFilePath = LockFile.LockFilePath;
+                }
+                else if (Project != null)
+                {
+                    lockFilePath = Path.Combine(Project.ProjectDirectory, LockFile.FileName);
+                }
+
+                diagnostics.Add(new DiagnosticMessage(
+                    ErrorCodes.DOTNET1014,
+                    ComposeMessageFromInnerExceptions(e),
+                    lockFilePath,
+                    DiagnosticMessageSeverity.Error));
+            }
+        }
+
+        private static string ComposeMessageFromInnerExceptions(Exception exception)
+        {
+            var sb = new StringBuilder();
+            var messages = new HashSet<string>();
+
+            while (exception != null)
+            {
+                messages.Add(exception.Message);
+                exception = exception.InnerException;
+            }
+
+            foreach (var message in messages)
+            {
+                sb.AppendLine(message);
+            }
+
+            return sb.ToString();
         }
 
         private void ResolveDependencies(Dictionary<LibraryKey, LibraryDescription> libraries,
@@ -336,7 +397,12 @@ namespace Microsoft.DotNet.ProjectModel
             }
         }
 
-        private void ScanLibraries(LockFileTarget target, LockFileLookup lockFileLookup, Dictionary<LibraryKey, LibraryDescription> libraries, PackageDependencyProvider packageResolver, ProjectDependencyProvider projectDependencyProvider)
+        private void ScanLibraries(LockFileTarget target,
+                                   LockFileLookup lockFileLookup,
+                                   Dictionary<LibraryKey, LibraryDescription> libraries,
+                                   MSBuildDependencyProvider msbuildResolver,
+                                   PackageDependencyProvider packageResolver,
+                                   ProjectDependencyProvider projectResolver)
         {
             foreach (var library in target.Libraries)
             {
@@ -349,11 +415,18 @@ namespace Microsoft.DotNet.ProjectModel
 
                     if (projectLibrary != null)
                     {
-                        var path = Path.GetFullPath(Path.Combine(ProjectDirectory, projectLibrary.Path));
-                        description = projectDependencyProvider.GetDescription(library.Name, path, library, ProjectResolver);
+                        if (MSBuildDependencyProvider.IsMSBuildProjectLibrary(projectLibrary))
+                        {
+                            description = msbuildResolver.GetDescription(TargetFramework, projectLibrary, library, IsDesignTime);
+                            type = LibraryType.MSBuildProject;
+                        }
+                        else
+                        {
+                            var path = Path.GetFullPath(Path.Combine(ProjectDirectory, projectLibrary.Path));
+                            description = projectResolver.GetDescription(library.Name, path, library, ProjectResolver);
+                            type = LibraryType.Project;
+                        }
                     }
-
-                    type = LibraryType.Project;
                 }
                 else
                 {
@@ -375,13 +448,9 @@ namespace Microsoft.DotNet.ProjectModel
 
         private void EnsureProjectLoaded()
         {
-            if (Project == null)
+            if (Project == null && ProjectDirectory != null)
             {
                 Project = ProjectResolver(ProjectDirectory);
-                if (Project == null)
-                {
-                    throw new InvalidOperationException($"Unable to resolve project from {ProjectDirectory}");
-                }
             }
         }
 
@@ -427,7 +496,7 @@ namespace Microsoft.DotNet.ProjectModel
         {
             var projectLockJsonPath = Path.Combine(projectDir, LockFile.FileName);
             return File.Exists(projectLockJsonPath) ?
-                        LockFileReader.Read(Path.Combine(projectDir, LockFile.FileName)) :
+                        LockFileReader.Read(Path.Combine(projectDir, LockFile.FileName), designTime: false) :
                         null;
         }
 
