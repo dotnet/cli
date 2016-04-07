@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System;
 using System.Linq;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.ProjectModel.Compilation;
@@ -35,6 +36,7 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
                 var targetName = ResolveTargetName(destinationPath, asset);
                 var transformedFile = asset.GetTransformedFile(tempLocation);
 
+                Console.WriteLine($"LibraryExporterExtensions: Copying file {Path.GetFileName(transformedFile)} to {Path.GetDirectoryName(targetName)}"); //todo remove
                 File.Copy(transformedFile, targetName, overwrite: true);
             }
         }

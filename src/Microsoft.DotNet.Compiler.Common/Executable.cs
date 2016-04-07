@@ -77,6 +77,7 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
             if (emitEntryPoint && !string.IsNullOrEmpty(_context.RuntimeIdentifier))
             {
                 // TODO: Pick a host based on the RID
+                //                 CopyHostTo(_runtimeOutputPath, _compilerOptions.OutputName + Constants.ExeSuffix);
                 CoreHost.CopyTo(_runtimeOutputPath, _compilerOptions.OutputName + Constants.ExeSuffix);
             }
         }

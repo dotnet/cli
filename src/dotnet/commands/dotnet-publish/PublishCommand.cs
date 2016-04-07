@@ -139,11 +139,11 @@ namespace Microsoft.DotNet.Tools.Publish
             var exports = exporter.GetAllExports();
             foreach (var export in exports.Where(e => !collectExclusionList.Contains(e.Library.Identity.Name)))
             {
-                Reporter.Verbose.WriteLine($"Publishing {export.Library.Identity.ToString().Green().Bold()} ...");
+                Reporter.Verbose.WriteLine($"publish: Publishing {export.Library.Identity.ToString().Green().Bold()} ...");
 
                 PublishAssetGroups(export.RuntimeAssemblyGroups, outputPath, nativeSubdirectories: false, includeRuntimeGroups: isPortable);
                 PublishAssetGroups(export.NativeLibraryGroups, outputPath, nativeSubdirectories, includeRuntimeGroups: isPortable);
-                export.RuntimeAssets.StructuredCopyTo(outputPath, outputPaths.IntermediateOutputDirectoryPath);
+                // export.RuntimeAssets.StructuredCopyTo(outputPath, outputPaths.IntermediateOutputDirectoryPath);
             }
 
             if (options.PreserveCompilationContext.GetValueOrDefault())
@@ -168,18 +168,19 @@ namespace Microsoft.DotNet.Tools.Publish
             }
 
             var contentFiles = new ContentFiles(context);
+            Console.WriteLine("content files!"); // todo remove
             contentFiles.StructuredCopyTo(outputPath);
 
             // Publish a host if this is an application
             if (options.EmitEntryPoint.GetValueOrDefault() && !string.IsNullOrEmpty(context.RuntimeIdentifier))
             {
-                Reporter.Verbose.WriteLine($"Renaming native host in output to create fully standalone output.");
+                Reporter.Verbose.WriteLine($"publish: Renaming native host in output to create fully standalone output.");
                 RenamePublishedHost(context, outputPath, options);
             }
 
             RunScripts(context, ScriptNames.PostPublish, contextVariables);
 
-            Reporter.Output.WriteLine($"Published to {outputPath}".Green().Bold());
+            Reporter.Output.WriteLine($"publish: Published to {outputPath}".Green().Bold());
 
             return true;
         }
@@ -328,6 +329,8 @@ namespace Microsoft.DotNet.Tools.Publish
             {
                 var targetPath = Path.Combine(outputPath, Path.GetFileName(file));
                 File.Copy(file, targetPath, overwrite: true);
+
+                Reporter.Verbose.WriteLine($"publishfiles: Publishing File {Path.GetFileName(targetPath)}");
             }
         }
 
@@ -349,6 +352,7 @@ namespace Microsoft.DotNet.Tools.Publish
                         Directory.CreateDirectory(destinationDirectory);
                     }
 
+                    Reporter.Verbose.WriteLine($"Publishing file {Path.GetFileName(file.RelativePath)} to {destinationDirectory}");
                     File.Copy(file.ResolvedPath, Path.Combine(destinationDirectory, file.FileName), overwrite: true);
                 }
             }
