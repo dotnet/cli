@@ -456,7 +456,7 @@ namespace Microsoft.DotNet.Tools.Build
 
             var succeeded = compileResult == 0;
 
-            if (succeeded)
+            if (succeeded && _rootProject.ProjectFile.HasRuntimeOutput(_args.ConfigValue))
             {
                 MakeRunnable();
             }
