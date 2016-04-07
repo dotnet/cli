@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         public IncrementalTestsTransitiveRuntime()
         {
             MainProject = "TestLibrary2";
-            ExpectedOutput = "This string came from the test library!" + Environment.NewLine;
+            ExpectedOutput = "This string came from the test library!" + Environment.NewLine + Environment.NewLine;
         }
 
         [Fact]

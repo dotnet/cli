@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         public IncrementalTestsOnResources()
         {
             MainProject = "TestProjectWithResource";
-            ExpectedOutput = "Hello World!" + Environment.NewLine;
+            ExpectedOutput = "Hello World!" + Environment.NewLine + Environment.NewLine;
         }
 
         [Fact]

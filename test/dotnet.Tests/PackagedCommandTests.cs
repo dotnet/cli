@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.Tests
             CommandResult result = new PortableCommand { WorkingDirectory = appDirectory }
                 .ExecuteWithCapturedOutput();
 
-            result.Should().HaveStdOut("Hello Portable World!" + Environment.NewLine);
+            result.Should().HaveStdOut("Hello Portable World!" + Environment.NewLine + Environment.NewLine);
             result.Should().NotHaveStdErr();
             result.Should().Pass();
         }

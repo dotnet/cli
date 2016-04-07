@@ -13,14 +13,13 @@ using Microsoft.DotNet.Tools.Test.Utilities;
 using Microsoft.Extensions.PlatformAbstractions;
 using System.Threading;
 
-namespace StreamForwarderTests
+namespace Microsoft.DotNet.Cli.Utils.Tests
 {
     public class StreamForwarderTests : TestBase
     {
-        private static readonly string s_rid = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
         private static readonly string s_testProjectRoot = Path.Combine(AppContext.BaseDirectory, "TestAssets", "TestProjects");
 
-        private TempDirectory _root;
+        private readonly TempDirectory _root;
 
         public static void Main()
         {
@@ -39,16 +38,18 @@ namespace StreamForwarderTests
                 return new[]
                 {
                     new object[] { "123", new string[]{"123"} },
-                    new object[] { "123\n", new string[] {"123"} },
-                    new object[] { "123\r\n", new string[] {"123"} },
+                    new object[] { "123\n", new string[] {"123", ""} },
+                    new object[] { "123\r\n", new string[] {"123", ""} },
                     new object[] { "1234\n5678", new string[] {"1234", "5678"} },
                     new object[] { "1234\r\n5678", new string[] {"1234", "5678"} },
-                    new object[] { "1234\n5678\n", new string[] {"1234", "5678"} },
-                    new object[] { "1234\r\n5678\r\n", new string[] {"1234", "5678"} },
+                    new object[] { "1234\n\n5678", new string[] {"1234", "", "5678"} },
+                    new object[] { "1234\r\n\r\n5678", new string[] {"1234", "", "5678"} },
+                    new object[] { "1234\n5678\n", new string[] {"1234", "5678", ""} },
+                    new object[] { "1234\r\n5678\r\n", new string[] {"1234", "5678", ""} },
                     new object[] { "1234\n5678\nabcdefghijklmnopqrstuvwxyz", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz"} },
                     new object[] { "1234\r\n5678\r\nabcdefghijklmnopqrstuvwxyz", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz"} },
-                    new object[] { "1234\n5678\nabcdefghijklmnopqrstuvwxyz\n", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz"} },
-                    new object[] { "1234\r\n5678\r\nabcdefghijklmnopqrstuvwxyz\r\n", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz"} }
+                    new object[] { "1234\n5678\nabcdefghijklmnopqrstuvwxyz\n", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz", ""} },
+                    new object[] { "1234\r\n5678\r\nabcdefghijklmnopqrstuvwxyz\r\n", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz", ""} }
                 };
             }
         }
@@ -101,6 +102,7 @@ namespace StreamForwarderTests
             TestCapturingAndForwardingHelper(ForwardOptions.WriteLine | ForwardOptions.Capture, inputStr, expectedCaptured, expectedWrites);
         }
 
+        [Flags]
         private enum ForwardOptions
         {
             None = 0x0,
