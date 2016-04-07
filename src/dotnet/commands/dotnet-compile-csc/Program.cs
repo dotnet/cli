@@ -226,6 +226,10 @@ namespace Microsoft.DotNet.Tools.Compiler.Csc
                     : "-debug:full");
             }
 
+            commonArgs.Add((string.IsNullOrEmpty(options.DebugType) || options.DebugType == "portable")
+                ? "-debug:portable"
+                : "-debug:full");
+
             return commonArgs;
         }
 
