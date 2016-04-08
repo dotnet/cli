@@ -96,7 +96,6 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                 var analyzerReferences = new List<AnalyzerReference>();
                 var libraryExport = GetExport(library);
 
-
                 // We need to filter out source references from non-root libraries,
                 // so we rebuild the library export
                 foreach (var reference in libraryExport.CompilationAssemblies)
@@ -105,6 +104,21 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                     {
                         compilationAssemblies.Add(reference);
                     }
+                }
+
+                // TODO: Specialize based on RID
+                IEnumerable<LibraryAsset> runtimeAssets;
+                foreach(var rid in fallbacks)
+                {
+                    runtimeAssets = libraryExport.RuntimeAssemblyGroups.GetRuntimeGroup(rid);
+                    if(runtimeAssets != null)
+                    {
+                        break;
+                    }
+                }
+                if(runtimeAssets == null)
+                {
+                    runtimeAssets = libraryExport.RuntimeAssemblyGroups.GetDefaultAssets();
                 }
 
                 // Source and analyzer references are not transitive
@@ -117,7 +131,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                 yield return LibraryExportBuilder.Create(library)
                     .WithCompilationAssemblies(compilationAssemblies)
                     .WithSourceReferences(sourceReferences)
-                    .WithRuntimeAssemblyGroups(libraryExport.RuntimeAssemblyGroups)
+                    .WithRuntimeAssemblyGroups(/* create group with one item from runtimeAssets */)
                     .WithRuntimeAssets(libraryExport.RuntimeAssets)
                     .WithNativeLibraryGroups(libraryExport.NativeLibraryGroups)
                     .WithEmbedddedResources(libraryExport.EmbeddedResources)
