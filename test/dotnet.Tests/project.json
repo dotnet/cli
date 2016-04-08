@@ -28,6 +28,7 @@
     "../../TestAssets/TestProjects/AppWithDirectAndToolDependency/**/*",
     "../../TestAssets/TestProjects/AppWithDirectDependency/**/*",
     "../../TestAssets/TestProjects/AppWithToolDependency/**/*",
+    "../../TestAssets/TestProjects/DependencyContextFromTool/**/*",
     "../../TestAssets/DesktopTestProjects/AppWithDirectDependencyDesktopAndPortable/**/*"
   ],
   "testRunner": "xunit"
