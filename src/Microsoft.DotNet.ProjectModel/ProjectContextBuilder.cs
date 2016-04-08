@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Resolution;
 using Microsoft.Extensions.Internal;
+using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.ProjectModel
@@ -118,7 +119,7 @@ namespace Microsoft.DotNet.ProjectModel
             Settings = settings;
             return this;
         }
-        
+
         public ProjectContextBuilder AsDesignTime()
         {
             IsDesignTime = true;
@@ -200,13 +201,17 @@ namespace Microsoft.DotNet.ProjectModel
             LibraryRange? platformDependency = null;
             if (mainProject != null)
             {
-                platformDependency = mainProject.Dependencies.FirstOrDefault(d => d.Type.Equals(LibraryDependencyType.Platform));
+                platformDependency = mainProject.Dependencies
+                    .Where(d =>  d.Type.Equals(LibraryDependencyType.Platform))
+                    .Cast<LibraryRange?>()
+                    .FirstOrDefault();
             }
+            bool isPortable = platformDependency != null || TargetFramework.IsDesktop();
 
             LockFileTarget target = null;
             if (lockFileLookup != null)
             {
-                target = SelectTarget(LockFile, platformDependency == null);
+                target = SelectTarget(LockFile, isPortable);
                 if (target != null)
                 {
                     var nugetPackageResolver = new PackageDependencyProvider(PackagesDirectory, frameworkReferenceResolver);
@@ -214,10 +219,21 @@ namespace Microsoft.DotNet.ProjectModel
                     ScanLibraries(target, lockFileLookup, libraries, msbuildProjectResolver, nugetPackageResolver, projectResolver);
                 }
             }
+
+            string runtime;
+            if (TargetFramework.IsDesktop())
+            {
+                runtime = PlatformServices.Default.Runtime.GetRuntimeIdentifier();
+            }
+            else
+            {
+                runtime = target?.RuntimeIdentifier;
+            }
+
             LibraryDescription platformLibrary = null;
             if(platformDependency != null)
             {
-                platformLibrary = libraries[new LibraryKey(platformLibrary.Identity.Name, platformLibrary.Identity.Type)];
+                platformLibrary = libraries[new LibraryKey(platformDependency.Value.Name)];
             }
 
             var referenceAssemblyDependencyResolver = new ReferenceAssemblyDependencyResolver(frameworkReferenceResolver);
@@ -285,7 +301,8 @@ namespace Microsoft.DotNet.ProjectModel
                 mainProject,
                 platformLibrary,
                 TargetFramework,
-                target?.RuntimeIdentifier,
+                isPortable,
+                runtime,
                 PackagesDirectory,
                 libraryManager,
                 LockFile);
@@ -466,9 +483,9 @@ namespace Microsoft.DotNet.ProjectModel
             }
         }
 
-        private LockFileTarget SelectTarget(LockFile lockFile, bool isStandalone)
+        private LockFileTarget SelectTarget(LockFile lockFile, bool isPortable)
         {
-            if (isStandalone)
+            if (!isPortable)
             {
                 foreach (var runtimeIdentifier in RuntimeIdentifiers)
                 {

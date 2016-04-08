@@ -20,6 +20,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
     {
         private readonly string _configuration;
         private readonly string _runtime;
+        private readonly string[] _runtimeFallbacks;
         private readonly ProjectDescription _rootProject;
         private readonly string _buildBasePath;
         private readonly string _solutionRootPath;
@@ -28,6 +29,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             LibraryManager manager,
             string configuration,
             string runtime,
+            string[] runtimeFallbacks,
             string buildBasePath,
             string solutionRootPath)
         {
@@ -39,6 +41,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             LibraryManager = manager;
             _configuration = configuration;
             _runtime = runtime;
+            _runtimeFallbacks = runtimeFallbacks;
             _buildBasePath = buildBasePath;
             _solutionRootPath = solutionRootPath;
             _rootProject = rootProject;
@@ -106,21 +109,6 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                     }
                 }
 
-                // TODO: Specialize based on RID
-                IEnumerable<LibraryAsset> runtimeAssets;
-                foreach(var rid in fallbacks)
-                {
-                    runtimeAssets = libraryExport.RuntimeAssemblyGroups.GetRuntimeGroup(rid);
-                    if(runtimeAssets != null)
-                    {
-                        break;
-                    }
-                }
-                if(runtimeAssets == null)
-                {
-                    runtimeAssets = libraryExport.RuntimeAssemblyGroups.GetDefaultAssets();
-                }
-
                 // Source and analyzer references are not transitive
                 if (library.Parents.Contains(_rootProject))
                 {
@@ -128,17 +116,50 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                     analyzerReferences.AddRange(libraryExport.AnalyzerReferences);
                 }
 
-                yield return LibraryExportBuilder.Create(library)
+                var builder = LibraryExportBuilder.Create(library);
+                if (_runtime != null && _runtimeFallbacks != null)
+                {
+                    builder.WithRuntimeAssemblyGroups(
+                        new[] {TrimAssetGroups(libraryExport.RuntimeAssemblyGroups, _runtimeFallbacks)}
+                        );
+                    builder.WithNativeLibraryGroups(
+                        new[] {TrimAssetGroups(libraryExport.NativeLibraryGroups, _runtimeFallbacks)}
+                        );
+                }
+                else
+                {
+                    builder.WithRuntimeAssemblyGroups(libraryExport.RuntimeAssemblyGroups);
+                    builder.WithNativeLibraryGroups(libraryExport.NativeLibraryGroups);
+                }
+
+                yield return builder
                     .WithCompilationAssemblies(compilationAssemblies)
                     .WithSourceReferences(sourceReferences)
-                    .WithRuntimeAssemblyGroups(/* create group with one item from runtimeAssets */)
                     .WithRuntimeAssets(libraryExport.RuntimeAssets)
-                    .WithNativeLibraryGroups(libraryExport.NativeLibraryGroups)
                     .WithEmbedddedResources(libraryExport.EmbeddedResources)
                     .WithAnalyzerReference(analyzerReferences)
                     .WithResourceAssemblies(libraryExport.ResourceAssemblies)
                     .Build();
             }
+        }
+
+        private LibraryAssetGroup TrimAssetGroups(IEnumerable<LibraryAssetGroup> runtimeAssemblyGroups,
+            string[] runtimeFallbacks)
+        {
+            LibraryAssetGroup runtimeAssets = null;
+            foreach (var rid in runtimeFallbacks)
+            {
+                runtimeAssets = runtimeAssemblyGroups.GetRuntimeGroup(rid);
+                if (runtimeAssets != null)
+                {
+                    break;
+                }
+            }
+            if (runtimeAssets == null)
+            {
+                runtimeAssets = runtimeAssemblyGroups.GetDefaultGroup();
+            }
+            return runtimeAssets;
         }
 
         /// <summary>
