@@ -223,7 +223,15 @@ namespace Microsoft.DotNet.ProjectModel
             string runtime;
             if (TargetFramework.IsDesktop())
             {
-                runtime = RuntimeIdentifiers.FirstOrDefault();
+                var legacyRuntime = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
+                if (RuntimeIdentifiers.Contains(legacyRuntime))
+                {
+                    runtime = legacyRuntime;
+                }
+                else
+                {
+                    runtime = RuntimeIdentifiers.FirstOrDefault();
+                }
             }
             else
             {
