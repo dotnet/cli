@@ -159,7 +159,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             {
                 runtimeAssets = runtimeAssemblyGroups.GetDefaultGroup();
             }
-            return runtimeAssets;
+            return new LibraryAssetGroup(runtimeAssets.Assets);
         }
 
         /// <summary>

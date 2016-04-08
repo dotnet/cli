@@ -223,7 +223,7 @@ namespace Microsoft.DotNet.ProjectModel
             string runtime;
             if (TargetFramework.IsDesktop())
             {
-                runtime = PlatformServices.Default.Runtime.GetRuntimeIdentifier();
+                runtime = RuntimeIdentifiers.FirstOrDefault();
             }
             else
             {
