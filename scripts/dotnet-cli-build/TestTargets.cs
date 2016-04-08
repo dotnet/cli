@@ -233,7 +233,6 @@ namespace Microsoft.DotNet.Cli.Build
                     Rmdir(Path.Combine(Dirs.NuGetPackages, ".tools", packageProject.Name));
                 }
             }
-
             return c.Success();
         }
 
