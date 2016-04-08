@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.Cli.Build
             return c.Success();
         }
 
-        [Target(nameof(PrepareTargets.Init), nameof(PackageCoreHost), nameof(CompileStage1), nameof(CompileStage2))]
+        [Target(nameof(PrepareTargets.Init), nameof(PackagePkgProjects), nameof(CompileStage1), nameof(CompileStage2))]
         public static BuildTargetResult Compile(BuildTargetContext c)
         {
             return c.Success();
@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.Cli.Build
         private static string HostPolicyVer = "1.0.1";
         private static string HostFxrVer = "1.0.1";
 
-        [Target]
+        [Target(nameof(PrepareTargets.Init))]
         public static BuildTargetResult CompileCoreHost(BuildTargetContext c)
         {
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
@@ -144,12 +144,8 @@ namespace Microsoft.DotNet.Cli.Build
         }
 
         [Target(nameof(CompileCoreHost))]
-        public static BuildTargetResult PackageCoreHost(BuildTargetContext c)
+        public static BuildTargetResult PackagePkgProjects(BuildTargetContext c)
         {
-            if (!string.Equals(Environment.GetEnvironmentVariable("BUILD_COREHOST_PACKAGES"), "1"))
-            {
-                return c.Success();
-            }
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
             var versionTag = buildVersion.ReleaseSuffix;
             var buildMajor = buildVersion.CommitCountString;
@@ -157,11 +153,11 @@ namespace Microsoft.DotNet.Cli.Build
 
             var version = buildVersion.NuGetVersion;
             var content = $@"{c.BuildContext["CommitHash"]}{Environment.NewLine}{version}{Environment.NewLine}";
-            File.WriteAllText(Path.Combine(c.BuildContext.BuildDirectory, "src", "corehost", "packaging", "version.txt"), content);
-            string corehostSrcDir = Path.Combine(c.BuildContext.BuildDirectory, "src", "corehost");
+            var pkgDir = Path.Combine(c.BuildContext.BuildDirectory, "pkg");
+            File.WriteAllText(Path.Combine(pkgDir, "version.txt"), content);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                Command.Create(Path.Combine(corehostSrcDir, "packaging", "pack.cmd"))
+                Command.Create(Path.Combine(pkgDir, "pack.cmd"))
                     // Workaround to arg escaping adding backslashes for arguments to .cmd scripts.
                     .Environment("__WorkaroundCliCoreHostBuildArch", arch)
                     .Environment("__WorkaroundCliCoreHostBinDir", Dirs.Corehost)
@@ -177,7 +173,7 @@ namespace Microsoft.DotNet.Cli.Build
             }
             else
             {
-                Exec(Path.Combine(corehostSrcDir, "packaging", "pack.sh"),
+                Exec(Path.Combine(pkgDir, "pack.sh"),
                     "--arch",
                     "x64",
                     "--hostbindir",
@@ -194,11 +190,13 @@ namespace Microsoft.DotNet.Cli.Build
                     versionTag);
             }
             int runtimeCount = 0;
-            foreach (var file in Directory.GetFiles(Path.Combine(corehostSrcDir, "packaging", "bin", "packages"), "*.nupkg"))
+            foreach (var file in Directory.GetFiles(Path.Combine(pkgDir, "bin", "packages"), "*.nupkg"))
             {
                 var fileName = Path.GetFileName(file);
-                File.Copy(file, Path.Combine(Dirs.Corehost, fileName));
+                File.Copy(file, Path.Combine(Dirs.Corehost, fileName), true);
                 runtimeCount += (fileName.StartsWith("runtime.") ? 1 : 0);
+
+                Console.WriteLine($"Copying package {fileName} to artifacts directory {Dirs.Corehost}.");
             }
             if (runtimeCount < 3)
             {
@@ -246,6 +244,9 @@ namespace Microsoft.DotNet.Cli.Build
                 outputDir: Dirs.Stage1);
 
             CleanOutputDir(Path.Combine(Dirs.Stage1, "sdk"));
+            FS.CopyRecursive(Dirs.Stage1, Dirs.Stage1Symbols);
+
+            RemovePdbsFromDir(Path.Combine(Dirs.Stage1, "sdk"));
 
             return result;
         }
@@ -296,13 +297,23 @@ namespace Microsoft.DotNet.Cli.Build
             }
 
             CleanOutputDir(Path.Combine(Dirs.Stage2, "sdk"));
+            FS.CopyRecursive(Dirs.Stage2, Dirs.Stage2Symbols);
+
+            RemovePdbsFromDir(Path.Combine(Dirs.Stage2, "sdk"));
 
             return c.Success();
         }
 
         private static void CleanOutputDir(string directory)
         {
-            FS.RmFilesInDirRecursive(directory, "vbc.exe");
+            foreach (var file in FilesToClean)
+            {
+                FS.RmFilesInDirRecursive(directory, file);
+            }
+        }
+
+        private static void RemovePdbsFromDir(string directory)
+        {
             FS.RmFilesInDirRecursive(directory, "*.pdb");
         }
 
