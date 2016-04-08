@@ -44,7 +44,7 @@ namespace Microsoft.Extensions.DependencyModel
 
         internal virtual bool IsEntryAssembly(Assembly assembly)
         {
-            return assembly.GetName() == Assembly.GetEntryAssembly()?.GetName();
+            return assembly.GetName().Equals(Assembly.GetEntryAssembly()?.GetName());
         }
 
         internal virtual Stream GetResourceStream(Assembly assembly, string name)
