@@ -32,7 +32,7 @@ namespace Microsoft.DotNet.ProjectModel
         private string PackagesDirectory { get; set; }
 
         private string ReferenceAssembliesPath { get; set; }
-        
+
         private bool IsDesignTime { get; set; }
 
         private Func<string, Project> ProjectResolver { get; set; }
@@ -208,6 +208,16 @@ namespace Microsoft.DotNet.ProjectModel
                     ScanLibraries(target, lockFileLookup, libraries, msbuildProjectResolver, nugetPackageResolver, projectResolver);
                 }
             }
+            LibraryDescription platformLibrary = null;
+            if (mainProject != null)
+            {
+                var platformDependency = mainProject.Dependencies.FirstOrDefault(d => d.Type.Equals(LibraryDependencyType.Platform));
+                if (platformDependency != null)
+                {
+                    libraries.TryGetValue(new LibraryKey(platformDependency.Name), out platformLibrary);
+                }
+            }
+
 
             var referenceAssemblyDependencyResolver = new ReferenceAssemblyDependencyResolver(frameworkReferenceResolver);
             bool requiresFrameworkAssemblies;
@@ -272,6 +282,7 @@ namespace Microsoft.DotNet.ProjectModel
             return new ProjectContext(
                 GlobalSettings,
                 mainProject,
+                platformLibrary,
                 TargetFramework,
                 target?.RuntimeIdentifier,
                 PackagesDirectory,

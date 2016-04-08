@@ -128,7 +128,7 @@ namespace Microsoft.DotNet.Tools.Publish
             // Use a library exporter to collect publish assets
             var exporter = context.CreateExporter(configuration);
 
-            var isPortable = string.IsNullOrEmpty(context.RuntimeIdentifier);
+            var isPortable = context.PlatformLibrary != null;
 
             // Collect all exports and organize them
             var packageExports = exporter.GetAllExports()
