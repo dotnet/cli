@@ -7,7 +7,7 @@ This document outlines the dependencies needed to run .NET Core CLI tools. Most 
 On Windows, the only dependency is the VC++ Redistributable. Depending on the version of Windows you are running on, the versions are changing.
 
 > **Note:** these dependencies are chained in the installer, you only need to install them manually if you are using
-> the installer script (`install.sh` or `install.ps1`). 
+> the installer script (`dotnet-install.sh` or `dotnet-install.ps1`). 
 
 * Windows 10
     * [Visual C++ Redistributable for Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145)
