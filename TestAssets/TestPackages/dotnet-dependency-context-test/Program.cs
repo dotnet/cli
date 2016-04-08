@@ -8,6 +8,13 @@ namespace Microsoft.DotNet.Tools.DependencyInvoker
     {
         public static int Main(string[] args)
         {
+            if(args.Length > 0 && args[0] == "--debug")
+            {
+                Console.WriteLine("Waiting for Debugger to attach, press ENTER to continue");
+                Console.WriteLine($"Process ID: {System.Diagnostics.Process.GetCurrentProcess().Id}");
+                Console.ReadLine();
+            }
+
             if(DependencyContext.Default != null)
             {
                 Console.WriteLine("DependencyContext.Default is set!");
@@ -27,6 +34,9 @@ namespace Microsoft.DotNet.Tools.DependencyInvoker
                 Console.WriteLine("DependencyContext.Default.RuntimeGraph is empty!");
                 return 1;
             }
+
+            Console.WriteLine("Tests succeeded!");
+            return 0;
         }
     }
 }
