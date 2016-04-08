@@ -32,9 +32,21 @@ pal::string_t fx_muxer_t::resolve_fx_dir(const pal::string_t& muxer_dir, runtime
     append_path(&fx_dir, _X("shared"));
     append_path(&fx_dir, fx_name.c_str());
 
-    // If production and no roll forward use given version.
-    // For prerelease, we will always roll forward.
-    if (!specified.is_prerelease() && !patch_roll_fwd)
+    bool do_roll_forward = false;
+    if (!specified.is_prerelease())
+    {
+        // If production and no roll forward use given version.
+        do_roll_forward = patch_roll_fwd;
+    }
+    else
+    {
+        // Prerelease, but roll forward only if version doesn't exist.
+        pal::string_t ver_dir = fx_dir;
+        append_path(&ver_dir, fx_ver.c_str());
+        do_roll_forward = !pal::directory_exists(ver_dir);
+    }
+
+    if (!do_roll_forward)
     {
         trace::verbose(_X("Did not roll forward because patch_roll_fwd=%d, chose [%s]"), patch_roll_fwd, fx_ver.c_str());
         append_path(&fx_dir, fx_ver.c_str());
@@ -45,28 +57,30 @@ pal::string_t fx_muxer_t::resolve_fx_dir(const pal::string_t& muxer_dir, runtime
 
         std::vector<pal::string_t> list;
         pal::readdir(fx_dir, &list);
-        fx_ver_t max_specified = specified;
+        fx_ver_t most_compatible = specified;
         for (const auto& version : list)
         {
             trace::verbose(_X("Inspecting version... [%s]"), version.c_str());
             fx_ver_t ver(-1, -1, -1);
             if (!specified.is_prerelease() && fx_ver_t::parse(version, &ver, true) && // true -- only prod. prevents roll forward to prerelease.
-                ver.get_major() == max_specified.get_major() &&
-                ver.get_minor() == max_specified.get_minor())
+                ver.get_major() == specified.get_major() &&
+                ver.get_minor() == specified.get_minor())
             {
-                max_specified = std::max(ver, max_specified);
+                // Pick the greatest production that differs only in patch.
+                most_compatible = std::max(ver, most_compatible);
             }
             if (specified.is_prerelease() && fx_ver_t::parse(version, &ver, false) && // false -- implies both production and prerelease.
                 ver.is_prerelease() && // prevent roll forward to production.
-                ver.get_major() == max_specified.get_major() &&
-                ver.get_minor() == max_specified.get_minor() &&
-                ver.get_patch() == max_specified.get_patch())
+                ver.get_major() == specified.get_major() &&
+                ver.get_minor() == specified.get_minor() &&
+                ver > specified)
             {
-                max_specified = std::max(ver, max_specified);
+                // Pick the smallest prerelease that is greater than specified.
+                most_compatible = (most_compatible == specified) ? ver : std::min(ver, most_compatible);
             }
         }
-        pal::string_t max_specified_str = max_specified.as_str();
-        append_path(&fx_dir, max_specified_str.c_str());
+        pal::string_t most_compatible_str = most_compatible.as_str();
+        append_path(&fx_dir, most_compatible_str.c_str());
     }
 
     trace::verbose(_X("Chose FX version [%s]"), fx_dir.c_str());
@@ -248,6 +262,7 @@ int fx_muxer_t::parse_args_and_execute(const pal::string_t& own_dir, int argoff,
     if (exec_mode)
     {
         known_opts.push_back(_X("--depsfile"));
+        known_opts.push_back(_X("--runtimeconfig"));
     }
 
     // Parse the known muxer arguments if any.
@@ -304,15 +319,28 @@ int fx_muxer_t::parse_args_and_execute(const pal::string_t& own_dir, int argoff,
 
     pal::string_t opts_deps_file = _X("--depsfile");
     pal::string_t opts_probe_path = _X("--additionalprobingpath");
+    pal::string_t opts_runtime_config = _X("--runtimeconfig");
+
     pal::string_t deps_file = get_last_known_arg(opts, opts_deps_file, _X(""));
+    pal::string_t runtime_config = get_last_known_arg(opts, opts_runtime_config, _X(""));
     std::vector<pal::string_t> probe_paths = opts.count(opts_probe_path) ? opts[opts_probe_path] : std::vector<pal::string_t>();
 
     trace::verbose(_X("Current argv is %s"), app_candidate.c_str());
 
     pal::string_t app_or_deps = deps_file.empty() ? app_candidate : deps_file;
-    pal::string_t no_json = app_candidate;
-    pal::string_t dev_config_file;
-    auto config_file = get_runtime_config_from_file(no_json, &dev_config_file);
+    pal::string_t config_file, dev_config_file;
+
+    if(runtime_config.empty())
+    {
+        trace::verbose(_X("Finding runtimeconfig.json from [%s]"), app_candidate.c_str());
+        get_runtime_config_paths_from_app(app_candidate, &config_file, &dev_config_file);   
+    }
+    else
+    {
+        trace::verbose(_X("Finding runtimeconfig.json from [%s]"), runtime_config.c_str());
+        get_runtime_config_paths_from_arg(runtime_config, &config_file, &dev_config_file);   
+    }
+
     runtime_config_t config(config_file, dev_config_file);
     for (const auto& path : config.get_probe_paths())
     {
