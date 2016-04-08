@@ -97,6 +97,20 @@ namespace Microsoft.DotNet.Cli.Build
                 var destFile = file.Replace(Dirs.Stage2, sharedHostRoot);
                 File.Copy(file, destFile, true);
             }
+            
+            string versionedFxrDir = Path.Combine(sharedHostRoot, "host", "fxr", c.BuildContext.Get<BuildVersion>("BuildVersion").NuGetVersion);
+            Directory.CreateDirectory(versionedFxrDir);
+            foreach (var file in Directory.GetFiles(Dirs.Stage2, "*", SearchOption.TopDirectoryOnly))
+            {
+                if (!Path.GetFileName(file).StartsWith("hostfxr"))
+                {
+                    continue;
+                }
+                
+                var destFile = file.Replace(Dirs.Stage2, versionedFxrDir);
+                File.Copy(file, destFile, true);
+            }
+            
             FixPermissions(sharedHostRoot);
 
             c.BuildContext["SharedHostPublishRoot"] = sharedHostRoot;
