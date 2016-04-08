@@ -119,12 +119,8 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                 var builder = LibraryExportBuilder.Create(library);
                 if (_runtime != null && _runtimeFallbacks != null)
                 {
-                    builder.WithRuntimeAssemblyGroups(
-                        new[] {TrimAssetGroups(libraryExport.RuntimeAssemblyGroups, _runtimeFallbacks)}
-                        );
-                    builder.WithNativeLibraryGroups(
-                        new[] {TrimAssetGroups(libraryExport.NativeLibraryGroups, _runtimeFallbacks)}
-                        );
+                    builder.WithRuntimeAssemblyGroups(TrimAssetGroups(libraryExport.RuntimeAssemblyGroups, _runtimeFallbacks));
+                    builder.WithNativeLibraryGroups(TrimAssetGroups(libraryExport.NativeLibraryGroups, _runtimeFallbacks));
                 }
                 else
                 {
@@ -143,23 +139,25 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             }
         }
 
-        private LibraryAssetGroup TrimAssetGroups(IEnumerable<LibraryAssetGroup> runtimeAssemblyGroups,
+        private IEnumerable<LibraryAssetGroup> TrimAssetGroups(IEnumerable<LibraryAssetGroup> runtimeAssemblyGroups,
             string[] runtimeFallbacks)
         {
-            LibraryAssetGroup runtimeAssets = null;
+            LibraryAssetGroup runtimeAssets;
             foreach (var rid in runtimeFallbacks)
             {
                 runtimeAssets = runtimeAssemblyGroups.GetRuntimeGroup(rid);
                 if (runtimeAssets != null)
                 {
-                    break;
+                    yield return new LibraryAssetGroup(runtimeAssets.Assets);
+                    yield break;
                 }
             }
-            if (runtimeAssets == null)
+
+            runtimeAssets = runtimeAssemblyGroups.GetDefaultGroup();
+            if (runtimeAssets != null)
             {
-                runtimeAssets = runtimeAssemblyGroups.GetDefaultGroup();
+                yield return runtimeAssets;
             }
-            return new LibraryAssetGroup(runtimeAssets.Assets);
         }
 
         /// <summary>
