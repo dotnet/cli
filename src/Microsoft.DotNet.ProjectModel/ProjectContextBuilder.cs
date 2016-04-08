@@ -197,10 +197,16 @@ namespace Microsoft.DotNet.ProjectModel
                 libraries.Add(new LibraryKey(mainProject.Identity.Name), mainProject);
             }
 
+            LibraryRange? platformDependency = null;
+            if (mainProject != null)
+            {
+                platformDependency = mainProject.Dependencies.FirstOrDefault(d => d.Type.Equals(LibraryDependencyType.Platform));
+            }
+
             LockFileTarget target = null;
             if (lockFileLookup != null)
             {
-                target = SelectTarget(LockFile);
+                target = SelectTarget(LockFile, platformDependency == null);
                 if (target != null)
                 {
                     var nugetPackageResolver = new PackageDependencyProvider(PackagesDirectory, frameworkReferenceResolver);
@@ -209,15 +215,10 @@ namespace Microsoft.DotNet.ProjectModel
                 }
             }
             LibraryDescription platformLibrary = null;
-            if (mainProject != null)
+            if(platformDependency != null)
             {
-                var platformDependency = mainProject.Dependencies.FirstOrDefault(d => d.Type.Equals(LibraryDependencyType.Platform));
-                if (platformDependency != null)
-                {
-                    libraries.TryGetValue(new LibraryKey(platformDependency.Name), out platformLibrary);
-                }
+                platformLibrary = libraries[new LibraryKey(platformLibrary.Identity.Name, platformLibrary.Identity.Type)];
             }
-
 
             var referenceAssemblyDependencyResolver = new ReferenceAssemblyDependencyResolver(frameworkReferenceResolver);
             bool requiresFrameworkAssemblies;
@@ -465,15 +466,18 @@ namespace Microsoft.DotNet.ProjectModel
             }
         }
 
-        private LockFileTarget SelectTarget(LockFile lockFile)
+        private LockFileTarget SelectTarget(LockFile lockFile, bool isStandalone)
         {
-            foreach (var runtimeIdentifier in RuntimeIdentifiers)
+            if (isStandalone)
             {
-                foreach (var scanTarget in lockFile.Targets)
+                foreach (var runtimeIdentifier in RuntimeIdentifiers)
                 {
-                    if (Equals(scanTarget.TargetFramework, TargetFramework) && string.Equals(scanTarget.RuntimeIdentifier, runtimeIdentifier, StringComparison.Ordinal))
+                    foreach (var scanTarget in lockFile.Targets)
                     {
-                        return scanTarget;
+                        if (Equals(scanTarget.TargetFramework, TargetFramework) && string.Equals(scanTarget.RuntimeIdentifier, runtimeIdentifier, StringComparison.Ordinal))
+                        {
+                            return scanTarget;
+                        }
                     }
                 }
             }
