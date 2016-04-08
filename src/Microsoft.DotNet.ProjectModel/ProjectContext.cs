@@ -20,6 +20,8 @@ namespace Microsoft.DotNet.ProjectModel
 
         public NuGetFramework TargetFramework { get; }
 
+        public LibraryDescription PlatformLibrary { get; }
+
         public string RuntimeIdentifier { get; }
 
         public Project ProjectFile => RootProject?.Project;
@@ -37,6 +39,7 @@ namespace Microsoft.DotNet.ProjectModel
         internal ProjectContext(
             GlobalSettings globalSettings,
             ProjectDescription rootProject,
+            LibraryDescription platformLibrary,
             NuGetFramework targetFramework,
             string runtimeIdentifier,
             string packagesDirectory,
@@ -45,6 +48,7 @@ namespace Microsoft.DotNet.ProjectModel
         {
             GlobalSettings = globalSettings;
             RootProject = rootProject;
+            PlatformLibrary = platformLibrary;
             TargetFramework = targetFramework;
             RuntimeIdentifier = runtimeIdentifier;
             PackagesDirectory = packagesDirectory;
@@ -146,8 +150,7 @@ namespace Microsoft.DotNet.ProjectModel
                 return this;
             }
 
-            var standalone = !RootProject.Dependencies
-                .Any(d => d.Type.Equals(LibraryDependencyType.Platform));
+            var standalone = PlatformLibrary == null;
 
             var context = CreateBuilder(ProjectFile.ProjectFilePath, TargetFramework)
                 .WithRuntimeIdentifiers(standalone ? runtimeIdentifiers : Enumerable.Empty<string>())
