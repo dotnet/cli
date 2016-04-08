@@ -85,18 +85,36 @@ namespace Microsoft.DotNet.Cli.Build
         public static BuildTargetResult CopySharedHostLayout(BuildTargetContext c)
         {
             var sharedHostRoot = Path.Combine(Dirs.Output, "obj", "sharedHost");
+            string versionedFxrDir = Path.Combine(sharedHostRoot, "host", "fxr", c.BuildContext.Get<BuildVersion>("BuildVersion").NuGetVersion);
+            
             if (Directory.Exists(sharedHostRoot))
             {
                 Utils.DeleteDirectory(sharedHostRoot);
             }
+            
+            if (Directory.Exists(versionedFxrDir))
+            {
+                Utils.DeleteDirectory(versionedFxrDir);
+            }
 
             Directory.CreateDirectory(sharedHostRoot);
+            Directory.CreateDirectory(versionedFxrDir);
 
             foreach (var file in Directory.GetFiles(Dirs.Stage2, "*", SearchOption.TopDirectoryOnly))
             {
-                var destFile = file.Replace(Dirs.Stage2, sharedHostRoot);
+                string destFile;
+                if (Path.GetFileName(file).Contains("hostfxr"))
+                {
+                    destFile = file.Replace(Dirs.Stage2, versionedFxrDir);
+                }
+                else
+                {
+                    destFile = file.Replace(Dirs.Stage2, sharedHostRoot);
+                }
+                
                 File.Copy(file, destFile, true);
             }
+            
             FixPermissions(sharedHostRoot);
 
             c.BuildContext["SharedHostPublishRoot"] = sharedHostRoot;
