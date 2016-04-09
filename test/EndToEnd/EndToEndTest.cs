@@ -8,11 +8,13 @@ using System.Runtime.InteropServices;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Microsoft.Extensions.PlatformAbstractions;
 using Xunit;
+using System.Diagnostics;
 
 namespace Microsoft.DotNet.Tests.EndToEnd
 {
     public class EndToEndTest : TestBase
     {
+        private static readonly string NetCoreAppTfm = "netcoreapp1.0";
         private static readonly string s_expectedOutput = "Hello World!" + Environment.NewLine;
         private static readonly string s_testdirName = "e2etestroot";
         private static readonly string s_outputdirName = "test space/bin";
@@ -42,20 +44,20 @@ namespace Microsoft.DotNet.Tests.EndToEnd
         [Fact]
         public void TestDotnetBuild()
         {
-            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: DefaultFramework);
+            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: NetCoreAppTfm);
 
             buildCommand.Execute().Should().Pass();
 
-            TestOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
+            TestOutputExecutable(OutputDirectory, buildCommand.GetPortableOutputName(), s_expectedOutput);
         }
 
         [Fact]
         public void TestDotnetIncrementalBuild()
         {
             // first build
-            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: DefaultFramework);
+            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: NetCoreAppTfm);
             buildCommand.Execute().Should().Pass();
-            TestOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
+            TestOutputExecutable(OutputDirectory, buildCommand.GetPortableOutputName(), s_expectedOutput);
 
             var binariesOutputDirectory = GetCompilationOutputPath(OutputDirectory, false);
             var latestWriteTimeFirstBuild = GetLastWriteTimeUtcOfDirectoryFiles(
@@ -63,7 +65,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 
             // second build; should get skipped (incremental because no inputs changed)
             buildCommand.Execute().Should().Pass();
-            TestOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
+            TestOutputExecutable(OutputDirectory, buildCommand.GetPortableOutputName(), s_expectedOutput);
 
             var latestWriteTimeUtcSecondBuild = GetLastWriteTimeUtcOfDirectoryFiles(
                 binariesOutputDirectory);
@@ -73,14 +75,14 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 
             // third build; should get compiled because the source file got touched
             buildCommand.Execute().Should().Pass();
-            TestOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
+            TestOutputExecutable(OutputDirectory, buildCommand.GetPortableOutputName(), s_expectedOutput);
 
             var latestWriteTimeUtcThirdBuild = GetLastWriteTimeUtcOfDirectoryFiles(
                 binariesOutputDirectory);
             Assert.NotEqual(latestWriteTimeUtcSecondBuild, latestWriteTimeUtcThirdBuild);
         }
 
-        [Fact]
+        [Fact(Skip = "Native compilation isn't shipping in 1.0 and we're moving it out anyway")]
         public void TestDotnetBuildNativeRyuJit()
         {
             if (!IsNativeCompilationSupported())
@@ -88,14 +90,14 @@ namespace Microsoft.DotNet.Tests.EndToEnd
                 return;
             }
 
-            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, framework: DefaultFramework);
+            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, framework: NetCoreAppTfm);
 
             buildCommand.Execute().Should().Pass();
 
             TestNativeOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
         }
 
-        [Fact]
+        [Fact(Skip = "Native compilation isn't shipping in 1.0 and we're moving it out anyway")]
         public void TestDotnetBuildNativeCpp()
         {
             if (!IsNativeCompilationSupported())
@@ -103,14 +105,14 @@ namespace Microsoft.DotNet.Tests.EndToEnd
                 return;
             }
 
-            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, nativeCppMode: true, framework: DefaultFramework);
+            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, nativeCppMode: true, framework: NetCoreAppTfm);
 
             buildCommand.Execute().Should().Pass();
 
             TestNativeOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
         }
 
-        [Fact]
+        [Fact(Skip = "Native compilation isn't shipping in 1.0 and we're moving it out anyway")]
         public void TestDotnetCompileNativeCppIncremental()
         {
             if (!IsNativeCompilationSupported())
@@ -119,7 +121,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             }
 
             // first build
-            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, nativeCppMode: true, framework: DefaultFramework);
+            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, nativeCppMode: true, framework: NetCoreAppTfm);
             var binariesOutputDirectory = GetCompilationOutputPath(OutputDirectory, false);
 
             buildCommand.Execute().Should().Pass();
@@ -140,6 +142,10 @@ namespace Microsoft.DotNet.Tests.EndToEnd
         [Fact]
         public void TestDotnetRun()
         {
+            var restoreCommand = new TestCommand("dotnet");
+            restoreCommand.Execute($"restore {TestProject}")
+                .Should()
+                .Pass();
             var runCommand = new RunCommand(TestProject);
 
             runCommand.Execute()
@@ -163,7 +169,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             var publishCommand = new PublishCommand(TestProject, output: OutputDirectory);
             publishCommand.Execute().Should().Pass();
 
-            TestExecutable(OutputDirectory, publishCommand.GetOutputExecutable(), s_expectedOutput);    
+            TestExecutable(OutputDirectory, publishCommand.GetPortableOutputName(), s_expectedOutput);    
         }
 
         [Fact]
@@ -205,6 +211,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             catch(Exception) {}
 
             Directory.CreateDirectory(RestoredTestProjectDirectory);
+            WriteNuGetConfig(RestoredTestProjectDirectory);
 
             var currentDirectory = Directory.GetCurrentDirectory();
             Directory.SetCurrentDirectory(RestoredTestProjectDirectory);
@@ -239,6 +246,24 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             }
 
             return isSupported;
+        }
+
+        // Todo: this is a hack until corefx is on nuget.org remove this After RC 2 Release
+        private static void WriteNuGetConfig(string directory)
+        {
+            var contents = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<configuration>
+<packageSources>
+<!--To inherit the global NuGet package sources remove the <clear/> line below -->
+<clear />
+<add key=""dotnet-core"" value=""https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"" />
+<add key=""api.nuget.org"" value=""https://api.nuget.org/v3/index.json"" />
+</packageSources>
+</configuration>";
+
+            var path = Path.Combine(directory, "NuGet.config");
+
+            File.WriteAllText(path, contents);
         }
 
         private static DateTime GetLastWriteTimeUtcOfDirectoryFiles(string outputDirectory)

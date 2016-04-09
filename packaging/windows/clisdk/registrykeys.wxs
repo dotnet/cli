@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?include "Variables.wxi" ?>
+  <Fragment>
+    <ComponentGroup Id="AuthoredRegistryKeys">
+      <!-- Include the 64-bit registry keys only in the 64-bit installer -->
+      <?if $(var.Platform) = x64?>
+      <Component Id="SetupRegistry_x64" Directory="TARGETDIR" Win64="yes">
+        <RegistryKey Root="HKLM" Key="SOFTWARE\dotnet\Setup">
+          <RegistryValue Action="write" Name="Install" Type="integer" Value="1" KeyPath="yes"/>
+          <RegistryValue Action="write" Name="InstallDir" Type="string" Value="[DOTNETHOME]" />
+          <RegistryValue Action="write" Name="Version" Type="string" Value="$(var.Dotnet_ProductVersion)" />
+          <RegistryValue Action="write" Name="BuildType" Type="string" Value="$(var.BuildType)" />
+        </RegistryKey>
+      </Component>
+      <?endif?>
+
+      <!-- Always install the 32-bit registry keys and env vars -->
+      <Component Id="SetupRegistry_x86" Directory="TARGETDIR" Win64="no">
+        <RegistryKey Root="HKLM" Key="SOFTWARE\dotnet\Setup">
+          <RegistryValue Action="write" Name="Install" Type="integer" Value="1" KeyPath="yes"/>
+          <RegistryValue Action="write" Name="InstallDir" Type="string" Value="[DOTNETHOME]" />
+          <RegistryValue Action="write" Name="Version" Type="string" Value="$(var.Dotnet_ProductVersion)" />
+          <RegistryValue Action="write" Name="BuildType" Type="string" Value="$(var.BuildType)" />
+        </RegistryKey>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

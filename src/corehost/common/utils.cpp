@@ -4,6 +4,22 @@
 #include "utils.h"
 #include "trace.h"
 
+bool library_exists_in_dir(const pal::string_t& lib_dir, const pal::string_t& lib_name, pal::string_t* p_lib_path)
+{
+    pal::string_t lib_path = lib_dir;
+    append_path(&lib_path, lib_name.c_str());
+
+    if (!pal::file_exists(lib_path))
+    {
+        return false;
+    }
+    if (p_lib_path)
+    {
+        *p_lib_path = lib_path;
+    }
+    return true;
+}
+
 bool coreclr_exists_in_dir(const pal::string_t& candidate)
 {
     pal::string_t test(candidate);
@@ -44,15 +60,21 @@ void append_path(pal::string_t* path1, const pal::char_t* path2)
 
 pal::string_t get_executable(const pal::string_t& filename)
 {
-    pal::string_t result(filename);
-
-    if (ends_with(result, _X(".exe"), false))
+    pal::string_t exe_suffix = pal::exe_suffix();
+    if (exe_suffix.empty())
     {
-        // We need to strip off the old extension
-        result.erase(result.size() - 4);
+        return filename;
     }
 
-    return result;
+    if (ends_with(filename, exe_suffix, false))
+    {
+        // We need to strip off the old extension
+        pal::string_t result(filename);
+        result.erase(result.size() - exe_suffix.size());
+        return result;
+    }
+
+    return filename;
 }
 
 pal::string_t strip_file_ext(const pal::string_t& path)
@@ -61,7 +83,13 @@ pal::string_t strip_file_ext(const pal::string_t& path)
     {
         return path;
     }
-    return path.substr(0, path.rfind(_X('.')));
+    size_t sep_pos = path.rfind(_X("/\\"));
+    size_t dot_pos = path.rfind(_X('.'));
+    if (sep_pos != pal::string_t::npos && sep_pos > dot_pos)
+    {
+	    return path;
+    }
+    return path.substr(0, dot_pos);
 }
 
 pal::string_t get_filename_without_ext(const pal::string_t& path)
@@ -74,7 +102,7 @@ pal::string_t get_filename_without_ext(const pal::string_t& path)
     size_t name_pos = path.find_last_of(_X("/\\"));
     size_t dot_pos = path.rfind(_X('.'));
     size_t start_pos = (name_pos == pal::string_t::npos) ? 0 : (name_pos + 1);
-    size_t count = (dot_pos == pal::string_t::npos) ? pal::string_t::npos : (dot_pos - start_pos);
+    size_t count = (dot_pos == pal::string_t::npos || dot_pos < start_pos) ? pal::string_t::npos : (dot_pos - start_pos);
     return path.substr(start_pos, count);
 }
 
@@ -121,23 +149,41 @@ const pal::char_t* get_arch()
     return _X("x64");
 #elif _TARGET_X86_
     return _X("x86");
+#elif _TARGET_ARM_
+    return _X("arm");
 #else
 #error "Unknown target"
 #endif
+}
+
+pal::string_t get_last_known_arg(
+    const std::unordered_map<pal::string_t, std::vector<pal::string_t>>& opts,
+    const pal::string_t& opt_key,
+    const pal::string_t& de_fault)
+{
+    if (opts.count(opt_key))
+    {
+        const auto& val = opts.find(opt_key)->second;
+        return val[val.size() - 1];
+    }
+    return de_fault;
 }
 
 bool parse_known_args(
     const int argc,
     const pal::char_t* argv[],
     const std::vector<pal::string_t>& known_opts,
-    std::unordered_map<pal::string_t, pal::string_t>* opts,
+    // Although multimap would provide this functionality the order of kv, values are
+    // not preserved in C++ < C++0x
+    std::unordered_map<pal::string_t, std::vector<pal::string_t>>* opts,
     int* num_args)
 {
     int arg_i = *num_args;
     while (arg_i < argc)
     {
         pal::string_t arg = argv[arg_i];
-        if (std::find(known_opts.begin(), known_opts.end(), pal::to_lower(arg)) == known_opts.end())
+        pal::string_t arg_lower = pal::to_lower(arg);
+        if (std::find(known_opts.begin(), known_opts.end(), arg_lower) == known_opts.end())
         {
             // Unknown argument.
             break;
@@ -149,7 +195,8 @@ bool parse_known_args(
             return false;
         }
 
-        (*opts)[arg] = argv[arg_i + 1];
+        trace::verbose(_X("Parsed known arg %s = %s"), arg.c_str(), argv[arg_i + 1]);
+        (*opts)[arg_lower].push_back(argv[arg_i + 1]);
 
         // Increment for both the option and its value.
         arg_i += 2;
@@ -160,3 +207,30 @@ bool parse_known_args(
     return true;
 }
 
+// Try to match 0xEF 0xBB 0xBF byte sequence (no endianness here.)
+bool skip_utf8_bom(pal::ifstream_t* stream)
+{
+    if (stream->eof() || !stream->good())
+    {
+        return false;
+    }
+
+    int peeked = stream->peek();
+    if (peeked == EOF || ((peeked & 0xFF) != 0xEF))
+    {
+        return false;
+    }
+
+    unsigned char bytes[3];
+    stream->read((char*) bytes, 3);
+    if ((stream->gcount() < 3) ||
+            (bytes[1] != 0xBB) || 
+            (bytes[2] != 0xBF))
+    {
+        // Reset to 0 if returning false.
+        stream->seekg(0, stream->beg);
+        return false;
+    }
+
+    return true;
+}

@@ -85,5 +85,53 @@ namespace Microsoft.DotNet.Cli.Build
             b[x] = b[y];
             b[y] = t;
         }
+
+        public static void DeleteDirectory(string path)
+        {
+            if (Directory.Exists(path))
+            {
+                string[] files = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
+                foreach (string file in files)
+                {
+                    File.SetAttributes(file, FileAttributes.Normal);
+                    File.Delete(file);
+                }
+                var retry = 5;
+                while (retry >= 0)
+                {
+                    try
+                    {
+                        Directory.Delete(path, true);
+                        return;
+                    }
+                    catch (IOException ex)
+                    {
+                        if (retry == 0)
+                        {
+                            throw;
+                        }
+                        System.Threading.Thread.Sleep(200);
+                        retry--;
+                    }
+                }
+            }
+        }
+
+        public static void CopyDirectoryRecursively(string path, string destination, bool keepParentDir = false)
+        {
+            if (keepParentDir)
+            {
+                path = path.TrimEnd(Path.DirectorySeparatorChar);
+                destination = Path.Combine(destination, Path.GetFileName(path));
+                Directory.CreateDirectory(destination);
+            }
+
+            foreach (var file in Directory.GetFiles(path, "*", SearchOption.AllDirectories))
+            {
+                string destFile = file.Replace(path, destination);
+                Directory.CreateDirectory(Path.GetDirectoryName(destFile));
+                File.Copy(file, destFile, true);
+            }
+        }
     }
 }

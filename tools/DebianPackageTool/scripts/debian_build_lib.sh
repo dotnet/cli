@@ -105,7 +105,11 @@ add_dir_to_install(){
 
     _copy_files_to_package "$copy_from_dir" "$rel_install_path" "${dir_files[@]}"
 
-    add_system_dir_placement "$rel_install_path" "${INSTALL_ROOT}/$rel_install_path"
+    for file in "${dir_files[@]}"
+    do
+        file_rel_dir="$(dirname $file)"
+        add_system_file_placement "${rel_install_path}/${file}" "${INSTALL_ROOT}/$rel_install_path/${file_rel_dir}"
+    done
 }
 
 # Usage: _copy_files_to_package {local files root directory} {relative directory in package to copy to} "${filepath_array[@]}"
@@ -142,6 +146,7 @@ _get_files_in_dir_tree(){
 
     # Use Globstar expansion to enumerate all directories and files in the tree
     shopt -s globstar
+    shopt -s dotglob
     dir_tree_list=( "${root_dir}/"** )
 
     # Build a new array with only the Files contained in $dir_tree_list

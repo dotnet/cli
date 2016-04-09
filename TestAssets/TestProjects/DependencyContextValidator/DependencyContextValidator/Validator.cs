@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace Microsoft.Extensions.DependencyModel
 {
@@ -43,6 +44,7 @@ namespace Microsoft.Extensions.DependencyModel
                     var resolvedPaths = compilationLibrary.ResolveReferencePaths();
                     foreach (var resolvedPath in resolvedPaths)
                     {
+                        Console.WriteLine($"Compilation {compilationLibrary.Name}:{Path.GetFileName(resolvedPath)}");
                         if (!File.Exists(resolvedPath))
                         {
                             Error($"Compilataion library resolved to non existent path {resolvedPath}");
@@ -54,12 +56,18 @@ namespace Microsoft.Extensions.DependencyModel
             foreach (var runtimeLibrary in context.RuntimeLibraries)
             {
                 CheckMetadata(runtimeLibrary);
-                foreach (var runtimeAssembly in runtimeLibrary.Assemblies)
-                {
-                    var assembly = Assembly.Load(runtimeAssembly.Name);
+                foreach (var native in runtimeLibrary.GetDefaultNativeAssets(context)) {}
+                foreach (var assembly in runtimeLibrary.GetDefaultAssemblyNames(context)) {
+                    Console.WriteLine($"Runtime {runtimeLibrary.Name}:{assembly.Name}");
                 }
             }
 
+            foreach (var native in context.GetDefaultNativeAssets()) {}
+
+            foreach (var name in context.GetDefaultAssemblyNames())
+            {
+                var assembly = Assembly.Load(name);
+            }
         }
     }
 }

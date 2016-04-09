@@ -22,7 +22,6 @@ include_directories(./json/casablanca/include)
 
 # CMake does not recommend using globbing since it messes with the freshness checks
 set(SOURCES
-    libhost.cpp
 
     #deps_format.cpp
     #./json/casablanca/src/json/json.cpp
@@ -33,7 +32,6 @@ set(SOURCES
 
     ./fxr/fx_ver.cpp
     ../corehost.cpp
-    ../policy_load.cpp
     ../common/trace.cpp
     ../common/utils.cpp)
 
@@ -44,8 +42,8 @@ else()
     list(APPEND SOURCES ../common/pal.unix.cpp)
 endif()
 
-add_executable(corehost ${SOURCES})
-install(TARGETS corehost DESTINATION bin)
+add_executable(dotnet ${SOURCES})
+install(TARGETS dotnet DESTINATION bin)
 add_definitions(-D_NO_ASYNCRTIMP)
 add_definitions(-D_NO_PPLXIMP)
 
@@ -56,7 +54,7 @@ endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     add_definitions(-D__LINUX__)
-    target_link_libraries (corehost "dl" "pthread")
+    target_link_libraries (dotnet "dl" "pthread")
 endif()
 
 add_subdirectory(dll)
