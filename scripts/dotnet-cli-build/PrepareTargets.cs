@@ -105,7 +105,13 @@ namespace Microsoft.DotNet.Cli.Build
             foreach (string templateFile in templateFiles)
             {
                 JObject projectRoot = JsonUtils.ReadProject(templateFile);
-                projectRoot["dependencies"]["Microsoft.NETCore.App"]["version"] = c.BuildContext.Get<BuildVersion>("BuildVersion").NetCoreAppVersion;
+
+                JToken netCoreAppDependency = projectRoot["dependencies"]["Microsoft.NETCore.App"];
+                if (netCoreAppDependency != null)
+                {
+                    netCoreAppDependency["version"] = c.BuildContext.Get<BuildVersion>("BuildVersion").NetCoreAppVersion;
+                }
+
                 JsonUtils.WriteProject(projectRoot, Path.ChangeExtension(templateFile, "template"));
             }
 
@@ -392,8 +398,8 @@ cmake is required to build the native host 'corehost'";
         }
 
         private static void AddInstallerArtifactToContext(
-            BuildTargetContext c, 
-            string artifactPrefix, 
+            BuildTargetContext c,
+            string artifactPrefix,
             string contextPrefix,
             string version)
         {
