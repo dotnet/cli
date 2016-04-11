@@ -70,9 +70,9 @@ namespace Microsoft.DotNet.Cli.Build
             return c.Success();
         }
 
-        // Moving PrepareTargets.RestorePackages after PackagePkgProjects because managed code depends on the
-        // Microsoft.NETCore.App package that is created during PackagePkgProjects.
-        [Target(nameof(PrepareTargets.Init), nameof(CompileCoreHost), nameof(PackagePkgProjects), nameof(RestoreLockedCoreHost), nameof(PrepareTargets.RestorePackages), nameof(CompileStage1), nameof(CompileStage2))]
+        // Moving PrepareTargets.RestorePackages after BuildCoreHost because managed code depends on the
+        // Microsoft.NETCore.App package that is created during BuildCoreHost.
+        [Target(nameof(PrepareTargets.Init), nameof(BuildCoreHost), nameof(PrepareTargets.RestorePackages), nameof(CompileStage1), nameof(CompileStage2))]
         public static BuildTargetResult Compile(BuildTargetContext c)
         {
             return c.Success();
@@ -148,6 +148,11 @@ namespace Microsoft.DotNet.Cli.Build
 
             return c.Success();
         }
+
+        [Target(
+            nameof(CompileCoreHost),
+            nameof(BuildCoreHostPackages))]
+        public static BuildTargetResult BuildCoreHost(BuildTargetContext c) => c.Success();
 
         [Target(nameof(PrepareTargets.Init))]
         public static BuildTargetResult CompileCoreHost(BuildTargetContext c)
@@ -227,8 +232,15 @@ namespace Microsoft.DotNet.Cli.Build
             return c.Success();
         }
 
-        [Target(nameof(CompileTargets.GenerateStubHostPackages))]
-        public static BuildTargetResult PackagePkgProjects(BuildTargetContext c)
+        [Target(
+            nameof(GenerateStubHostPackages),
+            nameof(PackageHostPackages),
+            nameof(CleanHostPackagesFromCache),
+            nameof(RestoreLockedCoreHost))]
+        public static BuildTargetResult BuildCoreHostPackages(BuildTargetContext c) => c.Success();
+
+        [Target]
+        public static BuildTargetResult PackageHostPackages(BuildTargetContext c)
         {
             var arch = IsWinx86 ? "x86" : "x64";
 
@@ -287,6 +299,18 @@ namespace Microsoft.DotNet.Cli.Build
                     throw new BuildFailureException($"Nupkg for {fileFilter} was not created.");
                 }
             }
+            return c.Success();
+        }
+
+        [Target]
+        public static BuildTargetResult CleanHostPackagesFromCache(BuildTargetContext c)
+        {
+            IEnumerable<string> packagesToClean = NuGetUtils.GetPackageIds(
+                Dirs.CorehostLocalPackages, 
+                Dirs.CorehostDummyPackages);
+
+            NuGetUtils.CleanPackagesFromCache(packagesToClean);
+
             return c.Success();
         }
 

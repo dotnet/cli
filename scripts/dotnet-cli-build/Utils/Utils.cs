@@ -104,7 +104,7 @@ namespace Microsoft.DotNet.Cli.Build
                         Directory.Delete(path, true);
                         return;
                     }
-                    catch (IOException ex)
+                    catch (IOException)
                     {
                         if (retry == 0)
                         {
