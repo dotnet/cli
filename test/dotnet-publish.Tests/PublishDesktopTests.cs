@@ -1,11 +1,14 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
+using Microsoft.Extensions.PlatformAbstractions;
 using Xunit;
 
 namespace Microsoft.DotNet.Tools.Publish.Tests
@@ -13,11 +16,16 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
     public class PublishDesktopTests : TestBase
     {
         [WindowsOnlyTheory]
-        [InlineData(null, "the-win-x64-version.txt")]
+        [InlineData(null, null)]
         [InlineData("win7-x64", "the-win-x64-version.txt")]
         [InlineData("win7-x86", "the-win-x86-version.txt")]
         public async Task DesktopApp_WithDependencyOnNativePackage_ProducesExpectedOutput(string runtime, string expectedOutputName)
         {
+            if(string.IsNullOrEmpty(expectedOutputName))
+            {
+                expectedOutputName = $"the-win-{RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant()}-version.txt";
+            }
+
             var testInstance = TestAssetsManager.CreateTestInstance(Path.Combine("..", "DesktopTestProjects", "DesktopAppWithNativeDep"))
                 .WithLockFiles();
 
@@ -33,12 +41,16 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
         }
 
         [WindowsOnlyTheory]
-        [InlineData("KestrelDesktopWithRuntimes", "http://localhost:20201", null, "libuv.dll", true)]
-        [InlineData("KestrelDesktopWithRuntimes", "http://localhost:20202", "win7-x64", "libuv.dll", true)]
-        [InlineData("KestrelDesktop", "http://localhost:20204", null, "libuv.dll", true)]
-        [InlineData("KestrelDesktop", "http://localhost:20205", "win7-x64", "libuv.dll", true)]
-        public async Task DesktopApp_WithKestrel_WorksWhenPublished(string project, string url, string runtime, string libuvName, bool runnable)
+        [InlineData("KestrelDesktopWithRuntimes", "http://localhost:20201", null, "libuv.dll")]
+        [InlineData("KestrelDesktopWithRuntimes", "http://localhost:20202", "win7-x64", "libuv.dll")]
+        [InlineData("KestrelDesktopWithRuntimes", "http://localhost:20202", "win7-x86", "libuv.dll")]
+        [InlineData("KestrelDesktop", "http://localhost:20204", null, "libuv.dll")]
+        [InlineData("KestrelDesktop", "http://localhost:20205", "win7-x64", "libuv.dll")]
+        [InlineData("KestrelDesktop", "http://localhost:20205", "win7-x86", "libuv.dll")]
+        public async Task DesktopApp_WithKestrel_WorksWhenPublished(string project, string url, string runtime, string libuvName)
         {
+            var runnable = string.IsNullOrEmpty(runtime) || PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers().Contains(runtime);
+
             var testInstance = GetTestInstance()
                 .WithLockFiles();
 
