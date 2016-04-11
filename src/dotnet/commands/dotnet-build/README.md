@@ -1,5 +1,5 @@
 % DOTNET-BUILD(1)
-% Zlatko Knezevic zlakne@microsoft.com
+% Microsoft Corporation dotnetclifeedback@microsoft.com
 % April 2016
 
 ## NAME 
