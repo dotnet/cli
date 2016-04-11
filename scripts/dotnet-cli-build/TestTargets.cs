@@ -145,8 +145,14 @@ namespace Microsoft.DotNet.Cli.Build
             return c.Success();
         }
 
-        [Target(nameof(CleanTestPackages), nameof(CleanProductPackages))]
-        public static BuildTargetResult BuildTestAssetPackages(BuildTargetContext c)
+        [Target(
+            nameof(CleanProductPackagesFromCache),
+            nameof(PackageTestPackages),
+            nameof(CleanTestPackagesFromCache))]
+        public static BuildTargetResult BuildTestAssetPackages(BuildTargetContext c) => c.Success();
+
+        [Target]
+        public static BuildTargetResult PackageTestPackages(BuildTargetContext c)
         {
             CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages"));
 
@@ -213,7 +219,7 @@ namespace Microsoft.DotNet.Cli.Build
         }
 
         [Target]
-        public static BuildTargetResult CleanProductPackages(BuildTargetContext c)
+        public static BuildTargetResult CleanProductPackagesFromCache(BuildTargetContext c)
         {
             foreach (var packageName in PackageTargets.ProjectsToPack)
             {
@@ -224,16 +230,12 @@ namespace Microsoft.DotNet.Cli.Build
         }
 
         [Target]
-        public static BuildTargetResult CleanTestPackages(BuildTargetContext c)
+        public static BuildTargetResult CleanTestPackagesFromCache(BuildTargetContext c)
         {
-            foreach (var packageProject in TestPackageProjects.Projects.Where(p => p.IsApplicable && p.Clean))
-            {
-                Rmdir(Path.Combine(Dirs.NuGetPackages, packageProject.Name));
-                if (packageProject.IsTool)
-                {
-                    Rmdir(Path.Combine(Dirs.NuGetPackages, ".tools", packageProject.Name));
-                }
-            }
+            NuGetUtils.CleanPackagesFromCache(
+                NuGetUtils.GetPackageIds(Dirs.TestPackages),
+                cleanTools: true);
+
             return c.Success();
         }
 

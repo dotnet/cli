@@ -217,7 +217,6 @@ namespace Microsoft.DotNet.Cli.Build
             var versionSuffix = c.BuildContext.Get<BuildVersion>("BuildVersion").CommitCountString;
             var configuration = c.BuildContext.Get<string>("Configuration");
 
-            var env = GetCommonEnvVars(c);
             var dotnet = DotNetCli.Stage2;
 
             var packagingBuildBasePath = Path.Combine(Dirs.Stage2Compilation, "forPackaging");
@@ -252,43 +251,6 @@ namespace Microsoft.DotNet.Cli.Build
             }
 
             return c.Success();
-        }
-
-        internal static Dictionary<string, string> GetCommonEnvVars(BuildTargetContext c)
-        {
-            // Set up the environment variables previously defined by common.sh/ps1
-            // This is overkill, but I want to cover all the variables used in all OSes (including where some have the same names)
-            var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
-            var configuration = c.BuildContext.Get<string>("Configuration");
-            var architecture = RuntimeEnvironment.RuntimeArchitecture;
-            var env = new Dictionary<string, string>()
-            {
-                { "RID", RuntimeEnvironment.GetRuntimeIdentifier() },
-                { "OSNAME", RuntimeEnvironment.OperatingSystem },
-                { "TFM", "dnxcore50" },
-                { "REPOROOT", Dirs.RepoRoot },
-                { "OutputDir", Dirs.Output },
-                { "Stage1Dir", Dirs.Stage1 },
-                { "Stage1CompilationDir", Dirs.Stage1Compilation },
-                { "Stage2Dir", Dirs.Stage2 },
-                { "STAGE2_DIR", Dirs.Stage2 },
-                { "Stage2CompilationDir", Dirs.Stage2Compilation },
-                { "PackageDir", Path.Combine(Dirs.Packages) }, // Legacy name
-                { "TestBinRoot", Dirs.TestOutput },
-                { "TestPackageDir", Dirs.TestPackages },
-                { "MajorVersion", buildVersion.Major.ToString() },
-                { "MinorVersion", buildVersion.Minor.ToString() },
-                { "PatchVersion", buildVersion.Patch.ToString() },
-                { "CommitCountVersion", buildVersion.CommitCountString },
-                { "COMMIT_COUNT_VERSION", buildVersion.CommitCountString },
-                { "DOTNET_CLI_VERSION", buildVersion.SimpleVersion },
-                { "DOTNET_MSI_VERSION", buildVersion.GenerateMsiVersion() },
-                { "VersionSuffix", buildVersion.VersionSuffix },
-                { "CONFIGURATION", configuration },
-                { "ARCHITECTURE", architecture }
-            };
-
-            return env;
         }
 
         private static void CreateZipFromDirectory(string directory, string artifactPath)
