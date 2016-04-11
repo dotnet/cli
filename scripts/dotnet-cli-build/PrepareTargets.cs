@@ -178,6 +178,7 @@ namespace Microsoft.DotNet.Cli.Build
             }
 
             CleanNuGetTempCache();
+            CleanPkgProjectsNuGetCache();
 
             // Determine cache expiration time
             var cacheExpiration = 7 * 24; // cache expiration in hours
@@ -221,6 +222,14 @@ namespace Microsoft.DotNet.Cli.Build
             }
 
             return c.Success();
+        }
+        
+        private static void CleanPkgProjectsNuGetCache()
+        {
+            foreach (var pkgProject in CompileTargets.PkgProjects)
+            {
+                Rmdir(Path.Combine(Dirs.NuGetPackages, pkgProject));
+            }
         }
 
         [Target(nameof(CheckPackageCache))]

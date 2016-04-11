@@ -42,6 +42,14 @@ namespace Microsoft.DotNet.Cli.Build
         private static string DotnetHostFxrBaseName => $"{Constants.DynamicLibPrefix}hostfxr{Constants.DynamicLibSuffix}";
         private static string HostPolicyBaseName => $"{Constants.DynamicLibPrefix}hostpolicy{Constants.DynamicLibSuffix}";
 
+        public static readonly string[] PkgProjects = new[]
+        {
+            "Microsoft.NETCore.App",
+            "Microsoft.NETCore.DotNetHost",
+            "Microsoft.NETCore.DotNetHostPolicy",
+            "Microsoft.NETCore.DotNetHostResolver",
+        };
+        
         // Updates the stage 2 with recent changes.
         [Target(nameof(PrepareTargets.Init), nameof(CompileStage2))]
         public static BuildTargetResult UpdateBuild(BuildTargetContext c)
