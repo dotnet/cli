@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.DotNet.ProjectModel.Files;
 
 namespace Microsoft.DotNet.ProjectModel
 {
@@ -39,7 +40,13 @@ namespace Microsoft.DotNet.ProjectModel
 
         public IEnumerable<string> AdditionalArguments { get; set; }
 
-        public string OutputName { get;set; }
+        public string OutputName { get; set; }
+
+        public string CompilerName { get; set; }
+
+        public IncludeFilesResolver EmbedInclude { get; set; }
+
+        public IncludeFilesResolver CopyToOutputInclude { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -60,7 +67,8 @@ namespace Microsoft.DotNet.ProjectModel
                    EnumerableEquals(Defines, other.Defines) &&
                    EnumerableEquals(SuppressWarnings, other.SuppressWarnings) &&
                    EnumerableEquals(AdditionalArguments, other.AdditionalArguments) &&
-                   OutputName == other.OutputName;
+                   OutputName == other.OutputName &&
+                   CompilerName == other.CompilerName;
         }
 
         private static bool EnumerableEquals(IEnumerable<string> left, IEnumerable<string> right)
@@ -160,6 +168,21 @@ namespace Microsoft.DotNet.ProjectModel
                 if (option.OutputName != null)
                 {
                     result.OutputName = option.OutputName;
+                }
+
+                if (option.CompilerName != null)
+                {
+                    result.CompilerName = option.CompilerName;
+                }
+
+                if (option.EmbedInclude != null)
+                {
+                    result.EmbedInclude = option.EmbedInclude;
+                }
+
+                if (option.CopyToOutputInclude != null)
+                {
+                    result.CopyToOutputInclude = option.CopyToOutputInclude;
                 }
             }
 

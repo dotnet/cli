@@ -142,21 +142,10 @@ namespace Microsoft.DotNet.ProjectModel
             project.Copyright = rawProject.Value<string>("copyright");
             project.Title = rawProject.Value<string>("title");
             project.EntryPoint = rawProject.Value<string>("entryPoint");
-            project.ProjectUrl = rawProject.Value<string>("projectUrl");
-            project.LicenseUrl = rawProject.Value<string>("licenseUrl");
-            project.IconUrl = rawProject.Value<string>("iconUrl");
-            project.CompilerName = rawProject.Value<string>("compilerName") ?? "csc";
             project.TestRunner = rawProject.Value<string>("testRunner");
-
             project.Authors =
                 rawProject.Value<JToken>("authors")?.Values<string>().ToArray() ?? EmptyArray<string>.Value;
-            project.Owners = rawProject.Value<JToken>("owners")?.Values<string>().ToArray() ?? EmptyArray<string>.Value;
-            project.Tags = rawProject.Value<JToken>("tags")?.Values<string>().ToArray() ?? EmptyArray<string>.Value;
-
             project.Language = rawProject.Value<string>("language");
-            project.ReleaseNotes = rawProject.Value<string>("releaseNotes");
-
-            project.RequireLicenseAcceptance = rawProject.Value<bool>("requireLicenseAcceptance");
 
             // REVIEW: Move this to the dependencies node?
             project.EmbedInteropTypes = rawProject.Value<bool>("embedInteropTypes");
@@ -206,6 +195,10 @@ namespace Microsoft.DotNet.ProjectModel
                         project.ProjectFilePath);
                 }
             }
+
+            project.PackOptions = GetPackOptions(rawProject, project) ?? new PackOptions();
+            project.RuntimeOptions = GetRuntimeOptions(rawProject) ?? new RuntimeOptions();
+            project.PublishInclude = GetPublishInclude(rawProject, project);
 
             BuildTargetFrameworksAndConfigurations(project, rawProject, diagnostics);
 
@@ -510,10 +503,22 @@ namespace Microsoft.DotNet.ProjectModel
 
         private static CommonCompilerOptions GetCompilationOptions(JObject rawObject, Project project)
         {
-            var rawOptions = rawObject.Value<JToken>("compilationOptions") as JObject;
+            var rawOptions = rawObject.Value<JToken>("buildOptions") as JObject;
             if (rawOptions == null)
             {
-                return null;
+                rawOptions = rawObject.Value<JToken>("compilationOptions") as JObject;
+                if (rawOptions == null)
+                {
+                    return null;
+                }
+
+                // TODO: add warning
+            }
+
+            var compilerName = rawObject.Value<string>("compilerName");
+            if (compilerName != null)
+            {
+                // TODO: add warning
             }
 
             var analyzerOptionsJson = rawOptions.Value<JToken>("analyzerOptions") as JObject;
@@ -546,6 +551,29 @@ namespace Microsoft.DotNet.ProjectModel
                 project.AnalyzerOptions = analyzerOptions;
             }
 
+            IncludeFilesResolver embed = null;
+            var embedOption = rawOptions.Value<JToken>("embed");
+            if (embedOption != null)
+            {
+                embed = new IncludeFilesResolver(
+                    project.ProjectDirectory,
+                    "embed",
+                    rawOptions,
+                    ProjectFilesCollection.DefaultResourcesBuiltInPatterns,
+                    ProjectFilesCollection.DefaultBuiltInExcludePatterns);
+            }
+
+            IncludeFilesResolver copyToOutput = null;
+            var copyToOutputOption = rawOptions.Value<JToken>("copyToOutput");
+            if (copyToOutputOption != null)
+            {
+                copyToOutput = new IncludeFilesResolver(
+                    project.ProjectDirectory,
+                    "copyToOutput",
+                    rawOptions,
+                    defaultBuiltInExclude: ProjectFilesCollection.DefaultBuiltInExcludePatterns);
+            }
+
             return new CommonCompilerOptions
             {
                 Defines = rawOptions.Value<JToken>("define")?.Values<string>().ToArray(),
@@ -563,8 +591,90 @@ namespace Microsoft.DotNet.ProjectModel
                 EmitEntryPoint = rawOptions.Value<bool?>("emitEntryPoint"),
                 GenerateXmlDocumentation = rawOptions.Value<bool?>("xmlDoc"),
                 PreserveCompilationContext = rawOptions.Value<bool?>("preserveCompilationContext"),
-                OutputName = rawOptions.Value<string>("outputName")
+                OutputName = rawOptions.Value<string>("outputName"),
+                CompilerName = rawOptions.Value<string>("compilerName") ?? compilerName ?? "csc",
+                EmbedInclude = embed,
+                CopyToOutputInclude = copyToOutput
             };
+        }
+
+        private static PackOptions GetPackOptions(JObject rawProject, Project project)
+        {
+            var rawPackOptions = rawProject.Value<JToken>("packOptions") as JObject;
+
+            // Files to be packed along with the project
+            IncludeFilesResolver packInclude = null;
+            if (rawPackOptions != null)
+            {
+                packInclude = new IncludeFilesResolver(
+                    project.ProjectDirectory, "files", rawPackOptions, defaultBuiltInExclude: ProjectFilesCollection.DefaultBuiltInExcludePatterns);
+            }
+
+            var repository = GetPackOptionsValue<JToken>("repository", rawProject, rawPackOptions) as JObject;
+
+            return new PackOptions
+            {
+                ProjectUrl = GetPackOptionsValue<string>("projectUrl", rawProject, rawPackOptions),
+                LicenseUrl = GetPackOptionsValue<string>("licenseUrl", rawProject, rawPackOptions),
+                IconUrl = GetPackOptionsValue<string>("iconUrl", rawProject, rawPackOptions),
+                Owners = GetPackOptionsValue<JToken>("owners", rawProject, rawPackOptions)?.Values<string>().ToArray() ?? EmptyArray<string>.Value,
+                Tags = GetPackOptionsValue<JToken>("tags", rawProject, rawPackOptions)?.Values<string>().ToArray() ?? EmptyArray<string>.Value,
+                ReleaseNotes = GetPackOptionsValue<string>("releaseNotes", rawProject, rawPackOptions),
+                RequireLicenseAcceptance = GetPackOptionsValue<bool>("requireLicenseAcceptance", rawProject, rawPackOptions),
+                RepositoryType = repository?.Value<string>("type"),
+                RepositoryUrl = repository?.Value<string>("url"),
+                PackInclude = packInclude
+            };
+        }
+
+        private static T GetPackOptionsValue<T>(string option, JObject rawProject, JObject rawPackOptions)
+        {
+            var rootValue = rawProject.Value<T>(option);
+            if (rootValue != null)
+            {
+                // TODO: add warning
+            }
+
+            if (rawPackOptions != null)
+            {
+                var packOptionValue = rawPackOptions.Value<T>(option);
+                if (packOptionValue != null)
+                {
+                    return packOptionValue;
+                }
+            }
+
+            return rootValue;
+        }
+
+        private static RuntimeOptions GetRuntimeOptions(JObject rawProject)
+        {
+            var rawRuntimeOptions = rawProject.Value<JToken>("runtimeOptions") as JObject;
+            if (rawRuntimeOptions == null)
+            {
+                return null;
+            }
+
+            return new RuntimeOptions
+            {
+                GcServer = rawRuntimeOptions.Value<bool>("gcServer"),
+                GcConcurrent = rawRuntimeOptions.Value<bool>("gcConcurrent")
+            };
+        }
+
+        private static IncludeFilesResolver GetPublishInclude(JObject rawProject, Project project)
+        {
+            var rawPublishOptions = rawProject.Value<JToken>("publishOptions") as JObject;
+            if (rawPublishOptions != null)
+            {
+                return new IncludeFilesResolver(
+                    project.ProjectDirectory,
+                    "publishOptions",
+                    rawProject,
+                    defaultBuiltInExclude: ProjectFilesCollection.DefaultBuiltInExcludePatterns);
+            }
+
+            return null;
         }
 
         private static string MakeDefaultTargetFrameworkDefine(NuGetFramework targetFramework)
