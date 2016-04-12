@@ -102,6 +102,12 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
         [InlineData("KestrelDesktopWithRuntimes", "http://localhost:20208")]
         public async Task DesktopApp_WithKestrel_WorksWhenRun(string project, string url)
         {
+            // Disabled due to https://github.com/dotnet/cli/issues/2428
+            if (PlatformServices.Default.Runtime.GetRuntimeIdentifier().EndsWith("-x86"))
+            {
+                return;
+            }
+
             var testInstance = GetTestInstance()
                 .WithLockFiles()
                 .WithBuildArtifacts();
