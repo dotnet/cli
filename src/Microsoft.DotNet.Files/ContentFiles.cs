@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.ProjectModel.Files;
 using Microsoft.DotNet.Tools.Common;
 
 namespace Microsoft.DotNet.Files
@@ -19,45 +20,68 @@ namespace Microsoft.DotNet.Files
             _context = context;
         }
 
-        public void StructuredCopyTo(string targetDirectory)
+        public void StructuredCopyTo(string targetDirectory, IEnumerable<IncludeEntry> includeEntries)
         {
-            var sourceFiles = _context
-                .ProjectFile
-                .Files
-                .GetContentFiles();
-
-            var sourceDirectory = _context.ProjectDirectory;
-
-            if (sourceFiles == null)
+            if (includeEntries == null)
             {
-                throw new ArgumentNullException(nameof(sourceFiles));
+                var sourceFiles = _context
+                    .ProjectFile
+                    .Files
+                    .GetContentFiles();
+
+                var sourceDirectory = _context.ProjectDirectory;
+
+                if (sourceFiles == null)
+                {
+                    throw new ArgumentNullException(nameof(sourceFiles));
+                }
+
+                sourceDirectory = EnsureTrailingSlash(sourceDirectory);
+                targetDirectory = EnsureTrailingSlash(targetDirectory);
+
+                var pathMap = sourceFiles
+                    .ToDictionary(s => s,
+                        s => Path.Combine(targetDirectory,
+                            PathUtility.GetRelativePathIgnoringDirectoryTraversals(sourceDirectory, s)));
+
+                foreach (var targetDir in pathMap.Values
+                    .Select(Path.GetDirectoryName)
+                    .Distinct()
+                    .Where(t => !Directory.Exists(t)))
+                {
+                    Directory.CreateDirectory(targetDir);
+                }
+
+                foreach (var sourceFilePath in pathMap.Keys)
+                {
+                    File.Copy(
+                        sourceFilePath,
+                        pathMap[sourceFilePath],
+                        overwrite: true);
+                }
+
+                RemoveAttributeFromFiles(pathMap.Values, FileAttributes.ReadOnly);
             }
-
-            sourceDirectory = EnsureTrailingSlash(sourceDirectory);
-            targetDirectory = EnsureTrailingSlash(targetDirectory);
-
-            var pathMap = sourceFiles
-                .ToDictionary(s => s,
-                    s => Path.Combine(targetDirectory,
-                        PathUtility.GetRelativePathIgnoringDirectoryTraversals(sourceDirectory, s)));
-
-            foreach (var targetDir in pathMap.Values
-                .Select(Path.GetDirectoryName)
-                .Distinct()
-                .Where(t => !Directory.Exists(t)))
+            else
             {
-                Directory.CreateDirectory(targetDir);
-            }
+                foreach (var targetDir in includeEntries
+                    .Select(f => Path.GetDirectoryName(f.TargetPath))
+                    .Distinct()
+                    .Where(t => !Directory.Exists(t)))
+                {
+                    Directory.CreateDirectory(targetDir);
+                }
 
-            foreach (var sourceFilePath in pathMap.Keys)
-            {
-                File.Copy(
-                    sourceFilePath,
-                    pathMap[sourceFilePath],
-                    overwrite: true);
-            }
+                foreach (var file in includeEntries)
+                {
+                    File.Copy(
+                        file.SourcePath,
+                        file.TargetPath,
+                        overwrite: true);
+                }
 
-            RemoveAttributeFromFiles(pathMap.Values, FileAttributes.ReadOnly);
+                RemoveAttributeFromFiles(includeEntries.Select(f => f.TargetPath), FileAttributes.ReadOnly);
+            }
         }
 
         private static void RemoveAttributeFromFiles(IEnumerable<string> files, FileAttributes attribute)

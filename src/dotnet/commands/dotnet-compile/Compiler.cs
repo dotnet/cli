@@ -46,9 +46,13 @@ namespace Microsoft.DotNet.Tools.Compiler
             return success;
         }
 
-        protected static bool AddNonCultureResources(Project project, List<string> compilerArgs, string intermediateOutputPath)
+        protected static bool AddNonCultureResources(
+            Project project,
+            List<string> compilerArgs,
+            string intermediateOutputPath,
+            CommonCompilerOptions compilationOptions)
         {
-            var resgenFiles = CompilerUtil.GetNonCultureResources(project, intermediateOutputPath);
+            var resgenFiles = CompilerUtil.GetNonCultureResources(project, intermediateOutputPath, compilationOptions);
 
             foreach (var resgenFile in resgenFiles)
             {
@@ -80,10 +84,11 @@ namespace Microsoft.DotNet.Tools.Compiler
         protected static bool GenerateCultureResourceAssemblies(
             Project project,
             List<LibraryExport> dependencies,
-            string outputPath)
+            string outputPath,
+            CommonCompilerOptions compilationOptions)
         {
             var referencePaths = CompilerUtil.GetReferencePathsForCultureResgen(dependencies);
-            var cultureResgenFiles = CompilerUtil.GetCultureResources(project, outputPath);
+            var cultureResgenFiles = CompilerUtil.GetCultureResources(project, outputPath, compilationOptions);
 
             foreach (var resgenFile in cultureResgenFiles)
             {

@@ -17,6 +17,7 @@ using NuGet.Frameworks;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Reflection.PortableExecutable;
+using Microsoft.DotNet.Tools.Common;
 
 namespace Microsoft.DotNet.Cli.Compiler.Common
 {
@@ -88,7 +89,8 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
         private void CopyContentFiles()
         {
             var contentFiles = new ContentFiles(_context);
-            contentFiles.StructuredCopyTo(_runtimeOutputPath);
+            var includeEntries = _compilerOptions.CopyToOutputInclude?.GetIncludeFiles(PathUtility.EnsureTrailingSlash(_runtimeOutputPath));
+            contentFiles.StructuredCopyTo(_runtimeOutputPath, includeEntries);
         }
 
         private void CopyAssemblies(IEnumerable<LibraryExport> libraryExports)
