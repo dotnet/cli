@@ -1,13 +1,13 @@
 {
-    "version": "1.0.0-*",
-    "compilationOptions": {
-        "emitEntryPoint": true
-    },
-    "dependencies": {
-        "NETStandard.Library": "1.0.0-rc2-23727",
-        "Microsoft.DotNet.Mcg": "1.0.0-prerelease-0003"
-    },
-    "frameworks": {
-        "dnxcore50": { }
-    }
+  "version": "1.0.0-*",
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+  "dependencies": {
+    "NETStandard.Library": "1.0.0-rc2-24011",
+    "Microsoft.DotNet.Mcg": "1.0.0-prerelease-0003"
+  },
+  "frameworks": {
+    "dnxcore50": {}
+  }
 }
