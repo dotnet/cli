@@ -67,7 +67,19 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             Task exec = null;
             if (runnable)
             {
-                var command = new TestCommand(Path.Combine(outputDir.FullName, publishCommand.GetOutputExecutable()));
+                var outputExePath = Path.Combine(outputDir.FullName, publishCommand.GetOutputExecutable());
+
+                // If we're running on a 64-bit OS but trying to launch a 32-bit process, we need to use corflags to force
+                // the process to be 32-bit. At some point we need to look at how users should do this themselves, but at
+                // worst they can use corflags too for v1.
+                if(RuntimeInformation.OSArchitecture == Architecture.X64 && runtime.EndsWith("x86"))
+                {
+                    Command.Create("corflags", new[] { outputExePath, "/32BITREQ+" })
+                        .Execute()
+                        .Should().Pass();
+                }
+
+                var command = new TestCommand(outputExePath);
                 try
                 {
                     exec = command.ExecuteAsync(url);
