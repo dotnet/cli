@@ -7,19 +7,18 @@ using System.IO;
 using System.Linq;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
-using Microsoft.DotNet.ProjectModel.Files;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Utilities;
-using Microsoft.Extensions.FileSystemGlobbing;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using NuGet;
 using NuGet.Frameworks;
 using NuGet.Packaging.Core;
 using NuGet.Versioning;
-using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.ProjectModel.Resources;
 using Microsoft.DotNet.Tools.Pack;
 using PackageBuilder = NuGet.PackageBuilder;
+using Microsoft.DotNet.ProjectModel.Files;
+using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
+using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace Microsoft.DotNet.Tools.Compiler
 {
@@ -42,7 +41,6 @@ namespace Microsoft.DotNet.Tools.Compiler
 
         public bool BuildPackage(IEnumerable<ProjectContext> contexts, List<DiagnosticMessage> packDiagnostics)
         {
-
             Reporter.Output.WriteLine($"Producing nuget package \"{GetPackageName()}\" for {Project.Name}");
 
             PackageBuilder = CreatePackageBuilder(Project);
@@ -112,9 +110,18 @@ namespace Microsoft.DotNet.Tools.Compiler
                 PackageBuilder.Files.Add(file);
             }
 
-            if (Project.Files.PackInclude != null && Project.Files.PackInclude.Any())
+            if (Project.PackOptions.Include != null)
             {
-                AddPackageFiles(Project.Files.PackInclude, packDiagnostics);
+                var files = Project.PackOptions.Include.GetIncludeFiles(targetBasePath: "/");
+                packDiagnostics.AddRange(Project.PackOptions.Include.Diagnostics);
+                PackageBuilder.Files.AddRange(GetPackageFiles(files, packDiagnostics));
+            }
+            else
+            {
+                if (Project.Files.PackInclude != null && Project.Files.PackInclude.Any())
+                {
+                    AddPackageFiles(Project.Files.PackInclude, packDiagnostics);
+                }
             }
 
             // Write the packages as long as we're still in a success state.
@@ -237,6 +244,18 @@ namespace Microsoft.DotNet.Tools.Compiler
             }
         }
 
+        private static IEnumerable<PhysicalPackageFile> GetPackageFiles(IEnumerable<IncludeEntry> includeFiles, IList<DiagnosticMessage> diagnostics)
+        {
+            foreach (var entry in includeFiles)
+            {
+                yield return new PhysicalPackageFile()
+                {
+                    SourcePath = PathUtility.GetPathWithDirectorySeparator(entry.SourcePath),
+                    TargetPath = PathUtility.GetPathWithDirectorySeparator(entry.TargetPath)
+                };
+            }
+        }
+
         protected void TryAddOutputFile(ProjectContext context,
             string outputPath,
             string filePath)
@@ -333,7 +352,7 @@ namespace Microsoft.DotNet.Tools.Compiler
         {
             var builder = new PackageBuilder();
             builder.Authors.AddRange(project.Authors);
-            builder.Owners.AddRange(project.Owners);
+            builder.Owners.AddRange(project.PackOptions.Owners);
 
             if (builder.Authors.Count == 0)
             {
@@ -354,24 +373,24 @@ namespace Microsoft.DotNet.Tools.Compiler
             builder.Title = project.Title;
             builder.Summary = project.Summary;
             builder.Copyright = project.Copyright;
-            builder.RequireLicenseAcceptance = project.RequireLicenseAcceptance;
-            builder.ReleaseNotes = project.ReleaseNotes;
+            builder.RequireLicenseAcceptance = project.PackOptions.RequireLicenseAcceptance;
+            builder.ReleaseNotes = project.PackOptions.ReleaseNotes;
             builder.Language = project.Language;
-            builder.Tags.AddRange(project.Tags);
+            builder.Tags.AddRange(project.PackOptions.Tags);
 
-            if (!string.IsNullOrEmpty(project.IconUrl))
+            if (!string.IsNullOrEmpty(project.PackOptions.IconUrl))
             {
-                builder.IconUrl = new Uri(project.IconUrl);
+                builder.IconUrl = new Uri(project.PackOptions.IconUrl);
             }
 
-            if (!string.IsNullOrEmpty(project.ProjectUrl))
+            if (!string.IsNullOrEmpty(project.PackOptions.ProjectUrl))
             {
-                builder.ProjectUrl = new Uri(project.ProjectUrl);
+                builder.ProjectUrl = new Uri(project.PackOptions.ProjectUrl);
             }
 
-            if (!string.IsNullOrEmpty(project.LicenseUrl))
+            if (!string.IsNullOrEmpty(project.PackOptions.LicenseUrl))
             {
-                builder.LicenseUrl = new Uri(project.LicenseUrl);
+                builder.LicenseUrl = new Uri(project.PackOptions.LicenseUrl);
             }
 
             return builder;

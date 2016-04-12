@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
             var baseOption = context.ProjectFile.GetCompilerOptions(framework, configurationName);
 
             IReadOnlyList<string> defaultSuppresses;
-            var compilerName = context.ProjectFile.CompilerName ?? "csc";
+            var compilerName = baseOption.CompilerName ?? "csc";
             if (DefaultCompilerWarningSuppresses.Suppresses.TryGetValue(compilerName, out defaultSuppresses))
             {
                 baseOption.SuppressWarnings = (baseOption.SuppressWarnings ?? Enumerable.Empty<string>()).Concat(defaultSuppresses).Distinct();

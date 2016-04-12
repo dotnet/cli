@@ -421,51 +421,6 @@ namespace Microsoft.DotNet.Tools.Publish
                 PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers();
             return allContexts.Select(c => c.CreateRuntimeContext(runtimes));
         }
-        
-        private static void CopyContents(ProjectContext context, string outputPath)
-        {
-            var contentFiles = context.ProjectFile.Files.GetContentFiles();
-            Copy(contentFiles, context.ProjectDirectory, outputPath);
-        }
-
-        private static void Copy(IEnumerable<string> contentFiles, string sourceDirectory, string targetDirectory)
-        {
-            if (contentFiles == null)
-            {
-                throw new ArgumentNullException(nameof(contentFiles));
-            }
-
-            sourceDirectory = PathUtility.EnsureTrailingSlash(sourceDirectory);
-            targetDirectory = PathUtility.EnsureTrailingSlash(targetDirectory);
-
-            foreach (var contentFilePath in contentFiles)
-            {
-                Reporter.Verbose.WriteLine($"Publishing {contentFilePath.Green().Bold()} ...");
-
-                var fileName = Path.GetFileName(contentFilePath);
-
-                var targetFilePath = contentFilePath.Replace(sourceDirectory, targetDirectory);
-                var targetFileParentFolder = Path.GetDirectoryName(targetFilePath);
-
-                // Create directory before copying a file
-                if (!Directory.Exists(targetFileParentFolder))
-                {
-                    Directory.CreateDirectory(targetFileParentFolder);
-                }
-
-                File.Copy(
-                    contentFilePath,
-                    targetFilePath,
-                    overwrite: true);
-
-                // clear read-only bit if set
-                var fileAttributes = File.GetAttributes(targetFilePath);
-                if ((fileAttributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
-                {
-                    File.SetAttributes(targetFilePath, fileAttributes & ~FileAttributes.ReadOnly);
-                }
-            }
-        }
 
         private static void RunScripts(ProjectContext context, string name, Dictionary<string, string> contextVariables)
         {
