@@ -42,14 +42,11 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
 
         [WindowsOnlyTheory]
         [InlineData("KestrelDesktopWithRuntimes", "http://localhost:20201", null, "libuv.dll")]
-        [InlineData("KestrelDesktopWithRuntimes", "http://localhost:20202", "win7-x64", "libuv.dll")]
-        [InlineData("KestrelDesktopWithRuntimes", "http://localhost:20202", "win7-x86", "libuv.dll")]
         [InlineData("KestrelDesktop", "http://localhost:20204", null, "libuv.dll")]
-        [InlineData("KestrelDesktop", "http://localhost:20205", "win7-x64", "libuv.dll")]
-        [InlineData("KestrelDesktop", "http://localhost:20205", "win7-x86", "libuv.dll")]
         public async Task DesktopApp_WithKestrel_WorksWhenPublished(string project, string url, string runtime, string libuvName)
         {
-            var runnable = string.IsNullOrEmpty(runtime) || PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers().Contains(runtime);
+            // Temporary until we resolve: https://github.com/dotnet/cli/issues/2428
+            var runnable = RuntimeInformation.ProcessArchitecture != Architecture.X86;
 
             var testInstance = GetTestInstance()
                 .WithLockFiles();
@@ -68,16 +65,6 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             if (runnable)
             {
                 var outputExePath = Path.Combine(outputDir.FullName, publishCommand.GetOutputExecutable());
-
-                // If we're running on a 64-bit OS but trying to launch a 32-bit process, we need to use corflags to force
-                // the process to be 32-bit. At some point we need to look at how users should do this themselves, but at
-                // worst they can use corflags too for v1.
-                if(RuntimeInformation.OSArchitecture == Architecture.X64 && runtime.EndsWith("x86"))
-                {
-                    Command.Create("corflags", new[] { outputExePath, "/32BITREQ+" })
-                        .Execute()
-                        .Should().Pass();
-                }
 
                 var command = new TestCommand(outputExePath);
                 try
@@ -103,7 +90,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
         public async Task DesktopApp_WithKestrel_WorksWhenRun(string project, string url)
         {
             // Disabled due to https://github.com/dotnet/cli/issues/2428
-            if (PlatformServices.Default.Runtime.GetRuntimeIdentifier().EndsWith("-x86"))
+            if (RuntimeInformation.ProcessArchitecture == Architecture.X86)
             {
                 return;
             }
