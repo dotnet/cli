@@ -26,7 +26,7 @@
         "dnxcore50"
       ],
       "dependencies": {
-        "System.Diagnostics.Process": "4.1.0-rc2-24008"
+        "System.Diagnostics.Process": "4.1.0-rc2-24011"
       }
     }
   }
