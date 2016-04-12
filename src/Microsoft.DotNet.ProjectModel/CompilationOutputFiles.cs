@@ -58,14 +58,26 @@ namespace Microsoft.DotNet.ProjectModel
 
         public virtual IEnumerable<ResourceFile> Resources()
         {
-            var resourceNames = Project.Files.ResourceFiles
-                .Select(f => ResourceUtility.GetResourceCultureName(f.Key))
-                .Where(f => !string.IsNullOrEmpty(f))
-                .Distinct();
-
-            foreach (var resourceName in resourceNames)
+            IEnumerable<string> resourceCultureNames = null;
+            var compilationOptions = Project.GetCompilerOptions(Framework, Configuration);
+            if (compilationOptions.EmbedInclude == null)
             {
-                yield return new ResourceFile(Path.Combine(BasePath, resourceName, Project.Name + ".resources" + FileNameSuffixes.DotNet.DynamicLib), resourceName);
+                resourceCultureNames = Project.Files.ResourceFiles
+                    .Select(f => ResourceUtility.GetResourceCultureName(f.Key))
+                    .Where(f => !string.IsNullOrEmpty(f))
+                    .Distinct();
+            }
+            else
+            {
+                resourceCultureNames = compilationOptions.EmbedInclude.GetIncludeFiles("/")
+                    .Select(f => ResourceUtility.GetResourceCultureName(f.SourcePath))
+                    .Where(f => !string.IsNullOrEmpty(f))
+                    .Distinct();
+            }
+
+            foreach (var resourceCultureName in resourceCultureNames)
+            {
+                yield return new ResourceFile(Path.Combine(BasePath, resourceCultureName, Project.Name + ".resources" + FileNameSuffixes.DotNet.DynamicLib), resourceName);
             }
         }
 
