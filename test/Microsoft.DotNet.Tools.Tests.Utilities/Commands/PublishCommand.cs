@@ -7,6 +7,7 @@ using Microsoft.Extensions.PlatformAbstractions;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
 {
@@ -21,8 +22,15 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         private readonly string _config;
         private readonly bool _noBuild;
         private readonly string _output;
+        private readonly string _buidBasePathDirectory;
 
-        public PublishCommand(string projectPath, string framework = "", string runtime = "", string output = "", string config = "", bool forcePortable = false, bool noBuild = false)
+        public PublishCommand(string projectPath,
+            string framework = "",
+            string runtime = "",
+            string output = "",
+            string config = "",
+            bool noBuild = false,
+            string buildBasePath = "")
             : base("dotnet")
         {
             _path = projectPath;
@@ -32,6 +40,13 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             _output = output;
             _config = config;
             _noBuild = noBuild;
+            _buidBasePathDirectory = buildBasePath;
+        }
+
+        public override Task<CommandResult> ExecuteAsync(string args = "")
+        {
+            args = $"publish {BuildArgs()} {args}";
+            return base.ExecuteAsync(args);
         }
 
         public override CommandResult Execute(string args = "")
@@ -93,7 +108,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         private string BuildArgs()
         {
-            return $"{_path} {FrameworkOption} {RuntimeOption} {OutputOption} {ConfigOption} {NoBuildFlag}";
+            return $"{_path} {FrameworkOption} {RuntimeOption} {OutputOption} {ConfigOption} {NoBuildFlag} {BuildBasePathOption}";
         }
 
         private string FrameworkOption => string.IsNullOrEmpty(_framework) ? "" : $"-f {_framework}";
@@ -101,5 +116,6 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         private string OutputOption => string.IsNullOrEmpty(_output) ? "" : $"-o \"{_output}\"";
         private string ConfigOption => string.IsNullOrEmpty(_config) ? "" : $"-c {_output}";
         private string NoBuildFlag => _noBuild ? "--no-build" :"";
+        private string BuildBasePathOption => string.IsNullOrEmpty(_buidBasePathDirectory) ? "" : $"-b {_buidBasePathDirectory}";
     }
 }

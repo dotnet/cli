@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli.Build.Framework;
 using Microsoft.Extensions.PlatformAbstractions;
@@ -9,12 +10,14 @@ using static Microsoft.DotNet.Cli.Build.FS;
 using static Microsoft.DotNet.Cli.Build.Framework.BuildHelpers;
 using System.Text.RegularExpressions;
 using System.Reflection.PortableExecutable;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Microsoft.DotNet.Cli.Build
 {
     public class CompileTargets
     {
-        public static readonly string CoreCLRVersion = "1.0.2-rc2-23931";
+        public static readonly string CoreCLRVersion = "1.0.2-rc2-24008";
         public static readonly string AppDepSdkVersion = "1.0.6-prerelease-00003";
         public static readonly bool IsWinx86 = CurrentPlatform.IsWindows && CurrentArchitecture.Isx86;
 
@@ -46,7 +49,9 @@ namespace Microsoft.DotNet.Cli.Build
             return c.Success();
         }
 
-        [Target(nameof(PrepareTargets.Init), nameof(PackageCoreHost), nameof(CompileStage1), nameof(CompileStage2))]
+        // Moving PrepareTargets.RestorePackages after PackagePkgProjects because managed code depends on the 
+        // Microsoft.NETCore.App package that is created during PackagePkgProjects.
+        [Target(nameof(PrepareTargets.Init), nameof(PackagePkgProjects), nameof(PrepareTargets.RestorePackages), nameof(CompileStage1), nameof(CompileStage2))]
         public static BuildTargetResult Compile(BuildTargetContext c)
         {
             return c.Success();
@@ -56,7 +61,7 @@ namespace Microsoft.DotNet.Cli.Build
         private static string HostPolicyVer = "1.0.1";
         private static string HostFxrVer = "1.0.1";
 
-        [Target]
+        [Target(nameof(PrepareTargets.Init))]
         public static BuildTargetResult CompileCoreHost(BuildTargetContext c)
         {
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
@@ -141,12 +146,8 @@ namespace Microsoft.DotNet.Cli.Build
         }
 
         [Target(nameof(CompileCoreHost))]
-        public static BuildTargetResult PackageCoreHost(BuildTargetContext c)
+        public static BuildTargetResult PackagePkgProjects(BuildTargetContext c)
         {
-            if (!string.Equals(Environment.GetEnvironmentVariable("BUILD_COREHOST_PACKAGES"), "1"))
-            {
-                return c.Success();
-            }
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
             var versionTag = buildVersion.ReleaseSuffix;
             var buildMajor = buildVersion.CommitCountString;
@@ -154,11 +155,11 @@ namespace Microsoft.DotNet.Cli.Build
 
             var version = buildVersion.NuGetVersion;
             var content = $@"{c.BuildContext["CommitHash"]}{Environment.NewLine}{version}{Environment.NewLine}";
-            File.WriteAllText(Path.Combine(c.BuildContext.BuildDirectory, "src", "corehost", "packaging", "version.txt"), content);
-            string corehostSrcDir = Path.Combine(c.BuildContext.BuildDirectory, "src", "corehost");
+            var pkgDir = Path.Combine(c.BuildContext.BuildDirectory, "pkg");
+            File.WriteAllText(Path.Combine(pkgDir, "version.txt"), content);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                Command.Create(Path.Combine(corehostSrcDir, "packaging", "pack.cmd"))
+                Command.Create(Path.Combine(pkgDir, "pack.cmd"))
                     // Workaround to arg escaping adding backslashes for arguments to .cmd scripts.
                     .Environment("__WorkaroundCliCoreHostBuildArch", arch)
                     .Environment("__WorkaroundCliCoreHostBinDir", Dirs.Corehost)
@@ -174,7 +175,7 @@ namespace Microsoft.DotNet.Cli.Build
             }
             else
             {
-                Exec(Path.Combine(corehostSrcDir, "packaging", "pack.sh"),
+                Exec(Path.Combine(pkgDir, "pack.sh"),
                     "--arch",
                     "x64",
                     "--hostbindir",
@@ -191,11 +192,13 @@ namespace Microsoft.DotNet.Cli.Build
                     versionTag);
             }
             int runtimeCount = 0;
-            foreach (var file in Directory.GetFiles(Path.Combine(corehostSrcDir, "packaging", "bin", "packages"), "*.nupkg"))
+            foreach (var file in Directory.GetFiles(Path.Combine(pkgDir, "bin", "packages"), "*.nupkg"))
             {
                 var fileName = Path.GetFileName(file);
-                File.Copy(file, Path.Combine(Dirs.Corehost, fileName));
+                File.Copy(file, Path.Combine(Dirs.Corehost, fileName), true);
                 runtimeCount += (fileName.StartsWith("runtime.") ? 1 : 0);
+
+                Console.WriteLine($"Copying package {fileName} to artifacts directory {Dirs.Corehost}.");
             }
             if (runtimeCount < 3)
             {
@@ -243,6 +246,9 @@ namespace Microsoft.DotNet.Cli.Build
                 outputDir: Dirs.Stage1);
 
             CleanOutputDir(Path.Combine(Dirs.Stage1, "sdk"));
+            FS.CopyRecursive(Dirs.Stage1, Dirs.Stage1Symbols);
+
+            RemovePdbsFromDir(Path.Combine(Dirs.Stage1, "sdk"));
 
             return result;
         }
@@ -293,13 +299,23 @@ namespace Microsoft.DotNet.Cli.Build
             }
 
             CleanOutputDir(Path.Combine(Dirs.Stage2, "sdk"));
+            FS.CopyRecursive(Dirs.Stage2, Dirs.Stage2Symbols);
+
+            RemovePdbsFromDir(Path.Combine(Dirs.Stage2, "sdk"));
 
             return c.Success();
         }
 
         private static void CleanOutputDir(string directory)
         {
-            FS.RmFilesInDirRecursive(directory, "vbc.exe");
+            foreach (var file in FilesToClean)
+            {
+                FS.RmFilesInDirRecursive(directory, file);
+            }
+        }
+
+        private static void RemovePdbsFromDir(string directory)
+        {
             FS.RmFilesInDirRecursive(directory, "*.pdb");
         }
 
@@ -316,8 +332,25 @@ namespace Microsoft.DotNet.Cli.Build
 
         public static void PublishSharedFramework(BuildTargetContext c, string outputDir, DotNetCli dotnetCli)
         {
-            string SharedFrameworkSourceRoot = Path.Combine(Dirs.RepoRoot, "src", "sharedframework", "framework");
+            string SharedFrameworkTemplateSourceRoot = Path.Combine(Dirs.RepoRoot, "src", "sharedframework", "framework");
             string SharedFrameworkNugetVersion = c.BuildContext.Get<string>("SharedFrameworkNugetVersion");
+
+            string sharedFrameworkRid;
+            if (PlatformServices.Default.Runtime.OperatingSystemPlatform == Platform.Windows)
+            {
+                sharedFrameworkRid = $"win7-{PlatformServices.Default.Runtime.RuntimeArchitecture}";
+            }
+            else
+            {
+                sharedFrameworkRid = PlatformServices.Default.Runtime.GetRuntimeIdentifier();
+            }
+
+            string SharedFrameworkSourceRoot = GenerateSharedFrameworkProject(c, SharedFrameworkTemplateSourceRoot, sharedFrameworkRid);
+            
+            dotnetCli.Restore("--verbosity", "verbose", "--disable-parallel", "--infer-runtimes", "--fallbacksource", Dirs.Corehost)
+                .WorkingDirectory(SharedFrameworkSourceRoot)
+                .Execute()
+                .EnsureSuccessful();
 
             // We publish to a sub folder of the PublishRoot so tools like heat and zip can generate folder structures easier.
             string SharedFrameworkNameAndVersionRoot = Path.Combine(outputDir, "shared", SharedFrameworkName, SharedFrameworkNugetVersion);
@@ -329,19 +362,10 @@ namespace Microsoft.DotNet.Cli.Build
             }
 
             string publishFramework = "dnxcore50"; // Temporary, use "netcoreapp" when we update nuget.
-            string publishRuntime;
-            if (PlatformServices.Default.Runtime.OperatingSystemPlatform == Platform.Windows)
-            {
-                publishRuntime = $"win7-{PlatformServices.Default.Runtime.RuntimeArchitecture}";
-            }
-            else
-            {
-                publishRuntime = PlatformServices.Default.Runtime.GetRuntimeIdentifier();
-            }
 
             dotnetCli.Publish(
                 "--output", SharedFrameworkNameAndVersionRoot,
-                "-r", publishRuntime,
+                "-r", sharedFrameworkRid,
                 "-f", publishFramework,
                 SharedFrameworkSourceRoot).Execute().EnsureSuccessful();
 
@@ -352,6 +376,7 @@ namespace Microsoft.DotNet.Cli.Build
             // Rename the .deps file
             var destinationDeps = Path.Combine(SharedFrameworkNameAndVersionRoot, $"{SharedFrameworkName}.deps.json");
             File.Move(Path.Combine(SharedFrameworkNameAndVersionRoot, "framework.deps.json"), destinationDeps);
+            ChangeEntryPointLibraryName(destinationDeps, null);
 
             // Generate RID fallback graph
             string runtimeGraphGeneratorRuntime = null;
@@ -397,6 +422,9 @@ namespace Microsoft.DotNet.Cli.Build
             File.Copy(
                 Path.Combine(Dirs.Corehost, HostPolicyBaseName),
                 Path.Combine(SharedFrameworkNameAndVersionRoot, HostPolicyBaseName), true);
+            File.Copy(
+                Path.Combine(Dirs.Corehost, DotnetHostFxrBaseName),
+                Path.Combine(SharedFrameworkNameAndVersionRoot, DotnetHostFxrBaseName), true);
 
             if (File.Exists(Path.Combine(SharedFrameworkNameAndVersionRoot, "mscorlib.ni.dll")))
             {
@@ -411,6 +439,30 @@ namespace Microsoft.DotNet.Cli.Build
             var version = SharedFrameworkNugetVersion;
             var content = $@"{c.BuildContext["CommitHash"]}{Environment.NewLine}{version}{Environment.NewLine}";
             File.WriteAllText(Path.Combine(SharedFrameworkNameAndVersionRoot, ".version"), content);
+        }
+
+        /// <summary>
+        /// Generates the real shared framework project that will get published.
+        /// </summary>
+        /// <param name="sharedFrameworkTemplatePath">The "sharedFramework" source template folder.</param>
+        private static string GenerateSharedFrameworkProject(BuildTargetContext c, string sharedFrameworkTemplatePath, string rid)
+        {
+            string sharedFrameworkProjectPath = Path.Combine(Dirs.Intermediate, "sharedFramework", "framework");
+            Utils.DeleteDirectory(sharedFrameworkProjectPath);
+            CopyRecursive(sharedFrameworkTemplatePath, sharedFrameworkProjectPath, true);
+
+            string templateFile = Path.Combine(sharedFrameworkProjectPath, "project.json.template");
+            JObject sharedFrameworkProject = JsonUtils.ReadProject(templateFile);
+            sharedFrameworkProject["dependencies"]["Microsoft.NETCore.App"] = c.BuildContext.Get<BuildVersion>("BuildVersion").NetCoreAppVersion;
+            ((JObject)sharedFrameworkProject["runtimes"]).RemoveAll();
+            sharedFrameworkProject["runtimes"][rid] = new JObject();
+
+            string projectJsonPath = Path.Combine(sharedFrameworkProjectPath, "project.json");
+            JsonUtils.WriteProject(sharedFrameworkProject, projectJsonPath);
+
+            Rm(templateFile);
+
+            return sharedFrameworkProjectPath;
         }
 
         private static BuildTargetResult CompileCliSdk(BuildTargetContext c, DotNetCli dotnet, string outputDir)
@@ -445,7 +497,7 @@ namespace Microsoft.DotNet.Cli.Build
                     "--output",
                     outputDir,
                     "--framework",
-                    "netstandard1.5") 
+                    "netstandard1.5")
                     .Execute()
                     .EnsureSuccessful();
 
@@ -468,6 +520,7 @@ namespace Microsoft.DotNet.Cli.Build
                     File.Delete(Path.Combine(binaryToCorehostifyOutDir, $"{binaryToCorehostify}.exe"));
                     File.Copy(compilersDeps, Path.Combine(outputDir, binaryToCorehostify + ".deps.json"));
                     File.Copy(compilersRuntimeConfig, Path.Combine(outputDir, binaryToCorehostify + ".runtimeconfig.json"));
+                    ChangeEntryPointLibraryName(Path.Combine(outputDir, binaryToCorehostify + ".deps.json"), binaryToCorehostify);
                 }
                 catch (Exception ex)
                 {
@@ -575,6 +628,42 @@ namespace Microsoft.DotNet.Cli.Build
             }
 
             return c.Success();
+        }
+
+        private static void ChangeEntryPointLibraryName(string depsFile, string newName)
+        {
+            JToken deps;
+            using (var file = File.OpenText(depsFile))
+            using (JsonTextReader reader = new JsonTextReader(file))
+            {
+                deps = JObject.ReadFrom(reader);
+            }
+
+            var target = deps["targets"][deps["runtimeTarget"]["name"].Value<string>()];
+            var library = target.Children<JProperty>().First();
+            var version = library.Name.Substring(library.Name.IndexOf('/') + 1);
+            if (newName == null)
+            {
+                library.Remove();
+            }
+            else
+            {
+                library.Replace(new JProperty(newName + '/' + version, library.Value));
+            }
+            library = deps["libraries"].Children<JProperty>().First();
+            if (newName == null)
+            {
+                library.Remove();
+            }
+            else
+            {
+                library.Replace(new JProperty(newName + '/' + version, library.Value));
+            }
+            using (var file = File.CreateText(depsFile))
+            using (var writer = new JsonTextWriter(file) { Formatting = Formatting.Indented})
+            {
+                deps.WriteTo(writer);
+            }
         }
 
         private static void DeleteMainPublishOutput(string path, string name)
