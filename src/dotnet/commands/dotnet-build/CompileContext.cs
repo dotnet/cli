@@ -533,12 +533,6 @@ namespace Microsoft.DotNet.Tools.Build
             ProjectDescription projectDependency;
             foreach (var dependency in node.Library.Dependencies)
             {
-                if (dependencies.ProjectDependenciesWithSources.TryGetValue(dependency.Name, out projectDependency))
-                {
-                    // Add to the list of projects to build
-                    outputs.Add(projectDependency);
-                }
-
                 // Sort the children
                 Sort(dependencies.Dependencies[dependency.Name], dependencies, outputs);
             }
