@@ -3,7 +3,7 @@
   "compilationOptions": {
     "emitEntryPoint": true
   },
-  
+
   "dependencies": {
     "Microsoft.NETCore.App": "1.0.0-rc2-*",
     "dotnet-hello": {
@@ -12,8 +12,6 @@
     }
   },
   "frameworks": {
-    "ne": {
-      "imports": "dnxcore50"
-    }
+    "netcoreapp1.0": { }
   }
 }
