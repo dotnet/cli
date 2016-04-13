@@ -231,7 +231,6 @@ namespace Microsoft.DotNet.Cli.Build
         public static BuildTargetResult CompileStage1(BuildTargetContext c)
         {
             CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "src"));
-            CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "test"));
 
             if (Directory.Exists(Dirs.Stage1))
             {
@@ -259,7 +258,6 @@ namespace Microsoft.DotNet.Cli.Build
             var configuration = c.BuildContext.Get<string>("Configuration");
 
             CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "src"));
-            CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "test"));
 
             if (Directory.Exists(Dirs.Stage2))
             {
