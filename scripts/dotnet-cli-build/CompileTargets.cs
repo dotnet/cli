@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli.Build.Framework;
@@ -156,7 +157,8 @@ namespace Microsoft.DotNet.Cli.Build
             var content = $@"{c.BuildContext["CommitHash"]}{Environment.NewLine}{version}{Environment.NewLine}";
             var pkgDir = Path.Combine(c.BuildContext.BuildDirectory, "pkg");
             File.WriteAllText(Path.Combine(pkgDir, "version.txt"), content);
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+
+            if (CurrentPlatform.IsWindows)
             {
                 Command.Create(Path.Combine(pkgDir, "pack.cmd"))
                     // Workaround to arg escaping adding backslashes for arguments to .cmd scripts.
@@ -171,6 +173,15 @@ namespace Microsoft.DotNet.Cli.Build
                     .ForwardStdErr()
                     .Execute()
                     .EnsureSuccessful();
+
+                // Workaround for x86 - x64 issue
+
+                var alternateRid = CurrentArchitecture.Isx64 
+                    ? "win7-x86"
+                    : "win7-x64";
+
+                CreateDummyNetCoreAppRuntimePackage(DotNetCli.Stage0, alternateRid, "1.0.0-rc2", Dirs.Corehost);
+
             }
             else
             {
@@ -301,6 +312,52 @@ namespace Microsoft.DotNet.Cli.Build
             RemovePdbsFromDir(Path.Combine(Dirs.Stage2, "sdk"));
 
             return c.Success();
+        }
+
+        private static void CreateDummyNetCoreAppRuntimePackage(DotNetCli dotnet, string rid, string version, string outputDir)
+        {
+            var packageId = $"runtime.{rid}.{SharedFrameworkName}";
+
+            var projectJson = new StringBuilder();
+            projectJson.Append("{");
+            projectJson.Append($"  \"version\": \"{version}\",");
+            projectJson.Append($"  \"name\": \"{packageId}\",");
+            projectJson.Append("  \"dependencies\": { \"NETStandard.Library\": \"1.5.0-rc2-24008\" },");
+            projectJson.Append("  \"frameworks\": { \"netcoreapp1.0\": { \"imports\": [\"netstandard1.5\", \"dnxcore50\"] } },");
+            projectJson.Append($"  \"runtimes\": {{ \"{rid}\": {{ }} }},");
+            projectJson.Append("}");
+
+            var programCs = "using System; namespace ConsoleApplication { public class Program { public static void Main(string[] args) { Console.WriteLine(\"Hello World!\"); } } }";
+
+            var tempPjDirectory = Path.Combine(Dirs.Intermediate, "dummyNETCoreAppPackage");
+            FS.Rmdir(tempPjDirectory);
+
+            Directory.CreateDirectory(tempPjDirectory);
+
+            var tempPjFile = Path.Combine(tempPjDirectory, "project.json");
+            var tempSourceFile = Path.Combine(tempPjDirectory, "Program.cs");
+
+            File.WriteAllText(tempPjFile, projectJson.ToString());
+            File.WriteAllText(tempSourceFile, programCs.ToString());
+
+            var oldDir = Directory.GetCurrentDirectory();
+            Directory.SetCurrentDirectory(tempPjDirectory);
+
+            dotnet.Restore("--verbosity", "verbose", "--disable-parallel")
+                .Execute()
+                .EnsureSuccessful();
+
+            dotnet.Build(tempPjFile, "--runtime", rid)
+                .Execute()
+                .EnsureSuccessful();
+
+            dotnet.Pack(
+                tempPjFile, "--no-build",
+                "--output", outputDir)
+                .Execute()
+                .EnsureSuccessful();
+
+            Directory.SetCurrentDirectory(oldDir);
         }
 
         private static void CleanOutputDir(string directory)
