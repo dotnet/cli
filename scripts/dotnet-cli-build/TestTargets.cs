@@ -166,7 +166,7 @@ namespace Microsoft.DotNet.Cli.Build
                 {
                     "netstandard1.5",
                     "netstandard1.3",
-                    "netstandardapp1.5"
+                    "netcoreapp1.0"
                 };
 
                 if (CurrentPlatform.IsWindows)
@@ -250,7 +250,7 @@ namespace Microsoft.DotNet.Cli.Build
             foreach (var project in projects)
             {
                 c.Info($"Building: {project}");
-                dotnet.Build("--framework", "netstandardapp1.5")
+                dotnet.Build("--framework", "netcoreapp1.0")
                     .WorkingDirectory(Path.GetDirectoryName(project))
                     .Execute()
                     .EnsureSuccessful();

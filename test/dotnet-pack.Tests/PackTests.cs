@@ -92,7 +92,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             File.Exists(outputPackage).Should().BeTrue(outputPackage);
 
             var zip = ZipFile.Open(outputPackage, ZipArchiveMode.Read);
-            zip.Entries.Should().Contain(e => e.FullName == "lib/netstandardapp1.5/TestLibraryWithConfiguration.dll");
+            zip.Entries.Should().Contain(e => e.FullName == "lib/netcoreapp1.0/TestLibraryWithConfiguration.dll");
         }
 
         [Fact]
@@ -109,13 +109,13 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             var outputPackage = Path.Combine(testInstance.TestRoot, "bin", "Debug", "LibraryWithOutputAssemblyName.1.0.0.nupkg");
             File.Exists(outputPackage).Should().BeTrue(outputPackage);
             var zip = ZipFile.Open(outputPackage, ZipArchiveMode.Read);
-            zip.Entries.Should().Contain(e => e.FullName == "lib/netstandardapp1.5/MyLibrary.dll");
+            zip.Entries.Should().Contain(e => e.FullName == "lib/netcoreapp1.0/MyLibrary.dll");
 
             var symbolsPackage = Path.Combine(testInstance.TestRoot, "bin", "Debug", "LibraryWithOutputAssemblyName.1.0.0.symbols.nupkg");
             File.Exists(symbolsPackage).Should().BeTrue(symbolsPackage);
             zip = ZipFile.Open(symbolsPackage, ZipArchiveMode.Read);
-            zip.Entries.Should().Contain(e => e.FullName == "lib/netstandardapp1.5/MyLibrary.dll");
-            zip.Entries.Should().Contain(e => e.FullName == "lib/netstandardapp1.5/MyLibrary.pdb");
+            zip.Entries.Should().Contain(e => e.FullName == "lib/netcoreapp1.0/MyLibrary.dll");
+            zip.Entries.Should().Contain(e => e.FullName == "lib/netcoreapp1.0/MyLibrary.pdb");
         }
 
         private void CopyProjectToTempDir(string projectDir, TempDirectory tempDir)
