@@ -101,10 +101,9 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
         public void CrossPublishingSucceedsAndHasExpectedArtifacts(string rid, string hostExtension, string[] expectedArtifacts)
         {
             var testNugetCache = "packages_cross_publish_test";
-            TestInstance instance = GetTestGroupTestAssetsManager("CrossPublishTestProjects")
-                .CreateTestInstance("StandaloneAppCrossPublish");
+            TestInstance instance = TestAssetsManager.CreateTestInstance(Path.Combine("PortableTests"));
                 
-            var testProject = Path.Combine(instance.TestRoot, "project.json");
+            var testProject = Path.Combine(instance.TestRoot, "StandaloneApp", "project.json");
 
             var restoreCommand = new RestoreCommand();
 
