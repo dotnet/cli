@@ -66,7 +66,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
         protected CommandResult BuildProject(string projectFile, bool noDependencies = false, bool noIncremental = false, bool expectBuildFailure = false)
         {
-            var buildCommand = new BuildCommand(projectFile, output: GetOutputDir(), framework: "netstandardapp1.5", noIncremental: noIncremental, noDependencies : noDependencies);
+            var buildCommand = new BuildCommand(projectFile, output: GetOutputDir(), framework: "netcoreapp1.0", noIncremental: noIncremental, noDependencies : noDependencies);
             var result = buildCommand.ExecuteWithCapturedOutput();
 
             if (!expectBuildFailure)
@@ -120,14 +120,14 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
         protected string GetCompilationOutputPath()
         {
-            var executablePath = Path.Combine(GetBinRoot(), "Debug", "netstandardapp1.5");
+            var executablePath = Path.Combine(GetBinRoot(), "Debug", "netcoreapp1.0");
 
             return executablePath;
         }
 
         protected string GetIntermediaryOutputPath()
         {
-            var executablePath = Path.Combine(TestProjectRoot, "obj", "Debug", "netstandardapp1.5");
+            var executablePath = Path.Combine(TestProjectRoot, "obj", "Debug", "netcoreapp1.0");
 
             return executablePath;
         }
