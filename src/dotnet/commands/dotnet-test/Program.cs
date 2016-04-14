@@ -7,8 +7,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.DotNet.Cli.Utils;
-using Microsoft.Dnx.Runtime.Common.CommandLine;
 using Microsoft.DotNet.ProjectModel;
+using Microsoft.Dnx.Runtime.Common.CommandLine;
 
 namespace Microsoft.DotNet.Tools.Test
 {
@@ -42,15 +42,44 @@ namespace Microsoft.DotNet.Tools.Test
                     RegisterForParentProcessExit(dotnetTestParams.ParentProcessId.Value);
                 }
 
-                var projectContexts = CreateProjectContexts(dotnetTestParams.ProjectPath);
+                var projectPath = GetProjectPath(dotnetTestParams.ProjectPath);
+                var runtimeIdentifiers = string.IsNullOrEmpty(dotnetTestParams.Runtime) ? Enumerable.Empty<string>() : new[] { dotnetTestParams.Runtime };
+                var exitCode = 0;
 
-                var projectContext = projectContexts.First();
+                if (dotnetTestParams.Framework != null)
+                {
+                    var projectContext = ProjectContext.Create(projectPath, dotnetTestParams.Framework, runtimeIdentifiers);
+                    exitCode = RunTest(projectContext, dotnetTestParams);
+                }
+                else
+                {
+                    var projectContexts = ProjectContext.CreateContextForEachFramework(projectPath, runtimeIdentifiers: runtimeIdentifiers);
+                    var summary = new Summary();
 
-                var testRunner = projectContext.ProjectFile.TestRunner;
+                    // Execute for all TFMs the project targets.
+                    foreach (var projectContext in projectContexts)
+                    {
+                        var result = RunTest(projectContext, dotnetTestParams);
+                        if (result == 0)
+                        {
+                            summary.Passed++;
+                        }
+                        else
+                        {
+                            summary.Failed++;
+                            if (exitCode == 0)
+                            {
+                                // If tests fail in more than one TFM, we'll have it use the result of the first one
+                                // as the exit code.
+                                exitCode = result;
+                            }
+                        }
+                    }
 
-                IDotnetTestRunner dotnetTestRunner = _dotnetTestRunnerFactory.Create(dotnetTestParams.Port);
+                    PrintSummary(summary);
+                }
 
-                return dotnetTestRunner.RunTests(projectContext, dotnetTestParams);
+                return exitCode;
             }
             catch (InvalidOperationException ex)
             {
@@ -98,7 +127,14 @@ namespace Microsoft.DotNet.Tools.Test
             }
         }
 
-        private static IEnumerable<ProjectContext> CreateProjectContexts(string projectPath)
+        private int RunTest(ProjectContext projectContext, DotnetTestParams dotnetTestParams)
+        {
+            var testRunner = projectContext.ProjectFile.TestRunner;
+            var dotnetTestRunner = _dotnetTestRunnerFactory.Create(dotnetTestParams.Port);
+            return dotnetTestRunner.RunTests(projectContext, dotnetTestParams);
+        }
+
+        private static string GetProjectPath(string projectPath)
         {
             projectPath = projectPath ?? Directory.GetCurrentDirectory();
 
@@ -112,7 +148,29 @@ namespace Microsoft.DotNet.Tools.Test
                 throw new InvalidOperationException($"{projectPath} does not exist.");
             }
 
-            return ProjectContext.CreateContextForEachFramework(projectPath);
+            return projectPath;
+        }
+
+        private static void PrintSummary(Summary summary)
+        {
+            var summaryMessage = $"SUMMARY: Total: {summary.Total} targets, Passed: {summary.Passed}, Failed: {summary.Failed}.";
+            if (summary.Failed > 0)
+            {
+                Reporter.Error.WriteLine(summaryMessage.Red());
+            }
+            else
+            {
+                Reporter.Output.WriteLine(summaryMessage);
+            }
+        }
+
+        private class Summary
+        {
+            public int Passed { get; set; }
+
+            public int Failed { get; set; }
+
+            public int Total => Passed + Failed;
         }
     }
 }

@@ -101,7 +101,7 @@ namespace Microsoft.DotNet.Cli.Build
             dotnet.Restore(
                 "--verbosity", "verbose",
                 "--fallbacksource", Dirs.Corehost)
-                .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectWithTests"))
+                .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectsWithTests"))
                 .Execute()
                 .EnsureSuccessful();
 
@@ -268,10 +268,24 @@ namespace Microsoft.DotNet.Cli.Build
                     .EnsureSuccessful();
             }
 
-            // build ProjectWithTests, which is outside of TestProjects and targets netcoreapp
-            string projectWithTests = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectWithTests");
+            // build ProjectWithTests\NetCoreAppOnlyProject, which is outside of TestProjects and targets netcoreapp
+            string projectWithTests = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectsWithTests", "NetCoreAppOnlyProject");
             c.Info($"Building: {projectWithTests}");
             dotnet.Build("--framework", "netcoreapp1.0")
+                .WorkingDirectory(projectWithTests)
+                .Execute()
+                .EnsureSuccessful();
+            
+            // build ProjectWithTests\MultipleFrameworkProject, which is outside of TestProjects and targets netcoreapp and net451
+            projectWithTests = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectsWithTests", "MultipleFrameworkProject");
+            c.Info($"Building: {projectWithTests}");
+            dotnet.Build("--framework", "netcoreapp1.0")
+                .WorkingDirectory(projectWithTests)
+                .Execute()
+                .EnsureSuccessful();
+            
+            c.Info($"Building: {projectWithTests}");
+            dotnet.Build("--framework", "net451")
                 .WorkingDirectory(projectWithTests)
                 .Execute()
                 .EnsureSuccessful();
