@@ -17,7 +17,8 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
                 AppContext.BaseDirectory,
                 "TestAssets",
                 "TestProjects",
-                "ProjectWithTests",
+                "ProjectsWithTests",
+                "NetCoreAppOnlyProject",
                 "project.json");
 
         private TestCommand _testCommand;
