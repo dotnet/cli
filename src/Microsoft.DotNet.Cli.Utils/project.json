@@ -6,11 +6,11 @@
   },
   "dependencies": {
     "Microsoft.DotNet.ProjectModel": "1.0.0-*",
-    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc2-20100",
-    "NuGet.Versioning": "3.5.0-beta-1123",
-    "NuGet.Packaging": "3.5.0-beta-1123",
-    "NuGet.Frameworks": "3.5.0-beta-1123",
-    "NuGet.ProjectModel": "3.5.0-beta-1123"
+    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc2-20459",
+    "NuGet.Versioning": "3.5.0-beta-1130",
+    "NuGet.Packaging": "3.5.0-beta-1130",
+    "NuGet.Frameworks": "3.5.0-beta-1130",
+    "NuGet.ProjectModel": "3.5.0-beta-1130"
   },
   "frameworks": {
     "net451": {
@@ -21,10 +21,12 @@
       }
     },
     "netstandard1.5": {
-      "imports": "dnxcore50",
+      "imports": [
+        "portable-net45+wp80+win8+wpa81+dnxcore50",
+        "dnxcore50"
+      ],
       "dependencies": {
-        "NETStandard.Library": "1.5.0-rc2-23931",
-        "System.Diagnostics.Process": "4.1.0-rc2-23931"
+        "System.Diagnostics.Process": "4.1.0-rc2-24008"
       }
     }
   }

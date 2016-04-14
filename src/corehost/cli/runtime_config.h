@@ -1,6 +1,9 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#ifndef __RUNTIME_CONFIG_H__
+#define __RUNTIME_CONFIG_H__
+
 #include <list>
 
 #include "pal.h"
@@ -19,10 +22,11 @@ public:
     const pal::string_t& get_fx_version() const;
     const pal::string_t& get_fx_name() const;
     const std::list<pal::string_t>& get_probe_paths() const;
-    bool get_fx_roll_fwd() const;
+    bool get_patch_roll_fwd() const;
+    bool get_prerelease_roll_fwd() const;
     bool get_portable() const;
     bool parse_opts(const json_value& opts);
-    void config_kv(std::vector<std::string>*, std::vector<std::string>*) const;
+    void config_kv(std::vector<pal::string_t>*, std::vector<pal::string_t>*) const;
 
 private:
     bool ensure_parsed();
@@ -34,10 +38,12 @@ private:
     std::list<pal::string_t> m_probe_paths;
     pal::string_t m_fx_name;
     pal::string_t m_fx_ver;
-    bool m_fx_roll_fwd;
+    bool m_patch_roll_fwd;
+    bool m_prerelease_roll_fwd;
 
     pal::string_t m_dev_path;
     pal::string_t m_path;
     bool m_portable;
     bool m_valid;
 };
+#endif // __RUNTIME_CONFIG_H__

@@ -2,9 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools.Test.Utilities;
+using Microsoft.Extensions.PlatformAbstractions;
 using System.Runtime.InteropServices;
 using Xunit;
 using FluentAssertions;
@@ -44,15 +46,14 @@ namespace Microsoft.DotNet.Tests
 
         // need conditional theories so we can skip on non-Windows
         [Theory]
-        [InlineData(".NETStandardApp,Version=v1.5", "CoreFX")]
-        [InlineData(".NETFramework,Version=v4.5.1", "NetFX")]
-        public void TestFrameworkSpecificDependencyToolsCanBeInvoked(string framework, string args)
+        [MemberData("DependencyToolArguments")]
+        public void TestFrameworkSpecificDependencyToolsCanBeInvoked(string framework, string args, string expectedDependencyToolPath)
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 return;
             }
-            
+
             var appDirectory = Path.Combine(_desktopTestProjectsRoot, "AppWithDirectDependencyDesktopAndPortable");
 
             new BuildCommand(Path.Combine(appDirectory, "project.json"))
@@ -65,8 +66,34 @@ namespace Microsoft.DotNet.Tests
 
                 result.Should().HaveStdOutContaining(framework);
                 result.Should().HaveStdOutContaining(args);
+                result.Should().HaveStdOutContaining(expectedDependencyToolPath);
                 result.Should().NotHaveStdErr();
                 result.Should().Pass();
+        }
+
+        [Fact]
+        public void ToolsCanAccessDependencyContextProperly()
+        {
+            var appDirectory = Path.Combine(_testProjectsRoot, "DependencyContextFromTool");
+
+            CommandResult result = new DependencyContextTestCommand() { WorkingDirectory = appDirectory }
+                .Execute(Path.Combine(appDirectory, "project.json"));
+
+            result.Should().Pass();
+        }
+
+        public static IEnumerable<object[]> DependencyToolArguments
+        {
+            get
+            {
+                var rid = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
+                var projectOutputPath  = $"AppWithDirectDependencyDesktopAndPortable\\bin\\Debug\\net451\\{rid}\\dotnet-desktop-and-portable.exe";
+                return new[]
+                {
+                    new object[] { ".NETStandard,Version=v1.5", "CoreFX", "lib\\netstandard1.5\\dotnet-desktop-and-portable.dll" },
+                    new object[] { ".NETFramework,Version=v4.5.1", "NetFX", projectOutputPath }
+                };
+            }
         }
 
         [Fact]
@@ -132,6 +159,26 @@ namespace Microsoft.DotNet.Tests
             public override CommandResult ExecuteWithCapturedOutput(string args = "")
             {
                 args = $"portable {args}";
+                return base.ExecuteWithCapturedOutput(args);
+            }
+        }
+
+        class DependencyContextTestCommand : TestCommand
+        {
+            public DependencyContextTestCommand()
+                : base("dotnet")
+            {
+            }
+
+            public override CommandResult Execute(string path)
+            {
+                var args = $"dependency-context-test {path}";
+                return base.Execute(args);
+            }
+
+            public override CommandResult ExecuteWithCapturedOutput(string path)
+            {
+                var args = $"dependency-context-test {path}";
                 return base.ExecuteWithCapturedOutput(args);
             }
         }
