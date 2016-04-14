@@ -42,15 +42,35 @@ namespace Microsoft.DotNet.Tools.Test
                     RegisterForParentProcessExit(dotnetTestParams.ParentProcessId.Value);
                 }
 
-                var projectContexts = CreateProjectContexts(dotnetTestParams.ProjectPath);
+                var projectContexts = CreateProjectContexts(dotnetTestParams.ProjectPath, dotnetTestParams.Runtime);
+                var ranTests = false;
+                foreach (var projectContext in projectContexts)
+                {
+                    if (dotnetTestParams.Framework != null && dotnetTestParams.Framework != projectContext.TargetFramework)
+                    {
+                        continue;
+                    }
 
-                var projectContext = projectContexts.First();
+                    ranTests = true;
+                    var testRunner = projectContext.ProjectFile.TestRunner;
+                    var dotnetTestRunner = _dotnetTestRunnerFactory.Create(dotnetTestParams.Port);
+                    var result = dotnetTestRunner.RunTests(projectContext, dotnetTestParams);
+                    if (result != 0)
+                    {
+                        return result;
+                    }
+                }
 
-                var testRunner = projectContext.ProjectFile.TestRunner;
+                if (!ranTests && projectContexts.Any() && dotnetTestParams.Framework != null)
+                {
+                    TestHostTracing.Source.TraceEvent(
+                        TraceEventType.Error, 
+                        0, 
+                        $"The target framework {dotnetTestParams.Framework} does not exist in {dotnetTestParams.ProjectPath}.");
+                    return 1;
+                }
 
-                IDotnetTestRunner dotnetTestRunner = _dotnetTestRunnerFactory.Create(dotnetTestParams.Port);
-
-                return dotnetTestRunner.RunTests(projectContext, dotnetTestParams);
+                return 0;
             }
             catch (InvalidOperationException ex)
             {
@@ -98,7 +118,7 @@ namespace Microsoft.DotNet.Tools.Test
             }
         }
 
-        private static IEnumerable<ProjectContext> CreateProjectContexts(string projectPath)
+        private static IEnumerable<ProjectContext> CreateProjectContexts(string projectPath, string runtimeIdentifier)
         {
             projectPath = projectPath ?? Directory.GetCurrentDirectory();
 
@@ -112,7 +132,8 @@ namespace Microsoft.DotNet.Tools.Test
                 throw new InvalidOperationException($"{projectPath} does not exist.");
             }
 
-            return ProjectContext.CreateContextForEachFramework(projectPath);
+            var runtimeIdentifiers = string.IsNullOrEmpty(runtimeIdentifier) ? null : new[] { runtimeIdentifier };
+            return ProjectContext.CreateContextForEachFramework(projectPath, runtimeIdentifiers: runtimeIdentifiers);
         }
     }
 }

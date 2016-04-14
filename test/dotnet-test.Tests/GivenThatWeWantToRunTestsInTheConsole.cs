@@ -21,7 +21,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
         {
             var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets"));
             var testInstance =
-                testAssetManager.CreateTestInstance("ProjectWithTests", identifier: "ConsoleTests");
+                testAssetManager.CreateTestInstance(Path.Combine("ProjectsWithTests", "NetCoreAppOnlyProject"), identifier: "ConsoleTests");
 
             _projectFilePath = Path.Combine(testInstance.TestRoot, "project.json");
             var contexts = ProjectContext.CreateContextForEachFramework(
