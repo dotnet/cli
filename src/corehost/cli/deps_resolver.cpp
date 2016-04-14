@@ -427,7 +427,7 @@ void deps_resolver_t::resolve_tpa_list(
         else
         {
             // FIXME: Consider this error as a fail fast?
-            trace::verbose(_X("Error: Could not resolve path to assembly: [%s, %s, %s]"), entry.library_name.c_str(), entry.library_version.c_str(), entry.relative_path.c_str());
+            trace::verbose(_X("Warning: Could not resolve path to assembly: [%s, %s, %s]"), entry.library_name.c_str(), entry.library_version.c_str(), entry.relative_path.c_str());
         }
     };
     
