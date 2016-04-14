@@ -48,6 +48,13 @@ namespace Microsoft.DotNet.Cli.Build
             "debian.8.2-x64"
         };
 
+        public static readonly string[] HostPackages = new[]
+        {
+            "Microsoft.NETCore.DotNetHost",
+            "Microsoft.NETCore.DotNetHostPolicy",
+            "Microsoft.NETCore.DotNetHostResolver"
+        };
+
         public const string SharedFrameworkName = "Microsoft.NETCore.App";
 
         private static string CoreHostBaseName => $"corehost{Constants.ExeSuffix}";
@@ -63,31 +70,34 @@ namespace Microsoft.DotNet.Cli.Build
 
         // Moving PrepareTargets.RestorePackages after PackagePkgProjects because managed code depends on the
         // Microsoft.NETCore.App package that is created during PackagePkgProjects.
-        [Target(nameof(PrepareTargets.Init), nameof(CompileCoreHost), nameof(PackagePkgProjects), nameof(CompileTargets.GenerateStubNETCoreAppPackages), nameof(PrepareTargets.RestorePackages), nameof(CompileStage1), nameof(CompileStage2))]
+        [Target(nameof(PrepareTargets.Init), nameof(CompileCoreHost), nameof(PackagePkgProjects), nameof(CompileTargets.GenerateStubHostPackages), nameof(PrepareTargets.RestorePackages), nameof(CompileStage1), nameof(CompileStage2))]
         public static BuildTargetResult Compile(BuildTargetContext c)
         {
             return c.Success();
         }
 
         [Target]
-        public static BuildTargetResult GenerateStubNETCoreAppPackages(BuildTargetContext c)
+        public static BuildTargetResult GenerateStubHostPackages(BuildTargetContext c)
         {
             string currentRid = GetRuntimeId();
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
 
-            foreach (var rid in NetCoreAppRids)
+            foreach (var hostPackageId in HostPackages)
             {
-                if (! rid.Equals(currentRid))
-
+                foreach (var rid in NetCoreAppRids)
                 {
-                    CreateDummyNetCoreAppRuntimePackage(
-                        DotNetCli.Stage0, 
-                        rid, 
-                        buildVersion.NetCoreAppVersion, 
-                        Dirs.Corehost);
+                    if (! rid.Equals(currentRid))
+
+                    {
+                        CreateDummyRuntimeNuGetPackage(
+                            DotNetCli.Stage0, 
+                            hostPackageId,
+                            rid, 
+                            buildVersion.NetCoreAppVersion, 
+                            Dirs.Corehost);
+                    }
                 }
             }
-
             return c.Success();
         }
 
@@ -339,9 +349,9 @@ namespace Microsoft.DotNet.Cli.Build
             return c.Success();
         }
 
-        private static void CreateDummyNetCoreAppRuntimePackage(DotNetCli dotnet, string rid, string version, string outputDir)
+        private static void CreateDummyRuntimeNuGetPackage(DotNetCli dotnet, string basePackageId, string rid, string version, string outputDir)
         {
-            var packageId = $"runtime.{rid}.{SharedFrameworkName}";
+            var packageId = $"runtime.{rid}.{basePackageId}";
 
             var projectJson = new StringBuilder();
             projectJson.Append("{");
@@ -354,7 +364,7 @@ namespace Microsoft.DotNet.Cli.Build
 
             var programCs = "using System; namespace ConsoleApplication { public class Program { public static void Main(string[] args) { Console.WriteLine(\"Hello World!\"); } } }";
 
-            var tempPjDirectory = Path.Combine(Dirs.Intermediate, "dummyNETCoreAppPackage");
+            var tempPjDirectory = Path.Combine(Dirs.Intermediate, "dummyNuGetPackageIntermediate");
             FS.Rmdir(tempPjDirectory);
 
             Directory.CreateDirectory(tempPjDirectory);

@@ -10,7 +10,8 @@
           "version": "1.0.0-rc2-*"
         },
         "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-*"
-      }
+      },
+      "imports": "dnxcore50"
     }
   }
 }
