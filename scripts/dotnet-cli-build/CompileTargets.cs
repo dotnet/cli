@@ -180,7 +180,11 @@ namespace Microsoft.DotNet.Cli.Build
                     ? "win7-x86"
                     : "win7-x64";
 
-                CreateDummyNetCoreAppRuntimePackage(DotNetCli.Stage0, alternateRid, "1.0.0-rc2", Dirs.Corehost);
+                CreateDummyNetCoreAppRuntimePackage(
+                    DotNetCli.Stage0, 
+                    alternateRid, 
+                    buildVersion.NetCoreAppVersion, 
+                    Dirs.Corehost);
 
             }
             else
