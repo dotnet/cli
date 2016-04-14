@@ -96,10 +96,9 @@ namespace Microsoft.DotNet.Cli.Build
                 .Execute()
                 .EnsureSuccessful();
 
-            // The 'ProjectWithTests' is a portable test app. Cannot call --infer-runtimes on it, since on win x64 machines,
-            // the x86 runtime is being inferred, and there are no x86 DotNetHost packages
             dotnet.Restore(
                 "--verbosity", "verbose",
+                "--infer-runtimes",
                 "--fallbacksource", Dirs.Corehost)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectWithTests"))
                 .Execute()
