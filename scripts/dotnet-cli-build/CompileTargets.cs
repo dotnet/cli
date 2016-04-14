@@ -36,6 +36,18 @@ namespace Microsoft.DotNet.Cli.Build
             "vbc.exe"
         };
 
+        public static readonly string[] NetCoreAppRids = new[]
+        {
+            "win7-x64",
+            "win7-x86",
+            "osx.10.10-x64",
+            "osx.10.11-x64",
+            "ubuntu.14.04-x64",
+            "centos.7-x64",
+            "rhel.7.2-x64",
+            "debian.8.2-x64"
+        };
+
         public const string SharedFrameworkName = "Microsoft.NETCore.App";
 
         private static string CoreHostBaseName => $"corehost{Constants.ExeSuffix}";
@@ -51,9 +63,31 @@ namespace Microsoft.DotNet.Cli.Build
 
         // Moving PrepareTargets.RestorePackages after PackagePkgProjects because managed code depends on the
         // Microsoft.NETCore.App package that is created during PackagePkgProjects.
-        [Target(nameof(PrepareTargets.Init), nameof(CompileCoreHost), nameof(PackagePkgProjects), nameof(PrepareTargets.RestorePackages), nameof(CompileStage1), nameof(CompileStage2))]
+        [Target(nameof(PrepareTargets.Init), nameof(CompileCoreHost), nameof(PackagePkgProjects), nameof(CompileTargets.GenerateStubNETCoreAppPackages), nameof(PrepareTargets.RestorePackages), nameof(CompileStage1), nameof(CompileStage2))]
         public static BuildTargetResult Compile(BuildTargetContext c)
         {
+            return c.Success();
+        }
+
+        [Target]
+        public static BuildTargetResult GenerateStubNETCoreAppPackages(BuildTargetContext c)
+        {
+            string currentRid = GetRuntimeId();
+            var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
+
+            foreach (var rid in NetCoreAppRids)
+            {
+                if (! rid.Equals(currentRid))
+
+                {
+                    CreateDummyNetCoreAppRuntimePackage(
+                        DotNetCli.Stage0, 
+                        rid, 
+                        buildVersion.NetCoreAppVersion, 
+                        Dirs.Corehost);
+                }
+            }
+
             return c.Success();
         }
 
@@ -173,19 +207,6 @@ namespace Microsoft.DotNet.Cli.Build
                     .ForwardStdErr()
                     .Execute()
                     .EnsureSuccessful();
-
-                // Workaround for x86 - x64 issue
-
-                var alternateRid = CurrentArchitecture.Isx64 
-                    ? "win7-x86"
-                    : "win7-x64";
-
-                CreateDummyNetCoreAppRuntimePackage(
-                    DotNetCli.Stage0, 
-                    alternateRid, 
-                    buildVersion.NetCoreAppVersion, 
-                    Dirs.Corehost);
-
             }
             else
             {
