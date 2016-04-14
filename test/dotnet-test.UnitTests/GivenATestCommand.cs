@@ -14,10 +14,13 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
     public class GivenATestCommand
     {
         private static readonly string ProjectJsonPath = Path.Combine(
-                AppContext.BaseDirectory,
+                Directory.GetCurrentDirectory(),
+                "..",
+                "..",
                 "TestAssets",
-                "TestProjects",
-                "ProjectWithTests",
+                 "TestProjects",
+                "ProjectsWithTests",
+                "NetCoreAppOnlyProject",
                 "project.json");
 
         private TestCommand _testCommand;

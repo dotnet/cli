@@ -71,8 +71,8 @@ namespace Microsoft.DotNet.Cli.Build
             CleanNuGetTempCache();
 
             var dotnet = DotNetCli.Stage2;
-            dotnet.Restore("--verbosity", "verbose", 
-                "--infer-runtimes", 
+            dotnet.Restore("--verbosity", "verbose",
+                "--infer-runtimes",
                 "--fallbacksource", Dirs.Corehost,
                 "--fallbacksource", Dirs.CorehostDummyPackages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages"))
@@ -253,6 +253,15 @@ namespace Microsoft.DotNet.Cli.Build
                     .Execute()
                     .EnsureSuccessful();
             }
+
+            // build ProjectWithTests\MultipleFrameworkProject for net451
+            var net45ProjectWithTests = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects", "ProjectWithTests", "MultipleFrameworkProject");
+
+            c.Info($"Building: {net45ProjectWithTests}");
+            dotnet.Build("--framework", "net451")
+                .WorkingDirectory(net45ProjectWithTests)
+                .Execute()
+                .EnsureSuccessful();
 
             return c.Success();
         }
