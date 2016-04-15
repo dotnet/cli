@@ -184,22 +184,15 @@ namespace Microsoft.DotNet.Tools.Compiler
 
             _scriptRunner.RunScripts(context, ScriptNames.PreCompile, contextVariables);
 
-            string commandName = $"compile-{compilerName}";
-            string commandArg = $"@{rsp}";
+            // Cache the reporters before invoking the command in case it is a built-in command, which replaces
+            // the static Reporter instances.
+            Reporter errorReporter = Reporter.Error;
+            Reporter outputReporter = Reporter.Output;
 
-            CommandResult result;
-            Func<string[], int> builtInCompiler;
-            if (Program.TryGetBuiltInCommand(commandName, out builtInCompiler))
-            {
-                result = InvokeBuiltInCompiler(context, diagnostics, commandName, commandArg, builtInCompiler);
-            }
-            else
-            {
-                result = _commandFactory.Create(commandName, new[] { commandArg })
-                    .OnErrorLine(line => HandleCompilerOutputLine(line, context, diagnostics, Reporter.Error))
-                    .OnOutputLine(line => HandleCompilerOutputLine(line, context, diagnostics, Reporter.Output))
-                    .Execute();
-            }
+            CommandResult result = _commandFactory.Create($"compile-{compilerName}", new[] { $"@{rsp}" })
+                .OnErrorLine(line => HandleCompilerOutputLine(line, context, diagnostics, errorReporter))
+                .OnOutputLine(line => HandleCompilerOutputLine(line, context, diagnostics, outputReporter))
+                .Execute();
 
             // Run post-compile event
             contextVariables["compile:CompilerExitCode"] = result.ExitCode.ToString();
@@ -220,47 +213,6 @@ namespace Microsoft.DotNet.Tools.Compiler
             return PrintSummary(diagnostics, sw, success);
         }
 
-        private static CommandResult InvokeBuiltInCompiler(
-            ProjectContext context,
-            List<DiagnosticMessage> diagnostics,
-            string commandName,
-            string commandArg,
-            Func<string[], int> builtInCompiler)
-        {
-            // redirecting the standard out and error so we can parse the diagnostics
-            TextWriter originalConsoleOut = Console.Out;
-            TextWriter originalConsoleError = Console.Error;
-            try
-            {
-                // Need to cache the current reporter.
-                // Writing to the cached reporters will write to the originalConsoleOut and originalConsoleError (the real stdout and stderr)
-                Reporter outputReporter = Reporter.Output;
-                var outputWriter = new LineNotificationTextWriter(originalConsoleOut.FormatProvider, originalConsoleOut.Encoding)
-                    .OnWriteLine(line => HandleCompilerOutputLine(line, context, diagnostics, outputReporter));
-                Console.SetOut(outputWriter);
-
-                Reporter errorReporter = Reporter.Error;
-                var errorWriter = new LineNotificationTextWriter(originalConsoleError.FormatProvider, originalConsoleError.Encoding)
-                    .OnWriteLine(line => HandleCompilerOutputLine(line, context, diagnostics, errorReporter));
-                Console.SetError(errorWriter);
-
-                // Reset the Reporters to the new Console Out and Error.
-                Reporter.Reset();
-
-                int exitCode = builtInCompiler(new[] { commandArg });
-
-                // fake out a ProcessStartInfo
-                ProcessStartInfo startInfo = new ProcessStartInfo(new Muxer().MuxerPath, $"{commandName} {commandArg}");
-                return new CommandResult(startInfo, exitCode, null, null);
-            }
-            finally
-            {
-                Console.SetOut(originalConsoleOut);
-                Console.SetError(originalConsoleError);
-                Reporter.Reset();
-            }
-        }
-
         private static void HandleCompilerOutputLine(string line, ProjectContext context, List<DiagnosticMessage> diagnostics, Reporter reporter)
         {
             var diagnostic = ParseDiagnostic(context.ProjectDirectory, line);
@@ -271,106 +223,6 @@ namespace Microsoft.DotNet.Tools.Compiler
             else
             {
                 reporter.WriteLine(line);
-            }
-        }
-
-        /// <summary>
-        /// A TextWriter that can raises an event for each line that is written to it.
-        /// </summary>
-        private class LineNotificationTextWriter : TextWriter
-        {
-            private Encoding _encoding;
-            private StringBuilder _currentString;
-            private Action<string> _lineHandler;
-
-            public LineNotificationTextWriter(IFormatProvider formatProvider, Encoding encoding)
-                : base(formatProvider)
-            {
-                _encoding = encoding;
-
-                // start with an average line length so the builder doesn't need to immediately grow
-                _currentString = new StringBuilder(128);
-            }
-
-            public LineNotificationTextWriter OnWriteLine(Action<string> lineHandler)
-            {
-                Debug.Assert(lineHandler != null);
-                Debug.Assert(_lineHandler == null);
-
-                _lineHandler = lineHandler;
-
-                return this;
-            }
-
-            public override Encoding Encoding
-            {
-                get { return _encoding; }
-            }
-
-            // Write(char) gets called for all overloads of Write
-            public override void Write(char value)
-            {
-                lock (_currentString)
-                {
-                    _currentString.Append(value);
-
-                    if (value == '\n')
-                    {
-                        _lineHandler?.Invoke(_currentString.ToString());
-                        _currentString.Clear();
-                    }
-                }
-            }
-
-            // optimize the common case - Write(string) - so we don't process char by char
-            public override void Write(string value)
-            {
-                lock (_currentString)
-                {
-                    List<int> newLineIndices = GetNewLines(value);
-
-                    if (newLineIndices == null || newLineIndices.Count == 0)
-                    {
-                        // no newlines, just append
-                        _currentString.Append(value);
-                    }
-                    else
-                    {
-                        int start = 0;
-                        for (int i = 0; i < newLineIndices.Count; i++)
-                        {
-                            int end = newLineIndices[i];
-
-                            _currentString.Append(value, start, end - start + 1);
-
-                            _lineHandler?.Invoke(_currentString.ToString());
-                            _currentString.Clear();
-
-                            start = end + 1;
-                        }
-
-                        _currentString.Append(value, start, value.Length - start);
-                    }
-                }
-            }
-
-            private static List<int> GetNewLines(string value)
-            {
-                List<int> result = null;
-                for (int i = 0; i < value.Length; i++)
-                {
-                    if (value[i] == '\n')
-                    {
-                        if (result == null)
-                        {
-                            result = new List<int>();
-                        }
-
-                        result.Add(i);
-                    }
-                }
-
-                return result;
             }
         }
     }
