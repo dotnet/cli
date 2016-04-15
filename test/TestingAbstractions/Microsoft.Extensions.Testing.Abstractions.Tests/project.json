@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0-*",
+  "dependencies": {
+    "Microsoft.NETCore.App": {
+      "type": "platform",
+      "version": "1.0.0-rc2-*"
+    },
+    "Microsoft.Extensions.Testing.Abstractions": {
+      "target": "project"
+    },
+    "System.Runtime.Serialization.Primitives": "4.1.1-rc2-24015",
+    "Microsoft.DotNet.Tools.Tests.Utilities": {
+      "target": "project"
+    },
+    "TestAppWithFullPdbs": {
+      "target": "project"
+    },
+    "TestAppWithPortablePdbs": {
+      "target": "project"
+    },
+    "xunit": "2.1.0",
+    "dotnet-test-xunit": "1.0.0-dev-140469-38",
+    "FluentAssertions": "4.2.2"
+  },
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": [
+        "netstandardapp1.5",
+        "dnxcore50",
+        "netstandard1.3",
+        "portable-net45+win8"
+      ]
+    }
+  },
+  "testRunner": "xunit"
+}

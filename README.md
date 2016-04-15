@@ -20,16 +20,36 @@ Build Status
 
 |Ubuntu 14.04 |Windows x64 |Windows x86 |Mac OS X |CentOS 7.1 |RHEL 7.2 |
 |:------:|:------:|:------:|:------:|:------:|:------:|
-|![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/601/badge)|![](https://mseng.visualstudio.com/DefaultCollection/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3022/badge)|![](https://mseng.visualstudio.com/DefaultCollection/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3071/badge)|![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/600/badge) |![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/597/badge) |![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/897/badge) |
+|![](https://mseng.visualstudio.com/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3132/badge)|![](https://mseng.visualstudio.com/DefaultCollection/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3022/badge)|![](https://mseng.visualstudio.com/DefaultCollection/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3071/badge)|![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/600/badge) |![](https://mseng.visualstudio.com/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3257/badge) |![](https://mseng.visualstudio.com/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3256/badge) |
 
-Installers
+Installers and Binaries
+-----------------------
+
+You can download .NET Core as either an installer (MSI, PKG) or a zip (zip, gzip). You can download the product in two flavours:
+
+- .NET Core - .NET Core runtime and framework
+- .NET Core SDK - .NET Core + CLI tools
+
+|         |Version |.NET Core Installer|.NET Core SDK Installer|.NET Core Binaries|.NET Core SDK Binaries|
+|---------|:------:|:------:|:------:|:------:|:------:|
+|**Windows x64**|[![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/Windows_x64_Release_version_badge.svg)](https://dotnetcli.blob.core.windows.net/dotnet/beta/dnvm/latest.win.x64.version)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-win-x64.latest.exe)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-dev-win-x64.latest.exe)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-win-x64.latest.zip)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-dev-win-x64.latest.zip)|
+|**Windows x86**|[![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/Windows_x86_Release_version_badge.svg)](https://dotnetcli.blob.core.windows.net/dotnet/beta/dnvm/latest.win.x86.version)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-win-x86.latest.exe)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-dev-win-x86.latest.exe)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-win-x86.latest.zip)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-dev-win-x86.latest.zip)|
+|**Ubuntu 14.04**|[![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/Ubuntu_x64_Release_version_badge.svg)](https://dotnetcli.blob.core.windows.net/dotnet/beta/dnvm/latest.ubuntu.x64.version)|*See Below*|*See Below*|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-ubuntu-x64.latest.tar.gz)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-dev-ubuntu-x64.latest.tar.gz)|
+|**Mac OS X**|[![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/OSX_x64_Release_version_badge.svg)](https://dotnetcli.blob.core.windows.net/dotnet/beta/dnvm/latest.osx.x64.version)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-osx-x64.latest.pkg)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-dev-osx-x64.latest.pkg)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-osx-x64.latest.tar.gz)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-dev-osx-x64.latest.tar.gz)|
+|**CentOS 7.1**|[![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/CentOS_x64_Release_version_badge.svg)](https://dotnetcli.blob.core.windows.net/dotnet/beta/dnvm/latest.centos.x64.version)|N/A |N/A |[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-centos-x64.latest.tar.gz)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-dev-centos-x64.latest.tar.gz)|
+|**RHEL 7.2**|[![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/RHEL_x64_Release_version_badge.svg)](https://dotnetcli.blob.core.windows.net/dotnet/beta/dnvm/latest.rhel.x64.version)|N/A |N/A |[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-centos-x64.latest.tar.gz)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-dev-rhel-x64.latest.tar.gz) |
+
+Ubuntu Installers
 ----------
 
-|         |Ubuntu 14.04 |Windows x64 |Windows x86 |Mac OS X |CentOS 7.1 |RHEL 7.2 |
-|---------|:------:|:------:|:------:|:------:|:------:|:------:|
-|**Version**|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/Ubuntu_x64_Release_version_badge.svg)|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/Windows_x64_Release_version_badge.svg)|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/Windows_x86_Release_version_badge.svg)|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/OSX_x64_Release_version_badge.svg)|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/CentOS_x64_Release_version_badge.svg)|![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/RHEL_x64_Release_version_badge.svg)|
-|**Installers**|[Download Debian Package](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-ubuntu-x64.latest.deb)|[Download Installer](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-win-x64.latest.exe)|[Download Installer](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-win-x86.latest.exe)|[Download Pkg](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-osx-x64.latest.pkg) |N/A |N/A |
-|**Binaries**|[Download tar file](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-combined-framework-sdk-host-ubuntu-x64.latest.tar.gz)|[Download zip file](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-combined-framework-sdk-host-win-x64.latest.zip)|[Download zip file](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-combined-framework-sdk-host-win-x86.latest.zip)|[Download tar file](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-combined-framework-sdk-host-osx-x64.latest.tar.gz) |[Download tar file](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-combined-framework-sdk-host-centos-x64.latest.tar.gz)|[Download tar file](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-combined-framework-sdk-host-rhel-x64.latest.tar.gz) |
+*Our Debian packages are put together slightly differently than the other OS specific installers. Instead of combining everything, we have three separate component packages that depend on each other. If you're installing these directly from the .deb files (via dpkg or similar), then you'll need to install them in the order presented below.*
+
+|         |Version |Installers|
+|---------|:------:|:------:|:------:|
+|**Shared Host**|[![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/Ubuntu_x64_Release_version_badge.svg)](https://dotnetcli.blob.core.windows.net/dotnet/beta/dnvm/latest.ubuntu.x64.version)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-host-ubuntu-x64.latest.deb)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-dev-ubuntu-x64.latest.tar.gz)|
+|**Shared Framework**|[![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/Ubuntu_x64_Release_version_badge.svg)](https://dotnetcli.blob.core.windows.net/dotnet/beta/dnvm/latest.ubuntu.x64.version)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-sharedframework-ubuntu-x64.latest.deb)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-ubuntu-x64.latest.tar.gz)|
+|**Sdk**|[![](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/Ubuntu_x64_Release_version_badge.svg)](https://dotnetcli.blob.core.windows.net/dotnet/beta/dnvm/latest.ubuntu.x64.version)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-sdk-ubuntu-x64.latest.deb)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/beta/Binaries/Latest/dotnet-dev-ubuntu-x64.latest.tar.gz)|
+
 
 Interested in .NET Core + ASP.NET Core 1.0 RC1 bits?
 ----------------------------------------------------
@@ -68,7 +88,7 @@ For more details, please refer to the [documentation](https://github.com/dotnet/
 Building from source
 --------------------
 
-If you are building from source, take note that the build depends on NuGet packages hosted on Myget, so if it is down, the build may fail. If that happens, you can always see the [Myget status page](http://status.myget.org/) for more info. 
+If you are building from source, take note that the build depends on NuGet packages hosted on MyGet, so if it is down, the build may fail. If that happens, you can always see the [MyGet status page](http://status.myget.org/) for more info. 
 
 Read over the [contributing guidelines](https://github.com/dotnet/cli/tree/master/CONTRIBUTING.md) and [developer documentation](https://github.com/dotnet/cli/tree/master/Documentation) for prerequisites for building from source.
 
@@ -76,3 +96,8 @@ Questions & Comments
 --------------------
 
 For any and all feedback, please use the Issues on this repository. 
+
+License
+--------------------
+
+By downloading the .zip you are agreeing to the terms in the project [EULA](https://aka.ms/dotnet-cli-eula).

@@ -13,6 +13,7 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
   [[ "$SOURCE" != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+OLDPATH="$PATH"
 
 source "$DIR/common/_prettyprint.sh"
 
@@ -83,12 +84,10 @@ done < "$DIR/../branchinfo.txt"
 [ -z "$DOTNET_INSTALL_DIR" ] && export DOTNET_INSTALL_DIR=$DIR/../.dotnet_stage0/$(uname)
 [ -d $DOTNET_INSTALL_DIR ] || mkdir -p $DOTNET_INSTALL_DIR
 
-# Ensure the latest stage0 is installed
-export CHANNEL=$RELEASE_SUFFIX
-$DIR/obtain/install.sh --channel $CHANNEL
+$DIR/obtain/dotnet-install.sh --channel $CHANNEL --verbose
 
 # Put stage 0 on the PATH (for this shell only)
-PATH="$DOTNET_INSTALL_DIR/bin:$PATH"
+PATH="$DOTNET_INSTALL_DIR:$PATH"
 
 # Increases the file descriptors limit for this bash. It prevents an issue we were hitting during restore
 FILE_DESCRIPTOR_LIMIT=$( ulimit -n )
@@ -102,13 +101,14 @@ fi
 echo "Restoring Build Script projects..."
 (
     cd $DIR
-    dotnet restore
+    dotnet restore --infer-runtimes
 )
 
 # Build the builder
 echo "Compiling Build Scripts..."
 dotnet publish "$DIR/dotnet-cli-build" -o "$DIR/dotnet-cli-build/bin" --framework netstandardapp1.5
 
+export PATH="$OLDPATH"
 # Run the builder
 echo "Invoking Build Scripts..."
 echo "Configuration: $CONFIGURATION"

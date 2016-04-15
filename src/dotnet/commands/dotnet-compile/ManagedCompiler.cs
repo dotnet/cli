@@ -5,11 +5,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.Extensions.DependencyModel;
+using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Compiler
 {
@@ -77,6 +79,15 @@ namespace Microsoft.DotNet.Tools.Compiler
             };
 
             var compilationOptions = context.ResolveCompilationOptions(args.ConfigValue);
+
+            // Set default platform if it isn't already set and we're on desktop
+            if(compilationOptions.EmitEntryPoint == true && string.IsNullOrEmpty(compilationOptions.Platform) && context.TargetFramework.IsDesktop())
+            {
+                // See https://github.com/dotnet/cli/issues/2428 for more details.
+                compilationOptions.Platform = RuntimeInformation.ProcessArchitecture == Architecture.X64 ?
+                    "x64" : "anycpu32bitpreferred";
+            }
+
             var languageId = CompilerUtil.ResolveLanguageId(context);
 
             var references = new List<string>();
@@ -96,7 +107,8 @@ namespace Microsoft.DotNet.Tools.Compiler
                 foreach (var resourceFile in dependency.EmbeddedResources)
                 {
                     var transformedResource = resourceFile.GetTransformedFile(intermediateOutputPath);
-                    var resourceName = ResourceManifestName.CreateManifestName(Path.GetFileName(resourceFile.ResolvedPath), context.ProjectFile.Name);
+                    var resourceName = ResourceManifestName.CreateManifestName(
+                        Path.GetFileName(resourceFile.ResolvedPath), compilationOptions.OutputName);
                     compilerArgs.Add($"--resource:\"{transformedResource}\",{resourceName}");
                 }
 
@@ -119,13 +131,13 @@ namespace Microsoft.DotNet.Tools.Compiler
                     context.RuntimeIdentifier ?? string.Empty);
 
                 var writer = new DependencyContextWriter();
-                var depsJsonFile = Path.Combine(intermediateOutputPath, context.ProjectFile.Name + "dotnet-compile.deps.json");
+                var depsJsonFile = Path.Combine(intermediateOutputPath, compilationOptions.OutputName + "dotnet-compile.deps.json");
                 using (var fileStream = File.Create(depsJsonFile))
                 {
                     writer.Write(dependencyContext, fileStream);
                 }
 
-                compilerArgs.Add($"--resource:\"{depsJsonFile}\",{context.ProjectFile.Name}.deps.json");
+                compilerArgs.Add($"--resource:\"{depsJsonFile}\",{compilationOptions.OutputName}.deps.json");
             }
 
             if (!AddNonCultureResources(context.ProjectFile, compilerArgs, intermediateOutputPath))

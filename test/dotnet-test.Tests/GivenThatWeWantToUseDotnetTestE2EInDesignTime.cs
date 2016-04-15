@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using System.IO;
 using FluentAssertions;
@@ -18,15 +19,21 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
 
         public GivenThatWeWantToUseDotnetTestE2EInDesignTime()
         {
-            var testInstance = TestAssetsManager.CreateTestInstance("ProjectWithTests").WithLockFiles();
+            var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets"));
+            var testInstance = testAssetManager.CreateTestInstance("ProjectWithTests");
 
             _projectFilePath = Path.Combine(testInstance.TestRoot, "project.json");
             var contexts = ProjectContext.CreateContextForEachFramework(
                 _projectFilePath,
                 null,
                 PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
-            var runtime = contexts.FirstOrDefault(c => !string.IsNullOrEmpty(c.RuntimeIdentifier))?.RuntimeIdentifier;
-            _outputPath = Path.Combine(testInstance.TestRoot, "bin", "Debug", DefaultFramework, runtime);
+
+            // Restore the project again in the destination to resolve projects
+            // Since the lock file has project relative paths in it, those will be broken
+            // unless we re-restore
+            new RestoreCommand() { WorkingDirectory = testInstance.TestRoot }.Execute().Should().Pass();
+
+            _outputPath = Path.Combine(testInstance.TestRoot, "bin", "Debug", "netcoreapp1.0");
             var buildCommand = new BuildCommand(_projectFilePath);
             var result = buildCommand.Execute();
 
@@ -41,7 +48,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
                 adapter.Listen();
 
                 var testCommand = new DotnetTestCommand();
-                var result = testCommand.Execute($"{_projectFilePath} -o {_outputPath} --port {adapter.Port}");
+                var result = testCommand.Execute($"{_projectFilePath} -o {_outputPath} --port {adapter.Port} --no-build");
                 result.Should().Pass();
 
                 adapter.Messages["TestSession.Connected"].Count.Should().Be(1);
@@ -58,7 +65,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
                 adapter.Listen();
 
                 var testCommand = new DotnetTestCommand();
-                var result = testCommand.Execute($"{_projectFilePath} -o {_outputPath} --port {adapter.Port}");
+                var result = testCommand.Execute($"{_projectFilePath} -o {_outputPath} --port {adapter.Port} --no-build");
                 result.Should().Pass();
 
                 adapter.Messages["TestSession.Connected"].Count.Should().Be(1);

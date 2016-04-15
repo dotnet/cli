@@ -1,5 +1,5 @@
 % DOTNET(1)
-% Zlatko Knezevic zlakne@microsoft.com
+% Microsoft Corporation dotnetclifeedback@microsoft.com
 % January 2016
 
 # NAME
@@ -8,7 +8,7 @@ dotnet -- general driver for running the command-line commands
 
 # SYNOPSIS
 
-dotnet [--version] [--help] [--verbose] < command > [< args >]
+dotnet [--version] [--info] [--help] [--verbose] < command > [< args >]
 
 # DESCRIPTION
 dotnet is a generic driver for the CLI toolchain. Invoked on its own, it will give out brief usage instructions. 
@@ -25,6 +25,10 @@ Each specific feature is implemented as a command. In order to use the feature, 
 
     Print out the version of the CLI tooling
 
+`--info`
+
+    Print out information about the CLI tooling
+
 `-h, --help`
 
     Print out a short help and a list of current commands. 
@@ -35,7 +39,7 @@ The following commands exist for dotnet.
 
 `dotnet-compile(1)`
 
-    Compile the application to either an intermidiate language (IL) or to a native binary. 
+    Compile the application to either an intermediate language (IL) or to a native binary. 
 
 `dotnet-restore(1)`
 
@@ -59,7 +63,7 @@ The following commands exist for dotnet.
 
 # EXAMPLES
 
-`dotnew new`
+`dotnet new`
 
     Initializes a sample .NET Core console application that can be compiled and ran.
 

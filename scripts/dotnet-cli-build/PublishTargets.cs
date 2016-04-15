@@ -12,22 +12,29 @@ namespace Microsoft.DotNet.Cli.Build
 {
     public static class PublishTargets
     {
-        private static CloudBlobContainer BlobContainer { get; set; }
+        private static AzurePublisher AzurePublisherTool { get; set; }
+
+        private static DebRepoPublisher DebRepoPublisherTool { get; set; }
 
         private static string Channel { get; set; }
 
-        private static string Version { get; set; }
+        private static string CliVersion { get; set; }
 
+        private static string CliNuGetVersion { get; set; }
+
+        private static string SharedFrameworkNugetVersion { get; set; }
 
         [Target]
         public static BuildTargetResult InitPublish(BuildTargetContext c)
         {
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("CONNECTION_STRING").Trim('"'));
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-            BlobContainer = blobClient.GetContainerReference("dotnet");
+            AzurePublisherTool = new AzurePublisher();
+            DebRepoPublisherTool = new DebRepoPublisher(Dirs.Packages);
 
-            Version = c.BuildContext.Get<BuildVersion>("BuildVersion").SimpleVersion;
+            CliVersion = c.BuildContext.Get<BuildVersion>("BuildVersion").SimpleVersion;
+            CliNuGetVersion = c.BuildContext.Get<BuildVersion>("BuildVersion").NuGetVersion;
+            SharedFrameworkNugetVersion = c.BuildContext.Get<string>("SharedFrameworkNugetVersion");
             Channel = c.BuildContext.Get<string>("Channel");
+
             return c.Success();
         }
 
@@ -41,82 +48,238 @@ namespace Microsoft.DotNet.Cli.Build
             return c.Success();
         }
 
-        [Target(nameof(PublishTargets.PublishVersionBadge),
-        nameof(PublishTargets.PublishCompressedFile),
-        nameof(PublishTargets.PublishSdkInstallerFile),
-        nameof(PublishTargets.PublishDebFileToDebianRepo),
-        nameof(PublishTargets.PublishSharedFrameworkCompressedFile),
-        nameof(PublishTargets.PublishSharedHostCompressedFile),
-        nameof(PublishTargets.PublishCombinedFrameworkSDKHostFile),
-        nameof(PublishTargets.PublishCombinedFrameworkHostFile),
-        nameof(PublishTargets.PublishLatestVersionTextFile))]
-        public static BuildTargetResult PublishArtifacts(BuildTargetContext c)
+        [Target(
+            nameof(PublishTargets.PublishInstallerFilesToAzure),
+            nameof(PublishTargets.PublishArchivesToAzure),
+            nameof(PublishTargets.PublishDebFilesToDebianRepo),
+            nameof(PublishTargets.PublishLatestCliVersionTextFile),
+            nameof(PublishTargets.PublishLatestSharedFrameworkVersionTextFile),
+            nameof(PublishTargets.PublishCoreHostPackages),
+            nameof(PublishTargets.PublishCliVersionBadge))]
+        public static BuildTargetResult PublishArtifacts(BuildTargetContext c) => c.Success();
+
+        [Target(
+            nameof(PublishTargets.PublishSharedHostInstallerFileToAzure),
+            nameof(PublishTargets.PublishSharedFrameworkInstallerFileToAzure),
+            nameof(PublishTargets.PublishSdkInstallerFileToAzure),
+            nameof(PublishTargets.PublishCombinedFrameworkSDKHostInstallerFileToAzure),
+            nameof(PublishTargets.PublishCombinedFrameworkHostInstallerFileToAzure))]
+        public static BuildTargetResult PublishInstallerFilesToAzure(BuildTargetContext c) => c.Success();
+
+        [Target(
+            nameof(PublishTargets.PublishCombinedHostFrameworkArchiveToAzure),
+            nameof(PublishTargets.PublishCombinedHostFrameworkSdkArchiveToAzure),
+            nameof(PublishTargets.PublishSDKSymbolsArchiveToAzure))]
+        public static BuildTargetResult PublishArchivesToAzure(BuildTargetContext c) => c.Success();
+
+        [Target(
+            nameof(PublishSdkDebToDebianRepo),
+            nameof(PublishSharedFrameworkDebToDebianRepo),
+            nameof(PublishSharedHostDebToDebianRepo))]
+        [BuildPlatforms(BuildPlatform.Ubuntu)]
+        public static BuildTargetResult PublishDebFilesToDebianRepo(BuildTargetContext c)
         {
             return c.Success();
         }
 
         [Target]
-        public static BuildTargetResult PublishVersionBadge(BuildTargetContext c)
+        public static BuildTargetResult PublishCliVersionBadge(BuildTargetContext c)
         {
             var versionBadge = c.BuildContext.Get<string>("VersionBadge");
             var latestVersionBadgeBlob = $"{Channel}/Binaries/Latest/{Path.GetFileName(versionBadge)}";
-            var versionBadgeBlob = $"{Channel}/Binaries/{Version}/{Path.GetFileName(versionBadge)}";
+            var versionBadgeBlob = $"{Channel}/Binaries/{CliNuGetVersion}/{Path.GetFileName(versionBadge)}";
 
-            PublishFileAzure(versionBadgeBlob, versionBadge);
-            PublishFileAzure(latestVersionBadgeBlob, versionBadge);
+            AzurePublisherTool.PublishFile(versionBadgeBlob, versionBadge);
+            AzurePublisherTool.PublishFile(latestVersionBadgeBlob, versionBadge);
             return c.Success();
         }
 
         [Target]
-        public static BuildTargetResult PublishCompressedFile(BuildTargetContext c)
+        public static BuildTargetResult PublishCoreHostPackages(BuildTargetContext c)
         {
-            var compressedFile = c.BuildContext.Get<string>("SdkCompressedFile");
-            var compressedFileBlob = $"{Channel}/Binaries/{Version}/{Path.GetFileName(compressedFile)}";
-            var latestCompressedFile = compressedFile.Replace(Version, "latest");
-            var latestCompressedFileBlob = $"{Channel}/Binaries/Latest/{Path.GetFileName(latestCompressedFile)}";
+            foreach (var file in Directory.GetFiles(Dirs.Corehost, "*.nupkg"))
+            {
+                var hostBlob = $"{Channel}/Binaries/{CliNuGetVersion}/{Path.GetFileName(file)}";
+                AzurePublisherTool.PublishFile(hostBlob, file);
+                Console.WriteLine($"Publishing package {hostBlob} to Azure.");
+            }
 
-            PublishFileAzure(compressedFileBlob, compressedFile);
-            PublishFileAzure(latestCompressedFileBlob, compressedFile);
             return c.Success();
         }
 
         [Target]
-        [BuildPlatforms(BuildPlatform.Windows, BuildPlatform.OSX, BuildPlatform.Ubuntu)]
-        public static BuildTargetResult PublishSdkInstallerFile(BuildTargetContext c)
-        {
-            var installerFile = c.BuildContext.Get<string>("SdkInstallerFile");
-            var installerFileBlob = $"{Channel}/Installers/{Version}/{Path.GetFileName(installerFile)}";
-            var latestInstallerFile = installerFile.Replace(Version, "latest");
-            var latestInstallerFileBlob = $"{Channel}/Installers/Latest/{Path.GetFileName(latestInstallerFile)}";
-
-            PublishFileAzure(installerFileBlob, installerFile);
-            PublishFileAzure(latestInstallerFileBlob, installerFile);
-            return c.Success();
-        }
-
-        [Target]
-        public static BuildTargetResult PublishLatestVersionTextFile(BuildTargetContext c)
-        {
-            var osname = Monikers.GetOSShortName();
-            var latestVersionBlob = $"{Channel}/dnvm/latest.{osname}.{CurrentArchitecture.Current}.version";
-            var latestVersionFile = Path.Combine(Dirs.Stage2, ".version");
-
-            PublishFileAzure(latestVersionBlob, latestVersionFile);
-            return c.Success();
-        }
-
-        [Target(nameof(PublishSdkInstallerFile))]
         [BuildPlatforms(BuildPlatform.Ubuntu)]
-        public static BuildTargetResult PublishDebFileToDebianRepo(BuildTargetContext c)
+        public static BuildTargetResult PublishSharedHostInstallerFileToAzure(BuildTargetContext c)
         {
-            var packageName = Monikers.GetDebianPackageName(c);
-            var installerFile = c.BuildContext.Get<string>("SdkInstallerFile");
-            var uploadUrl = $"https://dotnetcli.blob.core.windows.net/dotnet/{Channel}/Installers/{Version}/{Path.GetFileName(installerFile)}";
-            var uploadJson = GenerateUploadJsonFile(packageName, Version, uploadUrl);
+            var version = CliNuGetVersion;
+            var installerFile = c.BuildContext.Get<string>("SharedHostInstallerFile");
 
-            Cmd(Path.Combine(Dirs.RepoRoot, "scripts", "publish", "repoapi_client.sh"), "-addpkg", uploadJson)
-                    .Execute()
-                    .EnsureSuccessful();
+            AzurePublisherTool.PublishInstallerFileAndLatest(installerFile, Channel, version);
+
+            return c.Success();
+        }
+
+        [Target]
+        [BuildPlatforms(BuildPlatform.Ubuntu)]
+        public static BuildTargetResult PublishSharedFrameworkInstallerFileToAzure(BuildTargetContext c)
+        {
+            var version = SharedFrameworkNugetVersion;
+            var installerFile = c.BuildContext.Get<string>("SharedFrameworkInstallerFile");
+
+            AzurePublisherTool.PublishInstallerFileAndLatest(installerFile, Channel, version);
+
+            return c.Success();
+        }
+
+        [Target]
+        [BuildPlatforms(BuildPlatform.Ubuntu)]
+        public static BuildTargetResult PublishSdkInstallerFileToAzure(BuildTargetContext c)
+        {
+            var version = CliNuGetVersion;
+            var installerFile = c.BuildContext.Get<string>("SdkInstallerFile");
+
+            AzurePublisherTool.PublishInstallerFileAndLatest(installerFile, Channel, version);
+
+            return c.Success();
+        }
+
+        [Target]
+        [BuildPlatforms(BuildPlatform.Windows, BuildPlatform.OSX)]
+        public static BuildTargetResult PublishCombinedFrameworkHostInstallerFileToAzure(BuildTargetContext c)
+        {
+            var version = SharedFrameworkNugetVersion;
+            var installerFile = c.BuildContext.Get<string>("CombinedFrameworkHostInstallerFile");
+
+            AzurePublisherTool.PublishInstallerFileAndLatest(installerFile, Channel, version);
+
+            return c.Success();
+        }
+
+        [Target]
+        [BuildPlatforms(BuildPlatform.Windows, BuildPlatform.OSX)]
+        public static BuildTargetResult PublishCombinedFrameworkSDKHostInstallerFileToAzure(BuildTargetContext c)
+        {
+            var version = CliNuGetVersion;
+            var installerFile = c.BuildContext.Get<string>("CombinedFrameworkSDKHostInstallerFile");
+
+            AzurePublisherTool.PublishInstallerFileAndLatest(installerFile, Channel, version);
+
+            return c.Success();
+        }
+
+        [Target]
+        public static BuildTargetResult PublishCombinedHostFrameworkSdkArchiveToAzure(BuildTargetContext c)
+        {
+            var version = CliNuGetVersion;
+            var archiveFile = c.BuildContext.Get<string>("CombinedFrameworkSDKHostCompressedFile");
+
+            AzurePublisherTool.PublishArchiveAndLatest(archiveFile, Channel, version);
+
+            return c.Success();
+        }
+
+        [Target]
+        public static BuildTargetResult PublishSDKSymbolsArchiveToAzure(BuildTargetContext c)
+        {
+            var version = CliNuGetVersion;
+            var archiveFile = c.BuildContext.Get<string>("SdkSymbolsCompressedFile");
+
+            AzurePublisherTool.PublishArchiveAndLatest(archiveFile, Channel, version);
+
+            return c.Success();
+        }
+
+        [Target]
+        public static BuildTargetResult PublishCombinedHostFrameworkArchiveToAzure(BuildTargetContext c)
+        {
+            var version = SharedFrameworkNugetVersion;
+            var archiveFile = c.BuildContext.Get<string>("CombinedFrameworkHostCompressedFile");
+
+            AzurePublisherTool.PublishArchiveAndLatest(archiveFile, Channel, version);
+            return c.Success();
+        }
+
+        [Target]
+        public static BuildTargetResult PublishLatestCliVersionTextFile(BuildTargetContext c)
+        {
+            var version = CliNuGetVersion;
+
+            var osname = Monikers.GetOSShortName();
+            var latestCliVersionBlob = $"{Channel}/dnvm/latest.{osname}.{CurrentArchitecture.Current}.version";
+            var latestCliVersionFile = Path.Combine(Dirs.Stage2, "sdk", version, ".version");
+
+            AzurePublisherTool.PublishFile(latestCliVersionBlob, latestCliVersionFile);
+            return c.Success();
+        }
+
+        [Target]
+        public static BuildTargetResult PublishLatestSharedFrameworkVersionTextFile(BuildTargetContext c)
+        {
+            var version = SharedFrameworkNugetVersion;
+
+            var osname = Monikers.GetOSShortName();
+            var latestSharedFXVersionBlob = $"{Channel}/dnvm/latest.sharedfx.{osname}.{CurrentArchitecture.Current}.version";
+            var latestSharedFXVersionFile = Path.Combine(
+                Dirs.Stage2,
+                "shared",
+                CompileTargets.SharedFrameworkName,
+                version,
+                ".version");
+
+            AzurePublisherTool.PublishFile(latestSharedFXVersionBlob, latestSharedFXVersionFile);
+            return c.Success();
+        }
+
+        [Target]
+        [BuildPlatforms(BuildPlatform.Ubuntu)]
+        public static BuildTargetResult PublishSdkDebToDebianRepo(BuildTargetContext c)
+        {
+            var version = CliNuGetVersion;
+
+            var packageName = Monikers.GetSdkDebianPackageName(c);
+            var installerFile = c.BuildContext.Get<string>("SdkInstallerFile");
+            var uploadUrl = AzurePublisherTool.CalculateInstallerUploadUrl(installerFile, Channel, version);
+
+            DebRepoPublisherTool.PublishDebFileToDebianRepo(
+                packageName,
+                version,
+                uploadUrl);
+
+            return c.Success();
+        }
+
+        [Target]
+        [BuildPlatforms(BuildPlatform.Ubuntu)]
+        public static BuildTargetResult PublishSharedFrameworkDebToDebianRepo(BuildTargetContext c)
+        {
+            var version = SharedFrameworkNugetVersion;
+
+            var packageName = Monikers.GetDebianSharedFrameworkPackageName(c);
+            var installerFile = c.BuildContext.Get<string>("SharedFrameworkInstallerFile");
+            var uploadUrl = AzurePublisherTool.CalculateInstallerUploadUrl(installerFile, Channel, version);
+
+            DebRepoPublisherTool.PublishDebFileToDebianRepo(
+                packageName,
+                version,
+                uploadUrl);
+
+            return c.Success();
+        }
+
+        [Target]
+        [BuildPlatforms(BuildPlatform.Ubuntu)]
+        public static BuildTargetResult PublishSharedHostDebToDebianRepo(BuildTargetContext c)
+        {
+            var version = CliNuGetVersion;
+
+            var packageName = Monikers.GetDebianSharedHostPackageName(c);
+            var installerFile = c.BuildContext.Get<string>("SharedHostInstallerFile");
+            var uploadUrl = AzurePublisherTool.CalculateInstallerUploadUrl(installerFile, Channel, version);
+
+            DebRepoPublisherTool.PublishDebFileToDebianRepo(
+                packageName,
+                version,
+                uploadUrl);
 
             return c.Success();
         }
@@ -158,104 +321,6 @@ namespace Microsoft.DotNet.Cli.Build
                 }
             }
             return c.Success();
-        }
-
-        private static string GenerateUploadJsonFile(string packageName, string version, string uploadUrl)
-        {
-            var repoID = Environment.GetEnvironmentVariable("REPO_ID");
-            var uploadJson = Path.Combine(Dirs.Packages, "package_upload.json");
-            File.Delete(uploadJson);
-
-            using (var fileStream = File.Create(uploadJson))
-            {
-                using (StreamWriter sw = new StreamWriter(fileStream))
-                {
-                    sw.WriteLine("{");
-                    sw.WriteLine($"  \"name\":\"{packageName}\",");
-                    sw.WriteLine($"  \"version\":\"{version}\",");
-                    sw.WriteLine($"  \"repositoryId\":\"{repoID}\",");
-                    sw.WriteLine($"  \"sourceUrl\":\"{uploadUrl}\"");
-                    sw.WriteLine("}");
-                }
-            }
-
-            return uploadJson;
-        }
-
-        [Target]
-        public static BuildTargetResult PublishSharedFrameworkCompressedFile(BuildTargetContext c)
-        {
-            var compressedFile = c.BuildContext.Get<string>("SharedFrameworkCompressedFile");
-            var compressedFileBlob = $"{Channel}/Binaries/{Version}/{Path.GetFileName(compressedFile)}";
-            var latestCompressedFile = compressedFile.Replace(Version, "latest");
-            var latestCompressedFileBlob = $"{Channel}/Binaries/Latest/{Path.GetFileName(latestCompressedFile)}";
-
-            PublishFileAzure(compressedFileBlob, compressedFile);
-            PublishFileAzure(latestCompressedFileBlob, compressedFile);
-            return c.Success();
-        }
-
-        [Target]
-        public static BuildTargetResult PublishSharedHostCompressedFile(BuildTargetContext c)
-        {
-            var compressedFile = c.BuildContext.Get<string>("SharedHostCompressedFile");
-            var compressedFileBlob = $"{Channel}/Binaries/{Version}/{Path.GetFileName(compressedFile)}";
-            var latestCompressedFile = compressedFile.Replace(Version, "latest");
-            var latestCompressedFileBlob = $"{Channel}/Binaries/Latest/{Path.GetFileName(latestCompressedFile)}";
-
-            PublishFileAzure(compressedFileBlob, compressedFile);
-            PublishFileAzure(latestCompressedFileBlob, compressedFile);
-            return c.Success();
-        }
-
-        [Target]
-        public static BuildTargetResult PublishCombinedFrameworkSDKHostFile(BuildTargetContext c)
-        {
-            var compressedFile = c.BuildContext.Get<string>("CombinedFrameworkSDKHostCompressedFile");
-            var compressedFileBlob = $"{Channel}/Binaries/{Version}/{Path.GetFileName(compressedFile)}";
-            var latestCompressedFile = compressedFile.Replace(Version, "latest");
-            var latestCompressedFileBlob = $"{Channel}/Binaries/Latest/{Path.GetFileName(latestCompressedFile)}";
-
-            PublishFileAzure(compressedFileBlob, compressedFile);
-            PublishFileAzure(latestCompressedFileBlob, compressedFile);
-            return c.Success();
-        }
-
-        [Target]
-        public static BuildTargetResult PublishCombinedFrameworkHostFile(BuildTargetContext c)
-        {
-            var compressedFile = c.BuildContext.Get<string>("CombinedFrameworkHostCompressedFile");
-            var compressedFileBlob = $"{Channel}/Binaries/{Version}/{Path.GetFileName(compressedFile)}";
-            var latestCompressedFile = compressedFile.Replace(Version, "latest");
-            var latestCompressedFileBlob = $"{Channel}/Binaries/Latest/{Path.GetFileName(latestCompressedFile)}";
-
-            PublishFileAzure(compressedFileBlob, compressedFile);
-            PublishFileAzure(latestCompressedFileBlob, compressedFile);
-            return c.Success();
-        }
-
-        private static BuildTargetResult PublishFile(BuildTargetContext c, string file)
-        {
-            var env = PackageTargets.GetCommonEnvVars(c);
-            Cmd("powershell", "-NoProfile", "-NoLogo",
-                Path.Combine(Dirs.RepoRoot, "scripts", "publish", "publish.ps1"), file)
-                    .Environment(env)
-                    .Execute()
-                    .EnsureSuccessful();
-            return c.Success();
-        }
-
-        private static void PublishFileAzure(string blob, string file)
-        {
-            CloudBlockBlob blockBlob = BlobContainer.GetBlockBlobReference(blob);
-            blockBlob.UploadFromFileAsync(file, FileMode.Open).Wait();
-
-            if (Path.GetExtension(blockBlob.Uri.AbsolutePath.ToLower()) == ".svg")
-            {
-                blockBlob.Properties.ContentType = "image/svg+xml";
-                blockBlob.Properties.CacheControl = "no-cache";
-                blockBlob.SetPropertiesAsync().Wait();
-            }
         }
     }
 }

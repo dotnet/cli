@@ -96,13 +96,36 @@ namespace Microsoft.DotNet.Cli.Build
                     File.SetAttributes(file, FileAttributes.Normal);
                     File.Delete(file);
                 }
-
-                Directory.Delete(path, true);
+                var retry = 5;
+                while (retry >= 0)
+                {
+                    try
+                    {
+                        Directory.Delete(path, true);
+                        return;
+                    }
+                    catch (IOException ex)
+                    {
+                        if (retry == 0)
+                        {
+                            throw;
+                        }
+                        System.Threading.Thread.Sleep(200);
+                        retry--;
+                    }
+                }
             }
         }
 
-        public static void CopyDirectoryRecursively(string path, string destination)
+        public static void CopyDirectoryRecursively(string path, string destination, bool keepParentDir = false)
         {
+            if (keepParentDir)
+            {
+                path = path.TrimEnd(Path.DirectorySeparatorChar);
+                destination = Path.Combine(destination, Path.GetFileName(path));
+                Directory.CreateDirectory(destination);
+            }
+
             foreach (var file in Directory.GetFiles(path, "*", SearchOption.AllDirectories))
             {
                 string destFile = file.Replace(path, destination);

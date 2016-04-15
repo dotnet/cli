@@ -12,13 +12,12 @@
 #include "libhost.h"
 #include "error_codes.h"
 
+hostpolicy_init_t g_init;
 
-corehost_init_t* g_init = nullptr;
-
-int run(const corehost_init_t* init, const runtime_config_t& config, const arguments_t& args)
+int run(const arguments_t& args)
 {
     // Load the deps resolver
-    deps_resolver_t resolver(init->fx_dir(), &config, args);
+    deps_resolver_t resolver(g_init, args);
 
     if (!resolver.valid())
     {
@@ -26,15 +25,7 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
         return StatusCode::ResolverInitFailure;
     }
 
-    // Add packages directory
-    pal::string_t packages_dir = init->probe_dir();
-    if (packages_dir.empty() || !pal::directory_exists(packages_dir))
-    {
-        (void)pal::get_default_packages_directory(&packages_dir);
-    }
-    trace::info(_X("Package directory: %s"), packages_dir.empty() ? _X("not specified") : packages_dir.c_str());
-
-    pal::string_t clr_path = resolver.resolve_coreclr_dir(args.app_dir, packages_dir, args.dotnet_packages_cache);
+    pal::string_t clr_path = resolver.resolve_coreclr_dir();
     if (clr_path.empty() || !pal::realpath(&clr_path))
     {
         trace::error(_X("Could not resolve coreclr path"));
@@ -46,22 +37,19 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
     }
 
     probe_paths_t probe_paths;
-    if (!resolver.resolve_probe_paths(args.app_dir, packages_dir, args.dotnet_packages_cache, clr_path, &probe_paths))
+    if (!resolver.resolve_probe_paths(clr_path, &probe_paths))
     {
         return StatusCode::ResolverResolveFailure;
     }
 
-    // TODO: config.get_runtime_properties();
-
     // Build CoreCLR properties
-    const char* property_keys[] = {
+    std::vector<const char*> property_keys = {
         "TRUSTED_PLATFORM_ASSEMBLIES",
         "APP_PATHS",
         "APP_NI_PATHS",
         "NATIVE_DLL_SEARCH_DIRECTORIES",
         "PLATFORM_RESOURCE_ROOTS",
         "AppDomainCompatSwitch",
-        "SERVER_GC",
         // Workaround: mscorlib does not resolve symlinks for AppContext.BaseDirectory dotnet/coreclr/issues/2128
         "APP_CONTEXT_BASE_DIRECTORY",
         "APP_CONTEXT_DEPS_FILES"
@@ -72,13 +60,9 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
     auto native_dirs_cstr = pal::to_stdstring(probe_paths.native);
     auto resources_dirs_cstr = pal::to_stdstring(probe_paths.resources);
 
-    // Workaround for dotnet/cli Issue #488 and #652
-    pal::string_t server_gc;
-    std::string server_gc_cstr = (pal::getenv(_X("COREHOST_SERVER_GC"), &server_gc) && !server_gc.empty()) ? pal::to_stdstring(server_gc) : "0";
-    
     std::string deps = pal::to_stdstring(resolver.get_deps_file() + _X(";") + resolver.get_fx_deps_file());
 
-    const char* property_values[] = {
+    std::vector<const char*> property_values = {
         // TRUSTED_PLATFORM_ASSEMBLIES
         tpa_paths_cstr.c_str(),
         // APP_PATHS
@@ -91,15 +75,23 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
         resources_dirs_cstr.c_str(),
         // AppDomainCompatSwitch
         "UseLatestBehaviorWhenTFMNotSpecified",
-        // SERVER_GC
-        server_gc_cstr.c_str(),
         // APP_CONTEXT_BASE_DIRECTORY
         app_base_cstr.c_str(),
         // APP_CONTEXT_DEPS_FILES,
         deps.c_str(),
     };
 
-    size_t property_size = sizeof(property_keys) / sizeof(property_keys[0]);
+    for (int i = 0; i < g_init.cfg_keys.size(); ++i)
+    {
+        property_keys.push_back(g_init.cfg_keys[i].c_str());
+        property_values.push_back(g_init.cfg_values[i].c_str());
+    }
+
+    size_t property_size = property_keys.size();
+    assert(property_keys.size() == property_values.size());
+
+    // Add API sets to the process DLL search
+    pal::setup_api_sets(resolver.get_api_sets());
 
     // Bind CoreCLR
     if (!coreclr::bind(clr_path))
@@ -129,8 +121,8 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
     auto hr = coreclr::initialize(
         own_path.c_str(),
         "clrhost",
-        property_keys,
-        property_values,
+        property_keys.data(),
+        property_values.data(),
         property_size,
         &host_handle,
         &domain_id);
@@ -190,43 +182,55 @@ int run(const corehost_init_t* init, const runtime_config_t& config, const argum
     return exit_code;
 }
 
-SHARED_API int corehost_load(corehost_init_t* init)
+SHARED_API int corehost_load(host_interface_t* init)
 {
-    g_init = init;
+    trace::setup();
+    
+    if (!hostpolicy_init_t::init(init, &g_init))
+    {
+        return StatusCode::LibHostInitFailure;
+    }
+    
     return 0;
 }
 
 SHARED_API int corehost_main(const int argc, const pal::char_t* argv[])
 {
-    trace::setup();
+    if (trace::is_enabled())
+    {
+        trace::info(_X("--- Invoked policy [%s/%s/%s] main = {"),
+            _STRINGIFY(HOST_POLICY_PKG_NAME),
+            _STRINGIFY(HOST_POLICY_PKG_VER),
+            _STRINGIFY(HOST_POLICY_PKG_REL_DIR));
 
-    assert(g_init);
+        for (int i = 0; i < argc; ++i)
+        {
+            trace::info(_X("%s"), argv[i]);
+        }
+        trace::info(_X("}"));
+
+        trace::info(_X("Deps file: %s"), g_init.deps_file.c_str());
+        for (const auto& probe : g_init.probe_paths)
+        {
+            trace::info(_X("Additional probe dir: %s"), probe.c_str());
+        }
+    }
 
     // Take care of arguments
     arguments_t args;
-    if (!parse_arguments(g_init->deps_file(), g_init->probe_dir(), g_init->host_mode(), argc, argv, &args))
+    if (!parse_arguments(g_init.deps_file, g_init.probe_paths, g_init.host_mode, argc, argv, &args))
     {
         return StatusCode::LibHostInvalidArgs;
     }
+    if (trace::is_enabled())
+    {
+        args.print();
+    }
 
-    if (g_init->runtime_config())
-    {
-        return run(g_init, *g_init->runtime_config(), args);
-    }
-    else
-    {
-        runtime_config_t config(get_runtime_config_json(args.managed_application));
-        if (!config.is_valid())
-        {
-            trace::error(_X("Invalid runtimeconfig.json [%s]"), config.get_path().c_str());
-            return StatusCode::InvalidConfigFile;
-        }
-        return run(g_init, config, args);
-    }
+    return run(args);
 }
 
 SHARED_API int corehost_unload()
 {
-    g_init = nullptr;
     return 0;
 }
