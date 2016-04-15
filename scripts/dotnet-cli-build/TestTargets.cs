@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.Cli.Build
         [Target(nameof(RestoreTestAssetPackages), nameof(BuildTestAssetPackages))]
         public static BuildTargetResult SetupTestPackages(BuildTargetContext c) => c.Success();
 
-        [Target(nameof(RestoreTestAssetProjects), nameof(RestoreDesktopTestAssetProjects), nameof(BuildTestAssetProjects))]
+        [Target(nameof(RestoreTestAssetProjects), nameof(RestoreDesktopTestAssetProjects), nameof(RestoreCrossPublishTestAssetProjects), nameof(BuildTestAssetProjects))]
         public static BuildTargetResult SetupTestProjects(BuildTargetContext c) => c.Success();
 
         [Target]
@@ -137,6 +137,18 @@ namespace Microsoft.DotNet.Cli.Build
 
             return c.Success();
         }
+        
+        [Target]
+        public static BuildTargetResult RestoreCrossPublishTestAssetProjects(BuildTargetContext c)
+        {
+            var dotnet = DotNetCli.Stage2;
+
+            dotnet.Restore("--verbosity", "verbose")
+                .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "CrossPublishTestProjects"))
+                .Execute().EnsureSuccessful();
+                
+            return c.Success();
+        }
 
         [Target(nameof(CleanTestPackages), nameof(CleanProductPackages))]
         public static BuildTargetResult BuildTestAssetPackages(BuildTargetContext c)
@@ -188,7 +200,6 @@ namespace Microsoft.DotNet.Cli.Build
                         .Execute();
                 }
 
-
                 var projectJson = Path.Combine(fullPath, "project.json");
                 var dotnetPackArgs = new List<string> {
                     projectJson,
@@ -233,7 +244,6 @@ namespace Microsoft.DotNet.Cli.Build
                     Rmdir(Path.Combine(Dirs.NuGetPackages, ".tools", packageProject.Name));
                 }
             }
-
             return c.Success();
         }
 
