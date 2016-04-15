@@ -294,5 +294,15 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             var command = new TestCommand(Path.Combine(publishedDir.FullName, outputExe));
             command.Execute("").Should().ExitWith(0);
         }
+
+        [Fact]
+        public void PublishFailsWhenProjectRootIsEmpty()
+        {
+            using (var dir = new DisposableDirectory(Temp))
+            {
+                var command = new TestCommand("dotnet");
+                command.Execute($"publish {dir.Path}").Should().Fail();
+            }
+        }
     }
 }
