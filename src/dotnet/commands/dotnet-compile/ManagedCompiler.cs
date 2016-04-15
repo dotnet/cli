@@ -188,33 +188,10 @@ namespace Microsoft.DotNet.Tools.Compiler
             string commandArg = $"@{rsp}";
 
             CommandResult result;
-            Func<string[], int> builtInCommand;
-            if (Program.TryGetBuiltInCommand(commandName, out builtInCommand))
+            Func<string[], int> builtInCompiler;
+            if (Program.TryGetBuiltInCommand(commandName, out builtInCompiler))
             {
-                TextWriter originalConsoleOut = Console.Out;
-                TextWriter originalConsoleError = Console.Error;
-                try
-                {
-                    // redirect the standard out and error so we can parse the diagnostics
-                    var outputWriter = new LineNotificationTextWriter(originalConsoleOut.FormatProvider, originalConsoleOut.Encoding)
-                        .OnWriteLine(line => HandleCompilerOutputLine(line, context, diagnostics, Reporter.Output));
-                    Console.SetOut(outputWriter);
-
-                    var errorWriter = new LineNotificationTextWriter(originalConsoleError.FormatProvider, originalConsoleError.Encoding)
-                        .OnWriteLine(line => HandleCompilerOutputLine(line, context, diagnostics, Reporter.Error));
-                    Console.SetError(errorWriter);
-
-                    int exitCode = builtInCommand(new[] { commandArg });
-
-                    // fake out a ProcessStartInfo for the reporting code below
-                    ProcessStartInfo startInfo = new ProcessStartInfo(new Muxer().MuxerPath, $"{commandName} {commandArg}");
-                    result = new CommandResult(startInfo, exitCode, null, null);
-                }
-                finally
-                {
-                    Console.SetOut(originalConsoleOut);
-                    Console.SetError(originalConsoleError);
-                }
+                result = InvokeBuiltInCompiler(context, diagnostics, commandName, commandArg, builtInCompiler);
             }
             else
             {
@@ -241,6 +218,47 @@ namespace Microsoft.DotNet.Tools.Compiler
             }
 
             return PrintSummary(diagnostics, sw, success);
+        }
+
+        private static CommandResult InvokeBuiltInCompiler(
+            ProjectContext context,
+            List<DiagnosticMessage> diagnostics,
+            string commandName,
+            string commandArg,
+            Func<string[], int> builtInCompiler)
+        {
+            // redirecting the standard out and error so we can parse the diagnostics
+            TextWriter originalConsoleOut = Console.Out;
+            TextWriter originalConsoleError = Console.Error;
+            try
+            {
+                // Need to cache the current reporter.
+                // Writing to the cached reporters will write to the originalConsoleOut and originalConsoleError (the real stdout and stderr)
+                Reporter outputReporter = Reporter.Output;
+                var outputWriter = new LineNotificationTextWriter(originalConsoleOut.FormatProvider, originalConsoleOut.Encoding)
+                    .OnWriteLine(line => HandleCompilerOutputLine(line, context, diagnostics, outputReporter));
+                Console.SetOut(outputWriter);
+
+                Reporter errorReporter = Reporter.Error;
+                var errorWriter = new LineNotificationTextWriter(originalConsoleError.FormatProvider, originalConsoleError.Encoding)
+                    .OnWriteLine(line => HandleCompilerOutputLine(line, context, diagnostics, errorReporter));
+                Console.SetError(errorWriter);
+
+                // Reset the Reporters to the new Console Out and Error.
+                Reporter.Reset();
+
+                int exitCode = builtInCompiler(new[] { commandArg });
+
+                // fake out a ProcessStartInfo
+                ProcessStartInfo startInfo = new ProcessStartInfo(new Muxer().MuxerPath, $"{commandName} {commandArg}");
+                return new CommandResult(startInfo, exitCode, null, null);
+            }
+            finally
+            {
+                Console.SetOut(originalConsoleOut);
+                Console.SetError(originalConsoleError);
+                Reporter.Reset();
+            }
         }
 
         private static void HandleCompilerOutputLine(string line, ProjectContext context, List<DiagnosticMessage> diagnostics, Reporter reporter)
@@ -289,28 +307,70 @@ namespace Microsoft.DotNet.Tools.Compiler
                 get { return _encoding; }
             }
 
+            // Write(char) gets called for all overloads of Write
             public override void Write(char value)
             {
-                string currentLine = null;
-
                 lock (_currentString)
                 {
+                    _currentString.Append(value);
+
                     if (value == '\n')
                     {
-                        currentLine = _currentString.ToString();
+                        _lineHandler?.Invoke(_currentString.ToString());
                         _currentString.Clear();
+                    }
+                }
+            }
+
+            // optimize the common case - Write(string) - so we don't process char by char
+            public override void Write(string value)
+            {
+                lock (_currentString)
+                {
+                    List<int> newLineIndices = GetNewLines(value);
+
+                    if (newLineIndices == null || newLineIndices.Count == 0)
+                    {
+                        // no newlines, just append
+                        _currentString.Append(value);
                     }
                     else
                     {
-                        _currentString.Append(value);
+                        int start = 0;
+                        for (int i = 0; i < newLineIndices.Count; i++)
+                        {
+                            int end = newLineIndices[i];
+
+                            _currentString.Append(value, start, end - start + 1);
+
+                            _lineHandler?.Invoke(_currentString.ToString());
+                            _currentString.Clear();
+
+                            start = end + 1;
+                        }
+
+                        _currentString.Append(value, start, value.Length - start);
+                    }
+                }
+            }
+
+            private static List<int> GetNewLines(string value)
+            {
+                List<int> result = null;
+                for (int i = 0; i < value.Length; i++)
+                {
+                    if (value[i] == '\n')
+                    {
+                        if (result == null)
+                        {
+                            result = new List<int>();
+                        }
+
+                        result.Add(i);
                     }
                 }
 
-                if (currentLine != null)
-                {
-                    // invoke the handler outside of the lock
-                    _lineHandler?.Invoke(currentLine);
-                }
+                return result;
             }
         }
     }
