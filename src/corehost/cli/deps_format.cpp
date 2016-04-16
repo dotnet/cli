@@ -73,7 +73,7 @@ void deps_json_t::reconcile_libraries_with_targets(
                 entry.asset_name = asset_name;
                 entry.asset_type = (deps_entry_t::asset_types) i;
                 entry.relative_path = rel_path;
-                entry.is_serviceable = serviceable;
+                entry.is_serviceable = true || serviceable;
                 entry.is_rid_specific = rid_specific;
 
                 // TODO: Deps file does not follow spec. It uses '\\', should use '/'
