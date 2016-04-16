@@ -384,7 +384,8 @@ pal::string_t deps_resolver_t::resolve_coreclr_dir()
 
 void deps_resolver_t::resolve_tpa_list(
         const pal::string_t& clr_dir,
-        pal::string_t* output)
+        pal::string_t* output,
+        std::unordered_set<pal::string_t>* breadcrumb)
 {
     const std::vector<deps_entry_t> empty(0);
 
@@ -400,11 +401,15 @@ void deps_resolver_t::resolve_tpa_list(
 
     auto process_entry = [&](const pal::string_t& deps_dir, deps_json_t* deps, const dir_assemblies_t& dir_assemblies, const deps_entry_t& entry)
     {
+        if (entry.is_serviceable)
+        {
+            breadcrumb->insert(entry.library_name + _X(",") + entry.library_version);
+            breadcrumb->insert(entry.library_name);
+        }
         if (items.count(entry.asset_name))
         {
             return;
         }
-
         pal::string_t candidate;
 
         trace::info(_X("Processing TPA for deps entry [%s, %s, %s]"), entry.library_name.c_str(), entry.library_version.c_str(), entry.relative_path.c_str());
@@ -478,7 +483,8 @@ void deps_resolver_t::resolve_tpa_list(
 void deps_resolver_t::resolve_probe_dirs(
         deps_entry_t::asset_types asset_type,
         const pal::string_t& clr_dir,
-        pal::string_t* output)
+        pal::string_t* output,
+        std::unordered_set<pal::string_t>* breadcrumb)
 {
     bool is_resources = asset_type == deps_entry_t::asset_types::resources;
     assert(is_resources || asset_type == deps_entry_t::asset_types::native);
@@ -504,6 +510,12 @@ void deps_resolver_t::resolve_probe_dirs(
     bool track_api_sets = true;
     auto add_package_cache_entry = [&](const deps_entry_t& entry)
     {
+        if (entry.is_serviceable)
+        {
+            breadcrumb->insert(entry.library_name + _X(",") + entry.library_version);
+            breadcrumb->insert(entry.library_name);
+        }
+
         if (probe_entry_in_configs(entry, &candidate))
         {
             // For standalone apps, on win7, coreclr needs ApiSets which has to be in the DLL search path.
@@ -587,10 +599,10 @@ void deps_resolver_t::resolve_probe_dirs(
 //                         resolved path ordering.
 //
 //
-bool deps_resolver_t::resolve_probe_paths(const pal::string_t& clr_dir, probe_paths_t* probe_paths)
+bool deps_resolver_t::resolve_probe_paths(const pal::string_t& clr_dir, probe_paths_t* probe_paths, std::unordered_set<pal::string_t>* breadcrumb)
 {
-    resolve_tpa_list(clr_dir, &probe_paths->tpa);
-    resolve_probe_dirs(deps_entry_t::asset_types::native, clr_dir, &probe_paths->native);
-    resolve_probe_dirs(deps_entry_t::asset_types::resources, clr_dir, &probe_paths->resources);
+    resolve_tpa_list(clr_dir, &probe_paths->tpa, breadcrumb);
+    resolve_probe_dirs(deps_entry_t::asset_types::native, clr_dir, &probe_paths->native, breadcrumb);
+    resolve_probe_dirs(deps_entry_t::asset_types::resources, clr_dir, &probe_paths->resources, breadcrumb);
     return true;
 }
