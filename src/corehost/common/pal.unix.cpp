@@ -12,7 +12,7 @@
 #include <sys/types.h>
 #include <pwd.h>
 #include <unistd.h>
-
+#include <fcntl.h>
 #include <fnmatch.h>
 
 #if defined(__APPLE__)
@@ -32,6 +32,18 @@ pal::string_t pal::to_lower(const pal::string_t& in)
     pal::string_t ret = in;
     std::transform(ret.begin(), ret.end(), ret.begin(), ::tolower);
     return ret;
+}
+
+bool pal::touch_file(const pal::string_t& path)
+{
+    int fd = open(path.c_str(), (O_CREAT | O_EXCL), (S_IRUSR | S_IRGRP | S_IROTH));
+    if (fd == -1)
+    {
+        trace::warning(_X("open() in touch_file %s"), path.c_str());
+        return false;
+    }
+    (void) close(fd);
+    return true;
 }
 
 bool pal::getcwd(pal::string_t* recv)
@@ -112,11 +124,64 @@ bool pal::is_path_rooted(const pal::string_t& path)
     return path.front() == '/';
 }
 
+bool pal::get_default_breadcrumb_store(string_t* recv)
+{
+    recv->clear();
+    pal::string_t ext;
+    if (!get_default_extensions_directory(&ext))
+    {
+        trace::info(_X("Breadcrumb store not located because extensions doesn't exist"), ext.c_str());
+        return false;
+    }
+
+    append_path(&ext, _X("breadcrumbs"));
+    if (!pal::directory_exists(ext))
+    {
+        trace::info(_X("Breadcrumb store does not exist in [%s]"), ext.c_str());
+        return false;
+    }
+
+    if (access(ext.c_str(), (R_OK | W_OK)) != 0)
+    {
+        trace::info(_X("Breadcrumb store [%s] is not ACL-ed with rw-"), ext.c_str());
+        return false;
+    }
+
+    recv->assign(ext);
+    return true;
+}
+
 bool pal::get_default_extensions_directory(string_t* recv)
 {
     recv->clear();
-    append_path(recv, _X("opt"));
-    append_path(recv, _X("dotnetextensions"));
+    pal::string_t ext;
+    if (pal::getenv(_X("DOTNET_EXTENSIONS"), &ext) && pal::realpath(&ext))
+    {
+        // We should have the path in ext.
+        trace::info(_X("Realpath $DOTNET_EXTENSIONS [%s]"), ext.c_str());
+    }
+    
+    if (!pal::directory_exists(ext))
+    {
+        trace::info(_X("Directory dotnet extensions at [%s] not found"), ext.c_str());
+        ext.clear();
+        append_path(&ext, _X("opt"));
+        append_path(&ext, _X("dotnetextensions"));
+        if (!pal::directory_exists(ext))
+        {
+            trace::info(_X("Fallback directory dotnet extensions at [%s] not found"), ext.c_str());
+            return false;
+        }
+    }
+
+    if (access(ext.c_str(), R_OK) != 0)
+    {
+        trace::info(_X("Directory dotnet extensions at [%s] not ACL-ed properly"), ext.c_str());
+        return false;
+    }
+
+    recv->assign(ext);
+    trace::info(_X("Using dotnet extensions at [%s]"), ext.c_str());
     return true;
 }
 
