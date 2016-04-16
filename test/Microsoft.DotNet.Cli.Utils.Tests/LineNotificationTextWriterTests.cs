@@ -21,6 +21,10 @@ namespace Microsoft.DotNet.Cli.Utils
             yield return new object[] { "first\nsecond\nthird\nlast", 3 };
         }
 
+        /// <summary>
+        /// Tests the LineNotificationTextWriter.Write method raises OnWriteLine
+        /// the correct number of times and always with a '\n' character at the end of the line.
+        /// </summary>
         [Theory]
         [MemberData(nameof(TestStrings))]
         public void TestWrite(string inputStr, int newLineCount)
@@ -38,6 +42,10 @@ namespace Microsoft.DotNet.Cli.Utils
             Assert.Equal(newLineCount, count);
         }
 
+        /// <summary>
+        /// Tests the LineNotificationTextWriter.WriteLine method raises OnWriteLine
+        /// the correct number of times and always with a '\n' character at the end of the line.
+        /// </summary>
         [Theory]
         [MemberData(nameof(TestStrings))]
         public void TestWriteLine(string inputStr, int newLineCount)
@@ -55,6 +63,10 @@ namespace Microsoft.DotNet.Cli.Utils
             Assert.Equal(newLineCount + 1, count);
         }
 
+        /// <summary>
+        /// Tests the LineNotificationTextWriter.Write(char) method raises OnWriteLine
+        /// the correct number of times and always with a '\n' character at the end of the line.
+        /// </summary>
         [Fact]
         public void TestWriteChar()
         {

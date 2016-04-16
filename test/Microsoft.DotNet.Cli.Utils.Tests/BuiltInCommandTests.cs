@@ -10,6 +10,10 @@ namespace Microsoft.DotNet.Cli.Utils
 {
     public class BuiltInCommandTests : TestBase
     {
+        /// <summary>
+        /// Tests that BuiltInCommand.Execute returns the correct exit code and a
+        /// valid StartInfo FileName and Arguments.
+        /// </summary>
         [Fact]
         public void TestExecute()
         {
@@ -24,6 +28,10 @@ namespace Microsoft.DotNet.Cli.Utils
             Assert.Equal("fakeCommand 1 2", result.StartInfo.Arguments);
         }
 
+        /// <summary>
+        /// Tests that BuiltInCommand.Execute raises the OnOutputLine and OnErrorLine
+        /// the correct number of times and with the correct content.
+        /// </summary>
         [Fact]
         public void TestOnOutputLines()
         {
