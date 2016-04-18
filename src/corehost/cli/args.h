@@ -57,12 +57,18 @@ struct probe_config_t
 
     static probe_config_t svc_ni(const pal::string_t& dir, bool patch_roll_fwd, bool prerelease_roll_fwd)
     {
-        return probe_config_t(dir, false, patch_roll_fwd, prerelease_roll_fwd, nullptr, true, true);
+        bool runtime_assets_only = true;  // Since this is ngen based package location, assets should be managed.
+        bool serviceable_only = false;    // Ignore deps specified "serviceable" flag since all packages
+                                          // are not expected to be authored with this attribute.
+        return probe_config_t(dir, false, patch_roll_fwd, prerelease_roll_fwd, nullptr, serviceable_only, runtime_assets_only);
     }
 
     static probe_config_t svc(const pal::string_t& dir, bool patch_roll_fwd, bool prerelease_roll_fwd)
     {
-        return probe_config_t(dir, false, patch_roll_fwd, prerelease_roll_fwd, nullptr, true, false);
+        bool runtime_assets_only = false; // Include both native and managed assemblies.
+        bool serviceable_only = false;    // Ignore deps specified "serviceable" flag since all packages
+                                          // are not expected to be authored with this attribute.
+        return probe_config_t(dir, false, patch_roll_fwd, prerelease_roll_fwd, nullptr, serviceable_only, runtime_assets_only);
     }
 
     static probe_config_t cache_ni(const pal::string_t& dir)
