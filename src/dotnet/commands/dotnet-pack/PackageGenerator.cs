@@ -7,18 +7,18 @@ using System.IO;
 using System.Linq;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.ProjectModel.Files;
 using Microsoft.DotNet.ProjectModel.Graph;
+using Microsoft.DotNet.ProjectModel.Resources;
 using Microsoft.DotNet.ProjectModel.Utilities;
+using Microsoft.DotNet.Tools.Pack;
+using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using NuGet;
 using NuGet.Frameworks;
 using NuGet.Packaging.Core;
 using NuGet.Versioning;
-using Microsoft.DotNet.ProjectModel.Resources;
-using Microsoft.DotNet.Tools.Pack;
 using PackageBuilder = NuGet.PackageBuilder;
-using Microsoft.DotNet.ProjectModel.Files;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
-using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace Microsoft.DotNet.Tools.Compiler
 {
@@ -89,7 +89,8 @@ namespace Microsoft.DotNet.Tools.Compiler
             }
             else
             {
-                resourceCultures = compilationOptions.EmbedInclude.GetIncludeFiles("/")
+                var resolver = new IncludeFilesResolver(compilationOptions.EmbedInclude);
+                resourceCultures = resolver.GetIncludeFiles("/")
                     .Select(file => ResourceUtility.GetResourceCultureName(file.SourcePath))
                     .Distinct();
             }
@@ -122,16 +123,14 @@ namespace Microsoft.DotNet.Tools.Compiler
 
             if (Project.PackOptions.PackInclude != null)
             {
-                var files = Project.PackOptions.PackInclude.GetIncludeFiles(targetBasePath: "/", flatten: true);
-                packDiagnostics.AddRange(Project.PackOptions.PackInclude.Diagnostics);
+                var resolver = new IncludeFilesResolver(Project.PackOptions.PackInclude);
+                var files = resolver.GetIncludeFiles(targetBasePath: "/", flatten: true);
+                packDiagnostics.AddRange(resolver.Diagnostics);
                 PackageBuilder.Files.AddRange(GetPackageFiles(files, packDiagnostics));
             }
-            else
+            else if (Project.Files.PackInclude != null && Project.Files.PackInclude.Any())
             {
-                if (Project.Files.PackInclude != null && Project.Files.PackInclude.Any())
-                {
-                    AddPackageFiles(Project.Files.PackInclude, packDiagnostics);
-                }
+                AddPackageFiles(Project.Files.PackInclude, packDiagnostics);
             }
 
             // Write the packages as long as we're still in a success state.

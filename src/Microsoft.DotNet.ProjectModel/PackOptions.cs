@@ -25,6 +25,6 @@ namespace Microsoft.DotNet.ProjectModel
 
         public string RepositoryUrl { get; set; }
 
-        public IncludeFilesResolver PackInclude { get; set; }
+        public IncludeContext PackInclude { get; set; }
     }
 }

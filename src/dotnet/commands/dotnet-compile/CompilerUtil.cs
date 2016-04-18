@@ -11,6 +11,7 @@ using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Resources;
 using Microsoft.DotNet.Tools.Common;
+using Microsoft.DotNet.ProjectModel.Files;
 
 // This class is responsible with defining the arguments for the Compile verb.
 // It knows how to interpret them and set default values
@@ -61,8 +62,9 @@ namespace Microsoft.DotNet.Tools.Compiler
                         ).ToList();
             }
 
+            var resolver = new IncludeFilesResolver(compilationOptions.EmbedInclude);
             return
-                (from resourceFile in compilationOptions.EmbedInclude.GetIncludeFiles("/")
+                (from resourceFile in resolver.GetIncludeFiles("/")
                     let inputFile = resourceFile.SourcePath
                     where string.IsNullOrEmpty(ResourceUtility.GetResourceCultureName(inputFile))
                     let target = resourceFile.IsCustomTarget ? resourceFile.TargetPath : null
@@ -102,8 +104,9 @@ namespace Microsoft.DotNet.Tools.Compiler
                         ).ToList();
             }
 
+            var resolver = new IncludeFilesResolver(compilationOptions.EmbedInclude);
             return
-                (from resourceFileGroup in compilationOptions.EmbedInclude.GetIncludeFiles("/")
+                (from resourceFileGroup in resolver.GetIncludeFiles("/")
                  .GroupBy(resourceFile => ResourceUtility.GetResourceCultureName(resourceFile.SourcePath))
                     let culture = resourceFileGroup.Key
                     where !string.IsNullOrEmpty(culture)

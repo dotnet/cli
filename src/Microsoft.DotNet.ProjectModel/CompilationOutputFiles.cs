@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.DotNet.ProjectModel.Files;
 using Microsoft.DotNet.ProjectModel.Resources;
 using NuGet.Frameworks;
 
@@ -69,7 +70,8 @@ namespace Microsoft.DotNet.ProjectModel
             }
             else
             {
-                resourceCultureNames = compilationOptions.EmbedInclude.GetIncludeFiles("/")
+                var resolver = new IncludeFilesResolver(compilationOptions.EmbedInclude);
+                resourceCultureNames = resolver.GetIncludeFiles("/")
                     .Select(f => ResourceUtility.GetResourceCultureName(f.SourcePath))
                     .Where(f => !string.IsNullOrEmpty(f))
                     .Distinct();
