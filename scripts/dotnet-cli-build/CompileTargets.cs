@@ -315,7 +315,7 @@ namespace Microsoft.DotNet.Cli.Build
 
         private static void RemovePdbsFromDir(string directory)
         {
-            //FS.RmFilesInDirRecursive(directory, "*.pdb");
+            FS.RmFilesInDirRecursive(directory, "*.pdb");
         }
 
         private static void CopySharedHost(string outputDir)
