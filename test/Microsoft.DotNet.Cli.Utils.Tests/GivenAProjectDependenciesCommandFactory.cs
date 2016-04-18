@@ -25,12 +25,20 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         private static readonly NuGetFramework s_desktopTestFramework = FrameworkConstants.CommonFrameworks.Net451;  
         
         [WindowsOnlyFact]
-        public void It_resolves_desktop_apps_from_the_output_directory_using_default_configuration_when_configuration_is_null()
+        public void It_resolves_desktop_apps_from_the_output_directory_using_Debug_configuration_when_configuration_is_null()
         {
+            var configuration = "Debug";
+
             var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "DesktopTestProjects"));
             var testInstance = testAssetManager.CreateTestInstance("AppWithDirectDependencyDesktop")
-                .WithLockFiles()
-                .WithBuildArtifacts();
+                .WithLockFiles();
+
+            var buildCommand = new BuildCommand(
+                Path.Combine(testInstance.TestRoot, "project.json"), 
+                configuration: configuration)
+                    .ExecuteWithCapturedOutput()
+                    .Should()
+                    .Pass();
 
             var context = ProjectContext.Create(testInstance.TestRoot, s_desktopTestFramework);
 
@@ -43,17 +51,87 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
 
             var command = factory.Create("dotnet-desktop-and-portable", null);
 
-            command.CommandName.Should().Contain(Path.Combine(testInstance.TestRoot, "bin", "Debug"));
+            command.CommandName.Should().Contain(Path.Combine(testInstance.TestRoot, "bin", configuration));
             Path.GetFileName(command.CommandName).Should().Be("dotnet-desktop-and-portable.exe");
         }
 
         [WindowsOnlyFact]
         public void It_resolves_desktop_apps_from_the_output_directory_when_configuration_is_Debug()
         {
+            var configuration = "Debug";
+
             var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "DesktopTestProjects"));
             var testInstance = testAssetManager.CreateTestInstance("AppWithDirectDependencyDesktop")
-                .WithLockFiles()
-                .WithBuildArtifacts();
+                .WithLockFiles();
+
+            var buildCommand = new BuildCommand(
+                Path.Combine(testInstance.TestRoot, "project.json"), 
+                configuration: configuration)
+                    .ExecuteWithCapturedOutput()
+                    .Should()
+                    .Pass();
+
+            var context = ProjectContext.Create(testInstance.TestRoot, s_desktopTestFramework);
+
+            var factory = new ProjectDependenciesCommandFactory(
+                s_desktopTestFramework,
+                configuration,
+                null,
+                null,
+                testInstance.TestRoot);
+
+            var command = factory.Create("dotnet-desktop-and-portable", null);
+
+            command.CommandName.Should().Contain(Path.Combine(testInstance.TestRoot, "bin", configuration));
+            Path.GetFileName(command.CommandName).Should().Be("dotnet-desktop-and-portable.exe");
+        }
+
+        [WindowsOnlyFact]
+        public void It_resolves_desktop_apps_from_the_output_directory_when_configuration_is_Release()
+        {
+            var configuration = "Release";
+
+            var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "DesktopTestProjects"));
+            var testInstance = testAssetManager.CreateTestInstance("AppWithDirectDependencyDesktop")
+                .WithLockFiles();
+
+            var buildCommand = new BuildCommand(
+                Path.Combine(testInstance.TestRoot, "project.json"), 
+                configuration: configuration)
+                    .ExecuteWithCapturedOutput()
+                    .Should()
+                    .Pass();
+
+            var context = ProjectContext.Create(testInstance.TestRoot, s_desktopTestFramework);
+
+            var factory = new ProjectDependenciesCommandFactory(
+                s_desktopTestFramework,
+                configuration,
+                null,
+                null,
+                testInstance.TestRoot);
+
+            var command = factory.Create("dotnet-desktop-and-portable", null);
+
+            command.CommandName.Should().Contain(Path.Combine(testInstance.TestRoot, "bin", configuration));
+            Path.GetFileName(command.CommandName).Should().Be("dotnet-desktop-and-portable.exe");
+        }
+
+        [WindowsOnlyFact]
+        public void It_resolves_desktop_apps_from_the_output_directory_using_configuration_passed_to_create_over_configuration_passed_to_the_constructor()
+        {
+            var configuration = "Release";
+
+            var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "DesktopTestProjects"));
+            var testInstance = testAssetManager.CreateTestInstance("AppWithDirectDependencyDesktop")
+                .WithLockFiles();
+
+            var buildCommand = new BuildCommand(
+                Path.Combine(testInstance.TestRoot, "project.json"), 
+                configuration: configuration)
+                    .ExecuteWithCapturedOutput()
+                    .Should()
+                    .Pass();
 
             var context = ProjectContext.Create(testInstance.TestRoot, s_desktopTestFramework);
 
@@ -64,55 +142,9 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 null,
                 testInstance.TestRoot);
 
-            var command = factory.Create("dotnet-desktop-and-portable", null);
+            var command = factory.Create("dotnet-desktop-and-portable", null, configuration: configuration);
 
-            command.CommandName.Should().Contain(Path.Combine(testInstance.TestRoot, "bin", "Debug"));
-            Path.GetFileName(command.CommandName).Should().Be("dotnet-desktop-and-portable.exe");
-        }
-
-        [WindowsOnlyFact]
-        public void It_resolves_desktop_apps_from_the_output_directory_when_configuration_is_Release()
-        {
-            var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "DesktopTestProjects"));
-            var testInstance = testAssetManager.CreateTestInstance("AppWithDirectDependencyDesktop")
-                .WithLockFiles()
-                .WithBuildArtifacts();
-
-            var context = ProjectContext.Create(testInstance.TestRoot, s_desktopTestFramework);
-
-            var factory = new ProjectDependenciesCommandFactory(
-                s_desktopTestFramework,
-                "Release",
-                null,
-                null,
-                testInstance.TestRoot);
-
-            var command = factory.Create("dotnet-desktop-and-portable", null);
-
-            command.CommandName.Should().Contain(Path.Combine(testInstance.TestRoot, "bin", "Release"));
-            Path.GetFileName(command.CommandName).Should().Be("dotnet-desktop-and-portable.exe");
-        }
-
-        [WindowsOnlyFact]
-        public void It_resolves_desktop_apps_from_the_output_directory_when_configuration_is_Foo()
-        {
-            var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "DesktopTestProjects"));
-            var testInstance = testAssetManager.CreateTestInstance("AppWithDirectDependencyDesktop")
-                .WithLockFiles()
-                .WithBuildArtifacts();
-
-            var context = ProjectContext.Create(testInstance.TestRoot, s_desktopTestFramework);
-
-            var factory = new ProjectDependenciesCommandFactory(
-                s_desktopTestFramework,
-                "Foo",
-                null,
-                null,
-                testInstance.TestRoot);
-
-            var command = factory.Create("dotnet-desktop-and-portable", null);
-
-            command.CommandName.Should().Contain(Path.Combine(testInstance.TestRoot, "bin", "Foo"));
+            command.CommandName.Should().Contain(Path.Combine(testInstance.TestRoot, "bin", configuration));
             Path.GetFileName(command.CommandName).Should().Be("dotnet-desktop-and-portable.exe");
         }
     }
