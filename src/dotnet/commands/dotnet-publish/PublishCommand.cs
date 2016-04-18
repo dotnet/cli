@@ -10,6 +10,7 @@ using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Files;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.ProjectModel.Compilation;
+using Microsoft.DotNet.ProjectModel.Files;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Utilities;
 using Microsoft.DotNet.Tools.Common;
@@ -168,7 +169,12 @@ namespace Microsoft.DotNet.Tools.Publish
             }
 
             var contentFiles = new ContentFiles(context);
-            var includeEntries = context.ProjectFile.PublishInclude?.GetIncludeFiles(PathUtility.EnsureTrailingSlash(outputPath));
+            IEnumerable<IncludeEntry> includeEntries = null;
+            if (context.ProjectFile.PublishOptions != null)
+            {
+                var resolver = new IncludeFilesResolver(context.ProjectFile.PublishOptions);
+                includeEntries = resolver.GetIncludeFiles(PathUtility.EnsureTrailingSlash(outputPath));
+            }
             contentFiles.StructuredCopyTo(outputPath, includeEntries);
 
             // Publish a host if this is an application

@@ -198,7 +198,7 @@ namespace Microsoft.DotNet.ProjectModel
 
             project.PackOptions = GetPackOptions(rawProject, project) ?? new PackOptions();
             project.RuntimeOptions = GetRuntimeOptions(rawProject) ?? new RuntimeOptions();
-            project.PublishInclude = GetPublishInclude(rawProject, project);
+            project.PublishOptions = GetPublishInclude(rawProject, project);
 
             BuildTargetFrameworksAndConfigurations(project, rawProject, diagnostics);
 
@@ -551,11 +551,11 @@ namespace Microsoft.DotNet.ProjectModel
                 project.AnalyzerOptions = analyzerOptions;
             }
 
-            IncludeFilesResolver embed = null;
+            IncludeContext embed = null;
             var embedOption = rawOptions.Value<JToken>("embed");
             if (embedOption != null)
             {
-                embed = new IncludeFilesResolver(
+                embed = new IncludeContext(
                     project.ProjectDirectory,
                     "embed",
                     rawOptions,
@@ -563,11 +563,11 @@ namespace Microsoft.DotNet.ProjectModel
                     ProjectFilesCollection.DefaultBuiltInExcludePatterns);
             }
 
-            IncludeFilesResolver copyToOutput = null;
+            IncludeContext copyToOutput = null;
             var copyToOutputOption = rawOptions.Value<JToken>("copyToOutput");
             if (copyToOutputOption != null)
             {
-                copyToOutput = new IncludeFilesResolver(
+                copyToOutput = new IncludeContext(
                     project.ProjectDirectory,
                     "copyToOutput",
                     rawOptions,
@@ -603,10 +603,10 @@ namespace Microsoft.DotNet.ProjectModel
             var rawPackOptions = rawProject.Value<JToken>("packOptions") as JObject;
 
             // Files to be packed along with the project
-            IncludeFilesResolver packInclude = null;
+            IncludeContext packInclude = null;
             if (rawPackOptions != null)
             {
-                packInclude = new IncludeFilesResolver(
+                packInclude = new IncludeContext(
                     project.ProjectDirectory, "files", rawPackOptions, defaultBuiltInExclude: ProjectFilesCollection.DefaultBuiltInExcludePatterns);
             }
 
@@ -662,12 +662,12 @@ namespace Microsoft.DotNet.ProjectModel
             };
         }
 
-        private static IncludeFilesResolver GetPublishInclude(JObject rawProject, Project project)
+        private static IncludeContext GetPublishInclude(JObject rawProject, Project project)
         {
             var rawPublishOptions = rawProject.Value<JToken>("publishOptions") as JObject;
             if (rawPublishOptions != null)
             {
-                return new IncludeFilesResolver(
+                return new IncludeContext(
                     project.ProjectDirectory,
                     "publishOptions",
                     rawProject,

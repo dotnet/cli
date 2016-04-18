@@ -7,6 +7,6 @@ namespace Microsoft.DotNet.ProjectModel
     {
         public bool GcServer { get; set; }
 
-        public bool GcConcurrent { get; set; } = true;
+        public bool GcConcurrent { get; set; }
     }
 }

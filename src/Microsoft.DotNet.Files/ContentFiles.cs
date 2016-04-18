@@ -24,10 +24,7 @@ namespace Microsoft.DotNet.Files
         {
             if (includeEntries == null)
             {
-                var sourceFiles = _context
-                    .ProjectFile
-                    .Files
-                    .GetContentFiles();
+                var sourceFiles = _context.ProjectFile.Files.GetContentFiles();
 
                 var sourceDirectory = _context.ProjectDirectory;
 
@@ -54,10 +51,7 @@ namespace Microsoft.DotNet.Files
 
                 foreach (var sourceFilePath in pathMap.Keys)
                 {
-                    File.Copy(
-                        sourceFilePath,
-                        pathMap[sourceFilePath],
-                        overwrite: true);
+                    File.Copy(sourceFilePath, pathMap[sourceFilePath], overwrite: true);
                 }
 
                 RemoveAttributeFromFiles(pathMap.Values, FileAttributes.ReadOnly);
@@ -74,10 +68,7 @@ namespace Microsoft.DotNet.Files
 
                 foreach (var file in includeEntries)
                 {
-                    File.Copy(
-                        file.SourcePath,
-                        file.TargetPath,
-                        overwrite: true);
+                    File.Copy(file.SourcePath, file.TargetPath, overwrite: true);
                 }
 
                 RemoveAttributeFromFiles(includeEntries.Select(f => f.TargetPath), FileAttributes.ReadOnly);
