@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
-using NuGet.Frameworks;
+using System.Linq;
 using Microsoft.DotNet.ProjectModel;
+using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Build
 {
@@ -50,6 +51,11 @@ namespace Microsoft.DotNet.Tools.Build
             {
                 foreach (var dependency in projectNode.Dependencies)
                 {
+                    var context = dependency.ProjectContext;
+                    if (!context.ProjectFile.Files.SourceFiles.Any())
+                    {
+                        continue;
+                    }
                     var result = Build(dependency);
                     switch (result)
                     {
