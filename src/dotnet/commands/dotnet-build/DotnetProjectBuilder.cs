@@ -1,0 +1,324 @@
+using Microsoft.Dotnet.Cli.Compiler.Common;
+using Microsoft.DotNet.Cli.Compiler.Common;
+using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.Tools.Compiler;
+using Microsoft.Extensions.PlatformAbstractions;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+namespace Microsoft.DotNet.Tools.Build
+{
+    class DotnetProjectBuilder : ProjectBuilder
+    {
+        private readonly BuilderCommandApp _args;
+        private readonly IncrementalPreconditionManager _preconditionManager;
+        private readonly CompilerIOManager _compilerIOManager;
+
+        public DotnetProjectBuilder(BuilderCommandApp args) : base(args.ShouldSkipDependencies)
+        {
+            _args = (BuilderCommandApp)args.ShallowCopy();
+            _preconditionManager = new IncrementalPreconditionManager(
+                args.ShouldPrintIncrementalPreconditions,
+                args.ShouldNotUseIncrementality,
+                args.ShouldSkipDependencies);
+            _compilerIOManager = new CompilerIOManager(
+                args.ConfigValue,
+                args.OutputValue,
+                args.BuildBasePathValue,
+                args.GetRuntimes()
+                );
+        }
+
+        private void StampProjectWithSDKVersion(ProjectContext project)
+        {
+            if (File.Exists(DotnetFiles.VersionFile))
+            {
+                var projectVersionFile = project.GetSDKVersionFile(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
+                var parentDirectory = Path.GetDirectoryName(projectVersionFile);
+
+                if (!Directory.Exists(parentDirectory))
+                {
+                    Directory.CreateDirectory(parentDirectory);
+                }
+
+                string content = ComputeCurrentVersionFileData();
+
+                File.WriteAllText(projectVersionFile, content);
+            }
+            else
+            {
+                Reporter.Verbose.WriteLine($"Project {project.GetDisplayName()} was not stamped with a CLI version because the version file does not exist: {DotnetFiles.VersionFile}");
+            }
+        }
+
+        private static string ComputeCurrentVersionFileData()
+        {
+            var content = File.ReadAllText(DotnetFiles.VersionFile);
+            content += Environment.NewLine;
+            content += PlatformServices.Default.Runtime.GetRuntimeIdentifier();
+            return content;
+        }
+
+        private void PrintSummary(bool success)
+        {
+            // todo: Ideally it's the builder's responsibility for adding the time elapsed. That way we avoid cross cutting display concerns between compile and build for printing time elapsed
+            if (success)
+            {
+                //TODO: Bring this back?
+                //Reporter.Output.Write(" " + _preconditions.LogMessage());
+                Reporter.Output.WriteLine();
+            }
+
+            Reporter.Output.WriteLine();
+        }
+
+        private void CreateOutputDirectories()
+        {
+            if (!string.IsNullOrEmpty(_args.OutputValue))
+            {
+                Directory.CreateDirectory(_args.OutputValue);
+            }
+            if (!string.IsNullOrEmpty(_args.BuildBasePathValue))
+            {
+                Directory.CreateDirectory(_args.BuildBasePathValue);
+            }
+        }
+
+        private bool InvokeCompileOnDependency(ProjectDescription projectDependency)
+        {
+            var args = new List<string>();
+
+            args.Add("--framework");
+            args.Add($"{projectDependency.Framework}");
+
+            args.Add("--configuration");
+            args.Add(_args.ConfigValue);
+            args.Add(projectDependency.Project.ProjectDirectory);
+
+            if (!string.IsNullOrWhiteSpace(_args.RuntimeValue))
+            {
+                args.Add("--runtime");
+                args.Add(_args.RuntimeValue);
+            }
+
+            if (!string.IsNullOrEmpty(_args.VersionSuffixValue))
+            {
+                args.Add("--version-suffix");
+                args.Add(_args.VersionSuffixValue);
+            }
+
+            if (!string.IsNullOrWhiteSpace(_args.BuildBasePathValue))
+            {
+                args.Add("--build-base-path");
+                args.Add(_args.BuildBasePathValue);
+            }
+
+            var compileResult = CompileCommand.Run(args.ToArray());
+
+            return compileResult == 0;
+        }
+
+        private string[] GetCompilationArguments(ProjectGraphNode node)
+        {
+            // todo: add methods to CompilerCommandApp to generate the arg string?
+            var args = new List<string>();
+            args.Add("--framework");
+            args.Add(node.ProjectContext.TargetFramework.ToString());
+            args.Add("--configuration");
+            args.Add(_args.ConfigValue);
+
+            if (!string.IsNullOrWhiteSpace(_args.RuntimeValue))
+            {
+                args.Add("--runtime");
+                args.Add(_args.RuntimeValue);
+            }
+
+            if (!string.IsNullOrEmpty(_args.VersionSuffixValue))
+            {
+                args.Add("--version-suffix");
+                args.Add(_args.VersionSuffixValue);
+            }
+
+            if (!string.IsNullOrEmpty(_args.BuildBasePathValue))
+            {
+                args.Add("--build-base-path");
+                args.Add(_args.BuildBasePathValue);
+            }
+
+            if (node.IsRoot && !string.IsNullOrEmpty(_args.OutputValue))
+            {
+                args.Add("--output");
+                args.Add(_args.OutputValue);
+            }
+
+            args.Add(node.ProjectContext.ProjectDirectory);
+
+            return args.ToArray();
+        }
+
+        private void CopyCompilationOutput(OutputPaths outputPaths)
+        {
+            var dest = outputPaths.RuntimeOutputPath;
+            var source = outputPaths.CompilationOutputPath;
+
+            // No need to copy if dest and source are the same
+            if (string.Equals(dest, source, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            foreach (var file in outputPaths.CompilationFiles.All())
+            {
+                var destFileName = file.Replace(source, dest);
+                var directoryName = Path.GetDirectoryName(destFileName);
+                if (!Directory.Exists(directoryName))
+                {
+                    Directory.CreateDirectory(directoryName);
+                }
+                File.Copy(file, destFileName, true);
+            }
+        }
+
+        private void MakeRunnable(ProjectGraphNode graphNode)
+        {
+            var runtimeContext = graphNode.ProjectContext.ProjectFile.HasRuntimeOutput(_args.ConfigValue) ?
+                graphNode.ProjectContext.CreateRuntimeContext(_args.GetRuntimes()) :
+                graphNode.ProjectContext;
+
+            var outputPaths = runtimeContext.GetOutputPaths(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
+            var libraryExporter = runtimeContext.CreateExporter(_args.ConfigValue, _args.BuildBasePathValue);
+
+            CopyCompilationOutput(outputPaths);
+
+            var executable = new Executable(runtimeContext, outputPaths, libraryExporter, _args.ConfigValue);
+            executable.MakeCompilationOutputRunnable();
+        }
+
+        protected override bool CheckIncremental(ProjectGraphNode projectNode)
+        {
+            if (_args.ShouldNotUseIncrementality)
+            {
+                return false;
+            }
+            var preconditions = _preconditionManager.GatherIncrementalPreconditions(projectNode);
+            if (preconditions.PreconditionsDetected())
+            {
+                return false;
+            }
+            return NeedsRebuilding(projectNode);
+        }
+
+        protected override CompilationResult RunCompile(ProjectGraphNode projectNode)
+        {
+            try
+            {
+                var compileResult = CompileCommand.Run(GetCompilationArguments(projectNode));
+                var success = compileResult == 0;
+                if (projectNode.IsRoot)
+                {
+                    MakeRunnable(projectNode);
+                    PrintSummary(success);
+                }
+
+                return success ? CompilationResult.Success : CompilationResult.Failure;
+            }
+            finally
+            {
+                StampProjectWithSDKVersion(projectNode.ProjectContext);
+            }
+        }
+
+        private bool CLIChangedSinceLastCompilation(ProjectContext project)
+        {
+            var currentVersionFile = DotnetFiles.VersionFile;
+            var versionFileFromLastCompile = project.GetSDKVersionFile(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
+
+            if (!File.Exists(currentVersionFile))
+            {
+                // this CLI does not have a version file; cannot tell if CLI changed
+                return false;
+            }
+
+            if (!File.Exists(versionFileFromLastCompile))
+            {
+                // this is the first compilation; cannot tell if CLI changed
+                return false;
+            }
+
+            var currentContent = ComputeCurrentVersionFileData();
+
+            var versionsAreEqual = string.Equals(currentContent, File.ReadAllText(versionFileFromLastCompile), StringComparison.OrdinalIgnoreCase);
+
+            return !versionsAreEqual;
+        }
+
+        private bool NeedsRebuilding(ProjectGraphNode  graphNode)
+        {
+            var project = graphNode.ProjectContext;
+            if (CLIChangedSinceLastCompilation(project))
+            {
+                Reporter.Output.WriteLine($"Project {project.GetDisplayName()} will be compiled because the version or bitness of the CLI changed since the last build");
+                return true;
+            }
+
+            var compilerIO = _compilerIOManager.GetCompileIO(graphNode);
+
+            // rebuild if empty inputs / outputs
+            if (!(compilerIO.Outputs.Any() && compilerIO.Inputs.Any()))
+            {
+                Reporter.Output.WriteLine($"Project {project.GetDisplayName()} will be compiled because it either has empty inputs or outputs");
+                return true;
+            }
+
+            //rebuild if missing inputs / outputs
+            if (_compilerIOManager.AnyMissingIO(project, compilerIO.Outputs, "outputs") || _compilerIOManager.AnyMissingIO(project, compilerIO.Inputs, "inputs"))
+            {
+                return true;
+            }
+
+            // find the output with the earliest write time
+            var minOutputPath = compilerIO.Outputs.First();
+            var minDateUtc = File.GetLastWriteTimeUtc(minOutputPath);
+
+            foreach (var outputPath in compilerIO.Outputs)
+            {
+                if (File.GetLastWriteTimeUtc(outputPath) >= minDateUtc)
+                {
+                    continue;
+                }
+
+                minDateUtc = File.GetLastWriteTimeUtc(outputPath);
+                minOutputPath = outputPath;
+            }
+
+            // find inputs that are older than the earliest output
+            var newInputs = compilerIO.Inputs.FindAll(p => File.GetLastWriteTimeUtc(p) >= minDateUtc);
+
+            if (!newInputs.Any())
+            {
+                Reporter.Output.WriteLine($"Project {project.GetDisplayName()} was previously compiled. Skipping compilation.");
+                return false;
+            }
+
+            Reporter.Output.WriteLine($"Project {project.GetDisplayName()} will be compiled because some of its inputs were newer than its oldest output.");
+            Reporter.Verbose.WriteLine();
+            Reporter.Verbose.WriteLine($" Oldest output item:");
+            Reporter.Verbose.WriteLine($"  {minDateUtc.ToLocalTime()}: {minOutputPath}");
+            Reporter.Verbose.WriteLine();
+
+            Reporter.Verbose.WriteLine($" Inputs newer than the oldest output item:");
+
+            foreach (var newInput in newInputs)
+            {
+                Reporter.Verbose.WriteLine($"  {File.GetLastWriteTime(newInput)}: {newInput}");
+            }
+
+            Reporter.Verbose.WriteLine();
+
+            return true;
+        }
+    }
+}
