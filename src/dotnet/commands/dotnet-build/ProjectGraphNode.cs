@@ -2,21 +2,22 @@ using Microsoft.DotNet.ProjectModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.Tools.Build
 {
     public class ProjectGraphNode
     {
-        Func<ProjectContext> _projectContextCreator;
+        Task<ProjectContext> _projectContextCreator;
 
-        public ProjectGraphNode(ProjectContext projectContext, IEnumerable<ProjectGraphNode> dependencies, bool isRoot = false)
+        public ProjectGraphNode(Task<ProjectContext> projectContext, IEnumerable<ProjectGraphNode> dependencies, bool isRoot = false)
         {
-            ProjectContext = projectContext;
+            _projectContextCreator = projectContext;
             Dependencies = dependencies.ToList();
             IsRoot = isRoot;
         }
 
-        public ProjectContext ProjectContext { get; }
+        public ProjectContext ProjectContext { get { return _projectContextCreator.GetAwaiter().GetResult(); } }
 
         public IReadOnlyList<ProjectGraphNode> Dependencies { get; }
 
