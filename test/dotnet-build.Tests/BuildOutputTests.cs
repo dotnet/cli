@@ -128,7 +128,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             new BuildCommand(GetProjectPath(_testLibDirInfo),
                 output: outputValue != null ? Path.Combine(_testProjectsRoot, outputValue) : string.Empty,
                 buildBasePath: baseValue != null ? Path.Combine(_testProjectsRoot, baseValue) : string.Empty,
-                framework: DefaultFramework)
+                framework: DefaultLibraryFramework)
                 .ExecuteWithCapturedOutput().Should().Pass();
 
             var libdebug = _rootDirInfo.Sub(FormatPath(expectedLibCompile, DefaultLibraryFramework, _runtime));

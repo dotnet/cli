@@ -195,7 +195,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             publishCommand.GetOutputDirectory().Should().HaveFile("System.Runtime.dll");
         }
 
-        [WindowsOnlyFact]
+        [WindowsOnlyFact(Skip="https://github.com/dotnet/cli/issues/2536")]
         public void TestLibraryBindingRedirectGeneration()
         {
             TestInstance instance = TestAssetsManager.CreateTestInstance("TestBindingRedirectGeneration")
