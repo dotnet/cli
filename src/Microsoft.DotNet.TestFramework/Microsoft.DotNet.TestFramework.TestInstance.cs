@@ -11,6 +11,8 @@ namespace Microsoft.DotNet.TestFramework
 {
     public class TestInstance
     {
+        private static readonly ICollection<string> BuildArtefactBlackList = new List<string>() {".IncrementalCache", ".SDKVersion"};
+
         private string _testDestination;
         private string _testAssetRoot;
 
@@ -105,8 +107,13 @@ namespace Microsoft.DotNet.TestFramework
                                  .Where(file =>
                                  {
                                      file = file.ToLower();
-                                     return file.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}") 
+
+                                     var isArtefact = file.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}") 
                                             || file.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}");
+
+                                     var isBlackListed = BuildArtefactBlackList.Any(b => file.Contains(b.ToLower()));
+
+                                     return isArtefact && !isBlackListed;
                                  });
 
             foreach (string binFile in binFiles)
