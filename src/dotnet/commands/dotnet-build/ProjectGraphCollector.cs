@@ -1,0 +1,65 @@
+using System;
+using System.Collections.Generic;
+using NuGet.Frameworks;
+using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.ProjectModel.Graph;
+using System.Linq;
+
+namespace Microsoft.DotNet.Tools.Build
+{
+    public class ProjectGraphCollector
+    {
+        private readonly Func<string, NuGetFramework, ProjectContext> _projectContextFactory;
+
+        public ProjectGraphCollector(Func<string, NuGetFramework, ProjectContext> projectContextFactory)
+        {
+            _projectContextFactory = projectContextFactory;
+        }
+
+        public IEnumerable<ProjectGraphNode> Collect(IEnumerable<ProjectContext> contexts)
+        {
+            foreach (var context in contexts)
+            {
+                var libraries = context.LibraryManager.GetLibraries();
+                var lookup = libraries.ToDictionary(l => l.Identity.Name);
+                var root = lookup[context.ProjectFile.Name];
+                yield return TraverseProject(root, lookup, context);
+            }
+        }
+
+        private ProjectGraphNode TraverseProject(LibraryDescription root, IDictionary<string, LibraryDescription> lookup, ProjectContext context = null)
+        {
+            var deps = new List<ProjectGraphNode>();
+            foreach (var dependency in root.Dependencies)
+            {
+                if (dependency.Type.Equals(LibraryType.Project))
+                {
+                    deps.Add(TraverseProject(lookup[dependency.Name], lookup));
+                }
+                else
+                {
+                    deps.AddRange(TraversePackage(lookup[dependency.Name], lookup));
+                }
+            }
+            return new ProjectGraphNode(context ?? _projectContextFactory(root.Path, root.Framework), deps, context != null);
+        }
+
+        private IEnumerable<ProjectGraphNode> TraversePackage(LibraryDescription root, IDictionary<string, LibraryDescription> lookup)
+        {
+            foreach (var dependency in root.Dependencies)
+            {
+                if (dependency.Type.Equals(LibraryType.Project))
+                {
+                    yield return TraverseProject(lookup[dependency.Name], lookup);
+                }
+                else
+                {
+                    foreach(var node in TraversePackage(lookup[dependency.Name], lookup))
+                    {
+                        yield return node;
+                    }
+                }
+            }
+        }
+    }
+}
