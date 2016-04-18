@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.Tools.Build
         private static bool OnExecute(List<ProjectContext> contexts, CompilerCommandApp args)
         {
             var graphCollector = new ProjectGraphCollector((project, target) => ProjectContext.Create(project, target));
-            var graph = graphCollector.Collect(contexts);
+            var graph = graphCollector.Collect(contexts).ToArray();
             var builder = new DotnetProjectBuilder((BuilderCommandApp) args);
             return builder.Build(graph).All(r => r != CompilationResult.Failure);
         }

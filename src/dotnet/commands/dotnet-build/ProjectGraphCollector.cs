@@ -32,13 +32,15 @@ namespace Microsoft.DotNet.Tools.Build
             var deps = new List<ProjectGraphNode>();
             foreach (var dependency in root.Dependencies)
             {
-                if (dependency.Type.Equals(LibraryType.Project))
+                var libraryDescription = lookup[dependency.Name];
+
+                if (libraryDescription.Identity.Type.Equals(LibraryType.Project))
                 {
-                    deps.Add(TraverseProject(lookup[dependency.Name], lookup));
+                    deps.Add(TraverseProject(libraryDescription, lookup));
                 }
                 else
                 {
-                    deps.AddRange(TraversePackage(lookup[dependency.Name], lookup));
+                    deps.AddRange(TraversePackage(libraryDescription, lookup));
                 }
             }
             return new ProjectGraphNode(context ?? _projectContextFactory(root.Path, root.Framework), deps, context != null);

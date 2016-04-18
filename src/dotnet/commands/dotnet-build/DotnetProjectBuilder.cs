@@ -197,7 +197,7 @@ namespace Microsoft.DotNet.Tools.Build
             executable.MakeCompilationOutputRunnable();
         }
 
-        protected override bool CheckIncremental(ProjectGraphNode projectNode)
+        protected override bool SkipIncremental(ProjectGraphNode projectNode)
         {
             if (_args.ShouldNotUseIncrementality)
             {
@@ -208,7 +208,7 @@ namespace Microsoft.DotNet.Tools.Build
             {
                 return false;
             }
-            return NeedsRebuilding(projectNode);
+            return !NeedsRebuilding(projectNode);
         }
 
         protected override CompilationResult RunCompile(ProjectGraphNode projectNode)
