@@ -7,69 +7,34 @@ using System.IO;
 using System.Linq;
 using Microsoft.DotNet.ProjectModel.Utilities;
 using Microsoft.Extensions.FileSystemGlobbing;
-using Newtonsoft.Json.Linq;
 
 namespace Microsoft.DotNet.ProjectModel.Files
 {
     public class IncludeFilesResolver
     {
-        private static readonly char[] PatternSeparator = new[] { ';' };
-
+        private string _sourceBasePath;
+        private string _option;
         private List<string> _includePatterns;
         private List<string> _excludePatterns;
         private List<string> _includeFiles;
         private List<string> _excludeFiles;
         private List<string> _builtInsInclude;
         private List<string> _builtInsExclude;
-        private IDictionary<string, IncludeFilesResolver> _mappings;
-        private string _sourceBasePath;
-        private string _option;
+        private IEnumerable<KeyValuePair<string, IncludeFilesResolver>> _mappings;
         private IEnumerable<string> _resolvedIncludeFiles;
 
-        public IncludeFilesResolver(
-            string sourceBasePath,
-            string option,
-            JObject rawObject,
-            string[] defaultBuiltInInclude = null,
-            string[] defaultBuiltInExclude = null)
+        public IncludeFilesResolver(IncludeContext context)
         {
-            _sourceBasePath = sourceBasePath;
-            _option = option;
-            var token = rawObject.Value<JToken>(option);
-            if (token.Type != JTokenType.Object)
-            {
-                _includePatterns = new List<string>(ExtractValues(token));
-            }
-            else
-            {
-                _includePatterns = CreateCollection(sourceBasePath, "include", ExtractValues(token.Value<JToken>("include")), literalPath: false);
-                _excludePatterns = CreateCollection(sourceBasePath, "exclude", ExtractValues(token.Value<JToken>("exclude")), literalPath: false);
-                _includeFiles = CreateCollection(sourceBasePath, "includeFiles", ExtractValues(token.Value<JToken>("includeFiles")), literalPath: true);
-                _excludeFiles = CreateCollection(sourceBasePath, "excludeFiles", ExtractValues(token.Value<JToken>("excludeFiles")), literalPath: true);
-                var builtIns = token.Value<JToken>("builtIns") as JObject;
-                if (builtIns != null)
-                {
-                    _builtInsInclude = CreateCollection(sourceBasePath, "include", ExtractValues(builtIns.Value<JToken>("include")), literalPath: false);
-                    if (defaultBuiltInInclude != null && !_builtInsInclude.Any())
-                    {
-                        _builtInsInclude = defaultBuiltInInclude.ToList();
-                    }
-                    _builtInsExclude = CreateCollection(sourceBasePath, "exclude", ExtractValues(builtIns.Value<JToken>("exclude")), literalPath: false);
-                    if (defaultBuiltInExclude != null && !_builtInsExclude.Any())
-                    {
-                        _builtInsExclude = defaultBuiltInExclude.ToList();
-                    }
-                }
-                var mappings = token.Value<JToken>("mappings") as JObject;
-                if (mappings != null)
-                {
-                    _mappings = new Dictionary<string, IncludeFilesResolver>();
-                    foreach (var map in mappings)
-                    {
-                        _mappings.Add(map.Key, new IncludeFilesResolver(sourceBasePath, map.Key, mappings));
-                    }
-                }
-            }
+            _sourceBasePath = context.SourceBasePath;
+            _option = context.Option;
+            _includePatterns = context.IncludePatterns;
+            _excludePatterns = context.ExcludePatterns;
+            _includeFiles = context.IncludeFiles;
+            _excludeFiles = context.ExcludeFiles;
+            _builtInsInclude = context.BuiltInsInclude;
+            _builtInsExclude = context.BuiltInsExclude;
+            _mappings = context.Mappings?.Select(
+                map => new KeyValuePair<string, IncludeFilesResolver>(map.Key, new IncludeFilesResolver(map.Value)));
         }
 
         public List<DiagnosticMessage> Diagnostics { get; } = new List<DiagnosticMessage>();
@@ -217,78 +182,6 @@ namespace Microsoft.DotNet.ProjectModel.Files
             _resolvedIncludeFiles = files;
 
             return files;
-        }
-
-        private static string[] ExtractValues(JToken token)
-        {
-            if (token != null)
-            {
-                if (token.Type == JTokenType.String)
-                {
-                    return new string[] { token.Value<string>() };
-                }
-
-                else if (token.Type == JTokenType.Array)
-                {
-                    return token.Values<string>().ToArray();
-                }
-            }
-
-            return new string[0];
-        }
-
-        private static List<string> CreateCollection(string projectDirectory, string propertyName, IEnumerable<string> patternsStrings, bool literalPath)
-        {
-            var patterns = patternsStrings.SelectMany(patternsString => GetSourcesSplit(patternsString))
-                                          .Select(patternString => patternString.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar));
-
-            foreach (var pattern in patterns)
-            {
-                if (Path.IsPathRooted(pattern))
-                {
-                    throw new InvalidOperationException($"The '{propertyName}' property cannot be a rooted path.");
-                }
-
-                if (literalPath && pattern.Contains('*'))
-                {
-                    throw new InvalidOperationException($"The '{propertyName}' property cannot contain wildcard characters.");
-                }
-            }
-
-            return new List<string>(patterns.Select(pattern => FolderToPattern(pattern, projectDirectory)));
-        }
-
-        private static IEnumerable<string> GetSourcesSplit(string sourceDescription)
-        {
-            if (string.IsNullOrEmpty(sourceDescription))
-            {
-                return Enumerable.Empty<string>();
-            }
-
-            return sourceDescription.Split(PatternSeparator, StringSplitOptions.RemoveEmptyEntries);
-        }
-
-        private static string FolderToPattern(string candidate, string projectDir)
-        {
-            // This conversion is needed to support current template
-
-            // If it's already a pattern, no change is needed
-            if (candidate.Contains('*'))
-            {
-                return candidate;
-            }
-
-            // If the given string ends with a path separator, or it is an existing directory
-            // we convert this folder name to a pattern matching all files in the folder
-            if (candidate.EndsWith(@"\") ||
-                candidate.EndsWith("/") ||
-                Directory.Exists(Path.Combine(projectDir, candidate)))
-            {
-                return Path.Combine(candidate, "**", "*");
-            }
-
-            // Otherwise, it represents a single file
-            return candidate;
         }
     }
 }

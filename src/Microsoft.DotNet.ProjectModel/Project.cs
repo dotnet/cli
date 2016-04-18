@@ -78,7 +78,7 @@ namespace Microsoft.DotNet.ProjectModel
 
         public string RawRuntimeOptions { get; set; }
 
-        public IncludeFilesResolver PublishInclude { get; set; }
+        public IncludeContext PublishOptions { get; set; }
 
         public bool IsTestProject => !string.IsNullOrEmpty(TestRunner);
         
