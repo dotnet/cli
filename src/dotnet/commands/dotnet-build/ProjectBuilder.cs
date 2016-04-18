@@ -67,25 +67,19 @@ namespace Microsoft.DotNet.Tools.Build
                     }
                 }
             }
-            if (CheckIncremental(projectNode))
+            if (SkipIncremental(projectNode))
             {
-                return RunCompile(projectNode);
+                return CompilationResult.IncrementalSkip;
             }
             else
             {
-                return CompilationResult.IncrementalSkip;
+                return RunCompile(projectNode);
             }
         }
 
         protected abstract CompilationResult RunCompile(ProjectGraphNode projectNode);
 
-        protected abstract bool CheckIncremental(ProjectGraphNode projectNode);
-
-        private CompilationResult CompileDependency(ProjectGraphNode dependency)
-        {
-            throw new NotImplementedException();
-        }
-
+        protected abstract bool SkipIncremental(ProjectGraphNode projectNode);
 
         private class ProjectContextIdentity : Tuple<string, NuGetFramework>
         {
