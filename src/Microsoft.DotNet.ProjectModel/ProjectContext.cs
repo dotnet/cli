@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.ProjectModel
             LibraryManager libraryManager,
             LockFile lockfile)
         {
-            Identity = new ProjectContextIdentity(rootProject.Path, TargetFramework);
+            Identity = new ProjectContextIdentity(rootProject?.Path, TargetFramework);
             GlobalSettings = globalSettings;
             RootProject = rootProject;
             PlatformLibrary = platformLibrary;
