@@ -134,14 +134,40 @@ namespace Microsoft.DotNet.ProjectModel
 
             if (LockFile != null)
             {
+                var deduper = new HashSet<string>();
                 foreach (var target in LockFile.Targets)
                 {
-                    yield return new ProjectContextBuilder()
-                    .WithProject(Project)
-                    .WithLockFile(LockFile)
-                    .WithTargetFramework(target.TargetFramework)
-                    .WithRuntimeIdentifiers(new[] { target.RuntimeIdentifier })
-                    .Build();
+                    var builder = new ProjectContextBuilder()
+                        .WithProject(Project)
+                        .WithLockFile(LockFile)
+                        .WithTargetFramework(target.TargetFramework)
+                        .WithRuntimeIdentifiers(new[] { target.RuntimeIdentifier });
+                    if(IsDesignTime)
+                    {
+                        builder.AsDesignTime();
+                    }
+
+                    var context = builder.Build();
+                    if (deduper.Add($"{context.TargetFramework}/{context.RuntimeIdentifier}"))
+                    {
+                        yield return context;
+                    }
+                }
+            }
+            else
+            {
+                // Build a context for each framework. It won't be fully valid, since it won't have resolved data or runtime data, but the diagnostics will show that
+                // (Project Model Server needs this)
+                foreach(var framework in Project.GetTargetFrameworks())
+                {
+                    var builder = new ProjectContextBuilder()
+                        .WithProject(Project)
+                        .WithTargetFramework(framework.FrameworkName);
+                    if(IsDesignTime)
+                    {
+                        builder.AsDesignTime();
+                    }
+                    yield return builder.Build();
                 }
             }
         }
@@ -202,7 +228,7 @@ namespace Microsoft.DotNet.ProjectModel
             if (mainProject != null)
             {
                 platformDependency = mainProject.Dependencies
-                    .Where(d =>  d.Type.Equals(LibraryDependencyType.Platform))
+                    .Where(d => d.Type.Equals(LibraryDependencyType.Platform))
                     .Cast<LibraryRange?>()
                     .FirstOrDefault();
             }
@@ -583,7 +609,7 @@ namespace Microsoft.DotNet.ProjectModel
 
                 return combiner.CombinedHash;
             }
-            
+
             public override string ToString()
             {
                 return Name + " " + LibraryType;
