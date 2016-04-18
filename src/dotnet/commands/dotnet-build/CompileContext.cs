@@ -16,6 +16,49 @@ using Microsoft.DotNet.ProjectModel.Compilation;
 
 namespace Microsoft.DotNet.Tools.Build
 {
+    internal class ProjectCompiler
+    {
+        public void Compile(IEnumerable<ProjectGraphNode> roots)
+        {
+            foreach (var projectNode in roots)
+            {
+                CompileRoot(projectNode);
+            }
+        }
+
+        private void CompileRoot(ProjectGraphNode projectNode)
+        {
+            var skipIncrementalCheck = false;
+            foreach (var dependency in projectNode.Dependencies)
+            {
+                var result = CompileDependency(dependency);
+                switch (result)
+                {
+                    case CompilationResult.IncrementalSkip:
+                        break;
+                    case CompilationResult.Success:
+                        skipIncrementalCheck = false;
+                        break;
+                    case CompilationResult.Failure:
+                        return;//?
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+        }
+
+        private CompilationResult CompileDependency(ProjectGraphNode dependency)
+        {
+            throw new NotImplementedException();
+        }
+
+        private enum CompilationResult
+        {
+            IncrementalSkip, Success, Failure, 
+        }
+    }
+
+
     // todo: Convert CompileContext into a DAG of dependencies: if a node needs recompilation, the entire path up to root needs compilation
     // Knows how to orchestrate compilation for a ProjectContext
     // Collects icnremental safety checks and transitively compiles a project context
@@ -30,7 +73,7 @@ namespace Microsoft.DotNet.Tools.Build
 
         public bool IsSafeForIncrementalCompilation => !_preconditions.PreconditionsDetected();
 
-        public CompileContext(ProjectContext rootProject, BuilderCommandApp args)
+        public CompileContext(ProjectContext rootProject, BuilderCommandApp args, bool skipIncremental)
         {
             _rootProject = rootProject;
 
