@@ -4,6 +4,7 @@ using NuGet.Frameworks;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.ProjectModel.Graph;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.Tools.Build
 {
@@ -27,10 +28,10 @@ namespace Microsoft.DotNet.Tools.Build
             }
         }
 
-        private ProjectGraphNode TraverseProject(LibraryDescription root, IDictionary<string, LibraryDescription> lookup, ProjectContext context = null)
+        private ProjectGraphNode TraverseProject(LibraryDescription library, IDictionary<string, LibraryDescription> lookup, ProjectContext context = null)
         {
             var deps = new List<ProjectGraphNode>();
-            foreach (var dependency in root.Dependencies)
+            foreach (var dependency in library.Dependencies)
             {
                 var libraryDescription = lookup[dependency.Name];
 
@@ -43,7 +44,8 @@ namespace Microsoft.DotNet.Tools.Build
                     deps.AddRange(TraversePackage(libraryDescription, lookup));
                 }
             }
-            return new ProjectGraphNode(context ?? _projectContextFactory(root.Path, root.Framework), deps, context != null);
+            var task = context != null ? Task.FromResult(context) : Task.Run(() => _projectContextFactory(library.Path, library.Framework));
+            return new ProjectGraphNode(task, deps, context != null);
         }
 
         private IEnumerable<ProjectGraphNode> TraversePackage(LibraryDescription root, IDictionary<string, LibraryDescription> lookup)
