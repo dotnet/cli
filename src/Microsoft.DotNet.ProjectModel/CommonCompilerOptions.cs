@@ -1,7 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.DotNet.ProjectModel.Files;
@@ -44,9 +43,9 @@ namespace Microsoft.DotNet.ProjectModel
 
         public string CompilerName { get; set; }
 
-        public IncludeFilesResolver EmbedInclude { get; set; }
+        public IncludeContext EmbedInclude { get; set; }
 
-        public IncludeFilesResolver CopyToOutputInclude { get; set; }
+        public IncludeContext CopyToOutputInclude { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -68,7 +67,9 @@ namespace Microsoft.DotNet.ProjectModel
                    EnumerableEquals(SuppressWarnings, other.SuppressWarnings) &&
                    EnumerableEquals(AdditionalArguments, other.AdditionalArguments) &&
                    OutputName == other.OutputName &&
-                   CompilerName == other.CompilerName;
+                   CompilerName == other.CompilerName &&
+                   EmbedInclude.Equals(other.EmbedInclude) &&
+                   CopyToOutputInclude.Equals(other.CopyToOutputInclude);
         }
 
         private static bool EnumerableEquals(IEnumerable<string> left, IEnumerable<string> right)
