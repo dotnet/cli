@@ -31,16 +31,14 @@ namespace Microsoft.DotNet.Tools.Build
 
         private CompilationResult Build(ProjectGraphNode projectNode)
         {
-            var projectContextIdentity = new ProjectContextIdentity(projectNode.ProjectContext);
-
             CompilationResult result;
-            if (_compilationResults.TryGetValue(projectContextIdentity, out result))
+            if (_compilationResults.TryGetValue(projectNode.ProjectContext.Identity, out result))
             {
                 return result;
             }
             result = CompileWithDependencies(projectNode);
 
-            _compilationResults[projectContextIdentity] = result;
+            _compilationResults[projectNode.ProjectContext.Identity] = result;
 
             return result;
         }
@@ -67,25 +65,18 @@ namespace Microsoft.DotNet.Tools.Build
                     }
                 }
             }
-            if (SkipIncremental(projectNode))
+            if (NeedsRebuilding(projectNode))
             {
-                return CompilationResult.IncrementalSkip;
+                return RunCompile(projectNode);
             }
             else
             {
-                return RunCompile(projectNode);
+                return CompilationResult.IncrementalSkip;
             }
         }
 
         protected abstract CompilationResult RunCompile(ProjectGraphNode projectNode);
 
-        protected abstract bool SkipIncremental(ProjectGraphNode projectNode);
-
-        private class ProjectContextIdentity : Tuple<string, NuGetFramework>
-        {
-            public ProjectContextIdentity(ProjectContext context) : base(context.ProjectFile?.ProjectFilePath, context.TargetFramework)
-            {
-            }
-        }
+        protected abstract bool NeedsRebuilding(ProjectGraphNode projectNode);
     }
 }

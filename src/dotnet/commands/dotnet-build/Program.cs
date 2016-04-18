@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.Tools.Build
         {
             var graphCollector = new ProjectGraphCollector((project, target) => ProjectContext.Create(project, target));
             var graph = graphCollector.Collect(contexts).ToArray();
-            var builder = new DotnetProjectBuilder((BuilderCommandApp) args);
+            var builder = new DotNetProjectBuilder((BuilderCommandApp) args);
             return builder.Build(graph).All(r => r != CompilationResult.Failure);
         }
     }

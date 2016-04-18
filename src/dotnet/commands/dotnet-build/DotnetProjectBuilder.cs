@@ -1,17 +1,17 @@
-using Microsoft.Dotnet.Cli.Compiler.Common;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.Tools.Compiler;
 using Microsoft.Extensions.PlatformAbstractions;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace Microsoft.DotNet.Tools.Build
 {
-    class DotnetProjectBuilder : ProjectBuilder
+    class DotNetProjectBuilder : ProjectBuilder
     {
         private readonly BuilderCommandApp _args;
         private readonly IncrementalPreconditionManager _preconditionManager;
@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.Tools.Build
         private readonly ScriptRunner _scriptRunner;
         private readonly DotNetCommandFactory _commandFactory;
 
-        public DotnetProjectBuilder(BuilderCommandApp args) : base(args.ShouldSkipDependencies)
+        public DotNetProjectBuilder(BuilderCommandApp args) : base(args.ShouldSkipDependencies)
         {
             _args = (BuilderCommandApp)args.ShallowCopy();
             _preconditionManager = new IncrementalPreconditionManager(
@@ -129,20 +129,6 @@ namespace Microsoft.DotNet.Tools.Build
             executable.MakeCompilationOutputRunnable();
         }
 
-        protected override bool SkipIncremental(ProjectGraphNode projectNode)
-        {
-            if (_args.ShouldNotUseIncrementality)
-            {
-                return false;
-            }
-            var preconditions = _preconditionManager.GatherIncrementalPreconditions(projectNode);
-            if (preconditions.PreconditionsDetected())
-            {
-                return false;
-            }
-            return !NeedsRebuilding(projectNode);
-        }
-
         protected override CompilationResult RunCompile(ProjectGraphNode projectNode)
         {
             try
@@ -188,7 +174,7 @@ namespace Microsoft.DotNet.Tools.Build
             return !versionsAreEqual;
         }
 
-        private bool NeedsRebuilding(ProjectGraphNode  graphNode)
+        protected override bool NeedsRebuilding(ProjectGraphNode  graphNode)
         {
             var project = graphNode.ProjectContext;
             if (CLIChangedSinceLastCompilation(project))
