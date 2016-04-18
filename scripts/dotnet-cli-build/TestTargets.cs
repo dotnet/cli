@@ -17,6 +17,7 @@ namespace Microsoft.DotNet.Cli.Build
 
         public static readonly string[] TestProjects = new[]
         {
+            "crossgen.Tests",
             "EndToEnd",
             "dotnet.Tests",
             "dotnet-publish.Tests",
