@@ -16,6 +16,8 @@ namespace Microsoft.DotNet.Tools.Build
         private readonly BuilderCommandApp _args;
         private readonly IncrementalPreconditionManager _preconditionManager;
         private readonly CompilerIOManager _compilerIOManager;
+        private readonly ScriptRunner _scriptRunner;
+        private readonly DotNetCommandFactory _commandFactory;
 
         public DotnetProjectBuilder(BuilderCommandApp args) : base(args.ShouldSkipDependencies)
         {
@@ -30,6 +32,8 @@ namespace Microsoft.DotNet.Tools.Build
                 args.BuildBasePathValue,
                 args.GetRuntimes()
                 );
+            _scriptRunner = new ScriptRunner();
+            _commandFactory = new DotNetCommandFactory();
         }
 
         private void StampProjectWithSDKVersion(ProjectContext project)
@@ -85,78 +89,6 @@ namespace Microsoft.DotNet.Tools.Build
             {
                 Directory.CreateDirectory(_args.BuildBasePathValue);
             }
-        }
-
-        private bool InvokeCompileOnDependency(ProjectDescription projectDependency)
-        {
-            var args = new List<string>();
-
-            args.Add("--framework");
-            args.Add($"{projectDependency.Framework}");
-
-            args.Add("--configuration");
-            args.Add(_args.ConfigValue);
-            args.Add(projectDependency.Project.ProjectDirectory);
-
-            if (!string.IsNullOrWhiteSpace(_args.RuntimeValue))
-            {
-                args.Add("--runtime");
-                args.Add(_args.RuntimeValue);
-            }
-
-            if (!string.IsNullOrEmpty(_args.VersionSuffixValue))
-            {
-                args.Add("--version-suffix");
-                args.Add(_args.VersionSuffixValue);
-            }
-
-            if (!string.IsNullOrWhiteSpace(_args.BuildBasePathValue))
-            {
-                args.Add("--build-base-path");
-                args.Add(_args.BuildBasePathValue);
-            }
-
-            var compileResult = CompileCommand.Run(args.ToArray());
-
-            return compileResult == 0;
-        }
-
-        private string[] GetCompilationArguments(ProjectGraphNode node)
-        {
-            // todo: add methods to CompilerCommandApp to generate the arg string?
-            var args = new List<string>();
-            args.Add("--framework");
-            args.Add(node.ProjectContext.TargetFramework.ToString());
-            args.Add("--configuration");
-            args.Add(_args.ConfigValue);
-
-            if (!string.IsNullOrWhiteSpace(_args.RuntimeValue))
-            {
-                args.Add("--runtime");
-                args.Add(_args.RuntimeValue);
-            }
-
-            if (!string.IsNullOrEmpty(_args.VersionSuffixValue))
-            {
-                args.Add("--version-suffix");
-                args.Add(_args.VersionSuffixValue);
-            }
-
-            if (!string.IsNullOrEmpty(_args.BuildBasePathValue))
-            {
-                args.Add("--build-base-path");
-                args.Add(_args.BuildBasePathValue);
-            }
-
-            if (node.IsRoot && !string.IsNullOrEmpty(_args.OutputValue))
-            {
-                args.Add("--output");
-                args.Add(_args.OutputValue);
-            }
-
-            args.Add(node.ProjectContext.ProjectDirectory);
-
-            return args.ToArray();
         }
 
         private void CopyCompilationOutput(OutputPaths outputPaths)
@@ -215,8 +147,9 @@ namespace Microsoft.DotNet.Tools.Build
         {
             try
             {
-                var compileResult = CompileCommand.Run(GetCompilationArguments(projectNode));
-                var success = compileResult == 0;
+                var managedCompiler = new ManagedCompiler(_scriptRunner, _commandFactory);
+
+                var success = managedCompiler.Compile(projectNode.ProjectContext, _args);
                 if (projectNode.IsRoot)
                 {
                     MakeRunnable(projectNode);
