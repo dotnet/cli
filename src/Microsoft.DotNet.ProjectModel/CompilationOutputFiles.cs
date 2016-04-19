@@ -96,9 +96,9 @@ namespace Microsoft.DotNet.ProjectModel
                 return Project.Files.ResourceFiles.Select(f => f.Key);
             }
 
-            var resolver = new IncludeFilesResolver(compilerOptions.EmbedInclude);
+            var includeFiles = IncludeFilesResolver.GetIncludeFiles(compilerOptions.EmbedInclude, "/", diagnostics: null);
 
-            return resolver.GetIncludeFiles("/").Select(f => f.SourcePath);
+            return includeFiles.Select(f => f.SourcePath);
         }
     }
 }

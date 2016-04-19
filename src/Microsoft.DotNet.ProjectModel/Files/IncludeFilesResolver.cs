@@ -12,88 +12,69 @@ namespace Microsoft.DotNet.ProjectModel.Files
 {
     public class IncludeFilesResolver
     {
-        private string _sourceBasePath;
-        private string _option;
-        private List<string> _includePatterns;
-        private List<string> _excludePatterns;
-        private List<string> _includeFiles;
-        private List<string> _excludeFiles;
-        private List<string> _builtInsInclude;
-        private List<string> _builtInsExclude;
-        private IDictionary<string, IncludeFilesResolver> _mappings;
-        private IEnumerable<string> _resolvedIncludeFiles;
-
-        public IncludeFilesResolver(IncludeContext context)
+        public static IEnumerable<IncludeEntry> GetIncludeFiles(IncludeContext context, string targetBasePath, IList<DiagnosticMessage> diagnostics)
         {
-            _sourceBasePath = context.SourceBasePath;
-            _option = context.Option;
-            _includePatterns = context.IncludePatterns;
-            _excludePatterns = context.ExcludePatterns;
-            _includeFiles = context.IncludeFiles;
-            _excludeFiles = context.ExcludeFiles;
-            _builtInsInclude = context.BuiltInsInclude;
-            _builtInsExclude = context.BuiltInsExclude;
-
-            if (context.Mappings != null)
-            {
-                _mappings = new Dictionary<string, IncludeFilesResolver>();
-
-                foreach (var map in context.Mappings)
-                {
-                    _mappings.Add(map.Key, new IncludeFilesResolver(map.Value));
-                }
-            }
+            return GetIncludeFiles(context, targetBasePath, diagnostics, flatten: false);
         }
 
-        public List<DiagnosticMessage> Diagnostics { get; } = new List<DiagnosticMessage>();
-
-        public IEnumerable<IncludeEntry> GetIncludeFiles(string targetBasePath, bool flatten=false)
+        public static IEnumerable<IncludeEntry> GetIncludeFiles(
+            IncludeContext context,
+            string targetBasePath,
+            IList<DiagnosticMessage> diagnostics,
+            bool flatten)
         {
-            Diagnostics.Clear();
-            _sourceBasePath = PathUtility.EnsureTrailingSlash(_sourceBasePath);
+            var sourceBasePath = PathUtility.EnsureTrailingSlash(context.SourceBasePath);
             targetBasePath = PathUtility.GetPathWithDirectorySeparator(targetBasePath);
-            var includeFiles = new HashSet<IncludeEntry>();
+
+            var includeEntries = new HashSet<IncludeEntry>();
 
             // Check for illegal characters in target path
             if (string.IsNullOrEmpty(targetBasePath))
             {
-                Diagnostics.Add(new DiagnosticMessage(
+                diagnostics?.Add(new DiagnosticMessage(
                     ErrorCodes.NU1003,
-                    $"Invalid '{_option}' section. The target '{targetBasePath}' is invalid, " +
+                    $"Invalid '{context.Option}' section. The target '{targetBasePath}' is invalid, " +
                     "targets must either be a file name or a directory suffixed with '/'. " +
                     "The root directory of the package can be specified by using a single '/' character.",
-                    _sourceBasePath,
+                    sourceBasePath,
                     DiagnosticMessageSeverity.Error));
             }
             else if (targetBasePath.Split('/').Any(s => s.Equals(".") || s.Equals("..")))
             {
-                Diagnostics.Add(new DiagnosticMessage(
+                diagnostics?.Add(new DiagnosticMessage(
                     ErrorCodes.NU1004,
-                    $"Invalid '{_option}' section. " +
+                    $"Invalid '{context.Option}' section. " +
                     $"The target '{targetBasePath}' contains path-traversal characters ('.' or '..'). " +
                     "These characters are not permitted in target paths.",
-                    _sourceBasePath,
+                    sourceBasePath,
                     DiagnosticMessageSeverity.Error));
             }
             else
             {
-                var files = GetIncludeFilesCore();
+                var files = GetIncludeFilesCore(
+                    sourceBasePath,
+                    context.IncludePatterns,
+                    context.ExcludePatterns,
+                    context.IncludeFiles,
+                    context.ExcludeFiles,
+                    context.BuiltInsInclude,
+                    context.BuiltInsExclude);
 
                 var isFile = !targetBasePath.EndsWith(Path.DirectorySeparatorChar.ToString());
                 if (isFile && files.Count() > 1)
                 {
                     // It's a file. But the glob matched multiple things
-                    Diagnostics.Add(new DiagnosticMessage(
+                    diagnostics?.Add(new DiagnosticMessage(
                         ErrorCodes.NU1005,
                         $"Invalid '{ProjectFilesCollection.PackIncludePropertyName}' section. " +
                         $"The target '{targetBasePath}' refers to a single file, but the corresponding pattern " +
                         "produces multiple files. To mark the target as a directory, suffix it with '/'.",
-                        _sourceBasePath,
+                        sourceBasePath,
                         DiagnosticMessageSeverity.Error));
                 }
                 else if (isFile && files.Any())
                 {
-                    includeFiles.Add(new IncludeEntry(targetBasePath, files.First()));
+                    includeEntries.Add(new IncludeEntry(targetBasePath, files.First()));
                 }
                 else
                 {
@@ -109,54 +90,54 @@ namespace Microsoft.DotNet.ProjectModel.Files
                         }
                         else
                         {
-                            targetPath = Path.Combine(targetBasePath, PathUtility.GetRelativePath(_sourceBasePath, file));
+                            targetPath = Path.Combine(targetBasePath, PathUtility.GetRelativePath(sourceBasePath, file));
                         }
 
-                        includeFiles.Add(new IncludeEntry(targetPath, file));
+                        includeEntries.Add(new IncludeEntry(targetPath, file));
                     }
                 }
             }
             
-            if (_mappings != null)
+            if (context.Mappings != null)
             {
                 // Finally add all the mappings
-                foreach (var map in _mappings)
+                foreach (var map in context.Mappings)
                 {
                     var targetPath = Path.Combine(targetBasePath, PathUtility.GetPathWithDirectorySeparator(map.Key));
 
-                    foreach (var file in map.Value.GetIncludeFiles(targetPath, flatten))
+                    foreach (var file in GetIncludeFiles(map.Value, targetPath, diagnostics, flatten))
                     {
                         file.IsCustomTarget = true;
 
                         // Prefer named targets over default ones
-                        includeFiles.RemoveWhere(f => string.Equals(f.SourcePath, file.SourcePath));
-                        includeFiles.Add(file);
+                        includeEntries.RemoveWhere(f => string.Equals(f.SourcePath, file.SourcePath));
+                        includeEntries.Add(file);
                     }
-
-                    Diagnostics.AddRange(map.Value.Diagnostics);
                 }
             }
 
-            return includeFiles;
+            return includeEntries;
         }
 
-        private IEnumerable<string> GetIncludeFilesCore()
+        private static IEnumerable<string> GetIncludeFilesCore(
+            string sourceBasePath,
+            List<string> includePatterns,
+            List<string> excludePatterns,
+            List<string> includeFiles,
+            List<string> excludeFiles,
+            List<string> builtInsInclude,
+            List<string> builtInsExclude)
         {
-            if (_resolvedIncludeFiles != null)
-            {
-                return _resolvedIncludeFiles;
-            }
-
             var literalIncludedFiles = new List<string>();
 
-            if (_includeFiles != null)
+            if (includeFiles != null)
             {
                 // literal included files are added at the last, but the search happens early
                 // so as to make the process fail early in case there is missing file. fail early
                 // helps to avoid unnecessary globing for performance optimization
-                foreach (var literalRelativePath in _includeFiles)
+                foreach (var literalRelativePath in includeFiles)
                 {
-                    var fullPath = Path.GetFullPath(Path.Combine(_sourceBasePath, literalRelativePath));
+                    var fullPath = Path.GetFullPath(Path.Combine(sourceBasePath, literalRelativePath));
 
                     if (!File.Exists(fullPath))
                     {
@@ -169,33 +150,31 @@ namespace Microsoft.DotNet.ProjectModel.Files
 
             // Globbing
             var matcher = new Matcher();
-            if (_builtInsInclude != null)
+            if (builtInsInclude != null)
             {
-                matcher.AddIncludePatterns(_builtInsInclude);
+                matcher.AddIncludePatterns(builtInsInclude);
             }
-            if (_includePatterns != null)
+            if (includePatterns != null)
             {
-                matcher.AddIncludePatterns(_includePatterns);
+                matcher.AddIncludePatterns(includePatterns);
             }
-            if (_builtInsExclude != null)
+            if (builtInsExclude != null)
             {
-                matcher.AddExcludePatterns(_builtInsExclude);
+                matcher.AddExcludePatterns(builtInsExclude);
             }
-            if (_excludePatterns != null)
+            if (excludePatterns != null)
             {
-                matcher.AddExcludePatterns(_excludePatterns);
+                matcher.AddExcludePatterns(excludePatterns);
             }
 
-            var files = matcher.GetResultsInFullPath(_sourceBasePath);
+            var files = matcher.GetResultsInFullPath(sourceBasePath);
             files = files.Concat(literalIncludedFiles).Distinct();
 
-            if (files.Count() > 0 && _excludeFiles != null)
+            if (files.Count() > 0 && excludeFiles != null)
             {
-                var literalExcludedFiles = _excludeFiles.Select(file => Path.GetFullPath(Path.Combine(_sourceBasePath, file)));
+                var literalExcludedFiles = excludeFiles.Select(file => Path.GetFullPath(Path.Combine(sourceBasePath, file)));
                 files = files.Except(literalExcludedFiles);
             }
-
-            _resolvedIncludeFiles = files;
 
             return files;
         }

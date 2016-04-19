@@ -182,10 +182,12 @@ namespace Microsoft.DotNet.Tools.Publish
 
             if (context.ProjectFile.PublishOptions != null)
             {
-                var resolver = new IncludeFilesResolver(context.ProjectFile.PublishOptions);
-                var includeEntries = resolver.GetIncludeFiles(PathUtility.EnsureTrailingSlash(outputPath));
+                var includeEntries = IncludeFilesResolver.GetIncludeFiles(
+                    context.ProjectFile.PublishOptions,
+                    PathUtility.EnsureTrailingSlash(outputPath),
+                    diagnostics: null);
 
-                contentFiles.StructuredCopyToFromIncludeEntries(outputPath, includeEntries);
+                contentFiles.StructuredCopyTo(outputPath, includeEntries);
             }
             else
             {

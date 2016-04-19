@@ -346,9 +346,9 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                 return project.Project.Files.SourceFiles.Any();
             }
 
-            var resolver = new IncludeFilesResolver(compilerOptions.CompileInclude);
+            var includeFiles = IncludeFilesResolver.GetIncludeFiles(compilerOptions.CompileInclude, "/", diagnostics: null);
 
-            return resolver.GetIncludeFiles("/").Any();
+            return includeFiles.Any();
         }
 
         private IEnumerable<LibraryAsset> CollectAssets(CompilationOutputFiles files)

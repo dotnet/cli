@@ -66,9 +66,9 @@ namespace Microsoft.DotNet.Tools.Compiler
             string intermediateOutputPath,
             CommonCompilerOptions compilationOptions)
         {
-            var resolver = new IncludeFilesResolver(compilationOptions.EmbedInclude);
+            var includeFiles = IncludeFilesResolver.GetIncludeFiles(compilationOptions.EmbedInclude, "/", diagnostics: null);
             return
-                (from resourceFile in resolver.GetIncludeFiles("/")
+                (from resourceFile in includeFiles
                     let inputFile = resourceFile.SourcePath
                     where string.IsNullOrEmpty(ResourceUtility.GetResourceCultureName(inputFile))
                     let target = resourceFile.IsCustomTarget ? resourceFile.TargetPath : null
@@ -112,9 +112,9 @@ namespace Microsoft.DotNet.Tools.Compiler
             string outputPath,
             CommonCompilerOptions compilationOptions)
         {
-            var resolver = new IncludeFilesResolver(compilationOptions.EmbedInclude);
+            var includeFiles = IncludeFilesResolver.GetIncludeFiles(compilationOptions.EmbedInclude, "/", diagnostics: null);
             return
-                (from resourceFileGroup in resolver.GetIncludeFiles("/")
+                (from resourceFileGroup in includeFiles
                  .GroupBy(resourceFile => ResourceUtility.GetResourceCultureName(resourceFile.SourcePath))
                     let culture = resourceFileGroup.Key
                     where !string.IsNullOrEmpty(culture)
@@ -163,9 +163,9 @@ namespace Microsoft.DotNet.Tools.Compiler
                 return project.ProjectFile.Files.SourceFiles;
             }
 
-            var resolver = new IncludeFilesResolver(compilerOptions.CompileInclude);
+            var includeFiles = IncludeFilesResolver.GetIncludeFiles(compilerOptions.CompileInclude, "/", diagnostics: null);
 
-            return resolver.GetIncludeFiles("/").Select(f => f.SourcePath);
+            return includeFiles.Select(f => f.SourcePath);
         }
 
         //used in incremental precondition checks

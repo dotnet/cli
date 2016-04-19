@@ -70,9 +70,19 @@ namespace Microsoft.DotNet.ProjectModel
                    EnumerableEquals(AdditionalArguments, other.AdditionalArguments) &&
                    OutputName == other.OutputName &&
                    CompilerName == other.CompilerName &&
-                   CompileInclude.Equals(other.CompileInclude) &&
-                   EmbedInclude.Equals(other.EmbedInclude) &&
-                   CopyToOutputInclude.Equals(other.CopyToOutputInclude);
+                   IsEqual(CompileInclude, other.CompileInclude) &&
+                   IsEqual(EmbedInclude, other.EmbedInclude) &&
+                   IsEqual(CopyToOutputInclude, other.CopyToOutputInclude);
+        }
+
+        private static bool IsEqual(IncludeContext first, IncludeContext second)
+        {
+            if (first == null || second == null)
+            {
+                return first == second;
+            }
+
+            return first.Equals(second);
         }
 
         private static bool EnumerableEquals(IEnumerable<string> left, IEnumerable<string> right)

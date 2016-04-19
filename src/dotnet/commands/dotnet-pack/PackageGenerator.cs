@@ -89,8 +89,8 @@ namespace Microsoft.DotNet.Tools.Compiler
             }
             else
             {
-                var resolver = new IncludeFilesResolver(compilerOptions.EmbedInclude);
-                resourceCultures = resolver.GetIncludeFiles("/")
+                var includeFiles = IncludeFilesResolver.GetIncludeFiles(compilerOptions.EmbedInclude, "/", diagnostics: null);
+                resourceCultures = includeFiles
                     .Select(file => ResourceUtility.GetResourceCultureName(file.SourcePath))
                     .Distinct();
             }
@@ -123,9 +123,7 @@ namespace Microsoft.DotNet.Tools.Compiler
 
             if (Project.PackOptions.PackInclude != null)
             {
-                var resolver = new IncludeFilesResolver(Project.PackOptions.PackInclude);
-                var files = resolver.GetIncludeFiles(targetBasePath: "/", flatten: true);
-                packDiagnostics.AddRange(resolver.Diagnostics);
+                var files = IncludeFilesResolver.GetIncludeFiles(Project.PackOptions.PackInclude, "/", diagnostics: packDiagnostics, flatten: true);
                 PackageBuilder.Files.AddRange(GetPackageFiles(files, packDiagnostics));
             }
             else if (Project.Files.PackInclude != null && Project.Files.PackInclude.Any())

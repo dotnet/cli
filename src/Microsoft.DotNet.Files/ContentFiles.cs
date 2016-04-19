@@ -61,7 +61,7 @@ namespace Microsoft.DotNet.Files
             RemoveAttributeFromFiles(pathMap.Values, FileAttributes.ReadOnly);
         }
 
-        public void StructuredCopyToFromIncludeEntries(string targetDirectory, IEnumerable<IncludeEntry> includeEntries)
+        public void StructuredCopyTo(string targetDirectory, IEnumerable<IncludeEntry> includeEntries)
         {
             foreach (var targetDir in includeEntries
                 .Select(f => Path.GetDirectoryName(f.TargetPath))
