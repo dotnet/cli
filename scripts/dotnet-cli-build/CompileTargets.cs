@@ -98,7 +98,7 @@ namespace Microsoft.DotNet.Cli.Build
                             DotNetCli.Stage0, 
                             hostPackageId,
                             rid, 
-                            buildVersion.HostVersion, 
+                            buildVersion.HostNuGetPackageVersion, 
                             Dirs.CorehostDummyPackages);
                     }
                 }
