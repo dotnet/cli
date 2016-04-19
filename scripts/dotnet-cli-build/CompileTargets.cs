@@ -80,6 +80,9 @@ namespace Microsoft.DotNet.Cli.Build
             return c.Success();
         }
 
+        // We need to generate stub host packages so we can restore our standalone test assets against the metapackage 
+        // we built earlier in the build
+        // https://github.com/dotnet/cli/issues/2438
         [Target]
         public static BuildTargetResult GenerateStubHostPackages(BuildTargetContext c)
         {
@@ -91,14 +94,13 @@ namespace Microsoft.DotNet.Cli.Build
                 foreach (var rid in NetCoreAppRids)
                 {
                     if (! rid.Equals(currentRid))
-
                     {
                         CreateDummyRuntimeNuGetPackage(
                             DotNetCli.Stage0, 
                             hostPackageId,
                             rid, 
                             buildVersion.HostVersion, 
-                            Dirs.Corehost);
+                            Dirs.CorehostDummyPackages);
                     }
                 }
             }
@@ -440,7 +442,11 @@ namespace Microsoft.DotNet.Cli.Build
 
             string SharedFrameworkSourceRoot = GenerateSharedFrameworkProject(c, SharedFrameworkTemplateSourceRoot, sharedFrameworkRid);
 
-            dotnetCli.Restore("--verbosity", "verbose", "--disable-parallel", "--infer-runtimes", "--fallbacksource", Dirs.Corehost)
+            dotnetCli.Restore(
+                "--verbosity", "verbose", 
+                "--disable-parallel", 
+                "--infer-runtimes", 
+                "--fallbacksource", Dirs.Corehost)
                 .WorkingDirectory(SharedFrameworkSourceRoot)
                 .Execute()
                 .EnsureSuccessful();
