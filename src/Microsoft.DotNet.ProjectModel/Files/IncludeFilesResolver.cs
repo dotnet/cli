@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.ProjectModel.Files
         private List<string> _excludeFiles;
         private List<string> _builtInsInclude;
         private List<string> _builtInsExclude;
-        private IEnumerable<KeyValuePair<string, IncludeFilesResolver>> _mappings;
+        private IDictionary<string, IncludeFilesResolver> _mappings;
         private IEnumerable<string> _resolvedIncludeFiles;
 
         public IncludeFilesResolver(IncludeContext context)
@@ -33,8 +33,16 @@ namespace Microsoft.DotNet.ProjectModel.Files
             _excludeFiles = context.ExcludeFiles;
             _builtInsInclude = context.BuiltInsInclude;
             _builtInsExclude = context.BuiltInsExclude;
-            _mappings = context.Mappings?.Select(
-                map => new KeyValuePair<string, IncludeFilesResolver>(map.Key, new IncludeFilesResolver(map.Value)));
+
+            if (context.Mappings != null)
+            {
+                _mappings = new Dictionary<string, IncludeFilesResolver>();
+
+                foreach (var map in context.Mappings)
+                {
+                    _mappings.Add(map.Key, new IncludeFilesResolver(map.Value));
+                }
+            }
         }
 
         public List<DiagnosticMessage> Diagnostics { get; } = new List<DiagnosticMessage>();

@@ -43,6 +43,8 @@ namespace Microsoft.DotNet.ProjectModel
 
         public string CompilerName { get; set; }
 
+        public IncludeContext CompileInclude { get; set; }
+
         public IncludeContext EmbedInclude { get; set; }
 
         public IncludeContext CopyToOutputInclude { get; set; }
@@ -68,6 +70,7 @@ namespace Microsoft.DotNet.ProjectModel
                    EnumerableEquals(AdditionalArguments, other.AdditionalArguments) &&
                    OutputName == other.OutputName &&
                    CompilerName == other.CompilerName &&
+                   CompileInclude.Equals(other.CompileInclude) &&
                    EmbedInclude.Equals(other.EmbedInclude) &&
                    CopyToOutputInclude.Equals(other.CopyToOutputInclude);
         }
@@ -174,6 +177,11 @@ namespace Microsoft.DotNet.ProjectModel
                 if (option.CompilerName != null)
                 {
                     result.CompilerName = option.CompilerName;
+                }
+
+                if (option.CompileInclude != null)
+                {
+                    result.CompileInclude = option.CompileInclude;
                 }
 
                 if (option.EmbedInclude != null)
