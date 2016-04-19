@@ -16,7 +16,9 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
     public class ProjectToProjectDependenciesIncrementalTest : IncrementalTestBase
     {
         private readonly string[] _projects = new[] { "L0", "L11", "L12", "L21", "L22" };
+        private readonly string _appProject = "L0";
 
+        
         private string MainProjectExe
         {
             get
@@ -80,7 +82,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
             // third build with no dependencies but incremental; nothing rebuilds
             var result3 = BuildProject(noDependencies: true);
-            result3.Should().HaveSkippedProjectCompilation("L0");
+            result3.Should().HaveSkippedProjectCompilation("L0", _appFrameworkFullName);
             AssertResultDoesNotContainStrings(result3, dependencies);
         }
 
@@ -104,13 +106,38 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         {
             foreach (var rebuiltProject in expectedRebuilt)
             {
-                buildResult.Should().HaveCompiledProject(rebuiltProject);
+                string frameworkFullName = null;
+
+                if (TestProjectIsLibrary(rebuiltProject))
+                {
+                    buildResult
+                        .Should()
+                        .HaveCompiledProject(rebuiltProject, frameworkFullName: _libraryFrameworkFullName);
+                }
+                else
+                {
+                    buildResult
+                        .Should()
+                        .HaveCompiledProject(rebuiltProject, _appFrameworkFullName);
+                }
             }
 
             foreach (var skippedProject in SetDifference(_projects, expectedRebuilt))
             {
-                buildResult.Should().HaveSkippedProjectCompilation(skippedProject);
+                if (TestProjectIsLibrary(rebuiltProject))
+                {  
+                    buildResult.Should().HaveSkippedProjectCompilation(skippedProject, _libraryFrameworkFullName);
+                }
+                else
+                {
+                    buildResult.Should().HaveSkippedProjectCompilation(skippedProject, _appFrameworkFullName);
+                }
             }
+        }
+
+        private bool TestProjectIsLibrary(string testproject)
+        {
+            return testproject.Equals(_appProject, StringComparison.OrdinalIgnoreCase);
         }
 
         protected override string GetProjectDirectory(string projectName)
