@@ -6,6 +6,7 @@ using NuGet;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.DotNet.Tools.Pack;
+using Microsoft.DotNet.ProjectModel.Files;
 
 namespace Microsoft.DotNet.Tools.Compiler
 {
@@ -34,16 +35,37 @@ namespace Microsoft.DotNet.Tools.Compiler
 
         protected override bool GeneratePackage(string nupkg, List<DiagnosticMessage> packDiagnostics)
         {
-            foreach (var path in Project.Files.SourceFiles)
-            {
-                var srcFile = new PhysicalPackageFile
-                {
-                    SourcePath = path,
-                    TargetPath = Path.Combine("src", Common.PathUtility.GetRelativePath(Project.ProjectDirectory, path))
-                };
+            var compilerOptions = Project.GetCompilerOptions(
+                Project.GetTargetFramework(targetFramework: null).FrameworkName, Configuration);
 
-                PackageBuilder.Files.Add(srcFile);
+            if (compilerOptions.CompileInclude == null)
+            {
+                foreach (var path in Project.Files.SourceFiles)
+                {
+                    var srcFile = new PhysicalPackageFile
+                    {
+                        SourcePath = path,
+                        TargetPath = Path.Combine("src", Common.PathUtility.GetRelativePath(Project.ProjectDirectory, path))
+                    };
+
+                    PackageBuilder.Files.Add(srcFile);
+                }
             }
+            else
+            {
+                var resolver = new IncludeFilesResolver(compilerOptions.CompileInclude);
+                foreach (var entry in resolver.GetIncludeFiles("/"))
+                {
+                    var srcFile = new PhysicalPackageFile
+                    {
+                        SourcePath = entry.SourcePath,
+                        TargetPath = Path.Combine("src", entry.TargetPath)
+                    };
+
+                    PackageBuilder.Files.Add(srcFile);
+                }
+            }
+
             return base.GeneratePackage(nupkg, packDiagnostics);
         }
     }
