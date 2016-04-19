@@ -6,6 +6,7 @@ using System.Linq;
 
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.ProjectModel.Compilation;
+using Microsoft.DotNet.ProjectModel.Files;
 
 namespace Microsoft.DotNet.Tools.Build
 {
@@ -27,7 +28,9 @@ namespace Microsoft.DotNet.Tools.Build
             {
                 var projectDependency = dependency.Value.Library as ProjectDescription;
 
-                if (projectDependency != null && projectDependency.Resolved && projectDependency.Project.Files.SourceFiles.Any())
+                if (projectDependency != null &&
+                    projectDependency.Resolved &&
+                    HasSourceFiles(projectDependency))
                 {
                     ProjectDependenciesWithSources[projectDependency.Identity.Name] = projectDependency;
                 }
@@ -44,6 +47,20 @@ namespace Microsoft.DotNet.Tools.Build
             var dependencies = exporter.GetDependencies().ToList();
 
             return dependencies.ToDictionary(d => d.Library.Identity.Name);
+        }
+
+        private static bool HasSourceFiles(ProjectDescription projectDependency)
+        {
+            var compilerOptions = projectDependency.TargetFrameworkInfo.CompilerOptions;
+
+            if (compilerOptions.CompileInclude == null)
+            {
+                return projectDependency.Project.Files.SourceFiles.Any();
+            }
+
+            var resolver = new IncludeFilesResolver(compilerOptions.CompileInclude);
+
+            return resolver.GetIncludeFiles("/").Any();
         }
     }
 

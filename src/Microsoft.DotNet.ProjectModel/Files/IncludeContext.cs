@@ -17,9 +17,24 @@ namespace Microsoft.DotNet.ProjectModel.Files
             string sourceBasePath,
             string option,
             JObject rawObject,
-            string[] defaultBuiltInInclude = null,
-            string[] defaultBuiltInExclude = null)
+            string[] defaultBuiltInInclude,
+            string[] defaultBuiltInExclude)
         {
+            if (sourceBasePath == null)
+            {
+                throw new ArgumentNullException(nameof(sourceBasePath));
+            }
+
+            if (option == null)
+            {
+                throw new ArgumentNullException(nameof(option));
+            }
+
+            if (rawObject == null)
+            {
+                throw new ArgumentNullException(nameof(rawObject));
+            }
+
             SourceBasePath = sourceBasePath;
             Option = option;
             var token = rawObject.Value<JToken>(option);
@@ -29,31 +44,53 @@ namespace Microsoft.DotNet.ProjectModel.Files
             }
             else
             {
-                IncludePatterns = CreateCollection(sourceBasePath, "include", ExtractValues(token.Value<JToken>("include")), literalPath: false);
-                ExcludePatterns = CreateCollection(sourceBasePath, "exclude", ExtractValues(token.Value<JToken>("exclude")), literalPath: false);
-                IncludeFiles = CreateCollection(sourceBasePath, "includeFiles", ExtractValues(token.Value<JToken>("includeFiles")), literalPath: true);
-                ExcludeFiles = CreateCollection(sourceBasePath, "excludeFiles", ExtractValues(token.Value<JToken>("excludeFiles")), literalPath: true);
+                IncludePatterns = CreateCollection(
+                    sourceBasePath, "include", ExtractValues(token.Value<JToken>("include")), literalPath: false);
+
+                ExcludePatterns = CreateCollection(
+                    sourceBasePath, "exclude", ExtractValues(token.Value<JToken>("exclude")), literalPath: false);
+
+                IncludeFiles = CreateCollection(
+                    sourceBasePath, "includeFiles", ExtractValues(token.Value<JToken>("includeFiles")), literalPath: true);
+
+                ExcludeFiles = CreateCollection(
+                    sourceBasePath, "excludeFiles", ExtractValues(token.Value<JToken>("excludeFiles")), literalPath: true);
+
                 var builtIns = token.Value<JToken>("builtIns") as JObject;
                 if (builtIns != null)
                 {
-                    BuiltInsInclude = CreateCollection(sourceBasePath, "include", ExtractValues(builtIns.Value<JToken>("include")), literalPath: false);
+                    BuiltInsInclude = CreateCollection(
+                        sourceBasePath, "include", ExtractValues(builtIns.Value<JToken>("include")), literalPath: false);
+
                     if (defaultBuiltInInclude != null && !BuiltInsInclude.Any())
                     {
                         BuiltInsInclude = defaultBuiltInInclude.ToList();
                     }
-                    BuiltInsExclude = CreateCollection(sourceBasePath, "exclude", ExtractValues(builtIns.Value<JToken>("exclude")), literalPath: false);
+
+                    BuiltInsExclude = CreateCollection(
+                        sourceBasePath, "exclude", ExtractValues(builtIns.Value<JToken>("exclude")), literalPath: false);
+
                     if (defaultBuiltInExclude != null && !BuiltInsExclude.Any())
                     {
                         BuiltInsExclude = defaultBuiltInExclude.ToList();
                     }
                 }
+
                 var mappings = token.Value<JToken>("mappings") as JObject;
                 if (mappings != null)
                 {
-                    Mappings = new List<KeyValuePair<string, IncludeContext>>();
+                    Mappings = new Dictionary<string, IncludeContext>();
+
                     foreach (var map in mappings)
                     {
-                        Mappings.Add(new KeyValuePair<string, IncludeContext>(map.Key, new IncludeContext(sourceBasePath, map.Key, mappings)));
+                        Mappings.Add(
+                            map.Key,
+                            new IncludeContext(
+                                sourceBasePath,
+                                map.Key,
+                                mappings,
+                                defaultBuiltInInclude: null,
+                                defaultBuiltInExclude: null));
                     }
                 }
             }
@@ -75,7 +112,7 @@ namespace Microsoft.DotNet.ProjectModel.Files
 
         public List<string> BuiltInsExclude { get; }
 
-        public List<KeyValuePair<string, IncludeContext>> Mappings { get; }
+        public IDictionary<string, IncludeContext> Mappings { get; }
 
         public override bool Equals(object obj)
         {
@@ -118,10 +155,13 @@ namespace Microsoft.DotNet.ProjectModel.Files
             return new string[0];
         }
 
-        private static List<string> CreateCollection(string projectDirectory, string propertyName, IEnumerable<string> patternsStrings, bool literalPath)
+        internal static List<string> CreateCollection(
+            string projectDirectory, string propertyName, IEnumerable<string> patternsStrings, bool literalPath)
         {
-            var patterns = patternsStrings.SelectMany(patternsString => GetSourcesSplit(patternsString))
-                                          .Select(patternString => patternString.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar));
+            var patterns = patternsStrings
+                .SelectMany(patternsString => GetSourcesSplit(patternsString))
+                .Select(patternString =>
+                    patternString.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar));
 
             foreach (var pattern in patterns)
             {
@@ -151,8 +191,6 @@ namespace Microsoft.DotNet.ProjectModel.Files
 
         private static string FolderToPattern(string candidate, string projectDir)
         {
-            // This conversion is needed to support current template
-
             // If it's already a pattern, no change is needed
             if (candidate.Contains('*'))
             {

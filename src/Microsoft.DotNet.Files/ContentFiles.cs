@@ -20,59 +20,63 @@ namespace Microsoft.DotNet.Files
             _context = context;
         }
 
-        public void StructuredCopyTo(string targetDirectory, IEnumerable<IncludeEntry> includeEntries)
+        public void StructuredCopyTo(string targetDirectory)
         {
-            if (includeEntries == null)
+            var sourceFiles = _context
+                .ProjectFile
+                .Files
+                .GetContentFiles();
+
+            var sourceDirectory = _context.ProjectDirectory;
+
+            if (sourceFiles == null)
             {
-                var sourceFiles = _context.ProjectFile.Files.GetContentFiles();
-
-                var sourceDirectory = _context.ProjectDirectory;
-
-                if (sourceFiles == null)
-                {
-                    throw new ArgumentNullException(nameof(sourceFiles));
-                }
-
-                sourceDirectory = EnsureTrailingSlash(sourceDirectory);
-                targetDirectory = EnsureTrailingSlash(targetDirectory);
-
-                var pathMap = sourceFiles
-                    .ToDictionary(s => s,
-                        s => Path.Combine(targetDirectory,
-                            PathUtility.GetRelativePathIgnoringDirectoryTraversals(sourceDirectory, s)));
-
-                foreach (var targetDir in pathMap.Values
-                    .Select(Path.GetDirectoryName)
-                    .Distinct()
-                    .Where(t => !Directory.Exists(t)))
-                {
-                    Directory.CreateDirectory(targetDir);
-                }
-
-                foreach (var sourceFilePath in pathMap.Keys)
-                {
-                    File.Copy(sourceFilePath, pathMap[sourceFilePath], overwrite: true);
-                }
-
-                RemoveAttributeFromFiles(pathMap.Values, FileAttributes.ReadOnly);
+                throw new ArgumentNullException(nameof(sourceFiles));
             }
-            else
+
+            sourceDirectory = EnsureTrailingSlash(sourceDirectory);
+            targetDirectory = EnsureTrailingSlash(targetDirectory);
+
+            var pathMap = sourceFiles
+                .ToDictionary(s => s,
+                    s => Path.Combine(targetDirectory,
+                        PathUtility.GetRelativePathIgnoringDirectoryTraversals(sourceDirectory, s)));
+
+            foreach (var targetDir in pathMap.Values
+                .Select(Path.GetDirectoryName)
+                .Distinct()
+                .Where(t => !Directory.Exists(t)))
             {
-                foreach (var targetDir in includeEntries
-                    .Select(f => Path.GetDirectoryName(f.TargetPath))
-                    .Distinct()
-                    .Where(t => !Directory.Exists(t)))
-                {
-                    Directory.CreateDirectory(targetDir);
-                }
-
-                foreach (var file in includeEntries)
-                {
-                    File.Copy(file.SourcePath, file.TargetPath, overwrite: true);
-                }
-
-                RemoveAttributeFromFiles(includeEntries.Select(f => f.TargetPath), FileAttributes.ReadOnly);
+                Directory.CreateDirectory(targetDir);
             }
+
+            foreach (var sourceFilePath in pathMap.Keys)
+            {
+                File.Copy(
+                    sourceFilePath,
+                    pathMap[sourceFilePath],
+                    overwrite: true);
+            }
+
+            RemoveAttributeFromFiles(pathMap.Values, FileAttributes.ReadOnly);
+        }
+
+        public void StructuredCopyToFromIncludeEntries(string targetDirectory, IEnumerable<IncludeEntry> includeEntries)
+        {
+            foreach (var targetDir in includeEntries
+                .Select(f => Path.GetDirectoryName(f.TargetPath))
+                .Distinct()
+                .Where(t => !Directory.Exists(t)))
+            {
+                Directory.CreateDirectory(targetDir);
+            }
+
+            foreach (var file in includeEntries)
+            {
+                File.Copy(file.SourcePath, file.TargetPath, overwrite: true);
+            }
+
+            RemoveAttributeFromFiles(includeEntries.Select(f => f.TargetPath), FileAttributes.ReadOnly);
         }
 
         private static void RemoveAttributeFromFiles(IEnumerable<string> files, FileAttributes attribute)

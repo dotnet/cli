@@ -9,6 +9,7 @@ using Microsoft.DotNet.ProjectModel.Server.Helpers;
 using Microsoft.DotNet.ProjectModel.Server.Models;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using NuGet.Frameworks;
+using Microsoft.DotNet.ProjectModel.Files;
 
 namespace Microsoft.DotNet.ProjectModel.Server
 {
@@ -37,7 +38,7 @@ namespace Microsoft.DotNet.ProjectModel.Server
                                     .GetAllExports()
                                     .ToDictionary(export => export.Library.Identity.Name);
 
-            var allSourceFiles = new List<string>(context.ProjectFile.Files.SourceFiles);
+            var allSourceFiles = new List<string>(GetSourceFiles(context, configuration));
             var allFileReferences = new List<string>();
             var allProjectReferences = new List<ProjectReferenceDescription>();
             var allDependencies = new Dictionary<string, DependencyDescription>();
@@ -73,6 +74,20 @@ namespace Microsoft.DotNet.ProjectModel.Server
             snapshot.Dependencies = allDependencies;
 
             return snapshot;
+        }
+
+        private static IEnumerable<string> GetSourceFiles(ProjectContext context, string configuration)
+        {
+            var compilerOptions = context.ProjectFile.GetCompilerOptions(context.TargetFramework, configuration);
+
+            if (compilerOptions.CompileInclude == null)
+            {
+                return context.ProjectFile.Files.SourceFiles;
+            }
+
+            var resolver = new IncludeFilesResolver(compilerOptions.CompileInclude);
+
+            return resolver.GetIncludeFiles("/").Select(f => f.SourcePath);
         }
     }
 }

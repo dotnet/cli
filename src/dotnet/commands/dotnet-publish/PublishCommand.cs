@@ -179,13 +179,18 @@ namespace Microsoft.DotNet.Tools.Publish
             }
 
             var contentFiles = new ContentFiles(context);
-            IEnumerable<IncludeEntry> includeEntries = null;
+
             if (context.ProjectFile.PublishOptions != null)
             {
                 var resolver = new IncludeFilesResolver(context.ProjectFile.PublishOptions);
-                includeEntries = resolver.GetIncludeFiles(PathUtility.EnsureTrailingSlash(outputPath));
+                var includeEntries = resolver.GetIncludeFiles(PathUtility.EnsureTrailingSlash(outputPath));
+
+                contentFiles.StructuredCopyToFromIncludeEntries(outputPath, includeEntries);
             }
-            contentFiles.StructuredCopyTo(outputPath, includeEntries);
+            else
+            {
+                contentFiles.StructuredCopyTo(outputPath);
+            }
 
             // Publish a host if this is an application
             if (options.EmitEntryPoint.GetValueOrDefault() && !string.IsNullOrEmpty(context.RuntimeIdentifier))

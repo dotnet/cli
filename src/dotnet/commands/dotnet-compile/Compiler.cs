@@ -52,7 +52,15 @@ namespace Microsoft.DotNet.Tools.Compiler
             string intermediateOutputPath,
             CommonCompilerOptions compilationOptions)
         {
-            var resgenFiles = CompilerUtil.GetNonCultureResources(project, intermediateOutputPath, compilationOptions);
+            List<CompilerUtil.NonCultureResgenIO> resgenFiles = null;
+            if (compilationOptions.EmbedInclude == null)
+            {
+                resgenFiles = CompilerUtil.GetNonCultureResources(project, intermediateOutputPath);
+            }
+            else
+            {
+                resgenFiles = CompilerUtil.GetNonCultureResourcesFromIncludeEntries(project, intermediateOutputPath, compilationOptions);
+            }
 
             foreach (var resgenFile in resgenFiles)
             {
@@ -95,7 +103,16 @@ namespace Microsoft.DotNet.Tools.Compiler
         {
             var referencePaths = CompilerUtil.GetReferencePathsForCultureResgen(dependencies);
             var resgenReferenceArgs = referencePaths.Select(path => $"-r:{path}").ToList();
-            var cultureResgenFiles = CompilerUtil.GetCultureResources(project, outputPath, compilationOptions);
+
+            List<CompilerUtil.CultureResgenIO> cultureResgenFiles = null;
+            if (compilationOptions.EmbedInclude == null)
+            {
+                cultureResgenFiles = CompilerUtil.GetCultureResources(project, outputPath);
+            }
+            else
+            {
+                cultureResgenFiles = CompilerUtil.GetCultureResourcesFromIncludeEntries(project, outputPath, compilationOptions);
+            }
 
             foreach (var resgenFile in cultureResgenFiles)
             {

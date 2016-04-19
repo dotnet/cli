@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.ProjectModel.Files
         private List<string> _excludeFiles;
         private List<string> _builtInsInclude;
         private List<string> _builtInsExclude;
-        private IEnumerable<KeyValuePair<string, IncludeFilesResolver>> _mappings;
+        private IDictionary<string, IncludeFilesResolver> _mappings;
         private IEnumerable<string> _resolvedIncludeFiles;
 
         public IncludeFilesResolver(IncludeContext context)
@@ -33,8 +33,16 @@ namespace Microsoft.DotNet.ProjectModel.Files
             _excludeFiles = context.ExcludeFiles;
             _builtInsInclude = context.BuiltInsInclude;
             _builtInsExclude = context.BuiltInsExclude;
-            _mappings = context.Mappings?.Select(
-                map => new KeyValuePair<string, IncludeFilesResolver>(map.Key, new IncludeFilesResolver(map.Value)));
+
+            if (context.Mappings != null)
+            {
+                _mappings = new Dictionary<string, IncludeFilesResolver>();
+
+                foreach (var map in context.Mappings)
+                {
+                    _mappings.Add(map.Key, new IncludeFilesResolver(map.Value));
+                }
+            }
         }
 
         public List<DiagnosticMessage> Diagnostics { get; } = new List<DiagnosticMessage>();
@@ -70,6 +78,7 @@ namespace Microsoft.DotNet.ProjectModel.Files
             else
             {
                 var files = GetIncludeFilesCore();
+
                 var isFile = !targetBasePath.EndsWith(Path.DirectorySeparatorChar.ToString());
                 if (isFile && files.Count() > 1)
                 {
@@ -89,9 +98,11 @@ namespace Microsoft.DotNet.ProjectModel.Files
                 else
                 {
                     targetBasePath = targetBasePath.Substring(0, targetBasePath.Length - 1);
+
                     foreach (var file in files)
                     {
                         string targetPath = null;
+
                         if (flatten)
                         {
                             targetPath = Path.Combine(targetBasePath, Path.GetFileName(file));
@@ -112,6 +123,7 @@ namespace Microsoft.DotNet.ProjectModel.Files
                 foreach (var map in _mappings)
                 {
                     var targetPath = Path.Combine(targetBasePath, PathUtility.GetPathWithDirectorySeparator(map.Key));
+
                     foreach (var file in map.Value.GetIncludeFiles(targetPath, flatten))
                     {
                         file.IsCustomTarget = true;
@@ -120,6 +132,7 @@ namespace Microsoft.DotNet.ProjectModel.Files
                         includeFiles.RemoveWhere(f => string.Equals(f.SourcePath, file.SourcePath));
                         includeFiles.Add(file);
                     }
+
                     Diagnostics.AddRange(map.Value.Diagnostics);
                 }
             }
@@ -135,6 +148,7 @@ namespace Microsoft.DotNet.ProjectModel.Files
             }
 
             var literalIncludedFiles = new List<string>();
+
             if (_includeFiles != null)
             {
                 // literal included files are added at the last, but the search happens early
@@ -143,10 +157,12 @@ namespace Microsoft.DotNet.ProjectModel.Files
                 foreach (var literalRelativePath in _includeFiles)
                 {
                     var fullPath = Path.GetFullPath(Path.Combine(_sourceBasePath, literalRelativePath));
+
                     if (!File.Exists(fullPath))
                     {
                         throw new InvalidOperationException(string.Format("Can't find file {0}", literalRelativePath));
                     }
+
                     literalIncludedFiles.Add(fullPath);
                 }
             }
