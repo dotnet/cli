@@ -196,7 +196,7 @@ namespace Microsoft.DotNet.ProjectModel
                 }
             }
 
-            project.PackOptions = GetPackOptions(rawProject, project) ?? new PackOptions();
+            project.PackOptions = GetPackOptions(rawProject, project, diagnostics) ?? new PackOptions();
             project.RuntimeOptions = GetRuntimeOptions(rawProject) ?? new RuntimeOptions();
             project.PublishOptions = GetPublishInclude(rawProject, project);
 
@@ -340,7 +340,7 @@ namespace Microsoft.DotNet.ProjectModel
         {
             // Get the shared compilationOptions
             project._defaultCompilerOptions =
-                GetCompilationOptions(projectJsonObject, project) ?? new CommonCompilerOptions();
+                GetCompilationOptions(projectJsonObject, project, diagnostics) ?? new CommonCompilerOptions();
 
             project._defaultTargetFrameworkConfiguration = new TargetFrameworkInformation
             {
@@ -377,7 +377,7 @@ namespace Microsoft.DotNet.ProjectModel
             {
                 foreach (var configKey in configurationsSection)
                 {
-                    var compilerOptions = GetCompilationOptions(configKey.Value as JObject, project);
+                    var compilerOptions = GetCompilationOptions(configKey.Value as JObject, project, diagnostics);
 
                     // Only use this as a configuration if it's not a target framework
                     project._compilerOptionsByConfiguration[configKey.Key] = compilerOptions;
@@ -404,7 +404,7 @@ namespace Microsoft.DotNet.ProjectModel
                     try
                     {
                         var frameworkToken = framework.Value as JObject;
-                        var success = BuildTargetFrameworkNode(project, framework.Key, frameworkToken);
+                        var success = BuildTargetFrameworkNode(project, framework.Key, frameworkToken, diagnostics);
                         if (!success)
                         {
                             var lineInfo = (IJsonLineInfo)framework.Value;
@@ -432,10 +432,10 @@ namespace Microsoft.DotNet.ProjectModel
         /// <param name="frameworkKey">The name of the framework</param>
         /// <param name="frameworkValue">The Json object represent the settings</param>
         /// <returns>Returns true if it successes.</returns>
-        private bool BuildTargetFrameworkNode(Project project, string frameworkKey, JObject frameworkValue)
+        private bool BuildTargetFrameworkNode(Project project, string frameworkKey, JObject frameworkValue, ICollection<DiagnosticMessage> diagnostics)
         {
             // If no compilation options are provided then figure them out from the node
-            var compilerOptions = GetCompilationOptions(frameworkValue, project) ??
+            var compilerOptions = GetCompilationOptions(frameworkValue, project, diagnostics) ??
                                   new CommonCompilerOptions();
 
             var frameworkName = NuGetFramework.Parse(frameworkKey);
@@ -501,7 +501,7 @@ namespace Microsoft.DotNet.ProjectModel
             return true;
         }
 
-        private static CommonCompilerOptions GetCompilationOptions(JObject rawObject, Project project)
+        private static CommonCompilerOptions GetCompilationOptions(JObject rawObject, Project project, ICollection<DiagnosticMessage> diagnostics)
         {
             var rawOptions = rawObject.Value<JToken>("buildOptions") as JObject;
             if (rawOptions == null)
@@ -512,13 +512,30 @@ namespace Microsoft.DotNet.ProjectModel
                     return null;
                 }
 
-                // TODO: add warning
+                var lineInfo = (IJsonLineInfo)rawOptions;
+
+                diagnostics?.Add(
+                    new DiagnosticMessage(
+                        ErrorCodes.DOTNET1015,
+                        $"The 'compilationOptions' option is deprecated. Use 'buildOptions' instead.",
+                        project.ProjectFilePath,
+                        DiagnosticMessageSeverity.Warning,
+                        lineInfo.LineNumber,
+                        lineInfo.LinePosition));
             }
 
             var compilerName = rawObject.Value<string>("compilerName");
             if (compilerName != null)
             {
-                // TODO: add warning
+                var lineInfo = rawObject.Value<IJsonLineInfo>("compilerName");
+                diagnostics?.Add(
+                    new DiagnosticMessage(
+                        ErrorCodes.DOTNET1016,
+                        $"The 'compilerName' option in the root is deprecated. Use it in 'buildOptions' instead.",
+                        project.ProjectFilePath,
+                        DiagnosticMessageSeverity.Warning,
+                        lineInfo.LineNumber,
+                        lineInfo.LinePosition));
             }
 
             var analyzerOptionsJson = rawOptions.Value<JToken>("analyzerOptions") as JObject;
@@ -612,7 +629,7 @@ namespace Microsoft.DotNet.ProjectModel
             return null;
         }
 
-        private static PackOptions GetPackOptions(JObject rawProject, Project project)
+        private static PackOptions GetPackOptions(JObject rawProject, Project project, ICollection<DiagnosticMessage> diagnostics)
         {
             var rawPackOptions = rawProject.Value<JToken>("packOptions") as JObject;
 
@@ -628,29 +645,42 @@ namespace Microsoft.DotNet.ProjectModel
                     defaultBuiltInExclude: ProjectFilesCollection.DefaultBuiltInExcludePatterns);
             }
 
-            var repository = GetPackOptionsValue<JToken>("repository", rawProject, rawPackOptions) as JObject;
+            var repository = GetPackOptionsValue<JToken>("repository", rawProject, rawPackOptions, project, diagnostics) as JObject;
 
             return new PackOptions
             {
-                ProjectUrl = GetPackOptionsValue<string>("projectUrl", rawProject, rawPackOptions),
-                LicenseUrl = GetPackOptionsValue<string>("licenseUrl", rawProject, rawPackOptions),
-                IconUrl = GetPackOptionsValue<string>("iconUrl", rawProject, rawPackOptions),
-                Owners = GetPackOptionsValue<JToken>("owners", rawProject, rawPackOptions)?.Values<string>().ToArray() ?? EmptyArray<string>.Value,
-                Tags = GetPackOptionsValue<JToken>("tags", rawProject, rawPackOptions)?.Values<string>().ToArray() ?? EmptyArray<string>.Value,
-                ReleaseNotes = GetPackOptionsValue<string>("releaseNotes", rawProject, rawPackOptions),
-                RequireLicenseAcceptance = GetPackOptionsValue<bool>("requireLicenseAcceptance", rawProject, rawPackOptions),
+                ProjectUrl = GetPackOptionsValue<string>("projectUrl", rawProject, rawPackOptions, project, diagnostics),
+                LicenseUrl = GetPackOptionsValue<string>("licenseUrl", rawProject, rawPackOptions, project, diagnostics),
+                IconUrl = GetPackOptionsValue<string>("iconUrl", rawProject, rawPackOptions, project, diagnostics),
+                Owners = GetPackOptionsValue<JToken>("owners", rawProject, rawPackOptions, project, diagnostics)?.Values<string>().ToArray() ?? EmptyArray<string>.Value,
+                Tags = GetPackOptionsValue<JToken>("tags", rawProject, rawPackOptions, project, diagnostics)?.Values<string>().ToArray() ?? EmptyArray<string>.Value,
+                ReleaseNotes = GetPackOptionsValue<string>("releaseNotes", rawProject, rawPackOptions, project, diagnostics),
+                RequireLicenseAcceptance = GetPackOptionsValue<bool>("requireLicenseAcceptance", rawProject, rawPackOptions, project, diagnostics),
                 RepositoryType = repository?.Value<string>("type"),
                 RepositoryUrl = repository?.Value<string>("url"),
                 PackInclude = packInclude
             };
         }
 
-        private static T GetPackOptionsValue<T>(string option, JObject rawProject, JObject rawPackOptions)
+        private static T GetPackOptionsValue<T>(
+            string option,
+            JObject rawProject,
+            JObject rawPackOptions,
+            Project project,
+            ICollection<DiagnosticMessage> diagnostics)
         {
             var rootValue = rawProject.Value<T>(option);
-            if (rootValue != null)
+            if (rawProject.GetValue(option) != null)
             {
-                // TODO: add warning
+                var lineInfo = rawProject.Value<IJsonLineInfo>(option);
+                diagnostics?.Add(
+                    new DiagnosticMessage(
+                        ErrorCodes.DOTNET1016,
+                        $"The '{option}' option in the root is deprecated. Use it in 'packOptions' instead.",
+                        project.ProjectFilePath,
+                        DiagnosticMessageSeverity.Warning,
+                        lineInfo.LineNumber,
+                        lineInfo.LinePosition));
             }
 
             if (rawPackOptions != null)

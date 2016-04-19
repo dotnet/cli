@@ -53,8 +53,8 @@ namespace Microsoft.DotNet.Tools.Compiler
             }
             else
             {
-                var resolver = new IncludeFilesResolver(compilerOptions.CompileInclude);
-                foreach (var entry in resolver.GetIncludeFiles("/"))
+                var includeFiles = IncludeFilesResolver.GetIncludeFiles(compilerOptions.CompileInclude, "/", diagnostics: null);
+                foreach (var entry in includeFiles)
                 {
                     var srcFile = new PhysicalPackageFile
                     {

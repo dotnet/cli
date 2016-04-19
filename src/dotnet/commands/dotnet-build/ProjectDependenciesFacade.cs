@@ -58,9 +58,9 @@ namespace Microsoft.DotNet.Tools.Build
                 return projectDependency.Project.Files.SourceFiles.Any();
             }
 
-            var resolver = new IncludeFilesResolver(compilerOptions.CompileInclude);
+            var includeFiles = IncludeFilesResolver.GetIncludeFiles(compilerOptions.CompileInclude, "/", diagnostics: null);
 
-            return resolver.GetIncludeFiles("/").Any();
+            return includeFiles.Any();
         }
     }
 

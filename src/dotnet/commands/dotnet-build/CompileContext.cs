@@ -649,9 +649,9 @@ namespace Microsoft.DotNet.Tools.Build
                     return p.Project.Files.SourceFiles;
                 }
 
-                var resolver = new IncludeFilesResolver(options.CompileInclude);
+                var includeFiles = IncludeFilesResolver.GetIncludeFiles(options.CompileInclude, "/", diagnostics: null);
 
-                return resolver.GetIncludeFiles("/").Select(f => f.SourcePath);
+                return includeFiles.Select(f => f.SourcePath);
             }));
 
             // non project dependencies get captured by changes in the lock file

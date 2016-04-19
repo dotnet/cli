@@ -145,7 +145,6 @@ namespace Microsoft.DotNet.ProjectModel.Files
                 {
                     return new string[] { token.Value<string>() };
                 }
-
                 else if (token.Type == JTokenType.Array)
                 {
                     return token.Values<string>().ToArray();
@@ -156,7 +155,10 @@ namespace Microsoft.DotNet.ProjectModel.Files
         }
 
         internal static List<string> CreateCollection(
-            string projectDirectory, string propertyName, IEnumerable<string> patternsStrings, bool literalPath)
+            string projectDirectory,
+            string propertyName,
+            IEnumerable<string> patternsStrings,
+            bool literalPath)
         {
             var patterns = patternsStrings
                 .SelectMany(patternsString => GetSourcesSplit(patternsString))

@@ -85,8 +85,8 @@ namespace Microsoft.DotNet.ProjectModel.Workspaces
             }
             else
             {
-                var resolver = new IncludeFilesResolver(compilerOptions.CompileInclude);
-                sourceFiles = resolver.GetIncludeFiles("/").Select(f => f.SourcePath);
+                var includeFiles = IncludeFilesResolver.GetIncludeFiles(compilerOptions.CompileInclude, "/", diagnostics: null);
+                sourceFiles = includeFiles.Select(f => f.SourcePath);
             }
 
             foreach (var file in sourceFiles)

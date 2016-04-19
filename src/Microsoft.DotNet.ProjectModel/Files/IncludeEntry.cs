@@ -32,8 +32,8 @@ namespace Microsoft.DotNet.ProjectModel.Files
         public bool Equals(IncludeEntry other)
         {
             return other != null &&
-                TargetPath == other.TargetPath &&
-                SourcePath == other.SourcePath &&
+                string.Equals(TargetPath, other.TargetPath, StringComparison.Ordinal) &&
+                string.Equals(SourcePath, other.SourcePath, StringComparison.Ordinal) &&
                 IsCustomTarget == other.IsCustomTarget;
         }
     }

@@ -93,10 +93,12 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
 
             if (_compilerOptions.CopyToOutputInclude != null)
             {
-                var resolver = new IncludeFilesResolver(_compilerOptions.CopyToOutputInclude);
-                var includeEntries = resolver.GetIncludeFiles(PathUtility.EnsureTrailingSlash(_runtimeOutputPath));
+                var includeEntries = IncludeFilesResolver.GetIncludeFiles(
+                    _compilerOptions.CopyToOutputInclude,
+                    PathUtility.EnsureTrailingSlash(_runtimeOutputPath),
+                    diagnostics: null);
 
-                contentFiles.StructuredCopyToFromIncludeEntries(_runtimeOutputPath, includeEntries);
+                contentFiles.StructuredCopyTo(_runtimeOutputPath, includeEntries);
             }
             else
             {

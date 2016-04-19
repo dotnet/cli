@@ -85,9 +85,9 @@ namespace Microsoft.DotNet.ProjectModel.Server
                 return context.ProjectFile.Files.SourceFiles;
             }
 
-            var resolver = new IncludeFilesResolver(compilerOptions.CompileInclude);
+            var includeFiles = IncludeFilesResolver.GetIncludeFiles(compilerOptions.CompileInclude, "/", diagnostics: null);
 
-            return resolver.GetIncludeFiles("/").Select(f => f.SourcePath);
+            return includeFiles.Select(f => f.SourcePath);
         }
     }
 }
