@@ -21,12 +21,12 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
 {
     public class GivenADesktopAppWhichUsesCommandCreateDotnet : TestBase
     {
-        [Fact]
+        [WindowsOnlyFact]
         public void It_calls_dotnet_build_on_a_project_successfully()
         {
-            var testAssetsManager = GetTestAssetsManager("DesktopTestProjects");
+            var testAssetsManager = GetTestGroupTestAssetsManager("DesktopTestProjects");
             var testInstance = testAssetsManager
-                .CreateTestInstance("DesktopAppWhichCallDotnet")
+                .CreateTestInstance("DesktopAppWhichCallsDotnet")
                 .WithLockFiles();
                 
             var testProject = Path.Combine(testInstance.TestRoot, "project.json");
