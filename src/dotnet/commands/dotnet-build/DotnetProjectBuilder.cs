@@ -176,6 +176,16 @@ namespace Microsoft.DotNet.Tools.Build
 
         protected override bool NeedsRebuilding(ProjectGraphNode  graphNode)
         {
+            if (_args.ShouldNotUseIncrementality)
+            {
+                return true;
+            }
+            var preconditions = _preconditionManager.GatherIncrementalPreconditions(projectNode);
+            if (preconditions.PreconditionsDetected())
+            {
+                return true;
+            }
+
             var project = graphNode.ProjectContext;
             if (CLIChangedSinceLastCompilation(project))
             {

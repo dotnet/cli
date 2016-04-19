@@ -41,14 +41,14 @@ namespace Microsoft.DotNet.Tools.Build
                 }
                 else
                 {
-                    deps.AddRange(TraversePackage(libraryDescription, lookup));
+                    deps.AddRange(TraverseNonProject(libraryDescription, lookup));
                 }
             }
             var task = context != null ? Task.FromResult(context) : Task.Run(() => _projectContextFactory(library.Path, library.Framework));
             return new ProjectGraphNode(task, deps, context != null);
         }
 
-        private IEnumerable<ProjectGraphNode> TraversePackage(LibraryDescription root, IDictionary<string, LibraryDescription> lookup)
+        private IEnumerable<ProjectGraphNode> TraverseNonProject(LibraryDescription root, IDictionary<string, LibraryDescription> lookup)
         {
             foreach (var dependency in root.Dependencies)
             {
