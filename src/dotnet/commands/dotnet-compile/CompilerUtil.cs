@@ -48,20 +48,24 @@ namespace Microsoft.DotNet.Tools.Compiler
         }
 
         // used in incremental compilation
-        public static List<NonCultureResgenIO> GetNonCultureResources(Project project, string intermediateOutputPath, CommonCompilerOptions compilationOptions)
+        public static List<NonCultureResgenIO> GetNonCultureResources(Project project, string intermediateOutputPath)
         {
-            if (compilationOptions.EmbedInclude == null)
-            {
-                return
-                    (from resourceFile in project.Files.ResourceFiles
-                        let inputFile = resourceFile.Key
-                        where string.IsNullOrEmpty(ResourceUtility.GetResourceCultureName(inputFile))
-                        let metadataName = GetResourceFileMetadataName(project, resourceFile.Key, resourceFile.Value)
-                        let outputFile = ResourceUtility.IsResxFile(inputFile) ? Path.Combine(intermediateOutputPath, metadataName) : null
-                        select new NonCultureResgenIO(inputFile, outputFile, metadataName)
-                        ).ToList();
-            }
+            return
+                (from resourceFile in project.Files.ResourceFiles
+                 let inputFile = resourceFile.Key
+                 where string.IsNullOrEmpty(ResourceUtility.GetResourceCultureName(inputFile))
+                 let metadataName = GetResourceFileMetadataName(project, resourceFile.Key, resourceFile.Value)
+                 let outputFile = ResourceUtility.IsResxFile(inputFile) ? Path.Combine(intermediateOutputPath, metadataName) : null
+                 select new NonCultureResgenIO(inputFile, outputFile, metadataName)
+                    ).ToList();
+        }
 
+        // used in incremental compilation
+        public static List<NonCultureResgenIO> GetNonCultureResourcesFromIncludeEntries(
+            Project project,
+            string intermediateOutputPath,
+            CommonCompilerOptions compilationOptions)
+        {
             var resolver = new IncludeFilesResolver(compilationOptions.EmbedInclude);
             return
                 (from resourceFile in resolver.GetIncludeFiles("/")
@@ -89,21 +93,25 @@ namespace Microsoft.DotNet.Tools.Compiler
         }
 
         // used in incremental compilation
-        public static List<CultureResgenIO> GetCultureResources(Project project, string outputPath, CommonCompilerOptions compilationOptions)
+        public static List<CultureResgenIO> GetCultureResources(Project project, string outputPath)
         {
-            if (compilationOptions.EmbedInclude == null)
-            {
-                return
-                    (from resourceFileGroup in project.Files.ResourceFiles.GroupBy(resourceFile => ResourceUtility.GetResourceCultureName(resourceFile.Key))
-                        let culture = resourceFileGroup.Key
-                        where !string.IsNullOrEmpty(culture)
-                        let inputFileToMetadata = resourceFileGroup.ToDictionary(r => r.Key, r => GetResourceFileMetadataName(project, r.Key, r.Value))
-                        let resourceOutputPath = Path.Combine(outputPath, culture)
-                        let outputFile = Path.Combine(resourceOutputPath, project.Name + ".resources.dll")
-                        select new CultureResgenIO(culture, inputFileToMetadata, outputFile)
-                        ).ToList();
-            }
+            return
+                (from resourceFileGroup in project.Files.ResourceFiles.GroupBy(resourceFile => ResourceUtility.GetResourceCultureName(resourceFile.Key))
+                 let culture = resourceFileGroup.Key
+                 where !string.IsNullOrEmpty(culture)
+                 let inputFileToMetadata = resourceFileGroup.ToDictionary(r => r.Key, r => GetResourceFileMetadataName(project, r.Key, r.Value))
+                 let resourceOutputPath = Path.Combine(outputPath, culture)
+                 let outputFile = Path.Combine(resourceOutputPath, project.Name + ".resources.dll")
+                 select new CultureResgenIO(culture, inputFileToMetadata, outputFile)
+                    ).ToList();
+        }
 
+        // used in incremental compilation
+        public static List<CultureResgenIO> GetCultureResourcesFromIncludeEntries(
+            Project project,
+            string outputPath,
+            CommonCompilerOptions compilationOptions)
+        {
             var resolver = new IncludeFilesResolver(compilationOptions.EmbedInclude);
             return
                 (from resourceFileGroup in resolver.GetIncludeFiles("/")
@@ -148,7 +156,17 @@ namespace Microsoft.DotNet.Tools.Compiler
         }
 
         // used in incremental compilation
-        public static IEnumerable<string> GetCompilationSources(ProjectContext project) => project.ProjectFile.Files.SourceFiles;
+        public static IEnumerable<string> GetCompilationSources(ProjectContext project, CommonCompilerOptions compilerOptions)
+        {
+            if (compilerOptions.CompileInclude == null)
+            {
+                return project.ProjectFile.Files.SourceFiles;
+            }
+
+            var resolver = new IncludeFilesResolver(compilerOptions.CompileInclude);
+
+            return resolver.GetIncludeFiles("/").Select(f => f.SourcePath);
+        }
 
         //used in incremental precondition checks
         public static IEnumerable<string> GetCommandsInvokedByCompile(ProjectContext project, string configuration)

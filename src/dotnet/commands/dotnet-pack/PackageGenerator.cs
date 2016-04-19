@@ -74,14 +74,14 @@ namespace Microsoft.DotNet.Tools.Compiler
 
             var inputFolder = ArtifactPathsCalculator.InputPathForContext(context);
 
-            var compilationOptions = Project.GetCompilerOptions(context.TargetFramework, Configuration);
-            var outputName = compilationOptions.OutputName;
+            var compilerOptions = Project.GetCompilerOptions(context.TargetFramework, Configuration);
+            var outputName = compilerOptions.OutputName;
             var outputExtension =
-                context.TargetFramework.IsDesktop() && compilationOptions.EmitEntryPoint.GetValueOrDefault()
+                context.TargetFramework.IsDesktop() && compilerOptions.EmitEntryPoint.GetValueOrDefault()
                     ? ".exe" : ".dll";
 
             IEnumerable<string> resourceCultures = null;
-            if (compilationOptions.EmbedInclude == null)
+            if (compilerOptions.EmbedInclude == null)
             {
                 resourceCultures = context.ProjectFile.Files.ResourceFiles
                     .Select(resourceFile => ResourceUtility.GetResourceCultureName(resourceFile.Key))
@@ -89,7 +89,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             }
             else
             {
-                var resolver = new IncludeFilesResolver(compilationOptions.EmbedInclude);
+                var resolver = new IncludeFilesResolver(compilerOptions.EmbedInclude);
                 resourceCultures = resolver.GetIncludeFiles("/")
                     .Select(file => ResourceUtility.GetResourceCultureName(file.SourcePath))
                     .Distinct();
@@ -253,7 +253,9 @@ namespace Microsoft.DotNet.Tools.Compiler
             }
         }
 
-        private static IEnumerable<PhysicalPackageFile> GetPackageFiles(IEnumerable<IncludeEntry> includeFiles, IList<DiagnosticMessage> diagnostics)
+        private static IEnumerable<PhysicalPackageFile> GetPackageFiles(
+            IEnumerable<IncludeEntry> includeFiles,
+            IList<DiagnosticMessage> diagnostics)
         {
             foreach (var entry in includeFiles)
             {

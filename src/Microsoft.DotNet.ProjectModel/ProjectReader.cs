@@ -551,29 +551,6 @@ namespace Microsoft.DotNet.ProjectModel
                 project.AnalyzerOptions = analyzerOptions;
             }
 
-            IncludeContext embed = null;
-            var embedOption = rawOptions.Value<JToken>("embed");
-            if (embedOption != null)
-            {
-                embed = new IncludeContext(
-                    project.ProjectDirectory,
-                    "embed",
-                    rawOptions,
-                    ProjectFilesCollection.DefaultResourcesBuiltInPatterns,
-                    ProjectFilesCollection.DefaultBuiltInExcludePatterns);
-            }
-
-            IncludeContext copyToOutput = null;
-            var copyToOutputOption = rawOptions.Value<JToken>("copyToOutput");
-            if (copyToOutputOption != null)
-            {
-                copyToOutput = new IncludeContext(
-                    project.ProjectDirectory,
-                    "copyToOutput",
-                    rawOptions,
-                    defaultBuiltInExclude: ProjectFilesCollection.DefaultBuiltInExcludePatterns);
-            }
-
             return new CommonCompilerOptions
             {
                 Defines = rawOptions.Value<JToken>("define")?.Values<string>().ToArray(),
@@ -593,9 +570,46 @@ namespace Microsoft.DotNet.ProjectModel
                 PreserveCompilationContext = rawOptions.Value<bool?>("preserveCompilationContext"),
                 OutputName = rawOptions.Value<string>("outputName"),
                 CompilerName = rawOptions.Value<string>("compilerName") ?? compilerName ?? "csc",
-                EmbedInclude = embed,
-                CopyToOutputInclude = copyToOutput
+                CompileInclude = GetIncludeContext(
+                    project,
+                    rawOptions,
+                    "compile",
+                    defaultBuiltInInclude: ProjectFilesCollection.DefaultCompileBuiltInPatterns,
+                    defaultBuiltInExclude: ProjectFilesCollection.DefaultBuiltInExcludePatterns),
+                EmbedInclude = GetIncludeContext(
+                    project,
+                    rawOptions,
+                    "embed",
+                    defaultBuiltInInclude: ProjectFilesCollection.DefaultResourcesBuiltInPatterns,
+                    defaultBuiltInExclude: ProjectFilesCollection.DefaultBuiltInExcludePatterns),
+                CopyToOutputInclude = GetIncludeContext(
+                    project,
+                    rawOptions,
+                    "copyToOutput",
+                    defaultBuiltInInclude: null,
+                    defaultBuiltInExclude: ProjectFilesCollection.DefaultBuiltInExcludePatterns)
             };
+        }
+
+        private static IncludeContext GetIncludeContext(
+            Project project,
+            JObject rawOptions,
+            string option,
+            string[] defaultBuiltInInclude,
+            string[] defaultBuiltInExclude)
+        {
+            var contextOption = rawOptions.Value<JToken>(option);
+            if (contextOption != null)
+            {
+                return new IncludeContext(
+                    project.ProjectDirectory,
+                    option,
+                    rawOptions,
+                    defaultBuiltInInclude,
+                    defaultBuiltInExclude);
+            }
+
+            return null;
         }
 
         private static PackOptions GetPackOptions(JObject rawProject, Project project)
@@ -607,7 +621,11 @@ namespace Microsoft.DotNet.ProjectModel
             if (rawPackOptions != null)
             {
                 packInclude = new IncludeContext(
-                    project.ProjectDirectory, "files", rawPackOptions, defaultBuiltInExclude: ProjectFilesCollection.DefaultBuiltInExcludePatterns);
+                    project.ProjectDirectory,
+                    "files",
+                    rawPackOptions,
+                    defaultBuiltInInclude: null,
+                    defaultBuiltInExclude: ProjectFilesCollection.DefaultBuiltInExcludePatterns);
             }
 
             var repository = GetPackOptionsValue<JToken>("repository", rawProject, rawPackOptions) as JObject;
@@ -657,6 +675,7 @@ namespace Microsoft.DotNet.ProjectModel
 
             return new RuntimeOptions
             {
+                // Value<T>(null) will return default(T) which is false in this case.
                 GcServer = rawRuntimeOptions.Value<bool>("gcServer"),
                 GcConcurrent = rawRuntimeOptions.Value<bool>("gcConcurrent")
             };
@@ -671,6 +690,7 @@ namespace Microsoft.DotNet.ProjectModel
                     project.ProjectDirectory,
                     "publishOptions",
                     rawProject,
+                    defaultBuiltInInclude: null,
                     defaultBuiltInExclude: ProjectFilesCollection.DefaultBuiltInExcludePatterns);
             }
 

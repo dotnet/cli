@@ -90,13 +90,18 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
         private void CopyContentFiles()
         {
             var contentFiles = new ContentFiles(_context);
-            IEnumerable<IncludeEntry> includeEntries = null;
+
             if (_compilerOptions.CopyToOutputInclude != null)
             {
                 var resolver = new IncludeFilesResolver(_compilerOptions.CopyToOutputInclude);
-                includeEntries = resolver.GetIncludeFiles(PathUtility.EnsureTrailingSlash(_runtimeOutputPath));
+                var includeEntries = resolver.GetIncludeFiles(PathUtility.EnsureTrailingSlash(_runtimeOutputPath));
+
+                contentFiles.StructuredCopyToFromIncludeEntries(_runtimeOutputPath, includeEntries);
             }
-            contentFiles.StructuredCopyTo(_runtimeOutputPath, includeEntries);
+            else
+            {
+                contentFiles.StructuredCopyTo(_runtimeOutputPath);
+            }
         }
 
         private void CopyAssemblies(IEnumerable<LibraryExport> libraryExports)

@@ -148,7 +148,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 return false;
             }
             // Add project source files
-            var sourceFiles = CompilerUtil.GetCompilationSources(context);
+            var sourceFiles = CompilerUtil.GetCompilationSources(context, compilationOptions);
             compilerArgs.AddRange(sourceFiles);
 
             var compilerName = compilationOptions.CompilerName;

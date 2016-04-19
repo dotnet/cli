@@ -123,10 +123,10 @@ namespace Microsoft.DotNet.ProjectModel
 
         public bool HasRuntimeOutput(string configuration)
         {
-            var compilationOptions = GetCompilerOptions(targetFramework: null, configurationName: configuration);
+            var compilerOptions = GetCompilerOptions(targetFramework: null, configurationName: configuration);
 
             // TODO: Make this opt in via another mechanism
-            return compilationOptions.EmitEntryPoint.GetValueOrDefault() || IsTestProject;
+            return compilerOptions.EmitEntryPoint.GetValueOrDefault() || IsTestProject;
         }
 
         private CommonCompilerOptions GetCompilerOptions()

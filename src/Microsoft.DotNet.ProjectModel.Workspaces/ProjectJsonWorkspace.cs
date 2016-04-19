@@ -14,6 +14,7 @@ using Microsoft.CodeAnalysis.Host.Mef;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.ProjectModel.Compilation;
+using Microsoft.DotNet.ProjectModel.Files;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.ProjectModel.Workspaces
@@ -69,15 +70,26 @@ namespace Microsoft.DotNet.ProjectModel.Workspaces
             // TODO: ctor argument?
             var configuration = "Debug";
 
-            var compilationOptions = project.GetLanguageSpecificCompilerOptions(project.TargetFramework, configuration);
+            var compilerOptions = project.GetLanguageSpecificCompilerOptions(project.TargetFramework, configuration);
 
-            var compilationSettings = ToCompilationSettings(compilationOptions, project.TargetFramework, project.ProjectFile.ProjectDirectory);
+            var compilationSettings = ToCompilationSettings(compilerOptions, project.TargetFramework, project.ProjectFile.ProjectDirectory);
 
             OnParseOptionsChanged(projectInfo.Id, new CSharpParseOptions(compilationSettings.LanguageVersion, preprocessorSymbols: compilationSettings.Defines));
 
             OnCompilationOptionsChanged(projectInfo.Id, compilationSettings.CompilationOptions);
 
-            foreach (var file in project.ProjectFile.Files.SourceFiles)
+            IEnumerable<string> sourceFiles = null;
+            if (compilerOptions.CompileInclude == null)
+            {
+                sourceFiles = project.ProjectFile.Files.SourceFiles;
+            }
+            else
+            {
+                var resolver = new IncludeFilesResolver(compilerOptions.CompileInclude);
+                sourceFiles = resolver.GetIncludeFiles("/").Select(f => f.SourcePath);
+            }
+
+            foreach (var file in sourceFiles)
             {
                 using (var stream = File.OpenRead(file))
                 {
