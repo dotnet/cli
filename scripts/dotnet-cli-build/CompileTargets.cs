@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.Cli.Build
             "vbc.exe"
         };
 
-        public static readonly string[] NetCoreAppRids = new[]
+        public static readonly string[] HostPackageSupportedRids = new[]
         {
             "win7-x64",
             "win7-x86",
@@ -46,7 +46,6 @@ namespace Microsoft.DotNet.Cli.Build
             "centos.7-x64",
             "rhel.7-x64",
             "rhel.7.2-x64",
-            "debian.8.2-x64",
             "debian.8-x64"
         };
 
@@ -74,7 +73,7 @@ namespace Microsoft.DotNet.Cli.Build
 
         // Moving PrepareTargets.RestorePackages after PackagePkgProjects because managed code depends on the
         // Microsoft.NETCore.App package that is created during PackagePkgProjects.
-        [Target(nameof(PrepareTargets.Init), nameof(CompileCoreHost), nameof(PackagePkgProjects), nameof(CompileTargets.GenerateStubHostPackages), nameof(PrepareTargets.RestorePackages), nameof(CompileStage1), nameof(CompileStage2))]
+        [Target(nameof(PrepareTargets.Init), nameof(CompileCoreHost), nameof(PackagePkgProjects), nameof(PrepareTargets.RestorePackages), nameof(CompileStage1), nameof(CompileStage2))]
         public static BuildTargetResult Compile(BuildTargetContext c)
         {
             return c.Success();
@@ -91,7 +90,7 @@ namespace Microsoft.DotNet.Cli.Build
 
             foreach (var hostPackageId in HostPackages)
             {
-                foreach (var rid in NetCoreAppRids)
+                foreach (var rid in HostPackageSupportedRids)
                 {
                     if (! rid.Equals(currentRid))
                     {
@@ -195,7 +194,7 @@ namespace Microsoft.DotNet.Cli.Build
             return c.Success();
         }
 
-        [Target]
+        [Target(nameof(CompileTargets.GenerateStubHostPackages))]
         public static BuildTargetResult PackagePkgProjects(BuildTargetContext c)
         {
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
