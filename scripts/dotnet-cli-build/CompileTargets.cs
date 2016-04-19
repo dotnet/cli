@@ -380,24 +380,23 @@ namespace Microsoft.DotNet.Cli.Build
             File.WriteAllText(tempPjFile, projectJson.ToString());
             File.WriteAllText(tempSourceFile, programCs.ToString());
 
-            var oldDir = Directory.GetCurrentDirectory();
-            Directory.SetCurrentDirectory(tempPjDirectory);
 
             dotnet.Restore("--verbosity", "verbose", "--disable-parallel")
+                .WorkingDirectory(tempPjDirectory)
                 .Execute()
                 .EnsureSuccessful();
 
             dotnet.Build(tempPjFile, "--runtime", rid)
+                .WorkingDirectory(tempPjDirectory)
                 .Execute()
                 .EnsureSuccessful();
 
             dotnet.Pack(
                 tempPjFile, "--no-build",
                 "--output", outputDir)
+                .WorkingDirectory(tempPjDirectory)
                 .Execute()
                 .EnsureSuccessful();
-
-            Directory.SetCurrentDirectory(oldDir);
         }
 
         private static void CleanOutputDir(string directory)
