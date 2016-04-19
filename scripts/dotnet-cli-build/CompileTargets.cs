@@ -380,7 +380,6 @@ namespace Microsoft.DotNet.Cli.Build
             File.WriteAllText(tempPjFile, projectJson.ToString());
             File.WriteAllText(tempSourceFile, programCs.ToString());
 
-
             dotnet.Restore("--verbosity", "verbose", "--disable-parallel")
                 .WorkingDirectory(tempPjDirectory)
                 .Execute()

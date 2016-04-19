@@ -100,15 +100,6 @@ namespace Microsoft.DotNet.Cli.Build
                 .Execute()
                 .EnsureSuccessful();
 
-            dotnet.Restore(
-                "--verbosity", "verbose",
-                "--infer-runtimes",
-                "--fallbacksource", Dirs.Corehost,
-                "--fallbacksource", Dirs.CorehostDummyPackages)
-                .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectWithTests"))
-                .Execute()
-                .EnsureSuccessful();
-
             // The 'ProjectModelServer' directory contains intentionally-unresolved dependencies, so don't check for success. Also, suppress the output
             dotnet.Restore(
                 "--verbosity", "verbose",
@@ -261,14 +252,6 @@ namespace Microsoft.DotNet.Cli.Build
                     .Execute()
                     .EnsureSuccessful();
             }
-
-            // build ProjectWithTests, which is outside of TestProjects and targets netcoreapp
-            string projectWithTests = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectWithTests");
-            c.Info($"Building: {projectWithTests}");
-            dotnet.Build("--framework", "netcoreapp1.0")
-                .WorkingDirectory(projectWithTests)
-                .Execute()
-                .EnsureSuccessful();
 
             return c.Success();
         }
