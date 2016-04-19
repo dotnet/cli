@@ -62,7 +62,7 @@ namespace Microsoft.DotNet.Tools.Build
                         case CompilationResult.IncrementalSkip:
                             break;
                         case CompilationResult.Success:
-                            skipIncrementalCheck = false;
+                            skipIncrementalCheck = true;
                             break;
                         case CompilationResult.Failure:
                             return CompilationResult.Failure;
@@ -71,7 +71,7 @@ namespace Microsoft.DotNet.Tools.Build
                     }
                 }
             }
-            if (NeedsRebuilding(projectNode))
+            if (skipIncrementalCheck || NeedsRebuilding(projectNode))
             {
                 return RunCompile(projectNode);
             }
