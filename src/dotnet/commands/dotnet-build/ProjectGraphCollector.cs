@@ -52,13 +52,15 @@ namespace Microsoft.DotNet.Tools.Build
         {
             foreach (var dependency in root.Dependencies)
             {
-                if (dependency.Type.Equals(LibraryType.Project))
+                var libraryDescription = lookup[dependency.Name];
+
+                if (libraryDescription.Identity.Type.Equals(LibraryType.Project))
                 {
-                    yield return TraverseProject(lookup[dependency.Name], lookup);
+                    yield return TraverseProject(libraryDescription, lookup);
                 }
                 else
                 {
-                    foreach(var node in TraversePackage(lookup[dependency.Name], lookup))
+                    foreach(var node in TraversePackage(libraryDescription, lookup))
                     {
                         yield return node;
                     }
