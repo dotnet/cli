@@ -108,6 +108,16 @@ namespace Microsoft.DotNet.Cli.Build
             },
             new TestPackageProject()
             {
+                Name = "ToolWithOutputName",
+                IsTool = true,
+                Path = "TestAssets/TestPackages/ToolWithOutputName",
+                IsApplicable = true,
+                VersionSuffix = string.Empty,
+                Clean = true,
+                Frameworks = new [] { "netcoreapp1.0" }
+            },
+            new TestPackageProject()
+            {
                 Name = "Microsoft.DotNet.Cli.Utils",
                 IsTool = true,
                 Path = "src/Microsoft.DotNet.Cli.Utils",

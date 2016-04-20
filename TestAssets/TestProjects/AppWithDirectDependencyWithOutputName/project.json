@@ -1,0 +1,19 @@
+{
+  "compilationOptions": {
+    "emitEntryPoint": true,
+    "preserveCompilationContext": true
+  },
+  "dependencies": {
+    "ToolWithOutputName": {
+      "version": "1.0.0",
+      "target": "package"
+    },
+    "Microsoft.NETCore.App": {
+      "version": "1.0.0-rc2-*",
+      "type": "platform"
+    }
+  },
+  "frameworks": {
+    "netcoreapp1.0": { }
+  }
+}
