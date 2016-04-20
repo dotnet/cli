@@ -340,7 +340,7 @@ namespace Microsoft.DotNet.ProjectModel
         {
             // Get the shared compilationOptions
             project._defaultCompilerOptions =
-                GetCompilationOptions(projectJsonObject, project, diagnostics) ?? new CommonCompilerOptions();
+                GetCompilationOptions(projectJsonObject, project, diagnostics) ?? new CommonCompilerOptions { CompilerName = "csc" };
 
             project._defaultTargetFrameworkConfiguration = new TargetFrameworkInformation
             {
@@ -503,27 +503,6 @@ namespace Microsoft.DotNet.ProjectModel
 
         private static CommonCompilerOptions GetCompilationOptions(JObject rawObject, Project project, ICollection<DiagnosticMessage> diagnostics)
         {
-            var rawOptions = rawObject.Value<JToken>("buildOptions") as JObject;
-            if (rawOptions == null)
-            {
-                rawOptions = rawObject.Value<JToken>("compilationOptions") as JObject;
-                if (rawOptions == null)
-                {
-                    return null;
-                }
-
-                var lineInfo = (IJsonLineInfo)rawOptions;
-
-                diagnostics?.Add(
-                    new DiagnosticMessage(
-                        ErrorCodes.DOTNET1015,
-                        $"The 'compilationOptions' option is deprecated. Use 'buildOptions' instead.",
-                        project.ProjectFilePath,
-                        DiagnosticMessageSeverity.Warning,
-                        lineInfo.LineNumber,
-                        lineInfo.LinePosition));
-            }
-
             var compilerName = rawObject.Value<string>("compilerName");
             if (compilerName != null)
             {
@@ -532,6 +511,30 @@ namespace Microsoft.DotNet.ProjectModel
                     new DiagnosticMessage(
                         ErrorCodes.DOTNET1016,
                         $"The 'compilerName' option in the root is deprecated. Use it in 'buildOptions' instead.",
+                        project.ProjectFilePath,
+                        DiagnosticMessageSeverity.Warning,
+                        lineInfo.LineNumber,
+                        lineInfo.LinePosition));
+            }
+
+            var rawOptions = rawObject.Value<JToken>("buildOptions") as JObject;
+            if (rawOptions == null)
+            {
+                rawOptions = rawObject.Value<JToken>("compilationOptions") as JObject;
+                if (rawOptions == null)
+                {
+                    return new CommonCompilerOptions
+                    {
+                        CompilerName = compilerName ?? "csc"
+                    };
+                }
+
+                var lineInfo = (IJsonLineInfo)rawOptions;
+
+                diagnostics?.Add(
+                    new DiagnosticMessage(
+                        ErrorCodes.DOTNET1015,
+                        $"The 'compilationOptions' option is deprecated. Use 'buildOptions' instead.",
                         project.ProjectFilePath,
                         DiagnosticMessageSeverity.Warning,
                         lineInfo.LineNumber,
@@ -635,7 +638,7 @@ namespace Microsoft.DotNet.ProjectModel
 
             // Files to be packed along with the project
             IncludeContext packInclude = null;
-            if (rawPackOptions != null)
+            if (rawPackOptions != null && rawPackOptions.Value<JToken>("files") != null)
             {
                 packInclude = new IncludeContext(
                     project.ProjectDirectory,

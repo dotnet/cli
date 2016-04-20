@@ -184,11 +184,6 @@ namespace Microsoft.DotNet.ProjectModel
                     result.OutputName = option.OutputName;
                 }
 
-                if (option.CompilerName != null)
-                {
-                    result.CompilerName = option.CompilerName;
-                }
-
                 if (option.CompileInclude != null)
                 {
                     result.CompileInclude = option.CompileInclude;
@@ -202,6 +197,12 @@ namespace Microsoft.DotNet.ProjectModel
                 if (option.CopyToOutputInclude != null)
                 {
                     result.CopyToOutputInclude = option.CopyToOutputInclude;
+                }
+
+                // compilerName set in the root cannot be overriden.
+                if (result.CompilerName == null)
+                {
+                    result.CompilerName = option.CompilerName;
                 }
             }
 
