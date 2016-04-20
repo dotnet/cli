@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.Tools.Compiler;
 using Microsoft.DotNet.Cli.Utils;
+using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Build
 {
@@ -34,12 +35,26 @@ namespace Microsoft.DotNet.Tools.Build
             }
         }
 
-        private static bool OnExecute(List<ProjectContext> contexts, CompilerCommandApp args)
+        private static bool OnExecute(IEnumerable<string> files, IEnumerable<NuGetFramework> frameworks, CompilerCommandApp args)
         {
-            var graphCollector = new ProjectGraphCollector((project, target) => ProjectContext.Create(project, target));
-            var graph = graphCollector.Collect(contexts).ToArray();
+            var graphCollector = new ProjectGraphCollector(
+                (project, target) => ProjectContext.Create(project, target),
+                ResolveProjectFrameworks
+                );
+            var graph = graphCollector.Collect(files, frameworks).ToArray();
             var builder = new DotNetProjectBuilder((BuilderCommandApp) args);
             return builder.Build(graph).All(r => r != CompilationResult.Failure);
+        }
+
+        private static IEnumerable<NuGetFramework> ResolveProjectFrameworks(string projectPath)
+        {
+            if (!projectPath.EndsWith(Project.FileName))
+            {
+                projectPath = Path.Combine(projectPath, Project.FileName);
+            }
+            var project = ProjectReader.GetProject(projectPath);
+
+            return project.GetTargetFrameworks().Select(f => f.FrameworkName);
         }
     }
 }

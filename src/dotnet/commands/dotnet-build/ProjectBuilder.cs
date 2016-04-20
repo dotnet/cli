@@ -26,7 +26,6 @@ namespace Microsoft.DotNet.Tools.Build
         {
             foreach (var projectNode in roots)
             {
-                Console.WriteLine(projectNode.ProjectContext.Identity.TargetFramework);
                 yield return Build(projectNode);
             }
         }

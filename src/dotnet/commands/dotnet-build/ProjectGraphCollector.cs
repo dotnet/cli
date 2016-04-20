@@ -11,20 +11,30 @@ namespace Microsoft.DotNet.Tools.Build
     public class ProjectGraphCollector
     {
         private readonly Func<string, NuGetFramework, ProjectContext> _projectContextFactory;
+        private readonly Func<string, IEnumerable<NuGetFramework>> _projectFrameworkResolver;
 
-        public ProjectGraphCollector(Func<string, NuGetFramework, ProjectContext> projectContextFactory)
+        public ProjectGraphCollector(
+            Func<string, NuGetFramework, ProjectContext> projectContextFactory,
+            Func<string, IEnumerable<NuGetFramework>> projectFrameworkResolver
+            )
         {
             _projectContextFactory = projectContextFactory;
+            _projectFrameworkResolver = projectFrameworkResolver;
         }
 
-        public IEnumerable<ProjectGraphNode> Collect(IEnumerable<ProjectContext> contexts)
+        public IEnumerable<ProjectGraphNode> Collect(IEnumerable<string> files, IEnumerable<NuGetFramework> frameworks)
         {
-            foreach (var context in contexts)
+            foreach (var file in files)
             {
-                var libraries = context.LibraryManager.GetLibraries();
-                var lookup = libraries.ToDictionary(l => l.Identity.Name);
-                var root = lookup[context.ProjectFile.Name];
-                yield return TraverseProject((ProjectDescription)root, lookup, context);
+                var fileFrameworks = frameworks ?? _projectFrameworkResolver(file);
+                foreach (var framework in fileFrameworks)
+                {
+                    var context = _projectContextFactory(file, framework);
+                    var libraries = context.LibraryManager.GetLibraries();
+                    var lookup = libraries.ToDictionary(l => l.Identity.Name);
+                    var root = lookup[context.ProjectFile.Name];
+                    yield return TraverseProject((ProjectDescription) root, lookup, context);
+                }
             }
         }
 
