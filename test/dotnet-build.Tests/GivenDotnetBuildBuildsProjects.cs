@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
     public class GivenDotnetBuildBuildsProjects : TestBase
     {
         [Fact]
-        public void It_builds_projects_with_Unicode_characters_in_the_path_when_CWD_is_the_project_directory()
+        public void It_builds_projects_with_Unicode_in_path()
         {
             var testInstance = TestAssetsManager
                 .CreateTestInstance("TestAppWithUnicodéPath")
@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         }
 
         [Fact]
-        public void It_builds_projects_with_Unicode_characters_in_the_path_when_CWD_is_not_the_project_directory()
+        public void It_builds_projects_with_Unicode_in_path_project_path_passed()
         {
             var testInstance = TestAssetsManager
                 .CreateTestInstance("TestAppWithUnicodéPath")
