@@ -63,6 +63,11 @@ namespace Microsoft.DotNet.Files
 
         public void StructuredCopyTo(string targetDirectory, IEnumerable<IncludeEntry> includeEntries)
         {
+            if (includeEntries == null)
+            {
+                return;
+            }
+
             foreach (var targetDir in includeEntries
                 .Select(f => Path.GetDirectoryName(f.TargetPath))
                 .Distinct()

@@ -60,7 +60,7 @@ namespace Microsoft.DotNet.ProjectModel.Files
                     context.BuiltInsInclude,
                     context.BuiltInsExclude);
 
-                var isFile = !targetBasePath.EndsWith(Path.DirectorySeparatorChar.ToString());
+                var isFile = targetBasePath[targetBasePath.Length - 1] != Path.DirectorySeparatorChar;
                 if (isFile && files.Count() > 1)
                 {
                     // It's a file. But the glob matched multiple things
