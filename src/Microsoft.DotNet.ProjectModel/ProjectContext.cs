@@ -187,6 +187,35 @@ namespace Microsoft.DotNet.ProjectModel
             return context;
         }
 
+        /// <summary>
+        /// Creates a list of project contexts representing runtime based on a given context
+        /// </summary>
+        /// <param name="buildConfiguration">build configuration</param>
+        /// <returns>List of project contexts - one for each runtime identifier and one for runtime independent IL code (RuntimeIdentifier == null)</returns>
+
+        public IEnumerable<ProjectContext> CreateAllRuntimeContexts(string buildConfiguration)
+        {
+            if (!ProjectFile.HasRuntimeOutput(buildConfiguration))
+            {
+                return new[] { this };
+            }
+
+            IEnumerable<ProjectContext> allContexts = CreateContextForEachTarget(ProjectFile.ProjectFilePath);
+            IEnumerable<ProjectContext> runtimeContextsForTarget = FilterProjectContextsByFramework(allContexts, TargetFramework);
+
+            return runtimeContextsForTarget;
+        }
+
+        public static IEnumerable<ProjectContext> FilterProjectContextsByRuntime(IEnumerable<ProjectContext> contexts, string rid)
+        {
+            return contexts.Where(t => rid.Equals(t.RuntimeIdentifier)).ToList();
+        }
+
+        public static IEnumerable<ProjectContext> FilterProjectContextsByFramework(IEnumerable<ProjectContext> contexts, NuGetFramework framework)
+        {
+            return contexts.Where(t => framework.Equals(t.TargetFramework)).ToList();
+        }
+
         public OutputPaths GetOutputPaths(string configuration, string buidBasePath = null, string outputPath = null)
         {
             return OutputPathsCalculator.GetOutputPaths(ProjectFile,

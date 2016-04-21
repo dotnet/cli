@@ -119,17 +119,27 @@ namespace Microsoft.DotNet.Tools.Build
 
         private void MakeRunnable(ProjectGraphNode graphNode)
         {
-            var runtimeContext = graphNode.ProjectContext.ProjectFile.HasRuntimeOutput(_args.ConfigValue) ?
-                graphNode.ProjectContext.CreateRuntimeContext(_args.GetRuntimes()) :
-                graphNode.ProjectContext;
+            foreach (var runtimeContext in CreateRuntimeContexts(graphNode))
+            {
+                var outputPaths = runtimeContext.GetOutputPaths(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
+                var libraryExporter = runtimeContext.CreateExporter(_args.ConfigValue, _args.BuildBasePathValue);
 
-            var outputPaths = runtimeContext.GetOutputPaths(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
-            var libraryExporter = runtimeContext.CreateExporter(_args.ConfigValue, _args.BuildBasePathValue);
+                CopyCompilationOutput(outputPaths);
 
-            CopyCompilationOutput(outputPaths);
+                var executable = new Executable(runtimeContext, outputPaths, libraryExporter, _args.ConfigValue);
+                executable.MakeCompilationOutputRunnable();
+            }
+        }
 
-            var executable = new Executable(runtimeContext, outputPaths, libraryExporter, _args.ConfigValue);
-            executable.MakeCompilationOutputRunnable();
+        public IEnumerable<ProjectContext> CreateRuntimeContexts(ProjectGraphNode graphNode)
+        {
+            var allRuntimeContexts = graphNode.ProjectContext.CreateAllRuntimeContexts(_args.ConfigValue);
+            if (!string.IsNullOrEmpty(_args.RuntimeValue))
+            {
+                return ProjectContext.FilterProjectContextsByRuntime(allRuntimeContexts, _args.RuntimeValue);
+            }
+
+            return allRuntimeContexts;
         }
 
         protected override CompilationResult RunCompile(ProjectGraphNode projectNode)
@@ -207,7 +217,7 @@ namespace Microsoft.DotNet.Tools.Build
                 return true;
             }
 
-            var compilerIO = _compilerIOManager.GetCompileIO(graphNode);
+            var compilerIO = _compilerIOManager.GetCompileIO(graphNode, CreateRuntimeContexts());
 
             // rebuild if empty inputs / outputs
             if (!(compilerIO.Outputs.Any() && compilerIO.Inputs.Any()))

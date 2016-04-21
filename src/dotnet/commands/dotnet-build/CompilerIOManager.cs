@@ -54,7 +54,7 @@ namespace Microsoft.DotNet.Tools.Build
         // computes all the inputs and outputs that would be used in the compilation of a project
         // ensures that all paths are files
         // ensures no missing inputs
-        public CompilerIO GetCompileIO(ProjectGraphNode graphNode)
+        public CompilerIO GetCompileIO(ProjectGraphNode graphNode, IEnumerable<ProjectContext> runtimeContexts)
         {
             var isRootProject = graphNode.IsRoot;
             var project = graphNode.ProjectContext;
@@ -73,9 +73,8 @@ namespace Microsoft.DotNet.Tools.Build
             compilerIO.Inputs.AddRange(CompilerUtil.GetCompilationSources(project));
 
             var allOutputPath = new HashSet<string>(calculator.CompilationFiles.All());
-            if (isRootProject && project.ProjectFile.HasRuntimeOutput(_configuration))
+            foreach (var runtimeContext in runtimeContexts)
             {
-                var runtimeContext = project.CreateRuntimeContext(_runtimes);
                 foreach (var path in runtimeContext.GetOutputPaths(_configuration, _buildBasePath, _outputPath).RuntimeFiles.All())
                 {
                     allOutputPath.Add(path);
