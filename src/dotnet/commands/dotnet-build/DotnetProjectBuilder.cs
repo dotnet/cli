@@ -21,7 +21,6 @@ namespace Microsoft.DotNet.Tools.Build
         private readonly CompilerIOManager _compilerIOManager;
         private readonly ScriptRunner _scriptRunner;
         private readonly DotNetCommandFactory _commandFactory;
-        private readonly WorkspaceContext _workspace;
 
         public DotNetProjectBuilder(BuildCommandApp args)
         {
