@@ -149,6 +149,7 @@ namespace Microsoft.DotNet.ProjectModel.Graph
                         Version = version,
                         IsServiceable = ReadBool(value, "serviceable", defaultValue: false),
                         Sha512 = ReadString(value.Value("sha512")),
+                        Path = ReadString(value.Value("path")),
                         Files = ReadPathArray(value.Value("files"), ReadString)
                     });
                 }

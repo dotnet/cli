@@ -19,7 +19,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
         private static string PackagesPath = Path.Combine("package", "directory", "location");
 
         [Fact]
-        public void SholdUseEnvironmentVariableToGetDefaultLocation()
+        public void ShouldUseEnvironmentVariableToGetDefaultLocation()
         {
             var runtime = new Mock<IRuntimeEnvironment>();
 
@@ -33,7 +33,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
 
 
         [Fact]
-        public void SholdUseNugetUnderUserProfileOnWindows()
+        public void ShouldUseNuGetUnderUserProfileOnWindows()
         {
             var runtime = new Mock<IRuntimeEnvironment>();
             runtime.SetupGet(r => r.OperatingSystemPlatform).Returns(Platform.Windows);
@@ -47,7 +47,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
         }
 
         [Fact]
-        public void SholdUseNugetUnderHomeOnNonWindows()
+        public void ShouldUseNuGetUnderHomeOnNonWindows()
         {
             var runtime = new Mock<IRuntimeEnvironment>();
             runtime.SetupGet(r => r.OperatingSystemPlatform).Returns(Platform.Linux);
@@ -63,7 +63,10 @@ namespace Microsoft.Extensions.DependencyModel.Tests
         [Fact]
         public void ResolvesAllAssemblies()
         {
-            var packagePath = Path.Combine(PackagesPath, F.DefaultPackageName, F.DefaultVersion);
+            var packagePath = Path.Combine(
+                PackagesPath,
+                F.DefaultPackageName.ToLowerInvariant(),
+                F.DefaultVersion.ToLowerInvariant());
             var fileSystem = FileSystemMockBuilder.Create()
                 .AddFiles(packagePath, F.TwoAssemblies)
                 .Build();
@@ -83,7 +86,10 @@ namespace Microsoft.Extensions.DependencyModel.Tests
         [Fact]
         public void FailsWhenOneOfAssembliesNotFound()
         {
-            var packagePath = Path.Combine(PackagesPath, F.DefaultPackageName, F.DefaultVersion);
+            var packagePath = Path.Combine(
+                PackagesPath,
+                F.DefaultPackageName.ToLowerInvariant(),
+                F.DefaultVersion.ToLowerInvariant());
             var fileSystem = FileSystemMockBuilder.Create()
                 .AddFiles(packagePath, F.DefaultAssemblyPath)
                 .Build();

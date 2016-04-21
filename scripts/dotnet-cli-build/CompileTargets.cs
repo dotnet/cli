@@ -292,7 +292,7 @@ namespace Microsoft.DotNet.Cli.Build
             Directory.CreateDirectory(Dirs.Stage1);
 
             CopySharedHost(Dirs.Stage1);
-            PublishSharedFramework(c, Dirs.Stage1, DotNetCli.Stage0);
+            PublishSharedFramework(c, Dirs.Stage1, DotNetCli.Stage0, nuGetVersion: "3.5.0-beta-1199");
             var result = CompileCliSdk(c,
                 dotnet: DotNetCli.Stage0,
                 outputDir: Dirs.Stage1);
@@ -318,7 +318,17 @@ namespace Microsoft.DotNet.Cli.Build
             }
             Directory.CreateDirectory(Dirs.Stage2);
 
-            PublishSharedFramework(c, Dirs.Stage2, DotNetCli.Stage1);
+            // Restore again with Stage1.
+            DotNetCli.Stage1.Restore("--verbosity", "verbose", "--disable-parallel", "--fallbacksource", Dirs.Corehost)
+                .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "src"))
+                .Execute()
+                .EnsureSuccessful();
+            DotNetCli.Stage1.Restore("--verbosity", "verbose", "--disable-parallel", "--infer-runtimes")
+                .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "tools"))
+                .Execute()
+                .EnsureSuccessful();
+
+            PublishSharedFramework(c, Dirs.Stage2, DotNetCli.Stage1, nuGetVersion: null);
             CopySharedHost(Dirs.Stage2);
             var result = CompileCliSdk(c,
                 dotnet: DotNetCli.Stage1,
@@ -439,7 +449,7 @@ namespace Microsoft.DotNet.Cli.Build
                 Path.Combine(outputDir, DotnetHostFxrBaseName), true);
         }
 
-        public static void PublishSharedFramework(BuildTargetContext c, string outputDir, DotNetCli dotnetCli)
+        public static void PublishSharedFramework(BuildTargetContext c, string outputDir, DotNetCli dotnetCli, string nuGetVersion)
         {
             string SharedFrameworkTemplateSourceRoot = Path.Combine(Dirs.RepoRoot, "src", "sharedframework", "framework");
             string SharedFrameworkNugetVersion = c.BuildContext.Get<string>("SharedFrameworkNugetVersion");
@@ -508,14 +518,45 @@ namespace Microsoft.DotNet.Cli.Build
                 var runtimeGraphGeneratorProject = Path.Combine(Dirs.RepoRoot, "tools", runtimeGraphGeneratorName);
                 var runtimeGraphGeneratorOutput = Path.Combine(Dirs.Output, "tools", runtimeGraphGeneratorName);
 
-                dotnetCli.Publish(
-                    "--output", runtimeGraphGeneratorOutput,
-                    runtimeGraphGeneratorProject).Execute().EnsureSuccessful();
-                var runtimeGraphGeneratorExe = Path.Combine(runtimeGraphGeneratorOutput, $"{runtimeGraphGeneratorName}{Constants.ExeSuffix}");
+                // Override the NuGet version the RuntimeGraphGenerator depends on.
+                var originals = new[] { new { Path = (string)null, Content = (byte[])null } };
+                if (nuGetVersion != null)
+                {
+                    originals = new[]
+                        {
+                            Path.Combine("scripts", "update-dependencies"),
+                            Path.Combine("src", "dotnet"),
+                            Path.Combine("src", "Microsoft.DotNet.Cli.Utils"),
+                            Path.Combine("src", "Microsoft.DotNet.ProjectModel"),
+                            Path.Combine("test", "Microsoft.DotNet.Cli.Utils.Tests"),
+                            Path.Combine("tools", runtimeGraphGeneratorName)
+                        }
+                        .Select(p => Path.Combine(Dirs.RepoRoot, p, "project.json"))
+                        .Select(p => new { Path = p, Content = UpdateNuGetVersion(c, dotnetCli, p, nuGetVersion) })
+                        .ToArray();
+                }
 
-                Cmd(runtimeGraphGeneratorExe, "--project", SharedFrameworkSourceRoot, "--deps", destinationDeps, runtimeGraphGeneratorRuntime)
-                    .Execute()
-                    .EnsureSuccessful();
+                try
+                {
+                    dotnetCli.Publish(
+                        "--output", runtimeGraphGeneratorOutput,
+                        runtimeGraphGeneratorProject).Execute().EnsureSuccessful();
+                    var runtimeGraphGeneratorExe = Path.Combine(runtimeGraphGeneratorOutput, $"{runtimeGraphGeneratorName}{Constants.ExeSuffix}");
+
+                    Cmd(runtimeGraphGeneratorExe, "--project", SharedFrameworkSourceRoot, "--deps", destinationDeps, runtimeGraphGeneratorRuntime)
+                        .Execute()
+                        .EnsureSuccessful();
+                }
+                finally
+                {
+                    if (nuGetVersion != null)
+                    {
+                        foreach (var original in originals)
+                        {
+                            RestoreNuGetVersion(c, dotnetCli, original.Path, original.Content);
+                        }
+                    }
+                }
             }
             else
             {
@@ -549,6 +590,63 @@ namespace Microsoft.DotNet.Cli.Build
             var version = SharedFrameworkNugetVersion;
             var content = $@"{c.BuildContext["CommitHash"]}{Environment.NewLine}{version}{Environment.NewLine}";
             File.WriteAllText(Path.Combine(SharedFrameworkNameAndVersionRoot, ".version"), content);
+        }
+
+        private static byte[] UpdateNuGetVersion(BuildTargetContext c, DotNetCli dotnetCli, string projectJsonPath, string version)
+        {
+            c.Warn($"Setting the NuGet version in {projectJsonPath} to {version}.");
+            
+            var encoding = new UTF8Encoding(false);
+
+            var originalBytes = File.ReadAllBytes(projectJsonPath);
+            var originalJson = encoding.GetString(originalBytes);
+            var projectJson = JsonConvert.DeserializeObject<JObject>(originalJson);
+            var dependencies = (JObject)projectJson["dependencies"];
+            foreach (var property in dependencies.Properties())
+            {
+                if (property.Name.StartsWith("NuGet."))
+                {
+                    if (property.Value.Type == JTokenType.String)
+                    {
+                        property.Value = version;
+                    }
+                    else
+                    {
+                        property.Value["version"] = version;
+                    }
+                }
+            }
+
+            var newJson = JsonConvert.SerializeObject(projectJson, Formatting.Indented);
+            var newBytes = encoding.GetBytes(newJson);
+
+            File.WriteAllBytes(projectJsonPath, newBytes);
+
+            dotnetCli.Restore(
+                "--verbosity", "verbose",
+                "--disable-parallel",
+                "--infer-runtimes",
+                "--fallbacksource", Dirs.Corehost)
+                .WorkingDirectory(Path.GetDirectoryName(projectJsonPath))
+                .Execute()
+                .EnsureSuccessful();
+
+            return originalBytes;
+        }
+
+        private static void RestoreNuGetVersion(BuildTargetContext c, DotNetCli dotnetCli, string projectJsonPath, byte[] originalBytes)
+        {
+            c.Warn($"Restoring the original NuGet version to {projectJsonPath}.");
+            File.WriteAllBytes(projectJsonPath, originalBytes);
+
+            dotnetCli.Restore(
+                "--verbosity", "verbose",
+                "--disable-parallel",
+                "--infer-runtimes",
+                "--fallbacksource", Dirs.Corehost)
+                .WorkingDirectory(Path.GetDirectoryName(projectJsonPath))
+                .Execute()
+                .EnsureSuccessful();
         }
 
         /// <summary>
