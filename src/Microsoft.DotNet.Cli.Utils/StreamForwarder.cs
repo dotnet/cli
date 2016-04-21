@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
@@ -43,11 +44,9 @@ namespace Microsoft.DotNet.Cli.Utils
             return this;
         }
 
-        public Thread BeginRead(TextReader reader)
+        public Task BeginRead(TextReader reader)
         {
-            var thread = new Thread(() => Read(reader)) { IsBackground = true };
-            thread.Start();
-            return thread;
+            return Task.Run(() => Read(reader));
         }
 
         public void Read(TextReader reader)

@@ -7,6 +7,7 @@ using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
+using Microsoft.DotNet.ProjectModel;
 
 // This class is responsible with defining the arguments for the Compile verb.
 // It knows how to interpret them and set default values

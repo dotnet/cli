@@ -85,8 +85,11 @@ namespace Microsoft.DotNet.ProjectModel
             var project = new Project();
 
             var reader = new StreamReader(stream);
-
-            var rawProject = JObject.Parse(reader.ReadToEnd());
+            JObject rawProject;
+            using (var jsonReader = new JsonTextReader(reader))
+            {
+                rawProject = JObject.Load(jsonReader);
+            }
             if (rawProject == null)
             {
                 throw FileFormatException.Create(

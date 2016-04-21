@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using NuGet.Frameworks;
 using Microsoft.DotNet.ProjectModel;
+using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
@@ -131,12 +132,11 @@ namespace Microsoft.DotNet.Cli.Utils
 
             Reporter.Verbose.WriteLine($"Process ID: {_process.Id}");
 
-            var threadOut = _stdOut.BeginRead(_process.StandardOutput);
-            var threadErr = _stdErr.BeginRead(_process.StandardError);
-
+            var taskOut = _stdOut.BeginRead(_process.StandardOutput);
+            var taskErr = _stdErr.BeginRead(_process.StandardError);
             _process.WaitForExit();
-            threadOut.Join();
-            threadErr.Join();
+
+            Task.WhenAll(taskOut, taskErr);
 
             var exitCode = _process.ExitCode;
 
