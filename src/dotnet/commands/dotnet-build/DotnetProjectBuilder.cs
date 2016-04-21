@@ -217,7 +217,7 @@ namespace Microsoft.DotNet.Tools.Build
                 return true;
             }
 
-            var compilerIO = _compilerIOManager.GetCompileIO(graphNode, CreateRuntimeContexts());
+            var compilerIO = _compilerIOManager.GetCompileIO(graphNode, CreateRuntimeContexts(graphNode));
 
             // rebuild if empty inputs / outputs
             if (!(compilerIO.Outputs.Any() && compilerIO.Inputs.Any()))

@@ -84,7 +84,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             // run compile
             var outputDir = Path.Combine(testLibDir.Path, "bin");
             var testProject = GetProjectPath(testLibDir);
-            var buildCmd = new BuildCommand(testProject, output: outputDir, framework: DefaultLibraryFramework);
+            var buildCmd = new BuildCommand(testProject, output: outputDir, framework: DefaultLibraryFramework, runtime: CurrentRid);
             var result = buildCmd.ExecuteWithCapturedOutput();
             result.Should().Pass();
 
@@ -158,7 +158,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             var root = testInstance.TestRoot;
             var outputDir = Path.Combine(root, "bin");
             var testProject = ProjectUtils.GetProjectJson(root, "LibraryWithOutputAssemblyName");
-            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultLibraryFramework, runtime: CurrentRid);
+            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultLibraryFramework);
             var result = buildCommand.ExecuteWithCapturedOutput();
             result.Should().Pass();
 

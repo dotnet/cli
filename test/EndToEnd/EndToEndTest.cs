@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 
             buildCommand.Execute().Should().Pass();
 
-            TestOutputExecutable(OutputDirectory, buildCommand.GetPortableOutputName(), s_expectedOutput);
+            TestExecutable(OutputDirectory, buildCommand.GetPortableOutputName(), s_expectedOutput);
         }
 
         [Fact]
@@ -57,15 +57,15 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             // first build
             var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: NetCoreAppTfm);
             buildCommand.Execute().Should().Pass();
-            TestOutputExecutable(OutputDirectory, buildCommand.GetPortableOutputName(), s_expectedOutput);
+            TestExecutable(OutputDirectory, buildCommand.GetPortableOutputName(), s_expectedOutput);
 
-            var binariesOutputDirectory = GetCompilationOutputPath(OutputDirectory, false);
+            var binariesOutputDirectory = OutputDirectory;
             var latestWriteTimeFirstBuild = GetLastWriteTimeUtcOfDirectoryFiles(
                 binariesOutputDirectory);
 
             // second build; should get skipped (incremental because no inputs changed)
             buildCommand.Execute().Should().Pass();
-            TestOutputExecutable(OutputDirectory, buildCommand.GetPortableOutputName(), s_expectedOutput);
+            TestExecutable(OutputDirectory, buildCommand.GetPortableOutputName(), s_expectedOutput);
 
             var latestWriteTimeUtcSecondBuild = GetLastWriteTimeUtcOfDirectoryFiles(
                 binariesOutputDirectory);
@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 
             // third build; should get compiled because the source file got touched
             buildCommand.Execute().Should().Pass();
-            TestOutputExecutable(OutputDirectory, buildCommand.GetPortableOutputName(), s_expectedOutput);
+            TestExecutable(OutputDirectory, buildCommand.GetPortableOutputName(), s_expectedOutput);
 
             var latestWriteTimeUtcThirdBuild = GetLastWriteTimeUtcOfDirectoryFiles(
                 binariesOutputDirectory);
@@ -94,7 +94,8 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 
             buildCommand.Execute().Should().Pass();
 
-            TestNativeOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
+            TestExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
+            throw new NotImplementedException("not testing native");
         }
 
         [Fact(Skip = "Native compilation isn't shipping in 1.0 and we're moving it out anyway")]
@@ -109,7 +110,8 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 
             buildCommand.Execute().Should().Pass();
 
-            TestNativeOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
+            TestExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
+            throw new NotImplementedException("not testing native");
         }
 
         [Fact(Skip = "Native compilation isn't shipping in 1.0 and we're moving it out anyway")]
@@ -122,21 +124,23 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 
             // first build
             var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, nativeCppMode: true, framework: NetCoreAppTfm);
-            var binariesOutputDirectory = GetCompilationOutputPath(OutputDirectory, false);
+            var binariesOutputDirectory = OutputDirectory;
 
             buildCommand.Execute().Should().Pass();
 
-            TestNativeOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
+            TestExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
 
             var latestWriteTimeUtcFirstBuild = GetLastWriteTimeUtcOfDirectoryFiles(binariesOutputDirectory);
 
             // second build; should be skipped because nothing changed
             buildCommand.Execute().Should().Pass();
 
-            TestNativeOutputExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
+            TestExecutable(OutputDirectory, buildCommand.GetOutputExecutableName(), s_expectedOutput);
 
             var latestWriteTimeUtcSecondBuild = GetLastWriteTimeUtcOfDirectoryFiles(binariesOutputDirectory);
             Assert.Equal(latestWriteTimeUtcFirstBuild, latestWriteTimeUtcSecondBuild);
+            
+            throw new NotImplementedException("not testing native");
         }
 
         [Fact]

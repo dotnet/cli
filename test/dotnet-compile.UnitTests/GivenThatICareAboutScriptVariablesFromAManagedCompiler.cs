@@ -68,15 +68,6 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
         }
 
         [Fact]
-        public void It_passes_a_RuntimeOutputDir_variable_to_the_pre_compile_scripts_if_rid_is_set_in_the_ProjectContext()
-        {
-            var rid = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
-            var fixture = ScriptVariablesFixture.GetFixtureWithRids(rid);
-            fixture.PreCompileScriptVariables.Should().ContainKey("compile:RuntimeOutputDir");
-            fixture.PreCompileScriptVariables["compile:RuntimeOutputDir"].Should().Be(fixture.RuntimeOutputDir);
-        }
-
-        [Fact]
         public void It_passes_a_FullTargetFramework_variable_to_the_post_compile_scripts()
         {
             _fixture.PostCompileScriptVariables.Should().ContainKey("compile:FullTargetFramework");
@@ -125,15 +116,6 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             _fixture.PostCompileScriptVariables.Should().ContainKey("compile:CompilerExitCode");
             _fixture.PostCompileScriptVariables["compile:CompilerExitCode"].Should().Be("0");
         }
-
-        [Fact]
-        public void It_passes_a_RuntimeOutputDir_variable_to_the_post_compile_scripts_if_rid_is_set_in_the_ProjectContext()
-        {
-            var rid = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
-            var fixture = ScriptVariablesFixture.GetFixtureWithRids(rid);
-            fixture.PostCompileScriptVariables.Should().ContainKey("compile:RuntimeOutputDir");
-            fixture.PostCompileScriptVariables["compile:RuntimeOutputDir"].Should().Be(fixture.RuntimeOutputDir);
-        }
     }
 
     public class ScriptVariablesFixture
@@ -153,8 +135,6 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             "bin",
             ConfigValue,
             "netcoreapp1.0");
-
-        public string RuntimeOutputDir { get; private set; }
 
         public static string OutputFile = Path.Combine(OutputPath, "TestApp.dll");
 
@@ -221,8 +201,6 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
 
             var context = ProjectContext.Create(projectJson, TestAssetFramework, rids);
             managedCompiler.Compile(context, _args);
-
-            RuntimeOutputDir = Path.Combine(OutputPath, rid);
         }
 
         public static ScriptVariablesFixture GetFixtureWithRids(string rid)

@@ -168,20 +168,6 @@ namespace Microsoft.DotNet.Tools.Compiler
                 { "compile:ResponseFile", rsp }
             };
 
-            if (context.ProjectFile.HasRuntimeOutput(args.ConfigValue))
-            {
-                var runtimeContext = context.CreateAllRuntimeContexts(args.ConfigValue).First();
-                var runtimeOutputPath = runtimeContext.GetOutputPaths(args.ConfigValue, args.BuildBasePathValue, args.OutputValue);
-
-                contextVariables.Add(
-                    "compile:RuntimeOutputDir",
-                    runtimeOutputPath.RuntimeOutputPath.TrimEnd('\\', '/'));
-
-                contextVariables.Add(
-                    "compile:RuntimeIdentifier",
-                    runtimeContext.RuntimeIdentifier);
-            }
-
             _scriptRunner.RunScripts(context, ScriptNames.PreCompile, contextVariables);
 
             // Cache the reporters before invoking the command in case it is a built-in command, which replaces
