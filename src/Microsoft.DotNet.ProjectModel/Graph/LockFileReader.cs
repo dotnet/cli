@@ -143,12 +143,16 @@ namespace Microsoft.DotNet.ProjectModel.Graph
 
                 if (type == null || string.Equals(type, "package", StringComparison.OrdinalIgnoreCase))
                 {
+                    var pathValue = value.Value("path");
+                    var path = pathValue != null ? ReadString(pathValue) : null;
+
                     lockFile.PackageLibraries.Add(new LockFilePackageLibrary
                     {
                         Name = name,
                         Version = version,
                         IsServiceable = ReadBool(value, "serviceable", defaultValue: false),
                         Sha512 = ReadString(value.Value("sha512")),
+                        Path = path,
                         Files = ReadPathArray(value.Value("files"), ReadString)
                     });
                 }
