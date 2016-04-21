@@ -15,11 +15,13 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
 {
     public class PackageDependencyProvider
     {
+        private readonly string _packagesPath;
         private readonly VersionFolderPathResolver _packagePathResolver;
         private readonly FrameworkReferenceResolver _frameworkReferenceResolver;
 
         public PackageDependencyProvider(string packagesPath, FrameworkReferenceResolver frameworkReferenceResolver)
         {
+            _packagesPath = packagesPath;
             _packagePathResolver = new VersionFolderPathResolver(packagesPath);
             _frameworkReferenceResolver = frameworkReferenceResolver;
         }
@@ -40,7 +42,16 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
             var dependencies = new List<LibraryRange>(targetLibrary.Dependencies.Count + targetLibrary.FrameworkAssemblies.Count);
             PopulateDependencies(dependencies, targetLibrary, targetFramework);
 
-            var path = _packagePathResolver.GetInstallPath(package.Name, package.Version);
+            string path;
+            if (package.Path != null)
+            {
+                path = Path.Combine(_packagesPath, package.Path);
+            }
+            else
+            {
+                path = _packagePathResolver.GetInstallPath(package.Name, package.Version);
+            }
+
             var exists = Directory.Exists(path);
 
             if (exists)
