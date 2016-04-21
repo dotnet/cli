@@ -69,13 +69,13 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
         protected CommandResult BuildProject(string projectFile, bool noDependencies = false, bool noIncremental = false, bool expectBuildFailure = false)
         {
-            var buildCommand = new BuildCommand(projectFile, output: GetOutputDir(), framework: "netcoreapp1.0", noIncremental: noIncremental, noDependencies : noDependencies);
+            var buildCommand = new BuildCommand(projectFile, output: GetOutputDir(), framework: "netcoreapp1.0", runtime: CurrentRid, noIncremental: noIncremental, noDependencies : noDependencies);
             var result = buildCommand.ExecuteWithCapturedOutput();
 
             if (!expectBuildFailure)
             {
                 result.Should().Pass();
-                TestOutputExecutable(GetOutputExePath(), buildCommand.GetOutputExecutableName(), ExpectedOutput);
+                TestExecutable(GetOutputExePath(), buildCommand.GetOutputExecutableName(), ExpectedOutput);
             }
             else
             {

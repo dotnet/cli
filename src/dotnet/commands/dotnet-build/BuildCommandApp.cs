@@ -121,7 +121,21 @@ namespace Microsoft.DotNet.Tools.Compiler
                 IEnumerable<NuGetFramework> frameworks = null;
                 if (_frameworkOption.HasValue())
                 {
-                    frameworks = new [] { NuGetFramework.Parse(_frameworkOption.Value()) };
+                    NuGetFramework framework = NuGetFramework.Parse(_frameworkOption.Value());
+                    frameworks = new [] { framework };
+                    
+                    if (_outputOption.HasValue() && !_runtimeOption.HasValue())
+                    {
+                        foreach (var file in files)
+                        {
+                            var anyProjectContext = ProjectContext.CreateContextForEachFramework(file).First();
+                            if (!anyProjectContext.IsPortable)
+                            {
+                                Reporter.Error.WriteLine("When the '--output' option is provided and application is standalone, the '--runtime' option must also be provided.");
+                                return 1;
+                            }
+                        }
+                    }
                 }
                 var success = execute(files, frameworks, this);
 

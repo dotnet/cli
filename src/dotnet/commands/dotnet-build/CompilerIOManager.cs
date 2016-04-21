@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.Tools.Build
             return _cache.GetOrAdd(graphNode.ProjectContext.Identity, i => ComputeIO(graphNode));
         }
 
-        private CompilerIO ComputeIO(ProjectGraphNode graphNode)
+        public CompilerIO ComputeIO(ProjectGraphNode graphNode, IEnumerable<ProjectContext> runtimeContexts)
         {
             var inputs = new List<string>();
             var outputs = new List<string>();
@@ -65,9 +65,8 @@ namespace Microsoft.DotNet.Tools.Build
             inputs.AddRange(CompilerUtil.GetCompilationSources(project));
 
             var allOutputPath = new HashSet<string>(calculator.CompilationFiles.All());
-            if (isRootProject && project.ProjectFile.HasRuntimeOutput(_configuration))
+            foreach (var runtimeContext in runtimeContexts)
             {
-                var runtimeContext = _workspace.GetRuntimeContext(project, _runtimes);
                 foreach (var path in runtimeContext.GetOutputPaths(_configuration, _buildBasePath, _outputPath).RuntimeFiles.All())
                 {
                     allOutputPath.Add(path);

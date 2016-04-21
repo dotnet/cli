@@ -17,6 +17,7 @@ using NuGet.Frameworks;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Reflection.PortableExecutable;
+using System.Text.RegularExpressions;
 
 namespace Microsoft.DotNet.Cli.Compiler.Common
 {
@@ -72,6 +73,27 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
             CopyAssets(dependencies);
             GenerateBindingRedirects(_exporter);
         }
+        
+        private IEnumerable<string> FindCoreHostFiles()
+        {
+            if (string.IsNullOrEmpty(_context.RuntimeIdentifier))
+            {
+                yield break;
+            }
+
+            Regex libraryNamePattern = new Regex("^runtime\\.[A-Za-z\\-0-9\\.]*\\.Microsoft\\.NETCore\\.DotNetHost(Policy|Resolver)?$");
+            foreach (var export in _exporter.GetAllExports()
+                .Where(e => libraryNamePattern.IsMatch(e.Library.Identity.Name)))
+            {
+                foreach (LibraryAssetGroup nativeAssetGroup in export.NativeLibraryGroups)
+                {
+                    foreach (LibraryAsset nativeAsset in nativeAssetGroup.Assets)
+                    {
+                        yield return nativeAsset.ResolvedPath;
+                    }
+                }
+            }
+        }
 
         private void MakeCompilationOutputRunnableForCoreCLR()
         {
@@ -80,8 +102,21 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
             var emitEntryPoint = _compilerOptions.EmitEntryPoint ?? false;
             if (emitEntryPoint && !string.IsNullOrEmpty(_context.RuntimeIdentifier))
             {
-                // TODO: Pick a host based on the RID
-                CoreHost.CopyTo(_runtimeOutputPath, _compilerOptions.OutputName + Constants.ExeSuffix);
+                foreach (var sourcePath in FindCoreHostFiles())
+                {
+                    string destinationPath;
+                    if (Path.GetFileName(sourcePath).StartsWith("dotnet"))
+                    {
+                        string extension = _context.RuntimeIdentifier.ToLower().StartsWith("win") ? ".exe" : string.Empty;
+                        destinationPath = Path.Combine(_runtimeOutputPath, _compilerOptions.OutputName + extension);
+                    }
+                    else
+                    {
+                        destinationPath = Path.Combine(_runtimeOutputPath, Path.GetFileName(sourcePath));
+                    }
+
+                    File.Copy(sourcePath, destinationPath, overwrite: true);
+                }
             }
         }
 
