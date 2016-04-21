@@ -60,7 +60,7 @@ namespace Microsoft.DotNet.TestFramework
                                   {
                                       file = file.ToLower();
                                       return !file.EndsWith("project.lock.json")
-                                            && !file.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}") 
+                                            && !file.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}")
                                             && !file.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}");
                                   });
 
@@ -68,7 +68,6 @@ namespace Microsoft.DotNet.TestFramework
             {
                 string destFile = srcFile.Replace(_testAssetRoot, _testDestination);
                 File.Copy(srcFile, destFile, true);
-                FixTimeStamp(srcFile, destFile);
             }
         }
 
@@ -78,7 +77,6 @@ namespace Microsoft.DotNet.TestFramework
             {
                 string destinationLockFile = lockFile.Replace(_testAssetRoot, _testDestination);
                 File.Copy(lockFile, destinationLockFile, true);
-                FixTimeStamp(lockFile, destinationLockFile);
             }
 
             return this;
@@ -90,9 +88,9 @@ namespace Microsoft.DotNet.TestFramework
                                  .Where(dir =>
                                  {
                                      dir = dir.ToLower();
-                                     return dir.EndsWith($"{Path.DirectorySeparatorChar}bin") 
+                                     return dir.EndsWith($"{Path.DirectorySeparatorChar}bin")
                                             || dir.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}")
-                                            || dir.EndsWith($"{Path.DirectorySeparatorChar}obj") 
+                                            || dir.EndsWith($"{Path.DirectorySeparatorChar}obj")
                                             || dir.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}");
                                  });
 
@@ -105,7 +103,7 @@ namespace Microsoft.DotNet.TestFramework
                                  .Where(file =>
                                  {
                                      file = file.ToLower();
-                                     return file.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}") 
+                                     return file.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}")
                                             || file.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}");
                                  });
 
@@ -113,7 +111,6 @@ namespace Microsoft.DotNet.TestFramework
             {
                 string destFile = binFile.Replace(_testAssetRoot, _testDestination);
                 File.Copy(binFile, destFile, true);
-                FixTimeStamp(binFile, destFile);
             }
 
             return this;
@@ -122,16 +119,6 @@ namespace Microsoft.DotNet.TestFramework
         public string TestRoot
         {
             get { return _testDestination; }
-        }
-
-        private static void FixTimeStamp(string originalFile, string newFile)
-        {
-            // workaround for https://github.com/dotnet/corefx/issues/6083
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                var originalTime = File.GetLastWriteTime(originalFile);
-                File.SetLastWriteTime(newFile, originalTime);
-            }
         }
     }
 }
