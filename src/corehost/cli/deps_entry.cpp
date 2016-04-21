@@ -104,8 +104,8 @@ bool deps_entry_t::to_full_path(const pal::string_t& base, pal::string_t* str) c
     }
 
     pal::string_t new_base = base;
-    append_path(&new_base, library_name.c_str());
-    append_path(&new_base, library_version.c_str());
+    append_path(&new_base, pal::to_lower(library_name).c_str());
+    append_path(&new_base, pal::to_lower(library_version).c_str());
 
     return to_rel_path(new_base, str);
 }
@@ -154,9 +154,9 @@ bool deps_entry_t::to_hash_matched_path(const pal::string_t& base, pal::string_t
     // Build the nupkg file name. Just reserve approx 8 char_t's for the algorithm name.
     pal::string_t nupkg_filename;
     nupkg_filename.reserve(library_name.length() + 1 + library_version.length() + 16);
-    nupkg_filename.append(library_name);
+    nupkg_filename.append(pal::to_lower(library_name));
     nupkg_filename.append(_X("."));
-    nupkg_filename.append(library_version);
+    nupkg_filename.append(pal::to_lower(library_version));
     nupkg_filename.append(_X(".nupkg."));
     nupkg_filename.append(library_hash.substr(0, pos));
 
@@ -164,8 +164,8 @@ bool deps_entry_t::to_hash_matched_path(const pal::string_t& base, pal::string_t
     pal::string_t hash_file;
     hash_file.reserve(base.length() + library_name.length() + library_version.length() + nupkg_filename.length() + 3);
     hash_file.assign(base);
-    append_path(&hash_file, library_name.c_str());
-    append_path(&hash_file, library_version.c_str());
+    append_path(&hash_file, pal::to_lower(library_name).c_str());
+    append_path(&hash_file, pal::to_lower(library_version).c_str());
     append_path(&hash_file, nupkg_filename.c_str());
 
     // Read the contents of the hash file.
