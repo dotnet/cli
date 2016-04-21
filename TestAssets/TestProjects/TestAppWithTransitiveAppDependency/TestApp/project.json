@@ -1,4 +1,4 @@
-{
+﻿{
   "version": "1.0.0-*",
   "compilationOptions": {
     "emitEntryPoint": true,
@@ -12,7 +12,7 @@
     "Microsoft.NETCore.App": "1.0.0-rc2-*"
   },
   "frameworks": {
-    "netcoreapp1.0": { }
+    "netcoreapp1.0": {}
   },
   "scripts": {
     "prepublish": [
@@ -21,5 +21,15 @@
     "postpublish": [
       "echo postpublish_output ?%publish:ProjectPath%? ?%publish:Configuration%? ?%publish:OutputPath%? ?%publish:Framework%? ?%publish:Runtime%?"
     ]
+  },
+  "runtimes": {
+    "win7-x64": {},
+    "win7-x86": {},
+    "osx.10.10-x64": {},
+    "osx.10.11-x64": {},
+    "ubuntu.14.04-x64": {},
+    "centos.7-x64": {},
+    "rhel.7.2-x64": {},
+    "debian.8-x64": {}
   }
 }
