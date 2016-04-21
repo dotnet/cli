@@ -607,7 +607,7 @@ namespace Microsoft.DotNet.ProjectModel
                     rawOptions,
                     "copyToOutput",
                     defaultBuiltInInclude: null,
-                    defaultBuiltInExclude: ProjectFilesCollection.DefaultBuiltInExcludePatterns)
+                    defaultBuiltInExclude: ProjectFilesCollection.DefaultPublishExcludePatterns)
             };
         }
 
@@ -716,7 +716,7 @@ namespace Microsoft.DotNet.ProjectModel
 
         private static IncludeContext GetPublishInclude(JObject rawProject, Project project)
         {
-            var rawPublishOptions = rawProject.Value<JToken>("publishOptions") as JObject;
+            var rawPublishOptions = rawProject.Value<JToken>("publishOptions");
             if (rawPublishOptions != null)
             {
                 return new IncludeContext(
@@ -724,7 +724,7 @@ namespace Microsoft.DotNet.ProjectModel
                     "publishOptions",
                     rawProject,
                     defaultBuiltInInclude: null,
-                    defaultBuiltInExclude: ProjectFilesCollection.DefaultBuiltInExcludePatterns);
+                    defaultBuiltInExclude: ProjectFilesCollection.DefaultPublishExcludePatterns);
             }
 
             return null;
