@@ -62,6 +62,7 @@ namespace Microsoft.DotNet.Tools.Build
             var compilerIO = new CompilerIO(new List<string>(), new List<string>());
             var calculator = project.GetOutputPaths(_configuration, _buildBasePath, _outputPath);
             var binariesOutputPath = calculator.CompilationOutputPath;
+            var compilerOptions = project.ProjectFile.GetCompilerOptions(project.TargetFramework, _configuration);
 
             // input: project.json
             compilerIO.Inputs.Add(project.ProjectFile.ProjectFilePath);
@@ -70,7 +71,7 @@ namespace Microsoft.DotNet.Tools.Build
             AddLockFile(project, compilerIO);
 
             // input: source files
-            compilerIO.Inputs.AddRange(CompilerUtil.GetCompilationSources(project));
+            compilerIO.Inputs.AddRange(CompilerUtil.GetCompilationSources(project, compilerOptions));
 
             var allOutputPath = new HashSet<string>(calculator.CompilationFiles.All());
             if (isRootProject && project.ProjectFile.HasRuntimeOutput(_configuration))
@@ -92,10 +93,10 @@ namespace Microsoft.DotNet.Tools.Build
             AddCompilationOptions(project, _configuration, compilerIO);
 
             // input / output: resources with culture
-            AddNonCultureResources(project, calculator.IntermediateOutputDirectoryPath, compilerIO);
+            AddNonCultureResources(project, calculator.IntermediateOutputDirectoryPath, compilerIO, compilerOptions);
 
             // input / output: resources without culture
-            AddCultureResources(project, binariesOutputPath, compilerIO);
+            AddCultureResources(project, binariesOutputPath, compilerIO, compilerOptions);
 
             return compilerIO;
         }
@@ -130,9 +131,23 @@ namespace Microsoft.DotNet.Tools.Build
             }
         }
 
-        private static void AddNonCultureResources(ProjectContext project, string intermediaryOutputPath, CompilerIO compilerIO)
+        private static void AddNonCultureResources(
+            ProjectContext project,
+            string intermediaryOutputPath,
+            CompilerIO compilerIO,
+            CommonCompilerOptions compilationOptions)
         {
-            foreach (var resourceIO in CompilerUtil.GetNonCultureResources(project.ProjectFile, intermediaryOutputPath))
+            List<CompilerUtil.NonCultureResgenIO> resources = null;
+            if (compilationOptions.EmbedInclude == null)
+            {
+                resources = CompilerUtil.GetNonCultureResources(project.ProjectFile, intermediaryOutputPath);
+            }
+            else
+            {
+                resources = CompilerUtil.GetNonCultureResourcesFromIncludeEntries(project.ProjectFile, intermediaryOutputPath, compilationOptions);
+            }
+
+            foreach (var resourceIO in resources)
             {
                 compilerIO.Inputs.Add(resourceIO.InputFile);
 
@@ -143,9 +158,23 @@ namespace Microsoft.DotNet.Tools.Build
             }
         }
 
-        private static void AddCultureResources(ProjectContext project, string outputPath, CompilerIO compilerIO)
+        private static void AddCultureResources(
+            ProjectContext project,
+            string outputPath,
+            CompilerIO compilerIO,
+            CommonCompilerOptions compilationOptions)
         {
-            foreach (var cultureResourceIO in CompilerUtil.GetCultureResources(project.ProjectFile, outputPath))
+            List<CompilerUtil.CultureResgenIO> resources = null;
+            if (compilationOptions.EmbedInclude == null)
+            {
+                resources = CompilerUtil.GetCultureResources(project.ProjectFile, outputPath);
+            }
+            else
+            {
+                resources = CompilerUtil.GetCultureResourcesFromIncludeEntries(project.ProjectFile, outputPath, compilationOptions);
+            }
+
+            foreach (var cultureResourceIO in resources)
             {
                 compilerIO.Inputs.AddRange(cultureResourceIO.InputFileToMetadata.Keys);
 

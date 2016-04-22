@@ -169,9 +169,9 @@ namespace Microsoft.DotNet.Tools.Compiler
         }
 
         //used in incremental precondition checks
-        public static IEnumerable<string> GetCommandsInvokedByCompile(ProjectContext project, string configuration)
+        public static IEnumerable<string> GetCommandsInvokedByCompile(ProjectContext project)
         {
-            var compilerOptions = project.ProjectFile.GetCompilerOptions(project.TargetFramework, configuration);
+            var compilerOptions = project.ProjectFile.GetCompilerOptions(project.TargetFramework, configurationName: null);
             return new List<string> { compilerOptions.CompilerName, "compile" };
         }
     }
