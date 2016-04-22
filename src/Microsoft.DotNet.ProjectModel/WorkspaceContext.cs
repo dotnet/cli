@@ -173,13 +173,14 @@ namespace Microsoft.DotNet.ProjectModel
             if (currentEntry.IsInvalid)
             {
                 Project project;
-                if (!ProjectReader.TryGetProject(projectDirectory, out project, currentEntry.Diagnostics))
+                if (!ProjectReader.TryGetProject(projectDirectory, out project))
                 {
                     currentEntry.Reset();
                 }
                 else
                 {
                     currentEntry.Model = project;
+                    currentEntry.Diagnostics.AddRange(project.Diagnostics);
                     currentEntry.FilePath = project.ProjectFilePath;
                     currentEntry.UpdateLastWriteTimeUtc();
                 }

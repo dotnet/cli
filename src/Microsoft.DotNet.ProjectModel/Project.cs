@@ -80,6 +80,8 @@ namespace Microsoft.DotNet.ProjectModel
 
         public IncludeContext PublishOptions { get; set; }
 
+        public List<DiagnosticMessage> Diagnostics { get; } = new List<DiagnosticMessage>();
+
         public bool IsTestProject => !string.IsNullOrEmpty(TestRunner);
         
         public IEnumerable<TargetFrameworkInformation> GetTargetFrameworks()
