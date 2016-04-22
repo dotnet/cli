@@ -136,7 +136,7 @@ namespace Microsoft.DotNet.Cli.Utils
             var taskErr = _stdErr.BeginRead(_process.StandardError);
             _process.WaitForExit();
 
-            Task.WhenAll(taskOut, taskErr);
+            Task.WaitAll(taskOut, taskErr);
 
             var exitCode = _process.ExitCode;
 

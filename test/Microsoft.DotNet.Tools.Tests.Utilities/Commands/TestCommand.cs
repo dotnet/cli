@@ -113,7 +113,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             var taskErr = stdErr.BeginRead(CurrentProcess.StandardError);
 
             CurrentProcess.WaitForExit();
-            Task.WhenAll(taskOut, taskErr);
+            Task.WaitAll(taskOut, taskErr);
 
             var result = new CommandResult(
                 CurrentProcess.StartInfo,
@@ -133,7 +133,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             var tcs = new TaskCompletionSource<CommandResult>();
             CurrentProcess.Exited += (sender, arg) =>
             {
-                Task.WhenAll(taskOut, taskErr);
+                Task.WaitAll(taskOut, taskErr);
                 var result = new CommandResult(
                                     CurrentProcess.StartInfo,
                                     CurrentProcess.ExitCode,

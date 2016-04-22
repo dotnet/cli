@@ -60,7 +60,7 @@ namespace Microsoft.DotNet.Cli.Utils
                     outStream.DoneWriting();
                     errorStream.DoneWriting();
 
-                    Task.WhenAll(taskOut, taskErr);
+                    Task.WaitAll(taskOut, taskErr);
 
                     // fake out a ProcessStartInfo using the Muxer command name, since this is a built-in command
                     ProcessStartInfo startInfo = new ProcessStartInfo(new Muxer().MuxerPath, $"{CommandName} {CommandArgs}");
