@@ -354,6 +354,11 @@ int fx_muxer_t::read_config_and_execute(
     else
     {
         trace::verbose(_X("Specified runtimeconfig.json from [%s]"), runtime_config.c_str());
+        if (!pal::realpath(&runtime_config) || !pal::file_exists(runtime_config))
+        {
+            trace::error(_X("The specified runtimeconfig.json [%s] does not exist"), runtime_config.c_str());
+            return StatusCode::InvalidConfigFile;
+        }
         get_runtime_config_paths_from_arg(runtime_config, &config_file, &dev_config_file);
     }
 
