@@ -7,7 +7,6 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-
 namespace Microsoft.DotNet.Tools.Build
 {
     internal class IncrementalCache
@@ -47,7 +46,7 @@ namespace Microsoft.DotNet.Tools.Build
         {
             var parentDir = Path.GetDirectoryName(filePath);
 
-            if (!File.Exists(parentDir))
+            if (!Directory.Exists(parentDir))
             {
                 Directory.CreateDirectory(parentDir);
             }
