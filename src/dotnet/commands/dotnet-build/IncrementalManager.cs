@@ -171,16 +171,16 @@ namespace Microsoft.DotNet.Tools.Build
         private IncrementalResult TimestampsChanged(CompilerIO compilerIO)
         {
             // find the output with the earliest write time
-            var minDateUtc = File.GetLastWriteTimeUtc(compilerIO.Outputs.First());
+            var minDateUtc = DateTime.MaxValue;
 
             foreach (var outputPath in compilerIO.Outputs)
             {
-                if (File.GetLastWriteTimeUtc(outputPath) >= minDateUtc)
-                {
-                    continue;
-                }
+                var lastWriteTimeUtc = File.GetLastWriteTimeUtc(outputPath);
 
-                minDateUtc = File.GetLastWriteTimeUtc(outputPath);
+                if (lastWriteTimeUtc < minDateUtc)
+                {
+                    minDateUtc = lastWriteTimeUtc;
+                }
             }
 
             // find inputs that are older than the earliest output
