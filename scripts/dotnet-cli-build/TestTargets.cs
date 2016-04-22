@@ -76,7 +76,7 @@ namespace Microsoft.DotNet.Cli.Build
             var dotnet = DotNetCli.Stage2;
             dotnet.Restore("--verbosity", "verbose",
                 "--infer-runtimes",
-                "--fallbacksource", Dirs.Corehost,
+                "--fallbacksource", Dirs.CorehostLocalPackages,
                 "--fallbacksource", Dirs.CorehostDummyPackages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages"))
                 .Execute()
@@ -98,7 +98,7 @@ namespace Microsoft.DotNet.Cli.Build
                 "--verbosity", "verbose",
                 "--infer-runtimes",
                 "--fallbacksource", Dirs.TestPackages,
-                "--fallbacksource", Dirs.Corehost,
+                "--fallbacksource", Dirs.CorehostLocalPackages,
                 "--fallbacksource", Dirs.CorehostDummyPackages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects"))
                 .Execute()
@@ -108,7 +108,7 @@ namespace Microsoft.DotNet.Cli.Build
             dotnet.Restore(
                 "--verbosity", "verbose",
                 "--infer-runtimes",
-                "--fallbacksource", Dirs.Corehost,
+                "--fallbacksource", Dirs.CorehostLocalPackages,
                 "--fallbacksource", Dirs.CorehostDummyPackages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectModelServer", "DthTestProjects"))
                 .Execute();
@@ -131,7 +131,7 @@ namespace Microsoft.DotNet.Cli.Build
             dotnet.Restore("--verbosity", "verbose",
                 "--infer-runtimes",
                 "--fallbacksource", Dirs.TestPackages,
-                "--fallbacksource", Dirs.Corehost,
+                "--fallbacksource", Dirs.CorehostLocalPackages,
                 "--fallbacksource", Dirs.CorehostDummyPackages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "DesktopTestProjects"))
                 .Execute().EnsureSuccessful();
@@ -261,7 +261,7 @@ namespace Microsoft.DotNet.Cli.Build
             CleanNuGetTempCache();
             DotNetCli.Stage2.Restore("--verbosity", "verbose",
                 "--fallbacksource", Dirs.TestPackages,
-                "--fallbacksource", Dirs.Corehost,
+                "--fallbacksource", Dirs.CorehostLocalPackages,
                 "--fallbacksource", Dirs.CorehostDummyPackages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "test"))
                 .Execute()
