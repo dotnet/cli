@@ -36,17 +36,23 @@ namespace Microsoft.DotNet.Cli.Build
             "vbc.exe"
         };
 
-        public static readonly string[] HostPackageSupportedRids = new[]
+        public string HostPackagePlatformRid => HostPackageSupportedRids[
+                             (PlatformServices.Default.Runtime.OperatingSystemPlatform == Platform.Windows)
+                             ? $"win7-{PlatformServices.Default.Runtime.RuntimeArchitecture}"
+                             : PlatformServices.Default.Runtime.GetRuntimeIdentifier()];
+
+        public static readonly Dictionary<string, string> HostPackageSupportedRids = new Dictionary<string, string>()
         {
-            "win7-x64",
-            "win7-x86",
-            "osx.10.10-x64",
-            "osx.10.11-x64",
-            "ubuntu.14.04-x64",
-            "centos.7-x64",
-            "rhel.7-x64",
-            "rhel.7.2-x64",
-            "debian.8-x64"
+            // Key: Current platform RID. Value: The actual publishable (non-dummy) package name produced by the build system for this RID.
+            { "win7-x64", "win7-x64" },
+            { "win7-x86", "win7-x86" },
+            { "osx.10.10-x64", "osx.10.10-x64" },
+            { "osx.10.11-x64", "osx.10.10-x64" },
+            { "ubuntu.14.04-x64", "ubuntu.14.04-x64" },
+            { "centos.7-x64", "centos.7-x64" },
+            { "rhel.7-x64", "rhel.7-x64" },
+            { "rhel.7.2-x64", "rhel.7-x64" },
+            { "debian.8-x64", "debian.8-x64" }
         };
 
         public const string SharedFrameworkName = "Microsoft.NETCore.App";
@@ -83,7 +89,7 @@ namespace Microsoft.DotNet.Cli.Build
             PrepareDummyRuntimeNuGetPackage(DotNetCli.Stage0);
             foreach (var hostPackage in buildVersion.LatestHostPackages)
             {
-                foreach (var rid in HostPackageSupportedRids)
+                foreach (var rid in HostPackageSupportedRids.Keys)
                 {
                     if (!rid.Equals(currentRid))
                     {
@@ -104,9 +110,7 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
             var lockedHostFxrVersion = buildVersion.LockedHostFxrVersion;
-            var defaultRid = (PlatformServices.Default.Runtime.OperatingSystemPlatform == Platform.Windows)
-                           ? $"win7-{PlatformServices.Default.Runtime.RuntimeArchitecture}"
-                           : PlatformServices.Default.Runtime.GetRuntimeIdentifier();
+            var defaultRid = HostPackagePlatformRid;
             string projectJson = $@"{{
   ""dependencies"": {{
       ""Microsoft.NETCore.DotNetHostResolver"" : ""{lockedHostFxrVersion}""
@@ -272,7 +276,7 @@ namespace Microsoft.DotNet.Cli.Build
             }
             foreach (var item in buildVersion.LatestHostPackages)
             {
-                if (Directory.GetFiles(Dirs.CorehostLocalPackages, $"runtime.*.{item.Key}.{item.Value}.nupkg").Length == 0)
+                if (Directory.GetFiles(Dirs.CorehostLocalPackages, $"runtime.{HostPackagePlatformRid}.{item.Key}.{item.Value}.nupkg").Length == 0)
                 {
                     throw new BuildFailureException($"Nupkg for {item.Key}.{item.Value} was not created.");
                 }
