@@ -170,14 +170,22 @@ namespace Microsoft.DotNet.Tools.Build
             if (result.NeedsRebuilding)
             {
                 Reporter.Output.WriteLine($"Project {projectName} will be compiled because {result.Reason}");
-                foreach (var item in result.Items)
-                {
-                    Reporter.Verbose.WriteLine($"\t{item}");
-                }
+                PrintIncrementalItems(result);
             }
             else
             {
                 Reporter.Output.WriteLine($"Project {projectName} was previously compiled. Skipping compilation.");
+            }
+        }
+
+        private static void PrintIncrementalItems(IncrementalResult result)
+        {
+            if (Reporter.IsVerbose)
+            {
+                foreach (var item in result.Items)
+                {
+                    Reporter.Verbose.WriteLine($"\t{item}");
+                }
             }
         }
     }
