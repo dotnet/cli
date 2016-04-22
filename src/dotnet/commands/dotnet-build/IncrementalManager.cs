@@ -79,7 +79,6 @@ namespace Microsoft.DotNet.Tools.Build
             }
 
             return IncrementalResult.DoesNotNeedRebuild;
-            
         }
 
         private IncrementalResult CLIChanged(ProjectGraphNode graphNode)
@@ -195,7 +194,9 @@ namespace Microsoft.DotNet.Tools.Build
         public void CacheIncrementalState(ProjectGraphNode graphNode)
         {
             var incrementalCacheFile = graphNode.ProjectContext.IncrementalCacheFile(_configuration, _buildBasePath, _outputPath);
-            IncrementalCache.WriteToFile(incrementalCacheFile, new IncrementalCache(_compilerIoManager.GetCompileIO(graphNode)));
+
+            var incrementalCache = new IncrementalCache(_compilerIoManager.GetCompileIO(graphNode));
+            incrementalCache.WriteToFile(incrementalCacheFile);
         }
     }
 }

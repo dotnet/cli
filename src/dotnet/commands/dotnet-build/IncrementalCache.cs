@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.Tools.Build
             CompilerIO = compilerIO;
         }
 
-        public static void WriteToFile(string cacheFile, IncrementalCache cache)
+        public void WriteToFile(string cacheFile)
         {
             try
             {
@@ -31,8 +31,8 @@ namespace Microsoft.DotNet.Tools.Build
                 using (var streamWriter = new StreamWriter(new FileStream(cacheFile, FileMode.Create, FileAccess.Write, FileShare.None)))
                 {
                     var rootObject = new JObject();
-                    rootObject[InputsKeyName] = new JArray(cache.CompilerIO.Inputs);
-                    rootObject[OutputsKeyNane] = new JArray(cache.CompilerIO.Outputs);
+                    rootObject[InputsKeyName] = new JArray(CompilerIO.Inputs);
+                    rootObject[OutputsKeyNane] = new JArray(CompilerIO.Outputs);
 
                     JsonSerializer.Create().Serialize(streamWriter, rootObject);
                 }
