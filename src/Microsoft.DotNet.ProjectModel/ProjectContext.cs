@@ -8,6 +8,7 @@ using System.Linq;
 using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Resolution;
+using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.ProjectModel
@@ -152,6 +153,71 @@ namespace Microsoft.DotNet.ProjectModel
                         .WithReaderSettings(settings)
                         .WithProject(project)
                         .BuildAllTargets();
+        }
+
+        public static bool IsRidCompatibleWith(string rid, string otherRid)
+        {
+            if (otherRid == null)
+            {
+                return false;
+            }
+
+            if (rid == otherRid)
+            {
+                return true;
+            }
+
+            if (rid.EndsWith("x86") != otherRid.EndsWith("x86"))
+            {
+                return false;
+            }
+
+            if (rid.StartsWith("win10-"))
+            {
+                return otherRid.StartsWith("win8-") || otherRid.StartsWith("win7-");
+            }
+
+            if (rid.StartsWith("win8-"))
+            {
+                return otherRid.StartsWith("win7-");
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Creates a project context based on current platform
+        /// </summary>
+        /// <param name="buildConfiguration">build configuration</param>
+        /// <returns></returns>
+
+        public ProjectContext CreateRuntimeContextForCurrentPlatform(string buildConfiguration)
+        {
+            if (IsPortable)
+            {
+                return this;
+            }
+
+            string currentRid = PlatformServices.Default.Runtime.GetRuntimeIdentifier();
+
+            List<ProjectContext> contexts = CreateAllRuntimeContexts(buildConfiguration).ToList();
+            foreach (var runtimeContext in contexts)
+            {
+                if (runtimeContext.RuntimeIdentifier == currentRid)
+                {
+                    return runtimeContext;
+                }
+            }
+
+            foreach (var runtimeContext in contexts)
+            {
+                if (IsRidCompatibleWith(currentRid, runtimeContext.RuntimeIdentifier))
+                {
+                    return runtimeContext;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>

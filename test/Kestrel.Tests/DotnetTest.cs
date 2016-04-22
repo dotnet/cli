@@ -109,33 +109,8 @@ namespace Microsoft.DotNet.Kestrel.Tests
                 command.KillTree();
             }
         }
-        
-        private static bool IsRidCompatibleWith(string rid, string otherRid)
-        {
-            if (rid == otherRid)
-            {
-                return true;
-            }
-            
-            if (rid.EndsWith("x86") != otherRid.EndsWith("x86"))
-            {
-                return false;
-            }
-            
-            if (rid.StartsWith("win10-"))
-            {
-                return otherRid.StartsWith("win8-") || otherRid.StartsWith("win7-");
-            }
-            
-            if (rid.StartsWith("win8-"))
-            {
-                return otherRid.StartsWith("win7-");
-            }
-            
-            return false;
-        }
 
-        private static string Build(string testRoot)
+        private string Build(string testRoot)
         {
             string appName = Path.GetFileName(testRoot);
 
@@ -145,7 +120,6 @@ namespace Microsoft.DotNet.Kestrel.Tests
             result.Should().Pass();
 
             // the correct build assembly is next to its deps.json file 
-            string rid = PlatformServices.Default.Runtime.GetRuntimeIdentifier();
             var depsJsonFiles = Directory.EnumerateFiles(testRoot, appName + FileNameSuffixes.DepsJson, SearchOption.AllDirectories);
             string depsJsonFile;
             if (depsJsonFiles.Count() == 1)
@@ -154,7 +128,7 @@ namespace Microsoft.DotNet.Kestrel.Tests
             }
             else
             {
-                var standaloneAppDepsJsons = depsJsonFiles.Where((path) => IsRidCompatibleWith(rid, Directory.GetParent(path).Name));
+                var standaloneAppDepsJsons = depsJsonFiles.Where((path) => ProjectContext.IsRidCompatibleWith(CurrentRid, Directory.GetParent(path).Name));
                 depsJsonFile = standaloneAppDepsJsons.First();
             }
             
