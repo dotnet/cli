@@ -99,7 +99,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
                 output: outputValue != null ? Path.Combine(_testProjectsRoot, outputValue) : string.Empty,
                 buildBasePath: baseValue != null ? Path.Combine(_testProjectsRoot, baseValue) : string.Empty,
                 framework: DefaultFramework,
-                runtime: CurrentRid)
+                runtime: "win7-x64")
                 .ExecuteWithCapturedOutput().Should().Pass();
 
             var libdebug = _rootDirInfo.Sub(FormatPath(expectedLibCompile, DefaultLibraryFramework, _runtime));

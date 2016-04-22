@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
         protected CommandResult BuildProject(string projectFile, bool noDependencies = false, bool noIncremental = false, bool expectBuildFailure = false)
         {
-            var buildCommand = new BuildCommand(projectFile, output: GetOutputDir(), framework: "netcoreapp1.0", runtime: CurrentRid, noIncremental: noIncremental, noDependencies : noDependencies);
+            var buildCommand = new BuildCommand(projectFile, output: GetOutputDir(), framework: "netcoreapp1.0", runtime: "win7-x64", noIncremental: noIncremental, noDependencies : noDependencies);
             var result = buildCommand.ExecuteWithCapturedOutput();
 
             if (!expectBuildFailure)

@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         {
             get
             {
-                return MainProject + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : "");
+                return MainProject + ".exe";
             }
         }
 
@@ -50,6 +50,9 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
             // second build; nothing changed; no project required compilation
             var result2 = BuildProject();
+            Console.WriteLine("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+            Console.WriteLine(result2.StdOut);
+            Console.WriteLine("ENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDEND");
             AssertRebuilt(result2, Array.Empty<string>());
 
             //modify the source code of a project
