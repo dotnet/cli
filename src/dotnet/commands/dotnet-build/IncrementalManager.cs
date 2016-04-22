@@ -133,13 +133,16 @@ namespace Microsoft.DotNet.Tools.Build
                 return result;
             }
 
-            // check cache against input glob pattern changes
+            return CheckForInputGlobPatternChanges(graphNode, compilerIO);
+        }
+
+        private IncrementalResult CheckForInputGlobPatternChanges(ProjectGraphNode graphNode, CompilerIO compilerIO)
+        {
             var incrementalCacheFile = graphNode.ProjectContext.IncrementalCacheFile(_configuration, _buildBasePath, _outputPath);
 
             if (!File.Exists(incrementalCacheFile))
             {
-                // no cache present; cannot tell if anything changed
-                return IncrementalResult.DoesNotNeedRebuild;
+                return new IncrementalResult($"incremental cache file {incrementalCacheFile} is missing");
             }
 
             var incrementalCache = IncrementalCache.ReadFromFile(incrementalCacheFile);
@@ -191,7 +194,7 @@ namespace Microsoft.DotNet.Tools.Build
                 : IncrementalResult.DoesNotNeedRebuild;
         }
 
-        public void CacheIncrementalState(ProjectGraphNode graphNode)
+        public void PersistIncrementalState(ProjectGraphNode graphNode)
         {
             var incrementalCacheFile = graphNode.ProjectContext.IncrementalCacheFile(_configuration, _buildBasePath, _outputPath);
 

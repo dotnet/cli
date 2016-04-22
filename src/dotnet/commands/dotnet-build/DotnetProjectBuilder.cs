@@ -146,14 +146,14 @@ namespace Microsoft.DotNet.Tools.Build
             finally
             {
                 StampProjectWithSDKVersion(projectNode.ProjectContext);
-                _incrementalManager.CacheIncrementalState(projectNode);
+                _incrementalManager.PersistIncrementalState(projectNode);
             }
         }
 
         protected override void ProjectSkiped(ProjectGraphNode projectNode)
         {
             StampProjectWithSDKVersion(projectNode.ProjectContext);
-            _incrementalManager.CacheIncrementalState(projectNode);
+            _incrementalManager.PersistIncrementalState(projectNode);
         }
 
         protected override bool NeedsRebuilding(ProjectGraphNode graphNode)

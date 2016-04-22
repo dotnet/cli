@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<assemblies>
+  <assembly name="dotnet-build.Tests.dll" environment="64-bit .NET (unknown version) [collection-per-class, parallel (11 threads)]" test-framework="xUnit.net 2.1.0.3179" run-date="2016-04-22" run-time="11:27:36" total="57" passed="45" failed="12" skipped="0" time="121.110" errors="0">
+    <errors />
+    <collection total="1" passed="1" failed="0" skipped="0" name="Test collection for Microsoft.DotNet.Tools.Builder.Tests.IncrementalTestsTransitiveRuntime" time="15.825">
+      <test name="Microsoft.DotNet.Tools.Builder.Tests.IncrementalTestsTransitiveRuntime.TestSkipsRebuildWithTransitiveExeDependency" type="Microsoft.DotNet.Tools.Builder.Tests.IncrementalTestsTransitiveRuntime" method="TestSkipsRebuildWithTransitiveExeDependency" time="15.8247647" result="Pass" />
+    </collection>
+    <collection total="3" passed="3" failed="0" skipped="0" name="Test collection for Microsoft.DotNet.Tools.Builder.Tests.BuildStandAloneTests" time="16.585">
+      <test name="Microsoft.DotNet.Tools.Builder.Tests.BuildStandAloneTests.RuntimeOptionsGetsCopiedToRuntimeConfigJsonForAStandaloneApp" type="Microsoft.DotNet.Tools.Builder.Tests.BuildStandAloneTests" method="RuntimeOptionsGetsCopiedToRuntimeConfigJsonForAStandaloneApp" time="6.2541349" result="Pass" />
+      <test name="Microsoft.DotNet.Tools.Builder.Tests.BuildStandAloneTests.BuildingAStandAloneProjectProducesARuntimeConfigJsonFile" type="Microsoft.DotNet.Tools.Builder.Tests.BuildStandAloneTests" method="BuildingAStandAloneProjectProducesARuntimeConfigJsonFile" time="5.1188827" result="Pass" />
+      <test name="Microsoft.DotNet.Tools.Builder.Tests.BuildStandAloneTests.BuildingAStandAloneProjectProducesARuntimeConfigDevJsonFile" type="Microsoft.DotNet.Tools.Builder.Tests.BuildStandAloneTests" method="BuildingAStandAloneProjectProducesARuntimeConfigDevJsonFile" time="5.2115693" result="Pass" />
+    </collection>
+    <collection total="6" passed="1" failed="5" skipped="0" name="Test collection for Microsoft.DotNet.Tools.Builder.Tests.ProjectToProjectDependenciesIncrementalTest" time="67.275">
+      <test name="Microsoft.DotNet.Tools.Builder.Tests.ProjectToProjectDependenciesIncrementalTest.TestNoDependencyFlag" type="Microsoft.DotNet.Tools.Builder.Tests.ProjectToProjectDependenciesIncrementalTest" method="TestNoDependencyFlag" time="8.971319" result="Pass" />
+      <test name="Microsoft.DotNet.Tools.Builder.Tests.ProjectToProjectDependenciesIncrementalTest.TestIncrementalBuildOfDependencyGraph(testIdentifer: &quot;1&quot;, projectToTouch: &quot;L0&quot;, expectedRebuiltProjects: [&quot;L0&quot;])" type="Microsoft.DotNet.Tools.Builder.Tests.ProjectToProjectDependenciesIncrementalTest" method="TestIncrementalBuildOfDependencyGraph" time="13.1744611" result="Fail">
+        <failure exception-type="Xunit.Sdk.XunitException">
+          <message><![CDATA[
