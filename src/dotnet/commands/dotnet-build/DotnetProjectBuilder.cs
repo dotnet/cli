@@ -156,28 +156,28 @@ namespace Microsoft.DotNet.Tools.Build
             _incrementalManager.CacheIncrementalState(projectNode);
         }
 
-        protected override bool NeedsRebuilding(ProjectGraphNode graphNode)
+        protected override bool SkipBuild(ProjectGraphNode graphNode)
         {
             var result = _incrementalManager.NeedsRebuilding(graphNode);
 
             PrintIncrementalResult(graphNode.ProjectContext.GetDisplayName(), result);
 
-            return result.NeedsRebuilding;
+            return result.SkipBuild;
         }
 
         private void PrintIncrementalResult(string projectName, IncrementalResult result)
         {
-            if (result.NeedsRebuilding)
+            if (result.SkipBuild)
+            {
+                Reporter.Output.WriteLine($"Project {projectName} was previously compiled. Skipping compilation.");
+            }
+            else
             {
                 Reporter.Output.WriteLine($"Project {projectName} will be compiled because {result.Reason}");
                 foreach (var item in result.Items)
                 {
                     Reporter.Verbose.WriteLine($"\t{item}");
                 }
-            }
-            else
-            {
-                Reporter.Output.WriteLine($"Project {projectName} was previously compiled. Skipping compilation.");
             }
         }
     }

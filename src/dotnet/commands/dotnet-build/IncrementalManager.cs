@@ -61,24 +61,24 @@ namespace Microsoft.DotNet.Tools.Build
             var compilerIO = _compilerIoManager.GetCompileIO(graphNode);
 
             var result = CLIChanged(graphNode);
-            if (result.NeedsRebuilding)
+            if (result.SkipBuild)
             {
                 return result;
             }
 
             result = InputItemsChanged(graphNode, compilerIO);
-            if (result.NeedsRebuilding)
+            if (result.SkipBuild)
             {
                 return result;
             }
 
             result = TimestampsChanged(compilerIO);
-            if (result.NeedsRebuilding)
+            if (result.SkipBuild)
             {
                 return result;
             }
 
-            return IncrementalResult.DoesNotNeedRebuild;
+            return IncrementalResult.ShouldSkipBuild;
             
         }
 
@@ -90,13 +90,13 @@ namespace Microsoft.DotNet.Tools.Build
             if (!File.Exists(currentVersionFile))
             {
                 // this CLI does not have a version file; cannot tell if CLI changed
-                return IncrementalResult.DoesNotNeedRebuild;
+                return IncrementalResult.ShouldSkipBuild;
             }
 
             if (!File.Exists(versionFileFromLastCompile))
             {
                 // this is the first compilation; cannot tell if CLI changed
-                return IncrementalResult.DoesNotNeedRebuild;
+                return IncrementalResult.ShouldSkipBuild;
             }
 
             var currentContent = DotnetFiles.ReadAndInterpretVersionFile();
@@ -104,7 +104,7 @@ namespace Microsoft.DotNet.Tools.Build
             var versionsAreEqual = string.Equals(currentContent, File.ReadAllText(versionFileFromLastCompile), StringComparison.OrdinalIgnoreCase);
 
             return versionsAreEqual
-                ? IncrementalResult.DoesNotNeedRebuild
+                ? IncrementalResult.ShouldSkipBuild
                 : new IncrementalResult("the version or bitness of the CLI changed since the last build");
         }
 
@@ -123,13 +123,13 @@ namespace Microsoft.DotNet.Tools.Build
 
             // check non existent items
             var result = CheckMissingIO(compilerIO.Inputs, "inputs");
-            if (result.NeedsRebuilding)
+            if (result.SkipBuild)
             {
                 return result;
             }
 
             result = CheckMissingIO(compilerIO.Outputs, "outputs");
-            if (result.NeedsRebuilding)
+            if (result.SkipBuild)
             {
                 return result;
             }
@@ -140,7 +140,7 @@ namespace Microsoft.DotNet.Tools.Build
             if (!File.Exists(incrementalCacheFile))
             {
                 // no cache present; cannot tell if anything changed
-                return IncrementalResult.DoesNotNeedRebuild;
+                return IncrementalResult.ShouldSkipBuild;
             }
 
             var incrementalCache = IncrementalCache.ReadFromFile(incrementalCacheFile);
@@ -157,7 +157,7 @@ namespace Microsoft.DotNet.Tools.Build
                 return new IncrementalResult("Input items added from last build", diffResult.Additions);
             }
 
-            return IncrementalResult.DoesNotNeedRebuild;
+            return IncrementalResult.ShouldSkipBuild;
         }
 
         private IncrementalResult CheckMissingIO(IEnumerable<string> items, string itemsType)
@@ -166,7 +166,7 @@ namespace Microsoft.DotNet.Tools.Build
 
             return missingItems.Any()
                 ? new IncrementalResult($"expected {itemsType} are missing", missingItems)
-                : IncrementalResult.DoesNotNeedRebuild;
+                : IncrementalResult.ShouldSkipBuild;
         }
 
         private IncrementalResult TimestampsChanged(CompilerIO compilerIO)
@@ -189,7 +189,7 @@ namespace Microsoft.DotNet.Tools.Build
 
             return newInputs.Any()
                 ? new IncrementalResult("inputs were modified", newInputs)
-                : IncrementalResult.DoesNotNeedRebuild;
+                : IncrementalResult.ShouldSkipBuild;
         }
 
         public void CacheIncrementalState(ProjectGraphNode graphNode)

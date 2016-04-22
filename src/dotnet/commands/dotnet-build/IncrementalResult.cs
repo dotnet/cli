@@ -8,26 +8,26 @@ namespace Microsoft.DotNet.Tools.Build
 {
     internal class IncrementalResult
     {
-        public static IncrementalResult DoesNotNeedRebuild = new IncrementalResult(false, "", Enumerable.Empty<string>());
+        public static IncrementalResult ShouldSkipBuild = new IncrementalResult(true, "", Enumerable.Empty<string>());
 
-        public bool NeedsRebuilding { get; }
+        public bool SkipBuild { get; }
         public string Reason { get; }
         public IEnumerable<string> Items { get; }
 
-        private IncrementalResult(bool needsRebuilding, string reason, IEnumerable<string> items)
+        private IncrementalResult(bool skipBuild, string reason, IEnumerable<string> items)
         {
-            NeedsRebuilding = needsRebuilding;
+            SkipBuild = skipBuild;
             Reason = reason;
             Items = items;
         }
 
         public IncrementalResult(string reason)
-            : this(true, reason, Enumerable.Empty<string>())
+            : this(false, reason, Enumerable.Empty<string>())
         {
         }
 
         public IncrementalResult(string reason, IEnumerable<string> items)
-            : this(true, reason, items)
+            : this(false, reason, items)
         {
         }
     }

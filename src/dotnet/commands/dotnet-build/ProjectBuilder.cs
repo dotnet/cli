@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.Tools.Build
             return null;
         }
 
-        protected virtual bool NeedsRebuilding(ProjectGraphNode projectNode)
+        protected virtual bool SkipBuild(ProjectGraphNode projectNode)
         {
             return true;
         }
@@ -72,14 +72,14 @@ namespace Microsoft.DotNet.Tools.Build
                 return CompilationResult.IncrementalSkip;
             }
 
-            if (NeedsRebuilding(projectNode))
-            {
-                return RunCompile(projectNode);
-            }
-            else
+            if (SkipBuild(projectNode))
             {
                 ProjectSkiped(projectNode);
                 return CompilationResult.IncrementalSkip;
+            }
+            else
+            {
+                return RunCompile(projectNode);
             }
         }
     }
