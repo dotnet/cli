@@ -205,16 +205,6 @@ namespace Microsoft.DotNet.Cli.Build
                 VersionSuffix = s_testPackageBuildVersionSuffix,
                 Clean = false,
                 Frameworks = new [] { "netstandard1.5" }
-            },
-            new TestPackageProject()
-            {
-                Name = "dotnet-compile-fsc",
-                IsTool = true,
-                Path = "src/dotnet-compile-fsc",
-                IsApplicable = true,
-                VersionSuffix = s_testPackageBuildVersionSuffix,
-                Clean = true,
-                Frameworks = new [] { "netcoreapp1.0" }
             }
         };
     }

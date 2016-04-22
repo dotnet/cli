@@ -22,8 +22,7 @@ namespace Microsoft.DotNet.Cli.Build
             "Microsoft.Extensions.DependencyModel",
             "Microsoft.Extensions.Testing.Abstractions",
             "Microsoft.DotNet.Compiler.Common",
-            "Microsoft.DotNet.Files",
-            "dotnet-compile-fsc"
+            "Microsoft.DotNet.Files"
         };
 
         [Target(nameof(PackageTargets.CopyCLISDKLayout),
