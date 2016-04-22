@@ -11,7 +11,8 @@ namespace Microsoft.DotNet.TestFramework
 {
     public class TestInstance
     {
-        private static readonly ICollection<string> BuildArtifactBlackList = new List<string>() {".IncrementalCache", ".SDKVersion"};
+        // made tolower because the rest of the class works with normalized tolower strings
+        private static readonly IEnumerable<string> BuildArtifactBlackList = new List<string>() {".IncrementalCache", ".SDKVersion"}.Select(s => s.ToLower());
 
         private string _testDestination;
         private string _testAssetRoot;
@@ -111,7 +112,7 @@ namespace Microsoft.DotNet.TestFramework
                                      var isArtifact = file.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}") 
                                             || file.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}");
 
-                                     var isBlackListed = BuildArtifactBlackList.Any(b => file.Contains(b.ToLower()));
+                                     var isBlackListed = BuildArtifactBlackList.Any(b => file.Contains(b));
 
                                      return isArtifact && !isBlackListed;
                                  });
