@@ -132,7 +132,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         }
 
         [Fact]
-        public void TestRebuilRenamedSource()
+        public void TestRebuildRenamedSource()
         {
             CreateTestInstance();
             var buildResult = BuildProject();
@@ -153,7 +153,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         }
 
         [Fact]
-        public void TestRebuilDeletedSourceAfterCliChanged()
+        public void TestRebuildDeletedSourceAfterCliChanged()
         {
             CreateTestInstance();
             BuildProject().Should().HaveCompiledProject(MainProject, _appFrameworkFullName);
