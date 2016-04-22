@@ -291,7 +291,7 @@ namespace Microsoft.DotNet.Cli.Build
             }
             Directory.CreateDirectory(Dirs.Stage1);
 
-            CopySharedHost(Dirs.Stage1);
+            CopySharedHost(c, Dirs.Stage1);
             PublishSharedFramework(c, Dirs.Stage1, DotNetCli.Stage0);
             var result = CompileCliSdk(c,
                 dotnet: DotNetCli.Stage0,
@@ -319,7 +319,7 @@ namespace Microsoft.DotNet.Cli.Build
             Directory.CreateDirectory(Dirs.Stage2);
 
             PublishSharedFramework(c, Dirs.Stage2, DotNetCli.Stage1);
-            CopySharedHost(Dirs.Stage2);
+            CopySharedHost(c, Dirs.Stage2);
             var result = CompileCliSdk(c,
                 dotnet: DotNetCli.Stage1,
                 outputDir: Dirs.Stage2);
@@ -428,15 +428,18 @@ namespace Microsoft.DotNet.Cli.Build
             FS.RmFilesInDirRecursive(directory, "*.pdb");
         }
 
-        private static void CopySharedHost(string outputDir)
+        private static void CopySharedHost(BuildTargetContext c, string outputDir)
         {
             // corehost will be renamed to dotnet at some point and then this can be removed.
             File.Copy(
                 Path.Combine(Dirs.Corehost, CoreHostBaseName),
                 Path.Combine(outputDir, $"dotnet{Constants.ExeSuffix}"), true);
+            
+            string versionedFxrDir = Path.Combine(outputDir, "host", "fxr", c.BuildContext.Get<BuildVersion>("BuildVersion").NuGetVersion);
+            Directory.CreateDirectory(versionedFxrDir);
             File.Copy(
                 Path.Combine(Dirs.Corehost, DotnetHostFxrBaseName),
-                Path.Combine(outputDir, DotnetHostFxrBaseName), true);
+                Path.Combine(versionedFxrDir, DotnetHostFxrBaseName), true);
         }
 
         public static void PublishSharedFramework(BuildTargetContext c, string outputDir, DotNetCli dotnetCli)

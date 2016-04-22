@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli.Build.Framework;
@@ -92,11 +93,16 @@ namespace Microsoft.DotNet.Cli.Build
 
             Directory.CreateDirectory(sharedHostRoot);
 
-            foreach (var file in Directory.GetFiles(Dirs.Stage2, "*", SearchOption.TopDirectoryOnly))
+            string srcHostDir = Path.Combine(Dirs.Stage2, "host");
+            string destHostDir = Path.Combine(sharedHostRoot, "host");
+            foreach (var file in Directory.GetFiles(Dirs.Stage2, "*", SearchOption.TopDirectoryOnly)
+                         .Concat(Directory.GetFiles(srcHostDir, "*", SearchOption.AllDirectories)))
             {
                 var destFile = file.Replace(Dirs.Stage2, sharedHostRoot);
+                Directory.CreateDirectory(Path.GetDirectoryName(destFile));
                 File.Copy(file, destFile, true);
             }
+
             FixPermissions(sharedHostRoot);
 
             c.BuildContext["SharedHostPublishRoot"] = sharedHostRoot;
