@@ -8,7 +8,7 @@ namespace Microsoft.DotNet.Tools.Build
 {
     internal class IncrementalResult
     {
-        public static IncrementalResult DoesNotNeedRebuild = new IncrementalResult(false, "", Enumerable.Empty<string>());
+        public static readonly IncrementalResult DoesNotNeedRebuild = new IncrementalResult(false, "", Enumerable.Empty<string>());
 
         public bool NeedsRebuilding { get; }
         public string Reason { get; }
