@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel.Server;
 using Microsoft.DotNet.Tools.Build;
@@ -40,6 +41,8 @@ namespace Microsoft.DotNet.Cli
         public static int Main(string[] args)
         {
             DebugHelper.HandleDebugSwitch(ref args);
+
+            InitializeProcess();
 
             try
             {
@@ -136,6 +139,16 @@ namespace Microsoft.DotNet.Cli
 
             return exitCode;
 
+        }
+
+        /// <summary>
+        /// Performs initialization that must be done before anything else in the process.
+        /// </summary>
+        private static void InitializeProcess()
+        {
+            // by default, .NET Core doesn't have all code pages needed for Console apps.
+            // see the .NET Core Notes in https://msdn.microsoft.com/en-us/library/system.diagnostics.process(v=vs.110).aspx
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
 
         internal static bool TryGetBuiltInCommand(string commandName, out Func<string[], int> builtInCommand)
