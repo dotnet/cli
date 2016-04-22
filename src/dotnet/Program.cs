@@ -41,11 +41,9 @@ namespace Microsoft.DotNet.Cli
         public static int Main(string[] args)
         {
             DebugHelper.HandleDebugSwitch(ref args);
-
-            AssemblyLoadContext.Default.SetProfileOptimizationRoot(
-                new MulticoreJitProfilePathCalculator().MulticoreJitProfilePath);
-            AssemblyLoadContext.Default.StartProfileOptimization("dotnet");
-
+            
+            new MulticoreJitActivator().TryActivateMulticoreJit();
+            
             try
             {
                 return Program.ProcessArgs(args, new Telemetry());
