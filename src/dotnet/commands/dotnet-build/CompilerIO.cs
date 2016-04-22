@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.Tools.Build
             return new DiffResult(additions, deletions);
         }
 
-        internal struct DiffResult
+        internal class DiffResult
         {
             public IEnumerable<string> Additions { get; private set; }
             public IEnumerable<string> Deletions { get; private set; }
