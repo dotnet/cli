@@ -8,7 +8,7 @@ namespace Microsoft.DotNet.Tools.Build
 {
     internal class IncrementalResult
     {
-        public static IncrementalResult ShouldSkipBuild = new IncrementalResult(true, "", Enumerable.Empty<string>());
+        public static readonly IncrementalResult ShouldSkipBuild = new IncrementalResult(true, "", Enumerable.Empty<string>());
 
         public bool SkipBuild { get; }
         public string Reason { get; }
