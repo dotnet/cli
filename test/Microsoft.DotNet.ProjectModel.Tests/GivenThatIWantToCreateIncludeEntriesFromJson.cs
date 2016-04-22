@@ -73,15 +73,17 @@ namespace Microsoft.DotNet.ProjectModel.Tests
 
             var project = GetProject(json);
 
-            var embedInclude = GetIncludeFiles(project.GetCompilerOptions(null, null).CompileInclude, "/").ToArray();
+            var compileInclude = GetIncludeFiles(project.GetCompilerOptions(null, null).CompileInclude, "/").ToArray();
 
-            embedInclude.Length.Should().Be(2);
+            compileInclude.Should().HaveCount(2);
 
-            embedInclude[0].TargetPath.Should().Be(PathUtility.GetPathWithDirectorySeparator("files/file1.cs"));
-            embedInclude[0].SourcePath.Should().Contain(PathUtility.GetPathWithDirectorySeparator("files/file1.cs"));
+            compileInclude.Should().Contain(
+                entry => entry.TargetPath == PathUtility.GetPathWithDirectorySeparator("files/file1.cs") &&
+                    entry.SourcePath.Contains(PathUtility.GetPathWithDirectorySeparator("files/file1.cs")));
 
-            embedInclude[1].TargetPath.Should().Be(PathUtility.GetPathWithDirectorySeparator("files/file2.cs"));
-            embedInclude[1].SourcePath.Should().Contain(PathUtility.GetPathWithDirectorySeparator("files/file2.cs"));
+            compileInclude.Should().Contain(
+                entry => entry.TargetPath == PathUtility.GetPathWithDirectorySeparator("files/file2.cs") &&
+                    entry.SourcePath.Contains(PathUtility.GetPathWithDirectorySeparator("files/file2.cs")));
         }
 
         [Fact]
@@ -129,15 +131,17 @@ namespace Microsoft.DotNet.ProjectModel.Tests
 
             var project = GetProject(json);
 
-            var embedInclude = GetIncludeFiles(project.GetCompilerOptions(null, null).CopyToOutputInclude, "/").ToArray();
+            var copyToOutputInclude = GetIncludeFiles(project.GetCompilerOptions(null, null).CopyToOutputInclude, "/").ToArray();
 
-            embedInclude.Length.Should().Be(2);
+            copyToOutputInclude.Should().HaveCount(2);
 
-            embedInclude[0].TargetPath.Should().Be(PathUtility.GetPathWithDirectorySeparator("files/file1.txt"));
-            embedInclude[0].SourcePath.Should().Contain(PathUtility.GetPathWithDirectorySeparator("files/file1.txt"));
+            copyToOutputInclude.Should().Contain(
+                entry => entry.TargetPath == PathUtility.GetPathWithDirectorySeparator("files/file1.txt") &&
+                    entry.SourcePath.Contains(PathUtility.GetPathWithDirectorySeparator("files/file1.txt")));
 
-            embedInclude[1].TargetPath.Should().Be(PathUtility.GetPathWithDirectorySeparator("files/file2.txt"));
-            embedInclude[1].SourcePath.Should().Contain(PathUtility.GetPathWithDirectorySeparator("files/file2.txt"));
+            copyToOutputInclude.Should().Contain(
+                entry => entry.TargetPath == PathUtility.GetPathWithDirectorySeparator("files/file2.txt") &&
+                    entry.SourcePath.Contains(PathUtility.GetPathWithDirectorySeparator("files/file2.txt")));
         }
 
         [Fact]
@@ -156,15 +160,17 @@ namespace Microsoft.DotNet.ProjectModel.Tests
 
             var project = GetProject(json);
 
-            var embedInclude = GetIncludeFiles(project.PublishOptions, "/").ToArray();
+            var publishOptions = GetIncludeFiles(project.PublishOptions, "/").ToArray();
 
-            embedInclude.Length.Should().Be(2);
+            publishOptions.Should().HaveCount(2);
 
-            embedInclude[0].TargetPath.Should().Be(PathUtility.GetPathWithDirectorySeparator("files/pfile1.txt"));
-            embedInclude[0].SourcePath.Should().Contain(PathUtility.GetPathWithDirectorySeparator("files/pfile1.txt"));
+            publishOptions.Should().Contain(
+                entry => entry.TargetPath == PathUtility.GetPathWithDirectorySeparator("files/pfile1.txt") &&
+                    entry.SourcePath.Contains(PathUtility.GetPathWithDirectorySeparator("files/pfile1.txt")));
 
-            embedInclude[1].TargetPath.Should().Be(PathUtility.GetPathWithDirectorySeparator("files/pfile2ex.txt"));
-            embedInclude[1].SourcePath.Should().Contain(PathUtility.GetPathWithDirectorySeparator("files/pfile2ex.txt"));
+            publishOptions.Should().Contain(
+                entry => entry.TargetPath == PathUtility.GetPathWithDirectorySeparator("files/pfile2ex.txt") &&
+                    entry.SourcePath.Contains(PathUtility.GetPathWithDirectorySeparator("files/pfile2ex.txt")));
         }
 
         private Project GetProject(JObject json, ProjectReaderSettings settings = null)
