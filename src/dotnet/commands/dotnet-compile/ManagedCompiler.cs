@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.Cli.Utils;
@@ -189,6 +190,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             Reporter errorReporter = Reporter.Error;
             Reporter outputReporter = Reporter.Output;
 
+            Thread.Sleep(1000);
             CommandResult result = _commandFactory.Create($"compile-{compilerName}", new[] { $"@{rsp}" })
                 .OnErrorLine(line => HandleCompilerOutputLine(line, context, diagnostics, errorReporter))
                 .OnOutputLine(line => HandleCompilerOutputLine(line, context, diagnostics, outputReporter))
