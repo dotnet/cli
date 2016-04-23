@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.Cli.Build
             "vbc.exe"
         };
 
-        public string HostPackagePlatformRid => HostPackageSupportedRids[
+        public static string HostPackagePlatformRid => HostPackageSupportedRids[
                              (PlatformServices.Default.Runtime.OperatingSystemPlatform == Platform.Windows)
                              ? $"win7-{PlatformServices.Default.Runtime.RuntimeArchitecture}"
                              : PlatformServices.Default.Runtime.GetRuntimeIdentifier()];
@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.Cli.Build
             { "osx.10.10-x64", "osx.10.10-x64" },
             { "osx.10.11-x64", "osx.10.10-x64" },
             { "ubuntu.14.04-x64", "ubuntu.14.04-x64" },
-            { "centos.7-x64", "centos.7-x64" },
+            { "centos.7-x64", "rhel.7-x64" },
             { "rhel.7-x64", "rhel.7-x64" },
             { "rhel.7.2-x64", "rhel.7-x64" },
             { "debian.8-x64", "debian.8-x64" }
@@ -137,7 +137,7 @@ namespace Microsoft.DotNet.Cli.Build
 
             // Clean out before publishing locked binaries
             FS.Rmdir(Dirs.CorehostLocked);
-            DotNetCli.Stage0.Publish("--output", Dirs.CorehostLocked, "--no-build")
+            DotNetCli.Stage0.Publish("--output", Dirs.CorehostLocked, "--no-build", "-r", defaultRid)
                 .WorkingDirectory(tempPjDirectory)
                 .Execute()
                 .EnsureSuccessful();
@@ -276,9 +276,10 @@ namespace Microsoft.DotNet.Cli.Build
             }
             foreach (var item in buildVersion.LatestHostPackages)
             {
-                if (Directory.GetFiles(Dirs.CorehostLocalPackages, $"runtime.{HostPackagePlatformRid}.{item.Key}.{item.Value}.nupkg").Length == 0)
+                var fileFilter = $"runtime.{HostPackagePlatformRid}.{item.Key}.{item.Value}.nupkg";
+                if (Directory.GetFiles(Dirs.CorehostLocalPackages, fileFilter).Length == 0)
                 {
-                    throw new BuildFailureException($"Nupkg for {item.Key}.{item.Value} was not created.");
+                    throw new BuildFailureException($"Nupkg for {fileFilter} was not created.");
                 }
             }
             return c.Success();
