@@ -34,6 +34,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
                 };
             }
         }
+
         public static IEnumerable<object> GraphProjectsWithFrameworks
         {
             get
@@ -158,7 +159,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
                 {
                     foreach (var framework in frameworks)
                     {
-                        c.Measure(() => Run(new BuildCommand(i.TestRoot, framework:framework, noDependencies: true, buildProfile: false, verbose: false)));
+                        c.Measure(() => Run(new BuildCommand(i.TestRoot, framework:framework, noDependencies: true, buildProfile: false)));
                     }
                 }
             }, variation);
@@ -176,7 +177,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
                 {
                     foreach (var framework in frameworks)
                     {
-                        c.Measure(() => Run(new BuildCommand(i.TestRoot, framework: framework, noDependencies: true, buildProfile: false, verbose: false)));
+                        c.Measure(() => Run(new BuildCommand(i.TestRoot, framework: framework, noDependencies: true, buildProfile: false)));
                     }
                 }
                 foreach (var instance in instances)

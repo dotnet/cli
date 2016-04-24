@@ -1,5 +1,5 @@
-param( $versions)
-$qmode = $false;
+param($versions)
+$qmode = $true;
 
 function cleanpath()
 {
@@ -8,11 +8,13 @@ function cleanpath()
 foreach($ver in $versions)
 {
     cleanpath;
+    rm bin -rec -for
+    rm obj -rec -for
     if ($ver -ne "dev")
     {
         Write-Host -ForegroundColor Green "Installing $ver"
         $dotnetPath = "$PSScriptRoot\.dotnet\$ver"
-        if (!(test-path ".dotnet"))
+        if (!(test-path $dotnetPath))
         {
             & ($PSScriptRoot+"\..\..\scripts\obtain\install.ps1") preview $ver $dotnetPath;
         }

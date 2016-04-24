@@ -12,12 +12,12 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
     {
         protected void Build(string project)
         {
-            Run(new BuildCommand(project, verbose: false, buildProfile: false));
+            Run(new BuildCommand(project, buildProfile: false));
         }
 
         protected void Run(TestCommand command)
         {
-            command.ExecuteWithCapturedOutput().Should().Pass();
+            command.Execute().Should().Pass();
         }
 
         protected void RemoveBin(string project)
@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         {
             var fullname = callingMethod + (variation != "" ? "/" + variation : "");
             var context = new PerformanceIterationContext();
-           // action(context);
+            //action(context);
 
             TimeSpan totalTime;
             for (int i = 0; i < iterations; i++)
