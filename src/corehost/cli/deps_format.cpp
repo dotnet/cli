@@ -387,4 +387,10 @@ bool deps_json_t::load(bool portable, const pal::string_t& deps_path, const rid_
         trace::error(_X("A JSON parsing exception occurred in [%s]: %s"), deps_path.c_str(), jes.c_str());
         return false;
     }
+    catch (const std::exception& e)
+    {
+        pal::string_t es = pal::to_palstring(e.what());
+        trace::error(_X("A JSON parsing exception occurred in [%s]: %s"), deps_path.c_str(), es.c_str());
+        return false;
+    }
 }

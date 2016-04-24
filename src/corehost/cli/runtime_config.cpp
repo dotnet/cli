@@ -124,6 +124,12 @@ bool runtime_config_t::ensure_dev_config_parsed()
         trace::error(_X("A JSON parsing exception occurred in [%s]: %s"), m_dev_path.c_str(), jes.c_str());
         return false;
     }
+    catch (const std::exception& e)
+    {
+        pal::string_t es = pal::to_palstring(e.what());
+        trace::error(_X("A JSON parsing exception occurred in [%s]: %s"), m_dev_path.c_str(), es.c_str());
+        return false;
+    }
 
     return true;
 }
@@ -169,6 +175,12 @@ bool runtime_config_t::ensure_parsed()
     {
         pal::string_t jes = pal::to_palstring(je.what());
         trace::error(_X("A JSON parsing exception occurred in [%s]: %s"), m_path.c_str(), jes.c_str());
+        return false;
+    }
+    catch (const std::exception& e)
+    {
+        pal::string_t es = pal::to_palstring(e.what());
+        trace::error(_X("A JSON parsing exception occurred in [%s]: %s"), m_path.c_str(), es.c_str());
         return false;
     }
     return true;
