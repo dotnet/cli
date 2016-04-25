@@ -30,9 +30,9 @@ namespace Microsoft.DotNet.Tools.Build
             _preconditions.Add($"[Unknown Compiler] Project {projectName} is using unknown compiler {compilerName}.");
         }
 
-        public void AddPathProbingPrecondition(string projectName, string commandName)
+        public void AddPathProbingPrecondition(string projectName, ICommand command)
         {
-            _preconditions.Add($"[PATH Probing] Project {projectName} is loading tool \"{commandName}\" from PATH");
+            _preconditions.Add($"[PATH Probing] Project {projectName} is loading tool \"{command.CommandName} {command.CommandArgs}\" from PATH");
         }
 
         public void AddForceUnsafePrecondition()
