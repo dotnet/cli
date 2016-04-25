@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using Microsoft.DotNet.Cli.Build.Framework;
@@ -24,6 +26,8 @@ namespace Microsoft.DotNet.Cli.Build
 
         private static string SharedFrameworkNugetVersion { get; set; }
 
+        private static List<string> _latestBlobs;
+
         [Target]
         public static BuildTargetResult InitPublish(BuildTargetContext c)
         {
@@ -45,15 +49,63 @@ namespace Microsoft.DotNet.Cli.Build
         [Environment("PUBLISH_TO_AZURE_BLOB", "1", "true")] // This is set by CI systems
         public static BuildTargetResult Publish(BuildTargetContext c)
         {
+            if (ShouldPublishToLatest())
+            {
+                string targetContainer = $"{Channel}/Binaries/Latest/";
+
+                foreach (string blob in _latestBlobs)
+                    AzurePublisherTool.CopyBlob(blob.Replace("/dotnet/", ""), (targetContainer + Path.GetFileName(blob)).Replace(CliNuGetVersion, "latest").Replace(SharedFrameworkNugetVersion, "latest"));
+
+                PublishLatestCliVersionTextFile(c);
+                PublishLatestSharedFrameworkVersionTextFile(c);
+            }
+
             return c.Success();
+        }
+
+        private static bool ShouldPublishToLatest()
+        {
+             Dictionary<string, bool> runtimes = new Dictionary<string, bool>()
+             {
+                 {"win7-x64", false },
+                 {"win7-x86", false },
+                 {"osx.10.10", false },
+                 {"rhel.7", false },
+                 {"ubuntu.14.04", false },
+             };
+
+            _latestBlobs = new List<string>(AzurePublisherTool.ListBlobs($"{Channel}/Binaries/{CliNuGetVersion}/"));
+
+            foreach (string file in _latestBlobs)
+            {
+                string name = Path.GetFileName(file);
+                string key = string.Empty;
+
+                foreach (string runtime in runtimes.Keys)
+                {
+                    if (name.StartsWith($"runtime.{runtime}"))
+                    {
+                        key = runtime;
+                        break;
+                    }
+                }
+
+                runtimes[key] = true;
+            }
+
+            foreach (string key in runtimes.Keys)
+            {
+                if (!runtimes[key])
+                    return false;
+            }
+
+            return true;
         }
 
         [Target(
             nameof(PublishTargets.PublishInstallerFilesToAzure),
             nameof(PublishTargets.PublishArchivesToAzure),
             nameof(PublishTargets.PublishDebFilesToDebianRepo),
-            nameof(PublishTargets.PublishLatestCliVersionTextFile),
-            nameof(PublishTargets.PublishLatestSharedFrameworkVersionTextFile),
             nameof(PublishTargets.PublishCoreHostPackages),
             nameof(PublishTargets.PublishCliVersionBadge))]
         public static BuildTargetResult PublishArtifacts(BuildTargetContext c) => c.Success();
@@ -87,11 +139,8 @@ namespace Microsoft.DotNet.Cli.Build
         public static BuildTargetResult PublishCliVersionBadge(BuildTargetContext c)
         {
             var versionBadge = c.BuildContext.Get<string>("VersionBadge");
-            var latestVersionBadgeBlob = $"{Channel}/Binaries/Latest/{Path.GetFileName(versionBadge)}";
             var versionBadgeBlob = $"{Channel}/Binaries/{CliNuGetVersion}/{Path.GetFileName(versionBadge)}";
-
             AzurePublisherTool.PublishFile(versionBadgeBlob, versionBadge);
-            AzurePublisherTool.PublishFile(latestVersionBadgeBlob, versionBadge);
             return c.Success();
         }
 
