@@ -15,6 +15,13 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
 {
     public class PublishDesktopTests : TestBase
     {
+        private TestAssetsManager _testAssetsManager;
+
+        public PublishDesktopTests()
+        {
+            _testAssetsManager = GetTestGroupTestAssetsManager("DesktopTestProjects");
+        }
+
         [WindowsOnlyTheory]
         [InlineData(null, null)]
         [InlineData("win7-x64", "the-win-x64-version.txt")]
@@ -26,7 +33,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
                 expectedOutputName = $"the-win-{RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant()}-version.txt";
             }
 
-            var testInstance = TestAssetsManager.CreateTestInstance(Path.Combine("..", "DesktopTestProjects", "DesktopAppWithNativeDep"))
+            var testInstance = _testAssetsManager.CreateTestInstance("DesktopAppWithNativeDep")
                 .WithLockFiles();
 
             var publishCommand = new PublishCommand(testInstance.TestRoot, runtime: runtime);
@@ -123,9 +130,28 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             }
         }
 
-        private static TestInstance GetTestInstance([CallerMemberName] string callingMethod = "")
+
+        [WindowsOnlyFact]
+        public async Task DesktopApp_WithRuntimes_PublishedSplitPackageAssets()
         {
-            return TestAssetsManager.CreateTestInstance(Path.Combine("..", "DesktopTestProjects", "DesktopKestrelSample"), callingMethod);
+            var testInstance = _testAssetsManager.CreateTestInstance("DesktopAppWithRuntimes")
+                .WithLockFiles();
+
+            var publishCommand = new PublishCommand(testInstance.TestRoot, runtime: "win7-x64");
+            var result = await publishCommand.ExecuteAsync();
+
+            result.Should().Pass();
+
+            // Test the output
+            var outputDir = publishCommand.GetOutputDirectory(portable: false);
+            System.Console.WriteLine(outputDir);
+            outputDir.Should().HaveFile("api-ms-win-core-file-l1-1-0.dll");
+            outputDir.Should().HaveFile(publishCommand.GetOutputExecutable());
+        }
+
+        private TestInstance GetTestInstance([CallerMemberName] string callingMethod = "")
+        {
+            return _testAssetsManager.CreateTestInstance("DesktopKestrelSample", callingMethod);
         }
     }
 }
