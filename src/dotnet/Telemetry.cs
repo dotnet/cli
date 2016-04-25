@@ -9,7 +9,7 @@ namespace Microsoft.DotNet.Cli
 {
     public class Telemetry : ITelemetry
     {
-        public const double TimeoutInSeconds = 1.0;
+        public const double TimeoutInSeconds = 0.100;
 
         private bool _isInitialized = false;
         private TelemetryClient _client = null;
