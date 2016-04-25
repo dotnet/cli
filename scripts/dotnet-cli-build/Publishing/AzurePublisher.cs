@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using Microsoft.DotNet.Cli.Build.Framework;
@@ -21,7 +23,6 @@ namespace Microsoft.DotNet.Cli.Build
         public AzurePublisher()
         {
             _connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING").Trim('"');
-
             _blobContainer = GetDotnetBlobContainer(_connectionString);
         }
 
@@ -33,26 +34,16 @@ namespace Microsoft.DotNet.Cli.Build
             return blobClient.GetContainerReference(s_dotnetBlobContainerName);
         }
 
-        public void PublishInstallerFileAndLatest(string installerFile, string channel, string version)
+        public void PublishInstallerFile(string installerFile, string channel, string version)
         {
             var installerFileBlob = CalculateInstallerBlob(installerFile, channel, version);
-
-            var latestInstallerFileName = installerFile.Replace(version, "latest");
-            var latestInstallerFileBlob = CalculateInstallerBlob(latestInstallerFileName, channel, "Latest");
-
             PublishFile(installerFileBlob, installerFile);
-            PublishFile(latestInstallerFileBlob, installerFile);
         }
 
-        public void PublishArchiveAndLatest(string archiveFile, string channel, string version)
+        public void PublishArchive(string archiveFile, string channel, string version)
         {
             var archiveFileBlob = CalculateArchiveBlob(archiveFile, channel, version);
-
-            var latestArchiveFileName = archiveFile.Replace(version, "latest");
-            var latestArchiveFileBlob = CalculateArchiveBlob(latestArchiveFileName, channel, "Latest");
-
             PublishFile(archiveFileBlob, archiveFile);
-            PublishFile(latestArchiveFileBlob, archiveFile);
         }
 
         public void PublishFile(string blob, string file)
@@ -63,6 +54,21 @@ namespace Microsoft.DotNet.Cli.Build
             SetBlobPropertiesBasedOnFileType(blockBlob);
         }
 
+        public void CopyBlob(string sourceBlob, string targetBlob)
+        {
+            CloudBlockBlob source = _blobContainer.GetBlockBlobReference(sourceBlob);
+            CloudBlockBlob target = _blobContainer.GetBlockBlobReference(targetBlob);
+
+            // Create the empty blob
+            using (MemoryStream ms = new MemoryStream())
+            {
+                target.UploadFromStreamAsync(ms).Wait();
+            }
+
+            // Copy actual blob data
+            target.StartCopyAsync(source).Wait();
+        }
+
         private void SetBlobPropertiesBasedOnFileType(CloudBlockBlob blockBlob)
         {
             if (Path.GetExtension(blockBlob.Uri.AbsolutePath.ToLower()) == ".svg")
@@ -71,6 +77,49 @@ namespace Microsoft.DotNet.Cli.Build
                 blockBlob.Properties.CacheControl = "no-cache";
                 blockBlob.SetPropertiesAsync().Wait();
             }
+        }
+
+        public IEnumerable<string> ListBlobs(string virtualDirectory)
+        {
+            CloudBlobDirectory blobDir = _blobContainer.GetDirectoryReference(virtualDirectory);
+            BlobContinuationToken continuationToken = new BlobContinuationToken();
+
+            var blobFiles = blobDir.ListBlobsSegmentedAsync(continuationToken).Result;
+            return blobFiles.Results.Select(bf => bf.Uri.PathAndQuery);
+        }
+
+        public string AcquireLeaseOnContainer()
+        {
+            System.Threading.Tasks.Task<string> task = _blobContainer.AcquireLeaseAsync(TimeSpan.FromMinutes(1), null);
+            task.Wait(); 
+            return task.Result;
+        }
+
+        public void ReleaseLeaseOnContainer(string leaseId)
+        {
+            AccessCondition ac = new AccessCondition() { LeaseId = leaseId };
+            _blobContainer.ReleaseLeaseAsync(ac).Wait();
+        }
+
+        public bool IsLatestSpecifiedVersion(string version)
+        {
+            System.Threading.Tasks.Task<bool> task = _blobContainer.GetBlockBlobReference(version).ExistsAsync();
+            task.Wait();
+            return task.Result;
+        }
+
+        public void DropLatestSpecifiedVersion(string version)
+        {
+            CloudBlockBlob blob = _blobContainer.GetBlockBlobReference(version);
+            using (MemoryStream ms = new MemoryStream())
+            {
+                blob.UploadFromStreamAsync(ms).Wait();
+            }
+        }
+
+        public void DeleteBlob(string path)
+        {
+            _blobContainer.GetBlockBlobReference(path).DeleteAsync().Wait();
         }
 
         public string CalculateInstallerUploadUrl(string installerFile, string channel, string version)
