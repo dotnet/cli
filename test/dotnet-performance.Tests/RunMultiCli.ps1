@@ -1,5 +1,4 @@
-param($versions)
-$qmode = $false;
+param($versions,$qmode)
 
 function cleanpath()
 {
