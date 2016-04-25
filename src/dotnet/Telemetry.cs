@@ -9,6 +9,8 @@ namespace Microsoft.DotNet.Cli
 {
     public class Telemetry : ITelemetry
     {
+        public const double TimeoutInSeconds = 1.0;
+
         private bool _isInitialized = false;
         private TelemetryClient _client = null;
 
@@ -17,6 +19,8 @@ namespace Microsoft.DotNet.Cli
 
         private const string InstrumentationKey = "74cc1c9e-3e6e-4d05-b3fc-dde9101d0254";
         private const string TelemetryOptout = "DOTNET_CLI_TELEMETRY_OPTOUT";
+        private const string ContinousIntegrationFlag = "CI_TEST_MACHINE";
+        private const string CITestMachine = "CI Test Machine";
         private const string OSVersion = "OS Version";
         private const string OSPlatform = "OS Platform";
         private const string RuntimeId = "Runtime Id";
@@ -37,6 +41,7 @@ namespace Microsoft.DotNet.Cli
                 _client.InstrumentationKey = InstrumentationKey;
                 _client.Context.Session.Id = Guid.NewGuid().ToString();
 
+                var isCITestMachine = Env.GetEnvironmentVariableAsBool(ContinousIntegrationFlag);
                 var runtimeEnvironment = PlatformServices.Default.Runtime;
                 _client.Context.Device.OperatingSystem = runtimeEnvironment.OperatingSystem;
 
@@ -45,6 +50,7 @@ namespace Microsoft.DotNet.Cli
                 _commonProperties.Add(OSPlatform, runtimeEnvironment.OperatingSystemPlatform.ToString());
                 _commonProperties.Add(RuntimeId, runtimeEnvironment.GetRuntimeIdentifier());
                 _commonProperties.Add(ProductVersion, Product.Version);
+                _commonProperties.Add(CITestMachine, isCITestMachine.ToString());
                 _commonMeasurements = new Dictionary<string, double>();
 
                 _isInitialized = true;

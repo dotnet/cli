@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel.Server;
 using Microsoft.DotNet.Tools.Build;
@@ -111,6 +112,18 @@ namespace Microsoft.DotNet.Cli
                 command = "help";
             }
 
+            var hashedargs = string.Join(",", args.Select(x => HashHelper.sha256_hash(x)));
+            var task = Task.Factory.StartNew(
+                () => telemetryClient.TrackEvent(
+                    command,
+                    new Dictionary<string, string>
+                    {
+                        ["HashedArgs"] = hashedargs
+                    },
+                    null
+                )
+            );
+
             int exitCode;
             Func<string[], int> builtIn;
             if (s_builtIns.TryGetValue(command, out builtIn))
@@ -126,13 +139,7 @@ namespace Microsoft.DotNet.Cli
                 exitCode = result.ExitCode;
             }
 
-            telemetryClient.TrackEvent(
-                command,
-                null,
-                new Dictionary<string, double>
-                {
-                    ["ExitCode"] = exitCode
-                });
+            task.Wait(TimeSpan.FromSeconds(Telemetry.TimeoutInSeconds));
 
             return exitCode;
 
