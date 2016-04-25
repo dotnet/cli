@@ -1,5 +1,5 @@
 param($versions)
-$qmode = $true;
+$qmode = $false;
 
 function cleanpath()
 {
@@ -8,8 +8,14 @@ function cleanpath()
 foreach($ver in $versions)
 {
     cleanpath;
-    rm bin -rec -for
-    rm obj -rec -for
+    if (test-path bin)
+    {
+        cmd /c "rd /s /q bin"
+    }
+    if (test-path obj)
+    {
+        cmd /c "rd /s /q bin"
+    }
     if ($ver -ne "dev")
     {
         Write-Host -ForegroundColor Green "Installing $ver"

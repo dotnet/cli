@@ -31,11 +31,11 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
                 .WithLockFiles();
         }
 
-        public void Iterate(Action<PerformanceIterationContext> action, string variation = "", int iterations = 1, [CallerMemberName] string callingMethod = "")
+        public void Iterate(Action<PerformanceIterationContext> action, string variation = "", int iterations = 3, [CallerMemberName] string callingMethod = "")
         {
             var fullname = callingMethod + (variation != "" ? "/" + variation : "");
             var context = new PerformanceIterationContext();
-            //action(context);
+            action(context);
 
             TimeSpan totalTime;
             for (int i = 0; i < iterations; i++)

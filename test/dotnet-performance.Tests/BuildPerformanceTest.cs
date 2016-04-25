@@ -10,7 +10,6 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 {
     public class BuildPerformanceTest : PerformanceTestBase
     {
-
         public static IEnumerable<object> SingleProjects
         {
             get
@@ -19,36 +18,34 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
                 yield return new [] { "SingleTargetApp" };
             }
         }
+
         public static IEnumerable<object> GraphProjects
         {
             get
             {
-                yield return new object[] {
+                yield return new object[]
+                {
                     "TwoTargetGraph",
                     new[] { "TwoTargetGraph/TwoTargetP0", "TwoTargetGraph/TwoTargetP1", "TwoTargetGraph/TwoTargetP2" }
                 };
                 yield return new object[]
                 {
-                    "SingleTargetGraph",
-                    new[] { "SingleTargetGraph/SingleTargetP0", "SingleTargetGraph/SingleTargetP1", "SingleTargetGraph/SingleTargetP2" }
-                };
-            }
-        }
-
-        public static IEnumerable<object> GraphProjectsWithFrameworks
-        {
-            get
-            {
-                yield return new object[] {
-                    "TwoTargetGraph",
-                    new[] { "TwoTargetGraph/TwoTargetP0", "TwoTargetGraph/TwoTargetP1", "TwoTargetGraph/TwoTargetP2" },
-                    new[] { "netcoreapp1.0", "netstandard1.5"}
+                    "TwoTargetGraphLarge",
+                    new[]
+                    {
+                        "TwoTargetGraphLarge/TwoTargetLargeP0",
+                        "TwoTargetGraphLarge/TwoTargetLargeP1",
+                        "TwoTargetGraphLarge/TwoTargetLargeP2",
+                        "TwoTargetGraphLarge/TwoTargetLargeP3",
+                        "TwoTargetGraphLarge/TwoTargetLargeP4",
+                        "TwoTargetGraphLarge/TwoTargetLargeP5",
+                        "TwoTargetGraphLarge/TwoTargetLargeP6"
+                    }
                 };
                 yield return new object[]
                 {
                     "SingleTargetGraph",
-                    new[] { "SingleTargetGraph/SingleTargetP0", "SingleTargetGraph/SingleTargetP1", "SingleTargetGraph/SingleTargetP2" },
-                    new[] { "netcoreapp1.0"}
+                    new[] { "SingleTargetGraph/SingleTargetP0", "SingleTargetGraph/SingleTargetP1", "SingleTargetGraph/SingleTargetP2" }
                 };
             }
         }
@@ -145,8 +142,8 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
 
         [Theory]
-        [MemberData(nameof(GraphProjectsWithFrameworks))]
-        public void IncrementalSkipAllNoDependenciesInGraph(string variation, string[] projects, string[] frameworks)
+        [MemberData(nameof(GraphProjects))]
+        public void IncrementalSkipAllNoDependenciesInGraph(string variation, string[] projects)
         {
             var instances = projects.Select(p => CreateTestInstance(p, variation)).ToArray();
             var instance = instances[0];
@@ -157,17 +154,14 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             {
                 foreach (var i in instances)
                 {
-                    foreach (var framework in frameworks)
-                    {
-                        c.Measure(() => Run(new BuildCommand(i.TestRoot, framework:framework, noDependencies: true, buildProfile: false)));
-                    }
+                    c.Measure(() => Run(new BuildCommand(i.TestRoot, framework: DefaultFramework, noDependencies: true, buildProfile: false)));
                 }
             }, variation);
         }
 
         [Theory]
-        [MemberData(nameof(GraphProjectsWithFrameworks))]
-        public void BuildAllNoDependenciesInGraph(string variation, string[] projects, string[] frameworks)
+        [MemberData(nameof(GraphProjects))]
+        public void BuildAllNoDependenciesInGraph(string variation, string[] projects)
         {
             var instances = projects.Select(p => CreateTestInstance(p, variation)).ToArray();
 
@@ -175,10 +169,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             {
                 foreach (var i in instances.Reverse())
                 {
-                    foreach (var framework in frameworks)
-                    {
-                        c.Measure(() => Run(new BuildCommand(i.TestRoot, framework: framework, noDependencies: true, buildProfile: false)));
-                    }
+                    c.Measure(() => Run(new BuildCommand(i.TestRoot, framework: DefaultFramework, noDependencies: true, buildProfile: false)));
                 }
                 foreach (var instance in instances)
                 {
