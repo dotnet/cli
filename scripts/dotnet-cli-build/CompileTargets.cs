@@ -544,11 +544,6 @@ namespace Microsoft.DotNet.Cli.Build
             }
 
             CrossgenUtil.CrossgenDirectory(c, SharedFrameworkNameAndVersionRoot);
-
-            // Generate .version file for sharedfx
-            var version = SharedFrameworkNugetVersion;
-            var content = $@"{c.BuildContext["CommitHash"]}{Environment.NewLine}{version}{Environment.NewLine}";
-            File.WriteAllText(Path.Combine(SharedFrameworkNameAndVersionRoot, ".version"), content);
         }
 
         /// <summary>
@@ -644,11 +639,6 @@ namespace Microsoft.DotNet.Cli.Build
             File.Delete(compilersRuntimeConfig);
 
             CrossgenUtil.CrossgenDirectory(c, outputDir);
-
-            // Generate .version file
-            var version = buildVersion.NuGetVersion;
-            var content = $@"{c.BuildContext["CommitHash"]}{Environment.NewLine}{version}{Environment.NewLine}";
-            File.WriteAllText(Path.Combine(outputDir, ".version"), content);
 
             return c.Success();
         }
