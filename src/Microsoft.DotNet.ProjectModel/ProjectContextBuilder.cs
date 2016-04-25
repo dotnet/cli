@@ -132,42 +132,16 @@ namespace Microsoft.DotNet.ProjectModel
             EnsureProjectLoaded();
             LockFile = LockFile ?? LockFileResolver(ProjectDirectory);
 
-            if (LockFile != null && LockFile.Targets.Any())
+            if (LockFile != null)
             {
-                var deduper = new HashSet<string>();
                 foreach (var target in LockFile.Targets)
                 {
-                    var id = $"{target.TargetFramework}/{target.RuntimeIdentifier}";
-                    if (deduper.Add(id))
-                    {
-                        var builder = new ProjectContextBuilder()
-                            .WithProject(Project)
-                            .WithLockFile(LockFile)
-                            .WithTargetFramework(target.TargetFramework)
-                            .WithRuntimeIdentifiers(new[] { target.RuntimeIdentifier });
-                        if (IsDesignTime)
-                        {
-                            builder.AsDesignTime();
-                        }
-
-                        yield return builder.Build();
-                    }
-                }
-            }
-            else
-            {
-                // Build a context for each framework. It won't be fully valid, since it won't have resolved data or runtime data, but the diagnostics will show that
-                // (Project Model Server needs this)
-                foreach (var framework in Project.GetTargetFrameworks())
-                {
-                    var builder = new ProjectContextBuilder()
-                        .WithProject(Project)
-                        .WithTargetFramework(framework.FrameworkName);
-                    if (IsDesignTime)
-                    {
-                        builder.AsDesignTime();
-                    }
-                    yield return builder.Build();
+                    yield return new ProjectContextBuilder()
+                    .WithProject(Project)
+                    .WithLockFile(LockFile)
+                    .WithTargetFramework(target.TargetFramework)
+                    .WithRuntimeIdentifiers(new[] { target.RuntimeIdentifier })
+                    .Build();
                 }
             }
         }
@@ -191,17 +165,8 @@ namespace Microsoft.DotNet.ProjectModel
 
             RootDirectory = GlobalSettings?.DirectoryPath ?? RootDirectory;
             PackagesDirectory = PackagesDirectory ?? PackageDependencyProvider.ResolvePackagesPath(RootDirectory, GlobalSettings);
-
-            FrameworkReferenceResolver frameworkReferenceResolver;
-            if (string.IsNullOrEmpty(ReferenceAssembliesPath))
-            {
-                // Use the default static resolver
-                frameworkReferenceResolver = FrameworkReferenceResolver.Default;
-            }
-            else
-            {
-                frameworkReferenceResolver = new FrameworkReferenceResolver(ReferenceAssembliesPath);
-            }
+            ReferenceAssembliesPath = ReferenceAssembliesPath ?? FrameworkReferenceResolver.GetDefaultReferenceAssembliesPath();
+            var frameworkReferenceResolver = new FrameworkReferenceResolver(ReferenceAssembliesPath);
 
             LockFileLookup lockFileLookup = null;
             EnsureProjectLoaded();
@@ -237,18 +202,18 @@ namespace Microsoft.DotNet.ProjectModel
             if (mainProject != null)
             {
                 platformDependency = mainProject.Dependencies
-                    .Where(d => d.Type.Equals(LibraryDependencyType.Platform))
+                    .Where(d =>  d.Type.Equals(LibraryDependencyType.Platform))
                     .Cast<LibraryRange?>()
                     .FirstOrDefault();
             }
-            bool isPortable = platformDependency != null || TargetFramework.IsDesktop();
+            bool isPortable = platformDependency != null;
 
             LockFileTarget target = null;
             LibraryDescription platformLibrary = null;
 
             if (lockFileLookup != null)
             {
-                target = SelectTarget(LockFile, isPortable);
+                target = SelectTarget(LockFile);
                 if (target != null)
                 {
                     var nugetPackageResolver = new PackageDependencyProvider(PackagesDirectory, frameworkReferenceResolver);
@@ -262,9 +227,11 @@ namespace Microsoft.DotNet.ProjectModel
                 }
             }
 
-            string runtime;
-            if (TargetFramework.IsDesktop())
+            string runtime = target?.RuntimeIdentifier;
+            if (string.IsNullOrEmpty(runtime) && TargetFramework.IsDesktop())
             {
+                // we got a ridless target for desktop so turning portable mode on
+                isPortable = true;
                 var legacyRuntime = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
                 if (RuntimeIdentifiers.Contains(legacyRuntime))
                 {
@@ -274,10 +241,6 @@ namespace Microsoft.DotNet.ProjectModel
                 {
                     runtime = RuntimeIdentifiers.FirstOrDefault();
                 }
-            }
-            else
-            {
-                runtime = target?.RuntimeIdentifier;
             }
 
             var referenceAssemblyDependencyResolver = new ReferenceAssemblyDependencyResolver(frameworkReferenceResolver);
@@ -309,7 +272,7 @@ namespace Microsoft.DotNet.ProjectModel
             {
                 var frameworkInfo = Project.GetTargetFramework(TargetFramework);
 
-                if (frameworkReferenceResolver == null || string.IsNullOrEmpty(frameworkReferenceResolver.ReferenceAssembliesPath))
+                if (string.IsNullOrEmpty(ReferenceAssembliesPath))
                 {
                     // If there was an attempt to use reference assemblies but they were not installed
                     // report an error
@@ -408,13 +371,13 @@ namespace Microsoft.DotNet.ProjectModel
             {
                 var library = pair.Value;
 
-                // The System.* packages provide placeholders on any non netstandard platform
+                // The System.* packages provide placeholders on any non netstandard platform 
                 // To make them work seamlessly on those platforms, we fill the gap with a reference
                 // assembly (if available)
                 var package = library as PackageDescription;
-                if (package != null &&
-                    package.Resolved &&
-                    package.HasCompileTimePlaceholder &&
+                if (package != null && 
+                    package.Resolved && 
+                    package.HasCompileTimePlaceholder && 
                     !TargetFramework.IsPackageBased())
                 {
                     var newKey = new LibraryKey(library.Identity.Name, LibraryType.ReferenceAssembly);
@@ -538,18 +501,15 @@ namespace Microsoft.DotNet.ProjectModel
             }
         }
 
-        private LockFileTarget SelectTarget(LockFile lockFile, bool isPortable)
+        private LockFileTarget SelectTarget(LockFile lockFile)
         {
-            if (!isPortable)
+            foreach (var runtimeIdentifier in RuntimeIdentifiers)
             {
-                foreach (var runtimeIdentifier in RuntimeIdentifiers)
+                foreach (var scanTarget in lockFile.Targets)
                 {
-                    foreach (var scanTarget in lockFile.Targets)
+                    if (Equals(scanTarget.TargetFramework, TargetFramework) && string.Equals(scanTarget.RuntimeIdentifier, runtimeIdentifier, StringComparison.Ordinal))
                     {
-                        if (Equals(scanTarget.TargetFramework, TargetFramework) && string.Equals(scanTarget.RuntimeIdentifier, runtimeIdentifier, StringComparison.Ordinal))
-                        {
-                            return scanTarget;
-                        }
+                        return scanTarget;
                     }
                 }
             }
@@ -618,7 +578,7 @@ namespace Microsoft.DotNet.ProjectModel
 
                 return combiner.CombinedHash;
             }
-
+            
             public override string ToString()
             {
                 return Name + " " + LibraryType;

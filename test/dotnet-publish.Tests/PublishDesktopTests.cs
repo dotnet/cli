@@ -123,6 +123,25 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             }
         }
 
+
+        [WindowsOnlyFact]
+        public async Task DesktopApp_WithRuntimes_PublishedSplitPackageAssets()
+        {
+            var testInstance = TestAssetsManager.CreateTestInstance(Path.Combine("..", "DesktopTestProjects", "DesktopAppWithRuntimes"))
+                .WithLockFiles();
+
+            var publishCommand = new PublishCommand(testInstance.TestRoot, runtime: "win7-x64");
+            var result = await publishCommand.ExecuteAsync();
+
+            result.Should().Pass();
+
+            // Test the output
+            var outputDir = publishCommand.GetOutputDirectory(portable: false);
+            System.Console.WriteLine(outputDir);
+            outputDir.Should().HaveFile("api-ms-win-core-file-l1-1-0.dll");
+            outputDir.Should().HaveFile(publishCommand.GetOutputExecutable());
+        }
+
         private static TestInstance GetTestInstance([CallerMemberName] string callingMethod = "")
         {
             return TestAssetsManager.CreateTestInstance(Path.Combine("..", "DesktopTestProjects", "DesktopKestrelSample"), callingMethod);
