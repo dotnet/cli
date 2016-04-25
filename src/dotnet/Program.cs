@@ -41,9 +41,9 @@ namespace Microsoft.DotNet.Cli
         public static int Main(string[] args)
         {
             DebugHelper.HandleDebugSwitch(ref args);
-            
+
             new MulticoreJitActivator().TryActivateMulticoreJit();
-            
+
             try
             {
                 return Program.ProcessArgs(args, new Telemetry());
