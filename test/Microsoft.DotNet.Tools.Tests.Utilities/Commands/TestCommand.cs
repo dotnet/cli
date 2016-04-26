@@ -33,6 +33,12 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 #endif 
         }
 
+        public TestCommand WithWorkingDirectory(string workingDirectory)
+        {
+            WorkingDirectory = workingDirectory;
+            return this;
+        }
+
         public virtual CommandResult Execute(string args = "")
         {
             var commandPath = _command;
