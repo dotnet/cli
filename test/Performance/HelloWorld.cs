@@ -15,11 +15,10 @@ namespace Microsoft.DotNet.Tests.Performance
 {
     public class HelloWorld : TestBase
     {
-        private static readonly string NetCoreAppTfm = "netcoreapp1.0";
-        private static readonly string s_expectedOutput = "Hello World!" + Environment.NewLine;
         private static readonly string s_testdirName = "helloworldtestroot";
         private static readonly string s_outputdirName = "test space/bin";
 
+        private static string AssetsRoot { get; set; }
         private static string RestoredTestProjectDirectory { get; set; }
 
         private string TestDirectory { get; set; }
@@ -44,7 +43,7 @@ namespace Microsoft.DotNet.Tests.Performance
                 TestInstanceSetup();
 
                 // Setup the build command.
-                var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: NetCoreAppTfm);
+                var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: DefaultFramework);
                 using (iter.StartMeasurement())
                 {
                     // Execute the build command.
@@ -55,18 +54,18 @@ namespace Microsoft.DotNet.Tests.Performance
 
         private void TestInstanceSetup()
         {
-            var root = Temp.CreateDirectory();
+            var assetsManager = new TestAssetsManager(AssetsRoot);
+            var testInstance = assetsManager.CreateTestInstance(s_testdirName, string.Empty, Guid.NewGuid().ToString()).WithLockFiles();
 
-            var testInstanceDir = root.CopyDirectory(RestoredTestProjectDirectory);
-
-            TestDirectory = testInstanceDir.Path;
+            TestDirectory = testInstance.Path;
             TestProject = Path.Combine(TestDirectory, "project.json");
             OutputDirectory = Path.Combine(TestDirectory, s_outputdirName);
         }
 
         private static void SetupStaticTestProject()
         {
-            RestoredTestProjectDirectory = Path.Combine(AppContext.BaseDirectory, "bin", s_testdirName);
+            AssetsRoot = Path.Combine(AppContext.BaseDirectory, "bin");
+            RestoredTestProjectDirectory = Path.Combine(AssetsRoot, s_testdirName);
 
             // Ignore Delete Failure
             try
@@ -76,33 +75,17 @@ namespace Microsoft.DotNet.Tests.Performance
             catch (Exception) { }
 
             Directory.CreateDirectory(RestoredTestProjectDirectory);
-            WriteNuGetConfig(RestoredTestProjectDirectory);
 
-            var currentDirectory = Directory.GetCurrentDirectory();
-            Directory.SetCurrentDirectory(RestoredTestProjectDirectory);
+            // Todo: this is a hack until corefx is on nuget.org remove this After RC 2 Release
+            NuGetConfig.Write(RestoredTestProjectDirectory);
 
-            new NewCommand().Execute().Should().Pass();
-            new RestoreCommand().Execute("--quiet").Should().Pass();
+            var newCommand = new NewCommand();
+            newCommand.WorkingDirectory = RestoredTestProjectDirectory;
+            newCommand.Execute().Should().Pass();
 
-            Directory.SetCurrentDirectory(currentDirectory);
-        }
-
-        // Todo: this is a hack until corefx is on nuget.org remove this After RC 2 Release
-        private static void WriteNuGetConfig(string directory)
-        {
-            var contents = @"<?xml version=""1.0"" encoding=""utf-8""?>
-<configuration>
-<packageSources>
-<!--To inherit the global NuGet package sources remove the <clear/> line below -->
-<clear />
-<add key=""dotnet-core"" value=""https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"" />
-<add key=""api.nuget.org"" value=""https://api.nuget.org/v3/index.json"" />
-</packageSources>
-</configuration>";
-
-            var path = Path.Combine(directory, "NuGet.config");
-
-            File.WriteAllText(path, contents);
+            var restoreCommand = new RestoreCommand();
+            restoreCommand.WorkingDirectory = RestoredTestProjectDirectory;
+            restoreCommand.Execute("--quiet").Should().Pass();
         }
     }
 }
