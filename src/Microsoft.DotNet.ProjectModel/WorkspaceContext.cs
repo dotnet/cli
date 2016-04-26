@@ -445,7 +445,13 @@ namespace Microsoft.DotNet.ProjectModel
             if (File.Exists(path) &&
                 string.Equals(Path.GetFileName(path), Project.FileName, StringComparison.OrdinalIgnoreCase))
             {
-                return Path.GetFullPath(Path.GetDirectoryName(path));
+                string directoryName = Path.GetDirectoryName(path);
+                if (string.IsNullOrEmpty(directoryName))
+                {
+                    directoryName = Directory.GetCurrentDirectory();
+                }
+
+                return Path.GetFullPath(directoryName);
             }
             else if (Directory.Exists(path) &&
                      File.Exists(Path.Combine(path, Project.FileName)))
