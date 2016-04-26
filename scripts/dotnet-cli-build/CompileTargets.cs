@@ -364,7 +364,7 @@ namespace Microsoft.DotNet.Cli.Build
             projectJson.Append("{");
             projectJson.Append("  \"dependencies\": { \"NETStandard.Library\": \"1.5.0-rc2-24008\" },");
             projectJson.Append("  \"frameworks\": { \"netcoreapp1.0\": { \"imports\": [\"netstandard1.5\", \"dnxcore50\"] } },");
-            projectJson.Append("  \"runtimes\": { \"win7-x64\": { } },");
+            projectJson.Append("  \"runtimes\": { \"win7-x64\": {}, \"win7-x86\": {}, \"osx.10.10-x64\": {}, \"osx.10.11-x64\": {}, \"ubuntu.14.04-x64\": {}, \"centos.7-x64\": {}, \"rhel.7.2-x64\": {}, \"debian.8-x64\": {} }");
             projectJson.Append("}");
 
             var programCs = "using System; namespace ConsoleApplication { public class Program { public static void Main(string[] args) { Console.WriteLine(\"Hello World!\"); } } }";

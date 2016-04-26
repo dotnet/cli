@@ -39,9 +39,9 @@ namespace Microsoft.DotNet.Tools.Build
 
 
         // computes all the inputs and outputs that would be used in the compilation of a project
-        public CompilerIO GetCompileIO(ProjectGraphNode graphNode)
+        public CompilerIO GetCompileIO(ProjectGraphNode graphNode, IEnumerable<ProjectContext> runtimeContexts)
         {
-            return _cache.GetOrAdd(graphNode.ProjectContext.Identity, i => ComputeIO(graphNode));
+            return _cache.GetOrAdd(graphNode.ProjectContext.Identity, i => ComputeIO(graphNode, runtimeContexts));
         }
 
         public CompilerIO ComputeIO(ProjectGraphNode graphNode, IEnumerable<ProjectContext> runtimeContexts)

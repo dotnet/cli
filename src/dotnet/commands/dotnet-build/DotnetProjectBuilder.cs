@@ -157,19 +157,19 @@ namespace Microsoft.DotNet.Tools.Build
             finally
             {
                 StampProjectWithSDKVersion(projectNode.ProjectContext);
-                _incrementalManager.CacheIncrementalState(projectNode);
+                _incrementalManager.CacheIncrementalState(projectNode, CreateRuntimeContexts(projectNode));
             }
         }
 
         protected override void ProjectSkiped(ProjectGraphNode projectNode)
         {
             StampProjectWithSDKVersion(projectNode.ProjectContext);
-            _incrementalManager.CacheIncrementalState(projectNode);
+            _incrementalManager.CacheIncrementalState(projectNode, CreateRuntimeContexts(projectNode));
         }
 
         protected override bool NeedsRebuilding(ProjectGraphNode graphNode)
         {
-            var result = _incrementalManager.NeedsRebuilding(graphNode);
+            var result = _incrementalManager.NeedsRebuilding(graphNode, CreateRuntimeContexts(graphNode));
 
             PrintIncrementalResult(graphNode.ProjectContext.GetDisplayName(), result);
 

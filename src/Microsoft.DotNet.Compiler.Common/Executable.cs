@@ -81,15 +81,23 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
                 yield break;
             }
 
-            Regex libraryNamePattern = new Regex("^runtime\\.[A-Za-z\\-0-9\\.]*\\.Microsoft\\.NETCore\\.DotNetHost(Policy|Resolver)?$");
-            foreach (var export in _exporter.GetAllExports()
-                .Where(e => libraryNamePattern.IsMatch(e.Library.Identity.Name)))
+            string[] allowedCoreHostFileNames = new string[] {
+                "dotnet",
+                "hostpolicy",
+                "hostfxr",
+                "libhostpolicy",
+                "libhostfxr"
+            };
+            foreach (var export in _exporter.GetAllExports())
             {
                 foreach (LibraryAssetGroup nativeAssetGroup in export.NativeLibraryGroups)
                 {
                     foreach (LibraryAsset nativeAsset in nativeAssetGroup.Assets)
                     {
-                        yield return nativeAsset.ResolvedPath;
+                        if (allowedCoreHostFileNames.Contains(Path.GetFileNameWithoutExtension(nativeAsset.ResolvedPath).ToLower()))
+                        {
+                            yield return nativeAsset.ResolvedPath;
+                        }
                     }
                 }
             }
