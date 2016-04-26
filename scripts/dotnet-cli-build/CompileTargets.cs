@@ -36,17 +36,17 @@ namespace Microsoft.DotNet.Cli.Build
             "vbc.exe"
         };
 
-        public static readonly string[] HostPackageSupportedRids = new[]
+        public static readonly Dictionary<string, string[]> HostPackageRidToNativeFileNames = new Dictionary<string, string[]>()
         {
-            "win7-x64",
-            "win7-x86",
-            "osx.10.10-x64",
-            "osx.10.11-x64",
-            "ubuntu.14.04-x64",
-            "centos.7-x64",
-            "rhel.7-x64",
-            "rhel.7.2-x64",
-            "debian.8-x64"
+            { "win7-x64", new string[] { "dotnet.exe", "hostfxr.dll", "hostpolicy.dll" } },
+            { "win7-x86", new string[] { "dotnet.exe", "hostfxr.dll", "hostpolicy.dll" } },
+            { "osx.10.10-x64", new string[] { "dotnet", "libhostfxr.dylib", "libhostpolicy.dylib" } },
+            { "osx.10.11-x64", new string[] { "dotnet", "libhostfxr.dylib", "libhostpolicy.dylib" } },
+            { "ubuntu.14.04-x64", new string[] { "dotnet", "libhostfxr.so", "libhostpolicy.so" } },
+            { "centos.7-x64", new string[] { "dotnet", "libhostfxr.so", "libhostpolicy.so" } },
+            { "rhel.7-x64", new string[] { "dotnet", "libhostfxr.so", "libhostpolicy.so" } },
+            { "rhel.7.2-x64", new string[] { "dotnet", "libhostfxr.so", "libhostpolicy.so" } },
+            { "debian.8-x64", new string[] { "dotnet", "libhostfxr.so", "libhostpolicy.so" } }
         };
 
         public static readonly string[] HostPackages = new[]
@@ -87,20 +87,19 @@ namespace Microsoft.DotNet.Cli.Build
         {
             string currentRid = GetRuntimeId();
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
-            PrepareDummyRuntimeNuGetPackage(
-                            DotNetCli.Stage0,
-                            buildVersion.HostNuGetPackageVersion,
-                            Dirs.CorehostDummyPackages);
             foreach (var hostPackageId in HostPackages)
             {
-                foreach (var rid in HostPackageSupportedRids)
+                foreach (var ridToNativeFileNames in HostPackageRidToNativeFileNames)
                 {
+                    string rid = ridToNativeFileNames.Key;
+                    string[] files = ridToNativeFileNames.Value;
                     if (!rid.Equals(currentRid))
                     {
                         CreateDummyRuntimeNuGetPackage(
                             DotNetCli.Stage0,
                             hostPackageId,
                             rid,
+                            files,
                             buildVersion.HostNuGetPackageVersion,
                             Dirs.CorehostDummyPackages);
                     }
@@ -357,58 +356,46 @@ namespace Microsoft.DotNet.Cli.Build
             return c.Success();
         }
 
-
-        private static void PrepareDummyRuntimeNuGetPackage(DotNetCli dotnet, string version, string outputDir)
-        {
-            var projectJson = new StringBuilder();
-            projectJson.Append("{");
-            projectJson.Append("  \"dependencies\": { \"NETStandard.Library\": \"1.5.0-rc2-24008\" },");
-            projectJson.Append("  \"frameworks\": { \"netcoreapp1.0\": { \"imports\": [\"netstandard1.5\", \"dnxcore50\"] } },");
-            projectJson.Append("  \"runtimes\": { \"win7-x64\": {}, \"win7-x86\": {}, \"osx.10.10-x64\": {}, \"osx.10.11-x64\": {}, \"ubuntu.14.04-x64\": {}, \"centos.7-x64\": {}, \"rhel.7.2-x64\": {}, \"debian.8-x64\": {} }");
-            projectJson.Append("}");
-
-            var programCs = "using System; namespace ConsoleApplication { public class Program { public static void Main(string[] args) { Console.WriteLine(\"Hello World!\"); } } }";
-
-            var tempPjDirectory = Path.Combine(Dirs.Intermediate, "dummyNuGetPackageIntermediate");
-            FS.Rmdir(tempPjDirectory);
-
-            Directory.CreateDirectory(tempPjDirectory);
-
-            var tempPjFile = Path.Combine(tempPjDirectory, "project.json");
-            var tempSourceFile = Path.Combine(tempPjDirectory, "Program.cs");
-
-            File.WriteAllText(tempPjFile, projectJson.ToString());
-            File.WriteAllText(tempSourceFile, programCs.ToString());
-
-            dotnet.Restore("--verbosity", "verbose", "--disable-parallel")
-                .WorkingDirectory(tempPjDirectory)
-                .Execute()
-                .EnsureSuccessful();
-            dotnet.Build(tempPjFile, "--runtime", "win7-x64")
-                .WorkingDirectory(tempPjDirectory)
-                .Execute()
-                .EnsureSuccessful();
-        }
-
-        private static void CreateDummyRuntimeNuGetPackage(DotNetCli dotnet, string basePackageId, string rid, string version, string outputDir)
+        private static void CreateDummyRuntimeNuGetPackage(DotNetCli dotnet, string basePackageId, string rid, string[] files, string version, string outputDir)
         {
             var packageId = $"runtime.{rid}.{basePackageId}";
 
-            var projectJson = new StringBuilder();
-            projectJson.Append("{");
-            projectJson.Append($"  \"version\": \"{version}\",");
-            projectJson.Append($"  \"name\": \"{packageId}\",");
-            projectJson.Append("  \"dependencies\": { \"NETStandard.Library\": \"1.5.0-rc2-24008\" },");
-            projectJson.Append("  \"frameworks\": { \"netcoreapp1.0\": { \"imports\": [\"netstandard1.5\", \"dnxcore50\"] } },");
-            projectJson.Append("}");
-
             var tempPjDirectory = Path.Combine(Dirs.Intermediate, "dummyNuGetPackageIntermediate");
+            
+            FS.Mkdirp(tempPjDirectory);
+            
+            File.WriteAllText(Path.Combine(tempPjDirectory, "Program.cs"), "class Program { static void Main(string[] args) {} }");
+            
+            string[] absoluteFileNames = new string[files.Length];
+            for (int i = 0; i < files.Length; i++)
+            {
+                absoluteFileNames[i] = Path.Combine(tempPjDirectory, files[i]);
+                File.WriteAllText(absoluteFileNames[i], "<this file is created during the dotnet/cli build>");
+            }
+            
+            var projectJson = new StringBuilder();
+            projectJson.AppendLine("{");
+            projectJson.AppendLine($"  \"version\": \"{version}\",");
+            projectJson.AppendLine($"  \"name\": \"{packageId}\",");
+            projectJson.AppendLine("  \"dependencies\": { \"NETStandard.Library\": \"1.5.0-rc2-24008\" },");
+            projectJson.AppendLine("  \"frameworks\": { \"netcoreapp1.0\": { \"imports\": [\"netstandard1.5\", \"dnxcore50\"] } },");
+            projectJson.AppendLine($"  \"runtimes\": {{ \"{rid}\": {{}} }},");
+            projectJson.AppendLine("  \"packInclude\": {");
+            projectJson.AppendLine($"    \"runtimes/{rid}/native/\": [{string.Join(",", from path in absoluteFileNames select $"\"{path}\"".Replace("\\", "/"))}]");
+            projectJson.AppendLine("  }");
+            projectJson.AppendLine("}");
+
             var tempPjFile = Path.Combine(tempPjDirectory, "project.json");
 
             File.WriteAllText(tempPjFile, projectJson.ToString());
 
+            dotnet.Restore()
+                .WorkingDirectory(tempPjDirectory)
+                .Execute()
+                .EnsureSuccessful();
+                
             dotnet.Pack(
-                tempPjFile, "--no-build",
+                tempPjFile,
                 "--output", outputDir)
                 .WorkingDirectory(tempPjDirectory)
                 .Execute()
