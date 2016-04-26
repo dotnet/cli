@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.Extensions.PlatformAbstractions;
@@ -9,13 +10,14 @@ namespace Microsoft.DotNet.Cli
 {
     public class Telemetry : ITelemetry
     {
-        public const double TimeoutInSeconds = 0.100;
+        public const double TimeoutInMilliseconds = 100;
 
         private bool _isInitialized = false;
         private TelemetryClient _client = null;
 
         private Dictionary<string, string> _commonProperties = null;
         private Dictionary<string, double> _commonMeasurements = null;
+        private Task _trackEventTask = null;
 
         private const string InstrumentationKey = "74cc1c9e-3e6e-4d05-b3fc-dde9101d0254";
         private const string TelemetryOptout = "DOTNET_CLI_TELEMETRY_OPTOUT";
@@ -70,6 +72,13 @@ namespace Microsoft.DotNet.Cli
                 return;
             }
 
+            _trackEventTask = Task.Factory.StartNew(
+                () => TrackEventTask(eventName, properties, measurements)
+            );
+        }
+        
+        private void TrackEventTask(string eventName, IDictionary<string, string> properties, IDictionary<string, double> measurements)
+        {
             Dictionary<string, double> eventMeasurements = GetEventMeasures(measurements);
             Dictionary<string, string> eventProperties = GetEventProperties(properties);
 
@@ -84,6 +93,10 @@ namespace Microsoft.DotNet.Cli
             }
         }
 
+        public void Finish()
+        {
+            _trackEventTask.Wait(TimeSpan.FromMilliseconds(TimeoutInMilliseconds));
+        }
 
         private Dictionary<string, double> GetEventMeasures(IDictionary<string, double> measurements)
         {
