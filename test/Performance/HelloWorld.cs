@@ -54,10 +54,11 @@ namespace Microsoft.DotNet.Tests.Performance
 
         private void TestInstanceSetup()
         {
-            var assetsManager = new TestAssetsManager(AssetsRoot);
-            var testInstance = assetsManager.CreateTestInstance(s_testdirName, string.Empty, Guid.NewGuid().ToString()).WithLockFiles();
+            var root = Temp.CreateDirectory();
 
-            TestDirectory = testInstance.Path;
+            var testInstanceDir = root.CopyDirectory(RestoredTestProjectDirectory);
+
+            TestDirectory = testInstanceDir.Path;
             TestProject = Path.Combine(TestDirectory, "project.json");
             OutputDirectory = Path.Combine(TestDirectory, s_outputdirName);
         }
