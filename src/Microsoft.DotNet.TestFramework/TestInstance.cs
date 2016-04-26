@@ -18,6 +18,7 @@ namespace Microsoft.DotNet.TestFramework
 
         internal TestInstance(string testAssetRoot, string testDestination) : base(testDestination)
         {
+            Console.WriteLine($"Copying {testAssetRoot} to {testDestination}");
             if (string.IsNullOrEmpty(testAssetRoot))
             {
                 throw new ArgumentException("testAssetRoot");
