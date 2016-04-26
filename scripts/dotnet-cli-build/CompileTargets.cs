@@ -377,8 +377,8 @@ namespace Microsoft.DotNet.Cli.Build
             projectJson.AppendLine("{");
             projectJson.AppendLine($"  \"version\": \"{version}\",");
             projectJson.AppendLine($"  \"name\": \"{packageId}\",");
-            projectJson.AppendLine("  \"dependencies\": { \"NETStandard.Library\": \"1.5.0-rc2-24008\" },");
-            projectJson.AppendLine("  \"frameworks\": { \"netcoreapp1.0\": { \"imports\": [\"netstandard1.5\", \"dnxcore50\"] } },");
+            projectJson.AppendLine("  \"dependencies\": { \"NETStandard.Library\": \"1.5.0-rc2-24022\" },");
+            projectJson.AppendLine("  \"frameworks\": { \"netcoreapp1.0\": {}, \"netstandard1.5\": {} },");
             projectJson.AppendLine($"  \"runtimes\": {{ \"{rid}\": {{}} }},");
             projectJson.AppendLine("  \"packInclude\": {");
             projectJson.AppendLine($"    \"runtimes/{rid}/native/\": [{string.Join(",", from path in absoluteFileNames select $"\"{path}\"".Replace("\\", "/"))}]");

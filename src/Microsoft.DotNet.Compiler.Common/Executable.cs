@@ -124,6 +124,7 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
                     }
 
                     File.Copy(sourcePath, destinationPath, overwrite: true);
+                    File.SetLastWriteTimeUtc(destinationPath, DateTime.UtcNow);
                 }
             }
         }
