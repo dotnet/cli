@@ -5,18 +5,20 @@
       "type": "platform",
       "version": "1.0.0-rc2-*"
     },
-    "Microsoft.Extensions.Testing.Abstractions": {
+    "System.Runtime.Serialization.Primitives": "4.1.1-rc2-24027",
+    "Microsoft.DotNet.ProjectModel": {
       "target": "project"
     },
-    "System.Runtime.Serialization.Primitives": "4.1.1-rc2-24027",
-    "System.Diagnostics.Process": "4.1.0-rc2-24027",
-    "TestAppWithPortablePdbs": {
+    "Microsoft.DotNet.Cli.Utils": {
+      "target": "project"
+    },
+    "Microsoft.DotNet.Tools.Tests.Utilities": {
       "target": "project"
     },
     "xunit": "2.1.0",
+    "xunit.netcore.extensions": "1.0.0-prerelease-00206",
     "dotnet-test-xunit": "1.0.0-rc2-162081-13",
-    "FluentAssertions": "4.2.2",
-    "moq.netcore": "4.4.0-beta8"
+    "Microsoft.DotNet.xunit.performance": "1.0.0-alpha-build0028"
   },
   "frameworks": {
     "netcoreapp1.0": {
