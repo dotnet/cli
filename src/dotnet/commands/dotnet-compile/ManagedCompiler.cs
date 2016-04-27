@@ -81,7 +81,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 $"--out:{outputName}"
             };
 
-            var compilationOptions = context.ResolveCompilationOptions(args.ConfigValue);
+            var compilationOptions = context.ProjectFile.ResolveCompilationOptions(context.TargetFramework, args.ConfigValue);
 
             // Set default platform if it isn't already set and we're on desktop
             if (compilationOptions.EmitEntryPoint == true && string.IsNullOrEmpty(compilationOptions.Platform) && context.TargetFramework.IsDesktop())
@@ -148,7 +148,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 return false;
             }
             // Add project source files
-            var sourceFiles = CompilerUtil.GetCompilationSources(context);
+            var sourceFiles = CompilerUtil.GetCompilationSources(context.ProjectFile);
             compilerArgs.AddRange(sourceFiles);
 
             var compilerName = context.ProjectFile.CompilerName;

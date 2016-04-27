@@ -9,6 +9,7 @@ using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.ProjectModel.Utilities;
+using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Build
 {
@@ -44,18 +45,18 @@ namespace Microsoft.DotNet.Tools.Build
                 preconditions.AddForceUnsafePrecondition();
             }
 
-            var project = projectNode.ProjectContext;
+            var project = projectNode.Project;
             CollectScriptPreconditions(project, preconditions);
             CollectCompilerNamePreconditions(project, preconditions);
-            CollectCheckPathProbingPreconditions(project, preconditions);
+            CollectCheckPathProbingPreconditions(project, projectNode.TargetFramework, preconditions);
             _preconditions[projectNode.ProjectContext.Identity] = preconditions;
             return preconditions;
         }
 
-        private void CollectCheckPathProbingPreconditions(ProjectContext project, IncrementalPreconditions preconditions)
+        private void CollectCheckPathProbingPreconditions(Project project, NuGetFramework targetFramework, IncrementalPreconditions preconditions)
         {
             var pathCommands = CompilerUtil.GetCommandsInvokedByCompile(project)
-                .Select(commandName => Command.CreateDotNet(commandName, Enumerable.Empty<string>(), project.TargetFramework))
+                .Select(commandName => Command.CreateDotNet(commandName, Enumerable.Empty<string>(), targetFramework))
                 .Where(c => c.ResolutionStrategy.Equals(CommandResolutionStrategy.Path));
 
             foreach (var pathCommand in pathCommands)
@@ -64,11 +65,11 @@ namespace Microsoft.DotNet.Tools.Build
             }
         }
 
-        private void CollectCompilerNamePreconditions(ProjectContext project, IncrementalPreconditions preconditions)
+        private void CollectCompilerNamePreconditions(Project project, IncrementalPreconditions preconditions)
         {
-            if (project.ProjectFile != null)
+            if (project != null)
             {
-                var projectCompiler = project.ProjectFile.CompilerName;
+                var projectCompiler = project.CompilerName;
 
                 if (!KnownCompilers.Any(knownCompiler => knownCompiler.Equals(projectCompiler, StringComparison.Ordinal)))
                 {
@@ -77,12 +78,12 @@ namespace Microsoft.DotNet.Tools.Build
             }
         }
 
-        private void CollectScriptPreconditions(ProjectContext project, IncrementalPreconditions preconditions)
+        private void CollectScriptPreconditions(Project project, IncrementalPreconditions preconditions)
         {
-            if (project.ProjectFile != null)
+            if (project != null)
             {
-                var preCompileScripts = project.ProjectFile.Scripts.GetOrEmpty(ScriptNames.PreCompile);
-                var postCompileScripts = project.ProjectFile.Scripts.GetOrEmpty(ScriptNames.PostCompile);
+                var preCompileScripts = project.Scripts.GetOrEmpty(ScriptNames.PreCompile);
+                var postCompileScripts = project.Scripts.GetOrEmpty(ScriptNames.PostCompile);
 
                 if (preCompileScripts.Any())
                 {

@@ -55,11 +55,11 @@ namespace Microsoft.DotNet.Tools.Build
             _commandFactory = new DotNetCommandFactory();
         }
 
-        private void StampProjectWithSDKVersion(ProjectContext project)
+        private void StampProjectWithSDKVersion(ProjectGraphNode graphNode)
         {
             if (File.Exists(DotnetFiles.VersionFile))
             {
-                var projectVersionFile = project.GetSDKVersionFile(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
+                var projectVersionFile = graphNode.Project.GetSDKVersionFile(graphNode.TargetFramework, _args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
                 var parentDirectory = Path.GetDirectoryName(projectVersionFile);
 
                 if (!Directory.Exists(parentDirectory))
@@ -73,7 +73,7 @@ namespace Microsoft.DotNet.Tools.Build
             }
             else
             {
-                Reporter.Verbose.WriteLine($"Project {project.GetDisplayName()} was not stamped with a CLI version because the version file does not exist: {DotnetFiles.VersionFile}");
+                Reporter.Verbose.WriteLine($"Project {graphNode.Project.GetDisplayName(graphNode.TargetFramework)} was not stamped with a CLI version because the version file does not exist: {DotnetFiles.VersionFile}");
             }
         }
 
@@ -146,14 +146,14 @@ namespace Microsoft.DotNet.Tools.Build
             }
             finally
             {
-                StampProjectWithSDKVersion(projectNode.ProjectContext);
+                StampProjectWithSDKVersion(projectNode);
                 _incrementalManager.CacheIncrementalState(projectNode);
             }
         }
 
         protected override void ProjectSkiped(ProjectGraphNode projectNode)
         {
-            StampProjectWithSDKVersion(projectNode.ProjectContext);
+            StampProjectWithSDKVersion(projectNode);
             _incrementalManager.CacheIncrementalState(projectNode);
         }
 
@@ -161,7 +161,7 @@ namespace Microsoft.DotNet.Tools.Build
         {
             var result = _incrementalManager.NeedsRebuilding(graphNode);
 
-            PrintIncrementalResult(graphNode.ProjectContext.GetDisplayName(), result);
+            PrintIncrementalResult(graphNode.Project.GetDisplayName(graphNode.TargetFramework), result);
 
             return result.NeedsRebuilding;
         }

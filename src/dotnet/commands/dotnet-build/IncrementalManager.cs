@@ -84,7 +84,7 @@ namespace Microsoft.DotNet.Tools.Build
         private IncrementalResult CLIChanged(ProjectGraphNode graphNode)
         {
             var currentVersionFile = DotnetFiles.VersionFile;
-            var versionFileFromLastCompile = graphNode.ProjectContext.GetSDKVersionFile(_configuration, _buildBasePath, _outputPath);
+            var versionFileFromLastCompile = graphNode.Project.GetSDKVersionFile(graphNode.TargetFramework, _configuration, _buildBasePath, _outputPath);
 
             if (!File.Exists(currentVersionFile))
             {
@@ -139,7 +139,7 @@ namespace Microsoft.DotNet.Tools.Build
         private IncrementalResult CheckInputGlobChanges(ProjectGraphNode graphNode, CompilerIO compilerIO)
         {
             // check cache against input glob pattern changes
-            var incrementalCacheFile = graphNode.ProjectContext.IncrementalCacheFile(_configuration, _buildBasePath, _outputPath);
+            var incrementalCacheFile = graphNode.Project.IncrementalCacheFile(graphNode.TargetFramework, _configuration, _buildBasePath, _outputPath);
 
             if (!File.Exists(incrementalCacheFile))
             {
@@ -198,7 +198,7 @@ namespace Microsoft.DotNet.Tools.Build
 
         public void CacheIncrementalState(ProjectGraphNode graphNode)
         {
-            var incrementalCacheFile = graphNode.ProjectContext.IncrementalCacheFile(_configuration, _buildBasePath, _outputPath);
+            var incrementalCacheFile = graphNode.Project.IncrementalCacheFile(graphNode.TargetFramework, _configuration, _buildBasePath, _outputPath);
 
             var incrementalCache = new IncrementalCache(_compilerIoManager.GetCompileIO(graphNode));
             incrementalCache.WriteToFile(incrementalCacheFile);

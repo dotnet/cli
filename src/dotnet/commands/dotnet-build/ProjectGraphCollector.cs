@@ -15,22 +15,31 @@ namespace Microsoft.DotNet.Tools.Build
     {
         private readonly bool _collectDependencies;
         private readonly Func<string, NuGetFramework, ProjectContext> _projectContextFactory;
+        private readonly Func<string, Project> _projectFactory;
 
         public ProjectGraphCollector(bool collectDependencies,
-            Func<string, NuGetFramework, ProjectContext> projectContextFactory)
+            Func<string, NuGetFramework, ProjectContext> projectContextFactory,
+            Func<string, Project> projectFactory)
         {
             _collectDependencies = collectDependencies;
             _projectContextFactory = projectContextFactory;
+            _projectFactory = projectFactory;
         }
 
-        public IEnumerable<ProjectGraphNode> Collect(IEnumerable<ProjectContext> contexts)
+        public IEnumerable<ProjectGraphNode> Collect(IEnumerable<ProjectGraphNode> contexts)
         {
             foreach (var context in contexts)
             {
-                var libraries = context.LibraryManager.GetLibraries();
+                if (!_collectDependencies)
+                {
+                    yield return context;
+                    continue;
+                }
+
+                var libraries = context.ProjectContext.LibraryManager.GetLibraries();
                 var lookup = libraries.ToDictionary(l => l.Identity.Name);
-                var root = lookup[context.ProjectFile.Name];
-                yield return TraverseProject((ProjectDescription) root, lookup, context);
+                var root = lookup[context.ProjectContext.ProjectFile.Name];
+                yield return TraverseProject((ProjectDescription) root, lookup, context.ProjectContext);
             }
         }
 
@@ -55,8 +64,15 @@ namespace Microsoft.DotNet.Tools.Build
                     }
                 }
             }
-            var task = context != null ? Task.FromResult(context) : Task.Run(() => _projectContextFactory(project.Path, project.Framework));
-            return new ProjectGraphNode(task, deps, context != null);
+            var projectTask = context != null ?
+                Task.FromResult(context.ProjectFile) :
+                Task.Run(() => _projectFactory(project.Path));
+
+            var projectContextTask = context != null ?
+                Task.FromResult(context) :
+                Task.Run(() => _projectContextFactory(project.Path, project.Framework));
+
+            return new ProjectGraphNode(project.Framework, projectTask, projectContextTask, deps, context != null);
         }
 
         private IEnumerable<ProjectGraphNode> TraverseNonProject(LibraryDescription root, IDictionary<string, LibraryDescription> lookup)

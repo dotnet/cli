@@ -117,12 +117,12 @@ namespace Microsoft.DotNet.Tools.Compiler
         }
 
         // used in incremental compilation
-        public static IEnumerable<string> GetCompilationSources(ProjectContext project) => project.ProjectFile.Files.SourceFiles;
+        public static IEnumerable<string> GetCompilationSources(Project project) => project.Files.SourceFiles;
 
         //used in incremental precondition checks
-        public static IEnumerable<string> GetCommandsInvokedByCompile(ProjectContext project)
+        public static IEnumerable<string> GetCommandsInvokedByCompile(Project project)
         {
-            return new List<string> {project.ProjectFile?.CompilerName, "compile"};
+            return new List<string> {project?.CompilerName, "compile"};
         }
     }
 }
