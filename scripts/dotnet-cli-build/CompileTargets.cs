@@ -360,17 +360,17 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var packageId = $"runtime.{rid}.{basePackageId}";
 
-            var tempPjDirectory = Path.Combine(Dirs.Intermediate, "dummyNuGetPackageIntermediate");
+            var tempPjDirectory = Path.Combine(Dirs.Intermediate, "dummyNuGetPackageIntermediate", rid);
             
             FS.Mkdirp(tempPjDirectory);
             
             File.WriteAllText(Path.Combine(tempPjDirectory, "Program.cs"), "class Program { static void Main(string[] args) {} }");
             
             string[] absoluteFileNames = new string[files.Length];
-            for (int i = 0; i < files.Length; i++)
+            foreach (string file in files)
             {
-                absoluteFileNames[i] = Path.Combine(tempPjDirectory, files[i]);
-                File.WriteAllText(absoluteFileNames[i], "<this file is created during the dotnet/cli build>");
+                string absolutePath = Path.Combine(tempPjDirectory, file);
+                File.WriteAllText(absolutePath, "<this file is created during the dotnet/cli build>");
             }
             
             var projectJson = new StringBuilder();
@@ -381,7 +381,7 @@ namespace Microsoft.DotNet.Cli.Build
             projectJson.AppendLine("  \"frameworks\": { \"netcoreapp1.0\": {}, \"netstandard1.5\": {} },");
             projectJson.AppendLine($"  \"runtimes\": {{ \"{rid}\": {{}} }},");
             projectJson.AppendLine("  \"packInclude\": {");
-            projectJson.AppendLine($"    \"runtimes/{rid}/native/\": [{string.Join(",", from path in absoluteFileNames select $"\"{path}\"".Replace("\\", "/"))}]");
+            projectJson.AppendLine($"    \"runtimes/{rid}/native/\": [{string.Join(",", from path in files select $"\"{path}\"".Replace("\\", "\\\\"))}]");
             projectJson.AppendLine("  }");
             projectJson.AppendLine("}");
 
