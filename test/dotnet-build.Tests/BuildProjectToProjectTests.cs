@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         private string MainProjectExe
         {
             get
-            {
+            {   
                 return MainProject + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : "");
             }
         }
@@ -127,8 +127,6 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         {
             foreach (var rebuiltProject in expectedRebuilt)
             {
-                string frameworkFullName = null;
-
                 if (TestProjectIsApp(rebuiltProject))
                 {
                     buildResult
