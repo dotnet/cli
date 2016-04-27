@@ -17,13 +17,13 @@ namespace Microsoft.DotNet.Cli.Utils
         public TimeSpan Duration { get; }
         public IList<PerfTraceEvent> Children { get; }
 
-        public PerfTraceEvent(string type, string instance, IList<PerfTraceEvent> children, DateTime startUtc, TimeSpan duration)
+        public PerfTraceEvent(string type, string instance, IEnumerable<PerfTraceEvent> children, DateTime startUtc, TimeSpan duration)
         {
             Type = type;
             Instance = instance;
             StartUtc = startUtc;
             Duration = duration;
-            Children = children;
+            Children = children.OrderBy(e => e.StartUtc).ToList();
         }
     }
 
@@ -112,7 +112,7 @@ namespace Microsoft.DotNet.Cli.Utils
                 _context.RecordTiming(CreateEvent(), Parent);
             }
 
-            public PerfTraceEvent CreateEvent() => new PerfTraceEvent(_eventType, _instance, Children.ToList(), _startUtc, _stopwatch.Elapsed);
+            public PerfTraceEvent CreateEvent() => new PerfTraceEvent(_eventType, _instance, Children, _startUtc, _stopwatch.Elapsed);
         }
     }
 }

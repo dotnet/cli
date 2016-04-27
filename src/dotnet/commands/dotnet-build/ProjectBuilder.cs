@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.DotNet.ProjectModel;
 using NuGet.Frameworks;
+using Microsoft.DotNet.Cli.Utils;
 
 namespace Microsoft.DotNet.Tools.Build
 {
@@ -72,9 +73,17 @@ namespace Microsoft.DotNet.Tools.Build
                 return CompilationResult.IncrementalSkip;
             }
 
-            if (NeedsRebuilding(projectNode))
+            bool needsRebuilding;
+            using (PerfTrace.Current.CaptureTiming("NeedsRebuilding"))
             {
-                return RunCompile(projectNode);
+                needsRebuilding = NeedsRebuilding(projectNode);
+            }
+            if (needsRebuilding)
+            {
+                using (PerfTrace.Current.CaptureTiming("RunCompile"))
+                {
+                    return RunCompile(projectNode);
+                }
             }
             else
             {
