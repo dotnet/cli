@@ -39,12 +39,12 @@ namespace Microsoft.DotNet.Tools.Build
 
 
         // computes all the inputs and outputs that would be used in the compilation of a project
-        public CompilerIO GetCompileIO(ProjectGraphNode graphNode)
+        public CompilerIO GetCompileIO(ProjectGraphNode graphNode, IEnumerable<ProjectContext> runtimeContexts)
         {
-            return _cache.GetOrAdd(graphNode.ProjectContext.Identity, i => ComputeIO(graphNode));
+            return _cache.GetOrAdd(graphNode.ProjectContext.Identity, i => ComputeIO(graphNode, runtimeContexts));
         }
 
-        private CompilerIO ComputeIO(ProjectGraphNode graphNode)
+        public CompilerIO ComputeIO(ProjectGraphNode graphNode, IEnumerable<ProjectContext> runtimeContexts)
         {
             var inputs = new List<string>();
             var outputs = new List<string>();
@@ -66,9 +66,8 @@ namespace Microsoft.DotNet.Tools.Build
             inputs.AddRange(CompilerUtil.GetCompilationSources(project, compilerOptions));
 
             var allOutputPath = new HashSet<string>(calculator.CompilationFiles.All());
-            if (isRootProject && project.ProjectFile.HasRuntimeOutput(_configuration))
+            foreach (var runtimeContext in runtimeContexts)
             {
-                var runtimeContext = _workspace.GetRuntimeContext(project, _runtimes);
                 foreach (var path in runtimeContext.GetOutputPaths(_configuration, _buildBasePath, _outputPath).RuntimeFiles.All())
                 {
                     allOutputPath.Add(path);

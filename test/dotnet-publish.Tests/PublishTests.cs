@@ -142,7 +142,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
         }
 
         [Fact]
-        public void CrossPublishingSucceedsAndHasExpectedArtifacts()
+        public void CrossPublishingHasExpectedArtifacts()
         {
             var testNugetCache = "packages_cross_publish_test";
             TestInstance instance = TestAssetsManager.CreateTestInstance(Path.Combine("PortableTests"));

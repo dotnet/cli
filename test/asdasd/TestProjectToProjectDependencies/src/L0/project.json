@@ -1,13 +1,15 @@
 ﻿{
   "version": "1.0.0-*",
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
   "dependencies": {
-    "L22": "1.0.0-*",
-    "NETStandard.Library": "1.5.0-rc2-24022"
+    "L11": "1.0.0-*",
+    "L12": "1.0.0-*",
+    "Microsoft.NETCore.App": "1.0.0-rc2-*"
   },
   "frameworks": {
-    "netstandard1.5": {
-      "imports": "dnxcore50"
-    }
+    "netcoreapp1.0": {}
   },
   "runtimes": {
     "win7-x64": {},
