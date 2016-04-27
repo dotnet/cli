@@ -28,8 +28,8 @@ namespace Microsoft.DotNet.Kestrel.Tests
 
             var url = NetworkHelper.GetLocalhostUrlWithFreePort();
             var args = $"{url} {Guid.NewGuid().ToString()}";
+            string output = Build(Path.Combine(instance.TestRoot, KestrelPortable));
             var dotnetCommand = new DotnetCommand();
-            var output = Build(Path.Combine(instance.TestRoot, KestrelPortable));
 
             try
             {
@@ -51,18 +51,17 @@ namespace Microsoft.DotNet.Kestrel.Tests
 
             var url = NetworkHelper.GetLocalhostUrlWithFreePort();
             var args = $"{url} {Guid.NewGuid().ToString()}";
-            var dotnetCommand = new DotnetCommand();
-            var output = Build(Path.Combine(instance.TestRoot, KestrelStandalone));
+            var testCommand = new TestCommand(Build(Path.Combine(instance.TestRoot, KestrelStandalone)));
 
             try
             {
-                dotnetCommand.ExecuteAsync($"{output} {args}");
+                testCommand.ExecuteAsync(args);
                 NetworkHelper.IsServerUp(url).Should().BeTrue($"Unable to connect to kestrel server - {KestrelStandalone} @ {url}");
                 NetworkHelper.TestGetRequest(url, args);
             }
             finally
             {
-                dotnetCommand.KillTree();
+                testCommand.KillTree();
             }
         }
 
@@ -97,12 +96,11 @@ namespace Microsoft.DotNet.Kestrel.Tests
 
             var url = NetworkHelper.GetLocalhostUrlWithFreePort();
             var args = $"{url} {Guid.NewGuid().ToString()}";
-            var output = Publish(Path.Combine(instance.TestRoot, KestrelStandalone), false);
-            var command = new TestCommand(output);
+            var command = new TestCommand(Publish(Path.Combine(instance.TestRoot, KestrelStandalone), false));
 
             try
             {
-                command.ExecuteAsync($"{args}");
+                command.ExecuteAsync(args);
                 NetworkHelper.IsServerUp(url).Should().BeTrue($"Unable to connect to kestrel server - {KestrelStandalone} @ {url}");
                 NetworkHelper.TestGetRequest(url, args);
             }
@@ -112,19 +110,41 @@ namespace Microsoft.DotNet.Kestrel.Tests
             }
         }
 
-        private static string Build(string testRoot)
+        private string Build(string testRoot)
         {
             string appName = Path.GetFileName(testRoot);
 
-            var result = new BuildCommand(
-                projectPath: testRoot)
-                .ExecuteWithCapturedOutput();
+            var buildCommand = new BuildCommand(projectPath: testRoot);
+            var result = buildCommand.ExecuteWithCapturedOutput();
 
             result.Should().Pass();
 
             // the correct build assembly is next to its deps.json file 
-            var depsJsonFile = Directory.EnumerateFiles(testRoot, appName + FileNameSuffixes.DepsJson, SearchOption.AllDirectories).First();
-            return Path.Combine(Path.GetDirectoryName(depsJsonFile), appName + ".dll");
+            var depsJsonFiles = Directory.EnumerateFiles(testRoot, appName + FileNameSuffixes.DepsJson, SearchOption.AllDirectories);
+            string depsJsonFile;
+            if (depsJsonFiles.Count() == 1)
+            {
+                depsJsonFile = depsJsonFiles.First();
+            }
+            else
+            {
+                var standaloneAppDepsJsons = depsJsonFiles.Where((path) => ProjectContext.IsRidCompatibleWith(CurrentRid, Directory.GetParent(path).Name));
+                depsJsonFile = standaloneAppDepsJsons.First();
+            }
+            
+            var appPath = Path.GetDirectoryName(depsJsonFile);
+            var exePath = Path.Combine(appPath, buildCommand.GetOutputExecutableName());
+            if (File.Exists(exePath))
+            {
+                // standalone app
+                return exePath;
+            }
+            else
+            {
+                // portable app
+                var dllPath = Path.Combine(appPath, appName + ".dll");
+                return dllPath;
+            }
         }
 
         private static string Publish(string testRoot, bool isPortable)

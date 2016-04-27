@@ -24,7 +24,15 @@ namespace Microsoft.DotNet.ProjectModel
         {
             get
             {
-                var extension = FileNameSuffixes.CurrentPlatform.Exe;
+                string extension;
+                if (string.IsNullOrEmpty(_runtimeIdentifier))
+                {
+                    extension = FileNameSuffixes.CurrentPlatform.Exe;
+                }
+                else
+                {
+                    extension = _runtimeIdentifier.ToLower().StartsWith("win") ? ".exe" : string.Empty;
+                }
 
                 if (Framework.IsDesktop())
                 {

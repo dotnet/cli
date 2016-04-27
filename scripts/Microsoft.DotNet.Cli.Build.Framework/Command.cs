@@ -300,7 +300,7 @@ namespace Microsoft.DotNet.Cli.Build.Framework
                 return info.FileName;
             }
 
-            return info.FileName + " " + info.Arguments;
+            return info.WorkingDirectory + "> " + info.FileName + " " + info.Arguments;
         }
 
         private void ReportExecBegin()

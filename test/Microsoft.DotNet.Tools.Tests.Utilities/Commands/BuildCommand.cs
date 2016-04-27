@@ -240,6 +240,11 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             _buildProfile = buildProfile;
             _noIncremental = noIncremental;
             _noDependencies = noDependencies;
+            
+            /*if (!string.IsNullOrEmpty(_outputDirectory) && string.IsNullOrEmpty(_runtime))
+            {
+                throw new Exception("verify and fix me (make sure it is standalone app)");
+            }/**/
         }
 
         public override CommandResult Execute(string args = "")
