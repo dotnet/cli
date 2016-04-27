@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.Cli.Utils
 
     public static class PerfTrace
     {
-        private static ConcurrentBag<PerfTraceThreadContext> _threads;
+        private static ConcurrentBag<PerfTraceThreadContext> _threads = new ConcurrentBag<PerfTraceThreadContext>();
 
         [ThreadStatic]
         private static PerfTraceThreadContext _current;
@@ -40,9 +40,15 @@ namespace Microsoft.DotNet.Cli.Utils
 
         private static PerfTraceThreadContext InitializeCurrent()
         {
-            var context = new PerfTraceThreadContext(Thread.CurrentThread.ManagedThreadId);
+            var currentThread = Thread.CurrentThread;
+            var context = new PerfTraceThreadContext(currentThread.ManagedThreadId, currentThread.Name);
             _threads.Add(context);
             return context;
+        }
+
+        public static IEnumerable<PerfTraceThreadContext> GetEvents()
+        {
+            return _threads;
         }
     }
 
@@ -54,9 +60,9 @@ namespace Microsoft.DotNet.Cli.Utils
 
         public PerfTraceEvent Root => _activeEvent.CreateEvent();
 
-        public PerfTraceThreadContext(int threadId)
+        public PerfTraceThreadContext(int threadId, string threadName)
         {
-            _activeEvent = new TimerDisposable(this, "Thread", threadId.ToString());
+            _activeEvent = new TimerDisposable(this, "Thread", $"{threadName} {threadId.ToString()}");
             _threadId = threadId;
         }
 
@@ -88,7 +94,8 @@ namespace Microsoft.DotNet.Cli.Utils
             private Stopwatch _stopwatch = Stopwatch.StartNew();
 
             public TimerDisposable Parent { get; set; }
-            public ConcurrentBag<PerfTraceEvent> Children { get; set; }
+
+            public ConcurrentBag<PerfTraceEvent> Children { get; set; } = new ConcurrentBag<PerfTraceEvent>();
 
             public TimerDisposable(PerfTraceThreadContext context, string eventType, string instance)
             {

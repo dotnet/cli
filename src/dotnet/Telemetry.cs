@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.Cli
 
             try
             {
-                using (PerfTrace.CaptureTiming())
+                using (PerfTrace.Current.CaptureTiming())
                 {
                     _client = new TelemetryClient();
                     _client.InstrumentationKey = InstrumentationKey;
@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.Cli
                 return;
             }
 
-            using (PerfTrace.CaptureTiming())
+            using (PerfTrace.Current.CaptureTiming())
             {
                 Dictionary<string, double> eventMeasurements = GetEventMeasures(measurements);
                 Dictionary<string, string> eventProperties = GetEventProperties(properties);

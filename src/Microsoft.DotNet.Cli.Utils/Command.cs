@@ -128,7 +128,7 @@ namespace Microsoft.DotNet.Cli.Utils
             var sw = Stopwatch.StartNew();
             Reporter.Verbose.WriteLine($"> {FormatProcessInfo(_process.StartInfo)}".White());
 #endif
-            using (PerfTrace.CaptureTiming($"{Path.GetFileNameWithoutExtension(_process.StartInfo.FileName)} {_process.StartInfo.Arguments}"))
+            using (PerfTrace.Current.CaptureTiming($"{Path.GetFileNameWithoutExtension(_process.StartInfo.FileName)} {_process.StartInfo.Arguments}"))
             {
                 _process.Start();
 

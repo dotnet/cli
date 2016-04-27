@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.Cli
 
             try
             {
-                using (PerfTrace.CaptureTiming())
+                using (PerfTrace.Current.CaptureTiming())
                 {
                     return ProcessArgs(args, new Telemetry());
                 }
@@ -157,12 +157,21 @@ namespace Microsoft.DotNet.Cli
 
         }
 
-        private static void DumpPerfEvents(IEnumerable<PerfTraceEvent> events)
+        private static void DumpPerfEvents(IEnumerable<PerfTraceThreadContext> contexts)
         {
-            Console.WriteLine("Performance Summary:");
-            foreach (var evt in events)
+            Reporter.Output.WriteLine("Performance Summary:");
+            foreach (var context in contexts)
             {
-                Console.WriteLine($" {evt.Type} ({evt.Instance}): {evt.Duration.TotalMilliseconds:0.00}ms");
+                DumpPerfEvents(context.Root.Children);
+            }
+        }
+
+        private static void DumpPerfEvents(IEnumerable<PerfTraceEvent> events, int padding = 0)
+        {
+            foreach (var e in events)
+            {
+                Reporter.Output.WriteLine($"{new string(' ', padding)}[{e.Duration.ToString("ss\\.ffff").Blue()}] {e.Type.Bold()} {e.Instance}");
+                DumpPerfEvents(e.Children, padding + 1);
             }
         }
 
