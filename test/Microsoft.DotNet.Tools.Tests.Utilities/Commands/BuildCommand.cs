@@ -2,8 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.IO;
+using System.Linq;
 using Microsoft.DotNet.Cli.Utils;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.DotNet.ProjectModel;
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
@@ -267,6 +270,35 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         public string GetOutputExecutableName()
         {
             return _project.Name + GetExecutableExtension();
+        }
+
+        private string BuildRelativeOutputPath(bool portable)
+        {
+            // lets try to build an approximate output path
+            string config = string.IsNullOrEmpty(_configuration) ? "Debug" : _configuration;
+            string framework = string.IsNullOrEmpty(_framework) ?
+                _project.GetTargetFrameworks().First().FrameworkName.GetShortFolderName() : _framework;
+            
+            if (!portable)
+            {
+                var runtime = string.IsNullOrEmpty(_runtime) ? PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier() : _runtime;
+                return Path.Combine(config, framework, runtime);
+            }
+            else
+            {
+                return Path.Combine(config, framework);
+            }
+        }
+
+        public DirectoryInfo GetOutputDirectory(bool portable = false)
+        {
+            if (!string.IsNullOrEmpty(_outputDirectory))
+            {
+                return new DirectoryInfo(_outputDirectory);
+            }
+
+            string output = Path.Combine(_project.ProjectDirectory, "bin", BuildRelativeOutputPath(portable));
+            return new DirectoryInfo(output);
         }
 
         public string GetExecutableExtension()
