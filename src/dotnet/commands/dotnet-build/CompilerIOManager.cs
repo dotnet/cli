@@ -10,6 +10,7 @@ using Microsoft.DotNet.Tools.Compiler;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Cli.Compiler.Common;
+using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Build
 {
@@ -50,13 +51,13 @@ namespace Microsoft.DotNet.Tools.Build
             var outputs = new List<string>();
 
             var isRootProject = graphNode.IsRoot;
-            var project = graphNode.ProjectContext;
 
-            var calculator = project.GetOutputPaths(_configuration, _buildBasePath, _outputPath);
+            var project = graphNode.Project;
+            var calculator = project.GetOutputPaths(graphNode.TargetFramework, _configuration, _buildBasePath, _outputPath);
             var binariesOutputPath = calculator.CompilationOutputPath;
 
             // input: project.json
-            inputs.Add(project.ProjectFile.ProjectFilePath);
+            inputs.Add(project.ProjectFilePath);
 
             // input: lock file; find when dependencies change
             AddLockFile(project, inputs);
@@ -65,9 +66,9 @@ namespace Microsoft.DotNet.Tools.Build
             inputs.AddRange(CompilerUtil.GetCompilationSources(project));
 
             var allOutputPath = new HashSet<string>(calculator.CompilationFiles.All());
-            if (isRootProject && project.ProjectFile.HasRuntimeOutput(_configuration))
+            if (isRootProject && project.HasRuntimeOutput(_configuration))
             {
-                var runtimeContext = _workspace.GetRuntimeContext(project, _runtimes);
+                var runtimeContext = _workspace.GetRuntimeContext(graphNode.ProjectContext, _runtimes);
                 foreach (var path in runtimeContext.GetOutputPaths(_configuration, _buildBasePath, _outputPath).RuntimeFiles.All())
                 {
                     allOutputPath.Add(path);
@@ -81,7 +82,7 @@ namespace Microsoft.DotNet.Tools.Build
             }
 
             // input compilation options files
-            AddCompilationOptions(project, _configuration, inputs);
+            AddCompilationOptions(project, graphNode.TargetFramework, _configuration, inputs);
 
             // input / output: resources with culture
             AddNonCultureResources(project, calculator.IntermediateOutputDirectoryPath, inputs, outputs);
@@ -92,27 +93,28 @@ namespace Microsoft.DotNet.Tools.Build
             return new CompilerIO(inputs, outputs);
         }
 
-        private static void AddLockFile(ProjectContext project, List<string> inputs)
+        private static void AddLockFile(Project project, List<string> inputs)
         {
-            if (project.LockFile == null)
-            {
-                var errorMessage = $"Project {project.ProjectName()} does not have a lock file.";
-                Reporter.Error.WriteLine(errorMessage);
-                throw new InvalidOperationException(errorMessage);
-            }
+            //TODO: better way to fix this:
+            //if (project.LockFile == null)
+            //{
+            //    var errorMessage = $"Project {project.ProjectName()} does not have a lock file.";
+            //    Reporter.Error.WriteLine(errorMessage);
+            //    throw new InvalidOperationException(errorMessage);
+            //}
 
-            inputs.Add(project.LockFile.LockFilePath);
+            //inputs.Add(project.LockFile.LockFilePath);
 
-            if (project.LockFile.ExportFile != null)
-            {
-                inputs.Add(project.LockFile.ExportFile.ExportFilePath);
-            }
+            //if (project.LockFile.ExportFile != null)
+            //{
+            //    inputs.Add(project.LockFile.ExportFile.ExportFilePath);
+            //}
         }
 
 
-        private static void AddCompilationOptions(ProjectContext project, string config, List<string> inputs)
+        private static void AddCompilationOptions(Project project, NuGetFramework targetFramework, string config, List<string> inputs)
         {
-            var compilerOptions = project.ResolveCompilationOptions(config);
+            var compilerOptions = project.ResolveCompilationOptions(targetFramework, config);
 
             // input: key file
             if (compilerOptions.KeyFile != null)
@@ -121,9 +123,9 @@ namespace Microsoft.DotNet.Tools.Build
             }
         }
 
-        private static void AddNonCultureResources(ProjectContext project, string intermediaryOutputPath, List<string> inputs, IList<string> outputs)
+        private static void AddNonCultureResources(Project project, string intermediaryOutputPath, List<string> inputs, IList<string> outputs)
         {
-            foreach (var resourceIO in CompilerUtil.GetNonCultureResources(project.ProjectFile, intermediaryOutputPath))
+            foreach (var resourceIO in CompilerUtil.GetNonCultureResources(project, intermediaryOutputPath))
             {
                 inputs.Add(resourceIO.InputFile);
 
@@ -134,9 +136,9 @@ namespace Microsoft.DotNet.Tools.Build
             }
         }
 
-        private static void AddCultureResources(ProjectContext project, string outputPath, List<string> inputs, List<string> outputs)
+        private static void AddCultureResources(Project project, string outputPath, List<string> inputs, List<string> outputs)
         {
-            foreach (var cultureResourceIO in CompilerUtil.GetCultureResources(project.ProjectFile, outputPath))
+            foreach (var cultureResourceIO in CompilerUtil.GetCultureResources(project, outputPath))
             {
                 inputs.AddRange(cultureResourceIO.InputFileToMetadata.Keys);
 

@@ -46,7 +46,8 @@ namespace Microsoft.DotNet.Tools.Build
             var builderCommandApp = args;
             var graphCollector = new ProjectGraphCollector(
                 !builderCommandApp.ShouldSkipDependencies,
-                (project, target) => args.Workspace.GetProjectContext(project, target));
+                (project, target) => args.Workspace.GetProjectContext(project, target),
+                (project) => args.Workspace.GetProject(project));
 
             var contexts = ResolveRootContexts(files, frameworks, args);
             var graph = graphCollector.Collect(contexts).ToArray();
@@ -54,13 +55,11 @@ namespace Microsoft.DotNet.Tools.Build
             return builder.Build(graph).ToArray().All(r => r != CompilationResult.Failure);
         }
 
-        private static IEnumerable<ProjectContext> ResolveRootContexts(
+        private static IEnumerable<ProjectGraphNode> ResolveRootContexts(
             IEnumerable<string> files,
             IEnumerable<NuGetFramework> frameworks,
             BuildCommandApp args)
         {
-            List<Task<ProjectContext>> tasks = new List<Task<ProjectContext>>();
-
             foreach (var file in files)
             {
                 var project = args.Workspace.GetProject(file);
@@ -89,10 +88,15 @@ namespace Microsoft.DotNet.Tools.Build
 
                 foreach (var framework in selectedFrameworks)
                 {
-                    tasks.Add(Task.Run(() => args.Workspace.GetProjectContext(file, framework)));
+                    var projectTask = Task.Run(() => args.Workspace.GetProject(file));
+                    var projectContextTask = Task.Run(() => args.Workspace.GetProjectContext(file, framework));
+                    yield return new ProjectGraphNode(
+                        framework,
+                        projectTask,
+                        projectContextTask,
+                        Enumerable.Empty<ProjectGraphNode>(), true);
                 }
             }
-            return Task.WhenAll(tasks).GetAwaiter().GetResult();
         }
     }
 }

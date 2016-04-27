@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.ProjectModel.Workspaces
             // TODO: ctor argument?
             var configuration = "Debug";
 
-            var compilationOptions = project.GetLanguageSpecificCompilerOptions(project.TargetFramework, configuration);
+            var compilationOptions = project.GetLanguageSpecificCompilerOptions(configuration);
 
             var compilationSettings = ToCompilationSettings(compilationOptions, project.TargetFramework, project.ProjectFile.ProjectDirectory);
 
