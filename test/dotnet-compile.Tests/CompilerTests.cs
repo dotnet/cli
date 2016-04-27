@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
@@ -223,7 +224,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             result.Should().Pass();
 
             new DirectoryInfo(outputDir).Should().HaveFiles(
-                new[] { "MyApp.dll", "MyApp" + RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : "",
+                new[] { "MyApp.dll", "MyApp" + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : ""),
                     "MyApp.runtimeconfig.json", "MyApp.deps.json" });
         }
 
