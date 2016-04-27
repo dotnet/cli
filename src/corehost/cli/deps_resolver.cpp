@@ -328,6 +328,8 @@ bool deps_resolver_t::probe_entry_in_configs(const deps_entry_t& entry, pal::str
 //
 pal::string_t deps_resolver_t::resolve_coreclr_dir()
 {
+    trace::verbose(_X("--- Resolving CoreCLR directory ---"));
+
     auto process_coreclr = [&]
         (bool is_portable, const pal::string_t& deps_dir, deps_json_t* deps) -> pal::string_t
     {
