@@ -218,12 +218,12 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             var root = testInstance.TestRoot;
             var outputDir = Path.Combine(root, "bin");
             var testProject = ProjectUtils.GetProjectJson(root, "AppWithOutputAssemblyName");
-            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultFramework, runtime: "win7-x64");
+            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultFramework, runtime: CurrentRid);
             var result = buildCommand.ExecuteWithCapturedOutput();
             result.Should().Pass();
 
             new DirectoryInfo(outputDir).Should().HaveFiles(
-                new[] { "MyApp.dll", "MyApp.exe",
+                new[] { "MyApp.dll", "MyApp" + RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : "",
                     "MyApp.runtimeconfig.json", "MyApp.deps.json" });
         }
 
