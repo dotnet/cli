@@ -24,31 +24,31 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             { 
                 Rid="centos.7-x64",
                 HostExtension="", 
-                ExpectedArtifacts=new string[] { "libhostfxr.so", "libcoreclr.so", "libhostpolicy.so" } 
+                ExpectedArtifacts=new string[] { "libhostfxr.so", "libhostpolicy.so" } 
             }, 
             new 
             { 
                 Rid="rhel.7.2-x64",
                 HostExtension="", 
-                ExpectedArtifacts=new string[] { "libhostfxr.so", "libcoreclr.so", "libhostpolicy.so" } 
+                ExpectedArtifacts=new string[] { "libhostfxr.so", "libhostpolicy.so" } 
             }, 
             new 
             { 
                 Rid="ubuntu.14.04-x64",
                 HostExtension="", 
-                ExpectedArtifacts=new string[] { "libhostfxr.so", "libcoreclr.so", "libhostpolicy.so" } 
+                ExpectedArtifacts=new string[] { "libhostfxr.so", "libhostpolicy.so" } 
             }, 
             new 
             { 
                 Rid="win7-x64",
                 HostExtension=".exe", 
-                ExpectedArtifacts=new string[] { "hostfxr.dll", "coreclr.dll", "hostpolicy.dll" } 
+                ExpectedArtifacts=new string[] { "hostfxr.dll", "hostpolicy.dll" } 
             }, 
             new 
             { 
                 Rid="osx.10.11-x64",
                 HostExtension="", 
-                ExpectedArtifacts=new string[] { "libhostfxr.dylib", "libcoreclr.dylib", "libhostpolicy.dylib" } 
+                ExpectedArtifacts=new string[] { "libhostfxr.dylib", "libhostpolicy.dylib" } 
             }
         };
 
