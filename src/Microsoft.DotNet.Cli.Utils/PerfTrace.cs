@@ -40,8 +40,7 @@ namespace Microsoft.DotNet.Cli.Utils
 
         private static PerfTraceThreadContext InitializeCurrent()
         {
-            var currentThread = Thread.CurrentThread;
-            var context = new PerfTraceThreadContext(currentThread.ManagedThreadId, currentThread.Name);
+            var context = new PerfTraceThreadContext(Thread.CurrentThread.ManagedThreadId);
             _threads.Add(context);
             return context;
         }
@@ -60,9 +59,9 @@ namespace Microsoft.DotNet.Cli.Utils
 
         public PerfTraceEvent Root => _activeEvent.CreateEvent();
 
-        public PerfTraceThreadContext(int threadId, string threadName)
+        public PerfTraceThreadContext(int threadId)
         {
-            _activeEvent = new TimerDisposable(this, "Thread", $"{threadName} {threadId.ToString()}");
+            _activeEvent = new TimerDisposable(this, "Thread", $"{threadId.ToString()}");
             _threadId = threadId;
         }
 

@@ -160,19 +160,49 @@ namespace Microsoft.DotNet.Cli
         private static void DumpPerfEvents(IEnumerable<PerfTraceThreadContext> contexts)
         {
             Reporter.Output.WriteLine("Performance Summary:");
-            foreach (var context in contexts)
-            {
-                DumpPerfEvents(context.Root.Children);
-            }
+            DumpPerfEvents(contexts.Select(c => c.Root), null);
         }
 
-        private static void DumpPerfEvents(IEnumerable<PerfTraceEvent> events, int padding = 0)
+        private static void DumpPerfEvents(IEnumerable<PerfTraceEvent> events, PerfTraceEvent parent, int padding = 0)
         {
             foreach (var e in events)
             {
-                Reporter.Output.WriteLine($"{new string(' ', padding)}[{e.Duration.ToString("ss\\.ffff").Blue()}] {e.Type.Bold()} {e.Instance}");
-                DumpPerfEvents(e.Children, padding + 1);
+                Reporter.Output.Write(new string(' ', padding));
+                Reporter.Output.WriteLine(FormatEvent(e, parent));
+                DumpPerfEvents(e.Children, e, padding + 2);
             }
+        }
+
+        private static string FormatEvent(PerfTraceEvent e, PerfTraceEvent parent)
+        {
+            var builder = new StringBuilder();
+            FormatEventTimeStat(builder, e, parent);
+            builder.Append($" {e.Type.Bold()} {e.Instance}");
+            return builder.ToString();
+        }
+
+        private static void FormatEventTimeStat(StringBuilder builder, PerfTraceEvent e, PerfTraceEvent parent)
+        {
+            builder.Append("[");
+            var percent = e.Duration.TotalSeconds / parent?.Duration.TotalSeconds;
+            if (percent != null)
+            {
+                var formattedPercent = $"{percent*100:00\\.00%}";
+                if (percent > 0.5)
+                {
+                    builder.Append(formattedPercent.Red());
+                }
+                else if (percent > 0.25)
+                {
+                    builder.Append(formattedPercent.Yellow());
+                }
+                else
+                {
+                    builder.Append(formattedPercent);
+                }
+                builder.Append(":");
+            }
+            builder.Append($"{e.Duration.ToString("ss\\.ffff").Blue()}]");
         }
 
         private static void InitializeProcess()
