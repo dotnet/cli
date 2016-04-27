@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.Cli
             int sampleRate = ReciprocalSampleRateValue;
             bool isCITestMachine = Env.GetEnvironmentVariableAsBool(ContinousIntegrationFlag);
 
-			if(isCITestMachine)
+            if(isCITestMachine)
             {
                 sampleRate = ReciprocalSampleRateValueForCI;
                 _shouldLogTelemetry = (Environment.TickCount % ReciprocalSampleRateValue == 0);    
@@ -61,7 +61,7 @@ namespace Microsoft.DotNet.Cli
                 _client.InstrumentationKey = InstrumentationKey;
                 _client.Context.Session.Id = Guid.NewGuid().ToString();
 
-                
+
                 var runtimeEnvironment = PlatformServices.Default.Runtime;
                 _client.Context.Device.OperatingSystem = runtimeEnvironment.OperatingSystem;
 
