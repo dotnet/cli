@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.Tools.Build
             _outputPath = outputPath;
         }
 
-        public IncrementalResult NeedsRebuilding(ProjectGraphNode graphNode)
+        public IncrementalResult NeedsRebuilding(ProjectGraphNode graphNode, IEnumerable<ProjectContext> runtimeContexts)
         {
             if (!_shouldSkipDependencies &&
                 graphNode.Dependencies.Any(d => _projectBuilder.GetCompilationResult(d) != CompilationResult.IncrementalSkip))
@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.Tools.Build
                 return new IncrementalResult($"project is not safe for incremental compilation. Use {BuildCommandApp.BuildProfileFlag} flag for more information.");
             }
 
-            var compilerIO = _compilerIoManager.GetCompileIO(graphNode);
+            var compilerIO = _compilerIoManager.GetCompileIO(graphNode, runtimeContexts);
 
             var result = CLIChanged(graphNode);
             if (result.NeedsRebuilding)
@@ -196,11 +196,11 @@ namespace Microsoft.DotNet.Tools.Build
                 : IncrementalResult.DoesNotNeedRebuild;
         }
 
-        public void CacheIncrementalState(ProjectGraphNode graphNode)
+        public void CacheIncrementalState(ProjectGraphNode graphNode, IEnumerable<ProjectContext> runtimeContexts)
         {
             var incrementalCacheFile = graphNode.ProjectContext.IncrementalCacheFile(_configuration, _buildBasePath, _outputPath);
 
-            var incrementalCache = new IncrementalCache(_compilerIoManager.GetCompileIO(graphNode));
+            var incrementalCache = new IncrementalCache(_compilerIoManager.GetCompileIO(graphNode, runtimeContexts));
             incrementalCache.WriteToFile(incrementalCacheFile);
         }
     }

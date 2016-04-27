@@ -25,8 +25,7 @@ namespace Microsoft.DotNet.Tools.Test
             var reportingChannelFactory = new ReportingChannelFactory();
             var adapterChannel = reportingChannelFactory.CreateAdapterChannel(dotnetTestParams.Port.Value);
 
-            try
-            {
+
                 var pathToAssemblyUnderTest = new AssemblyUnderTest(projectContext, dotnetTestParams).Path;
                 var messages = new TestMessagesCollection();
                 using (var dotnetTest = new DotnetTest(messages, pathToAssemblyUnderTest))
@@ -51,13 +50,14 @@ namespace Microsoft.DotNet.Tools.Test
                     dotnetTest.StartListeningTo(adapterChannel);
 
                     adapterChannel.Connect();
-
-                    dotnetTest.StartHandlingMessages();
-                }
-            }
-            catch (Exception ex)
-            {
-                adapterChannel.SendError(ex);
+                    try
+                    {
+                        dotnetTest.StartHandlingMessages();
+                    }
+                    catch (Exception ex)
+                    {
+                        adapterChannel.SendError(ex);
+                    }
             }
         }
 

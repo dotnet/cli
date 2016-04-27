@@ -168,11 +168,10 @@ namespace Microsoft.DotNet.Tools.Compiler
                 { "compile:ResponseFile", rsp }
             };
 
-            if (context.ProjectFile.HasRuntimeOutput(args.ConfigValue))
+            ProjectContext runtimeContext = context.CreateRuntimeContextForCurrentPlatform(args.ConfigValue);
+            if (runtimeContext != null)
             {
-                var runtimeContext = args.Workspace.GetRuntimeContext(context, args.GetRuntimes());
                 var runtimeOutputPath = runtimeContext.GetOutputPaths(args.ConfigValue, args.BuildBasePathValue, args.OutputValue);
-
                 contextVariables.Add(
                     "compile:RuntimeOutputDir",
                     runtimeOutputPath.RuntimeOutputPath.TrimEnd('\\', '/'));

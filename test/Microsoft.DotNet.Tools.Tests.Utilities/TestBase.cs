@@ -24,6 +24,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         private TempRoot _temp;
         private static TestAssetsManager s_testsAssetsMgr;
         private static string s_repoRoot;
+        private static string s_currentRid;
 
         protected static string RepoRoot
         {
