@@ -66,19 +66,24 @@ namespace Microsoft.DotNet.Tools.Build
             inputs.AddRange(CompilerUtil.GetCompilationSources(project, compilerOptions));
 
             var allOutputPath = new HashSet<string>(calculator.CompilationFiles.All());
-            foreach (var runtimeContext in runtimeContexts)
+
+            // output: [root project only] runtime output files such as deps.json etc..
+            if (isRootProject)
             {
-                foreach (var path in runtimeContext.GetOutputPaths(_configuration, _buildBasePath, _outputPath).RuntimeFiles.All())
+                foreach (var runtimeContext in runtimeContexts)
                 {
-                    allOutputPath.Add(path);
+                    foreach (var path in runtimeContext.GetOutputPaths(_configuration, _buildBasePath, _outputPath).RuntimeFiles.All())
+                    {
+                        allOutputPath.Add(path);
+                    }
                 }
             }
+			
             foreach (var dependency in graphNode.Dependencies)
             {
                 var outputFiles = dependency.ProjectContext
                     .GetOutputPaths(_configuration, _buildBasePath, _outputPath)
                     .CompilationFiles;
-
                 inputs.Add(outputFiles.Assembly);
             }
 
