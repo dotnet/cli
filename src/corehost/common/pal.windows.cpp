@@ -10,8 +10,6 @@
 #include <codecvt>
 #include <ShlObj.h>
 
-static thread_local std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> t_converter;
-
 pal::string_t pal::to_lower(const pal::string_t& in)
 {
     pal::string_t ret = in;
@@ -253,17 +251,26 @@ bool pal::get_own_executable_path(string_t* recv)
     return true;
 }
 
-pal::string_t pal::to_palstring(const std::string& str)
+pal::string_t pal::utf8_palstring(const std::string& str)
 {
-    return t_converter.from_bytes(str);
+    // No need of explicit null termination, so pass in the actual length.
+    pal::string_t retval;
+    size_t size = ::MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.size(), nullptr, 0);
+    retval.resize(size, '\0');
+    if (size == 0)
+    {
+        return retval;
+    }
+    ::MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.size(), &retval[0], retval.size());
+    return retval;
 }
 
-void pal::to_palstring(const char* str, pal::string_t* out)
+void pal::utf8_palstring(const char* str, pal::string_t* out)
 {
-    out->assign(t_converter.from_bytes(str));
+    out->assign(utf8_palstring(str));
 }
 
-void pal::to_clrstring(const pal::string_t& str, std::vector<char>* out)
+void pal::pal_clrstring(const pal::string_t& str, std::vector<char>* out)
 {
     // Pass -1 as we want explicit null termination in the char buffer.
     size_t size = ::WideCharToMultiByte(CP_ACP, 0, str.c_str(), -1, nullptr, 0, nullptr, nullptr);

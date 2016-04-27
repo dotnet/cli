@@ -117,9 +117,9 @@ namespace pal
     inline size_t strlen(const char_t* str) { return ::wcslen(str); }
     inline void err_vprintf(const char_t* format, va_list vl) { ::vfwprintf(stderr, format, vl); ::fputws(_X("\r\n"), stderr); }
 
-    pal::string_t to_palstring(const std::string& str);
-    void to_palstring(const char* str, pal::string_t* out);
-    void to_clrstring(const pal::string_t& str, std::vector<char>* out);
+    pal::string_t utf8_palstring(const std::string& str);
+    void utf8_palstring(const char* str, pal::string_t* out);
+    void pal_clrstring(const pal::string_t& str, std::vector<char>* out);
     void clr_palstring(const char* out, pal::string_t* str);
 #else
     #ifdef COREHOST_MAKE_DLL
@@ -159,9 +159,9 @@ namespace pal
 
     inline size_t strlen(const char_t* str) { return ::strlen(str); }
     inline void err_vprintf(const char_t* format, va_list vl) { ::vfprintf(stderr, format, vl); ::fputc('\n', stderr); }
-    inline pal::string_t to_palstring(const std::string& str) { return str; }
-    inline void to_palstring(const char* str, pal::string_t* out) { out->assign(str); }
-    inline void to_clrstring(const pal::string_t& str, std::vector<char>* out) { out->assign(str.begin(), str.end()); out->push_back('\0'); }
+    inline pal::string_t utf8_palstring(const std::string& str) { return str; }
+    inline void utf8_palstring(const char* str, pal::string_t* out) { out->assign(str); }
+    inline void pal_clrstring(const pal::string_t& str, std::vector<char>* out) { out->assign(str.begin(), str.end()); out->push_back('\0'); }
     inline void clr_palstring(const char* clr, pal::string_t* str) { str->assign(clr); }
 #endif
 
