@@ -96,7 +96,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             new BuildCommand(GetProjectPath(_testAppDirDirInfo),
                 output: outputValue != null ? Path.Combine(_testProjectsRoot, outputValue) : string.Empty,
                 buildBasePath: baseValue != null ? Path.Combine(_testProjectsRoot, baseValue) : string.Empty,
-                framework: DefaultFramework)
+                framework: DefaultFramework,
                 runtime: CurrentRid)
                 .ExecuteWithCapturedOutput().Should().Pass();
 
