@@ -66,7 +66,7 @@ namespace Microsoft.DotNet.ProjectModel
 
         public static Project GetProject(string projectPath, ICollection<DiagnosticMessage> diagnostics, ProjectReaderSettings settings = null)
         {
-            projectPath = NormalizeProjectFilePath(projectPath);
+            projectPath = ProjectPath.NormalizeProjectFilePath(projectPath);
 
             var name = Path.GetFileName(Path.GetDirectoryName(projectPath));
 
@@ -241,38 +241,6 @@ namespace Microsoft.DotNet.ProjectModel
             }
 
             return project;
-        }
-
-        internal static string NormalizeProjectDirectoryPath(string path)
-        {
-            if (File.Exists(path) &&
-                string.Equals(Path.GetFileName(path), Project.FileName, StringComparison.OrdinalIgnoreCase))
-            {
-                string directoryName = Path.GetDirectoryName(path);
-                if (string.IsNullOrEmpty(directoryName))
-                {
-                    directoryName = Directory.GetCurrentDirectory();
-                }
-
-                return Path.GetFullPath(directoryName);
-            }
-            else if (Directory.Exists(path) &&
-                     File.Exists(Path.Combine(path, Project.FileName)))
-            {
-                return Path.GetFullPath(path);
-            }
-
-            return null;
-        }
-
-        internal static string NormalizeProjectFilePath(string path)
-        {
-            if (!path.EndsWith(Project.FileName))
-            {
-                path = Path.Combine(path, Project.FileName);
-            }
-
-            return Path.GetFullPath(path);
         }
 
         private static NuGetVersion SpecifySnapshot(string version, string snapshotValue)
