@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.Tools.Build
         public IncrementalPreconditions GetIncrementalPreconditions(ProjectGraphNode projectNode)
         {
             IncrementalPreconditions preconditions;
-            if (_preconditions.TryGetValue(projectNode.ProjectContext.Identity, out preconditions))
+            if (_preconditions.TryGetValue(projectNode.Identity, out preconditions))
             {
                 return preconditions;
             }
@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.Tools.Build
             CollectScriptPreconditions(project, preconditions);
             CollectCompilerNamePreconditions(project, preconditions);
             CollectCheckPathProbingPreconditions(project, projectNode.TargetFramework, preconditions);
-            _preconditions[projectNode.ProjectContext.Identity] = preconditions;
+            _preconditions[projectNode.Identity] = preconditions;
             return preconditions;
         }
 

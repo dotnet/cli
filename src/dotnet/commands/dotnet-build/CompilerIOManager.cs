@@ -10,6 +10,7 @@ using Microsoft.DotNet.Tools.Compiler;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Cli.Compiler.Common;
+using Microsoft.DotNet.ProjectModel.Graph;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Build
@@ -42,7 +43,7 @@ namespace Microsoft.DotNet.Tools.Build
         // computes all the inputs and outputs that would be used in the compilation of a project
         public CompilerIO GetCompileIO(ProjectGraphNode graphNode)
         {
-            return _cache.GetOrAdd(graphNode.ProjectContext.Identity, i => ComputeIO(graphNode));
+            return _cache.GetOrAdd(graphNode.Identity, i => ComputeIO(graphNode));
         }
 
         private CompilerIO ComputeIO(ProjectGraphNode graphNode)
@@ -51,8 +52,8 @@ namespace Microsoft.DotNet.Tools.Build
             var outputs = new List<string>();
 
             var isRootProject = graphNode.IsRoot;
-
             var project = graphNode.Project;
+
             var calculator = project.GetOutputPaths(graphNode.TargetFramework, _configuration, _buildBasePath, _outputPath);
             var binariesOutputPath = calculator.CompilationOutputPath;
 
@@ -95,20 +96,21 @@ namespace Microsoft.DotNet.Tools.Build
 
         private static void AddLockFile(Project project, List<string> inputs)
         {
-            //TODO: better way to fix this:
-            //if (project.LockFile == null)
-            //{
-            //    var errorMessage = $"Project {project.ProjectName()} does not have a lock file.";
-            //    Reporter.Error.WriteLine(errorMessage);
-            //    throw new InvalidOperationException(errorMessage);
-            //}
+            var lockFile = Path.Combine(project.ProjectDirectory, LockFile.FileName);
+            if (!File.Exists(lockFile))
+            {
+                var errorMessage = $"Project {project.ProjectName()} does not have a lock file.";
+                Reporter.Error.WriteLine(errorMessage);
+                throw new InvalidOperationException(errorMessage);
+            }
 
-            //inputs.Add(project.LockFile.LockFilePath);
+            inputs.Add(lockFile);
 
-            //if (project.LockFile.ExportFile != null)
-            //{
-            //    inputs.Add(project.LockFile.ExportFile.ExportFilePath);
-            //}
+            var exportFile = Path.Combine(project.ProjectDirectory, ExportFile.ExportFileName);
+            if (File.Exists(exportFile))
+            {
+                inputs.Add(exportFile);
+            }
         }
 
 

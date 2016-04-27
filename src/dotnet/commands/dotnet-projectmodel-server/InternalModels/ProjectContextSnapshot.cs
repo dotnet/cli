@@ -66,7 +66,7 @@ namespace Microsoft.DotNet.ProjectModel.Server
             snapshot.RootDependency = context.ProjectFile.Name;
             snapshot.TargetFramework = context.TargetFramework;
             snapshot.SourceFiles = allSourceFiles.Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(path => path).ToList();
-            snapshot.CompilerOptions = context.GetLanguageSpecificCompilerOptions(configuration);
+            snapshot.CompilerOptions = context.ProjectFile.GetLanguageSpecificCompilerOptions(context.TargetFramework, configuration);
             snapshot.ProjectReferences = allProjectReferences.OrderBy(reference => reference.Name).ToList();
             snapshot.FileReferences = allFileReferences.Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(path => path).ToList();
             snapshot.DependencyDiagnostics = allDependencyDiagnostics;

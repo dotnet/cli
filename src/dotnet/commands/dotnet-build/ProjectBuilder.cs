@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.Tools.Build
         public CompilationResult? GetCompilationResult(ProjectGraphNode projectNode)
         {
             CompilationResult result;
-            if (_compilationResults.TryGetValue(projectNode.ProjectContext.Identity, out result))
+            if (_compilationResults.TryGetValue(projectNode.Identity, out result))
             {
                 return result;
             }
@@ -44,13 +44,13 @@ namespace Microsoft.DotNet.Tools.Build
         private CompilationResult Build(ProjectGraphNode projectNode)
         {
             CompilationResult result;
-            if (_compilationResults.TryGetValue(projectNode.ProjectContext.Identity, out result))
+            if (_compilationResults.TryGetValue(projectNode.Identity, out result))
             {
                 return result;
             }
             result = CompileWithDependencies(projectNode);
 
-            _compilationResults[projectNode.ProjectContext.Identity] = result;
+            _compilationResults[projectNode.Identity] = result;
 
             return result;
         }
@@ -66,8 +66,8 @@ namespace Microsoft.DotNet.Tools.Build
                 }
             }
 
-            var context = projectNode.ProjectContext;
-            if (!context.ProjectFile.Files.SourceFiles.Any())
+            var context = projectNode.Project;
+            if (!context.Files.SourceFiles.Any())
             {
                 return CompilationResult.IncrementalSkip;
             }

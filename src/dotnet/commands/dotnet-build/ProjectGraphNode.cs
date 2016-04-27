@@ -37,5 +37,13 @@ namespace Microsoft.DotNet.Tools.Build
         public NuGetFramework TargetFramework { get; set; }
 
         public bool IsRoot { get; }
+
+        public ProjectContextIdentity Identity
+        {
+            get
+            {
+                return new ProjectContextIdentity(Project.ProjectFilePath, TargetFramework);
+            }
+        }
     }
 }
