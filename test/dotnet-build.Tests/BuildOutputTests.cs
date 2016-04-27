@@ -18,7 +18,6 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
     public class BuildOutputTests : TestBase
     {
         private string _testProjectsRoot;
-        private string _runtime;
         private DirectoryInfo _rootDirInfo;
         private DirectoryInfo _testAppDirDirInfo;
         private DirectoryInfo _testLibDirInfo;
@@ -70,7 +69,6 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
                 _testAppDirDirInfo.FullName,
                 null,
                 PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
-            _runtime = contexts.FirstOrDefault(c => !string.IsNullOrEmpty(c.RuntimeIdentifier))?.RuntimeIdentifier;
         }
 
         private string FormatPath(string input, string framework, string runtime)
@@ -99,11 +97,12 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
                 output: outputValue != null ? Path.Combine(_testProjectsRoot, outputValue) : string.Empty,
                 buildBasePath: baseValue != null ? Path.Combine(_testProjectsRoot, baseValue) : string.Empty,
                 framework: DefaultFramework)
+                runtime: CurrentRid)
                 .ExecuteWithCapturedOutput().Should().Pass();
 
-            var libdebug = _rootDirInfo.Sub(FormatPath(expectedLibCompile, DefaultLibraryFramework, _runtime));
-            var appdebug = _rootDirInfo.Sub(FormatPath(expectedAppCompile, DefaultFramework, _runtime));
-            var appruntime = _rootDirInfo.Sub(FormatPath(expectedAppRuntime, DefaultFramework, _runtime));
+            var libdebug = _rootDirInfo.Sub(FormatPath(expectedLibCompile, DefaultLibraryFramework, CurrentRid));
+            var appdebug = _rootDirInfo.Sub(FormatPath(expectedAppCompile, DefaultFramework, CurrentRid));
+            var appruntime = _rootDirInfo.Sub(FormatPath(expectedAppRuntime, DefaultFramework, CurrentRid));
 
             libdebug.Should().Exist()
                 .And.HaveFiles(_libCompileFiles)
@@ -128,10 +127,11 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             new BuildCommand(GetProjectPath(_testLibDirInfo),
                 output: outputValue != null ? Path.Combine(_testProjectsRoot, outputValue) : string.Empty,
                 buildBasePath: baseValue != null ? Path.Combine(_testProjectsRoot, baseValue) : string.Empty,
-                framework: DefaultLibraryFramework)
+                framework: DefaultLibraryFramework,
+                runtime: CurrentRid)
                 .ExecuteWithCapturedOutput().Should().Pass();
 
-            var libdebug = _rootDirInfo.Sub(FormatPath(expectedLibCompile, DefaultLibraryFramework, _runtime));
+            var libdebug = _rootDirInfo.Sub(FormatPath(expectedLibCompile, DefaultLibraryFramework, CurrentRid));
 
             libdebug.Should().Exist()
                 .And.HaveFiles(_libCompileFiles)
@@ -276,7 +276,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
             var libdebug = _testLibDirInfo.Sub("bin/Debug").Sub(DefaultLibraryFramework);
             var appdebug = _testAppDirDirInfo.Sub("bin/Debug").Sub(DefaultFramework);
-            var appruntime = appdebug.Sub(_runtime);
+            var appruntime = appdebug.Sub(CurrentRid);
 
             foreach (var name in names)
             {
