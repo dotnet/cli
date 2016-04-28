@@ -8,15 +8,15 @@ using NuGet.RuntimeModel;
 
 namespace Microsoft.DotNet.Cli.Build
 {
-    public class NuGetRidUtils
+    public class NugetRidUtils
     {
         private static readonly string s_runtimeJsonRelativePath = "scripts/dotnet-cli-build/runtime-graph.json";
 
         private RuntimeGraph _runtimeGraph;
 
-        public NuGetRidUtils(string repoRootDir) : this(repoRootDir, NuGetRidUtils.s_runtimeJsonRelativePath) { }
+        public NugetRidUtils(string repoRootDir) : this(repoRootDir, NugetRidUtils.s_runtimeJsonRelativePath) { }
 
-        public NuGetRidUtils(string repoRootDir, string runtimeJsonRelativePath)
+        public NugetRidUtils(string repoRootDir, string runtimeJsonRelativePath)
         {
             _runtimeGraph = ParseRuntimeGraph(
                 Path.Combine(repoRootDir, runtimeJsonRelativePath));
