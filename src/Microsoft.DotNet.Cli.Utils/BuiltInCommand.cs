@@ -100,13 +100,7 @@ namespace Microsoft.DotNet.Cli.Utils
             return this;
         }
 
-        public CommandResolutionStrategy ResolutionStrategy
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public CommandResolutionStrategy ResolutionStrategy => CommandResolutionStrategy.BuiltIn;
 
         public ICommand CaptureStdErr()
         {
