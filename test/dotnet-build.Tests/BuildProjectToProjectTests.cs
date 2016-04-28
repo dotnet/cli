@@ -71,10 +71,10 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         public void TestNoDependencyFlag()
         {
             var testInstance = TestAssetsManager.CreateTestInstance("TestProjectToProjectDependencies")
-                                                .WithLockFiles()
-                                                .WithBuildArtifacts();
+                                                .WithLockFiles();
 
             TestProjectRoot = testInstance.TestRoot;
+            var result1 = BuildProject();
 
             var dependencies = new[] { "L11", "L12", "L21", "L22" };
 
@@ -97,10 +97,10 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         public void TestNoDependenciesDependencyRebuild()
         {
             var testInstance = TestAssetsManager.CreateTestInstance("TestProjectToProjectDependencies")
-                                                .WithLockFiles()
-                                                .WithBuildArtifacts();
-
+                                                .WithLockFiles();
+                                                
             TestProjectRoot = testInstance.TestRoot;
+            var result1 = BuildProject();
 
             // modify the source code of a leaf dependency
             TouchSourcesOfProject("L11");
