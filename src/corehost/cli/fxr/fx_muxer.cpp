@@ -14,6 +14,37 @@
 #include "error_codes.h"
 #include "deps_format.h"
 
+
+void handle_missing_framework_error(const pal::string_t& fx_name, const pal::string_t& fx_version, const pal::string_t& fx_dir)
+{
+    pal::string_t fx_ver_dirs = get_directory(fx_dir);
+
+    trace::error(_X("The targeted framework { \"%s\": \"%s\" } was not found."), fx_name.c_str(), fx_version.c_str());
+    trace::error(_X("  - Check application dependencies and target a framework version installed at:"));
+    trace::error(_X("      %s"), fx_ver_dirs.c_str());
+
+    bool header = true;
+    std::vector<pal::string_t> versions;
+    pal::readdir(fx_ver_dirs, &versions);
+    for (const auto& ver : versions)
+    {
+        fx_ver_t parsed(-1, -1, -1);
+        if (fx_ver_t::parse(ver, &parsed, false))
+        {
+            if (header)
+            {
+                trace::error(_X("  - The following versions are installed:"));
+                header = false;
+            }
+            trace::error(_X("      %s"), ver.c_str());
+        }
+    }
+    if (header)
+    {
+        trace::error(_X("  - Or install the framework version that is being targeted."));
+    }
+}
+
 pal::string_t resolve_impl_version_from_deps(const pal::string_t& deps_json)
 {
     trace::verbose(_X("--- Resolving %s version from deps json [%s]"), LIBHOSTPOLICY_NAME, deps_json.c_str());
@@ -21,14 +52,14 @@ pal::string_t resolve_impl_version_from_deps(const pal::string_t& deps_json)
     pal::string_t retval;
     if (!pal::file_exists(deps_json))
     {
-        trace::verbose(_X("[%s] does not exist"), deps_json.c_str());
+        trace::verbose(_X("Dependency manifest [%s] does not exist"), deps_json.c_str());
         return retval;
     }
 
     pal::ifstream_t file(deps_json);
     if (!file.good())
     {
-        trace::verbose(_X("[%s] could not be opened"), deps_json.c_str());
+        trace::verbose(_X("Dependency manifest [%s] could not be opened"), deps_json.c_str());
         return retval;
     }
 
@@ -59,7 +90,7 @@ pal::string_t resolve_impl_version_from_deps(const pal::string_t& deps_json)
         (void)pal::utf8_palstring(je.what(), &jes);
         trace::error(_X("A JSON parsing exception occurred in [%s]: %s"), deps_json.c_str(), jes.c_str());
     }
-    trace::verbose(_X("%s version is [%s] in deps json file [%s]"), retval.c_str(), deps_json.c_str());
+    trace::verbose(_X("Resolved version %s from dependency manifest file [%s]"), retval.c_str(), deps_json.c_str());
     return retval;
 }
 
@@ -80,10 +111,13 @@ bool to_hostpolicy_package_path(const pal::string_t& dir, const pal::string_t& v
 
     if (!pal::file_exists(path))
     {
+        trace::verbose(_X("Did not find %s in path %s"), LIBHOSTPOLICY_NAME, path.c_str());
         return false;
     }
 
     *candidate = path;
+
+    trace::verbose(_X("Found %s in path %s"), LIBHOSTPOLICY_NAME, path.c_str());
     return true;
 }
 
@@ -101,12 +135,69 @@ bool hostpolicy_exists_in_svc(const pal::string_t& version, pal::string_t* resol
     pal::string_t path;
     if (to_hostpolicy_package_path(svc_dir, version, &path))
     {
-        resolved_dir->assign(path);
-        trace::verbose(_X("[%s] exists in servicing [%s]"), LIBHOSTPOLICY_NAME, path.c_str());
+        resolved_dir->assign(get_directory(path));
+        trace::verbose(_X("Found [%s] in servicing [%s]"), LIBHOSTPOLICY_NAME, path.c_str());
         return true;
     }
-    trace::verbose(_X("[%s] doesn't exist in servicing [%s]"), LIBHOSTPOLICY_NAME, path.c_str());
+    trace::verbose(_X("Did not find [%s] in servicing [%s]"), LIBHOSTPOLICY_NAME, path.c_str());
     return false;
+}
+
+pal::string_t get_deps_from_app_binary(const pal::string_t& app)
+{
+    pal::string_t deps_file;
+    deps_file.assign(get_directory(app));
+    deps_file.push_back(DIR_SEPARATOR);
+
+    pal::string_t app_name = get_filename(app);
+    deps_file.append(app_name, 0, app_name.find_last_of(_X(".")));
+    deps_file.append(_X(".deps.json"));
+    return deps_file;
+}
+
+bool resolve_impl_dir_from_probe_paths(const pal::string_t& version, const std::vector<pal::string_t>& probe_realpaths, pal::string_t* candidate)
+{
+    assert(!probe_realpaths.empty());
+    for (const auto& probe_path : probe_realpaths)
+    {
+        trace::verbose(_X("Considering %s to probe for %s"), probe_path.c_str(), LIBHOSTPOLICY_NAME);
+
+        pal::string_t path;
+        if (to_hostpolicy_package_path(probe_path, version, &path))
+        {
+            candidate->assign(get_directory(path));
+            return true;
+        }
+    }
+
+    trace::error(_X("Could not find required library %s in %d probing paths:"),
+        LIBHOSTPOLICY_NAME, probe_realpaths.size());
+    for (const auto& path : probe_realpaths)
+    {
+        trace::error(_X("  %s"), path.c_str());
+    }
+    return false;
+}
+
+bool resolve_impl_dir_for_portable(const pal::string_t& fx_dir, const runtime_config_t& config, pal::string_t* impl_dir)
+{
+    if (!pal::directory_exists(fx_dir))
+    {
+        handle_missing_framework_error(config.get_fx_name(), config.get_fx_version(), fx_dir);
+        return false;
+    }
+
+    pal::string_t fx_deps = fx_dir + DIR_SEPARATOR + config.get_fx_name() + _X(".deps.json");
+    pal::string_t version = resolve_impl_version_from_deps(fx_deps);
+    assert(!pal::file_exists(fx_deps) || !version.empty());
+
+    if (hostpolicy_exists_in_svc(version, impl_dir))
+    {
+        return true;
+    }
+
+    impl_dir->assign(fx_dir);
+    return true;
 }
 
 bool fx_muxer_t::resolve_impl_dir(host_mode_t mode,
@@ -118,70 +209,47 @@ bool fx_muxer_t::resolve_impl_dir(host_mode_t mode,
     const runtime_config_t& config,
     pal::string_t* impl_dir)
 {
+    // Portable app
     if (config.get_portable())
     {
-        pal::string_t fx_deps = fx_dir;
-        pal::string_t fx_deps_name = config.get_fx_name() + _X(".deps.json");
-        append_path(&fx_deps, fx_deps_name.c_str());
-
-        pal::string_t version = resolve_impl_version_from_deps(fx_deps);
-        if (!hostpolicy_exists_in_svc(version, impl_dir))
-        {
-            *impl_dir = fx_dir;
-        }
+        return resolve_impl_dir_for_portable(fx_dir, config, impl_dir);
     }
-    else
+
+    // Standalone app
+    pal::string_t app_deps_file = !deps_file.empty() ? deps_file : get_deps_from_app_binary(app_candidate);
+    pal::string_t version = resolve_impl_version_from_deps(app_deps_file);
+
+    assert(!pal::file_exists(app_deps_file) || !version.empty());
+    if (hostpolicy_exists_in_svc(version, impl_dir))
     {
-        pal::string_t app_deps_file = deps_file;
-        if (app_deps_file.empty())
-        {
-            pal::string_t app_name = get_filename(app_candidate);
-            pal::string_t app_deps_file = get_directory(app_candidate);
-            app_deps_file.push_back(DIR_SEPARATOR);
-            app_deps_file.append(app_name, 0, app_name.find_last_of(_X(".")));
-            app_deps_file.append(_X(".deps.json"));
-        }
-
-        pal::string_t version = resolve_impl_version_from_deps(app_deps_file);
-        if (!hostpolicy_exists_in_svc(version, impl_dir))
-        {
-            if (mode == host_mode_t::standalone || mode == host_mode_t::split_fx)
-            {
-                *impl_dir = own_dir;
-            }
-            else if (mode == host_mode_t::muxer)
-            {
-                *impl_dir = get_directory(deps_file.empty() ? app_candidate : deps_file);
-            }
-        }
-        trace::verbose(_X("The host impl directory before probing deps is [%s]"), impl_dir->c_str());
-        if (!library_exists_in_dir(*impl_dir, LIBHOSTPOLICY_NAME, nullptr) && !probe_realpaths.empty() && !deps_file.empty())
-        {
-            bool found = false;
-            pal::string_t candidate = *impl_dir;
-            for (const auto& probe_path : probe_realpaths)
-            {
-                trace::verbose(_X("Considering %s for hostpolicy library"), probe_path.c_str());
-                if (to_hostpolicy_package_path(probe_path, version, &candidate))
-                {
-                    found = true; // candidate contains the right path.
-                    break;
-                }
-            }
-            if (!found)
-            {
-                trace::error(_X("Could not find required library %s in the dependencies manifest [%s] or in %d probing paths: "),
-                    LIBHOSTPOLICY_NAME, deps_file.c_str(), probe_realpaths.size());
-                for (const auto& path : probe_realpaths)
-                {
-                    trace::error(_X("  %s"), path.c_str());
-                }
-                return false;
-            }
-            *impl_dir = get_directory(candidate);
-        }
+        return true;
     }
-    return true;
+
+    if (mode == host_mode_t::standalone || mode == host_mode_t::split_fx)
+    {
+        *impl_dir = own_dir;
+    }
+    else if (mode == host_mode_t::muxer)
+    {
+        *impl_dir = get_directory(deps_file.empty() ? app_candidate : deps_file);
+    }
+
+    if (library_exists_in_dir(*impl_dir, LIBHOSTPOLICY_NAME, nullptr))
+    {
+        return true;
+    }
+
+    pal::string_t candidate;
+    trace::verbose(_X("The host impl directory before probing deps is [%s]"), impl_dir->c_str());
+    if (!probe_realpaths.empty() && resolve_impl_dir_from_probe_paths(version, probe_realpaths, &candidate))
+    {
+        impl_dir->assign(candidate);
+        return true;
+    }
+
+    trace::error(_X("Expect required library %s to be present in [%s]"), LIBHOSTPOLICY_NAME, impl_dir->c_str());
+    trace::error(_X("  - This may be because of an invalid .NET Core FX configuration in the directory."));
+    return false;
 }
 
 pal::string_t fx_muxer_t::resolve_fx_dir(host_mode_t mode, const pal::string_t& own_dir, const runtime_config_t& config)
