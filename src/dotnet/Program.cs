@@ -202,7 +202,7 @@ namespace Microsoft.DotNet.Cli
                 }
                 builder.Append(":");
             }
-            builder.Append($"{e.Duration.ToString("ss\\.ffff").Blue()}]");
+            builder.Append($"{e.Duration.ToString("ss\\.fff").Blue()}]");
         }
 
         private static void InitializeProcess()

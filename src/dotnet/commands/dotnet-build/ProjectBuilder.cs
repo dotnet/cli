@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.DotNet.ProjectModel;
 using NuGet.Frameworks;
 using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.Cli.Compiler.Common;
 
 namespace Microsoft.DotNet.Tools.Build
 {
@@ -74,13 +75,13 @@ namespace Microsoft.DotNet.Tools.Build
             }
 
             bool needsRebuilding;
-            using (PerfTrace.Current.CaptureTiming("NeedsRebuilding"))
+            using (PerfTrace.Current.CaptureTiming($"{projectNode.ProjectContext.ProjectName()}", "NeedsRebuilding"))
             {
                 needsRebuilding = NeedsRebuilding(projectNode);
             }
             if (needsRebuilding)
             {
-                using (PerfTrace.Current.CaptureTiming("RunCompile"))
+                using (PerfTrace.Current.CaptureTiming($"{projectNode.ProjectContext.ProjectName()}","RunCompile"))
                 {
                     return RunCompile(projectNode);
                 }
