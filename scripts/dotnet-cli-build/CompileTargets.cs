@@ -35,6 +35,25 @@ namespace Microsoft.DotNet.Cli.Build
             "vbc.exe"
         };
 
+        public static string HostPackagePlatformRid => HostPackageSupportedRids[
+                             (PlatformServices.Default.Runtime.OperatingSystemPlatform == Platform.Windows)
+                             ? $"win7-{PlatformServices.Default.Runtime.RuntimeArchitecture}"
+                             : PlatformServices.Default.Runtime.GetRuntimeIdentifier()];
+
+        public static readonly Dictionary<string, string> HostPackageSupportedRids = new Dictionary<string, string>()
+        {
+            // Key: Current platform RID. Value: The actual publishable (non-dummy) package name produced by the build system for this RID.
+            { "win7-x64", "win7-x64" },
+            { "win7-x86", "win7-x86" },
+            { "osx.10.10-x64", "osx.10.10-x64" },
+            { "osx.10.11-x64", "osx.10.10-x64" },
+            { "ubuntu.14.04-x64", "ubuntu.14.04-x64" },
+            { "centos.7-x64", "rhel.7-x64" },
+            { "rhel.7-x64", "rhel.7-x64" },
+            { "rhel.7.2-x64", "rhel.7-x64" },
+            { "debian.8-x64", "debian.8-x64" }
+        };
+
         public const string SharedFrameworkName = "Microsoft.NETCore.App";
 
         public static Crossgen CrossgenUtil = new Crossgen(CoreCLRVersion);
@@ -83,7 +102,8 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
             var lockedHostFxrVersion = buildVersion.LockedHostFxrVersion;
-            var currentRid = GetRuntimeId();
+            var currentRid = HostPackagePlatformRid;
+            
             string projectJson = $@"{{
   ""dependencies"": {{
       ""Microsoft.NETCore.DotNetHostResolver"" : ""{lockedHostFxrVersion}""
@@ -254,7 +274,7 @@ namespace Microsoft.DotNet.Cli.Build
             }
             foreach (var item in buildVersion.LatestHostPackages)
             {
-                var fileFilter = $"runtime.{GetRuntimeId()}.{item.Key}.{item.Value}.nupkg";
+                var fileFilter = $"runtime.{HostPackagePlatformRid}.{item.Key}.{item.Value}.nupkg";
                 if (Directory.GetFiles(Dirs.CorehostLocalPackages, fileFilter).Length == 0)
                 {
                     throw new BuildFailureException($"Nupkg for {fileFilter} was not created.");
