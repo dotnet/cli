@@ -8,7 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Extensions.PlatformAbstractions.Internal;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Run
@@ -70,7 +70,7 @@ namespace Microsoft.DotNet.Tools.Run
 
             var frameworkContexts = _workspace.GetProjectContextCollection(Project).FrameworkOnlyContexts;
 
-            var rids = PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers();
+            var rids = RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers();
 
             ProjectContext frameworkContext;
             if (Framework == null)

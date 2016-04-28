@@ -14,7 +14,7 @@ using Microsoft.CodeAnalysis.Text;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Files;
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Extensions.PlatformAbstractions.Internal;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.ProjectModel.Workspaces
@@ -225,7 +225,7 @@ namespace Microsoft.DotNet.ProjectModel.Workspaces
             {
                 keyFile = Path.GetFullPath(Path.Combine(projectDirectory, compilerOptions.KeyFile));
 
-                if (PlatformServices.Default.Runtime.OperatingSystemPlatform != Extensions.PlatformAbstractions.Platform.Windows || useOssSigning)
+                if (RuntimeEnvironment.OperatingSystemPlatform != Extensions.PlatformAbstractions.Internal.Platform.Windows || useOssSigning)
                 {
                     return options.WithCryptoPublicKey(
                         SnkUtils.ExtractPublicKey(File.ReadAllBytes(keyFile)));

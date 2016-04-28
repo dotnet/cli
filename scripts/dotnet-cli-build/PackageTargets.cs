@@ -4,8 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli.Build.Framework;
-using Microsoft.Extensions.PlatformAbstractions;
-
+using Microsoft.Extensions.PlatformAbstractions.Internal;
 using static Microsoft.DotNet.Cli.Build.Framework.BuildHelpers;
 
 namespace Microsoft.DotNet.Cli.Build
@@ -20,6 +19,7 @@ namespace Microsoft.DotNet.Cli.Build
             "Microsoft.DotNet.ProjectModel.Workspaces",
             "Microsoft.DotNet.InternalAbstractions",
             "Microsoft.Extensions.DependencyModel",
+            "Microsoft.Extensions.PlatformAbstractions.Internal",
             "Microsoft.Extensions.Testing.Abstractions",
             "Microsoft.DotNet.Compiler.Common",
             "Microsoft.DotNet.Files",
@@ -261,11 +261,11 @@ namespace Microsoft.DotNet.Cli.Build
             // This is overkill, but I want to cover all the variables used in all OSes (including where some have the same names)
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
             var configuration = c.BuildContext.Get<string>("Configuration");
-            var architecture = PlatformServices.Default.Runtime.RuntimeArchitecture;
+            var architecture = RuntimeEnvironment.RuntimeArchitecture;
             var env = new Dictionary<string, string>()
             {
-                { "RID", PlatformServices.Default.Runtime.GetRuntimeIdentifier() },
-                { "OSNAME", PlatformServices.Default.Runtime.OperatingSystem },
+                { "RID", RuntimeEnvironment.GetRuntimeIdentifier() },
+                { "OSNAME", RuntimeEnvironment.OperatingSystem },
                 { "TFM", "dnxcore50" },
                 { "REPOROOT", Dirs.RepoRoot },
                 { "OutputDir", Dirs.Output },

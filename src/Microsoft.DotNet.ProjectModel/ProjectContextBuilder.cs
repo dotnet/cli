@@ -9,7 +9,7 @@ using System.Text;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Resolution;
 using Microsoft.Extensions.Internal;
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Extensions.PlatformAbstractions.Internal;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.ProjectModel
@@ -267,7 +267,7 @@ namespace Microsoft.DotNet.ProjectModel
             {
                 // we got a ridless target for desktop so turning portable mode on
                 isPortable = true;
-                var legacyRuntime = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
+                var legacyRuntime = RuntimeEnvironmentRidExtensions.GetLegacyRestoreRuntimeIdentifier();
                 if (RuntimeIdentifiers.Contains(legacyRuntime))
                 {
                     runtime = legacyRuntime;

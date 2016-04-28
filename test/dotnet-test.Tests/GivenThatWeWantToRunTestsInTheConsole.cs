@@ -5,10 +5,9 @@ using System;
 using System.IO;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.TestFramework;
-using Microsoft.Extensions.PlatformAbstractions;
-using Xunit;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using System.Linq;
+using Microsoft.Extensions.PlatformAbstractions.Internal;
+using Xunit;
 
 namespace Microsoft.Dotnet.Tools.Test.Tests
 {
@@ -26,7 +25,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
             var contexts = ProjectContext.CreateContextForEachFramework(
                 _projectFilePath,
                 null,
-                PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
+                RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers());
 
             // Restore the project again in the destination to resolve projects
             // Since the lock file has project relative paths in it, those will be broken

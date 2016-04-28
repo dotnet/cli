@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.ProjectModel.Graph;
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Extensions.PlatformAbstractions.Internal;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Cli.Utils
@@ -128,7 +128,7 @@ namespace Microsoft.DotNet.Cli.Utils
             return ProjectContext.Create(
                 projectRootPath,
                 framework,
-                PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
+                RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers());
 
         }
 

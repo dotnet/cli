@@ -188,6 +188,16 @@ namespace Microsoft.DotNet.Cli.Build
             },
             new TestPackageProject()
             {
+                Name = "Microsoft.Extensions.PlatformAbstractions.Internal",
+                IsTool = true,
+                Path = "src/Microsoft.Extensions.PlatformAbstractions.Internal",
+                IsApplicable = true,
+                VersionSuffix = s_testPackageBuildVersionSuffix,
+                Clean = false,
+                Frameworks = new [] { "net451", "netstandard1.3" }
+            },
+            new TestPackageProject()
+            {
                 Name = "Microsoft.Extensions.Testing.Abstractions",
                 IsTool = true,
                 Path = "src/Microsoft.Extensions.Testing.Abstractions",

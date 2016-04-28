@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Extensions.PlatformAbstractions.Internal;
 
 namespace Microsoft.DotNet.Tools.Test
 {
@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.Tools.Test
                 var projectPath = GetProjectPath(dotnetTestParams.ProjectPath);
                 var runtimeIdentifiers = !string.IsNullOrEmpty(dotnetTestParams.Runtime) ?
                     new[] { dotnetTestParams.Runtime } :
-                    PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers();
+                    RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers();
                 var exitCode = 0;
 
                 // Create a workspace

@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Extensions.PlatformAbstractions.Internal;
 using Newtonsoft.Json.Linq;
 using NuGet.Frameworks;
 using Xunit;
@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             var contexts = ProjectContext.CreateContextForEachFramework(
                 _testAppDirDirInfo.FullName,
                 null,
-                PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
+                RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers());
             _runtime = contexts.FirstOrDefault(c => !string.IsNullOrEmpty(c.RuntimeIdentifier))?.RuntimeIdentifier;
         }
 
@@ -177,9 +177,9 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         }
 
         [Theory]
-//        [InlineData("net20", false, true)]
-//        [InlineData("net40", true, true)]
-//        [InlineData("net461", true, true)]
+        //        [InlineData("net20", false, true)]
+        //        [InlineData("net40", true, true)]
+        //        [InlineData("net461", true, true)]
         [InlineData("netstandard1.5", true, false)]
         public void MultipleFrameworks_ShouldHaveValidTargetFrameworkAttribute(string frameworkName, bool shouldHaveTargetFrameworkAttribute, bool windowsOnly)
         {

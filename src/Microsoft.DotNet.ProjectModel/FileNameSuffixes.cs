@@ -1,5 +1,5 @@
 using System;
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Extensions.PlatformAbstractions.Internal;
 
 namespace Microsoft.DotNet.ProjectModel
 {
@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.ProjectModel
         {
             get
             {
-                switch (PlatformServices.Default.Runtime.OperatingSystemPlatform)
+                switch (RuntimeEnvironment.OperatingSystemPlatform)
                 {
                     case Platform.Windows:
                         return Windows;

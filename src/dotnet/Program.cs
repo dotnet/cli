@@ -17,7 +17,7 @@ using Microsoft.DotNet.Tools.Publish;
 using Microsoft.DotNet.Tools.Restore;
 using Microsoft.DotNet.Tools.Run;
 using Microsoft.DotNet.Tools.Test;
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Extensions.PlatformAbstractions.Internal;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Cli
@@ -168,12 +168,11 @@ namespace Microsoft.DotNet.Cli
             Reporter.Output.WriteLine($" Version:     {Product.Version}");
             Reporter.Output.WriteLine($" Commit Sha:  {commitSha}");
             Reporter.Output.WriteLine();
-            var runtimeEnvironment = PlatformServices.Default.Runtime;
             Reporter.Output.WriteLine("Runtime Environment:");
-            Reporter.Output.WriteLine($" OS Name:     {runtimeEnvironment.OperatingSystem}");
-            Reporter.Output.WriteLine($" OS Version:  {runtimeEnvironment.OperatingSystemVersion}");
-            Reporter.Output.WriteLine($" OS Platform: {runtimeEnvironment.OperatingSystemPlatform}");
-            Reporter.Output.WriteLine($" RID:         {runtimeEnvironment.GetRuntimeIdentifier()}");
+            Reporter.Output.WriteLine($" OS Name:     {RuntimeEnvironment.OperatingSystem}");
+            Reporter.Output.WriteLine($" OS Version:  {RuntimeEnvironment.OperatingSystemVersion}");
+            Reporter.Output.WriteLine($" OS Platform: {RuntimeEnvironment.OperatingSystemPlatform}");
+            Reporter.Output.WriteLine($" RID:         {RuntimeEnvironment.GetRuntimeIdentifier()}");
         }
 
         private static bool IsArg(string candidate, string longName)
