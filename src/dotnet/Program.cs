@@ -114,15 +114,7 @@ namespace Microsoft.DotNet.Cli
                 command = "help";
             }
 
-            var hashedargs = string.Join(",", args.Select(x => HashHelper.sha256_hash(x)));
-            telemetryClient.TrackEvent(
-                command,
-                new Dictionary<string, string>
-                {
-                    ["HashedArgs"] = hashedargs
-                },
-                null
-            );
+            telemetryClient.TrackEvent(command, args.ToList(), null);
 
             int exitCode;
             Func<string[], int> builtIn;
@@ -139,7 +131,6 @@ namespace Microsoft.DotNet.Cli
                 exitCode = result.ExitCode;
             }
 
-            telemetryClient.Finish();
 
             return exitCode;
 

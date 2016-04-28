@@ -19,7 +19,6 @@ namespace Microsoft.DotNet.Tests
         {
             EventName = eventName;
         }
-		public void Finish();
     }
 
 

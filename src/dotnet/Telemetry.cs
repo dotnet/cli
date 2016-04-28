@@ -10,23 +10,25 @@ namespace Microsoft.DotNet.Cli
 {
     public class Telemetry : ITelemetry
     {
-        public const double TimeoutInMilliseconds = 100;
 
-        private bool _isInitialized = false;
+        private bool _isCollectingTelemetry = false;
+        
+        
         private TelemetryClient _client = null;
 
         private Dictionary<string, string> _commonProperties = null;
         private Dictionary<string, double> _commonMeasurements = null;
         private Task _trackEventTask = null;
 
-        private const int ReciprocalSampleRateValue = 5;
-        private const int ReciprocalSampleRateValueForCI = 1000;
+        private int _sampleRate = 1;
+        private bool _isTestMachine = false;
 
-        private static bool _shouldLogTelemetry = (Environment.TickCount % ReciprocalSampleRateValue == 0);
+        private const int ReciprocalSampleRateValue = 1;
+        private const int ReciprocalSampleRateValueForTest = 1;        
         private const string InstrumentationKey = "74cc1c9e-3e6e-4d05-b3fc-dde9101d0254";
         private const string TelemetryOptout = "DOTNET_CLI_TELEMETRY_OPTOUT";
-        private const string ContinousIntegrationFlag = "CI_TEST_MACHINE";
-        private const string CITestMachine = "CI Test Machine";
+        private const string TestMachineFlag = "TEST_MACHINE";
+        private const string TestMachine = "Test Machine";
         private const string OSVersion = "OS Version";
         private const string OSPlatform = "OS Platform";
         private const string RuntimeId = "Runtime Id";
@@ -42,19 +44,56 @@ namespace Microsoft.DotNet.Cli
                 return;
             }
 
-            int sampleRate = ReciprocalSampleRateValue;
-            bool isCITestMachine = Env.GetEnvironmentVariableAsBool(ContinousIntegrationFlag);
+            _sampleRate = ReciprocalSampleRateValue;
+            _isTestMachine = Env.GetEnvironmentVariableAsBool(TestMachineFlag);
 
-            if(isCITestMachine)
+            if(_isTestMachine)
             {
-                sampleRate = ReciprocalSampleRateValueForCI;
-                _shouldLogTelemetry = (Environment.TickCount % ReciprocalSampleRateValue == 0);    
+                _sampleRate = ReciprocalSampleRateValueForTest;
             }
-            if(!_shouldLogTelemetry)
+            
+            bool shouldLogTelemetry = Environment.TickCount % _sampleRate == 0;
+
+            if(!shouldLogTelemetry)
             {
                 return;
             }
 
+            _isCollectingTelemetry = true;
+            try
+            {
+                //initialize in task to offload to parallel thread
+                _trackEventTask = Task.Factory.StartNew(() => InitializeTelemetry());
+            }
+            catch(Exception)
+            {
+                Debug.Fail("Exception during telemetry task initialization");
+            }
+        }
+        
+        public void TrackEvent(string eventName, IList<string> properties, IDictionary<string, double> measurements)
+        {
+            if (!_isCollectingTelemetry)
+            {
+                return;
+            }
+            
+            try
+            {
+                _trackEventTask = _trackEventTask.ContinueWith(
+                    () => TrackEventTask(eventName, 
+                        properties, 
+                        measurements)
+                );
+            }
+            catch(Exception)
+            {
+                Debug.Fail("Exception during telemetry task continuation");
+            }
+        }
+        
+        private void InitializeTelemetry()
+        {
             try
             {
                 _client = new TelemetryClient();
@@ -70,40 +109,30 @@ namespace Microsoft.DotNet.Cli
                 _commonProperties.Add(OSPlatform, runtimeEnvironment.OperatingSystemPlatform.ToString());
                 _commonProperties.Add(RuntimeId, runtimeEnvironment.GetRuntimeIdentifier());
                 _commonProperties.Add(ProductVersion, Product.Version);
-                _commonProperties.Add(CITestMachine, isCITestMachine.ToString());
-                _commonProperties.Add(ReciprocalSampleRate, sampleRate.ToString());
+                _commonProperties.Add(TestMachine, _isTestMachine.ToString());
+                _commonProperties.Add(ReciprocalSampleRate, _sampleRate.ToString());
                 _commonMeasurements = new Dictionary<string, double>();
 
-                _isInitialized = true;
             }
             catch (Exception)
             {
+                _isCollectingTelemetry = false;
                 // we dont want to fail the tool if telemetry fais. We should be able to detect abnormalities from data 
                 // at the server end
                 Debug.Fail("Exception during telemetry initialization");
-            }
-        }
-
-        public void TrackEvent(string eventName, IDictionary<string, string> properties, IDictionary<string, double> measurements)
-        {
-            if (!_isInitialized)
-            {
                 return;
             }
-            if(!_shouldLogTelemetry)
-            {
-                return;
-            }                
-
-            _trackEventTask = Task.Factory.StartNew(
-                () => TrackEventTask(eventName, properties, measurements)
-            );
         }
         
-        private void TrackEventTask(string eventName, IDictionary<string, string> properties, IDictionary<string, double> measurements)
+        private void TrackEventTask(string eventName, IList<string> properties, IDictionary<string, double> measurements)
         {
-            Dictionary<string, double> eventMeasurements = GetEventMeasures(measurements);
-            Dictionary<string, string> eventProperties = GetEventProperties(properties);
+            if (!_isCollectingTelemetry)
+            {
+                return;
+            }
+
+            var hashedargs = string.Join(",", HashHelper.Sha256HashList(properties));
+            _commonProperties.Add("HashedArgs", hashedargs);
 
             try
             {
@@ -113,14 +142,6 @@ namespace Microsoft.DotNet.Cli
             catch (Exception) 
             {
                 Debug.Fail("Exception during TrackEvent");
-            }
-        }
-
-        public void Finish()
-        {
-            if(_trackEventTask != null)
-            {
-                _trackEventTask.Wait(TimeSpan.FromMilliseconds(TimeoutInMilliseconds));
             }
         }
 
