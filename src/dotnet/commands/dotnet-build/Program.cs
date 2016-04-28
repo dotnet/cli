@@ -48,7 +48,6 @@ namespace Microsoft.DotNet.Tools.Build
                 !builderCommandApp.ShouldSkipDependencies,
                 (project, target) => args.Workspace.GetProjectContext(project, target));
 
-
             IEnumerable<ProjectContext> contexts;
             using (PerfTrace.Current.CaptureTiming(string.Empty, nameof(ResolveRootContexts)))
             {
@@ -106,7 +105,10 @@ namespace Microsoft.DotNet.Tools.Build
                     tasks.Add(Task.Run(() => args.Workspace.GetProjectContext(file, framework)));
                 }
             }
-            return Task.WhenAll(tasks).GetAwaiter().GetResult();
+            using (PerfTrace.Current.CaptureTiming(string.Empty, "Waiting for project contexts to finish loading"))
+            {
+                return Task.WhenAll(tasks).GetAwaiter().GetResult();
+            }
         }
     }
 }
