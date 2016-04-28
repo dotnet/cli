@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0-*",
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+  "dependencies": {
+    "BadPackage": "1.0.0"
+  },
+  "frameworks": {
+    "net451": {
+
+    }
+  }
+}
