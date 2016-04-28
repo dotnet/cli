@@ -50,16 +50,13 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         public void TestIncrementalBuildOfDependencyGraph(string testIdentifer, string projectToTouch, string[] expectedRebuiltProjects)
         {
             var testInstance = TestAssetsManager.CreateTestInstance("TestProjectToProjectDependencies", identifier: testIdentifer)
-                                                .WithLockFiles()
-                                                .WithBuildArtifacts();
+                                                .WithLockFiles();
 
             TestProjectRoot = testInstance.TestRoot;
-
+            var result1 = BuildProject();
+            
             // second build; nothing changed; no project required compilation
             var result2 = BuildProject();
-            Console.WriteLine("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-            Console.WriteLine(result2.StdOut);
-            Console.WriteLine("ENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDEND");
             AssertRebuilt(result2, Array.Empty<string>());
 
             //modify the source code of a project
