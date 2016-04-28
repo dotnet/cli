@@ -66,7 +66,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
             foreach (var buildOutputData in BuildOutputForRidData)
             {
-                var builtDir = buildCommand.GetOutputDirectory(portable: false);
+                var builtDir = buildCommand.GetOutputDirectory(portable: false, runtime: buildOutputData.Rid);
                 builtDir.Should().HaveFile("StandaloneApp"+ buildOutputData.HostExtension);
 
                 foreach (var artifact in buildOutputData.ExpectedArtifacts)
