@@ -19,7 +19,10 @@ namespace Microsoft.DotNet.Tools.Build
         {
             foreach (var projectNode in roots)
             {
-                yield return Build(projectNode);
+                using (PerfTrace.Current.CaptureTiming($"{projectNode.ProjectContext.ProjectName()}"))
+                {
+                    yield return Build(projectNode);
+                }
             }
         }
 

@@ -48,8 +48,18 @@ namespace Microsoft.DotNet.Tools.Build
                 !builderCommandApp.ShouldSkipDependencies,
                 (project, target) => args.Workspace.GetProjectContext(project, target));
 
-            var contexts = ResolveRootContexts(files, frameworks, args);
-            var graph = graphCollector.Collect(contexts).ToArray();
+
+            IEnumerable<ProjectContext> contexts;
+            using (PerfTrace.Current.CaptureTiming(string.Empty, nameof(ResolveRootContexts)))
+            {
+                contexts = ResolveRootContexts(files, frameworks, args);
+            }
+
+            ProjectGraphNode[] graph;
+            using (PerfTrace.Current.CaptureTiming(string.Empty, "Collect graph"))
+            {
+                graph = graphCollector.Collect(contexts).ToArray();
+            }
             var builder = new DotNetProjectBuilder(builderCommandApp);
             return builder.Build(graph).ToArray().All(r => r != CompilationResult.Failure);
         }
@@ -63,7 +73,11 @@ namespace Microsoft.DotNet.Tools.Build
 
             foreach (var file in files)
             {
-                var project = args.Workspace.GetProject(file);
+                Project project;
+                using (PerfTrace.Current.CaptureTiming(file, "Loading project.json"))
+                {
+                    project = args.Workspace.GetProject(file);
+                }
                 var projectFrameworks = project.GetTargetFrameworks().Select(f => f.FrameworkName);
                 if (!projectFrameworks.Any())
                 {
