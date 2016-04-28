@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Resolution;
@@ -46,6 +48,31 @@ namespace Microsoft.DotNet.ProjectModel
         {
             ProjectResolver = ResolveProject;
             LockFileResolver = ResolveLockFile;
+        }
+
+        public ProjectContextBuilder Clone()
+        {
+            var builder = new ProjectContextBuilder()
+                .WithLockFile(LockFile)
+                .WithProject(Project)
+                .WithProjectDirectory(ProjectDirectory)
+                .WithTargetFramework(TargetFramework)
+                .WithRuntimeIdentifiers(RuntimeIdentifiers)
+                .WithReferenceAssembliesPath(ReferenceAssembliesPath)
+                .WithPackagesDirectory(PackagesDirectory)
+                .WithRootDirectory(RootDirectory)
+                .WithProjectResolver(ProjectResolver)
+                .WithLockFileResolver(LockFileResolver)
+                .WithReaderSettings(Settings);
+            if(IsDesignTime)
+            {
+                builder.AsDesignTime();
+            }
+
+            // This only runs in DEBUG builds and ensures (via reflection) that absolutely EVERYTHING was copied :)
+            DebugAssertEqual(this, builder);
+
+            return builder;
         }
 
         public ProjectContextBuilder WithLockFile(LockFile lockFile)
@@ -147,15 +174,9 @@ namespace Microsoft.DotNet.ProjectModel
                     var id = $"{target.TargetFramework}/{target.RuntimeIdentifier}";
                     if (deduper.Add(id))
                     {
-                        var builder = new ProjectContextBuilder()
-                            .WithProject(Project)
-                            .WithLockFile(LockFile)
+                        var builder = Clone()
                             .WithTargetFramework(target.TargetFramework)
                             .WithRuntimeIdentifiers(new[] { target.RuntimeIdentifier });
-                        if (IsDesignTime)
-                        {
-                            builder.AsDesignTime();
-                        }
 
                         yield return builder.Build();
                     }
@@ -615,6 +636,15 @@ namespace Microsoft.DotNet.ProjectModel
             public override string ToString()
             {
                 return Name + " " + LibraryType;
+            }
+        }
+
+        [Conditional("DEBUG")]
+        private void DebugAssertEqual(ProjectContextBuilder left, ProjectContextBuilder right)
+        {
+            foreach(var field in typeof(ProjectContextBuilder).GetTypeInfo().GetFields())
+            {
+                Debug.Assert(ReferenceEquals(field.GetValue(left), field.GetValue(right)), "When a new property is added, it must be added to Clone");
             }
         }
     }
