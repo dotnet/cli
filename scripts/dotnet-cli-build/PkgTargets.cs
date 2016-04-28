@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
-using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli.Build.Framework;
-using Microsoft.Extensions.PlatformAbstractions;
 
 using static Microsoft.DotNet.Cli.Build.Framework.BuildHelpers;
 
