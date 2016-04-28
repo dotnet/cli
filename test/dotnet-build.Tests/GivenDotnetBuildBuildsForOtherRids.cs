@@ -60,14 +60,12 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
                 
             var testProject = Path.Combine(instance.TestRoot, "StandaloneApp", "project.json");
 
+            var buildCommand = new BuildCommand(testProject);
+            buildCommand.WorkingDirectory = Path.GetDirectoryName(testProject);
+            buildCommand.Execute().Should().Pass();
 
             foreach (var buildOutputData in BuildOutputForRidData)
             {
-                var buildCommand = new BuildCommand(testProject, runtime: buildOutputData.Rid);
-
-                buildCommand.WorkingDirectory = Path.GetDirectoryName(testProject);
-                buildCommand.Execute().Should().Pass();
-
                 var builtDir = buildCommand.GetOutputDirectory(portable: false);
                 builtDir.Should().HaveFile("StandaloneApp"+ buildOutputData.HostExtension);
 

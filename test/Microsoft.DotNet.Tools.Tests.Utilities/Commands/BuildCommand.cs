@@ -272,7 +272,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             return _project.Name + GetExecutableExtension();
         }
 
-        private string BuildRelativeOutputPath(bool portable)
+        private string BuildRelativeOutputPath(bool portable, string runtime)
         {
             // lets try to build an approximate output path
             string config = string.IsNullOrEmpty(_configuration) ? "Debug" : _configuration;
@@ -281,8 +281,8 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             
             if (!portable)
             {
-                var runtime = string.IsNullOrEmpty(_runtime) ? PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier() : _runtime;
-                return Path.Combine(config, framework, runtime);
+                var runtimeOrDefault = string.IsNullOrEmpty(runtime) ? PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier() : runtime;
+                return Path.Combine(config, framework, runtimeOrDefault);
             }
             else
             {
@@ -290,14 +290,14 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             }
         }
 
-        public DirectoryInfo GetOutputDirectory(bool portable = false)
+        public DirectoryInfo GetOutputDirectory(bool portable = false, string runtime=null)
         {
             if (!string.IsNullOrEmpty(_outputDirectory))
             {
                 return new DirectoryInfo(_outputDirectory);
             }
 
-            string output = Path.Combine(_project.ProjectDirectory, "bin", BuildRelativeOutputPath(portable));
+            string output = Path.Combine(_project.ProjectDirectory, "bin", BuildRelativeOutputPath(portable, runtime ?? _runtime));
             return new DirectoryInfo(output);
         }
 
