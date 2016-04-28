@@ -126,13 +126,20 @@ namespace Microsoft.DotNet.ProjectModel
             return this;
         }
 
+        /// <summary>
+        /// Produce all targets found in the lock file associated with this builder.
+        /// Returns an empty enumerable if there is no lock file
+        /// (making this unsuitable for scenarios where the lock file may not be present,
+        /// such as at design-time)
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<ProjectContext> BuildAllTargets()
         {
             ProjectDirectory = Project?.ProjectDirectory ?? ProjectDirectory;
             EnsureProjectLoaded();
             LockFile = LockFile ?? LockFileResolver(ProjectDirectory);
 
-            if (LockFile != null && LockFile.Targets.Any())
+            if (LockFile != null)
             {
                 var deduper = new HashSet<string>();
                 foreach (var target in LockFile.Targets)
@@ -152,22 +159,6 @@ namespace Microsoft.DotNet.ProjectModel
 
                         yield return builder.Build();
                     }
-                }
-            }
-            else
-            {
-                // Build a context for each framework. It won't be fully valid, since it won't have resolved data or runtime data, but the diagnostics will show that
-                // (Project Model Server needs this)
-                foreach (var framework in Project.GetTargetFrameworks())
-                {
-                    var builder = new ProjectContextBuilder()
-                        .WithProject(Project)
-                        .WithTargetFramework(framework.FrameworkName);
-                    if (IsDesignTime)
-                    {
-                        builder.AsDesignTime();
-                    }
-                    yield return builder.Build();
                 }
             }
         }

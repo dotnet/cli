@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.ProjectModel.Server
         private ProjectSnapshot _local = new ProjectSnapshot();
         private ProjectSnapshot _remote = new ProjectSnapshot();
 
-        private readonly WorkspaceContext _workspaceContext;
+        private readonly DesignTimeWorkspace _workspaceContext;
         private int? _contextProtocolVersion;
 
         private readonly List<Messenger<ProjectContextSnapshot>> _messengers;
@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.ProjectModel.Server
 
         public ProjectManager(int contextId,
                                      ILoggerFactory loggerFactory,
-                                     WorkspaceContext workspaceContext,
+                                     DesignTimeWorkspace workspaceContext,
                                      ProtocolManager protocolManager)
         {
             Id = contextId;

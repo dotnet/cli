@@ -648,6 +648,91 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             }
         }
 
+        [Fact]
+        public void TestTargetFrameworkChange()
+        {
+            using (var server = new DthTestServer(_loggerFactory))
+            using (var client = new DthTestClient(server, _loggerFactory))
+            {
+                var testProject = _testAssetsManager.CreateTestInstance("EmptyLibrary")
+                                                    .WithLockFiles()
+                                                    .TestRoot;
+
+                // initialize the project and drain all messages (7 message for project with one framework)
+                client.Initialize(testProject);
+                client.DrainAllMessages();
+
+                // update the target framework from netstandard1.3 to netstandard 1.5 so as to invalidate all
+                // dependencies
+                var projectJsonPath = Path.Combine(testProject, "project.json");
+                File.WriteAllText(projectJsonPath, 
+                                  File.ReadAllText(projectJsonPath).Replace("netstandard1.3", "netstandard1.5"));
+
+                // send files change request to server to prompt update
+                client.SendPayLoad(testProject, MessageTypes.FilesChanged);
+
+                // assert project information is updated
+                client.DrainTillFirst(MessageTypes.ProjectInformation)
+                      .RetrievePayloadAs<JObject>()
+                      .RetrievePropertyAs<JArray>("Frameworks")
+                      .AssertJArrayCount(1)
+                      .RetrieveArraryElementAs<JObject>(0)
+                      .AssertProperty("ShortName", "netstandard1.5");
+
+                // the NETStandard.Library dependency should turn unresolved
+                var dependencies = client.DrainTillFirst(MessageTypes.Dependencies);
+
+                dependencies.RetrievePayloadAs<JObject>()
+                            .RetrievePropertyAs<JArray>("Framework")
+                            .AssertJArrayCount(1)
+                            .RetrieveArraryElementAs<JObject>(0)
+                            .AssertProperty("ShortName", "netstandard1.5");
+
+                dependencies.RetrieveDependency("NETStandard.Library")
+                            .RetrievePropertyAs<JArray>("Errors")
+                            .AssertJArrayCount(1)
+                            .RetrieveArraryElementAs<JObject>(0)
+                            .AssertProperty("ErrorCode", "NU1001");
+
+                // warning for project.json and project.lock.json out of sync
+                var diagnostics = client.DrainTillFirst(MessageTypes.DependencyDiagnostics);
+
+                diagnostics.RetrievePayloadAs<JObject>()
+                           .RetrievePropertyAs<JArray>("Framework")
+                           .AssertJArrayCount(1)
+                           .RetrieveArraryElementAs<JObject>(0)
+                           .AssertProperty("ShortName", "netstandard1.5");
+
+                diagnostics.RetrievePayloadAs<JObject>()
+                           .RetrievePropertyAs<JArray>("Warnings")
+                           .AssertJArrayContains(1)
+                           .RetrieveArraryElementAs<JObject>(0)
+                           .AssertProperty("ErrorCode", "NU1006");
+
+                // restore again
+                var restoreCommand = new RestoreCommand();
+                restoreCommand.WorkingDirectory = testProject;
+                restoreCommand.Execute().Should().Pass();
+
+                client.DrainTillFirst(MessageTypes.ProjectInformation)
+                      .RetrievePayloadAs<JObject>()
+                      .RetrievePropertyAs<JArray>("Frameworks")
+                      .AssertJArrayCount(1)
+                      .RetrieveArraryElementAs<JObject>(0)
+                      .AssertProperty("ShortName", "netstandard1.5");
+
+                client.DrainTillFirst(MessageTypes.Dependencies)
+                      .RetrieveDependency("NETStandard.Library")
+                      .RetrievePropertyAs<JArray>("Errors")
+                      .AssertJArrayCount(0);
+
+                client.DrainTillFirst(MessageTypes.DependencyDiagnostics)
+                      .RetrievePayloadAs<JObject>()
+                      .RetrievePropertyAs<JArray>("Warnings")
+                      .AssertJArrayContains(0);
+            }
+        }
+
         private static string NormalizePathString(string original)
         {
             return original.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);

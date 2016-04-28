@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.ProjectModel.Server
     public class ProjectModelServerCommand
     {
         private readonly Dictionary<int, ProjectManager> _projects;
-        private readonly WorkspaceContext _workspaceContext;
+        private readonly DesignTimeWorkspace _workspaceContext;
         private readonly ProtocolManager _protocolManager;
         private readonly ILoggerFactory _loggerFactory;
         private readonly string _hostName;
@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.ProjectModel.Server
             _hostName = hostName;
             _loggerFactory = loggerFactory;
             _protocolManager = new ProtocolManager(maxVersion: 4, loggerFactory: _loggerFactory);
-            _workspaceContext = WorkspaceContext.Create(designTime: true);
+            _workspaceContext = new DesignTimeWorkspace(ProjectReaderSettings.ReadFromEnvironment());
             _projects = new Dictionary<int, ProjectManager>();
         }
 
