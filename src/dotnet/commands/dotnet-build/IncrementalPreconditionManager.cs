@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.DotNet.Tools.Compiler;
 using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.ProjectModel.Utilities;
@@ -17,13 +18,15 @@ namespace Microsoft.DotNet.Tools.Build
         private readonly bool _printPreconditions;
         private readonly bool _forceNonIncremental;
         private readonly bool _skipDependencies;
+        private readonly string _configuration;
         private Dictionary<ProjectContextIdentity, IncrementalPreconditions> _preconditions;
 
-        public IncrementalPreconditionManager(bool printPreconditions, bool forceNonIncremental, bool skipDependencies)
+        public IncrementalPreconditionManager(bool printPreconditions, bool forceNonIncremental, bool skipDependencies, string configuration)
         {
             _printPreconditions = printPreconditions;
             _forceNonIncremental = forceNonIncremental;
             _skipDependencies = skipDependencies;
+            _configuration = configuration;
             _preconditions = new Dictionary<ProjectContextIdentity, IncrementalPreconditions>();
         }
 
@@ -54,14 +57,43 @@ namespace Microsoft.DotNet.Tools.Build
 
         private void CollectCheckPathProbingPreconditions(ProjectContext project, IncrementalPreconditions preconditions)
         {
-            var pathCommands = CompilerUtil.GetCommandsInvokedByCompile(project)
-                .Select(commandName => Command.CreateDotNet(commandName, Enumerable.Empty<string>(), project.TargetFramework))
-                .Where(c => c.ResolutionStrategy.Equals(CommandResolutionStrategy.Path));
 
-            foreach (var pathCommand in pathCommands)
+            var compilerOptions = project.ProjectFile.GetCompilerOptions(project.TargetFramework, configurationName: null);
+            var compilerName =  compilerOptions.CompilerName;
+
+            HandleCompilerRunner(project, preconditions, compilerName);
+        }
+
+        private void HandleCompilerRunner(ProjectContext project, IncrementalPreconditions preconditions, string compilerName)
+        {
+            // mimic the resolution in ManagedCompiler
+            var commandFromManagedCompiler = new DotNetCommandFactory().Create($"compile-{compilerName}",
+                Enumerable.Empty<string>());
+
+            if (commandFromManagedCompiler.ResolutionStrategy.Equals(CommandResolutionStrategy.BuiltIn))
             {
-                preconditions.AddPathProbingPrecondition(project.ProjectName(), pathCommand.CommandName);
+                return;
             }
+            
+            // if it's not a builtin, managed compiler delegates to the muxer which delegates back to the dotnet driver
+            // mimic the resolution in the dotnet driver
+            var commandFromDotnetDriver = Command.Create($"dotnet-compile-{compilerName}", Enumerable.Empty<string>());
+
+            if (LoadedFromPath(commandFromDotnetDriver))
+            {
+                preconditions.AddPathProbingPrecondition(project.ProjectName(), commandFromDotnetDriver);
+            }
+        }
+
+        private static bool LoadedFromPath(ICommand c)
+        {
+            var resolutionStrategy = c.ResolutionStrategy;
+
+            return
+                resolutionStrategy.Equals(CommandResolutionStrategy.Path) ||
+                resolutionStrategy.Equals(CommandResolutionStrategy.RootedPath) ||
+                resolutionStrategy.Equals(CommandResolutionStrategy.ProjectLocal) ||
+                resolutionStrategy.Equals(CommandResolutionStrategy.OutputPath);
         }
 
         private void CollectCompilerNamePreconditions(ProjectContext project, IncrementalPreconditions preconditions)
