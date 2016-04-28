@@ -48,12 +48,12 @@ namespace Microsoft.DotNet.Tools.Test
                 var exitCode = 0;
 
                 // Create a workspace
-                var workspace = WorkspaceContext.Create(ProjectReaderSettings.ReadFromEnvironment(), designTime: false);
+                var workspace = new BuildWorkspace(ProjectReaderSettings.ReadFromEnvironment());
 
                 if (dotnetTestParams.Framework != null)
                 {
-                    var projectContext = ProjectContext.Create(projectPath, dotnetTestParams.Framework, runtimeIdentifiers);
-                    exitCode = RunTest(projectContext, dotnetTestParams);
+                    var projectContext = workspace.GetRuntimeContext(workspace.GetProjectContext(projectPath, dotnetTestParams.Framework), runtimeIdentifiers);
+                    exitCode = RunTest(projectContext, dotnetTestParams, workspace);
                 }
                 else
                 {
@@ -66,7 +66,7 @@ namespace Microsoft.DotNet.Tools.Test
                     // Execute for all TFMs the project targets.
                     foreach (var projectContext in projectContexts)
                     {
-                        var result = RunTest(projectContext, dotnetTestParams);
+                        var result = RunTest(projectContext, dotnetTestParams, workspace);
                         if (result == 0)
                         {
                             summary.Passed++;
@@ -134,11 +134,11 @@ namespace Microsoft.DotNet.Tools.Test
             }
         }
 
-        private int RunTest(ProjectContext projectContext, DotnetTestParams dotnetTestParams)
+        private int RunTest(ProjectContext projectContext, DotnetTestParams dotnetTestParams, BuildWorkspace workspace)
         {
             var testRunner = projectContext.ProjectFile.TestRunner;
             var dotnetTestRunner = _dotnetTestRunnerFactory.Create(dotnetTestParams.Port);
-            return dotnetTestRunner.RunTests(projectContext, dotnetTestParams);
+            return dotnetTestRunner.RunTests(projectContext, dotnetTestParams, workspace);
         }
 
         private static string GetProjectPath(string projectPath)
