@@ -81,7 +81,7 @@ namespace Microsoft.DotNet.Cli
             try
             {
                 _trackEventTask = _trackEventTask.ContinueWith(
-                    () => TrackEventTask(eventName, 
+                    x => TrackEventTask(eventName, 
                         properties, 
                         measurements)
                 );
@@ -131,8 +131,11 @@ namespace Microsoft.DotNet.Cli
                 return;
             }
 
+            var eventProperties = GetEventProperties(null);
+            var eventMeasurements = GetEventMeasures(measurements);
+
             var hashedargs = string.Join(",", HashHelper.Sha256HashList(properties));
-            _commonProperties.Add("HashedArgs", hashedargs);
+            eventProperties.Add("HashedArgs", hashedargs);
 
             try
             {
