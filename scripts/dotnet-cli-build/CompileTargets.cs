@@ -6,7 +6,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli.Build.Framework;
 using Microsoft.Extensions.PlatformAbstractions;
-
 using static Microsoft.DotNet.Cli.Build.FS;
 using static Microsoft.DotNet.Cli.Build.Framework.BuildHelpers;
 using System.Text.RegularExpressions;
@@ -85,15 +84,19 @@ namespace Microsoft.DotNet.Cli.Build
         [Target]
         public static BuildTargetResult GenerateStubHostPackages(BuildTargetContext c)
         {
-            string currentRid = GetRuntimeId();
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
+
+            string currentRid = GetRuntimeId();
+            var nugetRidUtils = new NuGetRidUtils(Dirs.RepoRoot);
+
             foreach (var hostPackageId in HostPackages)
             {
                 foreach (var ridToNativeFileNames in HostPackageRidToNativeFileNames)
                 {
                     string rid = ridToNativeFileNames.Key;
                     string[] files = ridToNativeFileNames.Value;
-                    if (!rid.Equals(currentRid))
+
+                    if (! nugetRidUtils.RidsAreCompatible(currentRid, rid))
                     {
                         CreateDummyRuntimeNuGetPackage(
                             DotNetCli.Stage0,
@@ -379,9 +382,9 @@ namespace Microsoft.DotNet.Cli.Build
             projectJson.AppendLine($"  \"name\": \"{packageId}\",");
             projectJson.AppendLine("  \"dependencies\": { \"NETStandard.Library\": \"1.5.0-rc2-24022\" },");
             projectJson.AppendLine("  \"frameworks\": { \"netcoreapp1.0\": {}, \"netstandard1.5\": {} },");
-            projectJson.AppendLine($"  \"runtimes\": {{ \"{rid}\": {{}} }},");
+            projectJson.AppendLine($"  \"runtimes\": {{ \"{rid}\": {{ }} }},");
             projectJson.AppendLine("  \"packInclude\": {");
-            projectJson.AppendLine($"    \"runtimes/{rid}/native/\": [{string.Join(",", from path in files select $"\"{path}\"".Replace("\\", "\\\\"))}]");
+            projectJson.AppendLine($"    \"runtimes/{rid}/native/\": [{string.Join(",", from path in files select $"\"{path}\"".Replace("\\", "/"))}]");
             projectJson.AppendLine("  }");
             projectJson.AppendLine("}");
 
