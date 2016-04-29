@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import argparse
 import glob
@@ -73,12 +73,17 @@ def process_arguments():
     global script_args
     script_args = parser.parse_args()
 
-def run_command(*vargs, title = None, from_dir = None, quiet = False):
+def run_command(*vargs, **kwargs):
+    title = kwargs['title'] if 'title' in kwargs else None
+    from_dir = kwargs['from_dir'] if 'from_dir' in kwargs else None
+    quiet = kwargs['quiet'] if 'quiet' in kwargs else False
+
     quoted_args = map(lambda x: '"{x}"'.format(x=x) if ' ' in x else x, vargs)
     cmd_line = ' '.join(quoted_args)
     should_log = not script_args.verbose and title != None
     redirect_args = { 'stderr': subprocess.STDOUT }
 
+    nullfile = None
     logfile = None
     cwd = None
 
@@ -86,13 +91,16 @@ def run_command(*vargs, title = None, from_dir = None, quiet = False):
         if should_log:
             log_name = '-'.join(re.sub(r'\W', ' ', title).lower().split()) + '.log'
             log_path = os.path.join(SCRIPT_ROOT_PATH, 'logs', 'run-perftests', log_name)
-            os.makedirs(os.path.dirname(log_path), exist_ok = True)
+            log_dir = os.path.dirname(log_path)
+            if not os.path.exists(log_dir):
+                os.makedirs(log_dir)
             cmd_line += ' > "{log}"'.format(log = log_path)
             logfile = open(log_path, 'w')
             redirect_args['stdout'] = logfile
 
         elif quiet or not script_args.verbose:
-            redirect_args['stdout'] = subprocess.DEVNULL
+            nullfile = open(os.devnull, 'w')
+            redirect_args['stdout'] = nullfile
 
         prefix = ''
         if not quiet and title != None:
@@ -105,14 +113,15 @@ def run_command(*vargs, title = None, from_dir = None, quiet = False):
             os.chdir(from_dir)
 
         if not quiet: print(prefix + cmd_line)
-        result = subprocess.run(vargs, **redirect_args)
+        returncode = subprocess.call(vargs, **redirect_args)
 
-        if result.returncode != 0:
+        if returncode != 0:
             logmsg = " See '{log}' for details.".format(log = log_path) if should_log else ''
-            raise FatalError("Command `{cmd}` returned with error code {e}.{log}".format(cmd = cmd_line, e = result.returncode, log = logmsg))
+            raise FatalError("Command `{cmd}` returned with error code {e}.{log}".format(cmd = cmd_line, e = returncode, log = logmsg))
 
     finally:
         if logfile != None: logfile.close()
+        if nullfile != None: nullfile.close()
         if cwd != None: os.chdir(cwd)
 
 def clone_repo(repo_url, local_path):
