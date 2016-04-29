@@ -8,6 +8,7 @@ using Xunit;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
+    [Collection("ConsoleWritingCollection")] //https://github.com/dotnet/cli/issues/2768
     public class BuiltInCommandTests : TestBase
     {
         /// <summary>
