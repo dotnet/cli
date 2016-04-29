@@ -298,6 +298,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             }
 
             string output = Path.Combine(_project.ProjectDirectory, "bin", BuildRelativeOutputPath(portable, runtime ?? _runtime));
+            
             return new DirectoryInfo(output);
         }
 

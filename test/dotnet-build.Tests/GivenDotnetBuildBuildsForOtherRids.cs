@@ -2,16 +2,14 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using FluentAssertions;
-using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using Microsoft.Extensions.PlatformAbstractions;
-using Newtonsoft.Json.Linq;
-using NuGet.Frameworks;
 using Xunit;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.DotNet.Tools.Builder.Tests
 {
@@ -66,12 +64,13 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
             foreach (var buildOutputData in BuildOutputForRidData)
             {
-                var builtDir = buildCommand.GetOutputDirectory(portable: false, runtime: buildOutputData.Rid);
-                builtDir.FullName.Should().HaveFile("StandaloneApp"+ buildOutputData.HostExtension);
+                DirectoryInfo builtDir = buildCommand.GetOutputDirectory(portable: false, runtime: buildOutputData.Rid);
+
+                builtDir.Should().HaveFile("StandaloneApp"+ buildOutputData.HostExtension);
 
                 foreach (var artifact in buildOutputData.ExpectedArtifacts)
                 {
-                    builtDir.FullName.Should().HaveFile(artifact);
+                     builtDir.Should().HaveFile(artifact);
                 }
             }
         }
