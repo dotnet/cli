@@ -247,7 +247,7 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
 
             var includeCompile = _compilerOptions.PreserveCompilationContext == true;
 
-            var exports = exporter.GetAllExports().ToArray();
+            var exports = _context.ExcludePlatformExports(exporter.GetAllExports()).ToArray();
             var dependencyContext = new DependencyContextBuilder().Build(
                 compilerOptions: includeCompile ? _compilerOptions : null,
                 compilationExports: includeCompile ? exports : null,
