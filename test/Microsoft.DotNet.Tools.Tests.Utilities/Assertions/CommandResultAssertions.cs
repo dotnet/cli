@@ -114,14 +114,14 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 		
 		public AndConstraint<CommandResultAssertions> HaveSkippedProjectCompilation(string skippedProject, string frameworkFullName)
         {
-            _commandResult.StdOut.Contains($"Project {skippedProject} ({frameworkFullName}) was previously compiled. Skipping compilation.");
+            _commandResult.StdOut.Should().Contain($"Project {skippedProject} ({frameworkFullName}) was previously compiled. Skipping compilation.");
 
             return new AndConstraint<CommandResultAssertions>(this);
         }
 
         public AndConstraint<CommandResultAssertions> HaveCompiledProject(string compiledProject, string frameworkFullName)
         {
-            _commandResult.StdOut.Contains($"Project {compiledProject} ({frameworkFullName}) will be compiled");
+            _commandResult.StdOut.Should().Contain($"Project {compiledProject} ({frameworkFullName}) will be compiled");
 
             return new AndConstraint<CommandResultAssertions>(this);
         }
