@@ -45,6 +45,8 @@ namespace Microsoft.DotNet.Cli.Build
 
         private static string CliNugetVersion { get; set; }
 
+        private static string CliProductionVersion { get; set; }
+
         private static string Arch { get; } = CurrentArchitecture.Current.ToString();
 
         private static void AcquireWix(BuildTargetContext c)
@@ -94,6 +96,7 @@ namespace Microsoft.DotNet.Cli.Build
             MsiVersion = buildVersion.GenerateMsiVersion();
             CliDisplayVersion = buildVersion.SimpleVersion;
             CliNugetVersion = buildVersion.NuGetVersion;
+            CliProductionVersion = buildVersion.ProductionVersion;
 
             AcquireWix(c);
             return c.Success();
@@ -141,6 +144,7 @@ namespace Microsoft.DotNet.Cli.Build
             var inputDir = c.BuildContext.Get<string>("SharedHostPublishRoot");
             var wixObjRoot = Path.Combine(Dirs.Output, "obj", "wix", "sharedhost");
             var sharedHostBrandName = $"'{Monikers.SharedHostBrandName}'";
+            var dependencyKey = $"Dotnet_CLI_SharedHost_{CliProductionVersion}";
 
             if (Directory.Exists(wixObjRoot))
             {
@@ -150,7 +154,7 @@ namespace Microsoft.DotNet.Cli.Build
 
             Cmd("powershell", "-NoProfile", "-NoLogo",
                 Path.Combine(Dirs.RepoRoot, "packaging", "windows", "host", "generatemsi.ps1"),
-                inputDir, SharedHostMsi, WixRoot, sharedHostBrandName, MsiVersion, CliDisplayVersion, CliNugetVersion, Arch, wixObjRoot)
+                inputDir, SharedHostMsi, WixRoot, sharedHostBrandName, MsiVersion, CliNugetVersion, dependencyKey, Arch, wixObjRoot)
                     .Execute()
                     .EnsureSuccessful();
             return c.Success();
