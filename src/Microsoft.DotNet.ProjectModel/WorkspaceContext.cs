@@ -224,6 +224,41 @@ namespace Microsoft.DotNet.ProjectModel
             return runtimeContext;
         }
 
+        public ProjectContext GetDefaultRunnableContext(string projectPath)
+        {
+            string currentRid = PlatformServices.Default.Runtime.GetRuntimeIdentifier();
+            ProjectContext ret = GetCompatibleRunnableContext(projectPath, currentRid);
+            if (ret == null)
+            {
+                throw new InvalidOperationException($"Could not find compatible runtime for `{currentRid}`.");
+            }
+
+            return ret;
+        }
+
+        public ProjectContext GetCompatibleRunnableContext(ProjectContext projectContext, string runtimeIdentifier)
+        {
+            IEnumerable<ProjectContext> allRuntimeContexts = GetAllRuntimeContexts(projectContext);
+            IEnumerable<ProjectContext> runnableRuntimeContexts = allRuntimeContexts.Where(r => r.RuntimeIdentifier == runtimeIdentifier);
+
+            if (runnableRuntimeContexts.Count() == 0)
+            {
+                runnableRuntimeContexts = allRuntimeContexts.Where(r => r.IsRidCompatible(runtimeIdentifier));
+            }
+
+            return runnableRuntimeContexts.FirstOrDefault();
+        }
+
+        public IEnumerable<ProjectContext> GetAllRuntimeContexts(ProjectContext projectContext)
+        {
+            if (projectContext.IsPortable)
+            {
+                return new ProjectContext[] { projectContext };
+            }
+
+            return ProjectContext.CreateContextForEachTarget(projectContext.ProjectFile);
+        }
+
         public Project GetProject(string projectDirectory) => GetProjectCore(projectDirectory)?.Model;
 
         public ProjectContextCollection GetProjectContextCollection(string projectPath)

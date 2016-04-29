@@ -155,93 +155,34 @@ namespace Microsoft.DotNet.ProjectModel
                         .BuildAllTargets();
         }
 
-        public static bool IsRidCompatibleWith(string rid, string otherRid)
+        public bool IsRidCompatible(string rid)
         {
-            if (otherRid == null)
+            if (rid == null)
             {
                 return false;
             }
 
-            if (rid == otherRid)
+            if (RuntimeIdentifier == rid)
             {
                 return true;
             }
 
-            if (rid.EndsWith("x86") != otherRid.EndsWith("x86"))
+            if (RuntimeIdentifier.EndsWith("x86") != rid.EndsWith("x86"))
             {
                 return false;
             }
 
-            if (rid.StartsWith("win10-"))
+            if (RuntimeIdentifier.StartsWith("win10-"))
             {
-                return otherRid.StartsWith("win8-") || otherRid.StartsWith("win7-");
+                return rid.StartsWith("win8-") || rid.StartsWith("win7-");
             }
 
-            if (rid.StartsWith("win8-"))
+            if (RuntimeIdentifier.StartsWith("win8-"))
             {
-                return otherRid.StartsWith("win7-");
+                return rid.StartsWith("win7-");
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Creates a project context based on current platform
-        /// </summary>
-        /// <param name="buildConfiguration">build configuration</param>
-        /// <returns></returns>
-
-        public ProjectContext CreateRuntimeContextForCurrentPlatform(string buildConfiguration)
-        {
-            if (IsPortable)
-            {
-                return this;
-            }
-
-            string currentRid = PlatformServices.Default.Runtime.GetRuntimeIdentifier();
-
-            List<ProjectContext> contexts = CreateAllRuntimeContexts(buildConfiguration).ToList();
-            foreach (var runtimeContext in contexts)
-            {
-                if (runtimeContext.RuntimeIdentifier == currentRid)
-                {
-                    return runtimeContext;
-                }
-            }
-
-            foreach (var runtimeContext in contexts)
-            {
-                if (IsRidCompatibleWith(currentRid, runtimeContext.RuntimeIdentifier))
-                {
-                    return runtimeContext;
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Creates a list of project contexts representing runtime based on a given context
-        /// </summary>
-        /// <param name="buildConfiguration">build configuration</param>
-        /// <returns>List of project contexts - one for each runtime identifier and one for runtime independent IL code (RuntimeIdentifier == null)</returns>
-
-        public IEnumerable<ProjectContext> CreateAllRuntimeContexts(string buildConfiguration)
-        {
-            if (!ProjectFile.HasRuntimeOutput(buildConfiguration))
-            {
-                return new[] { this };
-            }
-
-            IEnumerable<ProjectContext> allContexts = CreateContextForEachTarget(ProjectFile.ProjectFilePath);
-            IEnumerable<ProjectContext> runtimeContextsForTarget = FilterProjectContextsByFramework(allContexts, TargetFramework);
-
-            return runtimeContextsForTarget;
-        }
-
-        public static IEnumerable<ProjectContext> FilterProjectContextsByRuntime(IEnumerable<ProjectContext> contexts, string rid)
-        {
-            return contexts.Where(t => rid.Equals(t.RuntimeIdentifier)).ToList();
         }
 
         public static IEnumerable<ProjectContext> FilterProjectContextsByFramework(IEnumerable<ProjectContext> contexts, NuGetFramework framework)
