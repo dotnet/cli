@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Resolution;
-using Microsoft.Extensions.Internal;
 using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
 
