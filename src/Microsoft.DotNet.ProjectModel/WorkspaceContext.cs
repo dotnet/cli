@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Utilities;
+using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.ProjectModel
@@ -224,10 +225,10 @@ namespace Microsoft.DotNet.ProjectModel
             return runtimeContext;
         }
 
-        public ProjectContext GetDefaultRunnableContext(string projectPath)
+        public ProjectContext GetDefaultRunnableContext(ProjectContext projectContext)
         {
             string currentRid = PlatformServices.Default.Runtime.GetRuntimeIdentifier();
-            ProjectContext ret = GetCompatibleRunnableContext(projectPath, currentRid);
+            ProjectContext ret = GetCompatibleRunnableContext(projectContext, currentRid);
             if (ret == null)
             {
                 throw new InvalidOperationException($"Could not find compatible runtime for `{currentRid}`.");
@@ -256,7 +257,7 @@ namespace Microsoft.DotNet.ProjectModel
                 return new ProjectContext[] { projectContext };
             }
 
-            return ProjectContext.CreateContextForEachTarget(projectContext.ProjectFile);
+            return ProjectContext.CreateContextForEachTarget(projectContext.ProjectFile.ProjectFilePath);
         }
 
         public Project GetProject(string projectDirectory) => GetProjectCore(projectDirectory)?.Model;

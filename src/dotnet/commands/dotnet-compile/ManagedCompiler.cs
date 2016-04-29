@@ -167,7 +167,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 { "compile:ResponseFile", rsp }
             };
 
-            ProjectContext runtimeContext = context.CreateRuntimeContextForCurrentPlatform(args.ConfigValue);
+            ProjectContext runtimeContext = args.Workspace.GetDefaultRunnableContext(context);
             if (runtimeContext != null)
             {
                 var runtimeOutputPath = runtimeContext.GetOutputPaths(args.ConfigValue, args.BuildBasePathValue, args.OutputValue);

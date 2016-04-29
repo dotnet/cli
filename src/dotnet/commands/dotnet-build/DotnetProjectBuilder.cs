@@ -130,10 +130,10 @@ namespace Microsoft.DotNet.Tools.Build
 
         public IEnumerable<ProjectContext> CreateRuntimeContexts(ProjectGraphNode graphNode)
         {
-            var allRuntimeContexts = graphNode.ProjectContext.CreateAllRuntimeContexts(_args.ConfigValue);
+            var allRuntimeContexts = _args.Workspace.GetAllRuntimeContexts(graphNode.ProjectContext);
             if (!string.IsNullOrEmpty(_args.RuntimeValue))
             {
-                return ProjectContext.FilterProjectContextsByRuntime(allRuntimeContexts, _args.RuntimeValue);
+                return allRuntimeContexts.Where(r => r.RuntimeIdentifier == _args.RuntimeValue);
             }
 
             return allRuntimeContexts;
