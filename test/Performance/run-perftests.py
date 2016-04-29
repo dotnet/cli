@@ -207,6 +207,8 @@ def main():
         process_arguments()
         check_requirements()
 
+        script_args.xunit_perf_path = os.path.realpath(script_args.xunit_perf_path)
+
         clone_repo(XUNITPERF_REPO_URL, script_args.xunit_perf_path)
         make_xunit_perf(script_args.xunit_perf_path)
 
