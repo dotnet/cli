@@ -131,9 +131,6 @@ def get_xunitperf_dotnet_path(xunitperf_src_path):
 def get_xunitperf_runner_src_path(xunitperf_src_path):
     return os.path.join(xunitperf_src_path, 'src', 'cli', 'Microsoft.DotNet.xunit.performance.runner.cli')
 
-def get_xunitperf_runner_bin_path(xunitperf_src_path):
-    return os.path.join(get_xunitperf_runner_src_path(xunitperf_src_path), 'bin', 'Release')
-
 def get_xunitperf_analyzer_path(xunitperf_src_path):
     return os.path.join(xunitperf_src_path, 'src', 'xunit.performance.analysis', 'bin', 'Release', 'xunit.performance.analysis')
 
@@ -142,7 +139,6 @@ def make_xunit_perf(xunitperf_src_path):
     dotnet_base_path = os.path.dirname(dotnet_path)
     analyzer_base_path = os.path.dirname(get_xunitperf_analyzer_path(xunitperf_src_path))
     runner_src_path = get_xunitperf_runner_src_path(xunitperf_src_path)
-    runner_bin_path = get_xunitperf_runner_bin_path(xunitperf_src_path)
 
     if script_args.rebuild or not os.path.exists(dotnet_base_path) or not os.path.exists(analyzer_base_path):
         run_command(
@@ -150,16 +146,12 @@ def make_xunit_perf(xunitperf_src_path):
             title = "Build xunit-performance",
             from_dir = xunitperf_src_path,
         )
-    else:
-        print("# xunit-performance at '{path}' was already built, skipping CiBuild. Use --rebuild to force rebuild.".format(path = xunitperf_src_path))
-
-    if script_args.rebuild or not os.path.exists(runner_bin_path):
         run_command(
             dotnet_path, 'publish', '-c', 'Release', runner_src_path,
             title = "Build Microsoft.DotNet.xunit.performance.runner.cli",
         )
     else:
-        print("# Microsoft.DotNet.xunit.performance.runner.cli found already published. Use --rebuild to publish again.")
+        print("# xunit-performance at '{path}' was already built, skipping CiBuild. Use --rebuild to force rebuild.".format(path = xunitperf_src_path))
 
 def run_perf_test(runid, cli_path, xunitperf_src_path):
     cli_path = os.path.realpath(cli_path)
