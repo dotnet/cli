@@ -356,7 +356,7 @@ namespace Microsoft.DotNet.ProjectModel
             RuntimeGraph runtimeGraph = null;
             if (HasLoadedRuntimeGraph)
             {
-                runtimeGraph = LoadRuntimeGraph()
+                runtimeGraph = LoadRuntimeGraph(LockFile);
             }
 
             return new ProjectContext(
@@ -553,10 +553,9 @@ namespace Microsoft.DotNet.ProjectModel
             }
 
             // Question: can P2P references define a rid graph?
-            var allRuntimeJsons = lockFile
-                .SelectMany(lf => lf.PackageLibraries)
-                .Select(l => l.Files)
-                .Where(f => f.Equals("runtime.json", StringComparison.Ordinal));
+            IEnumerable<string> allRuntimeJsons = lockFile.PackageLibraries
+                .SelectMany(l => l.Files)
+                .Where(f => Path.GetFileName(f).Equals("runtime.json", StringComparison.Ordinal));
 
             if (allRuntimeJsons.Count() == 0)
             {
@@ -567,7 +566,7 @@ namespace Microsoft.DotNet.ProjectModel
 
             foreach (var runtimeJson in allRuntimeJsons)
             {
-                var packageRuntimeGraph = JsonRuntimeFormat.ReadRuntimeGraph(runtimeGraphJsonFile);
+                var packageRuntimeGraph = JsonRuntimeFormat.ReadRuntimeGraph(runtimeJson);
 
                 runtimeGraph = RuntimeGraph.Merge(runtimeGraph, packageRuntimeGraph);
             }
