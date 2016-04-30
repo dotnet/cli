@@ -200,5 +200,12 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             
             return this;
         }
+
+        public TestCommand WithWorkingDirectory(string path)
+        {
+            WorkingDirectory = path;
+
+            return this;
+        }
     }
 }

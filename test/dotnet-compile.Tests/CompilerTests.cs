@@ -21,127 +21,90 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
         }
 
         [Fact]
-        public void XmlDocumentationFileIsGenerated()
+        public void When_xmlDoc_is_true_then_doc_xml_is_generated()
         {
-            // create unique directories in the 'temp' folder
-            var root = Temp.CreateDirectory();
-            root.CopyFile(Path.Combine(_testProjectsRoot, "global.json"));
+            var root = TestAssetsManager.CreateTestInstance("TestLibraryWithDocs")
+                .WithBuildArtifacts();
+            
+            var outputXmlPath = Path.Combine(root.Path, "bin", "Debug", DefaultLibraryFramework, "TestLibrary.xml");
 
-            var testLibDir = root.CreateDirectory("TestLibrary");
-            var sourceTestLibDir = Path.Combine(_testProjectsRoot, "TestAppWithLibrary", "TestLibrary");
-
-            CopyProjectToTempDir(sourceTestLibDir, testLibDir);
-
-            // run compile
-            var outputDir = Path.Combine(testLibDir.Path, "bin");
-            var testProject = GetProjectPath(testLibDir);
-            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultLibraryFramework);
-            var result = buildCommand.ExecuteWithCapturedOutput();
-            result.Should().Pass();
-
-            // verify the output xml file
-            var outputXml = Path.Combine(outputDir, "Debug", DefaultLibraryFramework, "TestLibrary.xml");
-            Console.WriteLine("OUTPUT XML PATH: " + outputXml);
-            Assert.True(File.Exists(outputXml));
-            Assert.Contains("Gets the message from the helper", File.ReadAllText(outputXml));
+            new FileInfo(outputXmlPath)
+                .Should().Exist("because xmlDoc=true is specified in project.json")
+                   .And.ContainText("Gets the message from the helper", "because that is the intellisense doc comment in the TestLibraryWithDocs");
         }
 
         [Fact]
-        public void SatelliteAssemblyIsGeneratedByDotnetBuild()
+        public void When_project_has_resx_then_Sattelite_assembly_produced()
         {
-            // create unique directories in the 'temp' folder
-            var root = Temp.CreateDirectory();
-            var testLibDir = root.CreateDirectory("TestProjectWithCultureSpecificResource");
-            var sourceTestLibDir = Path.Combine(_testProjectsRoot, "TestProjectWithCultureSpecificResource");
-
-            CopyProjectToTempDir(sourceTestLibDir, testLibDir);
-
-            // run compile on a project with resources
-            var outputDir = Path.Combine(testLibDir.Path, "bin");
-            var testProject = GetProjectPath(testLibDir);
-            var buildCmd = new BuildCommand(testProject, output: outputDir, framework: DefaultFramework);
-            var result = buildCmd.ExecuteWithCapturedOutput();
-            result.Should().Pass();
+            var root = TestAssetsManager.CreateTestInstance("TestProjectWithCultureSpecificResource")
+                .WithBuildArtifacts();
 
             var generatedSatelliteAssemblyPath = Path.Combine(
-                outputDir,
-                "Debug",
-                DefaultFramework,
-                "fr",
-                "TestProjectWithCultureSpecificResource.resources.dll");
-            Assert.True(File.Exists(generatedSatelliteAssemblyPath), $"File {generatedSatelliteAssemblyPath} was not found.");
+                    root.Path,
+                    "bin",
+                    "Debug",
+                    DefaultFramework,
+                    "fr",
+                    "TestProjectWithCultureSpecificResource.resources.dll");
+
+            new FileInfo(generatedSatelliteAssemblyPath)
+                .Should().Exist("Because the project includes Strings.fr.resx");
         }
 
         [Fact]
-        public void LibraryWithAnalyzer()
+        public void When_PJ_references_analyzers_Then_they_are_executed()
         {
-            var root = Temp.CreateDirectory();
-            var testLibDir = root.CreateDirectory("TestLibraryWithAnalyzer");
-            var sourceTestLibDir = Path.Combine(_testProjectsRoot, "TestLibraryWithAnalyzer");
+            var root = TestAssetsManager.CreateTestInstance("TestLibraryWithAnalyzer")
+                .WithLockFiles();
 
-            CopyProjectToTempDir(sourceTestLibDir, testLibDir);
+            var buildResult = new TestCommand("dotnet")
+                .WithWorkingDirectory(root.Path)
+                .ExecuteWithCapturedOutput($"build -f {DefaultLibraryFramework}");
 
-            // run compile
-            var outputDir = Path.Combine(testLibDir.Path, "bin");
-            var testProject = GetProjectPath(testLibDir);
-            var buildCmd = new BuildCommand(testProject, output: outputDir, framework: DefaultLibraryFramework);
-            var result = buildCmd.ExecuteWithCapturedOutput();
-            result.Should().Pass();
+            buildResult
+                .Should().Pass();
 
-            Assert.Contains("CA1018", result.StdErr);
+            buildResult.StdErr
+                .Should().Contain("CA1018", "because this is produced by the analyzer");
         }
 
         [Fact]
+        // TODO: this test is really just testing space in path. It does not validate anything about
+        // PreserveCompilationContext
         public void CompilingAppWithPreserveCompilationContextWithSpaceInThePathShouldSucceed()
         {
-            var root = Temp.CreateDirectory();
+            var root = TestAssetsManager.CreateTestInstance("TestAppCompilationContext", "space directory")
+                .WithLockFiles();
 
-            var spaceBufferDirectory = root.CreateDirectory("space directory");
-            var testAppDir = spaceBufferDirectory.CreateDirectory("TestAppCompilationContext");
-
-            CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestAppCompilationContext"), testAppDir);
-
-            var testProjectDir = Path.Combine(_testProjectsRoot, "TestAppCompilationContext", "TestApp");
-            var testProject = Path.Combine(testProjectDir, "project.json");
-
-            var buildCommand = new BuildCommand(testProject);
-
-            buildCommand.Execute().Should().Pass();
+            new TestCommand("dotnet")
+                .WithWorkingDirectory(root.Path)
+                .ExecuteWithCapturedOutput($"build -f {DefaultLibraryFramework}")
+                .Should().Pass();
         }
 
         [Fact]
         public void ContentFilesAreCopied()
         {
             var testInstance = TestAssetsManager.CreateTestInstance("TestAppWithContentPackage")
-                                                .WithLockFiles();
+                .WithBuildArtifacts();
 
-            var root = testInstance.TestRoot;
-
-            // run compile
-            var outputDir = Path.Combine(root, "bin");
-            var testProject = ProjectUtils.GetProjectJson(root, "TestAppWithContentPackage");
-            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultFramework);
-            var result = buildCommand.ExecuteWithCapturedOutput();
-            result.Should().Pass();
-
-            result = Command.Create(Path.Combine(outputDir, "AppWithContentPackage" + buildCommand.GetExecutableExtension()), new string [0])
-                .CaptureStdErr()
-                .CaptureStdOut()
-                .Execute();
-            result.Should().Pass();
+            var outputDir = Path.Combine(testInstance.Path, "bin", "Debug", DefaultLibraryFramework);
 
             // verify the output xml file
             new DirectoryInfo(outputDir).Sub("scripts").Should()
                 .Exist()
-                .And.HaveFile("run.cmd");
-            new DirectoryInfo(outputDir).Should()
-                .HaveFile("config.xml");
+                .And.HaveFile("run.cmd", "because it is in the nupkg's dnxcore50 scripts directory")
+                .And.HaveFile("config.xml", "because it is in the nupkg's dnxcore50 config directory");
+
             // verify embedded resources
-            result.StdOut.Should().Contain("AppWithContentPackage.dnf.png");
-            result.StdOut.Should().Contain("AppWithContentPackage.ui.png");
+            result.StdOut.Should()
+                .Contain("AppWithContentPackage.dnf.png")
+                .And.Contain("AppWithContentPackage.ui.png");
+                
             // verify 'all' language files not included
             result.StdOut.Should().NotContain("AppWithContentPackage.dnf_all.png");
             result.StdOut.Should().NotContain("AppWithContentPackage.ui_all.png");
+            
             // verify classes
             result.StdOut.Should().Contain("AppWithContentPackage.Foo");
             result.StdOut.Should().Contain("MyNamespace.Util");
