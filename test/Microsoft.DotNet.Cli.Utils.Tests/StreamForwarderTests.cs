@@ -34,6 +34,8 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             {
                 return new[]
                 {
+                    new object[] { "\n\n\n", new string[]{"", "", Environment.NewLine} },
+                    new object[] { "\r\n\r\n\r\n", new string[]{"", "", Environment.NewLine} },
                     new object[] { "123", new string[]{"123"} },
                     new object[] { "123\n", new string[] {"123" + Environment.NewLine} },
                     new object[] { "123\r\n", new string[] {"123" + Environment.NewLine} },
