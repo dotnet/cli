@@ -22,8 +22,15 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         private string MainProjectExe
         {
             get
-            {
-                return MainProject + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : "");
+            {   
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    return MainProject + ".exe";
+                }
+                else
+                {
+                    return MainProject;
+                }
             }
         }
 
@@ -43,11 +50,11 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         public void TestIncrementalBuildOfDependencyGraph(string testIdentifer, string projectToTouch, string[] expectedRebuiltProjects)
         {
             var testInstance = TestAssetsManager.CreateTestInstance("TestProjectToProjectDependencies", identifier: testIdentifer)
-                                                .WithLockFiles()
-                                                .WithBuildArtifacts();
+                                                .WithLockFiles();
 
             TestProjectRoot = testInstance.TestRoot;
-
+            var result1 = BuildProject();
+            
             // second build; nothing changed; no project required compilation
             var result2 = BuildProject();
             AssertRebuilt(result2, Array.Empty<string>());
@@ -64,10 +71,10 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         public void TestNoDependencyFlag()
         {
             var testInstance = TestAssetsManager.CreateTestInstance("TestProjectToProjectDependencies")
-                                                .WithLockFiles()
-                                                .WithBuildArtifacts();
+                                                .WithLockFiles();
 
             TestProjectRoot = testInstance.TestRoot;
+            var result1 = BuildProject();
 
             var dependencies = new[] { "L11", "L12", "L21", "L22" };
 
@@ -90,10 +97,10 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         public void TestNoDependenciesDependencyRebuild()
         {
             var testInstance = TestAssetsManager.CreateTestInstance("TestProjectToProjectDependencies")
-                                                .WithLockFiles()
-                                                .WithBuildArtifacts();
-
+                                                .WithLockFiles();
+                                                
             TestProjectRoot = testInstance.TestRoot;
+            var result1 = BuildProject();
 
             // modify the source code of a leaf dependency
             TouchSourcesOfProject("L11");
@@ -127,7 +134,6 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         {
             foreach (var rebuiltProject in expectedRebuilt)
             {
-                string frameworkFullName = null;
 
                 if (TestProjectIsApp(rebuiltProject))
                 {

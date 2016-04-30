@@ -11,6 +11,7 @@ using Microsoft.DotNet.ProjectModel.Resolution;
 using Microsoft.Extensions.Internal;
 using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
+using NuGet.RuntimeModel;
 
 namespace Microsoft.DotNet.ProjectModel
 {
@@ -35,6 +36,8 @@ namespace Microsoft.DotNet.ProjectModel
         private string ReferenceAssembliesPath { get; set; }
 
         private bool IsDesignTime { get; set; }
+
+        private bool HasLoadedRuntimeGraph { get; set; }
 
         private Func<string, Project> ProjectResolver { get; set; }
 
@@ -117,6 +120,13 @@ namespace Microsoft.DotNet.ProjectModel
         public ProjectContextBuilder WithReaderSettings(ProjectReaderSettings settings)
         {
             Settings = settings;
+            return this;
+        }
+
+        // the runtime graph is not loaded by default because of perf implications
+        public ProjectContextBuilder WithLoadedRuntimeGraph()
+        {
+            HasLoadedRuntimeGraph = true;
             return this;
         }
 
@@ -343,6 +353,12 @@ namespace Microsoft.DotNet.ProjectModel
             // Create a library manager
             var libraryManager = new LibraryManager(libraries.Values.ToList(), diagnostics, Project?.ProjectFilePath);
 
+            RuntimeGraph runtimeGraph = null;
+            if (HasLoadedRuntimeGraph)
+            {
+                runtimeGraph = LoadRuntimeGraph(LockFile);
+            }
+
             return new ProjectContext(
                 GlobalSettings,
                 mainProject,
@@ -352,7 +368,8 @@ namespace Microsoft.DotNet.ProjectModel
                 runtime,
                 PackagesDirectory,
                 libraryManager,
-                LockFile);
+                LockFile,
+                runtimeGraph);
         }
 
         private void ReadLockFile(ICollection<DiagnosticMessage> diagnostics)
@@ -526,6 +543,35 @@ namespace Microsoft.DotNet.ProjectModel
 
                 libraries.Add(new LibraryKey(library.Name), description);
             }
+        }
+
+        private RuntimeGraph LoadRuntimeGraph(LockFile lockFile)
+        {
+            if (lockFile == null)
+            {
+                throw new Exception($"{nameof(ProjectContextBuilder)}: lock file is null, unable to load runtime graph");
+            }
+
+            // Question: can P2P references define a rid graph?
+            IEnumerable<string> allRuntimeJsons = lockFile.PackageLibraries
+                .SelectMany(l => l.Files)
+                .Where(f => Path.GetFileName(f).Equals("runtime.json", StringComparison.Ordinal));
+
+            if (allRuntimeJsons.Count() == 0)
+            {
+                throw new InvalidOperationException($"{nameof(ProjectContextBuilder)}: no runtime.json files found in dependency graph");
+            }
+
+            RuntimeGraph runtimeGraph = RuntimeGraph.Empty;
+
+            foreach (var runtimeJson in allRuntimeJsons)
+            {
+                var packageRuntimeGraph = JsonRuntimeFormat.ReadRuntimeGraph(runtimeJson);
+
+                runtimeGraph = RuntimeGraph.Merge(runtimeGraph, packageRuntimeGraph);
+            }
+            
+            return runtimeGraph;
         }
 
         private void EnsureProjectLoaded()

@@ -116,17 +116,27 @@ namespace Microsoft.DotNet.Tools.Build
 
         private void MakeRunnable(ProjectGraphNode graphNode)
         {
-            var runtimeContext = graphNode.ProjectContext.ProjectFile.HasRuntimeOutput(_args.ConfigValue) ?
-                _args.Workspace.GetRuntimeContext(graphNode.ProjectContext, _args.GetRuntimes()) :
-                graphNode.ProjectContext;
+            foreach (var runtimeContext in CreateRuntimeContexts(graphNode))
+            {
+                var outputPaths = runtimeContext.GetOutputPaths(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
+                var libraryExporter = runtimeContext.CreateExporter(_args.ConfigValue, _args.BuildBasePathValue);
 
-            var outputPaths = runtimeContext.GetOutputPaths(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
-            var libraryExporter = runtimeContext.CreateExporter(_args.ConfigValue, _args.BuildBasePathValue);
+                CopyCompilationOutput(outputPaths);
 
-            CopyCompilationOutput(outputPaths);
+                var executable = new Executable(runtimeContext, outputPaths, libraryExporter, _args.ConfigValue);
+                executable.MakeCompilationOutputRunnable();
+            }
+        }
 
-            var executable = new Executable(runtimeContext, outputPaths, libraryExporter, _args.ConfigValue);
-            executable.MakeCompilationOutputRunnable();
+        public IEnumerable<ProjectContext> CreateRuntimeContexts(ProjectGraphNode graphNode)
+        {
+            var allRuntimeContexts = _args.Workspace.GetAllRuntimeContexts(graphNode.ProjectContext);
+            if (!string.IsNullOrEmpty(_args.RuntimeValue))
+            {
+                return allRuntimeContexts.Where(r => r.RuntimeIdentifier == _args.RuntimeValue);
+            }
+
+            return allRuntimeContexts;
         }
 
         protected override CompilationResult RunCompile(ProjectGraphNode projectNode)
@@ -150,19 +160,19 @@ namespace Microsoft.DotNet.Tools.Build
             finally
             {
                 StampProjectWithSDKVersion(projectNode.ProjectContext);
-                _incrementalManager.CacheIncrementalState(projectNode);
+                _incrementalManager.CacheIncrementalState(projectNode, CreateRuntimeContexts(projectNode));
             }
         }
 
         protected override void ProjectSkiped(ProjectGraphNode projectNode)
         {
             StampProjectWithSDKVersion(projectNode.ProjectContext);
-            _incrementalManager.CacheIncrementalState(projectNode);
+            _incrementalManager.CacheIncrementalState(projectNode, CreateRuntimeContexts(projectNode));
         }
 
         protected override bool NeedsRebuilding(ProjectGraphNode graphNode)
         {
-            var result = _incrementalManager.NeedsRebuilding(graphNode);
+            var result = _incrementalManager.NeedsRebuilding(graphNode, CreateRuntimeContexts(graphNode));
 
             PrintIncrementalResult(graphNode.ProjectContext.GetDisplayName(), result);
 

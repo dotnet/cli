@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.ProjectModel;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
 {
@@ -23,6 +24,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         private TempRoot _temp;
         private static TestAssetsManager s_testsAssetsMgr;
         private static string s_repoRoot;
+        private static string s_currentRid;
 
         protected static string RepoRoot
         {
@@ -96,7 +98,20 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
                 return _temp;
             }
         }
-
+		
+        public string CurrentRid
+        {
+            get
+            {
+                if (s_currentRid == null)
+                {
+                    s_currentRid = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
+                }
+                
+                return s_currentRid;
+            }
+        }
+		
         public virtual void Dispose()
         {
             if (_temp != null && !PreserveTemp())
@@ -142,31 +157,6 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             result.Should().NotHaveStdErr();
             result.Should().Pass();
             return result;
-        }
-
-        protected void TestOutputExecutable(
-            string outputDir,
-            string executableName,
-            string expectedOutput,
-            bool native = false)
-        {
-            TestExecutable(GetCompilationOutputPath(outputDir, native), executableName, expectedOutput);
-        }
-
-        protected void TestNativeOutputExecutable(string outputDir, string executableName, string expectedOutput)
-        {
-            TestOutputExecutable(outputDir, executableName, expectedOutput, true);
-        }
-
-        protected string GetCompilationOutputPath(string outputDir, bool native)
-        {
-            var executablePath = outputDir;
-            if (native)
-            {
-                executablePath = Path.Combine(executablePath, "native");
-            }
-
-            return executablePath;
         }
 
         private bool IsPortable(string executablePath)

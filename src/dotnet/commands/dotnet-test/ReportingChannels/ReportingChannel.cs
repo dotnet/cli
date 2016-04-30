@@ -37,6 +37,11 @@ namespace Microsoft.DotNet.Tools.Test
 
         public void Send(Message message)
         {
+            if (_writer == null)
+            {
+                throw new InvalidOperationException($"Messages are not being read. {nameof(StartReadingMessages)} was not called.");
+            }
+
             lock (_writer)
             {
                 try

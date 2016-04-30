@@ -26,6 +26,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             var testInstance = TestAssetsManager.CreateTestInstance("TestAppWithTransitiveAppDependency")
                                                 .WithLockFiles();
             TestProjectRoot = testInstance.TestRoot;
+
             var buildResult = BuildProject();
             buildResult.Should().HaveCompiledProject(MainProject, _appFrameworkFullName);
             buildResult.Should().HaveCompiledProject(TestLibraryWithAppDependency, _appFrameworkFullName);

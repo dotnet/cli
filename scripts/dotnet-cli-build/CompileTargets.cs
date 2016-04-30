@@ -6,7 +6,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli.Build.Framework;
 using Microsoft.Extensions.PlatformAbstractions;
-
 using static Microsoft.DotNet.Cli.Build.FS;
 using static Microsoft.DotNet.Cli.Build.Framework.BuildHelpers;
 using System.Text.RegularExpressions;
@@ -85,23 +84,16 @@ namespace Microsoft.DotNet.Cli.Build
         public static BuildTargetResult GenerateStubHostPackages(BuildTargetContext c)
         {
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
-            var currentRid = HostPackagePlatformRid;
-            PrepareDummyRuntimeNuGetPackage(DotNetCli.Stage0);
-            foreach (var hostPackage in buildVersion.LatestHostPackages)
-            {
-                foreach (var rid in HostPackageSupportedRids.Values.Distinct())
-                {
-                    if (!rid.Equals(currentRid))
-                    {
-                        CreateDummyRuntimeNuGetPackage(
-                            DotNetCli.Stage0,
-                            hostPackage.Key,
-                            rid,
-                            hostPackage.Value,
-                            Dirs.CorehostDummyPackages);
-                    }
-                }
-            }
+
+            string currentRid = GetRuntimeId();
+            var nugetRidUtils = new NugetRidUtils(Dirs.RepoRoot);
+            var stubHostPackageGenerator = new StubHostPackageGenerator(nugetRidUtils);
+
+            stubHostPackageGenerator.GenerateStubPackagesForAllRidsExceptCurrent(
+                currentRid, 
+                buildVersion.LatestHostPackages, 
+                Dirs.CorehostDummyPackages);
+            
             return c.Success();
         }
 
@@ -111,6 +103,7 @@ namespace Microsoft.DotNet.Cli.Build
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
             var lockedHostFxrVersion = buildVersion.LockedHostFxrVersion;
             var currentRid = HostPackagePlatformRid;
+            
             string projectJson = $@"{{
   ""dependencies"": {{
       ""Microsoft.NETCore.DotNetHostResolver"" : ""{lockedHostFxrVersion}""
@@ -390,64 +383,6 @@ namespace Microsoft.DotNet.Cli.Build
             RemovePdbsFromDir(Path.Combine(Dirs.Stage2, "sdk"));
 
             return c.Success();
-        }
-
-
-        private static void PrepareDummyRuntimeNuGetPackage(DotNetCli dotnet)
-        {
-            var projectJson = new StringBuilder();
-            projectJson.Append("{");
-            projectJson.Append("  \"dependencies\": { \"NETStandard.Library\": \"1.5.0-rc2-24008\" },");
-            projectJson.Append("  \"frameworks\": { \"netcoreapp1.0\": { \"imports\": [\"netstandard1.5\", \"dnxcore50\"] } },");
-            projectJson.Append("  \"runtimes\": { \"win7-x64\": { } },");
-            projectJson.Append("}");
-
-            var programCs = "using System; namespace ConsoleApplication { public class Program { public static void Main(string[] args) { Console.WriteLine(\"Hello World!\"); } } }";
-
-            var tempPjDirectory = Path.Combine(Dirs.Intermediate, "dummyNuGetPackageIntermediate");
-            FS.Rmdir(tempPjDirectory);
-
-            Directory.CreateDirectory(tempPjDirectory);
-
-            var tempPjFile = Path.Combine(tempPjDirectory, "project.json");
-            var tempSourceFile = Path.Combine(tempPjDirectory, "Program.cs");
-
-            File.WriteAllText(tempPjFile, projectJson.ToString());
-            File.WriteAllText(tempSourceFile, programCs.ToString());
-
-            dotnet.Restore("--verbosity", "verbose", "--disable-parallel")
-                .WorkingDirectory(tempPjDirectory)
-                .Execute()
-                .EnsureSuccessful();
-            dotnet.Build(tempPjFile, "--runtime", "win7-x64")
-                .WorkingDirectory(tempPjDirectory)
-                .Execute()
-                .EnsureSuccessful();
-        }
-
-        private static void CreateDummyRuntimeNuGetPackage(DotNetCli dotnet, string basePackageId, string rid, string version, string outputDir)
-        {
-            var packageId = $"runtime.{rid}.{basePackageId}";
-
-            var projectJson = new StringBuilder();
-            projectJson.Append("{");
-            projectJson.Append($"  \"version\": \"{version}\",");
-            projectJson.Append($"  \"name\": \"{packageId}\",");
-            projectJson.Append("  \"dependencies\": { \"NETStandard.Library\": \"1.5.0-rc2-24008\" },");
-            projectJson.Append("  \"frameworks\": { \"netcoreapp1.0\": { \"imports\": [\"netstandard1.5\", \"dnxcore50\"] } },");
-            projectJson.Append("}");
-
-            var tempPjDirectory = Path.Combine(Dirs.Intermediate, "dummyNuGetPackageIntermediate");
-            var tempPjFile = Path.Combine(tempPjDirectory, "project.json");
-
-            File.WriteAllText(tempPjFile, projectJson.ToString());
-
-            dotnet.Pack(
-                tempPjFile, "--no-build",
-                "--output", outputDir)
-                .WorkingDirectory(tempPjDirectory)
-                .Execute()
-                .EnsureSuccessful();
         }
 
         private static void CleanOutputDir(string directory)

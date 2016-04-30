@@ -2,8 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.IO;
+using System.Linq;
 using Microsoft.DotNet.Cli.Utils;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.DotNet.ProjectModel;
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
@@ -240,6 +243,11 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             _buildProfile = buildProfile;
             _noIncremental = noIncremental;
             _noDependencies = noDependencies;
+            
+            /*if (!string.IsNullOrEmpty(_outputDirectory) && string.IsNullOrEmpty(_runtime))
+            {
+                throw new Exception("verify and fix me (make sure it is standalone app)");
+            }/**/
         }
 
         public override CommandResult Execute(string args = "")
@@ -262,6 +270,36 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         public string GetOutputExecutableName()
         {
             return _project.Name + GetExecutableExtension();
+        }
+
+        private string BuildRelativeOutputPath(bool portable, string runtime)
+        {
+            // lets try to build an approximate output path
+            string config = string.IsNullOrEmpty(_configuration) ? "Debug" : _configuration;
+            string framework = string.IsNullOrEmpty(_framework) ?
+                _project.GetTargetFrameworks().First().FrameworkName.GetShortFolderName() : _framework;
+            
+            if (!portable)
+            {
+                var runtimeOrDefault = string.IsNullOrEmpty(runtime) ? PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier() : runtime;
+                return Path.Combine(config, framework, runtimeOrDefault);
+            }
+            else
+            {
+                return Path.Combine(config, framework);
+            }
+        }
+
+        public DirectoryInfo GetOutputDirectory(bool portable = false, string runtime=null)
+        {
+            if (!string.IsNullOrEmpty(_outputDirectory))
+            {
+                return new DirectoryInfo(_outputDirectory);
+            }
+
+            string output = Path.Combine(_project.ProjectDirectory, "bin", BuildRelativeOutputPath(portable, runtime ?? _runtime));
+            
+            return new DirectoryInfo(output);
         }
 
         public string GetExecutableExtension()

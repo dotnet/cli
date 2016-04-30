@@ -72,6 +72,35 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
             CopyAssets(dependencies);
             GenerateBindingRedirects(_exporter);
         }
+        
+        private IEnumerable<string> FindCoreHostFiles()
+        {
+            if (string.IsNullOrEmpty(_context.RuntimeIdentifier))
+            {
+                yield break;
+            }
+
+            string[] allowedCoreHostFileNames = new string[] {
+                "dotnet",
+                "hostpolicy",
+                "hostfxr",
+                "libhostpolicy",
+                "libhostfxr"
+            };
+            foreach (var export in _exporter.GetAllExports())
+            {
+                foreach (LibraryAssetGroup nativeAssetGroup in export.NativeLibraryGroups)
+                {
+                    foreach (LibraryAsset nativeAsset in nativeAssetGroup.Assets)
+                    {
+                        if (allowedCoreHostFileNames.Contains(Path.GetFileNameWithoutExtension(nativeAsset.ResolvedPath).ToLower()))
+                        {
+                            yield return nativeAsset.ResolvedPath;
+                        }
+                    }
+                }
+            }
+        }
 
         private void MakeCompilationOutputRunnableForCoreCLR()
         {
@@ -80,8 +109,22 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
             var emitEntryPoint = _compilerOptions.EmitEntryPoint ?? false;
             if (emitEntryPoint && !string.IsNullOrEmpty(_context.RuntimeIdentifier))
             {
-                // TODO: Pick a host based on the RID
-                CoreHost.CopyTo(_runtimeOutputPath, _compilerOptions.OutputName + Constants.ExeSuffix);
+                foreach (var sourcePath in FindCoreHostFiles())
+                {
+                    string destinationPath;
+                    if (Path.GetFileName(sourcePath).StartsWith("dotnet"))
+                    {
+                        string extension = _context.RuntimeIdentifier.ToLower().StartsWith("win") ? ".exe" : string.Empty;
+                        destinationPath = Path.Combine(_runtimeOutputPath, _compilerOptions.OutputName + extension);
+                    }
+                    else
+                    {
+                        destinationPath = Path.Combine(_runtimeOutputPath, Path.GetFileName(sourcePath));
+                    }
+
+                    File.Copy(sourcePath, destinationPath, overwrite: true);
+                    File.SetLastWriteTimeUtc(destinationPath, DateTime.UtcNow);
+                }
             }
         }
 

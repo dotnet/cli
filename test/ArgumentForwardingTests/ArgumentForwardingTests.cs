@@ -40,6 +40,7 @@ namespace Microsoft.DotNet.Tests.ArgumentForwarding
         private void FindAndEnsureReflectorPresent()
         {
             ReflectorPath = Path.Combine(AppContext.BaseDirectory, s_reflectorDllName);
+            Console.WriteLine($"ReflectorPath = {ReflectorPath}");
             ReflectorCmdPath = Path.Combine(AppContext.BaseDirectory, s_reflectorCmdName);
             File.Exists(ReflectorPath).Should().BeTrue();
         }

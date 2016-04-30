@@ -8,7 +8,9 @@ using System.Linq;
 using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Resolution;
+using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
+using NuGet.RuntimeModel;
 
 namespace Microsoft.DotNet.ProjectModel
 {
@@ -42,6 +44,8 @@ namespace Microsoft.DotNet.ProjectModel
 
         public LibraryManager LibraryManager { get; }
 
+        public RuntimeGraph RuntimeGraph { get; }
+
         internal ProjectContext(
             GlobalSettings globalSettings,
             ProjectDescription rootProject,
@@ -51,7 +55,8 @@ namespace Microsoft.DotNet.ProjectModel
             string runtimeIdentifier,
             string packagesDirectory,
             LibraryManager libraryManager,
-            LockFile lockfile)
+            LockFile lockfile,
+            RuntimeGraph runtimeGraph)
         {
             Identity = new ProjectContextIdentity(rootProject?.Path, targetFramework);
             GlobalSettings = globalSettings;
@@ -63,6 +68,7 @@ namespace Microsoft.DotNet.ProjectModel
             LibraryManager = libraryManager;
             LockFile = lockfile;
             IsPortable = isPortable;
+            RuntimeGraph = runtimeGraph;
         }
 
         public LibraryExporter CreateExporter(string configuration, string buildBasePath = null)
@@ -152,6 +158,29 @@ namespace Microsoft.DotNet.ProjectModel
                         .WithReaderSettings(settings)
                         .WithProject(project)
                         .BuildAllTargets();
+        }
+
+        public bool IsRidCompatible(string rid)
+        {
+            if (RuntimeGraph == null)
+            {
+                throw new Exception("IsRidCompatible requires a ProjectContext with a loaded RuntimeGraph.");
+            }
+
+            // If this project has no runtime identifier, there's nothing to be compatible with
+            if (RuntimeIdentifier == null)
+            {
+                return false;
+            }
+
+            return RuntimeIdentifier.Equals(rid, StringComparison.Ordinal) 
+                ? true 
+                : RuntimeGraph.AreCompatible(RuntimeIdentifier, rid);
+        }
+
+        public static IEnumerable<ProjectContext> FilterProjectContextsByFramework(IEnumerable<ProjectContext> contexts, NuGetFramework framework)
+        {
+            return contexts.Where(t => framework.Equals(t.TargetFramework)).ToList();
         }
 
         public OutputPaths GetOutputPaths(string configuration, string buidBasePath = null, string outputPath = null)

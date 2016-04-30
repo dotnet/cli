@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
@@ -121,7 +122,26 @@ namespace Microsoft.DotNet.Tools.Compiler
                 IEnumerable<NuGetFramework> frameworks = null;
                 if (_frameworkOption.HasValue())
                 {
-                    frameworks = new [] { NuGetFramework.Parse(_frameworkOption.Value()) };
+                    NuGetFramework framework = NuGetFramework.Parse(_frameworkOption.Value());
+                    frameworks = new [] { framework };
+                    
+                    if (_outputOption.HasValue() && !_runtimeOption.HasValue())
+                    {
+                        foreach (var file in files)
+                        {
+                            var anyProjectContext = ProjectContext.CreateContextForEachFramework(file).Where(p => p.RuntimeIdentifier != null).FirstOrDefault();
+                            if (anyProjectContext == null)
+                            {
+                                continue;
+                            }
+
+                            if (!anyProjectContext.IsPortable)
+                            {
+                                Reporter.Error.WriteLine("When the '--output' option is provided and application is standalone, the '--runtime' option must also be provided.");
+                                return 1;
+                            }
+                        }
+                    }
                 }
                 var success = execute(files, frameworks, this);
 
