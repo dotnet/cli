@@ -34,21 +34,21 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             {
                 return new[]
                 {
-                    new object[] { "\n\n\n", new string[]{"", "", Environment.NewLine} },
-                    new object[] { "\r\n\r\n\r\n", new string[]{"", "", Environment.NewLine} },
+                    new object[] { "\n\n\n", new string[]{"\n", "\n", "\n"} },
+                    new object[] { "\r\n\r\n\r\n", new string[]{"\r\n", "\r\n", "\r\n"} },
                     new object[] { "123", new string[]{"123"} },
-                    new object[] { "123\n", new string[] {"123" + Environment.NewLine} },
-                    new object[] { "123\r\n", new string[] {"123" + Environment.NewLine} },
-                    new object[] { "1234\n5678", new string[] {"1234", "5678"} },
-                    new object[] { "1234\r\n5678", new string[] {"1234", "5678"} },
-                    new object[] { "1234\n\n5678", new string[] {"1234", "", "5678"} },
-                    new object[] { "1234\r\n\r\n5678", new string[] {"1234", "", "5678"} },
-                    new object[] { "1234\n5678\n", new string[] {"1234", "5678" + Environment.NewLine} },
-                    new object[] { "1234\r\n5678\r\n", new string[] {"1234", "5678" + Environment.NewLine} },
-                    new object[] { "1234\n5678\nabcdefghijklmnopqrstuvwxyz", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz"} },
-                    new object[] { "1234\r\n5678\r\nabcdefghijklmnopqrstuvwxyz", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz"} },
-                    new object[] { "1234\n5678\nabcdefghijklmnopqrstuvwxyz\n", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz" + Environment.NewLine} },
-                    new object[] { "1234\r\n5678\r\nabcdefghijklmnopqrstuvwxyz\r\n", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz" + Environment.NewLine} }
+                    new object[] { "123\n", new string[] {"123\n"} },
+                    new object[] { "123\r\n", new string[] {"123\r\n"} },
+                    new object[] { "1234\n5678", new string[] {"1234\n", "5678"} },
+                    new object[] { "1234\r\n5678", new string[] {"1234\r\n", "5678"} },
+                    new object[] { "1234\n\n5678", new string[] {"1234\n", "\n", "5678"} },
+                    new object[] { "1234\r\n\r\n5678", new string[] {"1234\r\n", "\r\n", "5678"} },
+                    new object[] { "1234\n5678\n", new string[] {"1234\n", "5678\n"} },
+                    new object[] { "1234\r\n5678\r\n", new string[] {"1234\r\n", "5678\r\n"} },
+                    new object[] { "1234\n5678\nabcdefghijklmnopqrstuvwxyz", new string[] {"1234\n", "5678\n", "abcdefghijklmnopqrstuvwxyz"} },
+                    new object[] { "1234\r\n5678\r\nabcdefghijklmnopqrstuvwxyz", new string[] {"1234\r\n", "5678\r\n", "abcdefghijklmnopqrstuvwxyz"} },
+                    new object[] { "1234\n5678\nabcdefghijklmnopqrstuvwxyz\n", new string[] {"1234\n", "5678\n", "abcdefghijklmnopqrstuvwxyz\n"} },
+                    new object[] { "1234\r\n5678\r\nabcdefghijklmnopqrstuvwxyz\r\n", new string[] {"1234\r\n", "5678\r\n", "abcdefghijklmnopqrstuvwxyz\r\n"} }
                 };
             }
         }
@@ -65,11 +65,6 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         [MemberData("ForwardingTheoryVariations")]
         public void TestForwardingOnly(string inputStr, string[] expectedWrites)
         {
-            for (int i = 0; i < expectedWrites.Length - 1; ++i)
-            {
-                expectedWrites[i] += Environment.NewLine;
-            }
-
             TestCapturingAndForwardingHelper(ForwardOptions.Write, inputStr, null, expectedWrites);
         }
 
@@ -77,11 +72,6 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         [MemberData("ForwardingTheoryVariations")]
         public void TestCaptureOnly(string inputStr, string[] expectedWrites)
         {
-            for (int i = 0; i < expectedWrites.Length - 1; ++i)
-            {
-                expectedWrites[i] += Environment.NewLine;
-            }
-
             var expectedCaptured = string.Join("", expectedWrites);
 
             TestCapturingAndForwardingHelper(ForwardOptions.Capture, inputStr, expectedCaptured, new string[0]);
@@ -91,11 +81,6 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         [MemberData("ForwardingTheoryVariations")]
         public void TestCaptureAndForwardingTogether(string inputStr, string[] expectedWrites)
         {
-            for (int i = 0; i < expectedWrites.Length - 1; ++i)
-            {
-                expectedWrites[i] += Environment.NewLine;
-            }
-
             var expectedCaptured = string.Join("", expectedWrites);
 
             TestCapturingAndForwardingHelper(ForwardOptions.Write | ForwardOptions.Capture, inputStr, expectedCaptured, expectedWrites);

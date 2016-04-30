@@ -11,7 +11,6 @@ namespace Microsoft.DotNet.Cli.Utils
 {
     public sealed class StreamForwarder
     {
-        private static readonly char[] s_ignoreCharacters = new char[] { '\r' };
         private static readonly char s_flushBuilderCharacter = '\n';
 
         private StringBuilder _builder;
@@ -67,31 +66,24 @@ namespace Microsoft.DotNet.Cli.Utils
             {
                 currentCharacter = buffer[0];
 
+                _builder.Append(currentCharacter);
+
                 if (currentCharacter == s_flushBuilderCharacter)
                 {
-                    WriteBuilder(true);
-                }
-                else if (! s_ignoreCharacters.Contains(currentCharacter))
-                {
-                    _builder.Append(currentCharacter);
+                    WriteBuilder();
                 }
             }
 
             // Flush anything else when the stream is closed
             // Which should only happen if someone used console.Write
-            WriteBuilder(false);
+            WriteBuilder();
         }
 
-        private void WriteBuilder(bool includeNewLine)
+        private void WriteBuilder()
         {
-            if (_builder.Length == 0 && !includeNewLine)
+            if (_builder.Length == 0)
             {
                 return;
-            }
-
-            if (includeNewLine)
-            {
-                _builder.Append(Environment.NewLine);
             }
 
             Write(_builder.ToString());
