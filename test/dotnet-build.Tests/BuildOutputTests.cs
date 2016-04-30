@@ -309,10 +309,10 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         }
 
         [Fact]
-        public void BuildingApp_WithExternalRuntimeConfig_ProducesCorrectOutputRuntimeConfig()
+        public void App_WithExternalRuntimeConfig_OutputsRuntimeConfig()
         {
             var instance = TestAssetsManager.CreateTestInstance("AppWithRuntimeOptionsFile").WithLockFiles();
-            var output = Path.Combine(instance.TestRoot, "bin", "Debug", DefaultFramework, "AppWithRuntimeOptionsFile.runtimeconfig.json");
+            var output = Path.Combine(instance.TestRoot, "bin", "Debug", DefaultFramework, GetRuntimeId() ,"AppWithRuntimeOptionsFile.runtimeconfig.json");
             var cmd = new BuildCommand(Path.Combine(instance.TestRoot, Project.FileName));
             cmd.ExecuteWithCapturedOutput().Should().Pass();
 
@@ -328,6 +328,11 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
                 runtimeOptions["someArray"].ToObject<string[]>().Should().Contain("one", "two");
                 runtimeOptions["someObject"].Value<JObject>()["someProperty"].Value<string>().Should().Be("someValue");
             }
+        }
+
+        private string GetRuntimeId()
+        {
+            return PlatformServices.Default.Runtime.GetRuntimeIdentifier();
         }
 
         private void CopyProjectToTempDir(string projectDir, TempDirectory tempDir)
