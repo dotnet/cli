@@ -161,7 +161,7 @@ bool hostpolicy_exists_in_svc(const pal::string_t& version, pal::string_t* resol
 }
 
 /**
- * Given path to app binary, say app.dll, retrieve the app.deps.json.
+ * Given path to app binary, say app.dll or app.exe, retrieve the app.deps.json.
  */
 pal::string_t get_deps_from_app_binary(const pal::string_t& app)
 {
@@ -212,12 +212,12 @@ bool resolve_hostpolicy_dir_from_probe_paths(const pal::string_t& version, const
 }
 
 /**
- * Given FX location, app dll and specified --depsfile, return deps that contains hostpolicy.dll
+ * Given FX location, app binary and specified --depsfile, return deps that contains hostpolicy.dll
  */
 pal::string_t get_deps_file(
     const pal::string_t& fx_dir,
     const pal::string_t& app_candidate,
-    const pal::string_t& deps_file,
+    const pal::string_t& specified_deps_file,
     const runtime_config_t& config)
 {
     if (config.get_portable())
@@ -228,25 +228,25 @@ pal::string_t get_deps_file(
     else
     {
         // Standalone app's hostpolicy is from specified deps or from app deps.
-        return !deps_file.empty() ? deps_file : get_deps_from_app_binary(app_candidate);
+        return !specified_deps_file.empty() ? specified_deps_file : get_deps_from_app_binary(app_candidate);
     }
 }
 
 /**
- * Given own location, FX location, app dll and specified --depsfile and probe paths
+ * Given own location, FX location, app binary and specified --depsfile and probe paths
  *     return location that is expected to contain hostpolicy
  */
 bool fx_muxer_t::resolve_hostpolicy_dir(host_mode_t mode,
     const pal::string_t& own_dir,
     const pal::string_t& fx_dir,
     const pal::string_t& app_candidate,
-    const pal::string_t& deps_file,
+    const pal::string_t& specified_deps_file,
     const std::vector<pal::string_t>& probe_realpaths,
     const runtime_config_t& config,
     pal::string_t* impl_dir)
 {
     // Obtain deps file for the given configuration.
-    pal::string_t resolved_deps = get_deps_file(fx_dir, app_candidate, deps_file, config);
+    pal::string_t resolved_deps = get_deps_file(fx_dir, app_candidate, specified_deps_file, config);
 
     // Resolve hostpolicy version out of the deps file.
     pal::string_t version = resolve_hostpolicy_version_from_deps(resolved_deps);
@@ -276,10 +276,13 @@ bool fx_muxer_t::resolve_hostpolicy_dir(host_mode_t mode,
     else
     {
         // Standalone apps can be activated by muxer or by standalone host or "corehost"
+        // 1. When activated with dotnet.exe or corehost.exe, check for hostpolicy in the deps dir or
+        //    app dir.
+        // 2. When activated with app.exe, the standalone host, check own directory.
         assert(mode == host_mode_t::muxer || mode == host_mode_t::standalone || mode == host_mode_t::split_fx);
-        expected = (mode == host_mode_t::muxer)
-            ? get_directory(deps_file.empty() ? app_candidate : deps_file)
-            : own_dir;
+        expected = (mode == host_mode_t::standalone)
+            ? own_dir
+            : get_directory(specified_deps_file.empty() ? app_candidate : specified_deps_file);
     }
 
     // Check if hostpolicy exists in "expected" directory.
@@ -308,6 +311,10 @@ bool fx_muxer_t::resolve_hostpolicy_dir(host_mode_t mode,
 
 pal::string_t fx_muxer_t::resolve_fx_dir(host_mode_t mode, const pal::string_t& own_dir, const runtime_config_t& config)
 {
+    // No FX resolution for standalone apps.
+    assert(mode != host_mode_t::standalone);
+
+    // If invoking using FX dotnet.exe, use own directory.
     if (mode == host_mode_t::split_fx)
     {
         return own_dir;
@@ -768,14 +775,14 @@ int fx_muxer_t::execute(const int argc, const pal::char_t* argv[])
     pal::string_t sdk_dotnet;
     if (!resolve_sdk_dotnet_path(own_dir, &sdk_dotnet))
     {
-        trace::error(_X("Could not resolve SDK directory from [%s]"), own_dir.c_str());
+        trace::error(_X("Did not find a suitable dotnet SDK at '%s'. Install dotnet SDK from https://github.com/dotnet/cli"), own_dir.c_str());
         return StatusCode::LibHostSdkFindFailure;
     }
     append_path(&sdk_dotnet, _X("dotnet.dll"));
 
     if (!pal::file_exists(sdk_dotnet))
     {
-        trace::error(_X("Could not find dotnet.dll at [%s]"), sdk_dotnet.c_str());
+        trace::error(_X("Found dotnet SDK, but did not find dotnet.dll at [%s]"), sdk_dotnet.c_str());
         return StatusCode::LibHostSdkFindFailure;
     }
 
