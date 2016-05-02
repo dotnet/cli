@@ -1,0 +1,12 @@
+{
+  "compilationOptions": {
+    "emitEntryPoint": true,
+    "preserveCompilationContext": true
+  },
+  "dependencies": {
+    "Microsoft.NETCore.App": "1.0.0-rc2-*"
+  },
+  "frameworks": {
+    "netcoreapp1.0": { }
+  }
+}

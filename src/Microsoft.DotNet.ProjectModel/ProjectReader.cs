@@ -229,6 +229,11 @@ namespace Microsoft.DotNet.ProjectModel
 
                 project.RawRuntimeOptions = runtimeOptions.ToString();
             }
+            else if (File.Exists(Path.Combine(projectPath, $"{projectName}.runtimeconfig.json")))
+            {
+                var runtimeOptions = JObject.Parse(File.ReadAllText(Path.Combine(projectPath, $"{projectName}.runtimeconfig.json")));
+                project.RawRuntimeOptions = ((runtimeOptions.Value<JToken>("runtimeOptions")) as JObject).ToString(); 
+            }
 
             return project;
         }

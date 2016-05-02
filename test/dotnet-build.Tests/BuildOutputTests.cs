@@ -307,6 +307,34 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             }
 
         }
+
+        [Fact]
+        public void App_WithExternalRuntimeConfig_OutputsRuntimeConfig()
+        {
+            var instance = TestAssetsManager.CreateTestInstance("AppWithRuntimeOptionsFile").WithLockFiles();
+            var output = Path.Combine(instance.TestRoot, "bin", "Debug", DefaultFramework, GetRuntimeId() ,"AppWithRuntimeOptionsFile.runtimeconfig.json");
+            var cmd = new BuildCommand(Path.Combine(instance.TestRoot, Project.FileName));
+            cmd.ExecuteWithCapturedOutput().Should().Pass();
+
+            using (var stream = new FileStream(output, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                var reader = new StreamReader(stream);
+
+                var rawProject = JObject.Parse(reader.ReadToEnd());
+                var runtimeOptions = rawProject["runtimeOptions"];
+
+                runtimeOptions["somethingString"].Value<string>().Should().Be("anything");
+                runtimeOptions["somethingBoolean"].Value<bool>().Should().BeTrue();
+                runtimeOptions["someArray"].ToObject<string[]>().Should().Contain("one", "two");
+                runtimeOptions["someObject"].Value<JObject>()["someProperty"].Value<string>().Should().Be("someValue");
+            }
+        }
+
+        private string GetRuntimeId()
+        {
+            return PlatformServices.Default.Runtime.GetRuntimeIdentifier();
+        }
+
         private void CopyProjectToTempDir(string projectDir, TempDirectory tempDir)
         {
             // copy all the files to temp dir
