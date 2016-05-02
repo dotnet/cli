@@ -113,6 +113,11 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
         {
             using (var peReader = new PEReader(File.OpenRead(path)))
             {
+                if (!peReader.HasMetadata)
+                {
+                    throw new InvalidDataException($"{path} does not contain managed metadata");
+                }
+
                 var metadataReader = peReader.GetMetadataReader();
 
                 foreach (var assemblyReferenceHandle in metadataReader.AssemblyReferences)

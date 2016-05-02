@@ -179,10 +179,17 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
 
         private static AssemblyReferenceInfo GetAssemblyInfo(LibraryAsset arg)
         {
+            var assemblyPath = arg.ResolvedPath;
+
             try
             {
-                using (var peReader = new PEReader(File.OpenRead(arg.ResolvedPath)))
+                using (var peReader = new PEReader(File.OpenRead(assemblyPath)))
                 {
+                    if (!peReader.HasMetadata)
+                    {
+                        throw new InvalidDataException($"{assemblyPath} does not contain managed metadata");
+                    }
+
                     var metadataReader = peReader.GetMetadataReader();
 
                     var definition = metadataReader.GetAssemblyDefinition();
@@ -212,7 +219,7 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
             }
             catch (Exception e)
             {
-                throw new InvalidDataException($"Could not read assembly info for {arg.ResolvedPath}", e);
+                throw new InvalidOperationException($"Could not read assembly information for {assemblyPath}", e);
             }
         }
 
