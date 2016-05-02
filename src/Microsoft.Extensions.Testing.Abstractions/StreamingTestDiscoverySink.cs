@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Newtonsoft.Json.Linq;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.Extensions.Testing.Abstractions
 {
@@ -10,7 +11,7 @@ namespace Microsoft.Extensions.Testing.Abstractions
         {
         }
 
-        public void SendTestFound(Test test)
+        public void SendTestFound(TestCase test)
         {
             if (test == null)
             {
