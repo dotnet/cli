@@ -6,7 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Files;
@@ -168,11 +170,5 @@ namespace Microsoft.DotNet.Tools.Compiler
             return includeFiles.Select(f => f.SourcePath);
         }
 
-        //used in incremental precondition checks
-        public static IEnumerable<string> GetCommandsInvokedByCompile(ProjectContext project)
-        {
-            var compilerOptions = project.ProjectFile.GetCompilerOptions(project.TargetFramework, configurationName: null);
-            return new List<string> { compilerOptions.CompilerName, "compile" };
-        }
     }
 }

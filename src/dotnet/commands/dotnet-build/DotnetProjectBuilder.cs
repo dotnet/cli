@@ -27,7 +27,8 @@ namespace Microsoft.DotNet.Tools.Build
             _preconditionManager = new IncrementalPreconditionManager(
                 args.ShouldPrintIncrementalPreconditions,
                 args.ShouldNotUseIncrementality,
-                args.ShouldSkipDependencies);
+                args.ShouldSkipDependencies,
+                _args.ConfigValue);
 
             _compilerIOManager = new CompilerIOManager(
                 args.ConfigValue,

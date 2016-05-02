@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.Cli.Utils
                     return new CommandSpec(
                         new Muxer().MuxerPath,
                         escapedArgs,
-                        CommandResolutionStrategy.RootedPath);
+                        CommandResolutionStrategy.BaseDirectory);
                 }
             }
             return null;

@@ -26,6 +26,9 @@
         // command loaded from project build output path
         OutputPath,
 
+        // CLI built-in command; (inside dotnet.dll)
+        BuiltIn,
+
         // command not found
         None
     }
