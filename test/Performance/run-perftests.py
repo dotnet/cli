@@ -167,11 +167,20 @@ def run_perf_test(runid, cli_path, xunitperf_src_path):
     dotnet_path = get_xunitperf_dotnet_path(xunitperf_src_path)
     runner_src_path = get_xunitperf_runner_src_path(xunitperf_src_path)
     result_xml_path = os.path.join(SCRIPT_ROOT_PATH, '{}.xml'.format(runid))
+    project_lock_path = os.path.join(SCRIPT_ROOT_PATH, 'project.lock.json')
 
     saved_path = os.environ.get('PATH')
     print("# Prepending {dir} to PATH".format(dir = os.path.dirname(cli_path)))
     os.environ['PATH'] = os.path.dirname(cli_path) + ';' + os.environ.get('PATH')
     try:
+        if os.path.exists(project_lock_path):
+            print("# Deleting {file}".format(file = project_lock_path))
+            os.remove(project_lock_path)
+        run_command(
+            cli_path, 'restore',
+            title = "Dotnet restore using \"{cli}\"".format(cli = cli_path),
+            from_dir = SCRIPT_ROOT_PATH,
+        )
         run_command(
             dotnet_path, 'run', '-p', runner_src_path, '-c', 'Release', '--',
             '-runner', cli_path, '-runid', runid,
