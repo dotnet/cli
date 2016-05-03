@@ -1,0 +1,3 @@
+- If this PR should not run tests please add text "skip-ci-please" (replace dashes with spaces, no quotes).
+- Please add description for changes you are making.
+- If there is an issue related to this PR, please add the reference.
