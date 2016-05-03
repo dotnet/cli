@@ -78,7 +78,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         public AndConstraint<DirectoryInfoAssertions> NotHaveFiles(IEnumerable<string> files, string because = "", params object[] becauseArgs)
         {
             var actualFiles = Subject.EnumerateFiles("*", SearchOption.TopDirectoryOnly).Select(f => f.Name);
-            var presentFiles = Enumerable.Union(actualFiles, files);
+            var presentFiles = Enumerable.Intersect(actualFiles, files);
             var nl = Environment.NewLine;
 
             Execute.Assertion

@@ -36,6 +36,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         public TestCommand WithWorkingDirectory(string workingDirectory)
         {
             WorkingDirectory = workingDirectory;
+            
             return this;
         }
 
@@ -198,13 +199,6 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         {
             Environment.Add(name, value);
             
-            return this;
-        }
-
-        public TestCommand WithWorkingDirectory(string path)
-        {
-            WorkingDirectory = path;
-
             return this;
         }
     }
