@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using Newtonsoft.Json.Linq;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.Extensions.Testing.Abstractions
 {
@@ -17,7 +18,7 @@ namespace Microsoft.Extensions.Testing.Abstractions
             _runningTests = new ConcurrentDictionary<string, TestState>();
         }
 
-        public void SendTestStarted(Test test)
+        public void SendTestStarted(TestCase test)
         {
             if (test == null)
             {
@@ -44,10 +45,10 @@ namespace Microsoft.Extensions.Testing.Abstractions
                 throw new ArgumentNullException(nameof(testResult));
             }
 
-            if (testResult.StartTime == default(DateTimeOffset) && testResult.Test.FullyQualifiedName != null)
+            if (testResult.StartTime == default(DateTimeOffset) && testResult.TestCase.FullyQualifiedName != null)
             {
                 TestState state;
-                _runningTests.TryRemove(testResult.Test.FullyQualifiedName, out state);
+                _runningTests.TryRemove(testResult.TestCase.FullyQualifiedName, out state);
 
                 testResult.StartTime = state.StartTime;
             }
