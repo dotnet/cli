@@ -5,16 +5,15 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using Microsoft.Extensions.PlatformAbstractions;
 using Xunit;
-using System.Diagnostics;
 
 namespace Microsoft.DotNet.Tests.EndToEnd
 {
     public class EndToEndTest : TestBase
     {
-        private static readonly string NetStandardTfm = "netstandard1.5";
+        private static readonly string NetCoreAppTfm = "netcoreapp1.0";
         private static readonly string s_expectedOutput = "Hello World!" + Environment.NewLine;
         private static readonly string s_testdirName = "e2etestroot";
         private static readonly string s_outputdirName = "test space/bin";
@@ -44,7 +43,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
         [Fact]
         public void TestDotnetBuild()
         {
-            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: NetStandardTfm);
+            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: NetCoreAppTfm);
 
             buildCommand.Execute().Should().Pass();
 
@@ -55,7 +54,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
         public void TestDotnetIncrementalBuild()
         {
             // first build
-            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: NetStandardTfm);
+            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: NetCoreAppTfm);
             buildCommand.Execute().Should().Pass();
             TestOutputExecutable(OutputDirectory, buildCommand.GetPortableOutputName(), s_expectedOutput);
 
@@ -90,7 +89,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
                 return;
             }
 
-            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, framework: NetStandardTfm);
+            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, framework: NetCoreAppTfm);
 
             buildCommand.Execute().Should().Pass();
 
@@ -105,7 +104,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
                 return;
             }
 
-            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, nativeCppMode: true, framework: NetStandardTfm);
+            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, nativeCppMode: true, framework: NetCoreAppTfm);
 
             buildCommand.Execute().Should().Pass();
 
@@ -121,7 +120,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             }
 
             // first build
-            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, nativeCppMode: true, framework: NetStandardTfm);
+            var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, native: true, nativeCppMode: true, framework: NetCoreAppTfm);
             var binariesOutputDirectory = GetCompilationOutputPath(OutputDirectory, false);
 
             buildCommand.Execute().Should().Pass();
@@ -142,13 +141,17 @@ namespace Microsoft.DotNet.Tests.EndToEnd
         [Fact]
         public void TestDotnetRun()
         {
+            var restoreCommand = new TestCommand("dotnet");
+            restoreCommand.Execute($"restore {TestProject}")
+                .Should()
+                .Pass();
             var runCommand = new RunCommand(TestProject);
 
             runCommand.Execute()
                 .Should()
                 .Pass();
         }
-        
+
         [Fact]
         public void TestDotnetPack()
         {
@@ -165,7 +168,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             var publishCommand = new PublishCommand(TestProject, output: OutputDirectory);
             publishCommand.Execute().Should().Pass();
 
-            TestExecutable(OutputDirectory, publishCommand.GetPortableOutputName(), s_expectedOutput);    
+            TestExecutable(OutputDirectory, publishCommand.GetPortableOutputName(), s_expectedOutput);
         }
 
         [Fact]
@@ -192,7 +195,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             TestProject = Path.Combine(TestDirectory, "project.json");
             OutputDirectory = Path.Combine(TestDirectory, s_outputdirName);
 
-            Rid = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
+            Rid = RuntimeEnvironmentRidExtensions.GetLegacyRestoreRuntimeIdentifier();
         }
 
         private static void SetupStaticTestProject()
@@ -204,9 +207,12 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             {
                 Directory.Delete(RestoredTestProjectDirectory, true);
             }
-            catch(Exception) {}
+            catch (Exception) { }
 
             Directory.CreateDirectory(RestoredTestProjectDirectory);
+
+            // Todo: this is a hack until corefx is on nuget.org remove this After RC 2 Release
+            NuGetConfig.Write(RestoredTestProjectDirectory);
 
             var currentDirectory = Directory.GetCurrentDirectory();
             Directory.SetCurrentDirectory(RestoredTestProjectDirectory);
@@ -220,7 +226,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
         private bool IsNativeCompilationSupported()
         {
             bool isSupported = true;
-            var platform = PlatformServices.Default.Runtime.OperatingSystem.ToLower();
+            var platform = RuntimeEnvironment.OperatingSystem.ToLower();
             switch (platform)
             {
                 case "centos":

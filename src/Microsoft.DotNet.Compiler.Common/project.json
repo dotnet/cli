@@ -4,18 +4,31 @@
     "keyFile": "../../tools/Key.snk"
   },
   "dependencies": {
-    "NETStandard.Library": "1.5.0-rc2-23931",
-    "System.CommandLine": "0.1.0-e160323-1",
-    "Microsoft.CodeAnalysis.CSharp": "1.3.0-beta1-20160329-01",
+    "Microsoft.CodeAnalysis.CSharp": "1.3.0-beta1-20160429-01",
     "Microsoft.DotNet.ProjectModel": "1.0.0-*",
     "Microsoft.DotNet.Cli.Utils": "1.0.0-*",
     "Microsoft.DotNet.Files": "1.0.0-*"
   },
   "frameworks": {
+    "net451": {
+      "frameworkAssemblies": {
+        "System.Runtime": {
+          "type": "build"
+        },
+        "System.Collections": {
+          "type": "build"
+        },
+        "System.IO": {
+            "type": "build"
+        },
+        "System.Threading.Tasks": {
+            "type": "build"
+        }
+      }
+    },
     "netstandard1.5": {
       "imports": [
-        "dnxcore50",
-        "portable-net45+win8"
+        "portable-net45+wp80+win8+wpa81+dnxcore50"
       ]
     }
   },

@@ -1,32 +1,31 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using Microsoft.Dnx.Runtime.Common.CommandLine;
-using Microsoft.Extensions.Logging;
+using Microsoft.DotNet.Cli.CommandLine;
+using Microsoft.DotNet.Cli.Utils;
 
 namespace Microsoft.DotNet.ProjectModel.Server
 {
     public class ProjectModelServerCommand
     {
         private readonly Dictionary<int, ProjectManager> _projects;
-        private readonly WorkspaceContext _workspaceContext;
+        private readonly DesignTimeWorkspace _workspaceContext;
         private readonly ProtocolManager _protocolManager;
-        private readonly ILoggerFactory _loggerFactory;
         private readonly string _hostName;
         private readonly int _port;
         private Socket _listenSocket;
 
-        public ProjectModelServerCommand(int port, string hostName, ILoggerFactory loggerFactory)
+        public ProjectModelServerCommand(int port, string hostName)
         {
             _port = port;
             _hostName = hostName;
-            _loggerFactory = loggerFactory;
-            _protocolManager = new ProtocolManager(maxVersion: 4, loggerFactory: _loggerFactory);
-            _workspaceContext = WorkspaceContext.Create();
+            _protocolManager = new ProtocolManager(maxVersion: 4);
+            _workspaceContext = new DesignTimeWorkspace(ProjectReaderSettings.ReadFromEnvironment());
             _projects = new Dictionary<int, ProjectManager>();
         }
 
@@ -46,30 +45,33 @@ namespace Microsoft.DotNet.ProjectModel.Server
 
             app.OnExecute(() =>
             {
-                var loggerFactory = new LoggerFactory();
-                loggerFactory.AddConsole(verbose.HasValue() ? LogLevel.Debug : LogLevel.Information);
-
-                var logger = loggerFactory.CreateLogger<ProjectModelServerCommand>();
-
-                if (!MonitorHostProcess(hostpid, logger))
+                try
                 {
-                    return 1;
-                }
+                    if (!MonitorHostProcess(hostpid))
+                    {
+                        return 1;
+                    }
 
-                var intPort = CheckPort(port, logger);
-                if (intPort == -1)
+                    var intPort = CheckPort(port);
+                    if (intPort == -1)
+                    {
+                        return 1;
+                    }
+
+                    if (!hostname.HasValue())
+                    {
+                        Reporter.Error.WriteLine($"Option \"{hostname.LongName}\" is missing.");
+                        return 1;
+                    }
+
+                    var program = new ProjectModelServerCommand(intPort, hostname.Value());
+                    program.OpenChannel();
+                }
+                catch (Exception ex)
                 {
-                    return 1;
+                    Reporter.Error.WriteLine($"Unhandled exception in server main: {ex}");
+                    throw;
                 }
-
-                if (!hostname.HasValue())
-                {
-                    logger.LogError($"Option \"{hostname.LongName}\" is missing.");
-                    return 1;
-                }
-
-                var program = new ProjectModelServerCommand(intPort, hostname.Value(), loggerFactory);
-                program.OpenChannel();
 
                 return 0;
             });
@@ -79,26 +81,23 @@ namespace Microsoft.DotNet.ProjectModel.Server
 
         public void OpenChannel()
         {
-            var logger = _loggerFactory.CreateLogger($"OpenChannel");
-
             _listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             _listenSocket.Bind(new IPEndPoint(IPAddress.Loopback, _port));
             _listenSocket.Listen(10);
 
-            logger.LogInformation($"Process ID {Process.GetCurrentProcess().Id}");
-            logger.LogInformation($"Listening on port {_port}");
+            Reporter.Output.WriteLine($"Process ID {Process.GetCurrentProcess().Id}");
+            Reporter.Output.WriteLine($"Listening on port {_port}");
 
             while (true)
             {
                 var acceptSocket = _listenSocket.Accept();
-                logger.LogInformation($"Client accepted {acceptSocket.LocalEndPoint}");
+                Reporter.Output.WriteLine($"Client accepted {acceptSocket.LocalEndPoint}");
 
                 var connection = new ConnectionContext(acceptSocket,
                                                        _hostName,
                                                        _protocolManager,
                                                        _workspaceContext,
-                                                       _projects,
-                                                       _loggerFactory);
+                                                       _projects);
 
                 connection.QueueStart();
             }
@@ -112,11 +111,11 @@ namespace Microsoft.DotNet.ProjectModel.Server
             }
         }
 
-        private static int CheckPort(CommandOption port, ILogger logger)
+        private static int CheckPort(CommandOption port)
         {
             if (!port.HasValue())
             {
-                logger.LogError($"Option \"{port.LongName}\" is missing.");
+                Reporter.Error.WriteLine($"Option \"{port.LongName}\" is missing.");
             }
 
             int result;
@@ -126,16 +125,16 @@ namespace Microsoft.DotNet.ProjectModel.Server
             }
             else
             {
-                logger.LogError($"Option \"{port.LongName}\" is not a valid Int32 value.");
+                Reporter.Error.WriteLine($"Option \"{port.LongName}\" is not a valid Int32 value.");
                 return -1;
             }
         }
 
-        private static bool MonitorHostProcess(CommandOption host, ILogger logger)
+        private static bool MonitorHostProcess(CommandOption host)
         {
             if (!host.HasValue())
             {
-                logger.LogError($"Option \"{host.LongName}\" is missing.");
+                Console.Error.WriteLine($"Option \"{host.LongName}\" is missing.");
                 return false;
             }
 
@@ -149,12 +148,12 @@ namespace Microsoft.DotNet.ProjectModel.Server
                     Process.GetCurrentProcess().Kill();
                 };
 
-                logger.LogDebug($"Server will exit when process {hostPID} exits.");
+                Reporter.Output.WriteLine($"Server will exit when process {hostPID} exits.");
                 return true;
             }
             else
             {
-                logger.LogError($"Option \"{host.LongName}\" is not a valid Int32 value.");
+                Reporter.Error.WriteLine($"Option \"{host.LongName}\" is not a valid Int32 value.");
                 return false;
             }
         }

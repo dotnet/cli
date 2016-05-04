@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             _nativeCompiler = nativeCompiler;
         }
 
-        public bool Compile(IEnumerable<ProjectContext> contexts, CompilerCommandApp args)
+        public bool Compile(IEnumerable<ProjectContext> contexts, BuildCommandApp args)
         {
             var success = true;
 
@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 success &= _managedCompiler.Compile(context, args);
                 if (args.IsNativeValue && success)
                 {
-                    var runtimeContext = context.CreateRuntimeContext(args.GetRuntimes());
+                    var runtimeContext = args.Workspace.GetRuntimeContext(context, args.GetRuntimes());
                     success &= _nativeCompiler.Compile(runtimeContext, args);
                 }
             }

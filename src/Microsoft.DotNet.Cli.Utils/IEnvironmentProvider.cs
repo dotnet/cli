@@ -1,9 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
@@ -16,5 +11,7 @@ namespace Microsoft.DotNet.Cli.Utils
         string GetCommandPathFromRootPath(string rootPath, string commandName, params string[] extensions);
 
         string GetCommandPathFromRootPath(string rootPath, string commandName, IEnumerable<string> extensions);
+
+        bool GetEnvironmentVariableAsBool(string name, bool defaultValue);
     }
 }

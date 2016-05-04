@@ -20,7 +20,7 @@ Build Status
 
 |Ubuntu 14.04 |Windows x64 |Windows x86 |Mac OS X |CentOS 7.1 |RHEL 7.2 |
 |:------:|:------:|:------:|:------:|:------:|:------:|
-|![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/392/badge)|![](https://mseng.visualstudio.com/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3234/badge)|![](https://mseng.visualstudio.com/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3236/badge)|![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/391/badge) |![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/565/badge) |![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/1199/badge)|
+|![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/392/badge)|N/A|![](https://mseng.visualstudio.com/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3234/badge)|![](https://mseng.visualstudio.com/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3236/badge)|![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/391/badge) |![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/565/badge) |![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/1199/badge)|
 
 Installers and Binaries
 -----------------------
@@ -35,6 +35,7 @@ You can download .NET Core as either an installer (MSI, PKG) or a zip (zip, gzip
 |**Windows x64**|[![](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/Windows_x64_Release_version_badge.svg)](https://dotnetcli.blob.core.windows.net/dotnet/dev/dnvm/latest.win.x64.version)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Installers/Latest/dotnet-win-x64.latest.exe)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Installers/Latest/dotnet-dev-win-x64.latest.exe)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-win-x64.latest.zip)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-dev-win-x64.latest.zip)|
 |**Windows x86**|[![](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/Windows_x86_Release_version_badge.svg)](https://dotnetcli.blob.core.windows.net/dotnet/dev/dnvm/latest.win.x86.version)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Installers/Latest/dotnet-win-x86.latest.exe)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Installers/Latest/dotnet-dev-win-x86.latest.exe)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-win-x86.latest.zip)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-dev-win-x86.latest.zip)|
 |**Ubuntu 14.04**|[![](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/Ubuntu_x64_Release_version_badge.svg)](https://dotnetcli.blob.core.windows.net/dotnet/dev/dnvm/latest.ubuntu.x64.version)|*See Below*|*See Below*|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-ubuntu-x64.latest.tar.gz)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-dev-ubuntu-x64.latest.tar.gz)|
+|**Debian 8.2**|[![](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/Debian_x64_Release_version_badge.svg)](https://dotnetcli.blob.core.windows.net/dotnet/dev/dnvm/latest.debian.x64.version)|N/A|N/A|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-debian-x64.latest.tar.gz)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-dev-debian-x64.latest.tar.gz)|
 |**Mac OS X**|[![](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/OSX_x64_Release_version_badge.svg)](https://dotnetcli.blob.core.windows.net/dotnet/dev/dnvm/latest.osx.x64.version)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Installers/Latest/dotnet-osx-x64.latest.pkg)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Installers/Latest/dotnet-dev-osx-x64.latest.pkg)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-osx-x64.latest.tar.gz)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-dev-osx-x64.latest.tar.gz)|
 |**CentOS 7.1**|[![](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/CentOS_x64_Release_version_badge.svg)](https://dotnetcli.blob.core.windows.net/dotnet/dev/dnvm/latest.centos.x64.version)|N/A |N/A |[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-centos-x64.latest.tar.gz)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-dev-centos-x64.latest.tar.gz)|
 |**RHEL 7.2**|[![](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/RHEL_x64_Release_version_badge.svg)](https://dotnetcli.blob.core.windows.net/dotnet/dev/dnvm/latest.rhel.x64.version)|N/A |N/A |[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-centos-x64.latest.tar.gz)|[Download](https://dotnetcli.blob.core.windows.net/dotnet/dev/Binaries/Latest/dotnet-dev-rhel-x64.latest.tar.gz) |
@@ -83,7 +84,7 @@ Compiling to IL is done using:
 
 This will drop a binary in `./bin/[configuration]/[framework]/[rid]/[binary name]` that you can just run.
 
-For more details, please refer to the [documentation](https://github.com/dotnet/corert/tree/master/Documentation).
+For more details, please refer to the [documentation](Documentation).
 
 Building from source
 --------------------
@@ -96,3 +97,8 @@ Questions & Comments
 --------------------
 
 For any and all feedback, please use the Issues on this repository. 
+
+License
+--------------------
+
+By downloading the .zip you are agreeing to the terms in the project [EULA](https://aka.ms/dotnet-cli-eula).

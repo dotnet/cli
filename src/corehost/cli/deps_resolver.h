@@ -24,20 +24,18 @@ struct probe_paths_t
 class deps_resolver_t
 {
 public:
-    deps_resolver_t(const corehost_init_t* init, const runtime_config_t& config, const arguments_t& args)
-        // Important: FX dir should come from "init" than "config",
-        //            since the host could be launching from FX dir.
-        : m_fx_dir(init->fx_dir())
+    deps_resolver_t(const hostpolicy_init_t& init, const arguments_t& args)
+        : m_fx_dir(init.fx_dir)
         , m_app_dir(args.app_dir)
         , m_coreclr_index(-1)
-        , m_portable(config.get_portable())
+        , m_portable(init.is_portable)
         , m_deps(nullptr)
         , m_fx_deps(nullptr)
     {
         m_deps_file = args.deps_path;
         if (m_portable)
         {
-            m_fx_deps_file = get_fx_deps(m_fx_dir, config.get_fx_name());
+            m_fx_deps_file = get_fx_deps(m_fx_dir, init.fx_name);
             trace::verbose(_X("Using %s FX deps file"), m_fx_deps_file.c_str());
             trace::verbose(_X("Using %s deps file"), m_deps_file.c_str());
             m_fx_deps = std::unique_ptr<deps_json_t>(new deps_json_t(false, m_fx_deps_file));
@@ -49,21 +47,34 @@ public:
         }
 
         setup_additional_probes(args.probe_paths);
-        setup_probe_config(init, config, args);
+        setup_probe_config(init, args);
     }
 
-    bool valid() { return m_deps->is_valid() && (!m_portable || m_fx_deps->is_valid());  }
-
+    bool valid(pal::string_t* errors)
+    {
+        if (!m_deps->is_valid())
+        {
+            errors->assign(_X("An error occurred while parsing ") + m_deps_file);
+            return false;
+        }
+        if (m_portable && !m_fx_deps->is_valid())
+        {
+            errors->assign(_X("An error occurred while parsing ") + m_fx_deps_file);
+            return false;
+        }
+        errors->clear();
+        return true;
+    }
     void setup_probe_config(
-        const corehost_init_t* init,
-        const runtime_config_t& config,
+        const hostpolicy_init_t& init,
         const arguments_t& args);
 
     void setup_additional_probes(const std::vector<pal::string_t>& probe_paths);
 
     bool resolve_probe_paths(
       const pal::string_t& clr_dir,
-      probe_paths_t* probe_paths);
+      probe_paths_t* probe_paths,
+      std::unordered_set<pal::string_t>* breadcrumb);
 
     pal::string_t resolve_coreclr_dir();
 
@@ -75,6 +86,11 @@ public:
     const pal::string_t& get_deps_file() const
     {
         return m_deps_file;
+    }
+
+    const std::unordered_set<pal::string_t>& get_api_sets() const
+    {
+        return m_api_set_paths;
     }
 private:
 
@@ -89,13 +105,15 @@ private:
     // Resolve order for TPA lookup.
     void resolve_tpa_list(
         const pal::string_t& clr_dir,
-        pal::string_t* output);
+        pal::string_t* output,
+        std::unordered_set<pal::string_t>* breadcrumb);
 
     // Resolve order for culture and native DLL lookup.
     void resolve_probe_dirs(
         deps_entry_t::asset_types asset_type,
         const pal::string_t& clr_dir,
-        pal::string_t* output);
+        pal::string_t* output,
+        std::unordered_set<pal::string_t>* breadcrumb);
 
     // Populate assemblies from the directory.
     void get_dir_assemblies(
@@ -112,6 +130,8 @@ private:
     bool try_roll_forward(
         const deps_entry_t& entry,
         const pal::string_t& probe_dir,
+        bool patch_roll_fwd,
+        bool prerelease_roll_fwd,
         pal::string_t* candidate);
 
     // Framework deps file.
@@ -125,9 +145,13 @@ private:
     dir_assemblies_t m_local_assemblies;
     dir_assemblies_t m_fx_assemblies;
 
-    std::unordered_map<pal::string_t, pal::string_t> m_roll_forward_cache;
+    std::unordered_map<pal::string_t, pal::string_t> m_patch_roll_forward_cache;
+    std::unordered_map<pal::string_t, pal::string_t> m_prerelease_roll_forward_cache;
 
     pal::string_t m_package_cache;
+
+    // Special entry for api-sets
+    std::unordered_set<pal::string_t> m_api_set_paths;
 
     // Special entry for coreclr in the deps entries
     int m_coreclr_index;

@@ -35,12 +35,12 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             // run compile
             var outputDir = Path.Combine(testLibDir.Path, "bin");
             var testProject = GetProjectPath(testLibDir);
-            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultFramework);
+            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultLibraryFramework);
             var result = buildCommand.ExecuteWithCapturedOutput();
             result.Should().Pass();
 
             // verify the output xml file
-            var outputXml = Path.Combine(outputDir, "Debug", DefaultFramework, "TestLibrary.xml");
+            var outputXml = Path.Combine(outputDir, "Debug", DefaultLibraryFramework, "TestLibrary.xml");
             Console.WriteLine("OUTPUT XML PATH: " + outputXml);
             Assert.True(File.Exists(outputXml));
             Assert.Contains("Gets the message from the helper", File.ReadAllText(outputXml));
@@ -84,7 +84,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             // run compile
             var outputDir = Path.Combine(testLibDir.Path, "bin");
             var testProject = GetProjectPath(testLibDir);
-            var buildCmd = new BuildCommand(testProject, output: outputDir, framework: DefaultFramework);
+            var buildCmd = new BuildCommand(testProject, output: outputDir, framework: DefaultLibraryFramework);
             var result = buildCmd.ExecuteWithCapturedOutput();
             result.Should().Pass();
 
@@ -148,23 +148,46 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
         }
 
         [Fact]
-        public void EmbeddedDependencyContextIsValidOnBuild()
+        public void EmbeddedResourcesAreCopied()
         {
-            var testProjectPath = Path.Combine(RepoRoot, "TestAssets", "TestProjects", "DependencyContextValidator", "TestApp");
-            var testProject = Path.Combine(testProjectPath, "project.json");
+            var testInstance = TestAssetsManager.CreateTestInstance("EndToEndTestApp")
+                                                .WithLockFiles()
+                                                .WithBuildArtifacts();
 
-            var runCommand = new RunCommand(testProject);
-            runCommand.Execute().Should().Pass();
+            var root = testInstance.TestRoot;
+
+            // run compile
+            var outputDir = Path.Combine(root, "bin");
+            var testProject = ProjectUtils.GetProjectJson(root, "EndToEndTestApp");
+            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultFramework);
+            var result = buildCommand.ExecuteWithCapturedOutput();
+            result.Should().Pass();
+
+            var objDirInfo = new DirectoryInfo(Path.Combine(root, "obj", "Debug", DefaultFramework));
+            objDirInfo.Should().HaveFile("EndToEndTestApp.resource1.resources");
+            objDirInfo.Should().HaveFile("myresource.resources");
+            objDirInfo.Should().HaveFile("EndToEndTestApp.defaultresource.resources");
         }
 
         [Fact]
-        public void DepsDependencyContextIsValidOnBuild()
+        public void CopyToOutputFilesAreCopied()
         {
-                var testProjectPath = Path.Combine(RepoRoot, "TestAssets", "TestProjects", "DependencyContextValidator", "TestAppDeps");
-                var testProject = Path.Combine(testProjectPath, "project.json");
+            var testInstance = TestAssetsManager.CreateTestInstance("EndToEndTestApp")
+                                                .WithLockFiles()
+                                                .WithBuildArtifacts();
 
-                var runCommand = new RunCommand(testProject);
-                runCommand.Execute().Should().Pass();
+            var root = testInstance.TestRoot;
+
+            // run compile
+            var outputDir = Path.Combine(root, "bin");
+            var testProject = ProjectUtils.GetProjectJson(root, "EndToEndTestApp");
+            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultFramework);
+            var result = buildCommand.ExecuteWithCapturedOutput();
+            result.Should().Pass();
+
+            var outputDirInfo = new DirectoryInfo(Path.Combine(outputDir, "copy"));
+            outputDirInfo.Should().HaveFile("file.txt");
+            outputDirInfo.Should().NotHaveFile("fileex.txt");
         }
 
         [Fact]
@@ -178,7 +201,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             var root = testInstance.TestRoot;
             var outputDir = Path.Combine(root, "bin");
             var testProject = ProjectUtils.GetProjectJson(root, "LibraryWithOutputAssemblyName");
-            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultFramework);
+            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultLibraryFramework);
             var result = buildCommand.ExecuteWithCapturedOutput();
             result.Should().Pass();
 

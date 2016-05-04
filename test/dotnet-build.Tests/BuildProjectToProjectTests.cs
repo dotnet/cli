@@ -16,7 +16,9 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
     public class ProjectToProjectDependenciesIncrementalTest : IncrementalTestBase
     {
         private readonly string[] _projects = new[] { "L0", "L11", "L12", "L21", "L22" };
+        private readonly string _appProject = "L0";
 
+        
         private string MainProjectExe
         {
             get
@@ -32,13 +34,12 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
         }
 
-        [Theory,
-        InlineData("1", "L0", new[] { "L0" }),
-        InlineData("2", "L11", new[] { "L0", "L11" }),
-        InlineData("3", "L12", new[] { "L0", "L11", "L12" }),
-        InlineData("4", "L22", new[] { "L0", "L11", "L12", "L22" }),
-        InlineData("5", "L21", new[] { "L0", "L11", "L21" })
-        ]
+        [Theory]
+        [InlineData("1", "L0", new[] { "L0" })]
+        [InlineData("2", "L11", new[] { "L0", "L11" })]
+        [InlineData("3", "L12", new[] { "L0", "L11", "L12" })]
+        [InlineData("4", "L22", new[] { "L0", "L11", "L12", "L22" })]
+        [InlineData("5", "L21", new[] { "L0", "L11", "L21" })]
         public void TestIncrementalBuildOfDependencyGraph(string testIdentifer, string projectToTouch, string[] expectedRebuiltProjects)
         {
             var testInstance = TestAssetsManager.CreateTestInstance("TestProjectToProjectDependencies", identifier: testIdentifer)
@@ -67,7 +68,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
                                                 .WithBuildArtifacts();
 
             TestProjectRoot = testInstance.TestRoot;
-            
+
             var dependencies = new[] { "L11", "L12", "L21", "L22" };
 
             // modify the source code of a leaf dependency
@@ -81,8 +82,29 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
             // third build with no dependencies but incremental; nothing rebuilds
             var result3 = BuildProject(noDependencies: true);
-            result3.Should().HaveSkippedProjectCompilation("L0");
+            result3.Should().HaveSkippedProjectCompilation("L0", _appFrameworkFullName);
             AssertResultDoesNotContainStrings(result3, dependencies);
+        }
+
+        [Fact]
+        public void TestNoDependenciesDependencyRebuild()
+        {
+            var testInstance = TestAssetsManager.CreateTestInstance("TestProjectToProjectDependencies")
+                                                .WithLockFiles()
+                                                .WithBuildArtifacts();
+
+            TestProjectRoot = testInstance.TestRoot;
+
+            // modify the source code of a leaf dependency
+            TouchSourcesOfProject("L11");
+
+            // second build with no dependencies, rebuilding leaf
+            var result2 = new BuildCommand(GetProjectDirectory("L11"), noDependencies: true, framework: DefaultLibraryFramework).ExecuteWithCapturedOutput();
+            result2.Should().HaveStdOutMatching("Compiling.*L11.*");
+
+            // third build with no dependencies but incremental; root project should rebuild
+            var result3 = BuildProject(noDependencies: true);
+            result3.Should().HaveCompiledProject("L0", _appFrameworkFullName);
         }
 
         private static void AssertResultDoesNotContainStrings(CommandResult commandResult, string[] strings)
@@ -105,13 +127,38 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         {
             foreach (var rebuiltProject in expectedRebuilt)
             {
-                buildResult.Should().HaveCompiledProject(rebuiltProject);
+                string frameworkFullName = null;
+
+                if (TestProjectIsApp(rebuiltProject))
+                {
+                    buildResult
+                        .Should()
+                        .HaveCompiledProject(rebuiltProject, frameworkFullName: _appFrameworkFullName);
+                }
+                else
+                {
+                    buildResult
+                        .Should()
+                        .HaveCompiledProject(rebuiltProject, _libraryFrameworkFullName);
+                }
             }
 
             foreach (var skippedProject in SetDifference(_projects, expectedRebuilt))
             {
-                buildResult.Should().HaveSkippedProjectCompilation(skippedProject);
+                if (TestProjectIsApp(skippedProject))
+                {  
+                    buildResult.Should().HaveSkippedProjectCompilation(skippedProject, _appFrameworkFullName);
+                }
+                else
+                {
+                    buildResult.Should().HaveSkippedProjectCompilation(skippedProject, _libraryFrameworkFullName);
+                }
             }
+        }
+
+        private bool TestProjectIsApp(string testproject)
+        {
+            return testproject.Equals(_appProject, StringComparison.OrdinalIgnoreCase);
         }
 
         protected override string GetProjectDirectory(string projectName)

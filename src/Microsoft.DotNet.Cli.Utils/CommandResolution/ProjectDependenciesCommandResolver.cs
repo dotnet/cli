@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.ProjectModel.Graph;
-using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
     public class ProjectDependenciesCommandResolver : ICommandResolver
     {
-        private static readonly CommandResolutionStrategy s_commandResolutionStrategy = 
+        private static readonly CommandResolutionStrategy s_commandResolutionStrategy =
             CommandResolutionStrategy.ProjectDependenciesPackage;
 
         private readonly IEnvironmentProvider _environment;
@@ -78,25 +78,11 @@ namespace Microsoft.DotNet.Cli.Utils
             var depsFilePath =
                 projectContext.GetOutputPaths(configuration, buildBasePath, outputPath).RuntimeFiles.DepsJson;
 
+            var runtimeConfigPath =
+                projectContext.GetOutputPaths(configuration, buildBasePath, outputPath).RuntimeFiles.RuntimeConfigJson;
+
             var toolLibrary = GetToolLibraryForContext(projectContext, commandName);
 
-            return ResolveFromDependencyLibrary(
-                toolLibrary,
-                depsFilePath,
-                commandName,
-                allowedExtensions,
-                commandArguments,
-                projectContext);
-        }
-
-        private CommandSpec ResolveFromDependencyLibrary(
-            LockFileTargetLibrary toolLibrary,
-            string depsFilePath,
-            string commandName,
-            IEnumerable<string> allowedExtensions,
-            IEnumerable<string> commandArguments,
-            ProjectContext projectContext)
-        {
             return _packagedCommandSpecFactory.CreateCommandSpecFromLibrary(
                         toolLibrary,
                         commandName,
@@ -104,18 +90,25 @@ namespace Microsoft.DotNet.Cli.Utils
                         allowedExtensions,
                         projectContext.PackagesDirectory,
                         s_commandResolutionStrategy,
-                        depsFilePath);
+                        depsFilePath,
+                        runtimeConfigPath);
         }
 
         private LockFileTargetLibrary GetToolLibraryForContext(
             ProjectContext projectContext, string commandName)
         {
-            var toolLibrary = projectContext.LockFile.Targets
+            var toolLibraries = projectContext.LockFile.Targets
                 .FirstOrDefault(t => t.TargetFramework.GetShortFolderName()
                                       .Equals(projectContext.TargetFramework.GetShortFolderName()))
-                ?.Libraries.FirstOrDefault(l => l.Name == commandName);
+                ?.Libraries.Where(l => l.Name == commandName ||
+                    l.RuntimeAssemblies.Any(r => Path.GetFileNameWithoutExtension(r.Path) == commandName)).ToList();
 
-            return toolLibrary;
+            if (toolLibraries?.Count() > 1)
+            {
+                throw new InvalidOperationException($"Ambiguous command name: {commandName}");
+            }
+
+            return toolLibraries?.FirstOrDefault();
         }
 
         private ProjectContext GetProjectContextFromDirectory(string directory, NuGetFramework framework)
@@ -132,17 +125,11 @@ namespace Microsoft.DotNet.Cli.Utils
                 return null;
             }
 
-            var projectContext = ProjectContext.Create(
-                projectRootPath, 
-                framework, 
-                PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
+            return ProjectContext.Create(
+                projectRootPath,
+                framework,
+                RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers());
 
-            if (projectContext.RuntimeIdentifier == null)
-            {
-                return null;
-            }
-
-            return projectContext;
         }
 
         private IEnumerable<string> GetAllowedCommandExtensionsFromEnvironment(IEnvironmentProvider environment)

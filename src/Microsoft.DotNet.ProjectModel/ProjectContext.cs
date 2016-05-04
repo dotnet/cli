@@ -14,11 +14,19 @@ namespace Microsoft.DotNet.ProjectModel
 {
     public class ProjectContext
     {
+        private string[] _runtimeFallbacks;
+
+        public ProjectContextIdentity Identity { get; }
+
         public GlobalSettings GlobalSettings { get; }
 
         public ProjectDescription RootProject { get; }
 
         public NuGetFramework TargetFramework { get; }
+
+        public LibraryDescription PlatformLibrary { get; }
+
+        public bool IsPortable { get; }
 
         public string RuntimeIdentifier { get; }
 
@@ -28,7 +36,7 @@ namespace Microsoft.DotNet.ProjectModel
 
         public string RootDirectory => GlobalSettings?.DirectoryPath;
 
-        public string ProjectDirectory => ProjectFile.ProjectDirectory;
+        public string ProjectDirectory => ProjectFile?.ProjectDirectory;
 
         public string PackagesDirectory { get; }
 
@@ -37,24 +45,40 @@ namespace Microsoft.DotNet.ProjectModel
         internal ProjectContext(
             GlobalSettings globalSettings,
             ProjectDescription rootProject,
+            LibraryDescription platformLibrary,
             NuGetFramework targetFramework,
+            bool isPortable,
             string runtimeIdentifier,
             string packagesDirectory,
             LibraryManager libraryManager,
             LockFile lockfile)
         {
+            Identity = new ProjectContextIdentity(rootProject?.Path, targetFramework);
             GlobalSettings = globalSettings;
             RootProject = rootProject;
+            PlatformLibrary = platformLibrary;
             TargetFramework = targetFramework;
             RuntimeIdentifier = runtimeIdentifier;
             PackagesDirectory = packagesDirectory;
             LibraryManager = libraryManager;
             LockFile = lockfile;
+            IsPortable = isPortable;
         }
 
         public LibraryExporter CreateExporter(string configuration, string buildBasePath = null)
         {
-            return new LibraryExporter(RootProject, LibraryManager, configuration, RuntimeIdentifier, buildBasePath, RootDirectory);
+            if (IsPortable && RuntimeIdentifier != null && _runtimeFallbacks == null)
+            {
+                var graph = RuntimeGraphCollector.Collect(LibraryManager.GetLibraries());
+                _runtimeFallbacks = graph.ExpandRuntime(RuntimeIdentifier).ToArray();
+            }
+            return new LibraryExporter(RootProject,
+                LibraryManager,
+                configuration,
+                RuntimeIdentifier,
+                _runtimeFallbacks,
+                buildBasePath,
+                RootDirectory);
         }
 
         /// <summary>
@@ -111,7 +135,7 @@ namespace Microsoft.DotNet.ProjectModel
                 yield return new ProjectContextBuilder()
                                 .WithProject(project)
                                 .WithTargetFramework(framework.FrameworkName)
-                                .WithReaderSettings(settings)
+                                .WithProjectReaderSettings(settings)
                                 .WithRuntimeIdentifiers(runtimeIdentifiers ?? Enumerable.Empty<string>())
                                 .Build();
             }
@@ -125,47 +149,9 @@ namespace Microsoft.DotNet.ProjectModel
             var project = ProjectReader.GetProject(projectPath);
 
             return new ProjectContextBuilder()
-                        .WithReaderSettings(settings)
+                        .WithProjectReaderSettings(settings)
                         .WithProject(project)
                         .BuildAllTargets();
-        }
-
-
-        /// <summary>
-        /// Creates a project context based on existing context but using runtime target
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="runtimeIdentifiers"></param>
-        /// <returns></returns>
-
-        public ProjectContext CreateRuntimeContext(IEnumerable<string> runtimeIdentifiers)
-        {
-            // Temporary until we have removed RID inference from NuGet
-            if(TargetFramework.IsCompileOnly)
-            {
-                return this;
-            }
-
-            // Check if there are any runtime targets (i.e. are we portable)
-            var standalone = LockFile.Targets
-                .Where(t => t.TargetFramework.Equals(TargetFramework))
-                .Any(t => !string.IsNullOrEmpty(t.RuntimeIdentifier));
-
-            var context = CreateBuilder(ProjectFile.ProjectFilePath, TargetFramework)
-                .WithRuntimeIdentifiers(standalone ? runtimeIdentifiers : Enumerable.Empty<string>())
-                .WithLockFile(LockFile)
-                .Build();
-
-            if (standalone && context.RuntimeIdentifier == null)
-            {
-                // We are standalone, but don't support this runtime
-                var rids = string.Join(", ", runtimeIdentifiers);
-                throw new InvalidOperationException($"Can not find runtime target for framework '{TargetFramework}' compatible with one of the target runtimes: '{rids}'. " +
-                                                    "Possible causes:" + Environment.NewLine +
-                                                    "1. The project has not been restored or restore failed - run `dotnet restore`" + Environment.NewLine +
-                                                    $"2. The project does not list one of '{rids}' in the 'runtimes' section.");
-            }
-            return context;
         }
 
         public OutputPaths GetOutputPaths(string configuration, string buidBasePath = null, string outputPath = null)

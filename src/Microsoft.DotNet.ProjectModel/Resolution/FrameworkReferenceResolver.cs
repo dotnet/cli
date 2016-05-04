@@ -2,14 +2,15 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Versioning;
 using System.Xml.Linq;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel.Utilities;
 using Microsoft.Extensions.DependencyModel.Resolution;
-using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.ProjectModel.Resolution
@@ -20,24 +21,24 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
         private static readonly NuGetFramework Dnx46 = new NuGetFramework(
             FrameworkConstants.FrameworkIdentifiers.Dnx,
             new Version(4, 6));
-            
+
         private static FrameworkReferenceResolver _default;
 
-        private readonly IDictionary<NuGetFramework, FrameworkInformation> _cache = new Dictionary<NuGetFramework, FrameworkInformation>();
+        private readonly ConcurrentDictionary<NuGetFramework, FrameworkInformation> _cache = new ConcurrentDictionary<NuGetFramework, FrameworkInformation>();
 
         private static readonly IDictionary<NuGetFramework, NuGetFramework[]> _aliases = new Dictionary<NuGetFramework, NuGetFramework[]>
         {
             { FrameworkConstants.CommonFrameworks.Dnx451, new [] { FrameworkConstants.CommonFrameworks.Net451 } },
             { Dnx46, new [] { FrameworkConstants.CommonFrameworks.Net46 } }
         };
-        
+
         public FrameworkReferenceResolver(string referenceAssembliesPath)
         {
             ReferenceAssembliesPath = referenceAssembliesPath;
         }
-        
+
         public string ReferenceAssembliesPath { get; }
-        
+
         public static FrameworkReferenceResolver Default
         {
             get
@@ -46,11 +47,11 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                 {
                     _default = new FrameworkReferenceResolver(GetDefaultReferenceAssembliesPath());
                 }
-                
+
                 return _default;
             }
         }
-        
+
         public static string GetDefaultReferenceAssembliesPath()
         {
             // Allow setting the reference assemblies path via an environment variable
@@ -61,7 +62,7 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                 return referenceAssembliesPath;
             }
 
-            if (PlatformServices.Default.Runtime.OperatingSystemPlatform != Platform.Windows)
+            if (RuntimeEnvironment.OperatingSystemPlatform != Platform.Windows)
             {
                 // There is no reference assemblies path outside of windows
                 // The environment variable can be used to specify one
@@ -208,9 +209,9 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
         private static FrameworkInformation GetFrameworkInformation(NuGetFramework targetFramework, string referenceAssembliesPath)
         {
             // Check for legacy frameworks
-            if (PlatformServices.Default.Runtime.OperatingSystemPlatform == Platform.Windows &&
+            if (RuntimeEnvironment.OperatingSystemPlatform == Platform.Windows &&
                 targetFramework.IsDesktop() &&
-                targetFramework.Version <= new Version(3, 5))
+                targetFramework.Version <= new Version(3, 5, 0, 0))
             {
                 return GetLegacyFrameworkInformation(targetFramework, referenceAssembliesPath);
             }

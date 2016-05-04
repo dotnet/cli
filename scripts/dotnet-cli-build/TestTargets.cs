@@ -17,36 +17,44 @@ namespace Microsoft.DotNet.Cli.Build
 
         public static readonly string[] TestProjects = new[]
         {
+            "ArgumentForwardingTests",
+            "crossgen.Tests",
             "EndToEnd",
             "dotnet.Tests",
-            "dotnet-publish.Tests",
+            "dotnet-build.Tests",
             "dotnet-compile.Tests",
             "dotnet-compile.UnitTests",
             "dotnet-compile-fsc.Tests",
-            "dotnet-build.Tests",
+            "dotnet-new.Tests",
             "dotnet-pack.Tests",
             "dotnet-projectmodel-server.Tests",
+            "dotnet-publish.Tests",
             "dotnet-resgen.Tests",
             "dotnet-run.Tests",
+            "dotnet-test.Tests",
+            "dotnet-test.UnitTests",
+            "Kestrel.Tests",
             "Microsoft.DotNet.Cli.Utils.Tests",
             "Microsoft.DotNet.Compiler.Common.Tests",
             "Microsoft.DotNet.ProjectModel.Tests",
-            "Microsoft.Extensions.DependencyModel.Tests",
-            "ArgumentForwardingTests",
-            "dotnet-test.UnitTests",
-            "dotnet-test.Tests"
+            "Microsoft.Extensions.DependencyModel.Tests"
         };
-        
+
+        public static readonly string[] WindowsTestProjects = new[]
+        {
+            "binding-redirects.Tests"
+        };
+
         public static readonly dynamic[] ConditionalTestAssets = new[]
         {
-            new { Path = "AppWithDirectDependencyDesktopAndPortable", Skip = new Func<bool>(() => !CurrentPlatform.IsWindows) } 
+            new { Path = "AppWithDirectDependencyDesktopAndPortable", Skip = new Func<bool>(() => !CurrentPlatform.IsWindows) }
         };
 
         [Target(
-            nameof(PrepareTargets.Init), 
-            nameof(SetupTests), 
-            nameof(RestoreTests), 
-            nameof(BuildTests), 
+            nameof(PrepareTargets.Init),
+            nameof(SetupTests),
+            nameof(RestoreTests),
+            nameof(BuildTests),
             nameof(RunTests),
             nameof(ValidateDependencies))]
         public static BuildTargetResult Test(BuildTargetContext c) => c.Success();
@@ -57,7 +65,10 @@ namespace Microsoft.DotNet.Cli.Build
         [Target(nameof(RestoreTestAssetPackages), nameof(BuildTestAssetPackages))]
         public static BuildTargetResult SetupTestPackages(BuildTargetContext c) => c.Success();
 
-        [Target(nameof(RestoreTestAssetProjects), nameof(RestoreDesktopTestAssetProjects), nameof(BuildTestAssetProjects))]
+        [Target(nameof(RestoreTestAssetProjects),
+            nameof(RestoreDesktopTestAssetProjects),
+            nameof(BuildTestAssetProjects),
+            nameof(BuildDesktopTestAssetProjects))]
         public static BuildTargetResult SetupTestProjects(BuildTargetContext c) => c.Success();
 
         [Target]
@@ -69,7 +80,10 @@ namespace Microsoft.DotNet.Cli.Build
             CleanNuGetTempCache();
 
             var dotnet = DotNetCli.Stage2;
-            dotnet.Restore("--verbosity", "verbose", "--infer-runtimes")
+            dotnet.Restore("--verbosity", "verbose",
+                "--infer-runtimes",
+                "--fallbacksource", Dirs.CorehostLocalPackages,
+                "--fallbacksource", Dirs.CorehostDummyPackages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestPackages"))
                 .Execute()
                 .EnsureSuccessful();
@@ -89,14 +103,19 @@ namespace Microsoft.DotNet.Cli.Build
             dotnet.Restore(
                 "--verbosity", "verbose",
                 "--infer-runtimes",
-                "--fallbacksource", Dirs.TestPackages)
+                "--fallbacksource", Dirs.TestPackages,
+                "--fallbacksource", Dirs.CorehostLocalPackages,
+                "--fallbacksource", Dirs.CorehostDummyPackages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects"))
-                .Execute().EnsureSuccessful();
+                .Execute()
+                .EnsureSuccessful();
 
             // The 'ProjectModelServer' directory contains intentionally-unresolved dependencies, so don't check for success. Also, suppress the output
             dotnet.Restore(
                 "--verbosity", "verbose",
-                "--infer-runtimes")
+                "--infer-runtimes",
+                "--fallbacksource", Dirs.CorehostLocalPackages,
+                "--fallbacksource", Dirs.CorehostDummyPackages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "ProjectModelServer", "DthTestProjects"))
                 .Execute();
 
@@ -115,12 +134,14 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var dotnet = DotNetCli.Stage2;
 
-            dotnet.Restore("--verbosity", "verbose", 
+            dotnet.Restore("--verbosity", "verbose",
                 "--infer-runtimes",
-                "--fallbacksource", Dirs.TestPackages)
+                "--fallbacksource", Dirs.TestPackages,
+                "--fallbacksource", Dirs.CorehostLocalPackages,
+                "--fallbacksource", Dirs.CorehostDummyPackages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "DesktopTestProjects"))
                 .Execute().EnsureSuccessful();
-                
+
             return c.Success();
         }
 
@@ -134,7 +155,7 @@ namespace Microsoft.DotNet.Cli.Build
             Rmdir(Dirs.TestPackages);
             Mkdirp(Dirs.TestPackages);
 
-            foreach (var testPackageProject in TestPackageProjects.Projects.Where(p => p.IsApplicable()))
+            foreach (var testPackageProject in TestPackageProjects.Projects.Where(p => p.IsApplicable))
             {
                 var relativePath = testPackageProject.Path;
 
@@ -143,21 +164,15 @@ namespace Microsoft.DotNet.Cli.Build
                 {
                     versionSuffix = c.BuildContext.Get<BuildVersion>("BuildVersion").VersionSuffix;
                 }
-                
+
                 var fullPath = Path.Combine(c.BuildContext.BuildDirectory, relativePath.Replace('/', Path.DirectorySeparatorChar));
                 c.Info($"Packing: {fullPath}");
 
-                // build and ignore failure, so net451 fail on non-windows doesn't crash the build
-                var packageBuildFrameworks = new List<string>()
-                {
-                    "netstandard1.5",
-                    "netstandard1.3",
-                    "netstandardapp1.5"
-                };
+                var packageBuildFrameworks = testPackageProject.Frameworks.ToList();
 
-                if (CurrentPlatform.IsWindows)
+                if (!CurrentPlatform.IsWindows)
                 {
-                    packageBuildFrameworks.Add("net451");
+                    packageBuildFrameworks.RemoveAll(f => f.StartsWith("net4"));
                 }
 
                 foreach (var packageBuildFramework in packageBuildFrameworks)
@@ -170,17 +185,17 @@ namespace Microsoft.DotNet.Cli.Build
                     buildArgs.Add(fullPath);
 
                     Mkdirp(Dirs.TestPackagesBuild);
-                    var packBuildResult = DotNetCli.Stage1.Build(buildArgs.ToArray())
-                        .Execute();
+                    dotnet.Build(buildArgs.ToArray())
+                        .Execute()
+                        .EnsureSuccessful();
                 }
-                
 
                 var projectJson = Path.Combine(fullPath, "project.json");
-                var dotnetPackArgs = new List<string> { 
+                var dotnetPackArgs = new List<string> {
                     projectJson,
                     "--no-build",
                     "--build-base-path", Dirs.TestPackagesBuild,
-                    "--output", Dirs.TestPackages 
+                    "--output", Dirs.TestPackages
                 };
 
                 if (!string.IsNullOrEmpty(versionSuffix))
@@ -203,7 +218,7 @@ namespace Microsoft.DotNet.Cli.Build
             foreach (var packageName in PackageTargets.ProjectsToPack)
             {
                 Rmdir(Path.Combine(Dirs.NuGetPackages, packageName));
-            }            
+            }
 
             return c.Success();
         }
@@ -211,40 +226,36 @@ namespace Microsoft.DotNet.Cli.Build
         [Target]
         public static BuildTargetResult CleanTestPackages(BuildTargetContext c)
         {
-            foreach (var packageProject in TestPackageProjects.Projects.Where(p => p.IsApplicable() && p.Clean))
+            foreach (var packageProject in TestPackageProjects.Projects.Where(p => p.IsApplicable && p.Clean))
             {
                 Rmdir(Path.Combine(Dirs.NuGetPackages, packageProject.Name));
-                if(packageProject.IsTool)
+                if (packageProject.IsTool)
                 {
                     Rmdir(Path.Combine(Dirs.NuGetPackages, ".tools", packageProject.Name));
                 }
-            }            
-
+            }
             return c.Success();
         }
 
         [Target]
         public static BuildTargetResult BuildTestAssetProjects(BuildTargetContext c)
         {
-            CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects"));
-
+            var testAssetsRoot = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects");
             var dotnet = DotNetCli.Stage2;
-            var nobuildFileName = ".noautobuild";
-            string testProjectsRoot = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects");
-            var projects = Directory.GetFiles(testProjectsRoot, "project.json", SearchOption.AllDirectories)
-                                    .Where(p => !ConditionalTestAssets.Where(s => !s.Skip() && p.EndsWith(Path.Combine(s.Path, "project.json"))).Any())
-                                    .Where(p => !File.Exists(Path.Combine(Path.GetDirectoryName(p), nobuildFileName)));
+            var framework = "netcoreapp1.0";
 
-            foreach (var project in projects)
-            {
-                c.Info($"Building: {project}");
-                dotnet.Build("--framework", "netstandardapp1.5")
-                    .WorkingDirectory(Path.GetDirectoryName(project))
-                    .Execute()
-                    .EnsureSuccessful();
-            }
+            return BuildTestAssets(c, testAssetsRoot, dotnet, framework);
+        }
 
-            return c.Success();
+        [Target]
+        [BuildPlatforms(BuildPlatform.Windows)]
+        public static BuildTargetResult BuildDesktopTestAssetProjects(BuildTargetContext c)
+        {
+            var testAssetsRoot = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "DesktopTestProjects");
+            var dotnet = DotNetCli.Stage2;
+            var framework = "net451";
+
+            return BuildTestAssets(c, testAssetsRoot, dotnet, framework);
         }
 
         [Target]
@@ -254,7 +265,10 @@ namespace Microsoft.DotNet.Cli.Build
             CleanBinObj(c, Path.Combine(c.BuildContext.BuildDirectory, "test"));
 
             CleanNuGetTempCache();
-            DotNetCli.Stage2.Restore("--verbosity", "verbose", "--infer-runtimes", "--fallbacksource", Dirs.TestPackages)
+            DotNetCli.Stage2.Restore("--verbosity", "verbose",
+                "--fallbacksource", Dirs.TestPackages,
+                "--fallbacksource", Dirs.CorehostLocalPackages,
+                "--fallbacksource", Dirs.CorehostDummyPackages)
                 .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "test"))
                 .Execute()
                 .EnsureSuccessful();
@@ -268,7 +282,7 @@ namespace Microsoft.DotNet.Cli.Build
 
             var configuration = c.BuildContext.Get<string>("Configuration");
 
-            foreach (var testProject in TestProjects)
+            foreach (var testProject in GetTestProjects())
             {
                 c.Info($"Building tests: {testProject}");
                 dotnet.Build("--configuration", configuration)
@@ -299,7 +313,7 @@ namespace Microsoft.DotNet.Cli.Build
 
             // Run the tests and set the VS vars in the environment when running them
             var failingTests = new List<string>();
-            foreach (var project in TestProjects)
+            foreach (var project in GetTestProjects())
             {
                 c.Info($"Running tests in: {project}");
                 var result = dotnet.Test("--configuration", configuration, "-xml", $"{project}-testResults.xml", "-notrait", "category=failing")
@@ -342,6 +356,41 @@ namespace Microsoft.DotNet.Cli.Build
 
             Cmd(validator, Path.Combine(c.BuildContext.BuildDirectory, "src"))
                 .Execute();
+
+            return c.Success();
+        }
+
+        private static IEnumerable<string> GetTestProjects()
+        {
+            List<string> testProjects = new List<string>();
+            testProjects.AddRange(TestProjects);
+
+            if (CurrentPlatform.IsWindows)
+            {
+                testProjects.AddRange(WindowsTestProjects);
+            }
+
+            return testProjects;
+        }
+
+        private static BuildTargetResult BuildTestAssets(BuildTargetContext c, string testAssetsRoot, DotNetCli dotnet, string framework)
+        {
+            CleanBinObj(c, testAssetsRoot);
+
+            var nobuildFileName = ".noautobuild";
+
+            var projects = Directory.GetFiles(testAssetsRoot, "project.json", SearchOption.AllDirectories)
+                                    .Where(p => !ConditionalTestAssets.Where(s => !s.Skip() && p.EndsWith(Path.Combine(s.Path, "project.json"))).Any())
+                                    .Where(p => !File.Exists(Path.Combine(Path.GetDirectoryName(p), nobuildFileName)));
+
+            foreach (var project in projects)
+            {
+                c.Info($"Building: {project}");
+                dotnet.Build("--framework", framework)
+                    .WorkingDirectory(Path.GetDirectoryName(project))
+                    .Execute()
+                    .EnsureSuccessful();
+            }
 
             return c.Success();
         }

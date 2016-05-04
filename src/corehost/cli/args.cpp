@@ -13,19 +13,22 @@ arguments_t::arguments_t() :
     app_argc(0),
     app_argv(nullptr),
     dotnet_packages_cache(_X("")),
-    dotnet_extensions(_X("")),
+    core_servicing(_X("")),
     deps_path(_X(""))
 {
 }
 
-bool parse_arguments(const pal::string_t& deps_path, const std::vector<pal::string_t>& probe_paths, host_mode_t mode,
+bool parse_arguments(
+    const pal::string_t& deps_path,
+    const std::vector<pal::string_t>& probe_paths,
+    host_mode_t mode,
     const int argc, const pal::char_t* argv[], arguments_t* arg_out)
 {
     arguments_t& args = *arg_out;
     // Get the full name of the application
     if (!pal::get_own_executable_path(&args.own_path) || !pal::realpath(&args.own_path))
     {
-        trace::error(_X("Failed to locate current executable"));
+        trace::error(_X("Failed to resolve full path of the current executable [%s]"), args.own_path.c_str());
         return false;
     }
 
@@ -42,7 +45,7 @@ bool parse_arguments(const pal::string_t& deps_path, const std::vector<pal::stri
         args.managed_application = pal::string_t(argv[1]);
         if (!pal::realpath(&args.managed_application))
         {
-            trace::error(_X("Failed to locate managed application: %s"), args.managed_application.c_str());
+            trace::error(_X("Failed to locate managed application [%s]"), args.managed_application.c_str());
             return false;
         }
         args.app_dir = get_directory(args.managed_application);
@@ -59,7 +62,7 @@ bool parse_arguments(const pal::string_t& deps_path, const std::vector<pal::stri
         args.managed_application = managed_app;
         if (!pal::realpath(&args.managed_application))
         {
-            trace::error(_X("Failed to locate managed application: %s"), args.managed_application.c_str());
+            trace::error(_X("Failed to locate managed application [%s]"), args.managed_application.c_str());
             return false;
         }
         args.app_dir = own_dir;
@@ -67,30 +70,9 @@ bool parse_arguments(const pal::string_t& deps_path, const std::vector<pal::stri
         args.app_argc = argc - 1;
     }
 
-    std::unordered_map<pal::string_t, std::vector<pal::string_t>> opts;
-    std::vector<pal::string_t> known_opts = { _X("--depsfile"), _X("--additionalprobingpath") };
-    int num_args = 0;
-    if (!parse_known_args(args.app_argc, args.app_argv, known_opts, &opts, &num_args))
+    if (!deps_path.empty())
     {
-        return false;
-    }
-
-    args.app_argc -= num_args;
-    args.app_argv += num_args;
-    pal::string_t opts_deps_file = _X("--depsfile");
-    pal::string_t opts_probe_path = _X("--additionalprobingpath");
-    pal::string_t deps_file = get_last_known_arg(opts, opts_deps_file, deps_path);
-    if (opts.count(opts_probe_path))
-    {
-        for (const auto& str : opts[opts_probe_path])
-        {
-            args.probe_paths.push_back(str);
-        }
-    }
-
-    if (!deps_file.empty())
-    {
-        args.deps_path = deps_file;
+        args.deps_path = deps_path;
         args.app_dir = get_directory(args.deps_path);
     }
 
@@ -112,7 +94,7 @@ bool parse_arguments(const pal::string_t& deps_path, const std::vector<pal::stri
     }
 
     pal::getenv(_X("DOTNET_HOSTING_OPTIMIZATION_CACHE"), &args.dotnet_packages_cache);
-    pal::get_default_extensions_directory(&args.dotnet_extensions);
+    pal::get_default_servicing_directory(&args.core_servicing);
 
     return true;
 }

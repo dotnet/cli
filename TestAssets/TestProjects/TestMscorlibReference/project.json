@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0-*",
+  "dependencies": {},
+  "frameworks": {
+    "netcoreapp1.0": {
+      "dependencies": {
+        "Microsoft.NETCore.App": "1.0.0-rc2-*"
+      }
+    },
+    "net451": {
+      "frameworkAssemblies": {
+        "mscorlib": ""
+      }
+    }
+  }
+}
