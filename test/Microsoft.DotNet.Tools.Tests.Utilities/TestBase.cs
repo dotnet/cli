@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.DotNet.Cli.Utils;
-using Microsoft.DotNet.TestFramework;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.TestFramework;
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
 {
@@ -18,7 +18,8 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
     /// </summary>
     public abstract class TestBase : IDisposable
     {
-        protected const string DefaultFramework = "netstandardapp1.5";
+        protected const string DefaultFramework = "netcoreapp1.0";
+        protected const string DefaultLibraryFramework = "netstandard1.5";
         private TempRoot _temp;
         private static TestAssetsManager s_testsAssetsMgr;
         private static string s_repoRoot;
@@ -32,7 +33,11 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
                     return s_repoRoot;
                 }
 
-                string directory = AppContext.BaseDirectory;
+#if NET451
+            string directory = AppDomain.CurrentDomain.BaseDirectory;
+#else
+            string directory = AppContext.BaseDirectory;
+#endif
 
                 while (!Directory.Exists(Path.Combine(directory, ".git")) && directory != null)
                 {
@@ -49,18 +54,29 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             }
         }
 
+        protected static readonly string ArtifactsDirectory = Path.Combine(RepoRoot, "artifacts", RuntimeEnvironment.GetRuntimeIdentifier());
+        protected static readonly string CorehostLocalPackages = Path.Combine(ArtifactsDirectory, "corehost");
+        protected static readonly string CorehostDummyPackages = Path.Combine(ArtifactsDirectory, "corehostdummypackages");
+
         protected static TestAssetsManager TestAssetsManager
         {
             get
             {
                 if (s_testsAssetsMgr == null)
                 {
-                    string assetsRoot = Path.Combine(RepoRoot, "TestAssets", "TestProjects");
-                    s_testsAssetsMgr = new TestAssetsManager(assetsRoot);
+                    s_testsAssetsMgr = GetTestGroupTestAssetsManager("TestProjects");
                 }
 
                 return s_testsAssetsMgr;
             }
+        }
+
+        protected static TestAssetsManager GetTestGroupTestAssetsManager(string testGroup)
+        {
+            string assetsRoot = Path.Combine(RepoRoot, "TestAssets", testGroup);
+            var testAssetsMgr = new TestAssetsManager(assetsRoot);
+
+            return testAssetsMgr;
         }
 
         protected TestBase()
@@ -103,7 +119,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
                 string.Equals("on", val, StringComparison.OrdinalIgnoreCase));
         }
 
-        protected void TestExecutable(string outputDir,
+        protected CommandResult TestExecutable(string outputDir,
             string executableName,
             string expectedOutput)
         {
@@ -123,9 +139,13 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
             var result = executableCommand.ExecuteWithCapturedOutput(string.Join(" ", args));
 
-            result.Should().HaveStdOut(expectedOutput);
+            if (!string.IsNullOrEmpty(expectedOutput))
+            { 
+                result.Should().HaveStdOut(expectedOutput);
+            }
             result.Should().NotHaveStdErr();
             result.Should().Pass();
+            return result;
         }
 
         protected void TestOutputExecutable(

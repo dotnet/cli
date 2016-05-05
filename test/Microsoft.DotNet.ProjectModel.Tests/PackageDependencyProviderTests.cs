@@ -6,6 +6,7 @@ using Microsoft.DotNet.Tools.Test.Utilities;
 using NuGet.Frameworks;
 using NuGet.Versioning;
 using Xunit;
+using System.IO;
 
 namespace Microsoft.DotNet.ProjectModel.Tests
 {
@@ -29,8 +30,8 @@ namespace Microsoft.DotNet.ProjectModel.Tests
             target.CompileTimeAssemblies.Add("lib/dotnet/_._");
             target.NativeLibraries.Add("runtimes/any/native/Microsoft.CSharp.CurrentVersion.targets");
 
-            var p1 = provider.GetDescription(NuGetFramework.Parse("netstandardapp1.5"), package, target);
-            var p2 = provider.GetDescription(NuGetFramework.Parse("netstandardapp1.5"), package, target);
+            var p1 = provider.GetDescription(NuGetFramework.Parse("netcoreapp1.0"), package, target);
+            var p2 = provider.GetDescription(NuGetFramework.Parse("netcoreapp1.0"), package, target);
 
             Assert.True(p1.Compatible);
             Assert.True(p2.Compatible);
@@ -43,17 +44,115 @@ namespace Microsoft.DotNet.ProjectModel.Tests
         }
 
         [Fact]
-        public void SingleMicrosoftCSharpReference()
+        public void HasCompileTimePlaceholderChecksAllCompileTimeAssets()
         {
-            // https://github.com/dotnet/cli/issues/1602
-            var instance = TestAssetsManager.CreateTestInstance("TestMicrosoftCSharpReference")
-                                            .WithLockFiles();
+            var provider = new PackageDependencyProvider("/foo/packages", new FrameworkReferenceResolver("/foo/references"));
+            var package = new LockFilePackageLibrary();
+            package.Name = "Something";
+            package.Version = NuGetVersion.Parse("1.0.0");
+            package.Files.Add("lib/net46/_._");
+            package.Files.Add("lib/net46/Something.dll");
+
+            var target = new LockFileTargetLibrary();
+            target.Name = "Something";
+            target.Version = package.Version;
+
+            target.RuntimeAssemblies.Add("lib/net46/_._");
+            target.RuntimeAssemblies.Add("lib/net46/Something.dll");
+            target.CompileTimeAssemblies.Add("lib/net46/_._");
+            target.CompileTimeAssemblies.Add("lib/net46/Something.dll");
+
+            var p1 = provider.GetDescription(NuGetFramework.Parse("net46"), package, target);
+            
+            Assert.False(p1.HasCompileTimePlaceholder);
+            Assert.Equal(1, p1.CompileTimeAssemblies.Count());
+            Assert.Equal(1, p1.RuntimeAssemblies.Count());
+            Assert.Equal("lib/net46/Something.dll", p1.CompileTimeAssemblies.First().Path);
+            Assert.Equal("lib/net46/Something.dll", p1.RuntimeAssemblies.First().Path);
+        }
+        
+        [Fact]
+        public void HasCompileTimePlaceholderReturnsFalseIfEmpty()
+        {
+            var provider = new PackageDependencyProvider("/foo/packages", new FrameworkReferenceResolver("/foo/references"));
+            var package = new LockFilePackageLibrary();
+            package.Name = "Something";
+            package.Version = NuGetVersion.Parse("1.0.0");
+
+            var target = new LockFileTargetLibrary();
+            target.Name = "Something";
+            target.Version = package.Version;
+
+            var p1 = provider.GetDescription(NuGetFramework.Parse("net46"), package, target);
+            
+            Assert.False(p1.HasCompileTimePlaceholder);
+            Assert.Equal(0, p1.CompileTimeAssemblies.Count());
+            Assert.Equal(0, p1.RuntimeAssemblies.Count());
+        }
+
+        [Theory]
+        [InlineData("TestMscorlibReference", true)]
+        [InlineData("TestMscorlibReference", false)]
+        [InlineData("TestMicrosoftCSharpReference", true)]
+        [InlineData("TestMicrosoftCSharpReference", false)]
+        [InlineData("TestSystemReference", true)]
+        [InlineData("TestSystemReference", false)]
+        [InlineData("TestSystemCoreReference", true)]
+        [InlineData("TestSystemCoreReference", false)]
+        public void TestDuplicateDefaultDesktopReferences(string sampleName, bool withLockFile)
+        {
+            var instance = TestAssetsManager.CreateTestInstance(sampleName);
+            if (withLockFile)
+            {
+                instance = instance.WithLockFiles();
+            }
 
             var context = new ProjectContextBuilder().WithProjectDirectory(instance.TestRoot)
-                                                     .WithTargetFramework("dnx451")
+                                                     .WithTargetFramework("net451")
                                                      .Build();
 
             Assert.Equal(4, context.RootProject.Dependencies.Count());
+        }
+
+        [Fact]
+        public void NoDuplicateReferencesWhenFrameworkMissing()
+        {
+            var instance = TestAssetsManager.CreateTestInstance("TestMicrosoftCSharpReferenceMissingFramework")
+                                            .WithLockFiles();
+
+            var context = new ProjectContextBuilder().WithProjectDirectory(instance.TestRoot)
+                                                     .WithTargetFramework("net99")
+                                                     .Build();
+
+            // Will fail with dupes if any
+            context.LibraryManager.GetLibraries().ToDictionary(l => l.Identity.Name);
+        }
+
+        [Fact]
+        public void NetCore50ShouldNotResolveFrameworkAssemblies()
+        {
+            var instance = TestAssetsManager.CreateTestInstance("TestMicrosoftCSharpReferenceMissingFramework")
+                                            .WithLockFiles();
+
+            var context = new ProjectContextBuilder().WithProjectDirectory(instance.TestRoot)
+                                                     .WithTargetFramework("netcore50")
+                                                     .Build();
+
+            var diagnostics = context.LibraryManager.GetAllDiagnostics();
+            Assert.False(diagnostics.Any(d => d.ErrorCode == ErrorCodes.DOTNET1011));
+        }
+
+        [Fact]
+        public void NoDuplicatesWithProjectAndReferenceAssemblyWithSameName()
+        {
+            var instance = TestAssetsManager.CreateTestInstance("DuplicatedReferenceAssembly")
+                                            .WithLockFiles();
+            var context = new ProjectContextBuilder().WithProjectDirectory(Path.Combine(instance.TestRoot, "TestApp"))
+                                                     .WithTargetFramework("net461")
+                                                     .Build();
+
+            // Will fail with dupes if any
+            context.LibraryManager.GetLibraries().ToDictionary(l => l.Identity.Name);
         }
     }
 }

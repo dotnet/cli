@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using Microsoft.DotNet.InternalAbstractions;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Cli.Utils
@@ -26,13 +27,18 @@ namespace Microsoft.DotNet.Cli.Utils
             _outputPath = outputPath;
             _buildBasePath = buildBasePath;
             _projectDirectory = projectDirectory;
+
+            if (_configuration == null)
+            {
+                _configuration = Constants.DefaultConfiguration;
+            }
         }
 
         public ICommand Create(
             string commandName,
             IEnumerable<string> args,
             NuGetFramework framework = null,
-            string configuration = Constants.DefaultConfiguration)
+            string configuration = null)
         {
             if (string.IsNullOrEmpty(configuration))
             {
@@ -76,7 +82,7 @@ namespace Microsoft.DotNet.Cli.Utils
                 ProjectDirectory = projectDirectory
             };
 
-            var commandResolver = GetProjectDependenciesCommandResolver();
+            var commandResolver = GetProjectDependenciesCommandResolver(framework);
 
             var commandSpec = commandResolver.Resolve(commandResolverArguments);
             if (commandSpec == null)
@@ -87,12 +93,29 @@ namespace Microsoft.DotNet.Cli.Utils
             return commandSpec;
         }
 
-        private ICommandResolver GetProjectDependenciesCommandResolver()
+        private ICommandResolver GetProjectDependenciesCommandResolver(NuGetFramework framework)
         {
             var environment = new EnvironmentProvider();
-            var packagedCommandSpecFactory = new PackagedCommandSpecFactory();
 
-            return new ProjectDependenciesCommandResolver(environment, packagedCommandSpecFactory);
+            if (framework.IsDesktop())
+            {
+                IPlatformCommandSpecFactory platformCommandSpecFactory = null;
+                if (RuntimeEnvironment.OperatingSystemPlatform == Platform.Windows)
+                {
+                    platformCommandSpecFactory = new WindowsExePreferredCommandSpecFactory();
+                }
+                else
+                {
+                    platformCommandSpecFactory = new GenericPlatformCommandSpecFactory();
+                }
+
+                return new OutputPathCommandResolver(environment, platformCommandSpecFactory);
+            }
+            else
+            {
+                var packagedCommandSpecFactory = new PackagedCommandSpecFactory();
+                return new ProjectDependenciesCommandResolver(environment, packagedCommandSpecFactory);
+            }
         }
     }
 }

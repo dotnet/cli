@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli.Build.Framework;
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.DotNet.InternalAbstractions;
 
 using static Microsoft.DotNet.Cli.Build.Framework.BuildHelpers;
 
@@ -14,11 +15,13 @@ namespace Microsoft.DotNet.Cli.Build
     {
         private const string ENGINE = "engine.exe";
 
+        private const string WixVersion = "3.10.2";
+
         private static string WixRoot
         {
             get
             {
-                return Path.Combine(Dirs.Output, "WixTools");
+                return Path.Combine(Dirs.Output, $"WixTools.{WixVersion}");
             }
         }
 
@@ -38,11 +41,11 @@ namespace Microsoft.DotNet.Cli.Build
 
         private static string MsiVersion { get; set; }
 
-        private static string CliVersion { get; set; }
+        private static string CliDisplayVersion { get; set; }
+
+        private static string CliNugetVersion { get; set; }
 
         private static string Arch { get; } = CurrentArchitecture.Current.ToString();
-
-        private static string Channel { get; set; }
 
         private static void AcquireWix(BuildTargetContext c)
         {
@@ -54,14 +57,24 @@ namespace Microsoft.DotNet.Cli.Build
             Directory.CreateDirectory(WixRoot);
 
             c.Info("Downloading WixTools..");
-            // Download Wix version 3.10.2 - https://wix.codeplex.com/releases/view/619491
-            Cmd("powershell", "-NoProfile", "-NoLogo",
-                $"Invoke-WebRequest -Uri https://wix.codeplex.com/downloads/get/1540241 -Method Get -OutFile {WixRoot}\\WixTools.zip")
-                    .Execute()
-                    .EnsureSuccessful();
+
+            DownloadFile($"https://dotnetcli.blob.core.windows.net/build/wix/wix.{WixVersion}.zip", Path.Combine(WixRoot, "WixTools.zip"));
 
             c.Info("Extracting WixTools..");
-            ZipFile.ExtractToDirectory($"{WixRoot}\\WixTools.zip", WixRoot);
+            ZipFile.ExtractToDirectory(Path.Combine(WixRoot, "WixTools.zip"), WixRoot);
+        }
+
+        private static void DownloadFile(string uri, string destinationPath)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                var getTask = httpClient.GetStreamAsync(uri);
+
+                using (var outStream = File.OpenWrite(destinationPath))
+                {
+                    getTask.Result.CopyTo(outStream);
+                }
+            }
         }
 
         [Target]
@@ -79,8 +92,8 @@ namespace Microsoft.DotNet.Cli.Build
 
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
             MsiVersion = buildVersion.GenerateMsiVersion();
-            CliVersion = buildVersion.SimpleVersion;
-            Channel = c.BuildContext.Get<string>("Channel");
+            CliDisplayVersion = buildVersion.SimpleVersion;
+            CliNugetVersion = buildVersion.NuGetVersion;
 
             AcquireWix(c);
             return c.Success();
@@ -111,10 +124,11 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var cliSdkRoot = c.BuildContext.Get<string>("CLISDKRoot");
             var upgradeCode = Utils.GenerateGuidFromName(SdkMsi).ToString().ToUpper();
+            var cliSdkBrandName = $"'{Monikers.CLISdkBrandName}'";
 
             Cmd("powershell", "-NoProfile", "-NoLogo",
                 Path.Combine(Dirs.RepoRoot, "packaging", "windows", "clisdk", "generatemsi.ps1"),
-                cliSdkRoot, SdkMsi, WixRoot, MsiVersion, CliVersion, upgradeCode, Arch, Channel)
+                cliSdkRoot, SdkMsi, WixRoot, cliSdkBrandName, MsiVersion, CliDisplayVersion, CliNugetVersion, upgradeCode, Arch)
                     .Execute()
                     .EnsureSuccessful();
             return c.Success();
@@ -126,6 +140,7 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var inputDir = c.BuildContext.Get<string>("SharedHostPublishRoot");
             var wixObjRoot = Path.Combine(Dirs.Output, "obj", "wix", "sharedhost");
+            var sharedHostBrandName = $"'{Monikers.SharedHostBrandName}'";
 
             if (Directory.Exists(wixObjRoot))
             {
@@ -135,7 +150,7 @@ namespace Microsoft.DotNet.Cli.Build
 
             Cmd("powershell", "-NoProfile", "-NoLogo",
                 Path.Combine(Dirs.RepoRoot, "packaging", "windows", "host", "generatemsi.ps1"),
-                inputDir, SharedHostMsi, WixRoot, MsiVersion, CliVersion, Arch, wixObjRoot)
+                inputDir, SharedHostMsi, WixRoot, sharedHostBrandName, MsiVersion, CliNugetVersion, Arch, wixObjRoot)
                     .Execute()
                     .EnsureSuccessful();
             return c.Success();
@@ -151,6 +166,7 @@ namespace Microsoft.DotNet.Cli.Build
             var msiVerison = sharedFrameworkNuGetVersion.Split('-')[0];
             var upgradeCode = Utils.GenerateGuidFromName(SharedFrameworkMsi).ToString().ToUpper();
             var wixObjRoot = Path.Combine(Dirs.Output, "obj", "wix", "sharedframework");
+            var sharedFxBrandName = $"'{Monikers.SharedFxBrandName}'";
 
             if (Directory.Exists(wixObjRoot))
             {
@@ -160,7 +176,7 @@ namespace Microsoft.DotNet.Cli.Build
 
             Cmd("powershell", "-NoProfile", "-NoLogo",
                 Path.Combine(Dirs.RepoRoot, "packaging", "windows", "sharedframework", "generatemsi.ps1"),
-                inputDir, SharedFrameworkMsi, WixRoot, msiVerison, sharedFrameworkNuGetName, sharedFrameworkNuGetVersion, upgradeCode, Arch, wixObjRoot)
+                inputDir, SharedFrameworkMsi, WixRoot, sharedFxBrandName, msiVerison, sharedFrameworkNuGetName, sharedFrameworkNuGetVersion, upgradeCode, Arch, wixObjRoot)
                     .Execute()
                     .EnsureSuccessful();
             return c.Success();
@@ -172,10 +188,11 @@ namespace Microsoft.DotNet.Cli.Build
         public static BuildTargetResult GenerateCliSdkBundle(BuildTargetContext c)
         {
             var upgradeCode = Utils.GenerateGuidFromName(SdkBundle).ToString().ToUpper();
+            var cliSdkBrandName = $"'{Monikers.CLISdkBrandName}'";
 
             Cmd("powershell", "-NoProfile", "-NoLogo",
                 Path.Combine(Dirs.RepoRoot, "packaging", "windows", "clisdk", "generatebundle.ps1"),
-                SdkMsi, SharedFrameworkMsi, SharedHostMsi, SdkBundle, WixRoot, MsiVersion, CliVersion, upgradeCode, Arch, Channel)
+                SdkMsi, SharedFrameworkMsi, SharedHostMsi, SdkBundle, WixRoot, cliSdkBrandName, MsiVersion, CliDisplayVersion, CliNugetVersion, upgradeCode, Arch)
                     .EnvironmentVariable("Stage2Dir", Dirs.Stage2)
                     .Execute()
                     .EnsureSuccessful();
@@ -189,10 +206,11 @@ namespace Microsoft.DotNet.Cli.Build
             var sharedFrameworkNuGetName = Monikers.SharedFrameworkName;
             var sharedFrameworkNuGetVersion = c.BuildContext.Get<string>("SharedFrameworkNugetVersion");
             var upgradeCode = Utils.GenerateGuidFromName(SharedFrameworkBundle).ToString().ToUpper();
+            var sharedFxBrandName = $"'{Monikers.SharedFxBrandName}'";
 
             Cmd("powershell", "-NoProfile", "-NoLogo",
                 Path.Combine(Dirs.RepoRoot, "packaging", "windows", "sharedframework", "generatebundle.ps1"),
-                SharedFrameworkMsi, SharedHostMsi, SharedFrameworkBundle, WixRoot, MsiVersion, CliVersion, sharedFrameworkNuGetName, sharedFrameworkNuGetVersion, upgradeCode, Arch, Channel)
+                SharedFrameworkMsi, SharedHostMsi, SharedFrameworkBundle, WixRoot, sharedFxBrandName, MsiVersion, CliDisplayVersion, sharedFrameworkNuGetName, sharedFrameworkNuGetVersion, upgradeCode, Arch)
                     .Execute()
                     .EnsureSuccessful();
             return c.Success();

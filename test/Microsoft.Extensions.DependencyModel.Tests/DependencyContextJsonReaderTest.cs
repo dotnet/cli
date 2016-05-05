@@ -26,15 +26,50 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             var context = Read(
 @"{
     ""runtimeTarget"": {
-        ""name"":"".NETStandardApp,Version=v1.5/osx.10.10-x64""
+        ""name"":"".NETCoreApp,Version=v1.0/osx.10.10-x64""
     },
     ""targets"": {
-        "".NETStandardApp,Version=v1.5/osx.10.10-x64"": {},
+        "".NETCoreApp,Version=v1.0/osx.10.10-x64"": {},
     }
 }");
             context.Target.IsPortable.Should().BeFalse();
-            context.Target.Framework.Should().Be(".NETStandardApp,Version=v1.5");
+            context.Target.Framework.Should().Be(".NETCoreApp,Version=v1.0");
             context.Target.Runtime.Should().Be("osx.10.10-x64");
+        }
+
+        [Fact]
+        public void GroupsRuntimeAssets()
+        {
+            var context = Read(@"
+ {
+     ""targets"": {
+         "".NETStandard,Version=v1.5"": {
+             ""System.Banana/1.0.0"": {
+                 ""runtimeTargets"": {
+                     ""runtimes/unix/Banana.dll"": { ""rid"": ""unix"", ""assetType"": ""runtime"" },
+                     ""runtimes/win7/Banana.dll"": { ""rid"": ""win7"",  ""assetType"": ""runtime"" },
+
+                     ""runtimes/native/win7/Apple.dll"": { ""rid"": ""win7"",  ""assetType"": ""native"" },
+                     ""runtimes/native/unix/libapple.so"": { ""rid"": ""unix"",  ""assetType"": ""native"" }
+                 }
+             }
+         }
+     },
+     ""libraries"": {
+         ""System.Banana/1.0.0"": {
+             ""type"": ""package"",
+             ""serviceable"": false,
+             ""sha512"": ""HASH-System.Banana""
+         },
+     }
+ }");
+            context.RuntimeLibraries.Should().HaveCount(1);
+            var runtimeLib = context.RuntimeLibraries.Single();
+            runtimeLib.RuntimeAssemblyGroups.Should().HaveCount(2);
+            runtimeLib.RuntimeAssemblyGroups.All(g => g.AssetPaths.Count == 1).Should().BeTrue();
+
+            runtimeLib.NativeLibraryGroups.Should().HaveCount(2);
+            runtimeLib.NativeLibraryGroups.All(g => g.AssetPaths.Count == 1).Should().BeTrue();
         }
 
         [Fact]
@@ -43,7 +78,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             var context = Read(
 @"{
     ""targets"": {
-        "".NETStandardApp,Version=v1.5"": {}
+        "".NETCoreApp,Version=v1.0"": {}
     }
 }");
             context.Target.IsPortable.Should().BeTrue();
@@ -55,10 +90,10 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             var context = Read(
 @"{
     ""runtimeTarget"": {
-        ""name"": "".NETStandardApp,Version=v1.5/osx.10.10-x64""
+        ""name"": "".NETCoreApp,Version=v1.0/osx.10.10-x64""
     },
     ""targets"": {
-        "".NETStandardApp,Version=v1.5/osx.10.10-x64"": {}
+        "".NETCoreApp,Version=v1.0/osx.10.10-x64"": {}
     }
 }");
             context.Target.IsPortable.Should().BeFalse();
@@ -70,10 +105,10 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             var context = Read(
 @"{
     ""targets"": {
-        "".NETStandardApp,Version=v1.5"": {}
+        "".NETCoreApp,Version=v1.0"": {}
     }
 }");
-            context.Target.Framework.Should().Be(".NETStandardApp,Version=v1.5");
+            context.Target.Framework.Should().Be(".NETCoreApp,Version=v1.0");
         }
 
         [Fact]
@@ -82,7 +117,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             var context = Read(
 @"{
     ""targets"": {
-        "".NETStandardApp,Version=v1.5/osx.10.10-x64"": {},
+        "".NETCoreApp,Version=v1.0/osx.10.10-x64"": {},
     },
     ""runtimes"": {
         ""osx.10.10-x64"": [ ],
@@ -106,7 +141,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             var context = Read(
 @"{
     ""targets"": {
-        "".NETStandardApp,Version=v1.5"": {
+        "".NETCoreApp,Version=v1.0"": {
             ""MyApp/1.0.1"": {
                 ""dependencies"": {
                     ""AspNet.Mvc"": ""1.0.0""
@@ -157,10 +192,10 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             var context = Read(
 @"{
     ""runtimeTarget"": {
-        ""name"": "".NETStandardApp,Version=v1.5""
+        ""name"": "".NETCoreApp,Version=v1.0""
     },
     ""targets"": {
-        "".NETStandardApp,Version=v1.5"": {
+        "".NETCoreApp,Version=v1.0"": {
             ""MyApp/1.0.1"": {
                 ""dependencies"": {
                     ""AspNet.Mvc"": ""1.0.0""
@@ -222,9 +257,9 @@ namespace Microsoft.Extensions.DependencyModel.Tests
         {
             var context = Read(
 @"{
-    ""runtimeTarget"": "".NETStandardApp,Version=v1.5"",
+    ""runtimeTarget"": "".NETCoreApp,Version=v1.0"",
     ""targets"": {
-        "".NETStandardApp,Version=v1.5"": {
+        "".NETCoreApp,Version=v1.0"": {
             ""System.Banana/1.0.0"": {
                 ""runtimeTargets"": {
                     ""runtime/win7-x64/lib/_._"": { ""assetType"": ""runtime"", ""rid"": ""win7-x64""},
@@ -270,7 +305,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
         ""optimize"": true
     },
     ""targets"": {
-        "".NETStandardApp,Version=v1.5/osx.10.10-x64"": {},
+        "".NETCoreApp,Version=v1.0/osx.10.10-x64"": {},
     }
 }");
             context.CompilationOptions.AllowUnsafe.Should().Be(true);

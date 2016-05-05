@@ -20,6 +20,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
     {
         private readonly string _configuration;
         private readonly string _runtime;
+        private readonly string[] _runtimeFallbacks;
         private readonly ProjectDescription _rootProject;
         private readonly string _buildBasePath;
         private readonly string _solutionRootPath;
@@ -28,6 +29,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             LibraryManager manager,
             string configuration,
             string runtime,
+            string[] runtimeFallbacks,
             string buildBasePath,
             string solutionRootPath)
         {
@@ -39,6 +41,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             LibraryManager = manager;
             _configuration = configuration;
             _runtime = runtime;
+            _runtimeFallbacks = runtimeFallbacks;
             _buildBasePath = buildBasePath;
             _solutionRootPath = solutionRootPath;
             _rootProject = rootProject;
@@ -96,7 +99,6 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                 var analyzerReferences = new List<AnalyzerReference>();
                 var libraryExport = GetExport(library);
 
-
                 // We need to filter out source references from non-root libraries,
                 // so we rebuild the library export
                 foreach (var reference in libraryExport.CompilationAssemblies)
@@ -114,16 +116,50 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                     analyzerReferences.AddRange(libraryExport.AnalyzerReferences);
                 }
 
-                yield return LibraryExportBuilder.Create(library)
+                var builder = LibraryExportBuilder.Create(library);
+                if (_runtime != null && _runtimeFallbacks != null)
+                {
+                    // For portable apps that are built with runtime trimming we replace RuntimeAssemblyGroups and NativeLibraryGroups
+                    // with single default group that contains asset specific to runtime we are trimming for
+                    // based on runtime fallback list
+                    builder.WithRuntimeAssemblyGroups(TrimAssetGroups(libraryExport.RuntimeAssemblyGroups, _runtimeFallbacks));
+                    builder.WithNativeLibraryGroups(TrimAssetGroups(libraryExport.NativeLibraryGroups, _runtimeFallbacks));
+                }
+                else
+                {
+                    builder.WithRuntimeAssemblyGroups(libraryExport.RuntimeAssemblyGroups);
+                    builder.WithNativeLibraryGroups(libraryExport.NativeLibraryGroups);
+                }
+
+                yield return builder
                     .WithCompilationAssemblies(compilationAssemblies)
                     .WithSourceReferences(sourceReferences)
-                    .WithRuntimeAssemblyGroups(libraryExport.RuntimeAssemblyGroups)
                     .WithRuntimeAssets(libraryExport.RuntimeAssets)
-                    .WithNativeLibraryGroups(libraryExport.NativeLibraryGroups)
                     .WithEmbedddedResources(libraryExport.EmbeddedResources)
                     .WithAnalyzerReference(analyzerReferences)
                     .WithResourceAssemblies(libraryExport.ResourceAssemblies)
                     .Build();
+            }
+        }
+
+        private IEnumerable<LibraryAssetGroup> TrimAssetGroups(IEnumerable<LibraryAssetGroup> runtimeAssemblyGroups,
+            string[] runtimeFallbacks)
+        {
+            LibraryAssetGroup runtimeAssets;
+            foreach (var rid in runtimeFallbacks)
+            {
+                runtimeAssets = runtimeAssemblyGroups.GetRuntimeGroup(rid);
+                if (runtimeAssets != null)
+                {
+                    yield return new LibraryAssetGroup(runtimeAssets.Assets);
+                    yield break;
+                }
+            }
+
+            runtimeAssets = runtimeAssemblyGroups.GetDefaultGroup();
+            if (runtimeAssets != null)
+            {
+                yield return runtimeAssets;
             }
         }
 
@@ -160,6 +196,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             var builder = LibraryExportBuilder.Create(library);
             builder.AddNativeLibraryGroup(new LibraryAssetGroup(PopulateAssets(library, library.NativeLibraries)));
             builder.AddRuntimeAssemblyGroup(new LibraryAssetGroup(PopulateAssets(library, library.RuntimeAssemblies)));
+            builder.WithResourceAssemblies(PopulateResources(library, library.ResourceAssemblies));
             builder.WithCompilationAssemblies(PopulateAssets(library, library.CompileTimeAssemblies));
 
             if (library.Identity.Type.Equals(LibraryType.Package))
@@ -242,6 +279,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         private LibraryExport ExportProject(ProjectDescription project)
         {
             var builder = LibraryExportBuilder.Create(project);
+            var compilerOptions = project.Project.GetCompilerOptions(project.TargetFrameworkInfo.FrameworkName, _configuration);
 
             if (!string.IsNullOrEmpty(project.TargetFrameworkInfo?.AssemblyPath))
             {
@@ -261,7 +299,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                     builder.AddRuntimeAsset(new LibraryAsset(Path.GetFileName(pdbPath), Path.GetFileName(pdbPath), pdbPath));
                 }
             }
-            else if (project.Project.Files.SourceFiles.Any())
+            else if (HasSourceFiles(project))
             {
                 var outputPaths = project.GetOutputPaths(_buildBasePath, _solutionRootPath, _configuration, _runtime);
 
@@ -286,6 +324,10 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                     builder.AddRuntimeAssemblyGroup(new LibraryAssetGroup(new[] { compilationAssemblyAsset }));
                     builder.WithRuntimeAssets(CollectAssets(outputPaths.CompilationFiles));
                 }
+
+                builder.WithResourceAssemblies(outputPaths.CompilationFiles.Resources().Select(r => new LibraryResourceAssembly(
+                    LibraryAsset.CreateFromAbsolutePath(outputPaths.CompilationFiles.BasePath, r.Path),
+                    r.Locale)));
             }
 
             builder.WithSourceReferences(project.Project.Files.SharedFiles.Select(f =>
@@ -295,10 +337,24 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             return builder.Build();
         }
 
+        private bool HasSourceFiles(ProjectDescription project)
+        {
+            var compilerOptions = project.TargetFrameworkInfo.CompilerOptions;
+
+            if (compilerOptions.CompileInclude == null)
+            {
+                return project.Project.Files.SourceFiles.Any();
+            }
+
+            var includeFiles = IncludeFilesResolver.GetIncludeFiles(compilerOptions.CompileInclude, "/", diagnostics: null);
+
+            return includeFiles.Any();
+        }
+
         private IEnumerable<LibraryAsset> CollectAssets(CompilationOutputFiles files)
         {
             var assemblyPath = files.Assembly;
-            foreach (var path in files.All())
+            foreach (var path in files.All().Except(files.Resources().Select(r => r.Path)))
             {
                 if (string.Equals(assemblyPath, path))
                 {
@@ -422,9 +478,24 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             return analyzerRefs;
         }
 
+        private IEnumerable<LibraryResourceAssembly> PopulateResources(TargetLibraryWithAssets library, IEnumerable<LockFileItem> section)
+        {
+            foreach (var assemblyPath in section.Where(a => !PackageDependencyProvider.IsPlaceholderFile(a.Path)))
+            {
+                string locale;
+                if(!assemblyPath.Properties.TryGetValue(Constants.LocaleLockFilePropertyName, out locale))
+                {
+                    locale = null;
+                }
+                yield return new LibraryResourceAssembly(
+                    LibraryAsset.CreateFromRelativePath(library.Path, assemblyPath.Path),
+                    locale);
+            }
+        }
+
         private IEnumerable<LibraryAsset> PopulateAssets(TargetLibraryWithAssets library, IEnumerable<LockFileItem> section)
         {
-            foreach (var assemblyPath in section)
+            foreach (var assemblyPath in section.Where(a => !PackageDependencyProvider.IsPlaceholderFile(a.Path)))
             {
                 yield return LibraryAsset.CreateFromRelativePath(library.Path, assemblyPath.Path);
             }

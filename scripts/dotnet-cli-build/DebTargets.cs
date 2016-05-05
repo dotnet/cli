@@ -4,7 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli.Build.Framework;
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.DotNet.InternalAbstractions;
 
 using static Microsoft.DotNet.Cli.Build.Framework.BuildHelpers;
 
@@ -47,7 +47,8 @@ namespace Microsoft.DotNet.Cli.Build
                 "-v", version, 
                 "-i", sdkPublishRoot, 
                 "-o", debFile, 
-                "-p", packageName, 
+                "-p", packageName,
+                "-b", Monikers.CLISdkBrandName,
                 "-m", manPagesDir, 
                 "--framework-debian-package-name", sharedFxDebianPackageName,
                 "--framework-nuget-name", Monikers.SharedFrameworkName,
@@ -78,7 +79,8 @@ namespace Microsoft.DotNet.Cli.Build
             Directory.CreateDirectory(objRoot);
 
             Cmd(Path.Combine(Dirs.RepoRoot, "scripts", "package", "package-sharedhost-debian.sh"),
-                    "--input", inputRoot, "--output", debFile, "--obj-root", objRoot, "--version", version, "-m", manPagesDir)
+                    "--input", inputRoot, "--output", debFile, "-b", Monikers.SharedFxBrandName,
+                    "--obj-root", objRoot, "--version", version, "-m", manPagesDir)
                     .Execute()
                     .EnsureSuccessful();
             return c.Success();
@@ -102,7 +104,7 @@ namespace Microsoft.DotNet.Cli.Build
             Directory.CreateDirectory(objRoot);
 
             Cmd(Path.Combine(Dirs.RepoRoot, "scripts", "package", "package-sharedframework-debian.sh"),
-                    "--input", inputRoot, "--output", debFile, "--package-name", packageName,
+                    "--input", inputRoot, "--output", debFile, "--package-name", packageName, "-b", Monikers.SharedFxBrandName,
                     "--framework-nuget-name", Monikers.SharedFrameworkName,
                     "--framework-nuget-version", c.BuildContext.Get<string>("SharedFrameworkNugetVersion"),
                     "--obj-root", objRoot, "--version", version)

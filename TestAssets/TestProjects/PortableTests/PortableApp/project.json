@@ -4,17 +4,24 @@
   },
   "dependencies": {},
   "frameworks": {
-    "netstandard1.5": {
-      "imports": [
-        "dnxcore50",
-        "portable-net45+win8"
-      ],
+    "netcoreapp1.0": {
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.0.0-rc2-23931"
+          "version": "1.0.0-rc3-*"
         }
       }
+    }
+  },
+  "runtimeOptions": {
+    "somethingString": "anything",
+    "somethingBoolean": true,
+    "someArray": [
+      "one",
+      "two"
+    ],
+    "someObject": {
+      "someProperty": "someValue"
     }
   }
 }

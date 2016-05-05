@@ -6,22 +6,32 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.DotNet.ProjectModel.Utilities;
-using Microsoft.Extensions.JsonParser.Sources;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NuGet.Frameworks;
 using NuGet.Packaging.Core;
 using NuGet.Versioning;
 
 namespace Microsoft.DotNet.ProjectModel.Graph
 {
-    public static class LockFileReader
-    {        
+    public class LockFileReader
+    {
+        private readonly LockFileSymbolTable _symbols;
+
+        public LockFileReader() : this(new LockFileSymbolTable()) { }
+
+        public LockFileReader(LockFileSymbolTable symbols)
+        {
+            _symbols = symbols;
+        }
+
         public static LockFile Read(string lockFilePath, bool designTime)
         {
             using (var stream = ResilientFileStreamOpener.OpenFile(lockFilePath))
             {
                 try
                 {
-                    return Read(lockFilePath, stream, designTime);
+                    return new LockFileReader().ReadLockFile(lockFilePath, stream, designTime);
                 }
                 catch (FileFormatException ex)
                 {
@@ -34,12 +44,12 @@ namespace Microsoft.DotNet.ProjectModel.Graph
             }
         }
 
-        public static LockFile Read(string lockFilePath, Stream stream, bool designTime)
+        public LockFile ReadLockFile(string lockFilePath, Stream stream, bool designTime)
         {
             try
             {
                 var reader = new StreamReader(stream);
-                var jobject = JsonDeserializer.Deserialize(reader) as JsonObject;
+                var jobject = JObject.Load(new JsonTextReader(reader));
 
                 if (jobject == null)
                 {
@@ -47,10 +57,10 @@ namespace Microsoft.DotNet.ProjectModel.Graph
                 }
 
                 var lockFile = ReadLockFile(lockFilePath, jobject);
-                
+
                 if (!designTime)
                 {
-                    var patcher = new LockFilePatcher(lockFile);
+                    var patcher = new LockFilePatcher(lockFile, this);
                     patcher.Patch();
                 }
 
@@ -70,13 +80,13 @@ namespace Microsoft.DotNet.ProjectModel.Graph
             }
         }
 
-        public static ExportFile ReadExportFile(string fragmentLockFilePath)
+        public ExportFile ReadExportFile(string fragmentLockFilePath)
         {
             using (var stream = ResilientFileStreamOpener.OpenFile(fragmentLockFilePath))
             {
                 try
                 {
-                    var rootJObject = JsonDeserializer.Deserialize(new StreamReader(stream)) as JsonObject;
+                    var rootJObject = JObject.ReadFrom(new JsonTextReader(new StreamReader(stream))) as JObject;
 
                     if (rootJObject == null)
                     {
@@ -84,7 +94,7 @@ namespace Microsoft.DotNet.ProjectModel.Graph
                     }
 
                     var version = ReadInt(rootJObject, "version", defaultValue: int.MinValue);
-                    var exports = ReadObject(rootJObject.ValueAsJsonObject("exports"), ReadTargetLibrary);
+                    var exports = ReadObject(rootJObject.Value<JObject>("exports"), ReadTargetLibrary);
 
                     return new ExportFile(fragmentLockFilePath, version, exports);
 
@@ -100,37 +110,38 @@ namespace Microsoft.DotNet.ProjectModel.Graph
             }
         }
 
-        private static LockFile ReadLockFile(string lockFilePath, JsonObject cursor)
+        private LockFile ReadLockFile(string lockFilePath, JObject cursor)
         {
             var lockFile = new LockFile(lockFilePath);
             lockFile.Version = ReadInt(cursor, "version", defaultValue: int.MinValue);
-            lockFile.Targets = ReadObject(cursor.ValueAsJsonObject("targets"), ReadTarget);
-            lockFile.ProjectFileDependencyGroups = ReadObject(cursor.ValueAsJsonObject("projectFileDependencyGroups"), ReadProjectFileDependencyGroup);
-            ReadLibrary(cursor.ValueAsJsonObject("libraries"), lockFile);
+            lockFile.Targets = ReadObject(cursor.Value<JObject>("targets"), ReadTarget);
+            lockFile.ProjectFileDependencyGroups = ReadObject(cursor.Value<JObject>("projectFileDependencyGroups"), ReadProjectFileDependencyGroup);
+            ReadLibrary(cursor.Value<JObject>("libraries"), lockFile);
 
             return lockFile;
         }
 
-        private static void ReadLibrary(JsonObject json, LockFile lockFile)
+        private void ReadLibrary(JObject json, LockFile lockFile)
         {
             if (json == null)
             {
                 return;
             }
 
-            foreach (var key in json.Keys)
+            foreach (var child in json)
             {
-                var value = json.ValueAsJsonObject(key);
+                var key = child.Key;
+                var value = json.Value<JObject>(key);
                 if (value == null)
                 {
-                    throw FileFormatException.Create("The value type is not object.", json.Value(key));
+                    throw FileFormatException.Create("The value type is not object.", json[key]);
                 }
 
                 var parts = key.Split(new[] { '/' }, 2);
                 var name = parts[0];
-                var version = parts.Length == 2 ? NuGetVersion.Parse(parts[1]) : null;
+                var version = parts.Length == 2 ? _symbols.GetVersion(parts[1]) : null;
 
-                var type = value.ValueAsString("type")?.Value;
+                var type = _symbols.GetString(value.Value<string>("type"));
 
                 if (type == null || string.Equals(type, "package", StringComparison.OrdinalIgnoreCase))
                 {
@@ -139,8 +150,8 @@ namespace Microsoft.DotNet.ProjectModel.Graph
                         Name = name,
                         Version = version,
                         IsServiceable = ReadBool(value, "serviceable", defaultValue: false),
-                        Sha512 = ReadString(value.Value("sha512")),
-                        Files = ReadPathArray(value.Value("files"), ReadString)
+                        Sha512 = ReadString(value["sha512"]),
+                        Files = ReadPathArray(value["files"], ReadString)
                     });
                 }
                 else if (type == "project")
@@ -151,10 +162,10 @@ namespace Microsoft.DotNet.ProjectModel.Graph
                         Version = version
                     };
 
-                    var pathValue = value.Value("path");
+                    var pathValue = value["path"];
                     projectLibrary.Path = pathValue == null ? null : ReadString(pathValue);
 
-                    var buildTimeDependencyValue = value.Value("msbuildProject");
+                    var buildTimeDependencyValue = value["msbuildProject"];
                     projectLibrary.MSBuildProject = buildTimeDependencyValue == null ? null : ReadString(buildTimeDependencyValue);
 
                     lockFile.ProjectLibraries.Add(projectLibrary);
@@ -162,9 +173,9 @@ namespace Microsoft.DotNet.ProjectModel.Graph
             }
         }
 
-        private static LockFileTarget ReadTarget(string property, JsonValue json)
+        private LockFileTarget ReadTarget(string property, JToken json)
         {
-            var jobject = json as JsonObject;
+            var jobject = json as JObject;
             if (jobject == null)
             {
                 throw FileFormatException.Create("The value type is not an object.", json);
@@ -172,10 +183,10 @@ namespace Microsoft.DotNet.ProjectModel.Graph
 
             var target = new LockFileTarget();
             var parts = property.Split(new[] { '/' }, 2);
-            target.TargetFramework = NuGetFramework.Parse(parts[0]);
+            target.TargetFramework = _symbols.GetFramework(parts[0]);
             if (parts.Length == 2)
             {
-                target.RuntimeIdentifier = parts[1];
+                target.RuntimeIdentifier = _symbols.GetString(parts[1]);
             }
 
             target.Libraries = ReadObject(jobject, ReadTargetLibrary);
@@ -183,9 +194,9 @@ namespace Microsoft.DotNet.ProjectModel.Graph
             return target;
         }
 
-        private static LockFileTargetLibrary ReadTargetLibrary(string property, JsonValue json)
+        private LockFileTargetLibrary ReadTargetLibrary(string property, JToken json)
         {
-            var jobject = json as JsonObject;
+            var jobject = json as JObject;
             if (jobject == null)
             {
                 throw FileFormatException.Create("The value type is not an object.", json);
@@ -194,171 +205,172 @@ namespace Microsoft.DotNet.ProjectModel.Graph
             var library = new LockFileTargetLibrary();
 
             var parts = property.Split(new[] { '/' }, 2);
-            library.Name = parts[0];
+            library.Name = _symbols.GetString(parts[0]);
             if (parts.Length == 2)
             {
-                library.Version = NuGetVersion.Parse(parts[1]);
+                library.Version = _symbols.GetVersion(parts[1]);
             }
 
-            library.Type = jobject.ValueAsString("type");
-            var framework = jobject.ValueAsString("framework");
+            library.Type = _symbols.GetString(jobject.Value<string>("type"));
+            var framework = jobject.Value<string>("framework");
             if (framework != null)
             {
-                library.TargetFramework = NuGetFramework.Parse(framework);
+                library.TargetFramework = _symbols.GetFramework(framework);
             }
 
-            library.Dependencies = ReadObject(jobject.ValueAsJsonObject("dependencies"), ReadPackageDependency);
-            library.FrameworkAssemblies = new HashSet<string>(ReadArray(jobject.Value("frameworkAssemblies"), ReadFrameworkAssemblyReference), StringComparer.OrdinalIgnoreCase);
-            library.RuntimeAssemblies = ReadObject(jobject.ValueAsJsonObject("runtime"), ReadFileItem);
-            library.CompileTimeAssemblies = ReadObject(jobject.ValueAsJsonObject("compile"), ReadFileItem);
-            library.ResourceAssemblies = ReadObject(jobject.ValueAsJsonObject("resource"), ReadFileItem);
-            library.NativeLibraries = ReadObject(jobject.ValueAsJsonObject("native"), ReadFileItem);
-            library.ContentFiles = ReadObject(jobject.ValueAsJsonObject("contentFiles"), ReadContentFile);
-            library.RuntimeTargets = ReadObject(jobject.ValueAsJsonObject("runtimeTargets"), ReadRuntimeTarget);
+            library.Dependencies = ReadObject(jobject.Value<JObject>("dependencies"), ReadPackageDependency);
+            library.FrameworkAssemblies = new HashSet<string>(ReadArray(jobject["frameworkAssemblies"], ReadFrameworkAssemblyReference), StringComparer.OrdinalIgnoreCase);
+            library.RuntimeAssemblies = ReadObject(jobject.Value<JObject>("runtime"), ReadFileItem);
+            library.CompileTimeAssemblies = ReadObject(jobject.Value<JObject>("compile"), ReadFileItem);
+            library.ResourceAssemblies = ReadObject(jobject.Value<JObject>("resource"), ReadFileItem);
+            library.NativeLibraries = ReadObject(jobject.Value<JObject>("native"), ReadFileItem);
+            library.ContentFiles = ReadObject(jobject.Value<JObject>("contentFiles"), ReadContentFile);
+            library.RuntimeTargets = ReadObject(jobject.Value<JObject>("runtimeTargets"), ReadRuntimeTarget);
+
             return library;
         }
 
-        private static LockFileRuntimeTarget ReadRuntimeTarget(string property, JsonValue json)
+        private LockFileRuntimeTarget ReadRuntimeTarget(string property, JToken json)
         {
-            var jsonObject = json as JsonObject;
+            var jsonObject = json as JObject;
             if (jsonObject == null)
             {
                 throw FileFormatException.Create("The value type is not an object.", json);
             }
 
             return new LockFileRuntimeTarget(
-                path: property,
-                runtime: jsonObject.ValueAsString("rid"),
-                assetType: jsonObject.ValueAsString("assetType")
+                path: _symbols.GetString(property),
+                runtime: _symbols.GetString(jsonObject.Value<string>("rid")),
+                assetType: _symbols.GetString(jsonObject.Value<string>("assetType"))
                 );
         }
 
-        private static LockFileContentFile ReadContentFile(string property, JsonValue json)
+        private LockFileContentFile ReadContentFile(string property, JToken json)
         {
             var contentFile = new LockFileContentFile()
             {
                 Path = property
             };
 
-            var jsonObject = json as JsonObject;
+            var jsonObject = json as JObject;
             if (jsonObject != null)
             {
 
                 BuildAction action;
-                BuildAction.TryParse(jsonObject.ValueAsString("buildAction"), out action);
+                BuildAction.TryParse(jsonObject.Value<string>("buildAction"), out action);
 
                 contentFile.BuildAction = action;
-                var codeLanguage = jsonObject.ValueAsString("codeLanguage");
+                var codeLanguage = _symbols.GetString(jsonObject.Value<string>("codeLanguage"));
                 if (codeLanguage == "any")
                 {
                     codeLanguage = null;
                 }
                 contentFile.CodeLanguage = codeLanguage;
-                contentFile.OutputPath = jsonObject.ValueAsString("outputPath");
-                contentFile.PPOutputPath = jsonObject.ValueAsString("ppOutputPath");
+                contentFile.OutputPath = jsonObject.Value<string>("outputPath");
+                contentFile.PPOutputPath = jsonObject.Value<string>("ppOutputPath");
                 contentFile.CopyToOutput = ReadBool(jsonObject, "copyToOutput", false);
             }
 
             return contentFile;
         }
 
-        private static ProjectFileDependencyGroup ReadProjectFileDependencyGroup(string property, JsonValue json)
+        private ProjectFileDependencyGroup ReadProjectFileDependencyGroup(string property, JToken json)
         {
             return new ProjectFileDependencyGroup(
                 string.IsNullOrEmpty(property) ? null : NuGetFramework.Parse(property),
                 ReadArray(json, ReadString));
         }
 
-        private static PackageDependency ReadPackageDependency(string property, JsonValue json)
+        private PackageDependency ReadPackageDependency(string property, JToken json)
         {
             var versionStr = ReadString(json);
             return new PackageDependency(
-                property,
-                versionStr == null ? null : VersionRange.Parse(versionStr));
+                _symbols.GetString(property),
+                versionStr == null ? null : _symbols.GetVersionRange(versionStr));
         }
 
-        private static LockFileItem ReadFileItem(string property, JsonValue json)
+        private LockFileItem ReadFileItem(string property, JToken json)
         {
-            var item = new LockFileItem { Path = PathUtility.GetPathWithDirectorySeparator(property) };
-            var jobject = json as JsonObject;
+            var item = new LockFileItem { Path = _symbols.GetString(PathUtility.GetPathWithDirectorySeparator(property)) };
+            var jobject = json as JObject;
 
             if (jobject != null)
             {
-                foreach (var subProperty in jobject.Keys)
+                foreach (var child in jobject)
                 {
-                    item.Properties[subProperty] = jobject.ValueAsString(subProperty);
+                    item.Properties[_symbols.GetString(child.Key)] = jobject.Value<string>(child.Key);
                 }
             }
             return item;
         }
 
-        private static string ReadFrameworkAssemblyReference(JsonValue json)
+        private string ReadFrameworkAssemblyReference(JToken json)
         {
             return ReadString(json);
         }
 
-        private static IList<TItem> ReadArray<TItem>(JsonValue json, Func<JsonValue, TItem> readItem)
+        private static IList<TItem> ReadArray<TItem>(JToken json, Func<JToken, TItem> readItem)
         {
             if (json == null)
             {
                 return new List<TItem>();
             }
 
-            var jarray = json as JsonArray;
+            var jarray = json as JArray;
             if (jarray == null)
             {
                 throw FileFormatException.Create("The value type is not array.", json);
             }
 
             var items = new List<TItem>();
-            for (int i = 0; i < jarray.Length; ++i)
+            for (int i = 0; i < jarray.Count; ++i)
             {
                 items.Add(readItem(jarray[i]));
             }
             return items;
         }
 
-        private static IList<string> ReadPathArray(JsonValue json, Func<JsonValue, string> readItem)
+        private IList<string> ReadPathArray(JToken json, Func<JToken, string> readItem)
         {
-            return ReadArray(json, readItem).Select(f => PathUtility.GetPathWithDirectorySeparator(f)).ToList();
+            return ReadArray(json, readItem).Select(f => _symbols.GetString(PathUtility.GetPathWithDirectorySeparator(f))).ToList();
         }
 
-        private static IList<TItem> ReadObject<TItem>(JsonObject json, Func<string, JsonValue, TItem> readItem)
+        private static IList<TItem> ReadObject<TItem>(JObject json, Func<string, JToken, TItem> readItem)
         {
             if (json == null)
             {
                 return new List<TItem>();
             }
             var items = new List<TItem>();
-            foreach (var childKey in json.Keys)
+            foreach (var child in json)
             {
-                items.Add(readItem(childKey, json.Value(childKey)));
+                items.Add(readItem(child.Key, json[child.Key]));
             }
             return items;
         }
 
-        private static bool ReadBool(JsonObject cursor, string property, bool defaultValue)
+        private static bool ReadBool(JObject cursor, string property, bool defaultValue)
         {
-            var valueToken = cursor.Value(property) as JsonBoolean;
-            if (valueToken == null)
+            var valueToken = cursor[property] as JValue;
+            if (valueToken == null || valueToken.Type != JTokenType.Boolean)
             {
                 return defaultValue;
             }
 
-            return valueToken.Value;
+            return (bool)valueToken.Value;
         }
 
-        private static int ReadInt(JsonObject cursor, string property, int defaultValue)
+        private static int ReadInt(JObject cursor, string property, int defaultValue)
         {
-            var number = cursor.Value(property) as JsonNumber;
-            if (number == null)
+            var number = cursor[property] as JValue;
+            if (number == null || number.Type != JTokenType.Integer)
             {
                 return defaultValue;
             }
 
             try
             {
-                var resultInInt = Convert.ToInt32(number.Raw);
+                var resultInInt = Convert.ToInt32(number.Value);
                 return resultInInt;
             }
             catch (Exception ex)
@@ -368,13 +380,13 @@ namespace Microsoft.DotNet.ProjectModel.Graph
             }
         }
 
-        private static string ReadString(JsonValue json)
+        private string ReadString(JToken json)
         {
-            if (json is JsonString)
+            if (json.Type == JTokenType.String)
             {
-                return (json as JsonString).Value;
+                return _symbols.GetString(json.ToString());
             }
-            else if (json is JsonNull)
+            else if (json.Type == JTokenType.Null)
             {
                 return null;
             }

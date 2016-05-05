@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.DotNet.ProjectModel.Files;
 using Microsoft.DotNet.ProjectModel.Resources;
 using NuGet.Frameworks;
 
@@ -27,8 +28,8 @@ namespace Microsoft.DotNet.ProjectModel
             Framework = framework;
             OutputExtension = FileNameSuffixes.DotNet.DynamicLib;
 
-            var compilationOptions = Project.GetCompilerOptions(framework, configuration);
-            if (framework.IsDesktop() && compilationOptions.EmitEntryPoint.GetValueOrDefault())
+            var compilerOptions = Project.GetCompilerOptions(framework, configuration);
+            if (framework.IsDesktop() && compilerOptions.EmitEntryPoint.GetValueOrDefault())
             {
                 OutputExtension = FileNameSuffixes.DotNet.Exe;
             }
@@ -40,9 +41,9 @@ namespace Microsoft.DotNet.ProjectModel
         {
             get
             {
-                var compilationOptions = Project.GetCompilerOptions(Framework, Configuration);
+                var compilerOptions = Project.GetCompilerOptions(Framework, Configuration);
 
-                return Path.Combine(BasePath, compilationOptions.OutputName + OutputExtension);
+                return Path.Combine(BasePath, compilerOptions.OutputName + OutputExtension);
             }
         }
 
@@ -56,16 +57,19 @@ namespace Microsoft.DotNet.ProjectModel
 
         public string OutputExtension { get; }
 
-        public virtual IEnumerable<string> Resources()
+        public virtual IEnumerable<ResourceFile> Resources()
         {
-            var resourceNames = Project.Files.ResourceFiles
-                .Select(f => ResourceUtility.GetResourceCultureName(f.Key))
+            var resourceCultureNames = GetResourceFiles()
+                .Select(f => ResourceUtility.GetResourceCultureName(f))
                 .Where(f => !string.IsNullOrEmpty(f))
                 .Distinct();
 
-            foreach (var resourceName in resourceNames)
+            foreach (var resourceCultureName in resourceCultureNames)
             {
-                yield return Path.Combine(BasePath, resourceName, Project.Name + ".resources" + FileNameSuffixes.DotNet.DynamicLib);
+                yield return new ResourceFile(
+                    Path.Combine(
+                        BasePath, resourceCultureName, Project.Name + ".resources" + FileNameSuffixes.DotNet.DynamicLib),
+                    resourceCultureName);
             }
         }
 
@@ -73,15 +77,28 @@ namespace Microsoft.DotNet.ProjectModel
         {
             yield return Assembly;
             yield return PdbPath;
-            var compilationOptions = Project.GetCompilerOptions(Framework, Configuration);
-            if (compilationOptions.GenerateXmlDocumentation == true)
+            var compilerOptions = Project.GetCompilerOptions(Framework, Configuration);
+            if (compilerOptions.GenerateXmlDocumentation == true)
             {
                 yield return Path.ChangeExtension(Assembly, "xml");
             }
             foreach (var resource in Resources())
             {
-                yield return resource;
+                yield return resource.Path;
             }
+        }
+
+        private IEnumerable<string> GetResourceFiles()
+        {
+            var compilerOptions = Project.GetCompilerOptions(Framework, Configuration);
+            if (compilerOptions.EmbedInclude == null)
+            {
+                return Project.Files.ResourceFiles.Keys;
+            }
+
+            var includeFiles = IncludeFilesResolver.GetIncludeFiles(compilerOptions.EmbedInclude, "/", diagnostics: null);
+
+            return includeFiles.Select(f => f.SourcePath);
         }
     }
 }

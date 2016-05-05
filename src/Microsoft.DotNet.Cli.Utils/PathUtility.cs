@@ -3,7 +3,7 @@
 
 using System;
 using System.IO;
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.DotNet.InternalAbstractions;
 
 namespace Microsoft.DotNet.Tools.Common
 {
@@ -59,9 +59,15 @@ namespace Microsoft.DotNet.Tools.Common
         public static void EnsureParentDirectory(string filePath)
         {
             string directory = Path.GetDirectoryName(filePath);
-            if (!Directory.Exists(directory))
+
+            EnsureDirectory(directory);
+        }
+        
+        public static void EnsureDirectory(string directoryPath)
+        {
+            if (!Directory.Exists(directoryPath))
             {
-                Directory.CreateDirectory(directory);
+                Directory.CreateDirectory(directoryPath);
             }
         }
 
@@ -98,7 +104,7 @@ namespace Microsoft.DotNet.Tools.Common
             }
 
             StringComparison compare;
-            if (PlatformServices.Default.Runtime.OperatingSystemPlatform == Platform.Windows)
+            if (RuntimeEnvironment.OperatingSystemPlatform == Platform.Windows)
             {
                 compare = StringComparison.OrdinalIgnoreCase;
                 // check if paths are on the same volume
@@ -216,12 +222,26 @@ namespace Microsoft.DotNet.Tools.Common
         {
             var comparison = StringComparison.Ordinal;
 
-            if (PlatformServices.Default.Runtime.OperatingSystemPlatform == Platform.Windows)
+            if (RuntimeEnvironment.OperatingSystemPlatform == Platform.Windows)
             {
                 comparison = StringComparison.OrdinalIgnoreCase;
             }
 
             return Path.GetExtension(filePath).Equals(extension, comparison);
+        }
+
+        /// <summary>
+        /// Gets the fully-qualified path without failing if the
+        /// path is empty.
+        /// </summary>
+        public static string GetFullPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return path;
+            }
+
+            return Path.GetFullPath(path);
         }
     }
 }

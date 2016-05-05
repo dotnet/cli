@@ -14,11 +14,11 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 {
     public class DirectoryInfoAssertions
     {
-        private DirectoryInfo _dirInfo;        
+        private DirectoryInfo _dirInfo;
 
         public DirectoryInfoAssertions(DirectoryInfo dir)
         {
-            _dirInfo = dir;                        
+            _dirInfo = dir;
         }
 
         public DirectoryInfo DirectoryInfo => _dirInfo;
@@ -56,6 +56,16 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             return new AndConstraint<DirectoryInfoAssertions>(this);
         }
 
+        public AndConstraint<DirectoryInfoAssertions> NotHaveFiles(IEnumerable<string> expectedFiles)
+        {
+            foreach (var expectedFile in expectedFiles)
+            {
+                NotHaveFile(expectedFile);
+            }
+
+            return new AndConstraint<DirectoryInfoAssertions>(this);
+        }
+
         public AndConstraint<DirectoryInfoAssertions> HaveDirectory(string expectedDir)
         {
             var dir = _dirInfo.EnumerateDirectories(expectedDir, SearchOption.TopDirectoryOnly).SingleOrDefault();
@@ -63,6 +73,22 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
                 .FailWith("Expected directory {0} cannot be found inside directory {1}.", expectedDir, _dirInfo.FullName);
 
             return new AndConstraint<DirectoryInfoAssertions>(new DirectoryInfoAssertions(dir));
+        }
+
+        public AndConstraint<DirectoryInfoAssertions> OnlyHaveFiles(IEnumerable<string> expectedFiles)
+        {
+            var actualFiles = _dirInfo.EnumerateFiles("*", SearchOption.TopDirectoryOnly).Select(f => f.Name);
+            var missingFiles = Enumerable.Except(expectedFiles, actualFiles);
+            var extraFiles = Enumerable.Except(actualFiles, expectedFiles);
+            var nl = Environment.NewLine;
+
+            Execute.Assertion.ForCondition(!missingFiles.Any())
+                .FailWith($"Following files cannot be found inside directory {_dirInfo.FullName} {nl} {string.Join(nl, missingFiles)}");
+
+            Execute.Assertion.ForCondition(!extraFiles.Any())
+                .FailWith($"Following extra files are found inside directory {_dirInfo.FullName} {nl} {string.Join(nl, extraFiles)}");
+
+            return new AndConstraint<DirectoryInfoAssertions>(this);
         }
     }
 }

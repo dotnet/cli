@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using System.Reflection;
-using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
@@ -28,7 +26,8 @@ namespace Microsoft.DotNet.Cli.Utils
             {
                 if (_hostDir == null)
                 {
-                    _hostDir = Path.GetDirectoryName(typeof(object).GetTypeInfo().Assembly.Location);
+                    var fxDepsFile = Muxer.GetDataFromAppDomain("FX_DEPS_FILE");
+                    _hostDir = Path.GetDirectoryName(fxDepsFile);
                 }
 
                 return _hostDir;

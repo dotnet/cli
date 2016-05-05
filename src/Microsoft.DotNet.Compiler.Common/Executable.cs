@@ -6,24 +6,27 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Files;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.ProjectModel.Compilation;
+using Microsoft.DotNet.ProjectModel.Files;
 using Microsoft.DotNet.ProjectModel.Graph;
+using Microsoft.DotNet.Tools.Common;
 using Microsoft.Extensions.DependencyModel;
 using NuGet.Frameworks;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace Microsoft.Dotnet.Cli.Compiler.Common
+namespace Microsoft.DotNet.Cli.Compiler.Common
 {
     public class Executable
     {
         private readonly ProjectContext _context;
 
         private readonly LibraryExporter _exporter;
+
+        private readonly string _configuration;
 
         private readonly OutputPaths _outputPaths;
 
@@ -34,12 +37,16 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
         private readonly CommonCompilerOptions _compilerOptions;
 
         public Executable(ProjectContext context, OutputPaths outputPaths, LibraryExporter exporter, string configuration)
+            : this(context, outputPaths, outputPaths.RuntimeOutputPath, outputPaths.IntermediateOutputDirectoryPath, exporter, configuration) { }
+
+        public Executable(ProjectContext context, OutputPaths outputPaths, string runtimeOutputPath, string intermediateOutputDirectoryPath, LibraryExporter exporter, string configuration)
         {
             _context = context;
             _outputPaths = outputPaths;
-            _runtimeOutputPath = outputPaths.RuntimeOutputPath;
-            _intermediateOutputPath = outputPaths.IntermediateOutputDirectoryPath;
+            _runtimeOutputPath = runtimeOutputPath;
+            _intermediateOutputPath = intermediateOutputDirectoryPath;
             _exporter = exporter;
+            _configuration = configuration;
             _compilerOptions = _context.ProjectFile.GetCompilerOptions(_context.TargetFramework, configuration);
         }
 
@@ -47,6 +54,23 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
         {
             CopyContentFiles();
             ExportRuntimeAssets();
+        }
+
+        private void VerifyCoreClrPresenceInPackageGraph()
+        {
+            var isCoreClrPresent = _exporter
+                .GetAllExports()
+                .SelectMany(e => e.NativeLibraryGroups)
+                .SelectMany(g => g.Assets)
+                .Select(a => a.FileName)
+                .Where(f => Constants.LibCoreClrBinaryNames.Contains(f))
+                .Any();
+
+            // coreclr should be present for standalone apps
+            if (! isCoreClrPresent)
+            {
+                throw new InvalidOperationException("Expected coreclr library not found in package graph. Please try running dotnet restore again.");
+            }
         }
 
         private void ExportRuntimeAssets()
@@ -70,13 +94,15 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
         }
 
         private void MakeCompilationOutputRunnableForCoreCLR()
-        {
+        {   
             WriteDepsFileAndCopyProjectDependencies(_exporter);
 
             var emitEntryPoint = _compilerOptions.EmitEntryPoint ?? false;
-            if (emitEntryPoint && !string.IsNullOrEmpty(_context.RuntimeIdentifier))
+
+            if (emitEntryPoint && !_context.IsPortable)
             {
                 // TODO: Pick a host based on the RID
+                VerifyCoreClrPresenceInPackageGraph();
                 CoreHost.CopyTo(_runtimeOutputPath, _compilerOptions.OutputName + Constants.ExeSuffix);
             }
         }
@@ -84,7 +110,20 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
         private void CopyContentFiles()
         {
             var contentFiles = new ContentFiles(_context);
-            contentFiles.StructuredCopyTo(_runtimeOutputPath);
+
+            if (_compilerOptions.CopyToOutputInclude != null)
+            {
+                var includeEntries = IncludeFilesResolver.GetIncludeFiles(
+                    _compilerOptions.CopyToOutputInclude,
+                    PathUtility.EnsureTrailingSlash(_runtimeOutputPath),
+                    diagnostics: null);
+
+                contentFiles.StructuredCopyTo(_runtimeOutputPath, includeEntries);
+            }
+            else
+            {
+                contentFiles.StructuredCopyTo(_runtimeOutputPath);
+            }
         }
 
         private void CopyAssemblies(IEnumerable<LibraryExport> libraryExports)
@@ -93,6 +132,16 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
             {
                 libraryExport.RuntimeAssemblyGroups.GetDefaultAssets().CopyTo(_runtimeOutputPath);
                 libraryExport.NativeLibraryGroups.GetDefaultAssets().CopyTo(_runtimeOutputPath);
+
+                foreach (var group in libraryExport.ResourceAssemblies.GroupBy(r => r.Locale))
+                {
+                    var localeSpecificDir = Path.Combine(_runtimeOutputPath, group.Key);
+                    if (!Directory.Exists(localeSpecificDir))
+                    {
+                        Directory.CreateDirectory(localeSpecificDir);
+                    }
+                    group.Select(r => r.Asset).CopyTo(localeSpecificDir);
+                }
             }
         }
 
@@ -108,9 +157,9 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
 
         private void WriteDepsFileAndCopyProjectDependencies(LibraryExporter exporter)
         {
-            WriteDeps(exporter);
-            WriteRuntimeConfig(exporter);
-            WriteDevRuntimeConfig(exporter);
+            // When called this way we don't need to filter exports, so we pass the same list to both.
+            var exports = exporter.GetAllExports().ToList();
+            WriteConfigurationFiles(exports, exports, includeDevConfig: true);
 
             var projectExports = exporter.GetDependencies(LibraryType.Project);
             CopyAssemblies(projectExports);
@@ -120,7 +169,20 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
             CopyAssets(packageExports);
         }
 
-        private void WriteRuntimeConfig(LibraryExporter exporter)
+        public void WriteConfigurationFiles(IEnumerable<LibraryExport> allExports, IEnumerable<LibraryExport> depsExports, bool includeDevConfig)
+        {
+            WriteDeps(depsExports);
+            if (_context.ProjectFile.HasRuntimeOutput(_configuration))
+            {
+                WriteRuntimeConfig(allExports);
+                if (includeDevConfig)
+                {
+                    WriteDevRuntimeConfig();
+                }
+            }
+        }
+
+        private void WriteRuntimeConfig(IEnumerable<LibraryExport> allExports)
         {
             if (!_context.TargetFramework.IsDesktop())
             {
@@ -131,31 +193,8 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
                 var runtimeOptions = new JObject();
                 json.Add("runtimeOptions", runtimeOptions);
 
-                var redistPackage = _context.RootProject.Dependencies
-                    .Where(r => r.Type.Equals(LibraryDependencyType.Platform))
-                    .ToList();
-                if(redistPackage.Count > 0)
-                {
-                    if(redistPackage.Count > 1)
-                    {
-                        throw new InvalidOperationException("Multiple packages with type: \"platform\" were specified!");
-                    }
-                    var packageName = redistPackage.Single().Name;
-
-                    var redistExport = exporter.GetAllExports()
-                        .FirstOrDefault(e => e.Library.Identity.Name.Equals(packageName));
-                    if (redistExport == null)
-                    {
-                        throw new InvalidOperationException($"Platform package '{packageName}' was not present in the graph.");
-                    }
-                    else
-                    {
-                        var framework = new JObject(
-                            new JProperty("name", redistExport.Library.Identity.Name),
-                            new JProperty("version", redistExport.Library.Identity.Version.ToNormalizedString()));
-                        runtimeOptions.Add("framework", framework);
-                    }
-                }
+                WriteFramework(runtimeOptions, allExports);
+                WriteRuntimeOptions(runtimeOptions);
 
                 var runtimeConfigJsonFile =
                     Path.Combine(_runtimeOutputPath, _compilerOptions.OutputName + FileNameSuffixes.RuntimeConfigJson);
@@ -168,7 +207,43 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
             }
         }
 
-        private void WriteDevRuntimeConfig(LibraryExporter exporter)
+        private void WriteFramework(JObject runtimeOptions, IEnumerable<LibraryExport> allExports)
+        {
+            var redistPackage = _context.PlatformLibrary;
+            if (redistPackage != null)
+            {
+                var packageName = redistPackage.Identity.Name;
+
+                var redistExport = allExports.FirstOrDefault(e => e.Library.Identity.Name.Equals(packageName));
+                if (redistExport == null)
+                {
+                    throw new InvalidOperationException($"Platform package '{packageName}' was not present in the graph.");
+                }
+                else
+                {
+                    var framework = new JObject(
+                        new JProperty("name", redistExport.Library.Identity.Name),
+                        new JProperty("version", redistExport.Library.Identity.Version.ToNormalizedString()));
+                    runtimeOptions.Add("framework", framework);
+                }
+            }
+        }
+
+        private void WriteRuntimeOptions(JObject runtimeOptions)
+        {
+            if (string.IsNullOrEmpty(_context.ProjectFile.RawRuntimeOptions))
+            {
+                return;
+            }
+
+            var runtimeOptionsFromProjectJson = JObject.Parse(_context.ProjectFile.RawRuntimeOptions);
+            foreach (var runtimeOption in runtimeOptionsFromProjectJson)
+            {
+                runtimeOptions.Add(runtimeOption.Key, runtimeOption.Value);
+            }
+        }
+
+        private void WriteDevRuntimeConfig()
         {
             if (_context.TargetFramework.IsDesktop())
             {
@@ -197,18 +272,17 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
             runtimeOptions.Add("additionalProbingPaths", additionalProbingPaths);
         }
 
-        public void WriteDeps(LibraryExporter exporter)
+        public void WriteDeps(IEnumerable<LibraryExport> exports)
         {
             Directory.CreateDirectory(_runtimeOutputPath);
 
             var includeCompile = _compilerOptions.PreserveCompilationContext == true;
 
-            var exports = exporter.GetAllExports().ToArray();
             var dependencyContext = new DependencyContextBuilder().Build(
                 compilerOptions: includeCompile ? _compilerOptions : null,
                 compilationExports: includeCompile ? exports : null,
                 runtimeExports: exports,
-                portable: string.IsNullOrEmpty(_context.RuntimeIdentifier),
+                portable: _context.IsPortable,
                 target: _context.TargetFramework,
                 runtime: _context.RuntimeIdentifier ?? string.Empty);
 
@@ -223,30 +297,34 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
         public void GenerateBindingRedirects(LibraryExporter exporter)
         {
             var outputName = _outputPaths.RuntimeFiles.Assembly;
+            var configFile = outputName + Constants.ConfigSuffix;
 
             var existingConfig = new DirectoryInfo(_context.ProjectDirectory)
                 .EnumerateFiles()
                 .FirstOrDefault(f => f.Name.Equals("app.config", StringComparison.OrdinalIgnoreCase));
 
-            XDocument baseAppConfig = null;
-
             if (existingConfig != null)
             {
-                using (var fileStream = File.OpenRead(existingConfig.FullName))
+                File.Copy(existingConfig.FullName, configFile, true);
+            }
+
+            List<string> configFiles = new List<string>();
+            configFiles.Add(configFile);
+
+            foreach (var export in exporter.GetDependencies())
+            {
+                var dependencyExecutables = export.RuntimeAssemblyGroups.GetDefaultAssets()
+                                                .Where(asset => asset.FileName.ToLower().EndsWith(FileNameSuffixes.DotNet.Exe))
+                                                .Select(asset => Path.Combine(_runtimeOutputPath, asset.FileName));
+
+                foreach (var executable in dependencyExecutables)
                 {
-                    baseAppConfig = XDocument.Load(fileStream);
+                    configFile = executable + Constants.ConfigSuffix;
+                    configFiles.Add(configFile);
                 }
             }
 
-            var appConfig = exporter.GetAllExports().GenerateBindingRedirects(baseAppConfig);
-
-            if (appConfig == null) { return; }
-
-            var path = outputName + ".config";
-            using (var stream = File.Create(path))
-            {
-                appConfig.Save(stream);
-            }
+            exporter.GetAllExports().GenerateBindingRedirects(configFiles);
         }
     }
 }

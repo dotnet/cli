@@ -4,9 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Microsoft.DotNet.Cli.Utils;
-using System.CommandLine;
 
 namespace Microsoft.DotNet.Tools.Compiler.Mcg
 {

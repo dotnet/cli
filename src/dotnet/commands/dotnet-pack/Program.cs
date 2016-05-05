@@ -4,9 +4,10 @@
 using System;
 using System.IO;
 using System.Linq;
-using Microsoft.DotNet.ProjectModel;
-using Microsoft.Dnx.Runtime.Common.CommandLine;
+using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.Tools.Common;
 using Microsoft.DotNet.Tools.Pack;
 
 namespace Microsoft.DotNet.Tools.Compiler
@@ -51,19 +52,13 @@ namespace Microsoft.DotNet.Tools.Compiler
                 }
 
                 // Set defaults based on the environment
-                var settings = ProjectReaderSettings.ReadFromEnvironment();
-                var versionSuffixValue = versionSuffix.Value();
-
-                if (!string.IsNullOrEmpty(versionSuffixValue))
-                {
-                    settings.VersionSuffix = versionSuffixValue;
-                }
+                var workspace = BuildWorkspace.Create(versionSuffix.Value());
 
                 var configValue = configuration.Value() ?? Cli.Utils.Constants.DefaultConfiguration;
                 var outputValue = output.Value();
-                var buildBasePathValue = buildBasePath.Value();
+                var buildBasePathValue = PathUtility.GetFullPath(buildBasePath.Value());
 
-                var contexts = ProjectContext.CreateContextForEachFramework(pathValue, settings);
+                var contexts = workspace.GetProjectContextCollection(pathValue).FrameworkOnlyContexts;
                 var project = contexts.First().ProjectFile;
 
                 var artifactPathsCalculator = new ArtifactPathsCalculator(project, buildBasePathValue, outputValue, configValue);
@@ -72,7 +67,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 int buildResult = 0;
                 if (!noBuild.HasValue())
                 {
-                    var buildProjectCommand = new BuildProjectCommand(project, buildBasePathValue, configValue, versionSuffixValue);
+                    var buildProjectCommand = new BuildProjectCommand(project, buildBasePathValue, configValue, workspace);
                     buildResult = buildProjectCommand.Execute();
                 }
 

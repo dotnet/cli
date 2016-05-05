@@ -1,5 +1,5 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using Newtonsoft.Json.Linq;
@@ -66,6 +66,21 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             }
 
             Assert.True(contains, "JArray doesn't contains the specified element.");
+
+            return array;
+        }
+
+        public static JArray AssertJArrayNotContains<T>(this JArray array, Func<T, bool> critiera)
+        {
+            foreach (var element in array)
+            {
+                var value = element.Value<T>();
+
+                if (critiera(value))
+                {
+                    Assert.True(false, "JArray contains unexpected element.");
+                }
+            }
 
             return array;
         }

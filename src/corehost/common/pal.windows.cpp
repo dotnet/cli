@@ -8,8 +8,7 @@
 #include <cassert>
 #include <locale>
 #include <codecvt>
-
-static std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> g_converter;
+#include <ShlObj.h>
 
 pal::string_t pal::to_lower(const pal::string_t& in)
 {
@@ -54,6 +53,49 @@ bool pal::find_coreclr(pal::string_t* recv)
     return false;
 }
 
+bool pal::touch_file(const pal::string_t& path)
+{
+    HANDLE hnd = ::CreateFileW(path.c_str(), 0, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (hnd == INVALID_HANDLE_VALUE)
+    {
+        trace::verbose(_X("Failed to leave breadcrumb"), HRESULT_FROM_WIN32(GetLastError()));
+        return false;
+    }
+    ::CloseHandle(hnd);
+    return true;
+}
+
+void pal::setup_api_sets(const std::unordered_set<pal::string_t>& api_sets)
+{
+    if (api_sets.empty())
+    {
+        return;
+    }
+
+    pal::string_t path;
+
+    (void) getenv(_X("PATH"), &path);
+
+    // We need this ugly hack, as the PInvoked DLL's static dependencies can come from
+    // some other NATIVE_DLL_SEARCH_DIRECTORIES and not necessarily side by side. However,
+    // CoreCLR.dll loads PInvoke DLLs with LOAD_WITH_ALTERED_SEARCH_PATH. Note that this
+    // option cannot be combined with LOAD_LIBRARY_SEARCH_USER_DIRS, so the AddDllDirectory
+    // doesn't help much in telling CoreCLR where to load the PInvoke DLLs from.
+    // So we resort to modifying the PATH variable on our own hoping Windows loader will do the right thing.
+    for (const auto& as : api_sets)
+    {
+        // AddDllDirectory is still needed for Standalone App's CoreCLR load.
+        ::AddDllDirectory(as.c_str());
+
+        // Path patch is needed for static dependencies of a PInvoked DLL load out of the nuget cache.
+        path.push_back(PATH_SEPARATOR);
+        path.append(as);
+    }
+
+    trace::verbose(_X("Setting PATH=%s"), path.c_str());
+
+    ::SetEnvironmentVariableW(_X("PATH"), path.c_str());
+}
 
 bool pal::getcwd(pal::string_t* recv)
 {
@@ -91,7 +133,7 @@ bool pal::load_library(const char_t* path, dll_t* dll)
     *dll = ::LoadLibraryExW(path, NULL, LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
     if (*dll == nullptr)
     {
-        trace::error(_X("Failed to load the dll from %s, HRESULT: 0x%X"), path, HRESULT_FROM_WIN32(GetLastError()));
+        trace::error(_X("Failed to load the dll from [%s], HRESULT: 0x%X"), path, HRESULT_FROM_WIN32(GetLastError()));
         return false;
     }
 
@@ -99,7 +141,7 @@ bool pal::load_library(const char_t* path, dll_t* dll)
     HMODULE dummy_module;
     if (!::GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN, path, &dummy_module))
     {
-        trace::error(_X("Failed to pin library: %s"));
+        trace::error(_X("Failed to pin library [%s] in [%s]"), path, _STRINGIFY(__FUNCTION__));
         return false;
     }
 
@@ -123,7 +165,25 @@ void pal::unload_library(dll_t library)
     // No-op. On windows, we pin the library, so it can't be unloaded.
 }
 
-bool pal::get_default_extensions_directory(string_t* recv)
+bool pal::get_default_breadcrumb_store(string_t* recv)
+{
+    recv->clear();
+
+    pal::char_t* prog_dat;
+    HRESULT hr = ::SHGetKnownFolderPath(FOLDERID_ProgramData, 0,  NULL, &prog_dat);
+    if (hr != S_OK)
+    {
+        trace::verbose(_X("Failed to read default breadcrumb store 0x%X"), hr);
+        return false;
+    }
+    recv->assign(prog_dat);
+    append_path(recv, _X("Microsoft"));
+    append_path(recv, _X("NetFramework"));
+    append_path(recv, _X("BreadcrumbStore"));
+    return true;
+}
+
+bool pal::get_default_servicing_directory(string_t* recv)
 {
     recv->clear();
 
@@ -138,7 +198,7 @@ bool pal::get_default_extensions_directory(string_t* recv)
         return false;
     }
 
-    append_path(recv, _X("dotnetextensions"));
+    append_path(recv, _X("coreservicing"));
     return true;
 }
 
@@ -158,14 +218,14 @@ bool pal::getenv(const char_t* name, string_t* recv)
         auto err = GetLastError();
         if (err != ERROR_ENVVAR_NOT_FOUND)
         {
-            trace::error(_X("Failed to read environment variable '%s', HRESULT: 0x%X"), name, HRESULT_FROM_WIN32(GetLastError()));
+            trace::error(_X("Failed to read environment variable [%s], HRESULT: 0x%X"), name, HRESULT_FROM_WIN32(GetLastError()));
         }
         return false;
     }
     auto buf = new char_t[length];
     if (::GetEnvironmentVariableW(name, buf, length) == 0)
     {
-        trace::error(_X("Failed to read environment variable '%s', HRESULT: 0x%X"), name, HRESULT_FROM_WIN32(GetLastError()));
+        trace::error(_X("Failed to read environment variable [%s], HRESULT: 0x%X"), name, HRESULT_FROM_WIN32(GetLastError()));
         return false;
     }
 
@@ -191,24 +251,42 @@ bool pal::get_own_executable_path(string_t* recv)
     return true;
 }
 
-std::string pal::to_stdstring(const string_t& str)
+static bool wchar_convert_helper(DWORD code_page, const char* cstr, int len, pal::string_t* out)
 {
-    return g_converter.to_bytes(str);
+    out->clear();
+
+    // No need of explicit null termination, so pass in the actual length.
+    size_t size = ::MultiByteToWideChar(code_page, 0, cstr, len, nullptr, 0);
+    if (size == 0)
+    {
+        return false;
+    }
+    out->resize(size, '\0');
+    return ::MultiByteToWideChar(code_page, 0, cstr, len, &(*out)[0], out->size()) != 0;
 }
 
-pal::string_t pal::to_palstring(const std::string& str)
+bool pal::utf8_palstring(const std::string& str, pal::string_t* out)
 {
-    return g_converter.from_bytes(str);
+    return wchar_convert_helper(CP_UTF8, &str[0], str.size(), out);
 }
 
-void pal::to_palstring(const char* str, pal::string_t* out)
+bool pal::pal_clrstring(const pal::string_t& str, std::vector<char>* out)
 {
-    out->assign(g_converter.from_bytes(str));
+    out->clear();
+
+    // Pass -1 as we want explicit null termination in the char buffer.
+    size_t size = ::WideCharToMultiByte(CP_ACP, 0, str.c_str(), -1, nullptr, 0, nullptr, nullptr);
+    if (size == 0)
+    {
+        return false;
+    }
+    out->resize(size, '\0');
+    return ::WideCharToMultiByte(CP_ACP, 0, str.c_str(), -1, out->data(), out->size(), nullptr, nullptr) != 0;
 }
 
-void pal::to_stdstring(const pal::char_t* str, std::string* out)
+bool pal::clr_palstring(const char* cstr, pal::string_t* out)
 {
-    out->assign(g_converter.to_bytes(str));
+    return wchar_convert_helper(CP_ACP, cstr, ::strlen(cstr), out);
 }
 
 bool pal::realpath(string_t* path)
@@ -217,7 +295,7 @@ bool pal::realpath(string_t* path)
     auto res = ::GetFullPathNameW(path->c_str(), MAX_PATH, buf, nullptr);
     if (res == 0 || res > MAX_PATH)
     {
-        trace::error(_X("Error resolving path: %s"), path->c_str());
+        trace::error(_X("Error resolving full path [%s]"), path->c_str());
         return false;
     }
     path->assign(buf);

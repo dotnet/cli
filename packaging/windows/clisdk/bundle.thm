@@ -22,9 +22,7 @@
         <Image X="0" Y="0" Width="620" Height="418" ImageFile="bg.png" />
         <Text X="0" Y="0" Width="620" Height="75" FontId="1" />
 
-        <Text Name="InstallVersion" X="11" Y="80" Width="135" Height="30" FontId="2" DisablePrefix="yes" HideWhenDisabled="yes">v[DisplayVersion]</Text>
-        <Text X="11" Y="110" Width="135" Height="30" FontId="2" DisablePrefix="yes">[ReleaseSuffix] [BuildType]</Text>
-        <Text X="11" Y="145" Width="135" Height="100" FontId="5" DisablePrefix="yes">#(loc.Motto)</Text>
+        <Text X="11" Y="80" Width="135" Height="100" FontId="5" DisablePrefix="yes">#(loc.Motto)</Text>
 
         <Text X="155" Y="80" Width="-11" Height="-70" TabStop="no" FontId="2" HexStyle="0x800000" DisablePrefix="yes" />
         <Richedit Name="EulaRichedit" X="158" Y="81" Width="-12" Height="-71" TabStop="yes" FontId="0" />
@@ -49,7 +47,7 @@
 
       <Text X="11" Y="80" Width="-11" Height="30" FontId="2" DisablePrefix="yes">#(loc.FilesInUseHeader)</Text>
       <Text X="11" Y="121" Width="-11" Height="34" FontId="3" DisablePrefix="yes">#(loc.FilesInUseLabel)</Text>
-      <Text Name="FilesInUseText" X="11" Y="150" Width="-11" Height="-86" FontId="3" DisablePrefix="yes" HexStyle="0x0000000C">A</Text>
+      <Text Name="FilesInUseText" X="11" Y="150" Width="-11" Height="-86" FontId="3" DisablePrefix="yes" HexStyle="0x0000000C"></Text>
 
       <Button Name="FilesInUseCloseRadioButton" X="300" Y="-65" Width="-11" Height="23" TabStop="yes" FontId="0" HideWhenDisabled="yes" HexStyle="0x000009">#(loc.FilesInUseCloseRadioButton)</Button>
       <Button Name="FilesInUseDontCloseRadioButton" X="300" Y="-45" Width="-11" Height="23" TabStop="yes" FontId="0" HideWhenDisabled="yes" HexStyle="0x000009">#(loc.FilesInUseDontCloseRadioButton)</Button>

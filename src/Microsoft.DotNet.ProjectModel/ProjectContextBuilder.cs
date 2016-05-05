@@ -3,23 +3,26 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.ProjectModel.Resolution;
-using Microsoft.Extensions.Internal;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.ProjectModel
 {
     public class ProjectContextBuilder
     {
+        // Note: When adding a property, make sure to add it to Clone below. You'll also need to update the CloneTest in
+        // Microsoft.DotNet.ProjectModel.Tests.ProjectContextBuilderTests
+
         private Project Project { get; set; }
 
         private LockFile LockFile { get; set; }
-
-        private GlobalSettings GlobalSettings { get; set; }
 
         private NuGetFramework TargetFramework { get; set; }
 
@@ -32,19 +35,41 @@ namespace Microsoft.DotNet.ProjectModel
         private string PackagesDirectory { get; set; }
 
         private string ReferenceAssembliesPath { get; set; }
-        
+
         private bool IsDesignTime { get; set; }
 
         private Func<string, Project> ProjectResolver { get; set; }
 
         private Func<string, LockFile> LockFileResolver { get; set; }
 
-        private ProjectReaderSettings Settings { get; set; } = ProjectReaderSettings.ReadFromEnvironment();
+        private ProjectReaderSettings ProjectReaderSettings { get; set; } = ProjectReaderSettings.ReadFromEnvironment();
 
         public ProjectContextBuilder()
         {
             ProjectResolver = ResolveProject;
             LockFileResolver = ResolveLockFile;
+        }
+
+        public ProjectContextBuilder Clone()
+        {
+            var builder = new ProjectContextBuilder()
+                .WithLockFile(LockFile)
+                .WithProject(Project)
+                .WithProjectDirectory(ProjectDirectory)
+                .WithTargetFramework(TargetFramework)
+                .WithRuntimeIdentifiers(RuntimeIdentifiers)
+                .WithReferenceAssembliesPath(ReferenceAssembliesPath)
+                .WithPackagesDirectory(PackagesDirectory)
+                .WithRootDirectory(RootDirectory)
+                .WithProjectResolver(ProjectResolver)
+                .WithLockFileResolver(LockFileResolver)
+                .WithProjectReaderSettings(ProjectReaderSettings);
+            if (IsDesignTime)
+            {
+                builder.AsDesignTime();
+            }
+
+            return builder;
         }
 
         public ProjectContextBuilder WithLockFile(LockFile lockFile)
@@ -113,18 +138,25 @@ namespace Microsoft.DotNet.ProjectModel
             return this;
         }
 
-        public ProjectContextBuilder WithReaderSettings(ProjectReaderSettings settings)
+        public ProjectContextBuilder WithProjectReaderSettings(ProjectReaderSettings projectReaderSettings)
         {
-            Settings = settings;
+            ProjectReaderSettings = projectReaderSettings;
             return this;
         }
-        
+
         public ProjectContextBuilder AsDesignTime()
         {
             IsDesignTime = true;
             return this;
         }
 
+        /// <summary>
+        /// Produce all targets found in the lock file associated with this builder.
+        /// Returns an empty enumerable if there is no lock file
+        /// (making this unsuitable for scenarios where the lock file may not be present,
+        /// such as at design-time)
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<ProjectContext> BuildAllTargets()
         {
             ProjectDirectory = Project?.ProjectDirectory ?? ProjectDirectory;
@@ -133,14 +165,33 @@ namespace Microsoft.DotNet.ProjectModel
 
             if (LockFile != null)
             {
+                var deduper = new HashSet<string>();
                 foreach (var target in LockFile.Targets)
                 {
-                    yield return new ProjectContextBuilder()
-                    .WithProject(Project)
-                    .WithLockFile(LockFile)
-                    .WithTargetFramework(target.TargetFramework)
-                    .WithRuntimeIdentifiers(new[] { target.RuntimeIdentifier })
-                    .Build();
+                    var context = Clone()
+                        .WithTargetFramework(target.TargetFramework)
+                        .WithRuntimeIdentifiers(new[] { target.RuntimeIdentifier }).Build();
+
+                    var id = $"{context.TargetFramework}/{context.RuntimeIdentifier}";
+                    if (deduper.Add(id))
+                    {
+                        yield return context;
+                    }
+                }
+            }
+            else
+            {
+                // Build a context for each framework. It won't be fully valid, since it won't have resolved data or runtime data, but the diagnostics will show that.
+                foreach (var framework in Project.GetTargetFrameworks())
+                {
+                    var builder = new ProjectContextBuilder()
+                        .WithProject(Project)
+                        .WithTargetFramework(framework.FrameworkName);
+                    if (IsDesignTime)
+                    {
+                        builder.AsDesignTime();
+                    }
+                    yield return builder.Build();
                 }
             }
         }
@@ -151,21 +202,26 @@ namespace Microsoft.DotNet.ProjectModel
 
             ProjectDirectory = Project?.ProjectDirectory ?? ProjectDirectory;
 
-            if (GlobalSettings == null && ProjectDirectory != null)
+            GlobalSettings globalSettings = null;
+            if (ProjectDirectory != null)
             {
                 RootDirectory = ProjectRootResolver.ResolveRootDirectory(ProjectDirectory);
-
-                GlobalSettings globalSettings;
-                if (GlobalSettings.TryGetGlobalSettings(RootDirectory, out globalSettings))
-                {
-                    GlobalSettings = globalSettings;
-                }
+                GlobalSettings.TryGetGlobalSettings(RootDirectory, out globalSettings);
             }
 
-            RootDirectory = GlobalSettings?.DirectoryPath ?? RootDirectory;
-            PackagesDirectory = PackagesDirectory ?? PackageDependencyProvider.ResolvePackagesPath(RootDirectory, GlobalSettings);
-            ReferenceAssembliesPath = ReferenceAssembliesPath ?? FrameworkReferenceResolver.GetDefaultReferenceAssembliesPath();
-            var frameworkReferenceResolver = new FrameworkReferenceResolver(ReferenceAssembliesPath);
+            RootDirectory = globalSettings?.DirectoryPath ?? RootDirectory;
+            PackagesDirectory = PackagesDirectory ?? PackageDependencyProvider.ResolvePackagesPath(RootDirectory, globalSettings);
+
+            FrameworkReferenceResolver frameworkReferenceResolver;
+            if (string.IsNullOrEmpty(ReferenceAssembliesPath))
+            {
+                // Use the default static resolver
+                frameworkReferenceResolver = FrameworkReferenceResolver.Default;
+            }
+            else
+            {
+                frameworkReferenceResolver = new FrameworkReferenceResolver(ReferenceAssembliesPath);
+            }
 
             LockFileLookup lockFileLookup = null;
             EnsureProjectLoaded();
@@ -197,15 +253,48 @@ namespace Microsoft.DotNet.ProjectModel
                 libraries.Add(new LibraryKey(mainProject.Identity.Name), mainProject);
             }
 
+            LibraryRange? platformDependency = null;
+            if (mainProject != null)
+            {
+                platformDependency = mainProject.Dependencies
+                    .Where(d => d.Type.Equals(LibraryDependencyType.Platform))
+                    .Cast<LibraryRange?>()
+                    .FirstOrDefault();
+            }
+            bool isPortable = platformDependency != null;
+
             LockFileTarget target = null;
+            LibraryDescription platformLibrary = null;
+
             if (lockFileLookup != null)
             {
-                target = SelectTarget(LockFile);
+                target = SelectTarget(LockFile, isPortable);
                 if (target != null)
                 {
                     var nugetPackageResolver = new PackageDependencyProvider(PackagesDirectory, frameworkReferenceResolver);
                     var msbuildProjectResolver = new MSBuildDependencyProvider(Project, ProjectResolver);
                     ScanLibraries(target, lockFileLookup, libraries, msbuildProjectResolver, nugetPackageResolver, projectResolver);
+
+                    if (platformDependency != null)
+                    {
+                        libraries.TryGetValue(new LibraryKey(platformDependency.Value.Name), out platformLibrary);
+                    }
+                }
+            }
+
+            string runtime = target?.RuntimeIdentifier;
+            if (string.IsNullOrEmpty(runtime) && TargetFramework.IsDesktop())
+            {
+                // we got a ridless target for desktop so turning portable mode on
+                isPortable = true;
+                var legacyRuntime = RuntimeEnvironmentRidExtensions.GetLegacyRestoreRuntimeIdentifier();
+                if (RuntimeIdentifiers.Contains(legacyRuntime))
+                {
+                    runtime = legacyRuntime;
+                }
+                else
+                {
+                    runtime = RuntimeIdentifiers.FirstOrDefault();
                 }
             }
 
@@ -238,7 +327,7 @@ namespace Microsoft.DotNet.ProjectModel
             {
                 var frameworkInfo = Project.GetTargetFramework(TargetFramework);
 
-                if (string.IsNullOrEmpty(ReferenceAssembliesPath))
+                if (frameworkReferenceResolver == null || string.IsNullOrEmpty(frameworkReferenceResolver.ReferenceAssembliesPath))
                 {
                     // If there was an attempt to use reference assemblies but they were not installed
                     // report an error
@@ -266,14 +355,21 @@ namespace Microsoft.DotNet.ProjectModel
                 }
             }
 
+            if (Project != null)
+            {
+                diagnostics.AddRange(Project.Diagnostics);
+            }
+
             // Create a library manager
             var libraryManager = new LibraryManager(libraries.Values.ToList(), diagnostics, Project?.ProjectFilePath);
 
             return new ProjectContext(
-                GlobalSettings,
+                globalSettings,
                 mainProject,
+                platformLibrary,
                 TargetFramework,
-                target?.RuntimeIdentifier,
+                isPortable,
+                runtime,
                 PackagesDirectory,
                 libraryManager,
                 LockFile);
@@ -335,26 +431,32 @@ namespace Microsoft.DotNet.ProjectModel
             {
                 var library = pair.Value;
 
-                // The System.* packages provide placeholders on any non netstandard platform 
+                // The System.* packages provide placeholders on any non netstandard platform
                 // To make them work seamlessly on those platforms, we fill the gap with a reference
                 // assembly (if available)
                 var package = library as PackageDescription;
-                if (package != null && package.Resolved && !package.CompileTimeAssemblies.Any())
+                if (package != null &&
+                    package.Resolved &&
+                    package.HasCompileTimePlaceholder &&
+                    !TargetFramework.IsPackageBased)
                 {
-                    var replacement = referenceAssemblyDependencyResolver.GetDescription(new LibraryRange(library.Identity.Name, LibraryType.ReferenceAssembly), TargetFramework);
-                    if (replacement?.Resolved == true)
+                    var newKey = new LibraryKey(library.Identity.Name, LibraryType.ReferenceAssembly);
+                    var dependency = new LibraryRange(library.Identity.Name, LibraryType.ReferenceAssembly);
+
+                    // If the framework assembly can't be resolved then mark it as unresolved but still replace the package
+                    // dependency
+                    var replacement = referenceAssemblyDependencyResolver.GetDescription(dependency, TargetFramework) ??
+                                        UnresolvedDependencyProvider.GetDescription(dependency, TargetFramework);
+
+                    requiresFrameworkAssemblies = true;
+
+                    // Remove the original package reference
+                    libraries.Remove(pair.Key);
+
+                    // Insert a reference assembly key if there isn't one
+                    if (!libraries.ContainsKey(newKey))
                     {
-                        requiresFrameworkAssemblies = true;
-
-                        // Remove the original package reference
-                        libraries.Remove(pair.Key);
-
-                        // Insert a reference assembly key if there isn't one
-                        var key = new LibraryKey(replacement.Identity.Name, LibraryType.ReferenceAssembly);
-                        if (!libraries.ContainsKey(key))
-                        {
-                            libraries[key] = replacement;
-                        }
+                        libraries[newKey] = replacement;
                     }
                 }
             }
@@ -393,6 +495,22 @@ namespace Microsoft.DotNet.ProjectModel
 
                     dependencyDescription.RequestedRanges.Add(dependency);
                     dependencyDescription.Parents.Add(library);
+                }
+            }
+
+            // Deduplicate libraries with the same name
+            // Priority list is backwards so not found -1 would be last when sorting by descending
+            var priorities = new[] { LibraryType.Package, LibraryType.Project, LibraryType.ReferenceAssembly };
+            var nameGroups = libraries.Keys.ToLookup(libraryKey => libraryKey.Name);
+            foreach (var nameGroup in nameGroups)
+            {
+                var librariesToRemove = nameGroup
+                    .OrderByDescending(libraryKey => Array.IndexOf(priorities, libraryKey.LibraryType))
+                    .Skip(1);
+
+                foreach (var library in librariesToRemove)
+                {
+                    libraries.Remove(library);
                 }
             }
         }
@@ -451,18 +569,26 @@ namespace Microsoft.DotNet.ProjectModel
             if (Project == null && ProjectDirectory != null)
             {
                 Project = ProjectResolver(ProjectDirectory);
+                if (Project == null)
+                {
+                    throw new InvalidOperationException($"Could not resolve project at: {ProjectDirectory}. " +
+                                                        $"This could happen when project.lock.json was moved after restore.");
+                }
             }
         }
 
-        private LockFileTarget SelectTarget(LockFile lockFile)
+        private LockFileTarget SelectTarget(LockFile lockFile, bool isPortable)
         {
-            foreach (var runtimeIdentifier in RuntimeIdentifiers)
+            if (!isPortable)
             {
-                foreach (var scanTarget in lockFile.Targets)
+                foreach (var runtimeIdentifier in RuntimeIdentifiers)
                 {
-                    if (Equals(scanTarget.TargetFramework, TargetFramework) && string.Equals(scanTarget.RuntimeIdentifier, runtimeIdentifier, StringComparison.Ordinal))
+                    foreach (var scanTarget in lockFile.Targets)
                     {
-                        return scanTarget;
+                        if (Equals(scanTarget.TargetFramework, TargetFramework) && string.Equals(scanTarget.RuntimeIdentifier, runtimeIdentifier, StringComparison.Ordinal))
+                        {
+                            return scanTarget;
+                        }
                     }
                 }
             }
@@ -480,9 +606,8 @@ namespace Microsoft.DotNet.ProjectModel
 
         private Project ResolveProject(string projectDirectory)
         {
-            // TODO: Handle diagnostics
             Project project;
-            if (ProjectReader.TryGetProject(projectDirectory, out project, diagnostics: null, settings: Settings))
+            if (ProjectReader.TryGetProject(projectDirectory, out project, settings: ProjectReaderSettings))
             {
                 return project;
             }
@@ -531,7 +656,7 @@ namespace Microsoft.DotNet.ProjectModel
 
                 return combiner.CombinedHash;
             }
-            
+
             public override string ToString()
             {
                 return Name + " " + LibraryType;

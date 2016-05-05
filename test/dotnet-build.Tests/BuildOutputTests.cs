@@ -1,13 +1,15 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using FluentAssertions;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using Microsoft.Extensions.PlatformAbstractions;
+using Newtonsoft.Json.Linq;
 using NuGet.Frameworks;
 using Xunit;
 
@@ -27,19 +29,35 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             "TestApp" + FileNameSuffixes.DotNet.ProgramDatabase,
             "TestApp" + FileNameSuffixes.CurrentPlatform.Exe,
             "TestApp" + FileNameSuffixes.DepsJson,
+            "TestApp" + FileNameSuffixes.RuntimeConfigJson,
             "TestLibrary" + FileNameSuffixes.DotNet.DynamicLib,
             "TestLibrary" + FileNameSuffixes.DotNet.ProgramDatabase
         };
+
+        private readonly string[] _runtimeExcludeFiles =
+        {
+            "TestLibrary" + FileNameSuffixes.RuntimeConfigJson,
+            "TestLibrary" + FileNameSuffixes.RuntimeConfigDevJson
+        };
+
         private readonly string[] _appCompileFiles =
         {
             "TestApp" + FileNameSuffixes.DotNet.DynamicLib,
             "TestApp" + FileNameSuffixes.DotNet.ProgramDatabase
         };
+
         private readonly string[] _libCompileFiles =
         {
             "TestLibrary" + FileNameSuffixes.DotNet.DynamicLib,
             "TestLibrary" + FileNameSuffixes.DotNet.ProgramDatabase
         };
+
+        private readonly string[] _libCompileExcludeFiles =
+        {
+            "TestLibrary" + FileNameSuffixes.RuntimeConfigJson,
+            "TestLibrary" + FileNameSuffixes.RuntimeConfigDevJson
+        };
+
 
         private void GetProjectInfo(string testRoot)
         {
@@ -51,7 +69,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             var contexts = ProjectContext.CreateContextForEachFramework(
                 _testAppDirDirInfo.FullName,
                 null,
-                PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
+                RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers());
             _runtime = contexts.FirstOrDefault(c => !string.IsNullOrEmpty(c.RuntimeIdentifier))?.RuntimeIdentifier;
         }
 
@@ -71,7 +89,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         //[InlineData(false, "out", null, "TestLibrary/bin/debug/{fw}", "TestApp/bin/debug/{fw}", "out")]
         //[InlineData(false, null, "build", "build/TestLibrary/bin/debug/{fw}", "build/TestApp/bin/debug/{fw}", "build/TestApp/bin/debug/{fw}/{rid}")]
         //[InlineData(false, "out", "build", "build/TestLibrary/bin/debug/{fw}", "build/TestApp/bin/debug/{fw}", "out")]
-        public void DefaultPaths(string testIdentifer, bool global, string outputValue, string baseValue, string expectedLibCompile, string expectedAppCompile, string expectedAppRuntime)
+        public void AppDefaultPaths(string testIdentifer, bool global, string outputValue, string baseValue, string expectedLibCompile, string expectedAppCompile, string expectedAppRuntime)
         {
             var testInstance = TestAssetsManager.CreateTestInstance("TestAppWithLibrary", identifier: testIdentifer)
                                                 .WithLockFiles();
@@ -79,17 +97,45 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
             new BuildCommand(GetProjectPath(_testAppDirDirInfo),
                 output: outputValue != null ? Path.Combine(_testProjectsRoot, outputValue) : string.Empty,
-                buidBasePath: baseValue != null ? Path.Combine(_testProjectsRoot, baseValue) : string.Empty,
+                buildBasePath: baseValue != null ? Path.Combine(_testProjectsRoot, baseValue) : string.Empty,
                 framework: DefaultFramework)
                 .ExecuteWithCapturedOutput().Should().Pass();
 
-            var libdebug = _rootDirInfo.Sub(FormatPath(expectedLibCompile, DefaultFramework, _runtime));
+            var libdebug = _rootDirInfo.Sub(FormatPath(expectedLibCompile, DefaultLibraryFramework, _runtime));
             var appdebug = _rootDirInfo.Sub(FormatPath(expectedAppCompile, DefaultFramework, _runtime));
             var appruntime = _rootDirInfo.Sub(FormatPath(expectedAppRuntime, DefaultFramework, _runtime));
 
-            libdebug.Should().Exist().And.HaveFiles(_libCompileFiles);
+            libdebug.Should().Exist()
+                .And.HaveFiles(_libCompileFiles)
+                .And.NotHaveFiles(_libCompileExcludeFiles);
             appdebug.Should().Exist().And.HaveFiles(_appCompileFiles);
-            appruntime.Should().Exist().And.HaveFiles(_runtimeFiles);
+            appruntime.Should().Exist()
+                .And.HaveFiles(_runtimeFiles)
+                .And.NotHaveFiles(_runtimeExcludeFiles);
+        }
+
+        [Theory]
+        [InlineData("1", true, null, null, "TestLibrary/bin/Debug/{fw}", "TestLibrary/bin/Debug/{fw}/{rid}")]
+        [InlineData("2", true, "out", null, "TestLibrary/bin/Debug/{fw}", "out")]
+        [InlineData("3", true, null, "build", "build/TestLibrary/bin/Debug/{fw}", "build/TestLibrary/bin/Debug/{fw}/{rid}")]
+        [InlineData("4", true, "out", "build", "build/TestLibrary/bin/Debug/{fw}", "out")]
+        public void LibDefaultPaths(string testIdentifer, bool global, string outputValue, string baseValue, string expectedLibCompile, string expectedLibOutput)
+        {
+            var testInstance = TestAssetsManager.CreateTestInstance("TestAppWithLibrary", identifier: testIdentifer)
+                                                .WithLockFiles();
+            GetProjectInfo(testInstance.TestRoot);
+
+            new BuildCommand(GetProjectPath(_testLibDirInfo),
+                output: outputValue != null ? Path.Combine(_testProjectsRoot, outputValue) : string.Empty,
+                buildBasePath: baseValue != null ? Path.Combine(_testProjectsRoot, baseValue) : string.Empty,
+                framework: DefaultLibraryFramework)
+                .ExecuteWithCapturedOutput().Should().Pass();
+
+            var libdebug = _rootDirInfo.Sub(FormatPath(expectedLibCompile, DefaultLibraryFramework, _runtime));
+
+            libdebug.Should().Exist()
+                .And.HaveFiles(_libCompileFiles)
+                .And.NotHaveFiles(_libCompileExcludeFiles);
         }
 
         [Fact]
@@ -98,12 +144,12 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             var testInstance = TestAssetsManager.CreateTestInstance("TestLibraryWithConfiguration")
                                                 .WithLockFiles();
 
-            var cmd = new BuildCommand(Path.Combine(testInstance.TestRoot, Project.FileName), framework: DefaultFramework);
+            var cmd = new BuildCommand(Path.Combine(testInstance.TestRoot, Project.FileName), framework: DefaultLibraryFramework);
             cmd.Environment["DOTNET_BUILD_VERSION"] = "85";
             cmd.Environment["DOTNET_ASSEMBLY_FILE_VERSION"] = "345";
             cmd.ExecuteWithCapturedOutput().Should().Pass();
 
-            var output = Path.Combine(testInstance.TestRoot, "bin", "Debug", DefaultFramework, "TestLibraryWithConfiguration.dll");
+            var output = Path.Combine(testInstance.TestRoot, "bin", "Debug", DefaultLibraryFramework, "TestLibraryWithConfiguration.dll");
             var informationalVersion = PeReaderUtils.GetAssemblyAttributeValue(output, "AssemblyInformationalVersionAttribute");
             var fileVersion = PeReaderUtils.GetAssemblyAttributeValue(output, "AssemblyFileVersionAttribute");
 
@@ -120,10 +166,10 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             var testInstance = TestAssetsManager.CreateTestInstance("TestLibraryWithConfiguration")
                                                 .WithLockFiles();
 
-            var cmd = new BuildCommand(Path.Combine(testInstance.TestRoot, Project.FileName), framework: DefaultFramework, versionSuffix: "85");
+            var cmd = new BuildCommand(Path.Combine(testInstance.TestRoot, Project.FileName), framework: DefaultLibraryFramework, versionSuffix: "85");
             cmd.ExecuteWithCapturedOutput().Should().Pass();
 
-            var output = Path.Combine(testInstance.TestRoot, "bin", "Debug", DefaultFramework, "TestLibraryWithConfiguration.dll");
+            var output = Path.Combine(testInstance.TestRoot, "bin", "Debug", DefaultLibraryFramework, "TestLibraryWithConfiguration.dll");
             var informationalVersion = PeReaderUtils.GetAssemblyAttributeValue(output, "AssemblyInformationalVersionAttribute");
 
             informationalVersion.Should().NotBeNull();
@@ -131,10 +177,10 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         }
 
         [Theory]
-//        [InlineData("net20", false, true)]
-//        [InlineData("net40", true, true)]
-//        [InlineData("net461", true, true)]
-        [InlineData("netstandardapp1.5", true, false)]
+        //        [InlineData("net20", false, true)]
+        //        [InlineData("net40", true, true)]
+        //        [InlineData("net461", true, true)]
+        [InlineData("netstandard1.5", true, false)]
         public void MultipleFrameworks_ShouldHaveValidTargetFrameworkAttribute(string frameworkName, bool shouldHaveTargetFrameworkAttribute, bool windowsOnly)
         {
             var framework = NuGetFramework.Parse(frameworkName);
@@ -169,6 +215,62 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         }
 
         [Fact]
+        public void UnresolvedReferenceCausesBuildToFailAndNotProduceOutput()
+        {
+            var testAssetsManager = GetTestGroupTestAssetsManager("NonRestoredTestProjects");
+            var testInstance = testAssetsManager.CreateTestInstance("TestProjectWithUnresolvedDependency")
+                                                .WithLockFiles();
+
+            var restoreResult = new RestoreCommand() { WorkingDirectory = testInstance.TestRoot }.Execute();
+            restoreResult.Should().Fail();
+            new DirectoryInfo(testInstance.TestRoot).Should().HaveFile("project.lock.json");
+
+            var buildCmd = new BuildCommand(testInstance.TestRoot);
+            var buildResult = buildCmd.ExecuteWithCapturedOutput();
+            buildResult.Should().Fail();
+
+            buildResult.StdErr.Should().Contain("The dependency ThisIsNotARealDependencyAndIfSomeoneGoesAndAddsAProjectWithThisNameIWillFindThemAndPunishThem could not be resolved.");
+
+            var outputDir = new DirectoryInfo(Path.Combine(testInstance.TestRoot, "bin", "Debug", "netcoreapp1.0"));
+            outputDir.GetFiles().Length.Should().Be(0);
+        }
+
+        [Fact]
+        public void PackageReferenceWithResourcesTest()
+        {
+            var testInstance = TestAssetsManager.CreateTestInstance("ResourcesTests")
+                                                .WithLockFiles();
+
+            var projectRoot = Path.Combine(testInstance.TestRoot, "TestApp");
+
+            var cmd = new BuildCommand(projectRoot);
+            var result = cmd.Execute();
+            result.Should().Pass();
+
+            var outputDir = new DirectoryInfo(Path.Combine(projectRoot, "bin", "Debug", "netcoreapp1.0"));
+
+            outputDir.Should().HaveFile("TestLibraryWithResources.dll");
+            outputDir.Sub("fr").Should().HaveFile("TestLibraryWithResources.resources.dll");
+
+            var depsJson = JObject.Parse(File.ReadAllText(Path.Combine(outputDir.FullName, $"{Path.GetFileNameWithoutExtension(cmd.GetOutputExecutableName())}.deps.json")));
+
+            foreach (var library in new[] { Tuple.Create("Microsoft.Data.OData", "5.6.4"), Tuple.Create("TestLibraryWithResources", "1.0.0") })
+            {
+                var resources = depsJson["targets"][".NETCoreApp,Version=v1.0"][library.Item1 + "/" + library.Item2]["resources"];
+
+                resources.Should().NotBeNull();
+
+                foreach (var item in resources.Children<JProperty>())
+                {
+                    var locale = item.Value["locale"];
+                    locale.Should().NotBeNull();
+
+                    item.Name.Should().EndWith($"{locale}/{library.Item1}.resources.dll");
+                }
+            }
+        }
+
+        [Fact]
         public void ResourceTest()
         {
             var testInstance = TestAssetsManager.CreateTestInstance("TestAppWithLibrary")
@@ -193,7 +295,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             new BuildCommand(GetProjectPath(_testAppDirDirInfo), framework: DefaultFramework)
                 .ExecuteWithCapturedOutput().Should().Pass();
 
-            var libdebug = _testLibDirInfo.Sub("bin/Debug").Sub(DefaultFramework);
+            var libdebug = _testLibDirInfo.Sub("bin/Debug").Sub(DefaultLibraryFramework);
             var appdebug = _testAppDirDirInfo.Sub("bin/Debug").Sub(DefaultFramework);
             var appruntime = appdebug.Sub(_runtime);
 
@@ -205,6 +307,30 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             }
 
         }
+
+        [Fact]
+        private void StandaloneApp_WithoutCoreClrDll_Fails()
+        {
+            // Convert a Portable App to Standalone to simulate the customer scenario
+            var testInstance = TestAssetsManager.CreateTestInstance("DependencyChangeTest")
+                                .WithLockFiles();
+
+            // Convert the portable test project to standalone by removing "type": "platform" and adding rids
+            var originalTestProject = Path.Combine(testInstance.TestRoot, "PortableApp_Standalone", "project.json");
+            var modifiedTestProject = Path.Combine(testInstance.TestRoot, "PortableApp_Standalone", "project.json.modified");
+
+            // Simulate a user editting the project.json
+            File.Delete(originalTestProject);
+            File.Copy(modifiedTestProject, originalTestProject);
+
+            var buildResult = new BuildCommand(originalTestProject, framework: DefaultFramework)
+                .ExecuteWithCapturedOutput();
+
+            buildResult.Should().Fail();
+
+            buildResult.StdErr.Should().Contain("Expected coreclr library not found in package graph. Please try running dotnet restore again.");
+        }
+
         private void CopyProjectToTempDir(string projectDir, TempDirectory tempDir)
         {
             // copy all the files to temp dir

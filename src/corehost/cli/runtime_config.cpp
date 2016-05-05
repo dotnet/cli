@@ -9,7 +9,8 @@
 #include <cassert>
 
 runtime_config_t::runtime_config_t(const pal::string_t& path, const pal::string_t& dev_path)
-    : m_fx_roll_fwd(true)
+    : m_patch_roll_fwd(true)
+    , m_prerelease_roll_fwd(false)
     , m_path(path)
     , m_dev_path(dev_path)
     , m_portable(false)
@@ -58,10 +59,16 @@ bool runtime_config_t::parse_opts(const json_value& opts)
         }
     }
 
-    auto roll_fwd = opts_obj.find(_X("applyPatches"));
-    if (roll_fwd != opts_obj.end())
+    auto patch_roll_fwd = opts_obj.find(_X("applyPatches"));
+    if (patch_roll_fwd != opts_obj.end())
     {
-        m_fx_roll_fwd = roll_fwd->second.as_bool();
+        m_patch_roll_fwd = patch_roll_fwd->second.as_bool();
+    }
+
+    auto prerelease_roll_fwd = opts_obj.find(_X("preReleaseRollForward"));
+    if (prerelease_roll_fwd != opts_obj.end())
+    {
+        m_prerelease_roll_fwd = prerelease_roll_fwd->second.as_bool();
     }
 
     auto framework =  opts_obj.find(_X("framework"));
@@ -89,9 +96,6 @@ bool runtime_config_t::ensure_dev_config_parsed()
         return true;
     }
 
-    // Set dev mode default values, if the file exists.
-    m_fx_roll_fwd = false;
-
     pal::ifstream_t file(m_dev_path);
     if (!file.good())
     {
@@ -114,12 +118,14 @@ bool runtime_config_t::ensure_dev_config_parsed()
             parse_opts(iter->second);
         }
     }
-    catch (const web::json::json_exception& je)
+    catch (const std::exception& je)
     {
-        pal::string_t jes = pal::to_palstring(je.what());
+        pal::string_t jes;
+        (void) pal::utf8_palstring(je.what(), &jes);
         trace::error(_X("A JSON parsing exception occurred in [%s]: %s"), m_dev_path.c_str(), jes.c_str());
         return false;
     }
+
     return true;
 }
 
@@ -160,9 +166,10 @@ bool runtime_config_t::ensure_parsed()
             parse_opts(iter->second);
         }
     }
-    catch (const web::json::json_exception& je)
+    catch (const std::exception& je)
     {
-        pal::string_t jes = pal::to_palstring(je.what());
+        pal::string_t jes;
+        (void) pal::utf8_palstring(je.what(), &jes);
         trace::error(_X("A JSON parsing exception occurred in [%s]: %s"), m_path.c_str(), jes.c_str());
         return false;
     }
@@ -181,10 +188,16 @@ const pal::string_t& runtime_config_t::get_fx_version() const
     return m_fx_ver;
 }
 
-bool runtime_config_t::get_fx_roll_fwd() const
+bool runtime_config_t::get_patch_roll_fwd() const
 {
     assert(m_valid);
-    return m_fx_roll_fwd;
+    return m_patch_roll_fwd;
+}
+
+bool runtime_config_t::get_prerelease_roll_fwd() const
+{
+    assert(m_valid);
+    return m_prerelease_roll_fwd;
 }
 
 bool runtime_config_t::get_portable() const
@@ -197,11 +210,11 @@ const std::list<pal::string_t>& runtime_config_t::get_probe_paths() const
     return m_probe_paths;
 }
 
-void runtime_config_t::config_kv(std::vector<std::string>* keys, std::vector<std::string>* values) const
+void runtime_config_t::config_kv(std::vector<pal::string_t>* keys, std::vector<pal::string_t>* values) const
 {
     for (const auto& kv : m_properties)
     {
-        keys->push_back(pal::to_stdstring(kv.first));
-        values->push_back(pal::to_stdstring(kv.second));
+        keys->push_back(kv.first);
+        values->push_back(kv.second);
     }
 }

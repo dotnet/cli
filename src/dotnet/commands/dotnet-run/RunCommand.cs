@@ -7,8 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel;
-using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Run
@@ -20,8 +20,16 @@ namespace Microsoft.DotNet.Tools.Run
         public string Project = null;
         public IReadOnlyList<string> Args = null;
 
+        public static readonly string[] DefaultFrameworks = new[]
+        {
+            FrameworkConstants.FrameworkIdentifiers.NetCoreApp,
+            FrameworkConstants.FrameworkIdentifiers.NetStandardApp,
+        };
+
+
         ProjectContext _context;
         List<string> _args;
+        private BuildWorkspace _workspace;
 
         public int Start()
         {
@@ -60,40 +68,37 @@ namespace Microsoft.DotNet.Tools.Run
                 Configuration = Constants.DefaultConfiguration;
             }
 
-            var rids = PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers();
+            var frameworkContexts = _workspace.GetProjectContextCollection(Project).FrameworkOnlyContexts;
 
+            var rids = RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers();
+
+            ProjectContext frameworkContext;
             if (Framework == null)
             {
-                var defaultFrameworks = new[]
+                if (frameworkContexts.Count() == 1)
                 {
-                    FrameworkConstants.FrameworkIdentifiers.DnxCore,
-                    FrameworkConstants.FrameworkIdentifiers.NetStandardApp,
-                };
-
-                var contexts = ProjectContext.CreateContextForEachFramework(Project, null);
-
-                ProjectContext context;
-                if (contexts.Count() == 1)
-                {
-                    context = contexts.Single();
+                    frameworkContext = frameworkContexts.Single();
                 }
                 else
                 {
-                    context = contexts.FirstOrDefault(c => defaultFrameworks.Contains(c.TargetFramework.Framework));
-                    if (context == null)
-                    {
-                        throw new InvalidOperationException($"Couldn't find target to run. Possible causes:" + Environment.NewLine +
-                            "1. No project.lock.json file or restore failed - run `dotnet restore`" + Environment.NewLine +
-                            $"2. project.lock.json has multiple targets none of which is in default list ({string.Join(", ", defaultFrameworks)})");
-                    }
+                    frameworkContext = frameworkContexts.FirstOrDefault(c => DefaultFrameworks.Contains(c.TargetFramework.Framework));
                 }
-
-                _context = context.CreateRuntimeContext(rids);
             }
             else
             {
-                _context = ProjectContext.Create(Project, NuGetFramework.Parse(Framework), rids);
+                frameworkContext = frameworkContexts.FirstOrDefault(c => Equals(c.TargetFramework, NuGetFramework.Parse(Framework)));
             }
+
+            if (frameworkContext == null)
+            {
+                throw new InvalidOperationException($"Couldn't find target to run. Possible causes:" + Environment.NewLine +
+                    "1. No project.lock.json file or restore failed - run `dotnet restore`" + Environment.NewLine +
+                    Framework == null ?
+                        $"2. project.lock.json has multiple targets none of which is in default list ({string.Join(", ", DefaultFrameworks)})" :
+                        $"2. The project does not support the desired framework: {Framework}");
+            }
+
+            _context = _workspace.GetRuntimeContext(frameworkContext, rids);
 
             if (Args == null)
             {
@@ -107,6 +112,9 @@ namespace Microsoft.DotNet.Tools.Run
 
         private int RunExecutable()
         {
+            // Set up the workspace
+            _workspace = new BuildWorkspace(ProjectReaderSettings.ReadFromEnvironment());
+
             CalculateDefaultsForNonAssigned();
 
             // Compile to that directory
@@ -117,20 +125,21 @@ namespace Microsoft.DotNet.Tools.Run
                 $"--configuration",
                 Configuration,
                 $"{_context.ProjectFile.ProjectDirectory}"
-            });
+            }, _workspace);
 
             if (result != 0)
             {
                 return result;
             }
 
+            List<string> hostArgs = new List<string>();
             if (!_context.TargetFramework.IsDesktop())
             {
                 // Add Nuget Packages Probing Path
                 var nugetPackagesRoot = _context.PackagesDirectory;
                 var probingPathArg = "--additionalprobingpath";
-                _args.Insert(0, nugetPackagesRoot);
-                _args.Insert(0, probingPathArg);
+                hostArgs.Insert(0, nugetPackagesRoot);
+                hostArgs.Insert(0, probingPathArg);
             }
 
             // Now launch the output and give it the results
@@ -161,11 +170,13 @@ namespace Microsoft.DotNet.Tools.Run
                 // The executable is a ".dll", we need to call it through dotnet.exe
                 var muxer = new Muxer();
 
-                command = Command.Create(muxer.MuxerPath, Enumerable.Concat(new[] { "exec", outputName }, _args));
+                command = Command.Create(muxer.MuxerPath, Enumerable.Concat(
+                            Enumerable.Concat(new string[] { "exec" }, hostArgs),
+                            Enumerable.Concat(new string[] { outputName }, _args)));
             }
             else
             {
-                command = Command.Create(outputName, _args);
+                command = Command.Create(outputName, Enumerable.Concat(hostArgs, _args));
             }
 
             result = command

@@ -3,11 +3,11 @@
 
 using System;
 using System.IO;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel;
-using Microsoft.Extensions.PlatformAbstractions;
-using Xunit;
+using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using System.Linq;
+using Xunit;
 
 namespace Microsoft.Dotnet.Tools.Test.Tests
 {
@@ -19,16 +19,26 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
         public GivenThatWeWantToRunTestsInTheConsole()
         {
             var testInstance =
-                TestAssetsManager.CreateTestInstance("ProjectWithTests", identifier: "ConsoleTests").WithLockFiles();
+                TestAssetsManager.CreateTestInstance(Path.Combine("ProjectsWithTests", "NetCoreAppOnlyProject"), identifier: "ConsoleTests");
 
             _projectFilePath = Path.Combine(testInstance.TestRoot, "project.json");
             var contexts = ProjectContext.CreateContextForEachFramework(
                 _projectFilePath,
                 null,
-                PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
+                RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers());
 
-            var runtime = contexts.FirstOrDefault(c => !string.IsNullOrEmpty(c.RuntimeIdentifier))?.RuntimeIdentifier;
-            _defaultOutputPath = Path.Combine(testInstance.TestRoot, "bin", "Debug", DefaultFramework, runtime);
+            // Restore the project again in the destination to resolve projects
+            // Since the lock file has project relative paths in it, those will be broken
+            // unless we re-restore
+            new RestoreCommand()
+                .WithFallbackSource(CorehostLocalPackages)
+                .WithFallbackSource(CorehostDummyPackages)
+                .WithWorkingDirectory(testInstance.TestRoot )
+                .Execute()
+                .Should()
+                .Pass();
+
+            _defaultOutputPath = Path.Combine(testInstance.TestRoot, "bin", "Debug", "netcoreapp1.0");
         }
 
         //ISSUE https://github.com/dotnet/cli/issues/1935
@@ -51,11 +61,23 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
         }
 
         [Fact]
+        public void It_runs_tests_for_a_local_project_json()
+        {
+            string projectDirectory = Path.GetDirectoryName(_projectFilePath);
+
+            new DotnetTestCommand()
+                .WithWorkingDirectory(projectDirectory)
+                .Execute("project.json")
+                .Should()
+                .Pass();
+        }
+
+        [Fact]
         public void It_builds_the_project_using_the_output_passed()
         {
             var testCommand = new DotnetTestCommand();
             var result = testCommand.Execute(
-                $"{_projectFilePath} -o {Path.Combine(AppContext.BaseDirectory, "output")} -f netstandardapp1.5");
+                $"{_projectFilePath} -o {Path.Combine(AppContext.BaseDirectory, "output")} -f netcoreapp1.0");
             result.Should().Pass();
         }
 

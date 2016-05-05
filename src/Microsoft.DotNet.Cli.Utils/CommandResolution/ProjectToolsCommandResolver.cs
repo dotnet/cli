@@ -2,29 +2,24 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.ProjectModel.Graph;
-using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.Extensions.DependencyModel;
-using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
-using NuGet.Packaging;
-using NuGet.ProjectModel;
-
-using LockFile = Microsoft.DotNet.ProjectModel.Graph.LockFile;
 using FileFormatException = Microsoft.DotNet.ProjectModel.FileFormatException;
+using LockFile = Microsoft.DotNet.ProjectModel.Graph.LockFile;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
     public class ProjectToolsCommandResolver : ICommandResolver
     {
-        private static readonly NuGetFramework s_toolPackageFramework = FrameworkConstants.CommonFrameworks.NetStandardApp15;
-        
-        private static readonly CommandResolutionStrategy s_commandResolutionStrategy = 
+        private static readonly NuGetFramework s_toolPackageFramework = FrameworkConstants.CommonFrameworks.NetCoreApp10;
+
+        private static readonly CommandResolutionStrategy s_commandResolutionStrategy =
             CommandResolutionStrategy.ProjectToolsPackage;
 
-        private static readonly string s_currentRuntimeIdentifier = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
+        private static readonly string s_currentRuntimeIdentifier = RuntimeEnvironmentRidExtensions.GetLegacyRestoreRuntimeIdentifier();
 
 
         private List<string> _allowedCommandExtensions;
@@ -34,7 +29,7 @@ namespace Microsoft.DotNet.Cli.Utils
         {
             _packagedCommandSpecFactory = packagedCommandSpecFactory;
 
-            _allowedCommandExtensions = new List<string>() 
+            _allowedCommandExtensions = new List<string>()
             {
                 FileNameSuffixes.DotNet.DynamicLib
             };
@@ -47,15 +42,15 @@ namespace Microsoft.DotNet.Cli.Utils
             {
                 return null;
             }
-            
+
             return ResolveFromProjectTools(
-                commandResolverArguments.CommandName, 
+                commandResolverArguments.CommandName,
                 commandResolverArguments.CommandArguments.OrEmptyIfNull(),
                 commandResolverArguments.ProjectDirectory);
         }
 
         private CommandSpec ResolveFromProjectTools(
-            string commandName, 
+            string commandName,
             IEnumerable<string> args,
             string projectDirectory)
         {
@@ -70,7 +65,7 @@ namespace Microsoft.DotNet.Cli.Utils
 
             return ResolveCommandSpecFromAllToolLibraries(
                 toolsLibraries,
-                commandName, 
+                commandName,
                 args,
                 projectContext);
         }
@@ -101,7 +96,7 @@ namespace Microsoft.DotNet.Cli.Utils
             ProjectContext projectContext)
         {
             var nugetPackagesRoot = projectContext.PackagesDirectory;
-            
+
             var lockFile = GetToolLockFile(toolLibraryRange, nugetPackagesRoot);
 
             var toolLibrary = lockFile.Targets
@@ -112,10 +107,10 @@ namespace Microsoft.DotNet.Cli.Utils
             {
                 return null;
             }
-            
+
             var depsFileRoot = Path.GetDirectoryName(lockFile.LockFilePath);
             var depsFilePath = GetToolDepsFilePath(toolLibraryRange, lockFile, depsFileRoot);
-            
+
             return _packagedCommandSpecFactory.CreateCommandSpecFromLibrary(
                     toolLibrary,
                     commandName,
@@ -123,7 +118,8 @@ namespace Microsoft.DotNet.Cli.Utils
                     _allowedCommandExtensions,
                     projectContext.PackagesDirectory,
                     s_commandResolutionStrategy,
-                    depsFilePath);
+                    depsFilePath,
+                    null);
         }
 
         private LockFile GetToolLockFile(
@@ -158,8 +154,8 @@ namespace Microsoft.DotNet.Cli.Utils
             var toolPathCalculator = new ToolPathCalculator(nugetPackagesRoot);
 
             return toolPathCalculator.GetBestLockFilePath(
-                toolLibrary.Name, 
-                toolLibrary.VersionRange, 
+                toolLibrary.Name,
+                toolLibrary.VersionRange,
                 s_toolPackageFramework);
         }
 
@@ -181,46 +177,76 @@ namespace Microsoft.DotNet.Cli.Utils
         }
 
         private string GetToolDepsFilePath(
-            LibraryRange toolLibrary, 
-            LockFile toolLockFile, 
+            LibraryRange toolLibrary,
+            LockFile toolLockFile,
             string depsPathRoot)
         {
             var depsJsonPath = Path.Combine(
                 depsPathRoot,
                 toolLibrary.Name + FileNameSuffixes.DepsJson);
 
-            EnsureToolJsonDepsFileExists(toolLibrary, toolLockFile, depsJsonPath);
+            EnsureToolJsonDepsFileExists(toolLockFile, depsJsonPath);
 
             return depsJsonPath;
         }
 
         private void EnsureToolJsonDepsFileExists(
-            LibraryRange toolLibrary, 
-            LockFile toolLockFile, 
+            LockFile toolLockFile,
             string depsPath)
         {
             if (!File.Exists(depsPath))
             {
-                var projectContext = new ProjectContextBuilder()
-                    .WithLockFile(toolLockFile)
-                    .WithTargetFramework(s_toolPackageFramework.ToString())
-                    .Build();
+                GenerateDepsJsonFile(toolLockFile, depsPath);
+            }
+        }
 
-                var exporter = projectContext.CreateExporter(Constants.DefaultConfiguration);
+        // Need to unit test this, so public
+        public void GenerateDepsJsonFile(
+            LockFile toolLockFile,
+            string depsPath)
+        {
+            Reporter.Verbose.WriteLine($"Generating deps.json at: {depsPath}");
 
-                var dependencyContext = new DependencyContextBuilder()
-                    .Build(null, 
-                        null, 
-                        exporter.GetAllExports(), 
-                        true, 
-                        s_toolPackageFramework, 
-                        string.Empty);
+            var projectContext = new ProjectContextBuilder()
+                .WithLockFile(toolLockFile)
+                .WithTargetFramework(s_toolPackageFramework.ToString())
+                .Build();
 
-                using (var fileStream = File.Create(depsPath))
+            var exporter = projectContext.CreateExporter(Constants.DefaultConfiguration);
+
+            var dependencyContext = new DependencyContextBuilder()
+                .Build(null,
+                    null,
+                    exporter.GetAllExports(),
+                    true,
+                    s_toolPackageFramework,
+                    string.Empty);
+
+            var tempDepsFile = Path.GetTempFileName();
+            using (var fileStream = File.Open(tempDepsFile, FileMode.Open, FileAccess.Write))
+            {
+                var dependencyContextWriter = new DependencyContextWriter();
+
+                dependencyContextWriter.Write(dependencyContext, fileStream);
+            }
+
+            try
+            {
+                File.Copy(tempDepsFile, depsPath);
+            }
+            catch (Exception e)
+            {
+                Reporter.Verbose.WriteLine($"unable to generate deps.json, it may have been already generated: {e.Message}");
+            }
+            finally
+            {
+                try
                 {
-                    var dependencyContextWriter = new DependencyContextWriter();
-
-                    dependencyContextWriter.Write(dependencyContext, fileStream);
+                    File.Delete(tempDepsFile);
+                }
+                catch (Exception e2)
+                {
+                    Reporter.Verbose.WriteLine($"unable to delete temporary deps.json file: {e2.Message}");
                 }
             }
         }

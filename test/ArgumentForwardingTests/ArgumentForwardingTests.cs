@@ -4,13 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Xunit;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using Microsoft.Extensions.PlatformAbstractions;
 using System.Diagnostics;
 using FluentAssertions;
 
@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.Tests.ArgumentForwarding
 {
     public class ArgumentForwardingTests : TestBase
     {
-        private static readonly string s_reflectorExeName = "ArgumentsReflector" + Constants.ExeSuffix;
+        private static readonly string s_reflectorDllName = "ArgumentsReflector.dll";
         private static readonly string s_reflectorCmdName = "reflector_cmd";
 
         private string ReflectorPath { get; set; }
@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.Tests.ArgumentForwarding
 
         private void FindAndEnsureReflectorPresent()
         {
-            ReflectorPath = Path.Combine(AppContext.BaseDirectory, s_reflectorExeName);
+            ReflectorPath = Path.Combine(AppContext.BaseDirectory, s_reflectorDllName);
             ReflectorCmdPath = Path.Combine(AppContext.BaseDirectory, s_reflectorCmdName);
             File.Exists(ReflectorPath).Should().BeTrue();
         }
@@ -50,6 +50,7 @@ namespace Microsoft.DotNet.Tests.ArgumentForwarding
         /// <param name="testUserArgument"></param>
         [Theory]
         [InlineData(@"""abc"" d e")]
+        [InlineData(@"""ábc"" d é")]
         [InlineData(@"""abc""      d e")]
         [InlineData("\"abc\"\t\td\te")]
         [InlineData(@"a\\b d""e f""g h")]
@@ -182,7 +183,7 @@ namespace Microsoft.DotNet.Tests.ArgumentForwarding
         /// <returns></returns>
         private string[] EscapeAndEvaluateArgumentString(string[] rawEvaluatedArgument)
         {
-            var commandResult = Command.Create(ReflectorPath, rawEvaluatedArgument)
+            var commandResult = Command.Create("dotnet", new[] { ReflectorPath }.Concat(rawEvaluatedArgument))
                 .CaptureStdErr()
                 .CaptureStdOut()
                 .Execute();
@@ -262,8 +263,8 @@ namespace Microsoft.DotNet.Tests.ArgumentForwarding
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = ReflectorPath,
-                    Arguments = testUserArgument,
+                    FileName = Env.GetCommandPath("dotnet", ".exe", ""),
+                    Arguments = $"{ReflectorPath} {testUserArgument}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     CreateNoWindow = true
