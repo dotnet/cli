@@ -30,7 +30,13 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
             // Restore the project again in the destination to resolve projects
             // Since the lock file has project relative paths in it, those will be broken
             // unless we re-restore
-            new RestoreCommand() { WorkingDirectory = testInstance.TestRoot }.Execute().Should().Pass();
+            new RestoreCommand()
+                .WithFallbackSource(CorehostLocalPackages)
+                .WithFallbackSource(CorehostDummyPackages)
+                .WithWorkingDirectory(testInstance.TestRoot )
+                .Execute()
+                .Should()
+                .Pass();
 
             _defaultOutputPath = Path.Combine(testInstance.TestRoot, "bin", "Debug", "netcoreapp1.0");
         }

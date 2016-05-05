@@ -17,7 +17,13 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             var testInstance = TestAssetsManager.CreateTestInstance("AppWithDirectDependencyAndTypeBuild")
                 .WithLockFiles();
 
-            new RestoreCommand() { WorkingDirectory = testInstance.TestRoot }.Execute().Should().Pass();
+            new RestoreCommand()
+                .WithFallbackSource(CorehostLocalPackages)
+                .WithFallbackSource(CorehostDummyPackages)
+                .WithWorkingDirectory(testInstance.TestRoot)
+                .Execute()
+                .Should()
+                .Pass();
 
             var publishCommand = new PublishCommand(testInstance.TestRoot);
             var publishResult = publishCommand.Execute();

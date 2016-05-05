@@ -146,6 +146,8 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             var testNugetCache = "packages_cross_publish_test";
             TestInstance instance = TestAssetsManager.CreateTestInstance(Path.Combine("PortableTests"));
                 
+            // TODO: StandaloneApp still references Microsoft.NETCoreApp rc2 package because
+            // we use dummy packages for the other platforms during our build
             var testProject = Path.Combine(instance.TestRoot, "StandaloneApp", "project.json");
 
             var restoreCommand = new RestoreCommand();

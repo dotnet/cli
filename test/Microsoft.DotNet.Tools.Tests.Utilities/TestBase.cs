@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.DotNet.Cli.Utils;
-using Microsoft.DotNet.TestFramework;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.TestFramework;
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
 {
@@ -53,6 +53,10 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
                 return s_repoRoot;
             }
         }
+
+        protected static readonly string ArtifactsDirectory = Path.Combine(RepoRoot, "artifacts", RuntimeEnvironment.GetRuntimeIdentifier());
+        protected static readonly string CorehostLocalPackages = Path.Combine(ArtifactsDirectory, "corehost");
+        protected static readonly string CorehostDummyPackages = Path.Combine(ArtifactsDirectory, "corehostdummypackages");
 
         protected static TestAssetsManager TestAssetsManager
         {
