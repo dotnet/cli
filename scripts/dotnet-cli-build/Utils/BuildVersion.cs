@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.Cli.Build
         public string SimpleVersion => $"{Major}.{Minor}.{Patch}.{CommitCountString}";
         public string VersionSuffix => $"{ReleaseSuffix}-{CommitCountString}";
         public string NuGetVersion => $"{Major}.{Minor}.{Patch}-{VersionSuffix}";
-        public string NetCoreAppVersion => $"{Major}.{Minor}.{Patch}-rc2-3{CommitCountString}";
+        public string NetCoreAppVersion => $"1.0.0-rc3-{CommitCountString}";
         public string ProductionVersion => $"{Major}.{Minor}.{Patch}";
 
         // ------------------------------------------HOST-VERSIONING-------------------------------------------
@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.Cli.Build
         public string LatestHostVersionNoSuffix => "1.0.1";
         public string LatestHostFxrVersionNoSuffix => "1.0.1";
         public string LatestHostPolicyVersionNoSuffix => "1.0.1";
-        public string LatestHostPrerelease => "rc2";
+        public string LatestHostPrerelease => "rc3";
         public string LatestHostBuildMajor => $"{CommitCountString}";
         public string LatestHostSuffix => $"{LatestHostPrerelease}-{LatestHostBuildMajor}-00";
 
