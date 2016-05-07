@@ -35,9 +35,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
             _defaultOutputPath = Path.Combine(testInstance.TestRoot, "bin", "Debug", "netcoreapp1.0");
         }
 
-        //ISSUE https://github.com/dotnet/cli/issues/1935
-        // This fact technically succeeds on Windows, but it causes a crash dialog to pop, which interrupts the build.
-        //[WindowsOnlyFact]
+        [Fact]
         public void It_returns_a_failure_when_it_fails_to_run_the_tests()
         {
             var testCommand = new DotnetTestCommand();
