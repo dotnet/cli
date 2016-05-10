@@ -68,7 +68,14 @@ namespace Microsoft.DotNet.Tools.Run
                 Configuration = Constants.DefaultConfiguration;
             }
 
-            var frameworkContexts = _workspace.GetProjectContextCollection(Project).FrameworkOnlyContexts;
+            var projectContextCollection = _workspace.GetProjectContextCollection(Project);
+            if (projectContextCollection == null)
+            {
+                throw new InvalidOperationException("Couldn't find a project to run. Possible causes:" + Environment.NewLine +
+                    "1. There is no project.json file in the current working directory." + Environment.NewLine +
+                    "2. The path specified with `--project` does not exist or does not contain a project.json file.");
+            }
+            var frameworkContexts = projectContextCollection.FrameworkOnlyContexts;
 
             var rids = RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers();
 
