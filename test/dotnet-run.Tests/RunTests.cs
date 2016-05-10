@@ -166,8 +166,8 @@ namespace Microsoft.DotNet.Tools.Run.Tests
                 .HaveStdErrContaining(
                     JoinWithNewlines(
                         "Couldn't find a project to run. Possible causes:",
-                        "1. There is no project.json file in the current working directory.",
-                        "2. The path specified with `--project` does not exist or does not contain a project.json file."
+                        "1. There is no project in the current working directory - use `dotnet run --project` to specify a path.",
+                        "2. The path specified with `--project` does not exist or does not contain a project."
                     ));        
         }
 
