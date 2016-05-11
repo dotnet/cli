@@ -25,13 +25,17 @@ namespace Microsoft.DotNet.ProjectModel
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (ReferenceEquals(obj, null))
             {
                 return false;
             }
+            if (ReferenceEquals(obj, this))
+            {
+                return true;
+            }
 
             var options = obj as AnalyzerOptions;
-            return obj != null && (this == options);
+            return options != null && options.LanguageId == LanguageId;
         }
 
         public override int GetHashCode()
