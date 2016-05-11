@@ -6,7 +6,12 @@ This repo contains the source code for cross-platform [.NET Core](http://github.
 
 New to .NET CLI?
 ------------
-Check out our http://dotnet.github.io/getting-started/ page. 
+Check out our [Getting started page](https://aka.ms/dotnetcoregs).
+
+Release schedule
+----------------
+
+There have been some changes in the schedule for .NET Core and .NET Core CLI tools. You can read more about them in the [.NET Core RC2 – Improvements, Schedule, and Roadmap](https://blogs.msdn.microsoft.com/dotnet/2016/05/06/net-core-rc2-improvements-schedule-and-roadmap/) blog post. 
 
 Found an issue?
 ---------------
@@ -20,7 +25,7 @@ Build Status
 
 |Ubuntu 14.04 |Debian 8.2 |Windows x64 |Windows x86 |Mac OS X |CentOS 7.1 |RHEL 7.2 |
 |:------:|:------:|:------:|:------:|:------:|:------:|:------:|
-|![](https://mseng.visualstudio.com/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3132/badge)|![](https://mseng.visualstudio.com/DefaultCollection/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3271/badge)|![](https://mseng.visualstudio.com/DefaultCollection/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3022/badge)|![](https://mseng.visualstudio.com/DefaultCollection/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3071/badge)|![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/600/badge) |![](https://mseng.visualstudio.com/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3257/badge) |![](https://mseng.visualstudio.com/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3256/badge) |
+|[![](https://mseng.visualstudio.com/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3132/badge)](https://mseng.visualstudio.com/dotnetcore/_build?_a=completed&definitionId=3132)|[![](https://mseng.visualstudio.com/DefaultCollection/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3271/badge)](https://mseng.visualstudio.com/dotnetcore/_build?_a=completed&definitionId=3271)|[![](https://mseng.visualstudio.com/DefaultCollection/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3022/badge)](https://mseng.visualstudio.com/dotnetcore/_build?_a=completed&definitionId=3022)|[![](https://mseng.visualstudio.com/DefaultCollection/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3071/badge)](https://mseng.visualstudio.com/dotnetcore/_build?_a=completed&definitionId=3071)|[![](https://devdiv.visualstudio.com/DefaultCollection/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/600/badge)](https://mseng.visualstudio.com/dotnetcore/_build?_a=completed&definitionId=3397)|[![](https://mseng.visualstudio.com/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3257/badge)](https://mseng.visualstudio.com/dotnetcore/_build?_a=completed&definitionId=3257)|[![](https://mseng.visualstudio.com/_apis/public/build/definitions/d09b7a4d-0a51-4c0e-a15a-07921d5b558f/3256/badge)](https://mseng.visualstudio.com/dotnetcore/_build?_a=completed&definitionId=3256)|
 
 Installers and Binaries
 -----------------------

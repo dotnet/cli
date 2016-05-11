@@ -288,8 +288,12 @@ get_azure_channel_from_channel() {
             echo "dev"
             return 0
             ;;
-        preview|beta)
+        beta)
             echo "beta"
+            return 0
+            ;;
+        preview)
+            echo "preview"
             return 0
             ;;
         production)
@@ -358,7 +362,7 @@ get_user_share_path() {
     if [ ! -z "${DOTNET_INSTALL_DIR:-}" ]; then
         echo $DOTNET_INSTALL_DIR
     else
-        echo "/usr/local/share/dotnet"
+        echo "$HOME/.dotnet"
     fi
     return 0
 }
@@ -528,7 +532,7 @@ local_version_file_relative_path="/.version"
 bin_folder_relative_path=""
 temporary_file_template="${TMPDIR:-/tmp}/dotnet.XXXXXXXXX"
 
-channel="preview"
+channel="beta"
 version="Latest"
 install_dir="<auto>"
 architecture="<auto>"
@@ -619,7 +623,7 @@ calculate_vars
 if [ "$dry_run" = true ]; then
     say "Payload URL: $download_link"
     say "Repeatable invocation: ./$(basename $0) --version $specific_version --channel $channel --install-dir $install_dir"
-    return 0
+    exit 0
 fi
 
 check_pre_reqs

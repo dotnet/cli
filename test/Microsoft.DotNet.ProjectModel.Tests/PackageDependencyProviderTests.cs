@@ -6,6 +6,7 @@ using Microsoft.DotNet.Tools.Test.Utilities;
 using NuGet.Frameworks;
 using NuGet.Versioning;
 using Xunit;
+using System.IO;
 
 namespace Microsoft.DotNet.ProjectModel.Tests
 {
@@ -40,6 +41,53 @@ namespace Microsoft.DotNet.ProjectModel.Tests
 
             Assert.Empty(p2.CompileTimeAssemblies);
             Assert.Empty(p2.RuntimeAssemblies);
+        }
+
+        [Fact]
+        public void HasCompileTimePlaceholderChecksAllCompileTimeAssets()
+        {
+            var provider = new PackageDependencyProvider("/foo/packages", new FrameworkReferenceResolver("/foo/references"));
+            var package = new LockFilePackageLibrary();
+            package.Name = "Something";
+            package.Version = NuGetVersion.Parse("1.0.0");
+            package.Files.Add("lib/net46/_._");
+            package.Files.Add("lib/net46/Something.dll");
+
+            var target = new LockFileTargetLibrary();
+            target.Name = "Something";
+            target.Version = package.Version;
+
+            target.RuntimeAssemblies.Add("lib/net46/_._");
+            target.RuntimeAssemblies.Add("lib/net46/Something.dll");
+            target.CompileTimeAssemblies.Add("lib/net46/_._");
+            target.CompileTimeAssemblies.Add("lib/net46/Something.dll");
+
+            var p1 = provider.GetDescription(NuGetFramework.Parse("net46"), package, target);
+            
+            Assert.False(p1.HasCompileTimePlaceholder);
+            Assert.Equal(1, p1.CompileTimeAssemblies.Count());
+            Assert.Equal(1, p1.RuntimeAssemblies.Count());
+            Assert.Equal("lib/net46/Something.dll", p1.CompileTimeAssemblies.First().Path);
+            Assert.Equal("lib/net46/Something.dll", p1.RuntimeAssemblies.First().Path);
+        }
+        
+        [Fact]
+        public void HasCompileTimePlaceholderReturnsFalseIfEmpty()
+        {
+            var provider = new PackageDependencyProvider("/foo/packages", new FrameworkReferenceResolver("/foo/references"));
+            var package = new LockFilePackageLibrary();
+            package.Name = "Something";
+            package.Version = NuGetVersion.Parse("1.0.0");
+
+            var target = new LockFileTargetLibrary();
+            target.Name = "Something";
+            target.Version = package.Version;
+
+            var p1 = provider.GetDescription(NuGetFramework.Parse("net46"), package, target);
+            
+            Assert.False(p1.HasCompileTimePlaceholder);
+            Assert.Equal(0, p1.CompileTimeAssemblies.Count());
+            Assert.Equal(0, p1.RuntimeAssemblies.Count());
         }
 
         [Theory]
@@ -92,6 +140,19 @@ namespace Microsoft.DotNet.ProjectModel.Tests
 
             var diagnostics = context.LibraryManager.GetAllDiagnostics();
             Assert.False(diagnostics.Any(d => d.ErrorCode == ErrorCodes.DOTNET1011));
+        }
+
+        [Fact]
+        public void NoDuplicatesWithProjectAndReferenceAssemblyWithSameName()
+        {
+            var instance = TestAssetsManager.CreateTestInstance("DuplicatedReferenceAssembly")
+                                            .WithLockFiles();
+            var context = new ProjectContextBuilder().WithProjectDirectory(Path.Combine(instance.TestRoot, "TestApp"))
+                                                     .WithTargetFramework("net461")
+                                                     .Build();
+
+            // Will fail with dupes if any
+            context.LibraryManager.GetLibraries().ToDictionary(l => l.Identity.Name);
         }
     }
 }

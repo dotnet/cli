@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Loader;
 using System.Text;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.InternalAbstractions;
@@ -42,6 +43,8 @@ namespace Microsoft.DotNet.Cli
         {
             DebugHelper.HandleDebugSwitch(ref args);
 
+            new MulticoreJitActivator().TryActivateMulticoreJit();
+
             if (Env.GetEnvironmentVariableAsBool("DOTNET_CLI_CAPTURE_TIMING", false))
             {
                 PerfTrace.Enabled = true;
@@ -58,7 +61,7 @@ namespace Microsoft.DotNet.Cli
             }
             catch (GracefulException e)
             {
-                Console.WriteLine(CommandContext.IsVerbose() ? e.ToString().Red().Bold() : e.Message.Red().Bold());
+                Reporter.Error.WriteLine(CommandContext.IsVerbose() ? e.ToString().Red().Bold() : e.Message.Red().Bold());
 
                 return 1;
             }
@@ -132,6 +135,8 @@ namespace Microsoft.DotNet.Cli
                 command = "help";
             }
 
+            telemetryClient.TrackEvent(command, null, null);
+
             int exitCode;
             Func<string[], int> builtIn;
             if (s_builtIns.TryGetValue(command, out builtIn))
@@ -147,13 +152,6 @@ namespace Microsoft.DotNet.Cli
                 exitCode = result.ExitCode;
             }
 
-            telemetryClient.TrackEvent(
-                command,
-                null,
-                new Dictionary<string, double>
-                {
-                    ["ExitCode"] = exitCode
-                });
 
             return exitCode;
 

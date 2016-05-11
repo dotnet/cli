@@ -15,11 +15,11 @@ namespace Microsoft.DotNet.ProjectModel
 
         private bool _needRefresh;
 
-        public DesignTimeWorkspace(ProjectReaderSettings settings) : base(settings) { }
+        public DesignTimeWorkspace(ProjectReaderSettings settings) : base(settings, true) { }
 
         public void AddProject(string path)
         {
-            var projectPath = NormalizeProjectPath(path);
+            var projectPath = ProjectPathHelper.NormalizeProjectDirectoryPath(path);
 
             if (projectPath != null)
             {

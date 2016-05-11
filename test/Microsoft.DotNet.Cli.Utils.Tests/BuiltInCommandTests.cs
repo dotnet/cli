@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.IO;
 using System.Linq;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
@@ -20,7 +21,7 @@ namespace Microsoft.DotNet.Cli.Utils
             Func<string[], int> testCommand = args => args.Length;
             string[] testCommandArgs = new[] { "1", "2" };
 
-            var builtInCommand = new BuiltInCommand("fakeCommand", testCommandArgs, testCommand);
+            var builtInCommand = new BuiltInCommand("fakeCommand", testCommandArgs, testCommand, new TestBuiltInCommandEnvironment());
             CommandResult result = builtInCommand.Execute();
 
             Assert.Equal(testCommandArgs.Length, result.ExitCode);
@@ -35,16 +36,20 @@ namespace Microsoft.DotNet.Cli.Utils
         [Fact]
         public void TestOnOutputLines()
         {
-            int exitCode = 29;
+            const int exitCode = 29;
+
+            TestBuiltInCommandEnvironment environment = new TestBuiltInCommandEnvironment();
 
             Func<string[], int> testCommand = args =>
             {
-                Console.Out.Write("first");
-                Console.Out.WriteLine("second");
-                Console.Out.WriteLine("third");
+                TextWriter outWriter = environment.GetConsoleOut();
+                outWriter.Write("first");
+                outWriter.WriteLine("second");
+                outWriter.WriteLine("third");
 
-                Console.Error.WriteLine("fourth");
-                Console.Error.WriteLine("fifth");
+                TextWriter errorWriter = environment.GetConsoleError();
+                errorWriter.WriteLine("fourth");
+                errorWriter.WriteLine("fifth");
 
                 return exitCode;
             };
@@ -52,7 +57,7 @@ namespace Microsoft.DotNet.Cli.Utils
             int onOutputLineCallCount = 0;
             int onErrorLineCallCount = 0;
 
-            CommandResult result = new BuiltInCommand("fakeCommand", Enumerable.Empty<string>(), testCommand)
+            CommandResult result = new BuiltInCommand("fakeCommand", Enumerable.Empty<string>(), testCommand, environment)
                 .OnOutputLine(line =>
                 {
                     onOutputLineCallCount++;
@@ -84,6 +89,42 @@ namespace Microsoft.DotNet.Cli.Utils
             Assert.Equal(exitCode, result.ExitCode);
             Assert.Equal(2, onOutputLineCallCount);
             Assert.Equal(2, onErrorLineCallCount);
+        }
+
+        private class TestBuiltInCommandEnvironment : IBuiltInCommandEnvironment
+        {
+            private TextWriter _consoleOut;
+            private TextWriter _consoleError;
+
+            public TextWriter GetConsoleOut()
+            {
+                return _consoleOut;
+            }
+
+            public void SetConsoleOut(TextWriter newOut)
+            {
+                _consoleOut = newOut;
+            }
+
+            public TextWriter GetConsoleError()
+            {
+                return _consoleError;
+            }
+
+            public void SetConsoleError(TextWriter newError)
+            {
+                _consoleError = newError;
+            }
+
+            public string GetWorkingDirectory()
+            {
+                return Directory.GetCurrentDirectory();
+            }
+
+            public void SetWorkingDirectory(string path)
+            {
+                // no-op
+            }
         }
     }
 }

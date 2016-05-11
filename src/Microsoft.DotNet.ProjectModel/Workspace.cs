@@ -31,11 +31,13 @@ namespace Microsoft.DotNet.ProjectModel
 
         private readonly ProjectReaderSettings _settings;
         private readonly LockFileReader _lockFileReader;
+        private readonly bool _designTime;
 
-        protected Workspace(ProjectReaderSettings settings)
+        protected Workspace(ProjectReaderSettings settings, bool designTime)
         {
             _settings = settings;
             _lockFileReader = new LockFileReader();
+            _designTime = designTime;
         }
 
         public ProjectContext GetProjectContext(string projectPath, NuGetFramework framework)
@@ -53,7 +55,7 @@ namespace Microsoft.DotNet.ProjectModel
 
         public ProjectContextCollection GetProjectContextCollection(string projectPath)
         {
-            var normalizedPath = NormalizeProjectPath(projectPath);
+            var normalizedPath = ProjectPathHelper.NormalizeProjectDirectoryPath(projectPath);
             if (normalizedPath == null)
             {
                 return null;
@@ -69,7 +71,7 @@ namespace Microsoft.DotNet.ProjectModel
 
         private LockFile GetLockFile(string projectDirectory)
         {
-            var normalizedPath = NormalizeProjectPath(projectDirectory);
+            var normalizedPath = ProjectPathHelper.NormalizeProjectDirectoryPath(projectDirectory);
             if (normalizedPath == null)
             {
                 return null;
@@ -84,7 +86,7 @@ namespace Microsoft.DotNet.ProjectModel
 
         private FileModelEntry<Project> GetProjectCore(string projectDirectory)
         {
-            var normalizedPath = NormalizeProjectPath(projectDirectory);
+            var normalizedPath = ProjectPathHelper.NormalizeProjectDirectoryPath(projectDirectory);
             if (normalizedPath == null)
             {
                 return null;
@@ -94,23 +96,6 @@ namespace Microsoft.DotNet.ProjectModel
                 normalizedPath,
                 key => AddProjectEntry(key, null),
                 (key, oldEntry) => AddProjectEntry(key, oldEntry));
-        }
-
-
-        protected static string NormalizeProjectPath(string path)
-        {
-            if (File.Exists(path) &&
-                string.Equals(Path.GetFileName(path), Project.FileName, StringComparison.OrdinalIgnoreCase))
-            {
-                return Path.GetDirectoryName(Path.GetFullPath(path));
-            }
-            else if (Directory.Exists(path) &&
-                     File.Exists(Path.Combine(path, Project.FileName)))
-            {
-                return Path.GetFullPath(path);
-            }
-
-            return null;
         }
 
         private FileModelEntry<Project> AddProjectEntry(string projectDirectory, FileModelEntry<Project> currentEntry)
@@ -168,7 +153,7 @@ namespace Microsoft.DotNet.ProjectModel
                     {
                         try
                         {
-                            currentEntry.Model = _lockFileReader.ReadLockFile(currentEntry.FilePath, fs, designTime: true);
+                            currentEntry.Model = _lockFileReader.ReadLockFile(currentEntry.FilePath, fs, designTime: _designTime);
                             currentEntry.UpdateLastWriteTimeUtc();
                         }
                         catch (FileFormatException ex)
@@ -225,6 +210,8 @@ namespace Microsoft.DotNet.ProjectModel
                 }
 
                 currentEntry.ProjectDiagnostics.AddRange(projectEntry.Diagnostics);
+                currentEntry.ProjectDiagnostics.AddRange(
+                    currentEntry.ProjectContexts.SelectMany(c => c.Diagnostics));
             }
 
             return currentEntry;

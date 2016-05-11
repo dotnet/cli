@@ -64,7 +64,7 @@ namespace Microsoft.DotNet.ProjectModel
                 .WithProjectResolver(ProjectResolver)
                 .WithLockFileResolver(LockFileResolver)
                 .WithProjectReaderSettings(ProjectReaderSettings);
-            if(IsDesignTime)
+            if (IsDesignTime)
             {
                 builder.AsDesignTime();
             }
@@ -168,14 +168,14 @@ namespace Microsoft.DotNet.ProjectModel
                 var deduper = new HashSet<string>();
                 foreach (var target in LockFile.Targets)
                 {
-                    var id = $"{target.TargetFramework}/{target.RuntimeIdentifier}";
+                    var context = Clone()
+                        .WithTargetFramework(target.TargetFramework)
+                        .WithRuntimeIdentifiers(new[] { target.RuntimeIdentifier }).Build();
+
+                    var id = $"{context.TargetFramework}/{context.RuntimeIdentifier}";
                     if (deduper.Add(id))
                     {
-                        var builder = Clone()
-                            .WithTargetFramework(target.TargetFramework)
-                            .WithRuntimeIdentifiers(new[] { target.RuntimeIdentifier });
-
-                        yield return builder.Build();
+                        yield return context;
                     }
                 }
             }
@@ -355,11 +355,6 @@ namespace Microsoft.DotNet.ProjectModel
                 }
             }
 
-            if (Project != null)
-            {
-                diagnostics.AddRange(Project.Diagnostics);
-            }
-
             // Create a library manager
             var libraryManager = new LibraryManager(libraries.Values.ToList(), diagnostics, Project?.ProjectFilePath);
 
@@ -372,7 +367,8 @@ namespace Microsoft.DotNet.ProjectModel
                 runtime,
                 PackagesDirectory,
                 libraryManager,
-                LockFile);
+                LockFile,
+                diagnostics);
         }
 
         private void ReadLockFile(ICollection<DiagnosticMessage> diagnostics)
@@ -440,15 +436,21 @@ namespace Microsoft.DotNet.ProjectModel
                     package.HasCompileTimePlaceholder &&
                     !TargetFramework.IsPackageBased)
                 {
+                    // requiresFrameworkAssemblies is true whenever we find a CompileTimePlaceholder in a non-package based framework, even if
+                    // the reference is unresolved. This ensures the best error experience when someone is building on a machine without
+                    // the target framework installed.
+                    requiresFrameworkAssemblies = true;
+
                     var newKey = new LibraryKey(library.Identity.Name, LibraryType.ReferenceAssembly);
                     var dependency = new LibraryRange(library.Identity.Name, LibraryType.ReferenceAssembly);
 
-                    // If the framework assembly can't be resolved then mark it as unresolved but still replace the package
-                    // dependency
-                    var replacement = referenceAssemblyDependencyResolver.GetDescription(dependency, TargetFramework) ??
-                                        UnresolvedDependencyProvider.GetDescription(dependency, TargetFramework);
-
-                    requiresFrameworkAssemblies = true;
+                    var replacement = referenceAssemblyDependencyResolver.GetDescription(dependency, TargetFramework);
+                    
+                    // If the reference is unresolved, just skip it.  Don't replace the package dependency
+                    if (replacement == null)
+                    {
+                        continue;
+                    }
 
                     // Remove the original package reference
                     libraries.Remove(pair.Key);
@@ -495,6 +497,22 @@ namespace Microsoft.DotNet.ProjectModel
 
                     dependencyDescription.RequestedRanges.Add(dependency);
                     dependencyDescription.Parents.Add(library);
+                }
+            }
+
+            // Deduplicate libraries with the same name
+            // Priority list is backwards so not found -1 would be last when sorting by descending
+            var priorities = new[] { LibraryType.Package, LibraryType.Project, LibraryType.ReferenceAssembly };
+            var nameGroups = libraries.Keys.ToLookup(libraryKey => libraryKey.Name);
+            foreach (var nameGroup in nameGroups)
+            {
+                var librariesToRemove = nameGroup
+                    .OrderByDescending(libraryKey => Array.IndexOf(priorities, libraryKey.LibraryType))
+                    .Skip(1);
+
+                foreach (var library in librariesToRemove)
+                {
+                    libraries.Remove(library);
                 }
             }
         }
