@@ -154,6 +154,22 @@ namespace Microsoft.DotNet.Tools.Run.Tests
                         "arg: [one]",
                         "arg: [two]"));
         }
+        
+        [Fact]
+        public void ItHandlesUnknownProjectFileCorrectly()
+        {
+            new RunCommand("bad path")
+                .ExecuteWithCapturedOutput()    
+                .Should()
+                .Fail()
+                .And
+                .HaveStdErrContaining(
+                    JoinWithNewlines(
+                        "Couldn't find a project to run. Possible causes:",
+                        "1. There is no project in the current working directory - use `dotnet run --project` to specify a path.",
+                        "2. The path specified with `--project` does not exist or does not contain a project."
+                    ));        
+        }
 
         private static string JoinWithNewlines(params string[] values)
         {
