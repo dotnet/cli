@@ -16,10 +16,8 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         public AndConstraint<FileInfoAssertions> ContainText(string expectedText, string because = "", params object[] becauseArgs)
         {
-            var text = Subject.OpenText().ReadToEnd();
-
             Execute.Assertion
-                .ForCondition(text.Contains(expectedText))
+                .ForCondition(SubjectContainsText(expectedText))
                 .BecauseOf(because, becauseArgs)
                 .FailWith($"Expected '{Subject.FullName}' to contain text '{expectedText}'{{reason}}, but it does not.");
 
@@ -28,14 +26,17 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         public AndConstraint<FileInfoAssertions> NotContainText(string expectedText, string because = "", params object[] becauseArgs)
         {
-            var text = Subject.OpenText().ReadToEnd();
-
             Execute.Assertion
-                .ForCondition(!text.Contains(expectedText))
+                .ForCondition(!SubjectContainsText(expectedText))
                 .BecauseOf(because, becauseArgs)
                 .FailWith($"Expected '{Subject.FullName}' to not contain text '{expectedText}'{{reason}}, but it does.");
 
             return new AndConstraint<FileInfoAssertions>(this);
+        }
+        
+        private bool SubjectContainsText(string text)
+        {
+            return Subject.OpenText().ReadToEnd().Contains(text);
         }
     }
 }

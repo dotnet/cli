@@ -122,8 +122,8 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
 
             new DirectoryInfo(Path.Combine(root, "obj", "Debug", DefaultFramework))
                 .Should().HaveFile("EndToEndTestApp.resource1.resources", "because *.resx is embedded")
-                .And.HaveFile("myresource.resources", "because resource2 got mapped to a new name");
-            objDirInfo.Should().HaveFile("EndToEndTestApp.defaultresource.resources");
+                .And.HaveFile("myresource.resources", "because resource2 got mapped to a new name")
+                .And.HaveFile("EndToEndTestApp.defaultresource.resources", "because *.resx is embedded");
         }
 
         [Fact]
@@ -147,7 +147,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
                 .WithBuildArtifacts()
                 .Path;
 
-            new DirectoryInfo(Path.Combine(root, "bin", "Debug", DefaultLibraryFramework))
+            new DirectoryInfo(Path.Combine(root, "bin", "Debug", "netstandard1.5"))
                 .Should().HaveFile("MyLibrary.dll", "because that is the outputName")
                 .And.NotHaveFile("LibraryWithOutputAssemblyName.dll", "because outputName overrides it");
         }
