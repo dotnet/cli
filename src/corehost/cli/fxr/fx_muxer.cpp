@@ -15,6 +15,8 @@
 #include "deps_format.h"
 
 
+static const pal::char_t* s_dotnet_sdk_download_url = _X("http://go.microsoft.com/fwlink/?LinkID=798306&clcid=0x409");
+
 /**
  * When the framework is not found, display detailed error message
  *   about available frameworks and installation of new framework.
@@ -303,9 +305,8 @@ bool fx_muxer_t::resolve_hostpolicy_dir(host_mode_t mode,
         return true;
     }
 
-    // If it still couldn't be found, flag an error for the "expected" location.
-    trace::error(_X("Expect required library %s to be present in [%s]"), LIBHOSTPOLICY_NAME, expected.c_str());
-    trace::error(_X("  - This may be because of an invalid .NET Core FX configuration in the directory."));
+    // If it still couldn't be found, somebody upstack messed up. Flag an error for the "expected" location.
+    trace::error(_X("A fatal error was encountered. The library '%s' required to execute the application was not found in '%s'."), LIBHOSTPOLICY_NAME, expected.c_str());
     return false;
 }
 
@@ -557,7 +558,29 @@ bool fx_muxer_t::resolve_sdk_dotnet_path(const pal::string_t& own_dir, pal::stri
 
 int muxer_usage()
 {
-    trace::error(_X("Usage: dotnet [--help | app.dll]"));
+    trace::println();
+    trace::println(_X("Microsoft .NET Core Shared Framework Host"));
+    trace::println();
+    trace::println(_X("  Version  : %s"), _STRINGIFY(HOST_FXR_PKG_VER));
+    trace::println(_X("  Build    : %s"), _STRINGIFY(REPO_COMMIT_HASH));
+    trace::println();
+    trace::println(_X("Usage: dotnet [common-options] [[options] path-to-application]"));
+    trace::println();
+    trace::println(_X("Common Options:"));
+    trace::println(_X("  --help                           Display .NET Core Shared Framework Host help."));
+    trace::println(_X("  --version                        Display .NET Core Shared Framework Host version."));
+    trace::println();
+    trace::println(_X("Options:"));
+    trace::println(_X("  --additionalprobingpath <path>   Path containing probing policy and assemblies to probe for."));
+    trace::println();
+    trace::println(_X("Path to Application:"));
+    trace::println(_X("  The path to a .NET Core managed application, dll or exe file to execute."));
+    trace::println();
+    trace::println(_X("If you are debugging the Shared Framework Host, set 'COREHOST_TRACE' to '1' in your environment."));
+    trace::println();
+    trace::println(_X("To get started on developing applications for .NET Core, install .NET SDK from:"));
+    trace::println(_X("  %s"), s_dotnet_sdk_download_url);
+    
     return StatusCode::InvalidArgFailure;
 }
 
@@ -612,30 +635,34 @@ int fx_muxer_t::parse_args_and_execute(
         }
 
         app_candidate = argv[cur_i];
-        bool is_app_runnable = (ends_with(app_candidate, _X(".dll"), false) || ends_with(app_candidate, _X(".exe"), false)) && pal::realpath(&app_candidate);
-        trace::verbose(_X("App %s runnable=[%d]"), app_candidate.c_str(), is_app_runnable);
-        // If exec mode is on, then check we have a dll at this point
-        if (exec_mode)
+        bool is_app_managed = (ends_with(app_candidate, _X(".dll"), false) || ends_with(app_candidate, _X(".exe"), false)) && pal::realpath(&app_candidate);
+
+        if (!is_app_managed)
         {
-            if (!is_app_runnable)
+            trace::verbose(_X("Application '%s' is not a managed executable."), app_candidate.c_str());
+
+            *is_an_app = false;
+
+            if (exec_mode)
             {
-                trace::error(_X("dotnet exec needs a .dll or .exe to execute. See usage."));
-                *is_an_app = false;
+                trace::error(_X("dotnet exec needs a managed .dll or .exe extension. The application specified was '%s'"), app_candidate.c_str());
                 return InvalidArgFailure;
             }
-        }
-        // For non-exec, non-standalone there is CLI invocation or app.dll execution after known args.
-        else
-        {
-            // Test if we have a real dll at this point.
-            if (!is_app_runnable)
-            {
-                // No we don't have a dll, this must be routed to the CLI.
-                *is_an_app = false;
-                return AppArgNotRunnable;
-            }
+
+            // Route to CLI.
+            return AppArgNotRunnable;
         }
     }
+
+    // App is managed executable.
+    trace::verbose(_X("Treating application '%s' as a managed executable."), app_candidate.c_str());
+
+    if (!pal::file_exists(app_candidate))
+    {
+        trace::error(_X("The application to execute does not exist: '%s'"), app_candidate.c_str());
+        return InvalidArgFailure;
+    }
+
     if (cur_i != 1)
     {
         vec_argv.resize(argc - cur_i + 1, 0); // +1 for dotnet
@@ -775,7 +802,16 @@ int fx_muxer_t::execute(const int argc, const pal::char_t* argv[])
     pal::string_t sdk_dotnet;
     if (!resolve_sdk_dotnet_path(own_dir, &sdk_dotnet))
     {
-        trace::error(_X("Did not find a suitable dotnet SDK at '%s'. Install dotnet SDK from https://github.com/dotnet/cli"), own_dir.c_str());
+        assert(argc > 1);
+        if (pal::strcasecmp(_X("--help"), argv[1]) == 0 ||
+            pal::strcasecmp(_X("--version"), argv[1]) == 0 ||
+            pal::strcasecmp(_X("-h"), argv[1]) == 0 ||
+            pal::strcasecmp(_X("-v"), argv[1]) == 0)
+        {
+            return muxer_usage();
+        }
+        trace::error(_X("Did you mean to run dotnet SDK commands? Please install dotnet SDK from: "));
+        trace::error(_X("  %s"), s_dotnet_sdk_download_url);
         return StatusCode::LibHostSdkFindFailure;
     }
     append_path(&sdk_dotnet, _X("dotnet.dll"));
@@ -796,4 +832,5 @@ int fx_muxer_t::execute(const int argc, const pal::char_t* argv[])
     trace::verbose(_X("Using dotnet SDK dll=[%s]"), sdk_dotnet.c_str());
     return parse_args_and_execute(own_dir, own_dll, 1, new_argv.size(), new_argv.data(), false, host_mode_t::muxer, &is_an_app);
 }
+
 
