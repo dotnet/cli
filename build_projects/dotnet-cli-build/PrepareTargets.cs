@@ -161,7 +161,6 @@ namespace Microsoft.DotNet.Cli.Build
             AddInstallerArtifactToContext(c, "dotnet-host", "SharedHost", hostVersion);
             AddInstallerArtifactToContext(c, "dotnet-sharedframework", "SharedFramework", sharedFrameworkVersion);
             AddInstallerArtifactToContext(c, "dotnet-dev", "CombinedFrameworkSDKHost", cliVersion);
-            AddInstallerArtifactToContext(c, "dotnet", "CombinedFrameworkHost", sharedFrameworkVersion);
             AddInstallerArtifactToContext(c, "dotnet-sharedframework-sdk", "CombinedFrameworkSDK", cliVersion);
             AddInstallerArtifactToContext(c, "dotnet-sdk-debug", "SdkSymbols", cliVersion);
 

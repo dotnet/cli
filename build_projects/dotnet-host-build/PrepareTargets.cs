@@ -31,7 +31,12 @@ namespace Microsoft.DotNet.Host.Build
         public static BuildTargetResult CheckCoreclrPlatformDependencies(BuildTargetContext c) => c.Success();
 
         // All major targets will depend on this in order to ensure variables are set up right if they are run independently
-        [Target(nameof(GenerateVersions), nameof(CheckPrereqs), nameof(LocateStage0), nameof(ExpectedBuildArtifacts))]
+        [Target(
+            nameof(GenerateVersions), 
+            nameof(CheckPrereqs), 
+            nameof(LocateStage0), 
+            nameof(ExpectedBuildArtifacts),
+            nameof(RestorePackages))]
         public static BuildTargetResult Init(BuildTargetContext c)
         {
             var configEnv = Environment.GetEnvironmentVariable("CONFIGURATION");
@@ -72,8 +77,21 @@ namespace Microsoft.DotNet.Host.Build
                 CommitCount = commitCount
             };
 
+            var branchInfo = new BranchInfo(Dirs.RepoRoot);
+            var buildVersion = new BuildVersion()
+            {
+                Major = int.Parse(branchInfo.Entries["MAJOR_VERSION"]),
+                Minor = int.Parse(branchInfo.Entries["MINOR_VERSION"]),
+                Patch = int.Parse(branchInfo.Entries["PATCH_VERSION"]),
+                ReleaseSuffix = branchInfo.Entries["RELEASE_SUFFIX"],
+                CommitCount = commitCount
+            };
+
+            c.BuildContext["BuildVersion"] = buildVersion;
             c.BuildContext["HostVersion"] = hostVersion;
             c.BuildContext["CommitHash"] = commitHash;
+            c.BuildContext["SharedFrameworkNugetVersion"] = buildVersion.NetCoreAppVersion;
+
 
             c.Info($"Building Version: {hostVersion.LatestHostVersionNoSuffix} (NuGet Packages: {hostVersion.LatestHostVersion})");
             c.Info($"From Commit: {commitHash}");
@@ -110,11 +128,51 @@ namespace Microsoft.DotNet.Host.Build
         public static BuildTargetResult ExpectedBuildArtifacts(BuildTargetContext c)
         {
             var config = Environment.GetEnvironmentVariable("CONFIGURATION");
-            var versionBadgeName = $"{CurrentPlatform.Current}_{CurrentArchitecture.Current}_{config}_version_badge.svg";
+            var versionBadgeName = $"sharedfx_{CurrentPlatform.Current}_{CurrentArchitecture.Current}_{config}_version_badge.svg";
             c.BuildContext["VersionBadge"] = Path.Combine(Dirs.Output, versionBadgeName);
 
+            var sharedFrameworkVersion = c.BuildContext.Get<string>("SharedFrameworkNugetVersion");
             var hostVersion = c.BuildContext.Get<HostVersion>("HostVersion").LockedHostVersion;
+            
+            AddInstallerArtifactToContext(c, "dotnet-host", "SharedHost", hostVersion);
+            AddInstallerArtifactToContext(c, "dotnet-sharedframework", "SharedFramework", sharedFrameworkVersion);
+            AddInstallerArtifactToContext(c, "dotnet", "CombinedFrameworkHost", sharedFrameworkVersion);
+
             return c.Success();
+        }
+
+        private static void AddInstallerArtifactToContext(
+            BuildTargetContext c,
+            string artifactPrefix,
+            string contextPrefix,
+            string version)
+        {
+            var productName = Monikers.GetProductMoniker(c, artifactPrefix, version);
+
+            var extension = CurrentPlatform.IsWindows ? ".zip" : ".tar.gz";
+            c.BuildContext[contextPrefix + "CompressedFile"] = Path.Combine(Dirs.Packages, productName + extension);
+
+            string installer = "";
+            switch (CurrentPlatform.Current)
+            {
+                case BuildPlatform.Windows:
+                    installer = productName + ".exe";
+                    break;
+                case BuildPlatform.OSX:
+                    installer = productName + ".pkg";
+                    break;
+                case BuildPlatform.Ubuntu:
+                    installer = productName + ".deb";
+                    break;
+                default:
+                    break;
+            }
+
+            if (!string.IsNullOrEmpty(installer))
+            {
+                c.BuildContext[contextPrefix + "InstallerFile"] = Path.Combine(Dirs.Packages, installer);
+            }
+
         }
 
         [Target]
@@ -170,6 +228,19 @@ namespace Microsoft.DotNet.Host.Build
             {
                 return c.Failed(errorMessageBuilder.ToString());
             }
+        }
+
+        [Target]
+        public static BuildTargetResult RestorePackages(BuildTargetContext c)
+        {
+            var dotnet = DotNetCli.Stage0;
+
+            dotnet.Restore("--verbosity", "verbose", "--disable-parallel")
+                .WorkingDirectory(Path.Combine(c.BuildContext.BuildDirectory, "tools", "independent", "RuntimeGraphGenerator"))
+                .Execute()
+                .EnsureSuccessful();
+
+            return c.Success();
         }
 
         [Target]
