@@ -4,8 +4,10 @@
     "keyFile": "../../tools/Key.snk"
   },
   "dependencies": {
-    "Microsoft.DotNet.ProjectModel": { "target": "project" },
-    "System.Runtime.Loader": "4.0.0-rc2-24027"
+    "Microsoft.DotNet.ProjectModel": {
+      "target": "project"
+    },
+    "System.Runtime.Loader": "4.0.0-rc3-24113-00"
   },
   "frameworks": {
     "netstandard1.5": {
