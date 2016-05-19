@@ -231,7 +231,7 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                 return null;
             }
 
-            return GetFrameworkInformation(version, targetFramework);
+            return GetFrameworkInformation(version, targetFramework, referenceAssembliesPath);
         }
 
         private static FrameworkInformation GetLegacyFrameworkInformation(NuGetFramework targetFramework, string referenceAssembliesPath)
@@ -294,7 +294,7 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                 var dir = new DirectoryInfo(searchPaths[i]);
                 if (dir.Exists)
                 {
-                    PopulateFromRedistList(dir, frameworkInfo);
+                    PopulateFromRedistList(dir, targetFramework, referenceAssembliesPath, frameworkInfo);
                 }
             }
 
@@ -323,7 +323,7 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
             return targetFramework.ToString();
         }
 
-        private static FrameworkInformation GetFrameworkInformation(DirectoryInfo directory, NuGetFramework targetFramework)
+        private static FrameworkInformation GetFrameworkInformation(DirectoryInfo directory, NuGetFramework targetFramework, string referenceAssembliesPath)
         {
             var frameworkInfo = new FrameworkInformation();
             frameworkInfo.Exists = true;
@@ -333,7 +333,7 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                 Path.Combine(frameworkInfo.Path, "Facades")
             };
 
-            PopulateFromRedistList(directory, frameworkInfo);
+            PopulateFromRedistList(directory, targetFramework, referenceAssembliesPath, frameworkInfo);
             if (string.IsNullOrEmpty(frameworkInfo.Name))
             {
                 frameworkInfo.Name = SynthesizeFrameworkFriendlyName(targetFramework);
@@ -341,7 +341,7 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
             return frameworkInfo;
         }
 
-        private static void PopulateFromRedistList(DirectoryInfo directory, FrameworkInformation frameworkInfo)
+        private static void PopulateFromRedistList(DirectoryInfo directory, NuGetFramework targetFramework, string referenceAssembliesPath, FrameworkInformation frameworkInfo)
         {
             // The redist list contains the list of assemblies for this target framework
             string redistList = Path.Combine(directory.FullName, "RedistList", "FrameworkList.xml");
@@ -353,6 +353,27 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                 using (var stream = File.OpenRead(redistList))
                 {
                     var frameworkList = XDocument.Load(stream);
+
+                    // There are some frameworks, that "inherit" from a base framework, like
+                    // e.g. .NET 4.0.3, and MonoAndroid.
+                    var includeFrameworkVersion = frameworkList.Root.Attribute("IncludeFramework")?.Value;
+                    if (includeFrameworkVersion != null)
+                    {
+                        // Get the NuGetFramework identifier for the framework to include
+                        var includeFramework = NuGetFramework.Parse($"{targetFramework.Framework}, Version={includeFrameworkVersion}");
+
+                        // Recursively call the code to get the framework information
+                        var includeFrameworkInfo = GetFrameworkInformation(includeFramework, referenceAssembliesPath);
+
+                        // Append the search paths of the included framework
+                        frameworkInfo.SearchPaths = frameworkInfo.SearchPaths.Concat(includeFrameworkInfo.SearchPaths).ToArray();
+
+                        // Add the assemblies of the included framework
+                        foreach (var assemblyEntry in includeFrameworkInfo.Assemblies)
+                        {
+                            frameworkInfo.Assemblies[assemblyEntry.Key] = assemblyEntry.Value;
+                        }
+                    }
 
                     // On mono, the RedistList.xml has an entry pointing to the TargetFrameworkDirectory
                     // It basically uses the GAC as the reference assemblies for all .NET framework
