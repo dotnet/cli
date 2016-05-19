@@ -354,6 +354,9 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                 {
                     var frameworkList = XDocument.Load(stream);
 
+                    // Remember the original search paths, because we might need them later
+                    var originalSearchPaths = frameworkInfo.SearchPaths;
+
                     // There are some frameworks, that "inherit" from a base framework, like
                     // e.g. .NET 4.0.3, and MonoAndroid.
                     var includeFrameworkVersion = frameworkList.Root.Attribute("IncludeFramework")?.Value;
@@ -380,6 +383,7 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                     // profiles
                     var targetFrameworkDirectory = frameworkList.Root.Attribute("TargetFrameworkDirectory")?.Value;
 
+                    IEnumerable<string> populateFromPaths;
                     if (!string.IsNullOrEmpty(targetFrameworkDirectory))
                     {
                         // For some odd reason, the paths are actually listed as \ so normalize them here
@@ -391,19 +395,56 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                         // Update the path to the framework
                         frameworkInfo.Path = resovledPath;
 
-                        PopulateAssemblies(frameworkInfo.Assemblies, resovledPath);
-                        PopulateAssemblies(frameworkInfo.Assemblies, Path.Combine(resovledPath, "Facades"));
+                        populateFromPaths = new List<string>
+                        {
+                            resovledPath,
+                            Path.Combine(resovledPath, "Facades")
+                        };
                     }
                     else
                     {
-                        foreach (var e in frameworkList.Root.Elements())
-                        {
-                            var assemblyName = e.Attribute("AssemblyName").Value;
-                            var version = e.Attribute("Version")?.Value;
+                        // Get all "File" elements
+                        var fileElements = frameworkList.Root.Elements();
 
-                            var entry = new AssemblyEntry();
-                            entry.Version = version != null ? Version.Parse(version) : null;
-                            frameworkInfo.Assemblies[assemblyName] = entry;
+                        // Use an enumerator to avoid unnecessary allocations, because we want to set
+                        // emptyFileElements only once to false.
+                        var filesEnumerator = fileElements.GetEnumerator();
+                        var emptyFileElements = true;
+                        if (filesEnumerator.MoveNext())
+                        {
+                            emptyFileElements = false;
+                            do
+                            {
+                                var e = filesEnumerator.Current;
+                                var assemblyName = e.Attribute("AssemblyName").Value;
+                                var version = e.Attribute("Version")?.Value;
+
+                                var entry = new AssemblyEntry();
+                                entry.Version = version != null ? Version.Parse(version) : null;
+                                frameworkInfo.Assemblies[assemblyName] = entry;
+                            }
+                            while (filesEnumerator.MoveNext());
+                        }
+
+                        if (emptyFileElements)
+                        {
+                            // When we haven't found any file elements, we probably processed a
+                            // Mono/Xamarin FrameworkList.xml. That means, that we have to
+                            // populate the assembly list from the files.
+                            populateFromPaths = originalSearchPaths;
+                        }
+                        else
+                        {
+                            populateFromPaths = null;
+                        }
+                    }
+
+                    // Do we need to populate from search paths?
+                    if (populateFromPaths != null)
+                    {
+                        foreach (var populateFromPath in populateFromPaths)
+                        {
+                            PopulateAssemblies(frameworkInfo.Assemblies, populateFromPath);
                         }
                     }
 
