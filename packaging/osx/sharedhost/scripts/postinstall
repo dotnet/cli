@@ -10,7 +10,7 @@ INSTALL_DESTINATION=$2
 # A temporary fix for the permissions issue(s)
 chmod 755 $INSTALL_DESTINATION/dotnet
 
-# Add the installation directory to the system-wide paths
-echo $INSTALL_DESTINATION | tee -a /etc/paths.d/dotnet
+# Add the host to the /usr/bin directory as a symlink
+ln -s $INSTALL_DESTINATION/dotnet/dotnet /usr/bin
 
 exit 0
