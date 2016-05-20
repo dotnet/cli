@@ -47,7 +47,7 @@ When using non-release versions of the CLI, `dotnet restore` will fail to restor
   <packageSources>
     <!--To inherit the global NuGet package sources remove the <clear/> line below -->
     <clear />
-    <add key="cli-deps" value="https://dotnet.myget.org/F/cli-deps/api/v3/index.json" />
+    <add key="dotnet-core" value="https://dotnet.myget.org/F/dotnet-core/api/v3/index.json" />
     <add key="api.nuget.org" value="https://api.nuget.org/v3/index.json" />
   </packageSources>
 </configuration>
