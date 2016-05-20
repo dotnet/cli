@@ -11,6 +11,8 @@ INSTALL_DESTINATION=$2
 chmod 755 $INSTALL_DESTINATION/dotnet
 
 # Add the host to the /usr/bin directory as a symlink
-ln -s $INSTALL_DESTINATION/dotnet/dotnet /usr/bin
+# Create the /usr/local/bin on 10.11
+mkdir -p /usr/local/bin
+ln -s $INSTALL_DESTINATION/dotnet/dotnet /usr/local/bin
 
 exit 0
