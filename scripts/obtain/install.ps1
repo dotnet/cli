@@ -18,7 +18,7 @@
 .PARAMETER Version
     Default: latest
     Represents a build version on specific channel. Possible values:
-    - 4-part version in a format A.B.C.D - represents specific version of build
+    - specific version
     - latest - most latest build on specific channel
     - lkg - last known good version on specific channel
     Note: LKG work is in progress. Once the work is finished, this will become new default
