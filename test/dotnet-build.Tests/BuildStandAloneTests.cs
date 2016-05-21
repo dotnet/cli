@@ -2,14 +2,14 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.IO;
-using Microsoft.DotNet.Tools.Test.Utilities;
-using Microsoft.DotNet.ProjectModel;
-using Microsoft.Extensions.PlatformAbstractions;
-using Xunit;
 using System.Linq;
-using Microsoft.DotNet.TestFramework;
-using Newtonsoft.Json.Linq;
 using FluentAssertions;
+using Microsoft.DotNet.InternalAbstractions;
+using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.TestFramework;
+using Microsoft.DotNet.Tools.Test.Utilities;
+using Newtonsoft.Json.Linq;
+using Xunit;
 
 namespace Microsoft.DotNet.Tools.Builder.Tests
 {
@@ -72,14 +72,14 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             var contexts = ProjectContext.CreateContextForEachFramework(
                 projectPath,
                 null,
-                PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
+                RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers());
 
             var runtime = contexts.FirstOrDefault(c => !string.IsNullOrEmpty(c.RuntimeIdentifier))?.RuntimeIdentifier;
 
             result.Should().Pass();
 
             var outputBase = new DirectoryInfo(
-                Path.Combine(testInstance.TestRoot, "StandaloneApp", "bin", "Debug", "netstandardapp1.5"));
+                Path.Combine(testInstance.TestRoot, "StandaloneApp", "bin", "Debug", "netcoreapp1.0"));
 
             return outputBase.Sub(runtime);
         }

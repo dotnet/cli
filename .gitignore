@@ -3,6 +3,9 @@
 # Test results
 *-testResults.xml
 
+# Multicore JIT Optimization profiles
+**/optimizationdata/dotnet
+
 # NuGet keeps dropping
 Library/
 
@@ -142,6 +145,8 @@ $tf/
 _ReSharper*/
 *.[Rr]e[Ss]harper
 *.DotSettings.user
+.idea/
+*.iml
 
 # JustCode is a .NET coding add-in
 .JustCode

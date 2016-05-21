@@ -1,6 +1,6 @@
 {
   "version": "1.0.0-*",
-  "compilationOptions": {
+  "buildOptions": {
     "emitEntryPoint": true,
     "preserveCompilationContext": true
   },
@@ -9,11 +9,9 @@
       "target": "project",
       "version": "1.0.0-*"
     },
-    "NETStandard.Library": "1.5.0-rc2-24015"
+    "Microsoft.NETCore.App": "1.0.0-rc3-*"
   },
   "frameworks": {
-    "netstandardapp1.5": {
-      "imports": "dnxcore50"
-    }
+    "netcoreapp1.0": {}
   }
 }

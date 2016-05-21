@@ -1,21 +1,34 @@
 {
-  "version": "1.0.0-*",
-  "compilationOptions": {
-    "emitEntryPoint": true
+  "version": "1.0.0-preview2-*",
+  "buildOptions": {
+    "emitEntryPoint": true,
+    "compile": {
+      "include": [
+        "**/*.cs",
+        "../dotnet/CommandLine/*.cs",
+        "../dotnet/commands/dotnet-compile-csc/AssemblyInfoOptionsCommandLine.cs",
+        "../dotnet/commands/dotnet-compile-csc/CommonCompilerOptionsCommandLine.cs"
+      ]
+    }
   },
   "dependencies": {
     "Microsoft.FSharp.Compiler.netcore": "1.0.0-alpha-160318",
-    "System.CommandLine": "0.1.0-e160323-1",
-    "Microsoft.DotNet.ProjectModel": "1.0.0-*",
-    "Microsoft.DotNet.Compiler.Common": "1.0.0-*",
-    "Microsoft.DotNet.Cli.Utils": "1.0.0-*",
+    "Microsoft.DotNet.ProjectModel": {
+      "target": "project"
+    },
+    "Microsoft.DotNet.Compiler.Common": {
+      "target": "project"
+    },
+    "Microsoft.DotNet.Cli.Utils": {
+      "target": "project"
+    },
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.0-rc2-*"
+      "version": "1.0.0-rc3-*"
     }
   },
   "frameworks": {
-    "netstandard1.5": {
+    "netcoreapp1.0": {
       "imports": [
         "dnxcore50",
         "portable-net45+win81",

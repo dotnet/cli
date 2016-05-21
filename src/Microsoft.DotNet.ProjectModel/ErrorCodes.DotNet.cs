@@ -16,5 +16,14 @@ namespace Microsoft.DotNet.ProjectModel
 
         // Failed to read lock file
         public static readonly string DOTNET1014 = nameof(DOTNET1014);
+
+        // The '{0}' option is deprecated. Use '{1}' instead.
+        public static readonly string DOTNET1015 = nameof(DOTNET1015);
+
+        // The '{0}' option in the root is deprecated. Use it in '{1}' instead.
+        public static readonly string DOTNET1016 = nameof(DOTNET1016);
+
+        // Project file does not exist '{0}'.
+        public static readonly string DOTNET1017 = nameof(DOTNET1017);
     }
 }

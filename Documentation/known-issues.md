@@ -1,6 +1,58 @@
 Known issues & workarounds
 ==========================
 
+## OpenSSL dependency on OS X
+OS X "El Capitan" (10.11) comes with 0.9.8 version of OpenSSL. .NET Core depends on versions >= 1.0.1 of OpenSSL. You can update the version by using [Homebrew](https://brew.sh), [MacPorts](https://www.macports.org/) or manually. The important bit is that you need to have the required OpenSSL version on the path when you work with .NET Core. 
+
+With Homebrew, you can run the following commands to get this done: 
+
+```console
+brew update
+brew install openssl
+brew link --force openssl
+```
+
+MacPorts doesn't have the concept of linking, so it is reccomended that you uninstall 0.9.8 version of OpenSSL using the following command:
+
+```console
+sudo port upgrade openssl
+sudo port -f uninstall openssl @0.9.8
+```
+
+You can verify whether you have the right version using the  `openssl version` command from the Terminal. 
+
+## Users of zsh (z shell) don't get `dotnet` on the path after install
+There is a problem with the way `path_helper` interacts with `zsh` which makes `dotnet` not appear on the path even though 
+the install places the file properly in the `/etc/paths.d/` directory. 
+
+**Issues tracking this:**
+
+* [#1567](https://github.com/dotnet/cli/issues/1567)
+
+**Workaround:** symlink the `dotnet` binary in the installation directory to a place in the global path, e.g. `/usr/local/bin`. 
+The command you can use is:
+
+```console
+ln -s /usr/local/share/dotnet/dotnet /usr/local/bin
+```
+
+## On dev builds of the tools, restoring default project from dotnet new fails
+When using non-release versions of the CLI, `dotnet restore` will fail to restore `Microsoft.NETCore.App` because for that particular version it exists on a NuGet feed that is not configured on the machine. This behavior is by design and does not happen with public releases (such as RC2).
+
+**Workaround:** create a `NuGet.config` file in the project directory which contains the following:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <!--To inherit the global NuGet package sources remove the <clear/> line below -->
+    <clear />
+    <add key="dotnet-core" value="https://dotnet.myget.org/F/dotnet-core/api/v3/index.json" />
+    <add key="api.nuget.org" value="https://api.nuget.org/v3/index.json" />
+  </packageSources>
+</configuration>
+```
+
 ## `dotnet restore` times out on Win7 x64
 If you have Virtual Box and you try to use the CLI on a Win7 x64 machine, `dotnet restore` will be really slow and will eventually time out without doing much restoring. 
 
@@ -53,4 +105,3 @@ get information and get unblocked.
 A "known issue" is a major issue that block users in doing their everyday tasks and that affect all or 
 most of the commands in the CLI tools. If you want to report or see minor issues, you can use the [issues list](https://github.com/dotnet/cli/issues). 
 
-  

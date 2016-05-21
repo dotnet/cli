@@ -2,15 +2,14 @@
   "version": "1.0.0-*",
   "dependencies": {
     "Microsoft.Extensions.DependencyModel": {
-      "target": "project",
-      "version": "1.0.0-*"
+      "target": "project"
     }
   },
   "frameworks": {
     "netstandard1.5": {
       "imports": "dnxcore50",
       "dependencies": {
-        "NETStandard.Library": "1.5.0-rc2-24015"
+        "Microsoft.NETCore.App": "1.0.0-rc3-*"
       }
     },
     "net451": {}

@@ -1,17 +1,16 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -22,30 +21,9 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
     public class DthTests : TestBase
     {
         private readonly TestAssetsManager _testAssetsManager;
-        private readonly ILoggerFactory _loggerFactory;
 
         public DthTests()
         {
-            _loggerFactory = new LoggerFactory();
-
-            var testVerbose = Environment.GetEnvironmentVariable("DOTNET_TEST_VERBOSE");
-            if (testVerbose == "2")
-            {
-                _loggerFactory.AddConsole(LogLevel.Trace);
-            }
-            else if (testVerbose == "1")
-            {
-                _loggerFactory.AddConsole(LogLevel.Information);
-            }
-            else if (testVerbose == "0")
-            {
-                _loggerFactory.AddConsole(LogLevel.Warning);
-            }
-            else
-            {
-                _loggerFactory.AddConsole(LogLevel.Error);
-            }
-
             _testAssetsManager = new TestAssetsManager(
                 Path.Combine(RepoRoot, "TestAssets", "ProjectModelServer", "DthTestProjects", "src"));
         }
@@ -56,8 +34,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             var projectPath = Path.Combine(_testAssetsManager.AssetsRoot, "EmptyConsoleApp");
             Assert.NotNull(projectPath);
 
-            using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server, _loggerFactory))
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
             {
                 client.Initialize(projectPath);
 
@@ -75,7 +53,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                                                             .AssertJArrayCount(2)
                                                             .Select(f => f["ShortName"].Value<string>());
 
-                Assert.Contains("netstandardapp1.5", frameworkShortNames);
+                Assert.Contains("netcoreapp1.0", frameworkShortNames);
                 Assert.Contains("dnx451", frameworkShortNames);
             }
         }
@@ -86,8 +64,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             var projectPath = Path.Combine(_testAssetsManager.AssetsRoot, "EmptyConsoleApp");
             Assert.NotNull(projectPath);
 
-            using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server, _loggerFactory))
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
             {
                 client.Initialize(projectPath);
                 var messages = client.DrainAllMessages()
@@ -123,8 +101,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
         [InlineData(3, 3)]
         public void DthStartup_ProtocolNegotiation(int requestVersion, int expectVersion)
         {
-            using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server, _loggerFactory))
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
             {
                 client.SetProtocolVersion(requestVersion);
 
@@ -138,8 +116,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
         [Fact]
         public void DthStartup_ProtocolNegotiation_ZeroIsNoAllowed()
         {
-            using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server, _loggerFactory))
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
             {
                 client.SetProtocolVersion(0);
 
@@ -168,8 +146,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             var projectPath = Path.Combine(_testAssetsManager.AssetsRoot, testProjectName);
             Assert.NotNull(projectPath);
 
-            using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server, _loggerFactory))
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
             {
                 client.Initialize(projectPath);
 
@@ -221,8 +199,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
         [Fact]
         public void DthNegative_BrokenProjectPathInLockFile()
         {
-            using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server, _loggerFactory))
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
             {
                 // After restore the project is copied to another place so that
                 // the relative path in project lock file is invalid.
@@ -255,8 +233,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             var projectPath = assets.CreateTestInstance("DthUpdateSearchPathSample").WithLockFiles().TestRoot;
             Assert.True(Directory.Exists(projectPath));
 
-            using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server, _loggerFactory))
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
             {
                 var testProject = Path.Combine(projectPath, "home", "src", "MainProject");
 
@@ -283,7 +261,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                     Path.Combine(projectPath, "home", GlobalSettings.FileName),
                     JsonConvert.SerializeObject(new { project = new string[] { "src" } }));
 
-                client.SendPayLoad(testProject, "RefreshDependencies");
+                client.SendPayload(testProject, "RefreshDependencies");
 
                 client.DrainTillFirst("ProjectInformation")
                       .RetrievePayloadAs<JObject>()
@@ -312,8 +290,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
         {
             var projectPath = _testAssetsManager.CreateTestInstance("EmptyConsoleApp").TestRoot;
 
-            using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server, _loggerFactory))
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
             {
                 client.Initialize(projectPath);
                 var messages = client.DrainAllMessages();
@@ -338,8 +316,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             var assetsManager = new TestAssetsManager(testAssetsPath);
             var testSource = assetsManager.CreateTestInstance("IncorrectProjectJson").TestRoot;
 
-            using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server, _loggerFactory))
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
             {
                 client.Initialize(Path.Combine(_testAssetsManager.AssetsRoot, "EmptyLibrary"));
                 client.Initialize(testSource);
@@ -371,8 +349,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             var assetsManager = new TestAssetsManager(testAssetsPath);
             var testSource = assetsManager.CreateTestInstance("IncorrectGlobalJson");
 
-            using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server, _loggerFactory))
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
             {
                 client.Initialize(Path.Combine(testSource.TestRoot, "src", "Project1"));
 
@@ -390,8 +368,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                                                 .WithLockFiles()
                                                 .TestRoot;
 
-            using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server, _loggerFactory))
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
             {
                 var projectFile = Path.Combine(testProject, Project.FileName);
                 var content = File.ReadAllText(projectFile);
@@ -402,7 +380,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                 messages.ContainsMessage(MessageTypes.Error);
 
                 File.WriteAllText(projectFile, content);
-                client.SendPayLoad(testProject, MessageTypes.FilesChanged);
+                client.SendPayload(testProject, MessageTypes.FilesChanged);
                 var clearError = client.DrainTillFirst(MessageTypes.Error);
                 clearError.Payload.AsJObject().AssertProperty("Message", null as string);
             }
@@ -417,8 +395,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                                                 .WithLockFiles()
                                                 .TestRoot;
 
-            using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server, _loggerFactory))
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
             {
                 var lockFilePath = Path.Combine(testProject, LockFile.FileName);
                 var lockFileContent = File.ReadAllText(lockFilePath);
@@ -469,8 +447,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
 
             File.WriteAllText(projectFilePath, JsonConvert.SerializeObject(projectJson));
 
-            using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server, _loggerFactory))
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
             {
                 client.Initialize(projectPath);
                 var messages = client.DrainAllMessages();
@@ -495,8 +473,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                                                      "src",
                                                      "MainApp");
 
-            using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server, _loggerFactory))
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
             {
                 client.Initialize(testProject);
                 var messages = client.DrainAllMessages();
@@ -506,13 +484,13 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                 var testProjectRoot = Path.Combine(RepoRoot, "TestAssets", "ProjectModelServer", "MSBuildReferencesProjects", "ValidCase01");
                 foreach (var classLibrary in classLibraries)
                 {
-                    dependencies.RetrieveDependency(classLibrary)
-                                .AssertProperty("Type", LibraryType.MSBuildProject.ToString())
-                                .AssertProperty("Path", NormalizePathString(Path.Combine(testProjectRoot, classLibrary, $"{classLibrary}.csproj")))
-                                .AssertProperty<bool>("Resolved", true)
-                                .AssertProperty("Name", classLibrary)
-                                .AssertProperty<JArray>("Errors", array => array.Count == 0)
-                                .AssertProperty<JArray>("Warnings", array => array.Count == 0);
+                    var dependency = dependencies.RetrieveDependency(classLibrary);
+                    dependency.AssertProperty("Type", LibraryType.MSBuildProject.ToString());
+                    dependency.AssertProperty("Path", NormalizePathString(Path.Combine(testProjectRoot, classLibrary, $"{classLibrary}.csproj")));
+                    dependency.AssertProperty<bool>("Resolved", true);
+                    dependency.AssertProperty("Name", classLibrary);
+                    dependency.AssertProperty<JArray>("Errors", array => array.Count == 0);
+                    dependency.AssertProperty<JArray>("Warnings", array => array.Count == 0);
                 }
 
                 var references = messages.RetrieveSingleMessage(MessageTypes.References)
@@ -550,8 +528,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                                                 .WithLockFiles()
                                                 .TestRoot;
 
-            using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server, _loggerFactory))
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
             {
                 client.Initialize(projectPath);
 
@@ -571,7 +549,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
 
                 File.WriteAllText(projectFilePath, JsonConvert.SerializeObject(projectJson));
 
-                client.SendPayLoad(projectPath, MessageTypes.RefreshDependencies);
+                client.SendPayload(projectPath, MessageTypes.RefreshDependencies);
 
                 var afterDependencies = client.DrainTillFirst(MessageTypes.Dependencies);
                 afterDependencies.RetrieveDependency(appName)
@@ -596,8 +574,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             var projectPath = tam.CreateTestInstance("ValidCase01").WithLockFiles().TestRoot;
             projectPath = Path.Combine(projectPath, "src", "MainApp");
 
-            using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server, _loggerFactory))
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
             {
                 client.Initialize(projectPath);
 
@@ -620,7 +598,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
 
                 File.WriteAllText(projectFilePath, JsonConvert.SerializeObject(projectJson));
 
-                client.SendPayLoad(projectPath, MessageTypes.RefreshDependencies);
+                client.SendPayload(projectPath, MessageTypes.RefreshDependencies);
 
                 var afterDependencies = client.DrainTillFirst(MessageTypes.Dependencies);
                 afterDependencies.RetrieveDependency("MainApp")
@@ -632,19 +610,95 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                 afterDependencies.RetrieveDependency("ClassLibrary3");
             }
         }
-        
+
         [Fact]
         public void TestMscorlibLibraryDuplication()
         {
             var projectPath = Path.Combine(RepoRoot, "TestAssets", "ProjectModelServer", "MscorlibLibraryDuplication");
-            
-            using (var server = new DthTestServer(_loggerFactory))
-            using (var client = new DthTestClient(server, _loggerFactory))
+
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
             {
                 client.Initialize(projectPath);
 
                 var messages = client.DrainAllMessages();
                 messages.AssertDoesNotContain(MessageTypes.Error);
+            }
+        }
+
+        [Fact]
+        public void TestTargetFrameworkChange()
+        {
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
+            {
+                var testProject = _testAssetsManager.CreateTestInstance("EmptyLibrary")
+                                                    .WithLockFiles()
+                                                    .TestRoot;
+
+                // initialize the project and drain all messages (7 message for project with one framework)
+                client.Initialize(testProject);
+                client.DrainAllMessages();
+
+                // update the target framework from netstandard1.3 to netstandard 1.5 so as to invalidate all
+                // dependencies
+                var projectJsonPath = Path.Combine(testProject, "project.json");
+                File.WriteAllText(projectJsonPath,
+                                  File.ReadAllText(projectJsonPath).Replace("netstandard1.3", "netstandard1.5"));
+
+                // send files change request to server to prompt update
+                client.SendPayload(testProject, MessageTypes.FilesChanged);
+
+                // assert project information is updated
+                client.DrainTillFirst(MessageTypes.ProjectInformation)
+                      .RetrievePayloadAs<JObject>()
+                      .RetrievePropertyAs<JArray>("Frameworks")
+                      .AssertJArrayCount(1)
+                      .RetrieveArraryElementAs<JObject>(0)
+                      .AssertProperty("ShortName", "netstandard1.5");
+
+                // the NETStandard.Library dependency should turn unresolved
+                var dependencies = client.DrainTillFirst(MessageTypes.Dependencies);
+
+                dependencies.RetrievePayloadAs<JObject>()
+                            .RetrievePropertyAs<JObject>("Framework")
+                            .AssertProperty("ShortName", "netstandard1.5");
+
+                dependencies.RetrieveDependency("NETStandard.Library")
+                            .RetrievePropertyAs<JArray>("Errors")
+                            .AssertJArrayCount(1)
+                            .RetrieveArraryElementAs<JObject>(0)
+                            .AssertProperty("ErrorCode", "NU1001");
+
+                // warning for project.json and project.lock.json out of sync
+                var diagnostics = client.DrainTillFirst(MessageTypes.DependencyDiagnostics);
+
+                diagnostics.RetrievePayloadAs<JObject>()
+                           .RetrievePropertyAs<JObject>("Framework")
+                           .AssertProperty("ShortName", "netstandard1.5");
+
+                diagnostics.RetrievePayloadAs<JObject>()
+                           .RetrievePropertyAs<JArray>("Warnings")
+                           .AssertJArrayCount(1)
+                           .RetrieveArraryElementAs<JObject>(0)
+                           .AssertProperty("ErrorCode", "NU1006");
+
+                // restore again
+                var restoreCommand = new RestoreCommand();
+                restoreCommand.WorkingDirectory = testProject;
+                restoreCommand.Execute().Should().Pass();
+
+                client.SendPayload(testProject, MessageTypes.RefreshDependencies);
+
+                client.DrainTillFirst(MessageTypes.Dependencies)
+                      .RetrieveDependency("NETStandard.Library")
+                      .RetrievePropertyAs<JArray>("Errors")
+                      .AssertJArrayCount(0);
+
+                client.DrainTillFirst(MessageTypes.DependencyDiagnostics)
+                      .RetrievePayloadAs<JObject>()
+                      .RetrievePropertyAs<JArray>("Warnings")
+                      .AssertJArrayCount(0);
             }
         }
 

@@ -57,7 +57,9 @@ namespace Microsoft.DotNet.Scripts
         {
             List<DependencyInfo> dependencyInfos = c.GetDependencyInfos();
 
-            IEnumerable<string> projectJsonFiles = Directory.GetFiles(Dirs.RepoRoot, "project.json", SearchOption.AllDirectories);
+            IEnumerable<string> projectJsonFiles = Enumerable.Union(
+                Directory.GetFiles(Dirs.RepoRoot, "project.json", SearchOption.AllDirectories),
+                Directory.GetFiles(Path.Combine(Dirs.RepoRoot, @"src\dotnet\commands\dotnet-new"), "project.json.pretemplate", SearchOption.AllDirectories));
 
             JObject projectRoot;
             foreach (string projectJsonFile in projectJsonFiles)
@@ -69,6 +71,12 @@ namespace Microsoft.DotNet.Scripts
                 catch (Exception e)
                 {
                     c.Warn($"Non-fatal exception occurred reading '{projectJsonFile}'. Skipping file. Exception: {e}. ");
+                    continue;
+                }
+
+                if (projectRoot == null)
+                {
+                    c.Warn($"A non valid JSON file was encountered '{projectJsonFile}'. Skipping file.");
                     continue;
                 }
 
@@ -182,7 +190,7 @@ namespace Microsoft.DotNet.Scripts
         [Target]
         public static BuildTargetResult ReplaceCrossGen(BuildTargetContext c)
         {
-            ReplaceFileContents(@"scripts\dotnet-cli-build\CompileTargets.cs", compileTargetsContent =>
+            ReplaceFileContents(@"build_projects\dotnet-cli-build\CompileTargets.cs", compileTargetsContent =>
             {
                 DependencyInfo coreFXInfo = c.GetCoreFXDependency();
                 Regex regex = new Regex(@"CoreCLRVersion = ""(?<version>\d.\d.\d)-(?<release>.*)"";");

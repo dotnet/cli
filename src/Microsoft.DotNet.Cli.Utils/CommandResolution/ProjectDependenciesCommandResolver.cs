@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.ProjectModel.Graph;
-using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
     public class ProjectDependenciesCommandResolver : ICommandResolver
     {
-        private static readonly CommandResolutionStrategy s_commandResolutionStrategy = 
+        private static readonly CommandResolutionStrategy s_commandResolutionStrategy =
             CommandResolutionStrategy.ProjectDependenciesPackage;
 
         private readonly IEnvironmentProvider _environment;
@@ -78,8 +78,20 @@ namespace Microsoft.DotNet.Cli.Utils
             var depsFilePath =
                 projectContext.GetOutputPaths(configuration, buildBasePath, outputPath).RuntimeFiles.DepsJson;
 
-            var runtimeConfigPath = 
+            if (! File.Exists(depsFilePath))
+            {
+                Reporter.Verbose.WriteLine($"projectdependenciescommandresolver: {depsFilePath} does not exist");
+                return null;
+            }
+
+            var runtimeConfigPath =
                 projectContext.GetOutputPaths(configuration, buildBasePath, outputPath).RuntimeFiles.RuntimeConfigJson;
+
+            if (! File.Exists(runtimeConfigPath))
+            {
+                Reporter.Verbose.WriteLine($"projectdependenciescommandresolver: {runtimeConfigPath} does not exist");
+                return null;
+            }
 
             var toolLibrary = GetToolLibraryForContext(projectContext, commandName);
 
@@ -97,12 +109,18 @@ namespace Microsoft.DotNet.Cli.Utils
         private LockFileTargetLibrary GetToolLibraryForContext(
             ProjectContext projectContext, string commandName)
         {
-            var toolLibrary = projectContext.LockFile.Targets
+            var toolLibraries = projectContext.LockFile.Targets
                 .FirstOrDefault(t => t.TargetFramework.GetShortFolderName()
                                       .Equals(projectContext.TargetFramework.GetShortFolderName()))
-                ?.Libraries.FirstOrDefault(l => l.Name == commandName);
+                ?.Libraries.Where(l => l.Name == commandName ||
+                    l.RuntimeAssemblies.Any(r => Path.GetFileNameWithoutExtension(r.Path) == commandName)).ToList();
 
-            return toolLibrary;
+            if (toolLibraries?.Count() > 1)
+            {
+                throw new InvalidOperationException($"Ambiguous command name: {commandName}");
+            }
+
+            return toolLibraries?.FirstOrDefault();
         }
 
         private ProjectContext GetProjectContextFromDirectory(string directory, NuGetFramework framework)
@@ -120,9 +138,9 @@ namespace Microsoft.DotNet.Cli.Utils
             }
 
             return ProjectContext.Create(
-                projectRootPath, 
-                framework, 
-                PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
+                projectRootPath,
+                framework,
+                RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers());
 
         }
 

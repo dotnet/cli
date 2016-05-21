@@ -60,14 +60,7 @@ int execute_app(
 
     if (code != StatusCode::Success)
     {
-        trace::error(_X("Could not load host policy library from [%s]"), impl_dll_dir.c_str());
-        if (init->fx_dir() == impl_dll_dir)
-        {
-            pal::string_t name = init->fx_name();
-            pal::string_t version = init->fx_version();
-            trace::error(_X("This may be because the targeted framework [\"%s\": \"%s\"] was not found."),
-                name.c_str(), version.c_str());
-        }
+        trace::error(_X("An error occurred while loading required library %s from [%s]"), LIBHOSTPOLICY_NAME, impl_dll_dir.c_str());
         return code;
     }
 
@@ -83,37 +76,21 @@ int execute_app(
     return code;
 }
 
-bool hostpolicy_exists_in_svc(pal::string_t* resolved_dir)
-{
-    pal::string_t svc_dir;
-    pal::get_default_extensions_directory(&svc_dir);
-    append_path(&svc_dir, _X("pkgs"));
-
-    pal::string_t version = _STRINGIFY(HOST_POLICY_PKG_VER);
-    pal::string_t rel_dir = _STRINGIFY(HOST_POLICY_PKG_REL_DIR);
-    if (DIR_SEPARATOR != '/')
-    {
-        replace_char(&rel_dir, '/', DIR_SEPARATOR);
-    }
-
-    pal::string_t path = svc_dir;
-    append_path(&path, _STRINGIFY(HOST_POLICY_PKG_NAME));
-    append_path(&path, version.c_str());
-    append_path(&path, rel_dir.c_str());
-
-    if (library_exists_in_dir(path, LIBHOSTPOLICY_NAME, nullptr))
-    {
-        resolved_dir->assign(path);
-        trace::verbose(_X("[%s] exists in servicing [%s]"), LIBHOSTPOLICY_NAME, path.c_str());
-        return true;
-    }
-    trace::verbose(_X("[%s] doesn't exist in servicing [%s]"), LIBHOSTPOLICY_NAME, path.c_str());
-    return false;
-}
+static char sccsid[] = "@(#)"            \
+                       HOST_PKG_VER      \
+                       "; Commit Hash: " \
+                       REPO_COMMIT_HASH  \
+                       "; Built on: "    \
+                       __DATE__          \
+                       " "               \
+                       __TIME__          \
+                       ;
 
 SHARED_API int hostfxr_main(const int argc, const pal::char_t* argv[])
 {
     trace::setup();
+    
+    trace::info(_X("--- Invoked hostfxr [commit hash: %s] main"), _STRINGIFY(REPO_COMMIT_HASH));
 
     fx_muxer_t muxer;
     return muxer.execute(argc, argv);

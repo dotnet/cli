@@ -4,14 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using FluentAssertions;
+using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel;
 using Moq;
 using NuGet.Frameworks;
 using Xunit;
-using Microsoft.DotNet.Cli.Utils;
-using FluentAssertions;
-using System.Linq;
-using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Microsoft.DotNet.Tools.Compiler.Tests
 {
@@ -28,14 +27,14 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
         public void It_passes_a_FullTargetFramework_variable_to_the_pre_compile_scripts()
         {
             _fixture.PreCompileScriptVariables.Should().ContainKey("compile:FullTargetFramework");
-            _fixture.PreCompileScriptVariables["compile:FullTargetFramework"].Should().Be(".NETStandardApp,Version=v1.5");
+            _fixture.PreCompileScriptVariables["compile:FullTargetFramework"].Should().Be(".NETCoreApp,Version=v1.0");
         }
 
         [Fact]
         public void It_passes_a_TargetFramework_variable_to_the_pre_compile_scripts()
         {
             _fixture.PreCompileScriptVariables.Should().ContainKey("compile:TargetFramework");
-            _fixture.PreCompileScriptVariables["compile:TargetFramework"].Should().Be("netstandardapp1.5");
+            _fixture.PreCompileScriptVariables["compile:TargetFramework"].Should().Be("netcoreapp1.0");
         }
 
         [Fact]
@@ -70,7 +69,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
         [Fact]
         public void It_passes_a_RuntimeOutputDir_variable_to_the_pre_compile_scripts_if_rid_is_set_in_the_ProjectContext()
         {
-            var rid = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
+            var rid = RuntimeEnvironmentRidExtensions.GetLegacyRestoreRuntimeIdentifier();
             var fixture = ScriptVariablesFixture.GetFixtureWithRids(rid);
             fixture.PreCompileScriptVariables.Should().ContainKey("compile:RuntimeOutputDir");
             fixture.PreCompileScriptVariables["compile:RuntimeOutputDir"].Should().Be(fixture.RuntimeOutputDir);
@@ -80,14 +79,14 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
         public void It_passes_a_FullTargetFramework_variable_to_the_post_compile_scripts()
         {
             _fixture.PostCompileScriptVariables.Should().ContainKey("compile:FullTargetFramework");
-            _fixture.PostCompileScriptVariables["compile:FullTargetFramework"].Should().Be(".NETStandardApp,Version=v1.5");
+            _fixture.PostCompileScriptVariables["compile:FullTargetFramework"].Should().Be(".NETCoreApp,Version=v1.0");
         }
 
         [Fact]
         public void It_passes_a_TargetFramework_variable_to_the_post_compile_scripts()
         {
             _fixture.PostCompileScriptVariables.Should().ContainKey("compile:TargetFramework");
-            _fixture.PostCompileScriptVariables["compile:TargetFramework"].Should().Be("netstandardapp1.5");
+            _fixture.PostCompileScriptVariables["compile:TargetFramework"].Should().Be("netcoreapp1.0");
         }
 
         [Fact]
@@ -129,7 +128,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
         [Fact]
         public void It_passes_a_RuntimeOutputDir_variable_to_the_post_compile_scripts_if_rid_is_set_in_the_ProjectContext()
         {
-            var rid = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
+            var rid = RuntimeEnvironmentRidExtensions.GetLegacyRestoreRuntimeIdentifier();
             var fixture = ScriptVariablesFixture.GetFixtureWithRids(rid);
             fixture.PostCompileScriptVariables.Should().ContainKey("compile:RuntimeOutputDir");
             fixture.PostCompileScriptVariables["compile:RuntimeOutputDir"].Should().Be(fixture.RuntimeOutputDir);
@@ -138,6 +137,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
 
     public class ScriptVariablesFixture
     {
+        public readonly NuGetFramework TestAssetFramework = FrameworkConstants.CommonFrameworks.NetCoreApp10;
         public const string ConfigValue = "Debug";
 
         public static string TestAssetPath = Path.Combine(
@@ -151,7 +151,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             TestAssetPath,
             "bin",
             ConfigValue,
-            "netstandardapp1.5");
+            "netcoreapp1.0");
 
         public string RuntimeOutputDir { get; private set; }
 
@@ -161,7 +161,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             TestAssetPath,
             "obj",
             ConfigValue,
-            "netstandardapp1.5",
+            "netcoreapp1.0",
             "dotnet-compile.rsp");
 
         public Dictionary<string, string> PreCompileScriptVariables { get; private set; }
@@ -176,6 +176,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             var projectJson = Path.Combine(TestAssetPath, "project.json");
             var command = new Mock<ICommand>();
             command.Setup(c => c.Execute()).Returns(new CommandResult());
+            command.Setup(c => c.WorkingDirectory(It.IsAny<string>())).Returns(() => command.Object);
             command.Setup(c => c.OnErrorLine(It.IsAny<Action<string>>())).Returns(() => command.Object);
             command.Setup(c => c.OnOutputLine(It.IsAny<Action<string>>())).Returns(() => command.Object);
             var commandFactory = new Mock<ICommandFactory>();
@@ -187,7 +188,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
                     It.IsAny<string>()))
                 .Returns(command.Object);
 
-            var _args = new CompilerCommandApp("dotnet compile", ".NET Compiler", "Compiler for the .NET Platform");
+            var _args = new BuildCommandApp("dotnet compile", ".NET Compiler", "Compiler for the .NET Platform", new BuildWorkspace(new ProjectReaderSettings()));
             _args.ConfigValue = ConfigValue;
 
             PreCompileScriptVariables = new Dictionary<string, string>();
@@ -218,7 +219,9 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
                 rids.Add(rid);
             }
 
-            var context = ProjectContext.Create(projectJson, new NuGetFramework(".NETStandardApp", new Version(1, 5)), rids);
+            var workspace = new BuildWorkspace(new ProjectReaderSettings());
+            var context = workspace.GetRuntimeContext(workspace.GetProjectContext(projectJson, TestAssetFramework), rids);
+            context = workspace.GetRuntimeContext(context, rids);
             managedCompiler.Compile(context, _args);
 
             RuntimeOutputDir = Path.Combine(OutputPath, rid);

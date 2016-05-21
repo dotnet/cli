@@ -49,7 +49,9 @@ void add_unique_path(
     deps_entry_t::asset_types asset_type,
     const pal::string_t& path,
     std::unordered_set<pal::string_t>* existing,
-    pal::string_t* output)
+    pal::string_t* serviced,
+    pal::string_t* non_serviced,
+    const pal::string_t& svc_dir)
 {
     // Resolve sym links.
     pal::string_t real = path;
@@ -62,9 +64,18 @@ void add_unique_path(
 
     trace::verbose(_X("Adding to %s path: %s"), deps_entry_t::s_known_asset_types[asset_type], real.c_str());
 
-    output->append(real);
+    if (starts_with(real, svc_dir, false))
+    {
+        serviced->append(real);
+        serviced->push_back(PATH_SEPARATOR);
+    }
+    else
+    {
+        non_serviced->append(real);
+        non_serviced->push_back(PATH_SEPARATOR);
+    }
 
-    output->push_back(PATH_SEPARATOR);
+
     existing->insert(real);
 }
 
@@ -187,9 +198,9 @@ void deps_resolver_t::setup_probe_config(
     const hostpolicy_init_t& init,
     const arguments_t& args)
 {
-    if (pal::directory_exists(args.dotnet_extensions))
+    if (pal::directory_exists(args.core_servicing))
     {
-        pal::string_t ext_ni = args.dotnet_extensions;
+        pal::string_t ext_ni = args.core_servicing;
         append_path(&ext_ni, get_arch());
         if (pal::directory_exists(ext_ni))
         {
@@ -198,7 +209,7 @@ void deps_resolver_t::setup_probe_config(
         }
 
         // Servicing normal probe.
-        pal::string_t ext_pkgs = args.dotnet_extensions;
+        pal::string_t ext_pkgs = args.core_servicing;
         append_path(&ext_pkgs, _X("pkgs"));
         m_probes.push_back(probe_config_t::svc(ext_pkgs, false, false));
     }
@@ -328,6 +339,8 @@ bool deps_resolver_t::probe_entry_in_configs(const deps_entry_t& entry, pal::str
 //
 pal::string_t deps_resolver_t::resolve_coreclr_dir()
 {
+    trace::verbose(_X("--- Resolving CoreCLR directory ---"));
+
     auto process_coreclr = [&]
         (bool is_portable, const pal::string_t& deps_dir, deps_json_t* deps) -> pal::string_t
     {
@@ -347,7 +360,7 @@ pal::string_t deps_resolver_t::resolve_coreclr_dir()
         }
         else
         {
-            trace::verbose(_X("Deps has no coreclr entry."));
+            trace::verbose(_X("Deps has no CoreCLR entry."));
         }
 
         // App/FX main dir or standalone app dir.
@@ -384,7 +397,8 @@ pal::string_t deps_resolver_t::resolve_coreclr_dir()
 
 void deps_resolver_t::resolve_tpa_list(
         const pal::string_t& clr_dir,
-        pal::string_t* output)
+        pal::string_t* output,
+        std::unordered_set<pal::string_t>* breadcrumb)
 {
     const std::vector<deps_entry_t> empty(0);
 
@@ -400,11 +414,15 @@ void deps_resolver_t::resolve_tpa_list(
 
     auto process_entry = [&](const pal::string_t& deps_dir, deps_json_t* deps, const dir_assemblies_t& dir_assemblies, const deps_entry_t& entry)
     {
+        if (entry.is_serviceable)
+        {
+            breadcrumb->insert(entry.library_name + _X(",") + entry.library_version);
+            breadcrumb->insert(entry.library_name);
+        }
         if (items.count(entry.asset_name))
         {
             return;
         }
-
         pal::string_t candidate;
 
         trace::info(_X("Processing TPA for deps entry [%s, %s, %s]"), entry.library_name.c_str(), entry.library_version.c_str(), entry.relative_path.c_str());
@@ -427,7 +445,7 @@ void deps_resolver_t::resolve_tpa_list(
         else
         {
             // FIXME: Consider this error as a fail fast?
-            trace::verbose(_X("Error: Could not resolve path to assembly: [%s, %s, %s]"), entry.library_name.c_str(), entry.library_version.c_str(), entry.relative_path.c_str());
+            trace::warning(_X("Could not resolve path to assembly: [%s, %s, %s]"), entry.library_name.c_str(), entry.library_version.c_str(), entry.relative_path.c_str());
         }
     };
     
@@ -478,7 +496,8 @@ void deps_resolver_t::resolve_tpa_list(
 void deps_resolver_t::resolve_probe_dirs(
         deps_entry_t::asset_types asset_type,
         const pal::string_t& clr_dir,
-        pal::string_t* output)
+        pal::string_t* output,
+        std::unordered_set<pal::string_t>* breadcrumb)
 {
     bool is_resources = asset_type == deps_entry_t::asset_types::resources;
     assert(is_resources || asset_type == deps_entry_t::asset_types::native);
@@ -494,6 +513,9 @@ void deps_resolver_t::resolve_probe_dirs(
     };
     std::function<pal::string_t(const pal::string_t&)>& action = is_resources ? resources : native;
     std::unordered_set<pal::string_t> items;
+    pal::string_t core_servicing = m_core_servicing;
+    pal::realpath(&core_servicing);
+    pal::string_t non_serviced;
 
     std::vector<deps_entry_t> empty(0);
     const auto& entries = m_deps->get_entries(asset_type);
@@ -504,6 +526,12 @@ void deps_resolver_t::resolve_probe_dirs(
     bool track_api_sets = true;
     auto add_package_cache_entry = [&](const deps_entry_t& entry)
     {
+        if (entry.is_serviceable)
+        {
+            breadcrumb->insert(entry.library_name + _X(",") + entry.library_version);
+            breadcrumb->insert(entry.library_name);
+        }
+
         if (probe_entry_in_configs(entry, &candidate))
         {
             // For standalone apps, on win7, coreclr needs ApiSets which has to be in the DLL search path.
@@ -522,7 +550,7 @@ void deps_resolver_t::resolve_probe_dirs(
                 m_api_set_paths.insert(result_dir);
             }
 
-            add_unique_path(asset_type, result_dir, &items, output);
+            add_unique_path(asset_type, result_dir, &items, output, &non_serviced, core_servicing);
         }
     };
     std::for_each(entries.begin(), entries.end(), add_package_cache_entry);
@@ -537,7 +565,7 @@ void deps_resolver_t::resolve_probe_dirs(
         {
             if (entry.is_rid_specific && entry.asset_type == asset_type && entry.to_rel_path(m_app_dir, &candidate))
             {
-                add_unique_path(asset_type, action(candidate), &items, output);
+                add_unique_path(asset_type, action(candidate), &items, output, &non_serviced, core_servicing);
             }
 
             // App called out an explicit API set dependency.
@@ -552,7 +580,7 @@ void deps_resolver_t::resolve_probe_dirs(
     track_api_sets = m_api_set_paths.empty();
 
     // App local path
-    add_unique_path(asset_type, m_app_dir, &items, output);
+    add_unique_path(asset_type, m_app_dir, &items, output, &non_serviced, core_servicing);
 
     // If API sets is not found (i.e., empty) in the probe paths above:
     // 1. For standalone app, do nothing as all are sxs.
@@ -567,11 +595,13 @@ void deps_resolver_t::resolve_probe_dirs(
         {
             m_api_set_paths.insert(m_fx_dir);
         }
-        add_unique_path(asset_type, m_fx_dir, &items, output);
+        add_unique_path(asset_type, m_fx_dir, &items, output, &non_serviced, core_servicing);
     }
 
     // CLR path
-    add_unique_path(asset_type, clr_dir, &items, output);
+    add_unique_path(asset_type, clr_dir, &items, output, &non_serviced, core_servicing);
+
+    output->append(non_serviced);
 }
 
 
@@ -587,10 +617,10 @@ void deps_resolver_t::resolve_probe_dirs(
 //                         resolved path ordering.
 //
 //
-bool deps_resolver_t::resolve_probe_paths(const pal::string_t& clr_dir, probe_paths_t* probe_paths)
+bool deps_resolver_t::resolve_probe_paths(const pal::string_t& clr_dir, probe_paths_t* probe_paths, std::unordered_set<pal::string_t>* breadcrumb)
 {
-    resolve_tpa_list(clr_dir, &probe_paths->tpa);
-    resolve_probe_dirs(deps_entry_t::asset_types::native, clr_dir, &probe_paths->native);
-    resolve_probe_dirs(deps_entry_t::asset_types::resources, clr_dir, &probe_paths->resources);
+    resolve_tpa_list(clr_dir, &probe_paths->tpa, breadcrumb);
+    resolve_probe_dirs(deps_entry_t::asset_types::native, clr_dir, &probe_paths->native, breadcrumb);
+    resolve_probe_dirs(deps_entry_t::asset_types::resources, clr_dir, &probe_paths->resources, breadcrumb);
     return true;
 }

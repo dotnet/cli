@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.ProjectModel
 {
     public class ProjectReader
     {
-        public static bool TryGetProject(string path, out Project project, ICollection<DiagnosticMessage> diagnostics = null, ProjectReaderSettings settings = null)
+        public static bool TryGetProject(string path, out Project project, ProjectReaderSettings settings = null)
         {
             project = null;
 
@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.ProjectModel
                 using (var stream = File.OpenRead(projectPath))
                 {
                     var reader = new ProjectReader();
-                    project = reader.ReadProject(stream, projectName, projectPath, diagnostics, settings);
+                    project = reader.ReadProject(stream, projectName, projectPath, settings);
                 }
             }
             catch (Exception ex)
@@ -62,31 +62,34 @@ namespace Microsoft.DotNet.ProjectModel
             return true;
         }
 
-        public static Project GetProject(string projectPath, ProjectReaderSettings settings = null) => GetProject(projectPath, new List<DiagnosticMessage>(), settings);
-
-        public static Project GetProject(string projectPath, ICollection<DiagnosticMessage> diagnostics, ProjectReaderSettings settings = null)
+        public static Project GetProject(string projectPath, ProjectReaderSettings settings = null)
         {
-            if (!projectPath.EndsWith(Project.FileName))
-            {
-                projectPath = Path.Combine(projectPath, Project.FileName);
-            }
+            projectPath = ProjectPathHelper.NormalizeProjectFilePath(projectPath);
 
             var name = Path.GetFileName(Path.GetDirectoryName(projectPath));
 
             using (var stream = new FileStream(projectPath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                return new ProjectReader().ReadProject(stream, name, projectPath, diagnostics, settings);
+                return new ProjectReader().ReadProject(stream, name, projectPath, settings);
             }
         }
 
-        public Project ReadProject(Stream stream, string projectName, string projectPath, ICollection<DiagnosticMessage> diagnostics, ProjectReaderSettings settings = null)
+        public Project ReadProject(Stream stream, string projectName, string projectPath, ProjectReaderSettings settings = null)
         {
             settings = settings ?? new ProjectReaderSettings();
             var project = new Project();
 
             var reader = new StreamReader(stream);
+            JObject rawProject;
+            using (var jsonReader = new JsonTextReader(reader))
+            {
+                rawProject = JObject.Load(jsonReader);
 
-            var rawProject = JObject.Parse(reader.ReadToEnd());
+                // Try to read another token to ensure we're at the end of the document.
+                // This will no-op if we are, and throw a JsonReaderException if there is additional content (which is what we want)
+                jsonReader.Read();
+            }
+
             if (rawProject == null)
             {
                 throw FileFormatException.Create(
@@ -138,25 +141,13 @@ namespace Microsoft.DotNet.ProjectModel
             }
 
             project.Description = rawProject.Value<string>("description");
-            project.Summary = rawProject.Value<string>("summary");
             project.Copyright = rawProject.Value<string>("copyright");
             project.Title = rawProject.Value<string>("title");
             project.EntryPoint = rawProject.Value<string>("entryPoint");
-            project.ProjectUrl = rawProject.Value<string>("projectUrl");
-            project.LicenseUrl = rawProject.Value<string>("licenseUrl");
-            project.IconUrl = rawProject.Value<string>("iconUrl");
-            project.CompilerName = rawProject.Value<string>("compilerName") ?? "csc";
             project.TestRunner = rawProject.Value<string>("testRunner");
-
             project.Authors =
                 rawProject.Value<JToken>("authors")?.Values<string>().ToArray() ?? EmptyArray<string>.Value;
-            project.Owners = rawProject.Value<JToken>("owners")?.Values<string>().ToArray() ?? EmptyArray<string>.Value;
-            project.Tags = rawProject.Value<JToken>("tags")?.Values<string>().ToArray() ?? EmptyArray<string>.Value;
-
             project.Language = rawProject.Value<string>("language");
-            project.ReleaseNotes = rawProject.Value<string>("releaseNotes");
-
-            project.RequireLicenseAcceptance = rawProject.Value<bool>("requireLicenseAcceptance");
 
             // REVIEW: Move this to the dependencies node?
             project.EmbedInteropTypes = rawProject.Value<bool>("embedInteropTypes");
@@ -166,6 +157,7 @@ namespace Microsoft.DotNet.ProjectModel
 
             // Project files
             project.Files = new ProjectFilesCollection(rawProject, project.ProjectDirectory, project.ProjectFilePath);
+            AddProjectFilesCollectionDiagnostics(rawProject, project);
 
             var commands = rawProject.Value<JToken>("commands") as JObject;
             if (commands != null)
@@ -207,7 +199,11 @@ namespace Microsoft.DotNet.ProjectModel
                 }
             }
 
-            BuildTargetFrameworksAndConfigurations(project, rawProject, diagnostics);
+            project.PackOptions = GetPackOptions(rawProject, project) ?? new PackOptions();
+            project.RuntimeOptions = GetRuntimeOptions(rawProject) ?? new RuntimeOptions();
+            project.PublishOptions = GetPublishInclude(rawProject, project);
+
+            BuildTargetFrameworksAndConfigurations(project, rawProject);
 
             PopulateDependencies(
                 project.ProjectFilePath,
@@ -343,11 +339,11 @@ namespace Microsoft.DotNet.ProjectModel
             }
         }
 
-        private void BuildTargetFrameworksAndConfigurations(Project project, JObject projectJsonObject, ICollection<DiagnosticMessage> diagnostics)
+        private void BuildTargetFrameworksAndConfigurations(Project project, JObject projectJsonObject)
         {
             // Get the shared compilationOptions
             project._defaultCompilerOptions =
-                GetCompilationOptions(projectJsonObject, project) ?? new CommonCompilerOptions();
+                GetCompilationOptions(projectJsonObject, project) ?? new CommonCompilerOptions { CompilerName = "csc" };
 
             project._defaultTargetFrameworkConfiguration = new TargetFrameworkInformation
             {
@@ -415,7 +411,7 @@ namespace Microsoft.DotNet.ProjectModel
                         if (!success)
                         {
                             var lineInfo = (IJsonLineInfo)framework.Value;
-                            diagnostics?.Add(
+                            project.Diagnostics.Add(
                                 new DiagnosticMessage(
                                     ErrorCodes.NU1008,
                                     $"\"{framework.Key}\" is an unsupported framework.",
@@ -510,10 +506,42 @@ namespace Microsoft.DotNet.ProjectModel
 
         private static CommonCompilerOptions GetCompilationOptions(JObject rawObject, Project project)
         {
-            var rawOptions = rawObject.Value<JToken>("compilationOptions") as JObject;
+            var compilerName = rawObject.Value<string>("compilerName");
+            if (compilerName != null)
+            {
+                var lineInfo = rawObject.Value<IJsonLineInfo>("compilerName");
+                project.Diagnostics.Add(
+                    new DiagnosticMessage(
+                        ErrorCodes.DOTNET1016,
+                        $"The 'compilerName' option in the root is deprecated. Use it in 'buildOptions' instead.",
+                        project.ProjectFilePath,
+                        DiagnosticMessageSeverity.Warning,
+                        lineInfo.LineNumber,
+                        lineInfo.LinePosition));
+            }
+
+            var rawOptions = rawObject.Value<JToken>("buildOptions") as JObject;
             if (rawOptions == null)
             {
-                return null;
+                rawOptions = rawObject.Value<JToken>("compilationOptions") as JObject;
+                if (rawOptions == null)
+                {
+                    return new CommonCompilerOptions
+                    {
+                        CompilerName = compilerName ?? "csc"
+                    };
+                }
+
+                var lineInfo = (IJsonLineInfo)rawOptions;
+
+                project.Diagnostics.Add(
+                    new DiagnosticMessage(
+                        ErrorCodes.DOTNET1015,
+                        $"The 'compilationOptions' option is deprecated. Use 'buildOptions' instead.",
+                        project.ProjectFilePath,
+                        DiagnosticMessageSeverity.Warning,
+                        lineInfo.LineNumber,
+                        lineInfo.LinePosition));
             }
 
             var analyzerOptionsJson = rawOptions.Value<JToken>("analyzerOptions") as JObject;
@@ -533,7 +561,7 @@ namespace Microsoft.DotNet.ProjectModel
                                     analyzerOption.Value.ToString(),
                                     project.ProjectFilePath);
                             }
-                            analyzerOptions.LanguageId = analyzerOption.Value.ToString();
+                            analyzerOptions = new AnalyzerOptions(analyzerOption.Value.ToString());
                             break;
 
                         default:
@@ -563,8 +591,146 @@ namespace Microsoft.DotNet.ProjectModel
                 EmitEntryPoint = rawOptions.Value<bool?>("emitEntryPoint"),
                 GenerateXmlDocumentation = rawOptions.Value<bool?>("xmlDoc"),
                 PreserveCompilationContext = rawOptions.Value<bool?>("preserveCompilationContext"),
-                OutputName = rawOptions.Value<string>("outputName")
+                OutputName = rawOptions.Value<string>("outputName"),
+                CompilerName = rawOptions.Value<string>("compilerName") ?? compilerName ?? "csc",
+                CompileInclude = GetIncludeContext(
+                    project,
+                    rawOptions,
+                    "compile",
+                    defaultBuiltInInclude: ProjectFilesCollection.DefaultCompileBuiltInPatterns,
+                    defaultBuiltInExclude: ProjectFilesCollection.DefaultBuiltInExcludePatterns),
+                EmbedInclude = GetIncludeContext(
+                    project,
+                    rawOptions,
+                    "embed",
+                    defaultBuiltInInclude: ProjectFilesCollection.DefaultResourcesBuiltInPatterns,
+                    defaultBuiltInExclude: ProjectFilesCollection.DefaultBuiltInExcludePatterns),
+                CopyToOutputInclude = GetIncludeContext(
+                    project,
+                    rawOptions,
+                    "copyToOutput",
+                    defaultBuiltInInclude: null,
+                    defaultBuiltInExclude: ProjectFilesCollection.DefaultPublishExcludePatterns)
             };
+        }
+
+        private static IncludeContext GetIncludeContext(
+            Project project,
+            JObject rawOptions,
+            string option,
+            string[] defaultBuiltInInclude,
+            string[] defaultBuiltInExclude)
+        {
+            var contextOption = rawOptions.Value<JToken>(option);
+            if (contextOption != null)
+            {
+                return new IncludeContext(
+                    project.ProjectDirectory,
+                    option,
+                    rawOptions,
+                    defaultBuiltInInclude,
+                    defaultBuiltInExclude);
+            }
+
+            return null;
+        }
+
+        private static PackOptions GetPackOptions(JObject rawProject, Project project)
+        {
+            var rawPackOptions = rawProject.Value<JToken>("packOptions") as JObject;
+
+            // Files to be packed along with the project
+            IncludeContext packInclude = null;
+            if (rawPackOptions != null && rawPackOptions.Value<JToken>("files") != null)
+            {
+                packInclude = new IncludeContext(
+                    project.ProjectDirectory,
+                    "files",
+                    rawPackOptions,
+                    defaultBuiltInInclude: null,
+                    defaultBuiltInExclude: ProjectFilesCollection.DefaultBuiltInExcludePatterns);
+            }
+
+            var repository = GetPackOptionsValue<JToken>("repository", rawProject, rawPackOptions, project) as JObject;
+
+            return new PackOptions
+            {
+                ProjectUrl = GetPackOptionsValue<string>("projectUrl", rawProject, rawPackOptions, project),
+                LicenseUrl = GetPackOptionsValue<string>("licenseUrl", rawProject, rawPackOptions, project),
+                IconUrl = GetPackOptionsValue<string>("iconUrl", rawProject, rawPackOptions, project),
+                Owners = GetPackOptionsValue<JToken>("owners", rawProject, rawPackOptions, project)?.Values<string>().ToArray() ?? EmptyArray<string>.Value,
+                Tags = GetPackOptionsValue<JToken>("tags", rawProject, rawPackOptions, project)?.Values<string>().ToArray() ?? EmptyArray<string>.Value,
+                ReleaseNotes = GetPackOptionsValue<string>("releaseNotes", rawProject, rawPackOptions, project),
+                RequireLicenseAcceptance = GetPackOptionsValue<bool>("requireLicenseAcceptance", rawProject, rawPackOptions, project),
+                Summary = GetPackOptionsValue<string>("summary", rawProject, rawPackOptions, project),
+                RepositoryType = repository?.Value<string>("type"),
+                RepositoryUrl = repository?.Value<string>("url"),
+                PackInclude = packInclude
+            };
+        }
+
+        private static T GetPackOptionsValue<T>(
+            string option,
+            JObject rawProject,
+            JObject rawPackOptions,
+            Project project)
+        {
+            var rootValue = rawProject.Value<T>(option);
+            if (rawProject.GetValue(option) != null)
+            {
+                var lineInfo = rawProject.Value<IJsonLineInfo>(option);
+                project.Diagnostics.Add(
+                    new DiagnosticMessage(
+                        ErrorCodes.DOTNET1016,
+                        $"The '{option}' option in the root is deprecated. Use it in 'packOptions' instead.",
+                        project.ProjectFilePath,
+                        DiagnosticMessageSeverity.Warning,
+                        lineInfo.LineNumber,
+                        lineInfo.LinePosition));
+            }
+
+            if (rawPackOptions != null)
+            {
+                var packOptionValue = rawPackOptions.Value<T>(option);
+                if (packOptionValue != null)
+                {
+                    return packOptionValue;
+                }
+            }
+
+            return rootValue;
+        }
+
+        private static RuntimeOptions GetRuntimeOptions(JObject rawProject)
+        {
+            var rawRuntimeOptions = rawProject.Value<JToken>("runtimeOptions") as JObject;
+            if (rawRuntimeOptions == null)
+            {
+                return null;
+            }
+
+            return new RuntimeOptions
+            {
+                // Value<T>(null) will return default(T) which is false in this case.
+                GcServer = rawRuntimeOptions.Value<bool>("gcServer"),
+                GcConcurrent = rawRuntimeOptions.Value<bool>("gcConcurrent")
+            };
+        }
+
+        private static IncludeContext GetPublishInclude(JObject rawProject, Project project)
+        {
+            var rawPublishOptions = rawProject.Value<JToken>("publishOptions");
+            if (rawPublishOptions != null)
+            {
+                return new IncludeContext(
+                    project.ProjectDirectory,
+                    "publishOptions",
+                    rawProject,
+                    defaultBuiltInInclude: null,
+                    defaultBuiltInExclude: ProjectFilesCollection.DefaultPublishExcludePatterns);
+            }
+
+            return null;
         }
 
         private static string MakeDefaultTargetFrameworkDefine(NuGetFramework targetFramework)
@@ -600,6 +766,54 @@ namespace Microsoft.DotNet.ProjectModel
             string projectPath = Path.Combine(path, Project.FileName);
 
             return File.Exists(projectPath);
+        }
+
+        private static void AddProjectFilesCollectionDiagnostics(JObject rawProject, Project project)
+        {
+            var compileWarning = "'compile' in 'buildOptions'";
+            AddDiagnosticMesage(rawProject, project, "compile", compileWarning);
+            AddDiagnosticMesage(rawProject, project, "compileExclude", compileWarning);
+            AddDiagnosticMesage(rawProject, project, "compileFiles", compileWarning);
+            AddDiagnosticMesage(rawProject, project, "compileBuiltIn", compileWarning);
+
+            var resourceWarning = "'embed' in 'buildOptions'";
+            AddDiagnosticMesage(rawProject, project, "resource", resourceWarning);
+            AddDiagnosticMesage(rawProject, project, "resourceExclude", resourceWarning);
+            AddDiagnosticMesage(rawProject, project, "resourceFiles", resourceWarning);
+            AddDiagnosticMesage(rawProject, project, "resourceBuiltIn", resourceWarning);
+            AddDiagnosticMesage(rawProject, project, "namedResource", resourceWarning);
+
+            var contentWarning = "'publishOptions' to publish or 'copyToOutput' in 'buildOptions' to copy to build output";
+            AddDiagnosticMesage(rawProject, project, "content", contentWarning);
+            AddDiagnosticMesage(rawProject, project, "contentExclude", contentWarning);
+            AddDiagnosticMesage(rawProject, project, "contentFiles", contentWarning);
+            AddDiagnosticMesage(rawProject, project, "contentBuiltIn", contentWarning);
+
+            AddDiagnosticMesage(rawProject, project, "packInclude", "'files' in 'packOptions'");
+            AddDiagnosticMesage(rawProject, project, "publishExclude", "'publishOptions'");
+            AddDiagnosticMesage(rawProject, project, "exclude", "'exclude' within 'compile' or 'embed'");
+        }
+
+        private static void AddDiagnosticMesage(
+            JObject rawProject,
+            Project project,
+            string option,
+            string message)
+        {
+            var lineInfo = rawProject.Value<IJsonLineInfo>(option);
+            if (lineInfo == null)
+            {
+                return;
+            }
+
+            project.Diagnostics.Add(
+                new DiagnosticMessage(
+                    ErrorCodes.DOTNET1015,
+                    $"The '{option}' option is deprecated. Use {message} instead.",
+                    project.ProjectFilePath,
+                    DiagnosticMessageSeverity.Warning,
+                    lineInfo.LineNumber,
+                    lineInfo.LinePosition));
         }
     }
 }

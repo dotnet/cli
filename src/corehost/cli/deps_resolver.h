@@ -25,14 +25,13 @@ class deps_resolver_t
 {
 public:
     deps_resolver_t(const hostpolicy_init_t& init, const arguments_t& args)
-        // Important: FX dir should come from "init" than "config",
-        //            since the host could be launching from FX dir.
         : m_fx_dir(init.fx_dir)
         , m_app_dir(args.app_dir)
         , m_coreclr_index(-1)
         , m_portable(init.is_portable)
         , m_deps(nullptr)
         , m_fx_deps(nullptr)
+        , m_core_servicing(args.core_servicing)
     {
         m_deps_file = args.deps_path;
         if (m_portable)
@@ -52,8 +51,21 @@ public:
         setup_probe_config(init, args);
     }
 
-    bool valid() { return m_deps->is_valid() && (!m_portable || m_fx_deps->is_valid());  }
-
+    bool valid(pal::string_t* errors)
+    {
+        if (!m_deps->is_valid())
+        {
+            errors->assign(_X("An error occurred while parsing ") + m_deps_file);
+            return false;
+        }
+        if (m_portable && !m_fx_deps->is_valid())
+        {
+            errors->assign(_X("An error occurred while parsing ") + m_fx_deps_file);
+            return false;
+        }
+        errors->clear();
+        return true;
+    }
     void setup_probe_config(
         const hostpolicy_init_t& init,
         const arguments_t& args);
@@ -62,7 +74,8 @@ public:
 
     bool resolve_probe_paths(
       const pal::string_t& clr_dir,
-      probe_paths_t* probe_paths);
+      probe_paths_t* probe_paths,
+      std::unordered_set<pal::string_t>* breadcrumb);
 
     pal::string_t resolve_coreclr_dir();
 
@@ -93,13 +106,15 @@ private:
     // Resolve order for TPA lookup.
     void resolve_tpa_list(
         const pal::string_t& clr_dir,
-        pal::string_t* output);
+        pal::string_t* output,
+        std::unordered_set<pal::string_t>* breadcrumb);
 
     // Resolve order for culture and native DLL lookup.
     void resolve_probe_dirs(
         deps_entry_t::asset_types asset_type,
         const pal::string_t& clr_dir,
-        pal::string_t* output);
+        pal::string_t* output,
+        std::unordered_set<pal::string_t>* breadcrumb);
 
     // Populate assemblies from the directory.
     void get_dir_assemblies(
@@ -135,6 +150,9 @@ private:
     std::unordered_map<pal::string_t, pal::string_t> m_prerelease_roll_forward_cache;
 
     pal::string_t m_package_cache;
+
+    // Servicing root, could be empty on platforms that don't support or when errors occur.
+    pal::string_t m_core_servicing;
 
     // Special entry for api-sets
     std::unordered_set<pal::string_t> m_api_set_paths;

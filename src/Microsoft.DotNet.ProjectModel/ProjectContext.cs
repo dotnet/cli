@@ -16,6 +16,8 @@ namespace Microsoft.DotNet.ProjectModel
     {
         private string[] _runtimeFallbacks;
 
+        public ProjectContextIdentity Identity { get; }
+
         public GlobalSettings GlobalSettings { get; }
 
         public ProjectDescription RootProject { get; }
@@ -34,11 +36,13 @@ namespace Microsoft.DotNet.ProjectModel
 
         public string RootDirectory => GlobalSettings?.DirectoryPath;
 
-        public string ProjectDirectory => ProjectFile.ProjectDirectory;
+        public string ProjectDirectory => ProjectFile?.ProjectDirectory;
 
         public string PackagesDirectory { get; }
 
         public LibraryManager LibraryManager { get; }
+
+        public List<DiagnosticMessage> Diagnostics { get; }
 
         internal ProjectContext(
             GlobalSettings globalSettings,
@@ -49,8 +53,10 @@ namespace Microsoft.DotNet.ProjectModel
             string runtimeIdentifier,
             string packagesDirectory,
             LibraryManager libraryManager,
-            LockFile lockfile)
+            LockFile lockfile,
+            List<DiagnosticMessage> diagnostics)
         {
+            Identity = new ProjectContextIdentity(rootProject?.Path, targetFramework);
             GlobalSettings = globalSettings;
             RootProject = rootProject;
             PlatformLibrary = platformLibrary;
@@ -60,6 +66,7 @@ namespace Microsoft.DotNet.ProjectModel
             LibraryManager = libraryManager;
             LockFile = lockfile;
             IsPortable = isPortable;
+            Diagnostics = diagnostics;
         }
 
         public LibraryExporter CreateExporter(string configuration, string buildBasePath = null)
@@ -132,7 +139,7 @@ namespace Microsoft.DotNet.ProjectModel
                 yield return new ProjectContextBuilder()
                                 .WithProject(project)
                                 .WithTargetFramework(framework.FrameworkName)
-                                .WithReaderSettings(settings)
+                                .WithProjectReaderSettings(settings)
                                 .WithRuntimeIdentifiers(runtimeIdentifiers ?? Enumerable.Empty<string>())
                                 .Build();
             }
@@ -146,42 +153,9 @@ namespace Microsoft.DotNet.ProjectModel
             var project = ProjectReader.GetProject(projectPath);
 
             return new ProjectContextBuilder()
-                        .WithReaderSettings(settings)
+                        .WithProjectReaderSettings(settings)
                         .WithProject(project)
                         .BuildAllTargets();
-        }
-
-
-        /// <summary>
-        /// Creates a project context based on existing context but using runtime target
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="runtimeIdentifiers"></param>
-        /// <returns></returns>
-
-        public ProjectContext CreateRuntimeContext(IEnumerable<string> runtimeIdentifiers)
-        {
-            // Temporary until we have removed RID inference from NuGet
-            if(TargetFramework.IsCompileOnly)
-            {
-                return this;
-            }
-
-            var context = CreateBuilder(ProjectFile.ProjectFilePath, TargetFramework)
-                .WithRuntimeIdentifiers(runtimeIdentifiers)
-                .WithLockFile(LockFile)
-                .Build();
-
-            if (!context.IsPortable && context.RuntimeIdentifier == null)
-            {
-                // We are standalone, but don't support this runtime
-                var rids = string.Join(", ", runtimeIdentifiers);
-                throw new InvalidOperationException($"Can not find runtime target for framework '{TargetFramework}' compatible with one of the target runtimes: '{rids}'. " +
-                                                    "Possible causes:" + Environment.NewLine +
-                                                    "1. The project has not been restored or restore failed - run `dotnet restore`" + Environment.NewLine +
-                                                    $"2. The project does not list one of '{rids}' in the 'runtimes' section.");
-            }
-            return context;
         }
 
         public OutputPaths GetOutputPaths(string configuration, string buidBasePath = null, string outputPath = null)

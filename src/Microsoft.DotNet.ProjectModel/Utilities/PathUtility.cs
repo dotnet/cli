@@ -3,7 +3,7 @@
 
 using System;
 using System.IO;
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.DotNet.InternalAbstractions;
 
 namespace Microsoft.DotNet.ProjectModel.Utilities
 {
@@ -61,17 +61,26 @@ namespace Microsoft.DotNet.ProjectModel.Utilities
         }
 
         /// <summary>
-        /// Returns path2 relative to path1, with Path.DirectorySeparatorChar as separator
+        /// Returns <paramref name="path2"/> relative to <paramref name="path1"/>, with Path.DirectorySeparatorChar as separator
         /// </summary>
         public static string GetRelativePath(string path1, string path2)
         {
-            return GetRelativePath(path1, path2, Path.DirectorySeparatorChar);
+            return GetRelativePath(path1, path2, Path.DirectorySeparatorChar, includeDirectoryTraversals: true);
         }
 
         /// <summary>
-        /// Returns path2 relative to path1, with given path separator
+        /// Returns <paramref name="path2"/> relative to <paramref name="path1"/>, with <c>Path.DirectorySeparatorChar</c>
+        /// as separator but ignoring directory traversals.
         /// </summary>
-        public static string GetRelativePath(string path1, string path2, char separator)
+        public static string GetRelativePathIgnoringDirectoryTraversals(string path1, string path2)
+        {
+            return GetRelativePath(path1, path2, Path.DirectorySeparatorChar, false);
+        }
+
+        /// <summary>
+        /// Returns <paramref name="path2"/> relative to <paramref name="path1"/>, with given path separator
+        /// </summary>
+        public static string GetRelativePath(string path1, string path2, char separator, bool includeDirectoryTraversals)
         {
             if (string.IsNullOrEmpty(path1))
             {
@@ -84,7 +93,7 @@ namespace Microsoft.DotNet.ProjectModel.Utilities
             }
 
             StringComparison compare;
-            if (PlatformServices.Default.Runtime.OperatingSystemPlatform == Platform.Windows)
+            if (RuntimeEnvironment.OperatingSystemPlatform == Platform.Windows)
             {
                 compare = StringComparison.OrdinalIgnoreCase;
                 // check if paths are on the same volume
@@ -133,10 +142,14 @@ namespace Microsoft.DotNet.ProjectModel.Utilities
                 return path;
             }
 
-            for (var i = index; len1 > i; ++i)
+            if (includeDirectoryTraversals)
             {
-                path += ".." + separator;
+                for (var i = index; len1 > i; ++i)
+                {
+                    path += ".." + separator;
+                }
             }
+
             for (var i = index; len2 - 1 > i; ++i)
             {
                 path += path2Segments[i] + separator;

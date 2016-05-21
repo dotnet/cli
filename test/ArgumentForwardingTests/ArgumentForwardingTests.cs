@@ -11,7 +11,6 @@ using Xunit;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using Microsoft.Extensions.PlatformAbstractions;
 using System.Diagnostics;
 using FluentAssertions;
 
@@ -51,6 +50,7 @@ namespace Microsoft.DotNet.Tests.ArgumentForwarding
         /// <param name="testUserArgument"></param>
         [Theory]
         [InlineData(@"""abc"" d e")]
+        [InlineData(@"""ábc"" d é")]
         [InlineData(@"""abc""      d e")]
         [InlineData("\"abc\"\t\td\te")]
         [InlineData(@"a\\b d""e f""g h")]

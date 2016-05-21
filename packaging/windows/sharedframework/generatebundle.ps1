@@ -6,13 +6,13 @@ param(
     [Parameter(Mandatory=$true)][string]$SharedHostMSIFile,
     [Parameter(Mandatory=$true)][string]$DotnetBundleOutput,
     [Parameter(Mandatory=$true)][string]$WixRoot,
+    [Parameter(Mandatory=$true)][string]$ProductMoniker,
     [Parameter(Mandatory=$true)][string]$DotnetMSIVersion,
     [Parameter(Mandatory=$true)][string]$DotnetCLIVersion,
     [Parameter(Mandatory=$true)][string]$SharedFrameworkNugetName,
     [Parameter(Mandatory=$true)][string]$SharedFrameworkNugetVersion,
     [Parameter(Mandatory=$true)][string]$SharedFrameworkUpgradeCode,
-    [Parameter(Mandatory=$true)][string]$Architecture,
-    [Parameter(Mandatory=$true)][string]$ReleaseSuffix
+    [Parameter(Mandatory=$true)][string]$Architecture
 )
 
 . "$PSScriptRoot\..\..\..\scripts\common\_common.ps1"
@@ -25,16 +25,18 @@ function RunCandleForBundle
 
     Write-Host Running candle for bundle..
     $AuthWsxRoot =  Join-Path $RepoRoot "packaging\windows\sharedframework"
+    $SharedFrameworkComponentVersion = $SharedFrameworkNugetVersion.Replace('-', '_');
 
     .\candle.exe -nologo `
         -dMicrosoftEula="$RepoRoot\packaging\osx\sharedframework\resources\en.lproj\eula.rtf" `
+        -dProductMoniker="$ProductMoniker" `
         -dBuildVersion="$DotnetMSIVersion" `
         -dDisplayVersion="$DotnetCLIVersion" `
-        -dReleaseSuffix="$ReleaseSuffix" `
         -dSharedFXMsiSourcePath="$SharedFxMSIFile" `
         -dSharedHostMsiSourcePath="$SharedHostMSIFile" `
         -dFrameworkName="$SharedFrameworkNugetName" `
         -dFrameworkDisplayVersion="$SharedFrameworkNugetVersion" `
+        -dFrameworkComponentVersion="$SharedFrameworkComponentVersion" `
         -dFrameworkUpgradeCode="$SharedFrameworkUpgradeCode" `
         -arch "$Architecture" `
         -ext WixBalExtension.dll `

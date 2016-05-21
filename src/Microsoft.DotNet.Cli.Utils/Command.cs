@@ -7,16 +7,17 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using NuGet.Frameworks;
+using System.Threading.Tasks;
 using Microsoft.DotNet.ProjectModel;
+using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
     public class Command : ICommand
     {
         private readonly Process _process;
-        private readonly StreamForwarder _stdOut;
-        private readonly StreamForwarder _stdErr;
+        private StreamForwarder _stdOut;
+        private StreamForwarder _stdErr;
 
         private bool _running = false;
 
@@ -26,12 +27,8 @@ namespace Microsoft.DotNet.Cli.Utils
             {
                 FileName = commandSpec.Path,
                 Arguments = commandSpec.Args,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true
+                UseShellExecute = false
             };
-
-            _stdOut = new StreamForwarder();
-            _stdErr = new StreamForwarder();
 
             _process = new Process
             {
@@ -90,16 +87,16 @@ namespace Microsoft.DotNet.Cli.Utils
         {
             return new Command(commandSpec);
         }
-        
+
         public static Command CreateForScript(
-            string commandName, 
-            IEnumerable<string> args, 
-            Project project, 
+            string commandName,
+            IEnumerable<string> args,
+            Project project,
             string[] inferredExtensionList)
         {
-            var commandSpec = CommandResolver.TryResolveScriptCommandSpec(commandName, 
-                args, 
-                project, 
+            var commandSpec = CommandResolver.TryResolveScriptCommandSpec(commandName,
+                args,
+                project,
                 inferredExtensionList);
 
             if (commandSpec == null)
@@ -126,16 +123,19 @@ namespace Microsoft.DotNet.Cli.Utils
             var sw = Stopwatch.StartNew();
             Reporter.Verbose.WriteLine($"> {FormatProcessInfo(_process.StartInfo)}".White());
 #endif
-            _process.Start();
+            using (PerfTrace.Current.CaptureTiming($"{Path.GetFileNameWithoutExtension(_process.StartInfo.FileName)} {_process.StartInfo.Arguments}"))
+            {
+                _process.Start();
 
-            Reporter.Verbose.WriteLine($"Process ID: {_process.Id}");
+                Reporter.Verbose.WriteLine($"Process ID: {_process.Id}");
 
-            var threadOut = _stdOut.BeginRead(_process.StandardOutput);
-            var threadErr = _stdErr.BeginRead(_process.StandardError);
+                var taskOut = _stdOut?.BeginRead(_process.StandardOutput);
+                var taskErr = _stdErr?.BeginRead(_process.StandardError);
+                _process.WaitForExit();
 
-            _process.WaitForExit();
-            threadOut.Join();
-            threadErr.Join();
+                taskOut?.Wait();
+                taskErr?.Wait();
+            }
 
             var exitCode = _process.ExitCode;
 
@@ -154,8 +154,8 @@ namespace Microsoft.DotNet.Cli.Utils
             return new CommandResult(
                 this._process.StartInfo,
                 exitCode,
-                _stdOut.CapturedOutput,
-                _stdErr.CapturedOutput);
+                _stdOut?.CapturedOutput,
+                _stdErr?.CapturedOutput);
         }
 
         public ICommand WorkingDirectory(string projectDirectory)
@@ -177,6 +177,7 @@ namespace Microsoft.DotNet.Cli.Utils
         public ICommand CaptureStdOut()
         {
             ThrowIfRunning();
+            EnsureStdOut();
             _stdOut.Capture();
             return this;
         }
@@ -184,6 +185,7 @@ namespace Microsoft.DotNet.Cli.Utils
         public ICommand CaptureStdErr()
         {
             ThrowIfRunning();
+            EnsureStdErr();
             _stdErr.Capture();
             return this;
         }
@@ -193,6 +195,8 @@ namespace Microsoft.DotNet.Cli.Utils
             ThrowIfRunning();
             if (!onlyIfVerbose || CommandContext.IsVerbose())
             {
+                EnsureStdOut();
+
                 if (to == null)
                 {
                     _stdOut.ForwardTo(writeLine: Reporter.Output.WriteLine);
@@ -211,6 +215,8 @@ namespace Microsoft.DotNet.Cli.Utils
             ThrowIfRunning();
             if (!onlyIfVerbose || CommandContext.IsVerbose())
             {
+                EnsureStdErr();
+
                 if (to == null)
                 {
                     _stdErr.ForwardTo(writeLine: Reporter.Error.WriteLine);
@@ -227,6 +233,8 @@ namespace Microsoft.DotNet.Cli.Utils
         public ICommand OnOutputLine(Action<string> handler)
         {
             ThrowIfRunning();
+            EnsureStdOut();
+
             _stdOut.ForwardTo(writeLine: handler);
             return this;
         }
@@ -234,6 +242,8 @@ namespace Microsoft.DotNet.Cli.Utils
         public ICommand OnErrorLine(Action<string> handler)
         {
             ThrowIfRunning();
+            EnsureStdErr();
+
             _stdErr.ForwardTo(writeLine: handler);
             return this;
         }
@@ -252,6 +262,18 @@ namespace Microsoft.DotNet.Cli.Utils
             }
 
             return info.FileName + " " + info.Arguments;
+        }
+
+        private void EnsureStdOut()
+        {
+            _stdOut = _stdOut ?? new StreamForwarder();
+            _process.StartInfo.RedirectStandardOutput = true;
+        }
+
+        private void EnsureStdErr()
+        {
+            _stdErr = _stdErr ?? new StreamForwarder();
+            _process.StartInfo.RedirectStandardError = true;
         }
 
         private void ThrowIfRunning([CallerMemberName] string memberName = null)

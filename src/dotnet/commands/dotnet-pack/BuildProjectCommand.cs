@@ -1,11 +1,10 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Linq;
-using System.Text;
-using Microsoft.DotNet.Cli.Utils;
-using Microsoft.DotNet.ProjectModel;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.ProjectModel.Files;
 
 namespace Microsoft.DotNet.Tools.Pack
 {
@@ -16,33 +15,30 @@ namespace Microsoft.DotNet.Tools.Pack
         private readonly string _buildBasePath;
         private readonly string _configuration;
 
-        private readonly string _versionSuffix;
+        private readonly BuildWorkspace _workspace;
 
         public BuildProjectCommand(
             Project project,
             string buildBasePath,
             string configuration,
-            string versionSuffix)
+            BuildWorkspace workspace)
         {
             _project = project;
             _buildBasePath = buildBasePath;
             _configuration = configuration;
-            _versionSuffix = versionSuffix;
+            _workspace = workspace;
         }
 
         public int Execute()
         {
-            if (_project.Files.SourceFiles.Any())
+            if (HasSourceFiles())
             {
                 var argsBuilder = new List<string>();
                 argsBuilder.Add("--configuration");
                 argsBuilder.Add($"{_configuration}");
 
-                if (!string.IsNullOrEmpty(_versionSuffix))
-                {
-                    argsBuilder.Add("--version-suffix");
-                    argsBuilder.Add(_versionSuffix);
-                }
+                // Passing the Workspace along will flow the version suffix,
+                // so we don't need to pass it as an argument.
 
                 if (!string.IsNullOrEmpty(_buildBasePath))
                 {
@@ -52,12 +48,27 @@ namespace Microsoft.DotNet.Tools.Pack
 
                 argsBuilder.Add($"{_project.ProjectFilePath}");
 
-                var result = Build.BuildCommand.Run(argsBuilder.ToArray());
+                var result = Build.BuildCommand.Run(argsBuilder.ToArray(), _workspace);
 
                 return result;
             }
 
             return 0;
+        }
+
+        private bool HasSourceFiles()
+        {
+            var compilerOptions = _project.GetCompilerOptions(
+                _project.GetTargetFramework(targetFramework: null).FrameworkName, _configuration);
+
+            if (compilerOptions.CompileInclude == null)
+            {
+                return _project.Files.SourceFiles.Any();
+            }
+
+            var includeFiles = IncludeFilesResolver.GetIncludeFiles(compilerOptions.CompileInclude, "/", diagnostics: null);
+
+            return includeFiles.Any();
         }
     }
 }

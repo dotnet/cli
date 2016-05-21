@@ -16,7 +16,9 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
         private static readonly string ProjectJsonPath = Path.Combine(
                 AppContext.BaseDirectory,
                 "TestAssets",
-                "ProjectWithTests",
+                "TestProjects",
+                "ProjectsWithTests",
+                "NetCoreAppOnlyProject",
                 "project.json");
 
         private TestCommand _testCommand;
@@ -27,7 +29,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
         {
             _dotnetTestRunnerMock = new Mock<IDotnetTestRunner>();
             _dotnetTestRunnerMock
-                .Setup(d => d.RunTests(It.IsAny<ProjectContext>(), It.IsAny<DotnetTestParams>()))
+                .Setup(d => d.RunTests(It.IsAny<ProjectContext>(), It.IsAny<DotnetTestParams>(), It.IsAny<BuildWorkspace>()))
                 .Returns(0);
 
             _dotnetTestRunnerFactoryMock = new Mock<IDotnetTestRunnerFactory>();
@@ -48,7 +50,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
         [Fact]
         public void It_creates_a_runner_if_the_args_do_no_include_help()
         {
-            var result = _testCommand.DoRun(new[] { ProjectJsonPath });
+            var result = _testCommand.DoRun(new[] { ProjectJsonPath, "-f", "netcoreapp1.0" });
 
             result.Should().Be(0);
             _dotnetTestRunnerFactoryMock.Verify(d => d.Create(It.IsAny<int?>()), Times.Once);
@@ -57,10 +59,10 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
         [Fact]
         public void It_runs_the_tests_through_the_DotnetTestRunner()
         {
-            var result = _testCommand.DoRun(new[] { ProjectJsonPath });
+            var result = _testCommand.DoRun(new[] { ProjectJsonPath, "-f", "netcoreapp1.0" });
 
             _dotnetTestRunnerMock.Verify(
-                d => d.RunTests(It.IsAny<ProjectContext>(), It.IsAny<DotnetTestParams>()),
+                d => d.RunTests(It.IsAny<ProjectContext>(), It.IsAny<DotnetTestParams>(), It.IsAny<BuildWorkspace>()),
                 Times.Once);
         }
     }

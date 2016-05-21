@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.ProjectModel.Server
         public ErrorMessage GlobalErrorMessage { get; set; }
         public Dictionary<NuGetFramework, ProjectContextSnapshot> ProjectContexts { get; } = new Dictionary<NuGetFramework, ProjectContextSnapshot>();
 
-        public static ProjectSnapshot Create(string projectDirectory, string configuration, WorkspaceContext workspaceContext, IReadOnlyList<string> projectSearchPaths)
+        public static ProjectSnapshot Create(string projectDirectory, string configuration, DesignTimeWorkspace workspaceContext, IReadOnlyList<string> projectSearchPaths)
         {
             var projectContextsCollection = workspaceContext.GetProjectContextCollection(projectDirectory);
             if (!projectContextsCollection.ProjectContexts.Any())
@@ -35,12 +35,12 @@ namespace Microsoft.DotNet.ProjectModel.Server
             snapshot.ProjectSearchPaths = currentSearchPaths.ToList();
             snapshot.GlobalJsonPath = globalSettings?.FilePath;
 
-            foreach (var projectContext in projectContextsCollection.ProjectContexts)
+            foreach (var projectContext in projectContextsCollection.FrameworkOnlyContexts)
             {
-                snapshot.ProjectContexts[projectContext.TargetFramework] = 
+                snapshot.ProjectContexts[projectContext.TargetFramework] =
                     ProjectContextSnapshot.Create(projectContext, configuration, currentSearchPaths);
             }
-            
+
             return snapshot;
         }
     }

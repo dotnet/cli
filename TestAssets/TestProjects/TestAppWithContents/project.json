@@ -1,15 +1,18 @@
 {
   "version": "1.0.0-*",
-  "compilationOptions": {
-    "emitEntryPoint": true
+  "buildOptions": {
+    "emitEntryPoint": true,
+    "copyToOutput": {
+      "include": "testcontentfile.txt"
+    }
   },
   "dependencies": {
-    "NETStandard.Library": "1.5.0-rc2-24015"
+    "Microsoft.NETCore.App": "1.0.0-rc3-*"
   },
-  "content": "testcontentfile.txt",
   "frameworks": {
-    "netstandardapp1.5": {
-      "imports": "dnxcore50"
-    }
+    "netcoreapp1.0": {}
+  },
+  "publishOptions": {
+    "include": "testcontentfile.txt"
   }
 }

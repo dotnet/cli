@@ -116,11 +116,11 @@ namespace pal
 
     inline size_t strlen(const char_t* str) { return ::wcslen(str); }
     inline void err_vprintf(const char_t* format, va_list vl) { ::vfwprintf(stderr, format, vl); ::fputws(_X("\r\n"), stderr); }
+    inline void out_vprintf(const char_t* format, va_list vl) { ::vfwprintf(stdout, format, vl); ::fputws(_X("\r\n"), stdout); }
 
-    pal::string_t to_palstring(const std::string& str);
-    std::string to_stdstring(const pal::string_t& str);
-    void to_palstring(const char* str, pal::string_t* out);
-    void to_stdstring(const pal::char_t* str, std::string* out);
+    bool utf8_palstring(const std::string& str, pal::string_t* out);
+    bool pal_clrstring(const pal::string_t& str, std::vector<char>* out);
+    bool clr_palstring(const char* cstr, pal::string_t* out);
 #else
     #ifdef COREHOST_MAKE_DLL
         #define SHARED_API extern "C"
@@ -159,12 +159,13 @@ namespace pal
 
     inline size_t strlen(const char_t* str) { return ::strlen(str); }
     inline void err_vprintf(const char_t* format, va_list vl) { ::vfprintf(stderr, format, vl); ::fputc('\n', stderr); }
-    inline pal::string_t to_palstring(const std::string& str) { return str; }
-    inline std::string to_stdstring(const pal::string_t& str) { return str; }
-    inline void to_palstring(const char* str, pal::string_t* out) { out->assign(str); }
-    inline void to_stdstring(const char_t* str, std::string* out) { out->assign(str); }
+    inline void out_vprintf(const char_t* format, va_list vl) { ::vfprintf(stdout, format, vl); ::fputc('\n', stdout); }
+    inline bool utf8_palstring(const std::string& str, pal::string_t* out) { out->assign(str); return true; }
+    inline bool pal_clrstring(const pal::string_t& str, std::vector<char>* out) { out->assign(str.begin(), str.end()); out->push_back('\0'); return true; }
+    inline bool clr_palstring(const char* cstr, pal::string_t* out) { out->assign(cstr); return true; }
 #endif
 
+    bool touch_file(const pal::string_t& path);
     bool realpath(string_t* path);
     bool file_exists(const string_t& path);
     inline bool directory_exists(const string_t& path) { return file_exists(path); }
@@ -173,7 +174,8 @@ namespace pal
 
     bool get_own_executable_path(string_t* recv);
     bool getenv(const char_t* name, string_t* recv);
-    bool get_default_extensions_directory(string_t* recv);
+    bool get_default_servicing_directory(string_t* recv);
+    bool get_default_breadcrumb_store(string_t* recv);
     bool is_path_rooted(const string_t& path);
 
     int xtoi(const char_t* input);

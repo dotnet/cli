@@ -1,20 +1,16 @@
 {
-  "version": "1.0.0-*",
-  "compilationOptions": {
+  "version": "1.0.0-rc-*",
+  "buildOptions": {
     "emitEntryPoint": true
   },
   "frameworks": {
-    "netstandard1.5": {
+    "netcoreapp1.0": {
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.0.0-rc2-*"
+          "version": "1.0.0-rc3-*"
         }
-      },
-      "imports": [
-        "portable-net45+win8",
-        "dnxcore50"
-      ]
+      }
     },
     "net451": {}
   }

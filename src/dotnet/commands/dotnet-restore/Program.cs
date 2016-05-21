@@ -2,23 +2,16 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
+using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
-using Microsoft.Dnx.Runtime.Common.CommandLine;
-using Microsoft.Dotnet.Cli.Compiler.Common;
-using Microsoft.DotNet.ProjectModel;
-using Microsoft.DotNet.ProjectModel.Graph;
-using NuGet.Frameworks;
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.DotNet.InternalAbstractions;
 
 namespace Microsoft.DotNet.Tools.Restore
 {
     public partial class RestoreCommand
     {
-        private static readonly string DefaultRid = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
+        private static readonly string DefaultRid = RuntimeEnvironmentRidExtensions.GetLegacyRestoreRuntimeIdentifier();
 
         public static int Run(string[] args)
         {
@@ -35,7 +28,7 @@ namespace Microsoft.DotNet.Tools.Restore
             // "--verbosity" switch that goes BEFORE the command
             var quiet = args.Any(s => s.Equals("--quiet", StringComparison.OrdinalIgnoreCase));
             args = args.Where(s => !s.Equals("--quiet", StringComparison.OrdinalIgnoreCase)).ToArray();
-            
+
             app.OnExecute(() =>
             {
                 try

@@ -8,6 +8,8 @@ if(WIN32)
     add_compile_options($<$<CONFIG:RelWithDebInfo>:/MT>)
     add_compile_options($<$<CONFIG:Release>:/MT>)
     add_compile_options($<$<CONFIG:Debug>:/MTd>)
+else()
+    add_compile_options(-fPIC)
 endif()
 
 include(../setup.cmake)
@@ -26,6 +28,7 @@ set(SOURCES
     ../json/casablanca/src/json/json_serialization.cpp
     ../json/casablanca/src/utilities/asyncrt_utils.cpp
     ../fxr/fx_ver.cpp
+    ../breadcrumbs.cpp
     ../args.cpp
     ../hostpolicy.cpp
     ../coreclr.cpp

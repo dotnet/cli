@@ -1,14 +1,13 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.IO;
+using FluentAssertions;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using System.IO;
-using FluentAssertions;
 using Xunit;
-using Microsoft.Extensions.PlatformAbstractions;
-using System.Linq;
 
 namespace Microsoft.Dotnet.Tools.Test.Tests
 {
@@ -19,14 +18,13 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
 
         public GivenThatWeWantToUseDotnetTestE2EInDesignTime()
         {
-            var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets"));
-            var testInstance = testAssetManager.CreateTestInstance("ProjectWithTests");
+            var testInstance = TestAssetsManager.CreateTestInstance(Path.Combine("ProjectsWithTests", "NetCoreAppOnlyProject"));
 
             _projectFilePath = Path.Combine(testInstance.TestRoot, "project.json");
             var contexts = ProjectContext.CreateContextForEachFramework(
                 _projectFilePath,
                 null,
-                PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
+                RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers());
 
             // Restore the project again in the destination to resolve projects
             // Since the lock file has project relative paths in it, those will be broken

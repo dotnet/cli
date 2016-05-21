@@ -7,8 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel;
-using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Run
@@ -20,8 +20,26 @@ namespace Microsoft.DotNet.Tools.Run
         public string Project = null;
         public IReadOnlyList<string> Args = null;
 
-        ProjectContext _context;
-        List<string> _args;
+        private readonly ICommandFactory _commandFactory;
+        private ProjectContext _context;
+        private List<string> _args;
+        private BuildWorkspace _workspace;
+
+        public static readonly string[] DefaultFrameworks = new[]
+        {
+            FrameworkConstants.FrameworkIdentifiers.NetCoreApp,
+            FrameworkConstants.FrameworkIdentifiers.NetStandardApp,
+        };
+
+        public RunCommand()
+            : this(new RunCommandFactory())
+        {
+        }
+
+        public RunCommand(ICommandFactory commandFactory)
+        {
+            _commandFactory = commandFactory;
+        }
 
         public int Start()
         {
@@ -60,40 +78,39 @@ namespace Microsoft.DotNet.Tools.Run
                 Configuration = Constants.DefaultConfiguration;
             }
 
-            var rids = PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers();
+            var frameworkContexts = _workspace.GetProjectContextCollection(Project)
+                .EnsureValid(Project)
+                .FrameworkOnlyContexts;
 
+            var rids = RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers();
+
+            ProjectContext frameworkContext;
             if (Framework == null)
             {
-                var defaultFrameworks = new[]
+                if (frameworkContexts.Count() == 1)
                 {
-                    FrameworkConstants.FrameworkIdentifiers.NetCoreApp,
-                    FrameworkConstants.FrameworkIdentifiers.NetStandardApp,
-                };
-
-                var contexts = ProjectContext.CreateContextForEachFramework(Project, null);
-
-                ProjectContext context;
-                if (contexts.Count() == 1)
-                {
-                    context = contexts.Single();
+                    frameworkContext = frameworkContexts.Single();
                 }
                 else
                 {
-                    context = contexts.FirstOrDefault(c => defaultFrameworks.Contains(c.TargetFramework.Framework));
-                    if (context == null)
-                    {
-                        throw new InvalidOperationException($"Couldn't find target to run. Possible causes:" + Environment.NewLine +
-                            "1. No project.lock.json file or restore failed - run `dotnet restore`" + Environment.NewLine +
-                            $"2. project.lock.json has multiple targets none of which is in default list ({string.Join(", ", defaultFrameworks)})");
-                    }
+                    frameworkContext = frameworkContexts.FirstOrDefault(c => DefaultFrameworks.Contains(c.TargetFramework.Framework));
                 }
-
-                _context = context.CreateRuntimeContext(rids);
             }
             else
             {
-                _context = ProjectContext.Create(Project, NuGetFramework.Parse(Framework), rids);
+                frameworkContext = frameworkContexts.FirstOrDefault(c => Equals(c.TargetFramework, NuGetFramework.Parse(Framework)));
             }
+
+            if (frameworkContext == null)
+            {
+                throw new InvalidOperationException($"Couldn't find target to run. Possible causes:" + Environment.NewLine +
+                    "1. No project.lock.json file or restore failed - run `dotnet restore`" + Environment.NewLine +
+                    Framework == null ?
+                        $"2. project.lock.json has multiple targets none of which is in default list ({string.Join(", ", DefaultFrameworks)})" :
+                        $"2. The project does not support the desired framework: {Framework}");
+            }
+
+            _context = _workspace.GetRuntimeContext(frameworkContext, rids);
 
             if (Args == null)
             {
@@ -107,6 +124,9 @@ namespace Microsoft.DotNet.Tools.Run
 
         private int RunExecutable()
         {
+            // Set up the workspace
+            _workspace = new BuildWorkspace(ProjectReaderSettings.ReadFromEnvironment());
+
             CalculateDefaultsForNonAssigned();
 
             // Compile to that directory
@@ -117,7 +137,7 @@ namespace Microsoft.DotNet.Tools.Run
                 $"--configuration",
                 Configuration,
                 $"{_context.ProjectFile.ProjectDirectory}"
-            });
+            }, _workspace);
 
             if (result != 0)
             {
@@ -156,24 +176,22 @@ namespace Microsoft.DotNet.Tools.Run
                 }
             }
 
-            Command command;
+            ICommand command;
             if (outputName.EndsWith(FileNameSuffixes.DotNet.DynamicLib, StringComparison.OrdinalIgnoreCase))
             {
                 // The executable is a ".dll", we need to call it through dotnet.exe
                 var muxer = new Muxer();
 
-                command = Command.Create(muxer.MuxerPath, Enumerable.Concat(
+                command = _commandFactory.Create(muxer.MuxerPath, Enumerable.Concat(
                             Enumerable.Concat(new string[] { "exec" }, hostArgs),
                             Enumerable.Concat(new string[] { outputName }, _args)));
             }
             else
             {
-                command = Command.Create(outputName, Enumerable.Concat(hostArgs, _args));
+                command = _commandFactory.Create(outputName, Enumerable.Concat(hostArgs, _args));
             }
 
             result = command
-                .ForwardStdOut()
-                .ForwardStdErr()
                 .Execute()
                 .ExitCode;
 
@@ -187,6 +205,14 @@ namespace Microsoft.DotNet.Tools.Run
                 .ForwardStdErr();
             var result = command.Execute();
             return result.ExitCode;
+        }
+
+        private class RunCommandFactory : ICommandFactory
+        {
+            public ICommand Create(string commandName, IEnumerable<string> args, NuGetFramework framework = null, string configuration = "Debug")
+            {
+                return Command.Create(commandName, args, framework, configuration);
+            }
         }
     }
 }

@@ -1,36 +1,46 @@
 {
   "version": "1.0.0-*",
   "description": "Microsoft.DotNet.Tools.Tests.Utilities Class Library",
-  "compilationOptions": {
+  "buildOptions": {
     "keyFile": "../../tools/Key.snk"
   },
   "dependencies": {
-    "Microsoft.NETCore.App": {
-      "type": "platform",
-      "version": "1.0.0-rc2-*"
-    },
-    "System.Runtime.Serialization.Primitives": "4.1.1-rc2-24015",
-    "System.Collections.Immutable": "1.2.0-rc2-24015",
-    "System.Net.NetworkInformation": "4.1.0-rc2-24015",
     "FluentAssertions": "4.0.0",
     "xunit": "2.1.0",
-    "dotnet-test-xunit": "1.0.0-dev-140469-38",
-    "Microsoft.DotNet.TestFramework": "1.0.0-*",
-    "Microsoft.DotNet.Cli.Utils": "1.0.0-*",
-    "Microsoft.DotNet.ProjectModel": "1.0.0-*",
-    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc2-20100",
+    "dotnet-test-xunit": "1.0.0-rc2-192208-24",
+    "Microsoft.DotNet.TestFramework": {
+      "target": "project"
+    },
+    "Microsoft.DotNet.Cli.Utils": {
+      "target": "project"
+    },
+    "Microsoft.DotNet.ProjectModel": {
+      "target": "project"
+    },
     "Microsoft.DotNet.InternalAbstractions": {
-      "target": "project",
-      "version": "1.0.0-*"
+      "target": "project"
     }
   },
   "frameworks": {
     "netcoreapp1.0": {
       "imports": [
-        "netstandardapp1.5",
-        "dnxcore50",
-        "portable-net45+win8"
-      ]
+        "dotnet5.4",
+        "portable-net451+win8"
+      ],
+      "Microsoft.NETCore.App": {
+        "type": "platform",
+        "version": "1.0.0-rc3-*"
+      },
+      "System.Runtime.Serialization.Primitives": "4.1.1-rc2-24022",
+      "System.Collections.Immutable": "1.2.0-rc2-24022",
+      "System.Net.NetworkInformation": "4.1.0-rc2-24022"
+    },
+    "net451": {
+      "frameworkAssemblies": {
+        "System.Runtime": {
+          "type": "build"
+        }
+      }
     }
   }
 }

@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.ProjectModel
 {
@@ -11,7 +13,15 @@ namespace Microsoft.DotNet.ProjectModel
     {
         public Project Project { get; set; }
 
+        /// <summary>
+        /// Gets all the ProjectContexts in this collection
+        /// </summary>
         public List<ProjectContext> ProjectContexts { get; } = new List<ProjectContext>();
+
+        /// <summary>
+        /// Gets the ProjectContexts in this collection which are not runtime-specific (i.e. the ones used for compilation)
+        /// </summary>
+        public IEnumerable<ProjectContext> FrameworkOnlyContexts => ProjectContexts.Where(c => string.IsNullOrEmpty(c.RuntimeIdentifier));
 
         public List<DiagnosticMessage> ProjectDiagnostics { get; } = new List<DiagnosticMessage>();
 
@@ -49,6 +59,16 @@ namespace Microsoft.DotNet.ProjectModel
 
                 return false;
             }
+        }
+
+        public ProjectContext GetTarget(NuGetFramework targetFramework) => GetTarget(targetFramework, string.Empty);
+
+        public ProjectContext GetTarget(NuGetFramework targetFramework, string runtimeIdentifier)
+        {
+            return ProjectContexts
+                .FirstOrDefault(c =>
+                    Equals(c.TargetFramework, targetFramework) &&
+                    string.Equals(c.RuntimeIdentifier ?? string.Empty, runtimeIdentifier ?? string.Empty));
         }
 
         public void Reset()
