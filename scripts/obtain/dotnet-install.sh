@@ -267,13 +267,17 @@ get_latest_version_info() {
     local azure_channel=$2
     local normalized_architecture=$3
     
-    local osname=$(get_current_os_name)
+    local osname
+    local version_file_url
     
-    local version_file_url="$azure_feed/$azure_channel/dnvm/latest.$osname.$normalized_architecture.version"
-    say_verbose "get_latest_version_info: latest url: $version_file_url"
-    
-    download $version_file_url
-    return $?
+    if osname=$(get_current_os_name); then
+	version_file_url="$azure_feed/$azure_channel/dnvm/latest.$osname.$normalized_architecture.version"
+	say_verbose "get_latest_version_info: latest url: $version_file_url"
+	download $version_file_url
+    else
+	return 1
+    fi
+
 }
 
 # args:
@@ -319,10 +323,14 @@ get_specific_version_from_version() {
     
     case $version in
         latest)
-            local version_info="$(get_latest_version_info $azure_feed $azure_channel $normalized_architecture)"
-            say_verbose "get_specific_version_from_version: version_info=$version_info"
-            echo "$version_info" | get_version_from_version_info
-            return 0
+            local version_info
+	    if version_info="$(get_latest_version_info $azure_feed $azure_channel $normalized_architecture)"; then
+		say_verbose "get_specific_version_from_version: version_info=$version_info"
+		echo "$version_info" | get_version_from_version_info
+		return 0
+	    else
+		return 1
+	    fi
             ;;
         lkg)
             say_err "``--version LKG`` not supported yet."
@@ -348,11 +356,16 @@ construct_download_link() {
     local normalized_architecture=$3
     local specific_version=${4//[$'\t\r\n']}
     
-    local osname=$(get_current_os_name)
+    local osname
+    local download_link
     
-    local download_link="$azure_feed/$azure_channel/Binaries/$specific_version/dotnet-dev-$osname-$normalized_architecture.$specific_version.tar.gz"
-    echo "$download_link"
-    return 0
+    if osname=$(get_current_os_name); then
+	download_link="$azure_feed/$azure_channel/Binaries/$specific_version/dotnet-dev-$osname-$normalized_architecture.$specific_version.tar.gz"
+	echo "$download_link"
+	return 0
+    else
+	return 1
+    fi
 }
 
 get_user_share_path() {
