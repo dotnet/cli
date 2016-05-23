@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.Cli.Build
     public class VersionRepoUpdater
     {
         private static Regex s_nugetFileRegex = new Regex("^(.*?)\\.(([0-9]+\\.)?[0-9]+\\.[0-9]+(-([A-z0-9-]+))?)\\.nupkg$");
-
+        private static string s_baseGitHubPath = $"/build-info/dotnet/cli";
         private string _gitHubAuthToken;
         private string _gitHubUser;
         private string _gitHubEmail;
@@ -60,6 +60,19 @@ namespace Microsoft.DotNet.Cli.Build
             await UpdateGitHubFile(packageInfoFilePath, packageInfoFileContent, message);
         }
 
+        public async Task PublishVersionBadge(string badgePath, string channel, string version, string pointer)
+        {
+            byte[] data = System.IO.File.ReadAllBytes(badgePath);
+            string githubFileName = $"{s_baseGitHubPath}/{channel}/{pointer}/{Path.GetFileName(badgePath)}";
+            await PushChangesToGitHubFile(githubFileName, data, "Updating CLI version badge to '{version}'");
+        }
+
+        public async Task PublishVersionFile(string name, string versionInfo, string channel, string version, string pointer)
+        {
+            string githubFileName = $"{s_baseGitHubPath}/{channel}/{pointer}/{name}";
+            await UpdateGitHubFile(githubFileName, versionInfo, "Updating CLI version files to '{version}'");
+        }
+
         private static List<NuGetPackageInfo> GetPackageInfo(string nupkgFilePath)
         {
             List<NuGetPackageInfo> packages = new List<NuGetPackageInfo>();
@@ -81,23 +94,27 @@ namespace Microsoft.DotNet.Cli.Build
 
         private async Task UpdateGitHubFile(string path, string newFileContent, string commitMessage)
         {
+            await PushChangesToGitHubFile(path, Encoding.UTF8.GetBytes(newFileContent), commitMessage);
+        }
+
+        private async Task PushChangesToGitHubFile(string githubFile, byte[] data, string commitMessage)
+        {
             using (HttpClient client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
                 client.DefaultRequestHeaders.Add("Authorization", $"token {_gitHubAuthToken}");
                 client.DefaultRequestHeaders.Add("User-Agent", _gitHubUser);
 
-                string fileUrl = $"https://api.github.com/repos/{_versionsRepoOwner}/{_versionsRepo}/contents/{path}";
+                string fileUrl = $"https://api.github.com/repos/{_versionsRepoOwner}/{_versionsRepo}/contents/{githubFile}";
 
-                Console.WriteLine($"Getting the 'sha' of the current contents of file '{_versionsRepoOwner}/{_versionsRepo}/{path}'");
+                Console.WriteLine($"Getting the 'sha' of the current contents of file '{_versionsRepoOwner}/{_versionsRepo}/{githubFile}'");
 
                 string currentFile = await client.GetStringAsync(fileUrl);
                 string currentSha = JObject.Parse(currentFile)["sha"].ToString();
+                string convertedData = ToBase64(data);
 
                 Console.WriteLine($"Got 'sha' value of '{currentSha}'");
-
-                Console.WriteLine($"Request to update file '{_versionsRepoOwner}/{_versionsRepo}/{path}' contents to:");
-                Console.WriteLine(newFileContent);
+                Console.WriteLine($"Request to update file '{fileUrl}' contents to: \r\n{convertedData}");
 
                 string updateFileBody = $@"{{
   ""message"": ""{commitMessage}"",
@@ -105,7 +122,7 @@ namespace Microsoft.DotNet.Cli.Build
     ""name"": ""{_gitHubUser}"",
     ""email"": ""{_gitHubEmail}""
   }},
-  ""content"": ""{ToBase64(newFileContent)}"",
+  ""content"": ""{convertedData}"",
   ""sha"": ""{currentSha}""
 }}";
 
@@ -120,9 +137,9 @@ namespace Microsoft.DotNet.Cli.Build
             }
         }
 
-        private static string ToBase64(string value)
+        private static string ToBase64(byte[] value)
         {
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(value));
+            return Convert.ToBase64String(value);
         }
 
         private class NuGetPackageInfo
