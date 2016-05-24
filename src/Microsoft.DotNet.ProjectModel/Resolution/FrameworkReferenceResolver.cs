@@ -403,27 +403,18 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                     }
                     else
                     {
-                        // Get all "File" elements
-                        var fileElements = frameworkList.Root.Elements();
-
-                        // Use an enumerator to avoid unnecessary allocations, because we want to set
-                        // emptyFileElements only once to false.
-                        var filesEnumerator = fileElements.GetEnumerator();
                         var emptyFileElements = true;
-                        if (filesEnumerator.MoveNext())
+                        foreach (var e in frameworkList.Root.Elements())
                         {
+                            // Remember that we had at least one framework assembly
                             emptyFileElements = false;
-                            do
-                            {
-                                var e = filesEnumerator.Current;
-                                var assemblyName = e.Attribute("AssemblyName").Value;
-                                var version = e.Attribute("Version")?.Value;
 
-                                var entry = new AssemblyEntry();
-                                entry.Version = version != null ? Version.Parse(version) : null;
-                                frameworkInfo.Assemblies[assemblyName] = entry;
-                            }
-                            while (filesEnumerator.MoveNext());
+                            var assemblyName = e.Attribute("AssemblyName").Value;
+                            var version = e.Attribute("Version")?.Value;
+
+                            var entry = new AssemblyEntry();
+                            entry.Version = version != null ? Version.Parse(version) : null;
+                            frameworkInfo.Assemblies[assemblyName] = entry;
                         }
 
                         if (emptyFileElements)
