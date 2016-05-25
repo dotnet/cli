@@ -1,94 +1,120 @@
-﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
-using FluentAssertions;
-using FluentAssertions.Execution;
-using Microsoft.DotNet.Cli.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
+using FluentAssertions;
+using FluentAssertions.Execution;
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
 {
-    public class DirectoryInfoAssertions
+    public class DirectoryInfoAssertions : FileSystemInfoAssertions<DirectoryInfo, DirectoryInfoAssertions>
     {
-        private DirectoryInfo _dirInfo;
-
-        public DirectoryInfoAssertions(DirectoryInfo dir)
+        public DirectoryInfoAssertions(DirectoryInfo subject)
         {
-            _dirInfo = dir;
+            Subject = subject;
         }
 
-        public DirectoryInfo DirectoryInfo => _dirInfo;
-
-        public AndConstraint<DirectoryInfoAssertions> Exist()
+        public AndConstraint<DirectoryInfoAssertions> HaveFile(string expectedFile, string because = "", params object[] becauseArgs)
         {
-            Execute.Assertion.ForCondition(_dirInfo.Exists)
-                .FailWith("Expected directory {0} does not exist.", _dirInfo.FullName);
-            return new AndConstraint<DirectoryInfoAssertions>(this);
-        }
-
-        public AndConstraint<DirectoryInfoAssertions> HaveFile(string expectedFile)
-        {
-            var file = _dirInfo.EnumerateFiles(expectedFile, SearchOption.TopDirectoryOnly).SingleOrDefault();
-            Execute.Assertion.ForCondition(file != null)
-                .FailWith("Expected File {0} cannot be found in directory {1}.", expectedFile, _dirInfo.FullName);
-            return new AndConstraint<DirectoryInfoAssertions>(this);
-        }
-
-        public AndConstraint<DirectoryInfoAssertions> NotHaveFile(string expectedFile)
-        {
-            var file = _dirInfo.EnumerateFiles(expectedFile, SearchOption.TopDirectoryOnly).SingleOrDefault();
-            Execute.Assertion.ForCondition(file == null)
-                .FailWith("File {0} should not be found in directory {1}.", expectedFile, _dirInfo.FullName);
-            return new AndConstraint<DirectoryInfoAssertions>(this);
-        }
-
-        public AndConstraint<DirectoryInfoAssertions> HaveFiles(IEnumerable<string> expectedFiles)
-        {
-            foreach (var expectedFile in expectedFiles)
-            {
-                HaveFile(expectedFile);
-            }
+            Execute.Assertion
+                .ForCondition(SubjectHasFile(expectedFile))
+                .BecauseOf(because, becauseArgs)
+                .FailWith($"Expected '{Subject.FullName}' to have file {expectedFile}{{reason}}, but it does not.");
 
             return new AndConstraint<DirectoryInfoAssertions>(this);
         }
 
-        public AndConstraint<DirectoryInfoAssertions> NotHaveFiles(IEnumerable<string> expectedFiles)
+        public AndConstraint<DirectoryInfoAssertions> NotHaveFile(string expectedFile, string because = "", params object[] becauseArgs)
         {
-            foreach (var expectedFile in expectedFiles)
-            {
-                NotHaveFile(expectedFile);
-            }
+            Execute.Assertion
+                .ForCondition(!SubjectHasFile(expectedFile))
+                .BecauseOf(because, becauseArgs)
+                .FailWith($"Expected '{Subject.FullName}' not to have file {expectedFile}{{reason}}, but it does.");
 
             return new AndConstraint<DirectoryInfoAssertions>(this);
         }
 
-        public AndConstraint<DirectoryInfoAssertions> HaveDirectory(string expectedDir)
+        public AndConstraint<DirectoryInfoAssertions> HaveDirectory(string expectedDir, string because = "", params object[] becauseArgs)
         {
-            var dir = _dirInfo.EnumerateDirectories(expectedDir, SearchOption.TopDirectoryOnly).SingleOrDefault();
-            Execute.Assertion.ForCondition(dir != null)
-                .FailWith("Expected directory {0} cannot be found inside directory {1}.", expectedDir, _dirInfo.FullName);
+            Execute.Assertion
+                .ForCondition(SubjectHasDirectory(expectedDir))
+                .BecauseOf(because, becauseArgs)
+                .FailWith($"Expected '{Subject.FullName}' to have directory {expectedDir}{{reason}}, but it does not.");
 
-            return new AndConstraint<DirectoryInfoAssertions>(new DirectoryInfoAssertions(dir));
+            return new AndConstraint<DirectoryInfoAssertions>(this);
         }
 
-        public AndConstraint<DirectoryInfoAssertions> OnlyHaveFiles(IEnumerable<string> expectedFiles)
+        public AndConstraint<DirectoryInfoAssertions> NotHaveDirectory(string expectedDir, string because = "", params object[] becauseArgs)
         {
-            var actualFiles = _dirInfo.EnumerateFiles("*", SearchOption.TopDirectoryOnly).Select(f => f.Name);
-            var missingFiles = Enumerable.Except(expectedFiles, actualFiles);
-            var extraFiles = Enumerable.Except(actualFiles, expectedFiles);
+            Execute.Assertion
+                .ForCondition(!SubjectHasDirectory(expectedDir))
+                .BecauseOf(because, becauseArgs)
+                .FailWith($"Expected '{Subject.FullName}' to not have directory {expectedDir}{{reason}}, but it does.");
+
+            return new AndConstraint<DirectoryInfoAssertions>(this);
+        }
+
+        public AndConstraint<DirectoryInfoAssertions> HaveFiles(IEnumerable<string> expectedFiles, string because = "", params object[] becauseArgs)
+        {
+            var missingFiles = Enumerable.Except(expectedFiles, SubjectChildFiles);
             var nl = Environment.NewLine;
 
-            Execute.Assertion.ForCondition(!missingFiles.Any())
-                .FailWith($"Following files cannot be found inside directory {_dirInfo.FullName} {nl} {string.Join(nl, missingFiles)}");
-
-            Execute.Assertion.ForCondition(!extraFiles.Any())
-                .FailWith($"Following extra files are found inside directory {_dirInfo.FullName} {nl} {string.Join(nl, extraFiles)}");
+            Execute.Assertion
+                .ForCondition(!missingFiles.Any())
+                .BecauseOf(because, becauseArgs)
+                .FailWith($"Expected '{Subject.FullName}' to have:{nl}{string.Join(nl, expectedFiles)} {nl}{{reason}}, but the following files are missing:{nl}{string.Join(nl, missingFiles)}");
 
             return new AndConstraint<DirectoryInfoAssertions>(this);
+        }
+
+        public AndConstraint<DirectoryInfoAssertions> NotHaveFiles(IEnumerable<string> files, string because = "", params object[] becauseArgs)
+        {
+            var presentFiles = Enumerable.Intersect(SubjectChildFiles, files);
+            var nl = Environment.NewLine;
+
+            Execute.Assertion
+                .ForCondition(!presentFiles.Any())
+                .BecauseOf(because, becauseArgs)
+                .FailWith($"Expected '{Subject.FullName}' to not have: {nl}{string.Join(nl, files)} {nl}{{reason}}, but the following extra files were found:{nl}{string.Join(nl, presentFiles)}");
+
+            return new AndConstraint<DirectoryInfoAssertions>(this);
+        }
+
+        public AndConstraint<DirectoryInfoAssertions> OnlyHaveFiles(IEnumerable<string> expectedFiles, string because = "", params object[] becauseArgs)
+        {
+            var missingFiles = Enumerable.Except(expectedFiles, SubjectChildFiles);
+            var extraFiles = Enumerable.Except(SubjectChildFiles, expectedFiles);
+            var nl = Environment.NewLine;
+
+            Execute.Assertion
+                .ForCondition(!missingFiles.Any())
+                .BecauseOf(because, becauseArgs)
+                .FailWith($"Expected '{Subject.FullName}' to have: {nl}{string.Join(nl, expectedFiles)} {nl}{{reason}}, but the following files are missing:{nl}{string.Join(nl, missingFiles)}");
+
+            Execute.Assertion
+                .ForCondition(!extraFiles.Any())
+                .BecauseOf(because, becauseArgs)
+                .FailWith($"Expected '{Subject.FullName}' to only have: {nl}{string.Join(nl, expectedFiles)} {nl}{{reason}}, but the following extra files were found:{nl}{string.Join(nl, extraFiles)}");
+
+            return new AndConstraint<DirectoryInfoAssertions>(this);
+        }
+        
+        private IEnumerable<string> SubjectChildFiles
+        {
+            get
+            {
+                return Subject.EnumerateFiles("*", SearchOption.TopDirectoryOnly).Select(f => f.Name);
+            }
+        }
+        
+        private bool SubjectHasDirectory(string expectedDir)
+        {
+            return new DirectoryInfo(Path.Combine(Subject.FullName, expectedDir)).Exists;
+        }
+        
+        private bool SubjectHasFile(string expectedFile)
+        {
+            return new FileInfo(Path.Combine(Subject.FullName, expectedFile)).Exists;
         }
     }
 }

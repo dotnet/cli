@@ -14,7 +14,10 @@
     }
   },
   "dependencies": {
-    "Microsoft.NETCore.App": "1.0.0-rc3-*"
+    "Microsoft.NETCore.App": {
+      "version": "1.0.0-rc3-*",
+      "type": "platform"
+    }
   },
   "packOptions": {
     "files": {

@@ -13,233 +13,168 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
 {
     public class CompilerTests : TestBase
     {
-        private readonly string _testProjectsRoot;
-
-        public CompilerTests()
+        [Fact]
+        public void When_xmlDoc_is_true_then_doc_xml_is_generated()
         {
-            _testProjectsRoot = Path.Combine(AppContext.BaseDirectory, "TestAssets", "TestProjects");
+            var root = TestAssetsManager.CreateTestInstance("TestLibraryWithXmlDoc")
+                .WithBuildArtifacts()
+                .Path;
+            
+            var outputXmlPath = Path.Combine(root, "bin", "Debug", DefaultLibraryFramework, "TestLibraryWithXmlDoc.xml");
+
+            new FileInfo(outputXmlPath)
+                .Should().Exist("because xmlDoc=true is specified in project.json")
+                .And.ContainText("Gets the message from the helper", "because that is the intellisense doc comment in the TestLibraryWithDocs");
         }
 
         [Fact]
-        public void XmlDocumentationFileIsGenerated()
+        public void When_project_has_resx_then_Sattelite_assembly_produced()
         {
-            // create unique directories in the 'temp' folder
-            var root = Temp.CreateDirectory();
-            root.CopyFile(Path.Combine(_testProjectsRoot, "global.json"));
-
-            var testLibDir = root.CreateDirectory("TestLibrary");
-            var sourceTestLibDir = Path.Combine(_testProjectsRoot, "TestAppWithLibrary", "TestLibrary");
-
-            CopyProjectToTempDir(sourceTestLibDir, testLibDir);
-
-            // run compile
-            var outputDir = Path.Combine(testLibDir.Path, "bin");
-            var testProject = GetProjectPath(testLibDir);
-            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultLibraryFramework);
-            var result = buildCommand.ExecuteWithCapturedOutput();
-            result.Should().Pass();
-
-            // verify the output xml file
-            var outputXml = Path.Combine(outputDir, "Debug", DefaultLibraryFramework, "TestLibrary.xml");
-            Console.WriteLine("OUTPUT XML PATH: " + outputXml);
-            Assert.True(File.Exists(outputXml));
-            Assert.Contains("Gets the message from the helper", File.ReadAllText(outputXml));
-        }
-
-        [Fact]
-        public void SatelliteAssemblyIsGeneratedByDotnetBuild()
-        {
-            // create unique directories in the 'temp' folder
-            var root = Temp.CreateDirectory();
-            var testLibDir = root.CreateDirectory("TestProjectWithCultureSpecificResource");
-            var sourceTestLibDir = Path.Combine(_testProjectsRoot, "TestProjectWithCultureSpecificResource");
-
-            CopyProjectToTempDir(sourceTestLibDir, testLibDir);
-
-            // run compile on a project with resources
-            var outputDir = Path.Combine(testLibDir.Path, "bin");
-            var testProject = GetProjectPath(testLibDir);
-            var buildCmd = new BuildCommand(testProject, output: outputDir, framework: DefaultFramework);
-            var result = buildCmd.ExecuteWithCapturedOutput();
-            result.Should().Pass();
+            var root = TestAssetsManager.CreateTestInstance("TestProjectWithCultureSpecificResource")
+                .WithBuildArtifacts()
+                .Path;
 
             var generatedSatelliteAssemblyPath = Path.Combine(
-                outputDir,
-                "Debug",
-                DefaultFramework,
-                "fr",
-                "TestProjectWithCultureSpecificResource.resources.dll");
-            Assert.True(File.Exists(generatedSatelliteAssemblyPath), $"File {generatedSatelliteAssemblyPath} was not found.");
+                    root,
+                    "bin",
+                    "Debug",
+                    DefaultFramework,
+                    "fr",
+                    "TestProjectWithCultureSpecificResource.resources.dll");
+
+            new FileInfo(generatedSatelliteAssemblyPath)
+                .Should().Exist("Because the project includes Strings.fr.resx");
         }
 
         [Fact]
-        public void LibraryWithAnalyzer()
+        public void When_PJ_references_analyzers_Then_they_are_executed()
         {
-            var root = Temp.CreateDirectory();
-            var testLibDir = root.CreateDirectory("TestLibraryWithAnalyzer");
-            var sourceTestLibDir = Path.Combine(_testProjectsRoot, "TestLibraryWithAnalyzer");
+            var root = TestAssetsManager.CreateTestInstance("TestLibraryWithAnalyzer")
+                .WithLockFiles()
+                .Path;
 
-            CopyProjectToTempDir(sourceTestLibDir, testLibDir);
+            var buildResult = new TestCommand("dotnet")
+                .WithWorkingDirectory(root)
+                .ExecuteWithCapturedOutput($"build -f {DefaultLibraryFramework}");
 
-            // run compile
-            var outputDir = Path.Combine(testLibDir.Path, "bin");
-            var testProject = GetProjectPath(testLibDir);
-            var buildCmd = new BuildCommand(testProject, output: outputDir, framework: DefaultLibraryFramework);
-            var result = buildCmd.ExecuteWithCapturedOutput();
-            result.Should().Pass();
+            buildResult
+                .Should().Pass();
 
-            Assert.Contains("CA1018", result.StdErr);
+            buildResult.StdErr
+                .Should().Contain("CA1018", "because this is produced by the analyzer");
         }
 
         [Fact]
+        // TODO: this test is really just testing space in path. It does not validate anything about
+        // PreserveCompilationContext
         public void CompilingAppWithPreserveCompilationContextWithSpaceInThePathShouldSucceed()
         {
-            var root = Temp.CreateDirectory();
+            var root = TestAssetsManager.CreateTestInstance("TestAppCompilationContext", "space directory")
+                .WithLockFiles()
+                .Path;
 
-            var spaceBufferDirectory = root.CreateDirectory("space directory");
-            var testAppDir = spaceBufferDirectory.CreateDirectory("TestAppCompilationContext");
-
-            CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestAppCompilationContext"), testAppDir);
-
-            var testProjectDir = Path.Combine(_testProjectsRoot, "TestAppCompilationContext", "TestApp");
-            var testProject = Path.Combine(testProjectDir, "project.json");
-
-            var buildCommand = new BuildCommand(testProject);
-
-            buildCommand.Execute().Should().Pass();
+            new TestCommand("dotnet")
+                .WithWorkingDirectory(Path.Combine(root, "TestApp"))
+                .ExecuteWithCapturedOutput($"build -f {DefaultFramework}")
+                .Should().Pass();
         }
 
         [Fact]
-        public void ContentFilesAreCopied()
+        public void When_PJ_references_package_with_content_Then_it_is_included_in_the_project()
         {
-            var testInstance = TestAssetsManager.CreateTestInstance("TestAppWithContentPackage")
-                                                .WithLockFiles();
+            var root = TestAssetsManager.CreateTestInstance("TestAppWithContentPackage")
+                .WithLockFiles()
+                .Path;
 
-            var root = testInstance.TestRoot;
+            var result = new TestCommand("dotnet")
+                .WithWorkingDirectory(root)
+                .ExecuteWithCapturedOutput($"build -f {DefaultFramework}");
 
-            // run compile
-            var outputDir = Path.Combine(root, "bin");
-            var testProject = ProjectUtils.GetProjectJson(root, "TestAppWithContentPackage");
-            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultFramework);
-            var result = buildCommand.ExecuteWithCapturedOutput();
+            var outputDir = Path.Combine(root, "bin", "Debug", DefaultFramework);
+
             result.Should().Pass();
 
-            result = Command.Create(Path.Combine(outputDir, "AppWithContentPackage" + buildCommand.GetExecutableExtension()), new string [0])
-                .CaptureStdErr()
-                .CaptureStdOut()
-                .Execute();
-            result.Should().Pass();
-
-            // verify the output xml file
+            new DirectoryInfo(outputDir)
+                .Should().HaveFile("config.xml", "because it is in the contentFiles/cs/dnxcore50/config directory");
+                
             new DirectoryInfo(outputDir).Sub("scripts").Should()
                 .Exist()
-                .And.HaveFile("run.cmd");
-            new DirectoryInfo(outputDir).Should()
-                .HaveFile("config.xml");
+                .And.HaveFile("run.cmd", "because it is in the contentFiles/cs/dnxcore50/scripts directory");
+
             // verify embedded resources
-            result.StdOut.Should().Contain("AppWithContentPackage.dnf.png");
-            result.StdOut.Should().Contain("AppWithContentPackage.ui.png");
-            // verify 'all' language files not included
-            result.StdOut.Should().NotContain("AppWithContentPackage.dnf_all.png");
-            result.StdOut.Should().NotContain("AppWithContentPackage.ui_all.png");
-            // verify classes
-            result.StdOut.Should().Contain("AppWithContentPackage.Foo");
-            result.StdOut.Should().Contain("MyNamespace.Util");
+            result.StdOut.Should()
+                .Contain("AppWithContentPackage.dnf.png", "because it is in the contentFiles/cs/dnxcore50/images directory.")
+                .And.Contain("AppWithContentPackage.ui.png", "because it is in the contentFiles/cs/dnxcore50/images directory.")
+                .And.Contain("AppWithContentPackage.Foo", "because it is in the contentFiles/cs/dnxcore50/code directory.")
+                .And.Contain("MyNamespace.Util", "because it is in the contentFiles/cs/dnxcore50/code directory.")
+                .And.NotContain("AppWithContentPackage.dnf_all.png", "because it is in the contentFiles/any directory.")
+                .And.NotContain("AppWithContentPackage.ui_all.png", "because it is in the contentFiles/any directory.");
+            
         }
 
         [Fact]
-        public void EmbeddedResourcesAreCopied()
+        public void When_resources_are_embedded_Then_they_are_in_output()
         {
-            var testInstance = TestAssetsManager.CreateTestInstance("EndToEndTestApp")
+            var root = TestAssetsManager.CreateTestInstance("EndToEndTestApp")
                                                 .WithLockFiles()
-                                                .WithBuildArtifacts();
+                                                .WithBuildArtifacts()
+                                                .Path;
 
-            var root = testInstance.TestRoot;
-
-            // run compile
-            var outputDir = Path.Combine(root, "bin");
-            var testProject = ProjectUtils.GetProjectJson(root, "EndToEndTestApp");
-            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultFramework);
-            var result = buildCommand.ExecuteWithCapturedOutput();
-            result.Should().Pass();
-
-            var objDirInfo = new DirectoryInfo(Path.Combine(root, "obj", "Debug", DefaultFramework));
-            objDirInfo.Should().HaveFile("EndToEndTestApp.resource1.resources");
-            objDirInfo.Should().HaveFile("myresource.resources");
-            objDirInfo.Should().HaveFile("EndToEndTestApp.defaultresource.resources");
+            new DirectoryInfo(Path.Combine(root, "obj", "Debug", DefaultFramework))
+                .Should().HaveFile("EndToEndTestApp.resource1.resources", "because *.resx is embedded")
+                .And.HaveFile("myresource.resources", "because resource2 got mapped to a new name")
+                .And.HaveFile("EndToEndTestApp.defaultresource.resources", "because *.resx is embedded");
         }
 
         [Fact]
-        public void CopyToOutputFilesAreCopied()
+        public void When_copyToOutput_is_configured_Then_included_files_are_copied_except_excluded()
         {
-            var testInstance = TestAssetsManager.CreateTestInstance("EndToEndTestApp")
+            var root = TestAssetsManager.CreateTestInstance("EndToEndTestApp")
                                                 .WithLockFiles()
-                                                .WithBuildArtifacts();
+                                                .WithBuildArtifacts()
+                                                .Path;
 
-            var root = testInstance.TestRoot;
-
-            // run compile
-            var outputDir = Path.Combine(root, "bin");
-            var testProject = ProjectUtils.GetProjectJson(root, "EndToEndTestApp");
-            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultFramework);
-            var result = buildCommand.ExecuteWithCapturedOutput();
-            result.Should().Pass();
-
-            var outputDirInfo = new DirectoryInfo(Path.Combine(outputDir, "copy"));
-            outputDirInfo.Should().HaveFile("file.txt");
-            outputDirInfo.Should().NotHaveFile("fileex.txt");
+            new DirectoryInfo(Path.Combine(root, "bin", "Debug", DefaultFramework, "copy"))
+                .Should().HaveFile("file.txt", "because it is included by copyToOutput")
+                .And.NotHaveFile("fileex.txt", "because it is excluded by copyToOutput");
         }
 
         [Fact]
-        public void CanSetOutputAssemblyNameForLibraries()
+        public void When_outputName_is_set_for_library_Then_the_library_bares_that_name()
         {
-            var testInstance =
-                TestAssetsManager
-                    .CreateTestInstance("LibraryWithOutputAssemblyName")
-                    .WithLockFiles();
+            var root = TestAssetsManager.CreateTestInstance("LibraryWithOutputAssemblyName")
+                .WithLockFiles()
+                .WithBuildArtifacts()
+                .Path;
 
-            var root = testInstance.TestRoot;
-            var outputDir = Path.Combine(root, "bin");
-            var testProject = ProjectUtils.GetProjectJson(root, "LibraryWithOutputAssemblyName");
-            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultLibraryFramework);
-            var result = buildCommand.ExecuteWithCapturedOutput();
-            result.Should().Pass();
-
-            new DirectoryInfo(outputDir).Should().HaveFiles(new [] { "MyLibrary.dll" });
+            new DirectoryInfo(Path.Combine(root, "bin", "Debug", "netstandard1.5"))
+                .Should().HaveFile("MyLibrary.dll", "because that is the outputName")
+                .And.NotHaveFile("LibraryWithOutputAssemblyName.dll", "because outputName overrides it");
         }
 
         [Fact]
-        public void CanSetOutputAssemblyNameForApps()
+        public void When_outputName_is_set_for_app_Then_the_app_bares_that_name()
         {
-            var testInstance =
-                TestAssetsManager
-                    .CreateTestInstance("AppWithOutputAssemblyName")
-                    .WithLockFiles();
-
-            var root = testInstance.TestRoot;
-            var outputDir = Path.Combine(root, "bin");
-            var testProject = ProjectUtils.GetProjectJson(root, "AppWithOutputAssemblyName");
-            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultFramework);
-            var result = buildCommand.ExecuteWithCapturedOutput();
-            result.Should().Pass();
-
-            new DirectoryInfo(outputDir).Should().HaveFiles(
-                new [] { "MyApp.dll", "MyApp" + buildCommand.GetExecutableExtension(),
-                    "MyApp.runtimeconfig.json", "MyApp.deps.json" });
-        }
-
-        private void CopyProjectToTempDir(string projectDir, TempDirectory tempDir)
-        {
-            // copy all the files to temp dir
-            foreach (var file in Directory.EnumerateFiles(projectDir))
-            {
-                tempDir.CopyFile(file);
-            }
-        }
-
-        private string GetProjectPath(TempDirectory projectDir)
-        {
-            return Path.Combine(projectDir.Path, "project.json");
+            var root = TestAssetsManager.CreateTestInstance("AppWithOutputAssemblyName")
+                .WithLockFiles()
+                .WithBuildArtifacts()
+                .Path;
+                
+            new DirectoryInfo(Path.Combine(root, "bin", "Debug", DefaultFramework))
+                .Should().HaveFiles(
+                    new [] 
+                    { 
+                        "MyApp.dll", 
+                        "MyApp.runtimeconfig.json", 
+                        "MyApp.deps.json" 
+                    }, "because that is the outputName")
+                .And.NotHaveFiles(
+                    new [] 
+                    { 
+                        "AppWithOutputAssemblyName.dll", 
+                        "AppWithOutputAssemblyName.runtimeconfig.json", 
+                        "AppWithOutputAssemblyName.deps.json" 
+                    }, "because outputName is set");
         }
     }
 }

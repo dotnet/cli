@@ -5,7 +5,10 @@
     "outputName": "AppWithContentPackage"
   },
   "dependencies": {
-    "Microsoft.NETCore.App": "1.0.0-rc3-*",
+    "Microsoft.NETCore.App": {
+      "version": "1.0.0-rc3-*",
+      "type": "platform"
+    },
     "SharedContentA": "1.0.0-*"
   },
   "frameworks": {

@@ -36,6 +36,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         public TestCommand WithWorkingDirectory(string workingDirectory)
         {
             WorkingDirectory = workingDirectory;
+            
             return this;
         }
 
