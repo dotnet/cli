@@ -6,8 +6,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel;
-using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Microsoft.DotNet.Tools.Test
 {
@@ -26,10 +26,10 @@ namespace Microsoft.DotNet.Tools.Test
 
             var dotnetTestParams = new DotnetTestParams();
 
-            dotnetTestParams.Parse(args);
-
             try
             {
+                dotnetTestParams.Parse(args);
+            
                 if (dotnetTestParams.Help)
                 {
                     return 0;
@@ -44,29 +44,37 @@ namespace Microsoft.DotNet.Tools.Test
                 var projectPath = GetProjectPath(dotnetTestParams.ProjectPath);
                 var runtimeIdentifiers = !string.IsNullOrEmpty(dotnetTestParams.Runtime) ?
                     new[] { dotnetTestParams.Runtime } :
-                    PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers();
+                    RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers();
                 var exitCode = 0;
 
                 // Create a workspace
-                var workspace = WorkspaceContext.Create(ProjectReaderSettings.ReadFromEnvironment(), designTime: false);
+                var workspace = new BuildWorkspace(ProjectReaderSettings.ReadFromEnvironment());
 
                 if (dotnetTestParams.Framework != null)
                 {
-                    var projectContext = ProjectContext.Create(projectPath, dotnetTestParams.Framework, runtimeIdentifiers);
-                    exitCode = RunTest(projectContext, dotnetTestParams);
+                    var projectContext = workspace.GetProjectContext(projectPath, dotnetTestParams.Framework);
+                    if (projectContext == null)
+                    {
+                        Reporter.Error.WriteLine($"Project '{projectPath}' does not support framework: {dotnetTestParams.UnparsedFramework}");
+                        return 1;
+                    }
+                    projectContext = workspace.GetRuntimeContext(projectContext, runtimeIdentifiers);
+
+                    exitCode = RunTest(projectContext, dotnetTestParams, workspace);
                 }
                 else
                 {
                     var summary = new Summary();
-                    var projectContexts = workspace
-                        .GetProjectContextCollection(projectPath).FrameworkOnlyContexts
+                    var projectContexts = workspace.GetProjectContextCollection(projectPath)
+                        .EnsureValid(projectPath)
+                        .FrameworkOnlyContexts
                         .Select(c => workspace.GetRuntimeContext(c, runtimeIdentifiers))
                         .ToList();
 
                     // Execute for all TFMs the project targets.
                     foreach (var projectContext in projectContexts)
                     {
-                        var result = RunTest(projectContext, dotnetTestParams);
+                        var result = RunTest(projectContext, dotnetTestParams, workspace);
                         if (result == 0)
                         {
                             summary.Passed++;
@@ -93,7 +101,7 @@ namespace Microsoft.DotNet.Tools.Test
                 TestHostTracing.Source.TraceEvent(TraceEventType.Error, 0, ex.ToString());
                 return -1;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!(ex is GracefulException))
             {
                 TestHostTracing.Source.TraceEvent(TraceEventType.Error, 0, ex.ToString());
                 return -2;
@@ -134,11 +142,11 @@ namespace Microsoft.DotNet.Tools.Test
             }
         }
 
-        private int RunTest(ProjectContext projectContext, DotnetTestParams dotnetTestParams)
+        private int RunTest(ProjectContext projectContext, DotnetTestParams dotnetTestParams, BuildWorkspace workspace)
         {
             var testRunner = projectContext.ProjectFile.TestRunner;
             var dotnetTestRunner = _dotnetTestRunnerFactory.Create(dotnetTestParams.Port);
-            return dotnetTestRunner.RunTests(projectContext, dotnetTestParams);
+            return dotnetTestRunner.RunTests(projectContext, dotnetTestParams, workspace);
         }
 
         private static string GetProjectPath(string projectPath)

@@ -227,11 +227,16 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             bool buildProfile=true,
             bool noIncremental=false,
             bool noDependencies=false,
-            bool verbose=true)
+            bool verbose=true,
+            bool skipLoadProject=false)
             : base("dotnet")
         {
             _projectPath = projectPath;
-            _project = ProjectReader.GetProject(projectPath);
+
+            if (!skipLoadProject)
+            {
+                _project = ProjectReader.GetProject(projectPath);
+            }
 
             _outputDirectory = output;
             _buildBasePathDirectory = buildBasePath;

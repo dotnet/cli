@@ -4,8 +4,9 @@
 using System.Collections.Generic;
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel;
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.DotNet.Tools.Common;
 using NuGet.Frameworks;
 
 // This class is responsible with defining the arguments for the Compile verb.
@@ -45,14 +46,14 @@ namespace Microsoft.DotNet.Tools.Compiler
         public bool ShouldNotUseIncrementality { get; set; }
         public bool ShouldSkipDependencies { get; set; }
 
-        public WorkspaceContext Workspace { get; private set; }
+        public BuildWorkspace Workspace { get; private set; }
 
         // workaround: CommandLineApplication is internal therefore I cannot make _app protected so baseclasses can add their own params
         private readonly Dictionary<string, CommandOption> baseClassOptions;
 
         public BuildCommandApp(string name, string fullName, string description) : this(name, fullName, description, workspace: null) { }
 
-        public BuildCommandApp(string name, string fullName, string description, WorkspaceContext workspace)
+        public BuildCommandApp(string name, string fullName, string description, BuildWorkspace workspace)
         {
             Workspace = workspace;
             _app = new CommandLineApplication
@@ -79,7 +80,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             _versionSuffixOption = _app.Option("--version-suffix <VERSION_SUFFIX>", "Defines what `*` should be replaced with in version field in project.json", CommandOptionType.SingleValue);
             _projectArgument = _app.Argument("<PROJECT>", "The project to compile, defaults to the current directory. " +
                                                           "Can be one or multiple paths to project.json, project directory " +
-                                                          "or globbing patter that matches project.json files", multipleValues: true);
+                                                          "or globbing pattern that matches project.json files", multipleValues: true);
 
             _shouldPrintIncrementalPreconditionsArgument = _app.Option(BuildProfileFlag, "Set this flag to print the incremental safety checks that prevent incremental compilation", CommandOptionType.NoValue);
             _shouldNotUseIncrementalityArgument = _app.Option(NoIncrementalFlag, "Set this flag to turn off incremental build", CommandOptionType.NoValue);
@@ -97,7 +98,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 }
 
                 OutputValue = _outputOption.Value();
-                BuildBasePathValue = _buildBasePath.Value();
+                BuildBasePathValue = PathUtility.GetFullPath(_buildBasePath.Value());
                 ConfigValue = _configurationOption.Value() ?? Constants.DefaultConfiguration;
                 RuntimeValue = _runtimeOption.Value();
                 VersionSuffixValue = _versionSuffixOption.Value();
@@ -108,20 +109,14 @@ namespace Microsoft.DotNet.Tools.Compiler
                 // Set defaults based on the environment
                 if (Workspace == null)
                 {
-                    var settings = ProjectReaderSettings.ReadFromEnvironment();
-
-                    if (!string.IsNullOrEmpty(VersionSuffixValue))
-                    {
-                        settings.VersionSuffix = VersionSuffixValue;
-                    }
-                    Workspace = WorkspaceContext.Create(settings, designTime: false);
+                    Workspace = BuildWorkspace.Create(VersionSuffixValue);
                 }
 
                 var files = new ProjectGlobbingResolver().Resolve(_projectArgument.Values);
                 IEnumerable<NuGetFramework> frameworks = null;
                 if (_frameworkOption.HasValue())
                 {
-                    frameworks = new [] { NuGetFramework.Parse(_frameworkOption.Value()) };
+                    frameworks = new[] { NuGetFramework.Parse(_frameworkOption.Value()) };
                 }
                 var success = execute(files, frameworks, this);
 
@@ -136,7 +131,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             var rids = new List<string>();
             if (string.IsNullOrEmpty(RuntimeValue))
             {
-                return PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers();
+                return RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers();
             }
             else
             {

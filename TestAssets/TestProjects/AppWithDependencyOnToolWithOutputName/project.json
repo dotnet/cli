@@ -1,18 +1,17 @@
 {
   "version": "1.0.0-*",
-  "compilationOptions": {
+  "buildOptions": {
     "emitEntryPoint": true
   },
   "dependencies": {
     "Microsoft.NETCore.App": {
-      "version": "1.0.0-rc2-*",
+      "version": "1.0.0-rc3-004363",
       "type": "platform"
     }
   },
   "frameworks": {
-    "netcoreapp1.0": { }
+    "netcoreapp1.0": {}
   },
-
   "tools": {
     "ToolWithOutputName": {
       "version": "1.0.0",

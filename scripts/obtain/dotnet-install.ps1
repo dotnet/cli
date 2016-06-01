@@ -29,6 +29,9 @@
     Default: <auto> - this value represents currently running OS architecture
     Architecture of dotnet binaries to be installed.
     Possible values are: <auto>, x64 and x86
+.PARAMETER SharedRuntime
+    Default: false
+    Installs just the shared runtime bits, not the entire SDK
 .PARAMETER DebugSymbols
     If set the installer will include symbols in the installation.
 .PARAMETER DryRun
@@ -51,6 +54,7 @@ param(
    [string]$Version="Latest",
    [string]$InstallDir="<auto>",
    [string]$Architecture="<auto>",
+   [switch]$SharedRuntime,
    [switch]$DebugSymbols, # TODO: Switch does not work yet. Symbols zip is not being uploaded yet.
    [switch]$DryRun,
    [switch]$NoPath,
@@ -114,9 +118,22 @@ function Get-Version-Info-From-Version-Text([string]$VersionText) {
 function Get-Latest-Version-Info([string]$AzureFeed, [string]$AzureChannel, [string]$CLIArchitecture) {
     Say-Invocation $MyInvocation
 
-    $VersionFileUrl = "$AzureFeed/$AzureChannel/dnvm/latest.win.$CLIArchitecture.version"
+    $VersionFileUrl = $null
+    if ($SharedRuntime) {
+        $VersionFileUrl = "$AzureFeed/$AzureChannel/dnvm/latest.sharedfx.win.$CLIArchitecture.version"
+    }
+    else {
+        $VersionFileUrl = "$AzureFeed/$AzureChannel/dnvm/latest.win.$CLIArchitecture.version"
+    }
+    
     $Response = Invoke-WebRequest -UseBasicParsing $VersionFileUrl
-    $VersionText = [Text.Encoding]::UTF8.GetString($Response.Content)
+
+    switch ($Response.Headers.'Content-Type'){
+        { ($_ -eq "application/octet-stream") } { $VersionText = [Text.Encoding]::UTF8.GetString($Response.Content) }
+        { ($_ -eq "text/plain") } { $VersionText = $Response.Content }
+        default { throw "``$Response.Headers.'Content-Type'`` is an unknown .version file content type." }
+    }
+    
 
     $VersionInfo = Get-Version-Info-From-Version-Text $VersionText
 
@@ -130,7 +147,8 @@ function Get-Azure-Channel-From-Channel([string]$Channel) {
     # For compatibility with build scripts accept also directly Azure channels names
     switch ($Channel.ToLower()) {
         { ($_ -eq "future") -or ($_ -eq "dev") } { return "dev" }
-        { ($_ -eq "preview") -or ($_ -eq "beta") } { return "beta" }
+        { ($_ -eq "beta") } { return "beta" }
+        { ($_ -eq "preview") } { return "preview" }
         { $_ -eq "production" } { throw "Production channel does not exist yet" }
         default { throw "``$Channel`` is an invalid channel name. Use one of the following: ``future``, ``preview``, ``production``" }
     }
@@ -153,7 +171,13 @@ function Get-Download-Links([string]$AzureFeed, [string]$AzureChannel, [string]$
     Say-Invocation $MyInvocation
     
     $ret = @()
-    $files = @("dotnet-dev")
+    $files = @()
+    if ($SharedRuntime) {
+        $files += "dotnet";
+    }
+    else {
+        $files += "dotnet-dev";
+    }
     
     foreach ($file in $files) {
         $PayloadURL = "$AzureFeed/$AzureChannel/Binaries/$SpecificVersion/$file-win-$CLIArchitecture.$SpecificVersion.zip"
@@ -300,7 +324,7 @@ if ($DryRun) {
         Say "- $DownloadLink"
     }
     Say "Repeatable invocation: .\$($MyInvocation.MyCommand) -Version $SpecificVersion -Channel $Channel -Architecture $CLIArchitecture -InstallDir $InstallDir"
-    return
+    exit 0
 }
 
 $InstallRoot = Resolve-Installation-Path $InstallDir
@@ -310,7 +334,7 @@ $IsSdkInstalled = Is-Dotnet-Package-Installed -InstallRoot $InstallRoot -Relativ
 Say-Verbose ".NET SDK installed? $IsSdkInstalled"
 if ($IsSdkInstalled) {
     Say ".NET SDK version $SpecificVersion is already installed."
-    return
+    exit 0
 }
 
 New-Item -ItemType Directory -Force -Path $InstallRoot | Out-Null
@@ -329,10 +353,11 @@ foreach ($DownloadLink in $DownloadLinks) {
 $BinPath = Get-Absolute-Path $(Join-Path -Path $InstallRoot -ChildPath $BinFolderRelativePath)
 if (-Not $NoPath) {
     Say "Adding to current process PATH: `"$BinPath`". Note: This change will not be visible if PowerShell was run as a child process."
-    $env:path += ";$BinPath"
+    $env:path = "$BinPath;" + $env:path
 }
 else {
     Say "Binaries of dotnet can be found in $BinPath"
 }
 
 Say "Installation finished"
+exit 0

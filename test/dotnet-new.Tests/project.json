@@ -3,7 +3,7 @@
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.0-rc2-*"
+      "version": "1.0.0-rc3-004363"
     },
     "Microsoft.DotNet.Tools.Tests.Utilities": {
       "target": "project"
@@ -13,7 +13,7 @@
       "target": "project"
     },
     "xunit": "2.1.0",
-    "dotnet-test-xunit": "1.0.0-dev-140469-38"
+    "dotnet-test-xunit": "1.0.0-rc2-192208-24"
   },
   "frameworks": {
     "netcoreapp1.0": {

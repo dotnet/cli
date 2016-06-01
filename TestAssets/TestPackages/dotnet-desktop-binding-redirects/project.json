@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0-*",
-  "compilationOptions": {
+  "version": "1.0.0-rc-*",
+  "buildOptions": {
     "emitEntryPoint": true
   },
   "dependencies": {
@@ -15,4 +15,3 @@
     }
   }
 }
-

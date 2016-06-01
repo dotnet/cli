@@ -12,14 +12,16 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Host.Mef;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.DotNet.Cli.Compiler.Common;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Files;
-using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
+
+using RoslynWorkspace = Microsoft.CodeAnalysis.Workspace;
 
 namespace Microsoft.DotNet.ProjectModel.Workspaces
 {
-    public class ProjectJsonWorkspace : Workspace
+    public class ProjectJsonWorkspace : RoslynWorkspace
     {
         private Dictionary<string, AssemblyMetadata> _cache = new Dictionary<string, AssemblyMetadata>();
 
@@ -225,7 +227,7 @@ namespace Microsoft.DotNet.ProjectModel.Workspaces
             {
                 keyFile = Path.GetFullPath(Path.Combine(projectDirectory, compilerOptions.KeyFile));
 
-                if (PlatformServices.Default.Runtime.OperatingSystemPlatform != Extensions.PlatformAbstractions.Platform.Windows || useOssSigning)
+                if (RuntimeEnvironment.OperatingSystemPlatform != InternalAbstractions.Platform.Windows || useOssSigning)
                 {
                     return options.WithCryptoPublicKey(
                         SnkUtils.ExtractPublicKey(File.ReadAllBytes(keyFile)));

@@ -1,19 +1,23 @@
 {
   "version": "1.0.0-*",
-  "compilationOptions": {
+  "buildOptions": {
     "emitEntryPoint": true
   },
   "dependencies": {
     "Microsoft.Data.OData": "5.6.4",
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.0-rc2-*"
+      "version": "1.0.0-rc3-004363"
     },
-    "TestLibraryWithResources": { "target": "project" }
+    "TestLibraryWithResources": {
+      "target": "project"
+    }
   },
   "frameworks": {
     "netcoreapp1.0": {
-        "imports": [ "portable-net45+win8" ]
+      "imports": [
+        "portable-net45+win8"
+      ]
     }
   }
 }

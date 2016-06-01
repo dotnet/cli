@@ -36,11 +36,13 @@ namespace Microsoft.DotNet.ProjectModel
 
         public string RootDirectory => GlobalSettings?.DirectoryPath;
 
-        public string ProjectDirectory => ProjectFile.ProjectDirectory;
+        public string ProjectDirectory => ProjectFile?.ProjectDirectory;
 
         public string PackagesDirectory { get; }
 
         public LibraryManager LibraryManager { get; }
+
+        public List<DiagnosticMessage> Diagnostics { get; }
 
         internal ProjectContext(
             GlobalSettings globalSettings,
@@ -51,7 +53,8 @@ namespace Microsoft.DotNet.ProjectModel
             string runtimeIdentifier,
             string packagesDirectory,
             LibraryManager libraryManager,
-            LockFile lockfile)
+            LockFile lockfile,
+            List<DiagnosticMessage> diagnostics)
         {
             Identity = new ProjectContextIdentity(rootProject?.Path, targetFramework);
             GlobalSettings = globalSettings;
@@ -63,6 +66,7 @@ namespace Microsoft.DotNet.ProjectModel
             LibraryManager = libraryManager;
             LockFile = lockfile;
             IsPortable = isPortable;
+            Diagnostics = diagnostics;
         }
 
         public LibraryExporter CreateExporter(string configuration, string buildBasePath = null)
@@ -135,7 +139,7 @@ namespace Microsoft.DotNet.ProjectModel
                 yield return new ProjectContextBuilder()
                                 .WithProject(project)
                                 .WithTargetFramework(framework.FrameworkName)
-                                .WithReaderSettings(settings)
+                                .WithProjectReaderSettings(settings)
                                 .WithRuntimeIdentifiers(runtimeIdentifiers ?? Enumerable.Empty<string>())
                                 .Build();
             }
@@ -149,7 +153,7 @@ namespace Microsoft.DotNet.ProjectModel
             var project = ProjectReader.GetProject(projectPath);
 
             return new ProjectContextBuilder()
-                        .WithReaderSettings(settings)
+                        .WithProjectReaderSettings(settings)
                         .WithProject(project)
                         .BuildAllTargets();
         }

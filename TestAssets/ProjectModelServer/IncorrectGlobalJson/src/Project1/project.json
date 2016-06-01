@@ -1,10 +1,10 @@
 {
   "version": "1.0.0-*",
-  "compilationOptions": {
+  "buildOptions": {
     "emitEntryPoint": true
   },
   "dependencies": {
-    "Microsoft.NETCore.App": "1.0.0-rc2-*"
+    "Microsoft.NETCore.App": "1.0.0-rc3-004363"
   },
   "frameworks": {
     "netcoreapp1.0": {}

@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0-*",
-  "compilationOptions": {
+  "version": "1.0.0-rc-*",
+  "buildOptions": {
     "emitEntryPoint": true
   },
   "frameworks": {
@@ -8,9 +8,9 @@
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.0.0-rc2-*"
+          "version": "1.0.0-rc3-004363"
         }
-      },
+      }
     },
     "net451": {}
   }

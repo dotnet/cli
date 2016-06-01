@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel;
-using Microsoft.DotNet.ProjectModel.Graph;
-using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
-using NuGet.Packaging;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
@@ -58,6 +53,12 @@ namespace Microsoft.DotNet.Cli.Utils
 
             var buildOutputPath = projectContext.GetOutputPaths(configuration, buildBasePath, outputPath).RuntimeFiles.BasePath;
 
+            if (! Directory.Exists(buildOutputPath))
+            {
+                Reporter.Verbose.WriteLine($"outputpathresolver: {buildOutputPath} does not exist");
+                return null;
+            }
+
             return _environment.GetCommandPathFromRootPath(buildOutputPath, commandName);
         }
 
@@ -78,7 +79,7 @@ namespace Microsoft.DotNet.Cli.Utils
             var projectContext = ProjectContext.Create(
                 projectRootPath,
                 framework,
-                PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
+                RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers());
 
             if (projectContext.RuntimeIdentifier == null)
             {

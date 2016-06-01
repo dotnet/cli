@@ -1,15 +1,14 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
-using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using Microsoft.Extensions.PlatformAbstractions;
 using Xunit;
-using System;
 
 namespace Microsoft.DotNet.Tools.Publish.Tests
 {
@@ -42,7 +41,7 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
                 Rid="ubuntu.14.04-x64",
                 HostExtension="", 
                 ExpectedArtifacts=new string[] { "libhostfxr.so", "libcoreclr.so", "libhostpolicy.so" } 
-            }, 
+            },
             new 
             { 
                 Rid="win7-x64",
@@ -52,9 +51,9 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             new 
             { 
                 Rid="osx.10.11-x64",
-                HostExtension="", 
-                ExpectedArtifacts=new string[] { "libhostfxr.dylib", "libcoreclr.dylib", "libhostpolicy.dylib" } 
-            }
+                HostExtension="",
+                ExpectedArtifacts=new string[] { "libhostfxr.dylib", "libcoreclr.dylib", "libhostpolicy.dylib" }
+            },
         };
 
         public static IEnumerable<object[]> PublishOptions
@@ -65,11 +64,11 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
                 {
                     new object[] { "1", "", "", "", "" },
                     new object[] { "2", "netcoreapp1.0", "", "", "" },
-                    new object[] { "3", "", PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier(), "", "" },
+                    new object[] { "3", "", RuntimeEnvironmentRidExtensions.GetLegacyRestoreRuntimeIdentifier(), "", "" },
                     new object[] { "4", "", "", "Release", "" },
                     new object[] { "5", "", "", "", "some/dir"},
                     new object[] { "6", "", "", "", "some/dir/with spaces" },
-                    new object[] { "7", "netcoreapp1.0", PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier(), "Debug", "some/dir" },
+                    new object[] { "7", "netcoreapp1.0", RuntimeEnvironmentRidExtensions.GetLegacyRestoreRuntimeIdentifier(), "Debug", "some/dir" },
                 };
             }
         }
@@ -194,20 +193,14 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
         }
 
         [Fact]
-        public void PublishedLibraryShouldOutputDependenciesAndNoHost()
+        public void PublishedLibraryWithoutRIDShouldFail()
         {
             TestInstance instance = TestAssetsManager.CreateTestInstance(Path.Combine("TestAppWithLibrary"))
                                                      .WithLockFiles();
 
             var testProject = _getProjectJson(instance.TestRoot, "TestLibrary");
             var publishCommand = new PublishCommand(testProject);
-            publishCommand.Execute().Should().Pass();
-
-            publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibrary.exe");
-            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibrary.dll");
-            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibrary.pdb");
-            // dependencies should also be copied
-            publishCommand.GetOutputDirectory().Should().HaveFile("System.Runtime.dll");
+            publishCommand.Execute().Should().Fail();
         }
 
         [WindowsOnlyFact()]
@@ -222,16 +215,16 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             var publishCommand = new PublishCommand(lesserTestProject, "net451");
             publishCommand.Execute().Should().Pass();
 
-            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.dll");
+            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.exe");
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.pdb");
-            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.dll.config");
+            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.exe.config");
             publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibraryLesser.deps.json");
 
             // dependencies should also be copied
             publishCommand.GetOutputDirectory().Should().HaveFile("Newtonsoft.Json.dll");
             publishCommand.GetOutputDirectory().Delete(true);
 
-            publishCommand = new PublishCommand(lesserTestProject, "netstandard1.5", PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier());
+            publishCommand = new PublishCommand(lesserTestProject, "netcoreapp1.0", RuntimeEnvironmentRidExtensions.GetLegacyRestoreRuntimeIdentifier());
             publishCommand.Execute().Should().Pass();
 
             publishCommand.GetOutputDirectory().Should().HaveFile("TestLibraryLesser.dll");
@@ -372,6 +365,22 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
                 .Execute()
                 .Should()
                 .Pass();
+        }
+
+        [Fact]
+        public void PublishFailsCorrectlyWithUnrestoredProject()
+        {
+            // NOTE: we don't say "WithLockFiles", so the project is "unrestored"
+            TestInstance instance = TestAssetsManager.CreateTestInstance("TestAppSimple");
+
+            new PublishCommand(instance.TestRoot)
+                .ExecuteWithCapturedOutput()
+                .Should()
+                .Fail()
+                .And
+                .HaveStdErrContaining("NU1009")
+                .And
+                .HaveStdErrContaining("dotnet restore");
         }
     }
 }

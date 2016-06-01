@@ -1,14 +1,19 @@
 {
   "version": "1.0.0-*",
-  "compilationOptions": {
-    "keyFile": "../../tools/test_key.snk"
+  "buildOptions": {
+    "keyFile": "../../tools/test_key.snk",
+    "copyToOutput": {
+      "include": [
+        "../../TestAssets/TestProjects/TestAppWithLibrary/**"
+      ]
+    }
   },
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.0-rc2-*"
+      "version": "1.0.0-rc3-004363"
     },
-    "System.Runtime.Serialization.Primitives": "4.1.1-rc2-24027",
+    "System.Runtime.Serialization.Primitives": "4.1.1-rc3-24131-00",
     "Microsoft.DotNet.ProjectModel": {
       "target": "project"
     },
@@ -16,7 +21,7 @@
       "target": "project"
     },
     "xunit": "2.1.0",
-    "dotnet-test-xunit": "1.0.0-rc2-162081-13"
+    "dotnet-test-xunit": "1.0.0-rc2-192208-24"
   },
   "frameworks": {
     "netcoreapp1.0": {
@@ -26,8 +31,10 @@
       ]
     }
   },
-  "content": [
-    "../../TestAssets/TestProjects/TestAppWithLibrary/**"
-  ],
-  "testRunner": "xunit"
+  "testRunner": "xunit",
+  "publishOptions": {
+    "include": [
+      "../../TestAssets/TestProjects/TestAppWithLibrary/**"
+    ]
+  }
 }

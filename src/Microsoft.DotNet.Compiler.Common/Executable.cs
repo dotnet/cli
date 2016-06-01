@@ -37,11 +37,14 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
         private readonly CommonCompilerOptions _compilerOptions;
 
         public Executable(ProjectContext context, OutputPaths outputPaths, LibraryExporter exporter, string configuration)
+            : this(context, outputPaths, outputPaths.RuntimeOutputPath, outputPaths.IntermediateOutputDirectoryPath, exporter, configuration) { }
+
+        public Executable(ProjectContext context, OutputPaths outputPaths, string runtimeOutputPath, string intermediateOutputDirectoryPath, LibraryExporter exporter, string configuration)
         {
             _context = context;
             _outputPaths = outputPaths;
-            _runtimeOutputPath = outputPaths.RuntimeOutputPath;
-            _intermediateOutputPath = outputPaths.IntermediateOutputDirectoryPath;
+            _runtimeOutputPath = runtimeOutputPath;
+            _intermediateOutputPath = intermediateOutputDirectoryPath;
             _exporter = exporter;
             _configuration = configuration;
             _compilerOptions = _context.ProjectFile.GetCompilerOptions(_context.TargetFramework, configuration);
@@ -51,6 +54,23 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
         {
             CopyContentFiles();
             ExportRuntimeAssets();
+        }
+
+        private void VerifyCoreClrPresenceInPackageGraph()
+        {
+            var isCoreClrPresent = _exporter
+                .GetAllExports()
+                .SelectMany(e => e.NativeLibraryGroups)
+                .SelectMany(g => g.Assets)
+                .Select(a => a.FileName)
+                .Where(f => Constants.LibCoreClrBinaryNames.Contains(f))
+                .Any();
+
+            // coreclr should be present for standalone apps
+            if (! isCoreClrPresent)
+            {
+                throw new InvalidOperationException("Expected coreclr library not found in package graph. Please try running dotnet restore again.");
+            }
         }
 
         private void ExportRuntimeAssets()
@@ -74,13 +94,15 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
         }
 
         private void MakeCompilationOutputRunnableForCoreCLR()
-        {
+        {   
             WriteDepsFileAndCopyProjectDependencies(_exporter);
 
             var emitEntryPoint = _compilerOptions.EmitEntryPoint ?? false;
-            if (emitEntryPoint && !string.IsNullOrEmpty(_context.RuntimeIdentifier))
+
+            if (emitEntryPoint && !_context.IsPortable)
             {
                 // TODO: Pick a host based on the RID
+                VerifyCoreClrPresenceInPackageGraph();
                 CoreHost.CopyTo(_runtimeOutputPath, _compilerOptions.OutputName + Constants.ExeSuffix);
             }
         }
@@ -135,14 +157,11 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
 
         private void WriteDepsFileAndCopyProjectDependencies(LibraryExporter exporter)
         {
-            WriteDeps(exporter);
-            if (_context.ProjectFile.HasRuntimeOutput(_configuration))
-            {
-                WriteRuntimeConfig(exporter);
-                WriteDevRuntimeConfig(exporter);
-            }
+            // When called this way we don't need to filter exports, so we pass the same list to both.
+            var exports = exporter.GetAllExports().ToList();
+            WriteConfigurationFiles(exports, exports, includeDevConfig: true);
 
-            var projectExports = exporter.GetDependencies(LibraryType.Project);
+            var projectExports = exporter.GetAllProjectTypeDependencies();
             CopyAssemblies(projectExports);
             CopyAssets(projectExports);
 
@@ -150,7 +169,20 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
             CopyAssets(packageExports);
         }
 
-        private void WriteRuntimeConfig(LibraryExporter exporter)
+        public void WriteConfigurationFiles(IEnumerable<LibraryExport> allExports, IEnumerable<LibraryExport> depsExports, bool includeDevConfig)
+        {
+            WriteDeps(depsExports);
+            if (_context.ProjectFile.HasRuntimeOutput(_configuration))
+            {
+                WriteRuntimeConfig(allExports);
+                if (includeDevConfig)
+                {
+                    WriteDevRuntimeConfig();
+                }
+            }
+        }
+
+        private void WriteRuntimeConfig(IEnumerable<LibraryExport> allExports)
         {
             if (!_context.TargetFramework.IsDesktop())
             {
@@ -161,7 +193,7 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
                 var runtimeOptions = new JObject();
                 json.Add("runtimeOptions", runtimeOptions);
 
-                WriteFramework(runtimeOptions, exporter);
+                WriteFramework(runtimeOptions, allExports);
                 WriteRuntimeOptions(runtimeOptions);
 
                 var runtimeConfigJsonFile =
@@ -175,15 +207,14 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
             }
         }
 
-        private void WriteFramework(JObject runtimeOptions, LibraryExporter exporter)
+        private void WriteFramework(JObject runtimeOptions, IEnumerable<LibraryExport> allExports)
         {
             var redistPackage = _context.PlatformLibrary;
             if (redistPackage != null)
             {
                 var packageName = redistPackage.Identity.Name;
 
-                var redistExport = exporter.GetAllExports()
-                    .FirstOrDefault(e => e.Library.Identity.Name.Equals(packageName));
+                var redistExport = allExports.FirstOrDefault(e => e.Library.Identity.Name.Equals(packageName));
                 if (redistExport == null)
                 {
                     throw new InvalidOperationException($"Platform package '{packageName}' was not present in the graph.");
@@ -212,7 +243,7 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
             }
         }
 
-        private void WriteDevRuntimeConfig(LibraryExporter exporter)
+        private void WriteDevRuntimeConfig()
         {
             if (_context.TargetFramework.IsDesktop())
             {
@@ -241,13 +272,12 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
             runtimeOptions.Add("additionalProbingPaths", additionalProbingPaths);
         }
 
-        public void WriteDeps(LibraryExporter exporter)
+        public void WriteDeps(IEnumerable<LibraryExport> exports)
         {
             Directory.CreateDirectory(_runtimeOutputPath);
 
             var includeCompile = _compilerOptions.PreserveCompilationContext == true;
 
-            var exports = exporter.GetAllExports().ToArray();
             var dependencyContext = new DependencyContextBuilder().Build(
                 compilerOptions: includeCompile ? _compilerOptions : null,
                 compilationExports: includeCompile ? exports : null,

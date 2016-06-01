@@ -44,6 +44,26 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         }
 
         [Fact]
+        public void It_builds_projects_with_ruleset_relative_path()
+        {
+            var testInstance = TestAssetsManager
+                .CreateTestInstance("TestRuleSet")
+                .WithLockFiles();
+
+            new BuildCommand(Path.Combine("TestLibraryWithRuleSet", "project.json"), skipLoadProject: true)
+                .WithWorkingDirectory(testInstance.TestRoot)
+                .ExecuteWithCapturedOutput()
+                .Should()
+                .Pass()
+                .And
+                .HaveStdErrContaining("CA1001")
+                .And
+                .HaveStdErrContaining("CA2213")
+                .And
+                .NotHaveStdErrContaining("CA1018"); // this violation is hidden in the ruleset
+        }
+
+        [Fact]
         public void It_builds_projects_with_a_local_project_json_path()
         {
             var testInstance = TestAssetsManager
@@ -79,6 +99,21 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
                 "TestLibraryWithXmlDoc.dll",
                 "TestLibraryWithXmlDoc.xml"
             });
+        }
+
+        [WindowsOnlyFact]
+        public void It_builds_projects_targeting_net46_and_Roslyn()
+        {
+            var testInstance = TestAssetsManager
+                .CreateTestInstance("AppWithNet46AndRoslyn")
+                .WithLockFiles();
+
+            var testProject = Path.Combine(testInstance.TestRoot, "project.json");
+
+            new BuildCommand(testProject)
+                .Execute()
+                .Should()
+                .Pass();
         }
     }
 }

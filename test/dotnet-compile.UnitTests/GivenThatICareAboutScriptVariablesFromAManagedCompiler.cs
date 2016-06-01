@@ -4,14 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using FluentAssertions;
+using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel;
 using Moq;
 using NuGet.Frameworks;
 using Xunit;
-using Microsoft.DotNet.Cli.Utils;
-using FluentAssertions;
-using System.Linq;
-using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Microsoft.DotNet.Tools.Compiler.Tests
 {
@@ -70,7 +69,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
         [Fact]
         public void It_passes_a_RuntimeOutputDir_variable_to_the_pre_compile_scripts_if_rid_is_set_in_the_ProjectContext()
         {
-            var rid = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
+            var rid = RuntimeEnvironmentRidExtensions.GetLegacyRestoreRuntimeIdentifier();
             var fixture = ScriptVariablesFixture.GetFixtureWithRids(rid);
             fixture.PreCompileScriptVariables.Should().ContainKey("compile:RuntimeOutputDir");
             fixture.PreCompileScriptVariables["compile:RuntimeOutputDir"].Should().Be(fixture.RuntimeOutputDir);
@@ -129,7 +128,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
         [Fact]
         public void It_passes_a_RuntimeOutputDir_variable_to_the_post_compile_scripts_if_rid_is_set_in_the_ProjectContext()
         {
-            var rid = PlatformServices.Default.Runtime.GetLegacyRestoreRuntimeIdentifier();
+            var rid = RuntimeEnvironmentRidExtensions.GetLegacyRestoreRuntimeIdentifier();
             var fixture = ScriptVariablesFixture.GetFixtureWithRids(rid);
             fixture.PostCompileScriptVariables.Should().ContainKey("compile:RuntimeOutputDir");
             fixture.PostCompileScriptVariables["compile:RuntimeOutputDir"].Should().Be(fixture.RuntimeOutputDir);
@@ -177,6 +176,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             var projectJson = Path.Combine(TestAssetPath, "project.json");
             var command = new Mock<ICommand>();
             command.Setup(c => c.Execute()).Returns(new CommandResult());
+            command.Setup(c => c.WorkingDirectory(It.IsAny<string>())).Returns(() => command.Object);
             command.Setup(c => c.OnErrorLine(It.IsAny<Action<string>>())).Returns(() => command.Object);
             command.Setup(c => c.OnOutputLine(It.IsAny<Action<string>>())).Returns(() => command.Object);
             var commandFactory = new Mock<ICommandFactory>();
@@ -188,7 +188,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
                     It.IsAny<string>()))
                 .Returns(command.Object);
 
-            var _args = new BuildCommandApp("dotnet compile", ".NET Compiler", "Compiler for the .NET Platform", WorkspaceContext.Create(designTime: false));
+            var _args = new BuildCommandApp("dotnet compile", ".NET Compiler", "Compiler for the .NET Platform", new BuildWorkspace(new ProjectReaderSettings()));
             _args.ConfigValue = ConfigValue;
 
             PreCompileScriptVariables = new Dictionary<string, string>();
@@ -219,7 +219,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
                 rids.Add(rid);
             }
 
-            var workspace = WorkspaceContext.Create(ProjectReaderSettings.ReadFromEnvironment(), designTime: false);
+            var workspace = new BuildWorkspace(new ProjectReaderSettings());
             var context = workspace.GetRuntimeContext(workspace.GetProjectContext(projectJson, TestAssetFramework), rids);
             context = workspace.GetRuntimeContext(context, rids);
             managedCompiler.Compile(context, _args);

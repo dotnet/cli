@@ -4,13 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.Compiler.Common;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.Tools.Compiler;
-using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Microsoft.DotNet.Tools.Build
 {
@@ -23,7 +21,7 @@ namespace Microsoft.DotNet.Tools.Build
         private readonly DotNetCommandFactory _commandFactory;
         private readonly IncrementalManager _incrementalManager;
 
-        public DotNetProjectBuilder(BuildCommandApp args): base(args.ShouldSkipDependencies)
+        public DotNetProjectBuilder(BuildCommandApp args) : base(args.ShouldSkipDependencies)
         {
             _args = args;
 
@@ -47,13 +45,19 @@ namespace Microsoft.DotNet.Tools.Build
                 _args.ShouldSkipDependencies,
                 _args.ConfigValue,
                 _args.BuildBasePathValue,
-                _args.OutputValue
+                _args.OutputValue,
+                BuildIncrementalArgumentList(_args)
                 );
 
             _scriptRunner = new ScriptRunner();
 
             _commandFactory = new DotNetCommandFactory();
         }
+
+        private static IDictionary<string, string> BuildIncrementalArgumentList(BuildCommandApp args) => new Dictionary<string, string>()
+        {
+            ["version-suffix"] = args.VersionSuffixValue
+        };
 
         private void StampProjectWithSDKVersion(ProjectContext project)
         {
@@ -116,17 +120,44 @@ namespace Microsoft.DotNet.Tools.Build
 
         private void MakeRunnable(ProjectGraphNode graphNode)
         {
-            var runtimeContext = graphNode.ProjectContext.ProjectFile.HasRuntimeOutput(_args.ConfigValue) ?
-                _args.Workspace.GetRuntimeContext(graphNode.ProjectContext, _args.GetRuntimes()) :
-                graphNode.ProjectContext;
+            try
+            {
+                var runtimeContext = graphNode.ProjectContext.ProjectFile.HasRuntimeOutput(_args.ConfigValue) ?
+                    _args.Workspace.GetRuntimeContext(graphNode.ProjectContext, _args.GetRuntimes()) :
+                    graphNode.ProjectContext;
 
-            var outputPaths = runtimeContext.GetOutputPaths(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
-            var libraryExporter = runtimeContext.CreateExporter(_args.ConfigValue, _args.BuildBasePathValue);
+                var outputPaths = runtimeContext.GetOutputPaths(_args.ConfigValue, _args.BuildBasePathValue, _args.OutputValue);
+                var libraryExporter = runtimeContext.CreateExporter(_args.ConfigValue, _args.BuildBasePathValue);
 
-            CopyCompilationOutput(outputPaths);
+                CopyCompilationOutput(outputPaths);
 
-            var executable = new Executable(runtimeContext, outputPaths, libraryExporter, _args.ConfigValue);
-            executable.MakeCompilationOutputRunnable();
+                var executable = new Executable(runtimeContext, outputPaths, libraryExporter, _args.ConfigValue);
+                executable.MakeCompilationOutputRunnable();
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Failed to make the following project runnable: {graphNode.ProjectContext.GetDisplayName()} reason: {e.Message}", e);
+            }
+        }
+
+        protected override CompilationResult Build(ProjectGraphNode projectNode)
+        {
+            var result = base.Build(projectNode);
+            AfterRootBuild(projectNode, result);
+            return result;
+        }
+
+        protected void AfterRootBuild(ProjectGraphNode projectNode, CompilationResult result)
+        {
+            if (result != CompilationResult.IncrementalSkip && projectNode.IsRoot)
+            {
+                var success = result == CompilationResult.Success;
+                if (success)
+                {
+                    MakeRunnable(projectNode);
+                }
+                PrintSummary(projectNode, success);
+            }
         }
 
         protected override CompilationResult RunCompile(ProjectGraphNode projectNode)
@@ -136,15 +167,6 @@ namespace Microsoft.DotNet.Tools.Build
                 var managedCompiler = new ManagedCompiler(_scriptRunner, _commandFactory);
 
                 var success = managedCompiler.Compile(projectNode.ProjectContext, _args);
-                if (projectNode.IsRoot)
-                {
-                    if (success)
-                    {
-                        MakeRunnable(projectNode);
-                    }
-                    PrintSummary(projectNode, success);
-                }
-
                 return success ? CompilationResult.Success : CompilationResult.Failure;
             }
             finally

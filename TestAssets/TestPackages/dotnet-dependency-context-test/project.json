@@ -1,14 +1,16 @@
 {
-  "version": "1.0.0-*",
-  "compilationOptions": {
+  "version": "1.0.0-rc-*",
+  "buildOptions": {
     "emitEntryPoint": true
   },
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.0-rc2-*"
+      "version": "1.0.0-rc3-004363"
     },
-    "Microsoft.Extensions.DependencyModel": "1.0.0-*"
+    "Microsoft.Extensions.DependencyModel": {
+      "target": "project"
+    }
   },
   "frameworks": {
     "netcoreapp1.0": {

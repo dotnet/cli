@@ -6,9 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using FluentAssertions;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using Microsoft.Extensions.PlatformAbstractions;
 using Newtonsoft.Json.Linq;
 using NuGet.Frameworks;
 using Xunit;
@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             var contexts = ProjectContext.CreateContextForEachFramework(
                 _testAppDirDirInfo.FullName,
                 null,
-                PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers());
+                RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers());
             _runtime = contexts.FirstOrDefault(c => !string.IsNullOrEmpty(c.RuntimeIdentifier))?.RuntimeIdentifier;
         }
 
@@ -176,10 +176,29 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             informationalVersion.Should().BeEquivalentTo("1.0.0-85");
         }
 
+        [Fact]
+        public void BuildGlobbingMakesAllRunnable()
+        {
+            var testInstance = TestAssetsManager.CreateTestInstance("AppWithAppDependency")
+                                                .WithLockFiles();
+
+            var cmd = new BuildCommand(string.Format("*{0}project.json", Path.DirectorySeparatorChar), skipLoadProject: true)
+                .WithWorkingDirectory(testInstance.TestRoot)
+                .Execute()
+                .Should()
+                .Pass();
+
+            foreach (var project in new [] { "TestApp1", "TestApp2" })
+            {
+                new DirectoryInfo(Path.Combine(testInstance.TestRoot, project, "bin", "Debug", DefaultFramework))
+                    .Should().HaveFile($"{project}.deps.json");
+            }
+        }
+
         [Theory]
-//        [InlineData("net20", false, true)]
-//        [InlineData("net40", true, true)]
-//        [InlineData("net461", true, true)]
+        //        [InlineData("net20", false, true)]
+        //        [InlineData("net40", true, true)]
+        //        [InlineData("net461", true, true)]
         [InlineData("netstandard1.5", true, false)]
         public void MultipleFrameworks_ShouldHaveValidTargetFrameworkAttribute(string frameworkName, bool shouldHaveTargetFrameworkAttribute, bool windowsOnly)
         {
@@ -307,6 +326,31 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             }
 
         }
+
+        [Fact]
+        private void StandaloneApp_WithoutCoreClrDll_Fails()
+        {
+            // Convert a Portable App to Standalone to simulate the customer scenario
+            var testInstance = TestAssetsManager.CreateTestInstance("DependencyChangeTest")
+                                .WithLockFiles();
+
+            // Convert the portable test project to standalone by removing "type": "platform" and adding rids
+            var originalTestProject = Path.Combine(testInstance.TestRoot, "PortableApp_Standalone", "project.json");
+            var modifiedTestProject = Path.Combine(testInstance.TestRoot, "PortableApp_Standalone", "project.json.modified");
+
+            // Simulate a user editting the project.json
+            File.Delete(originalTestProject);
+            File.Copy(modifiedTestProject, originalTestProject);
+
+            var buildResult = new BuildCommand(originalTestProject, framework: DefaultFramework)
+                .ExecuteWithCapturedOutput();
+
+            buildResult.Should().Fail();
+
+            buildResult.StdErr.Should().Contain("Can not find runtime target for framework '.NETCoreApp,Version=v1.0' compatible with one of the target runtimes");
+            buildResult.StdErr.Should().Contain("The project has not been restored or restore failed - run `dotnet restore`");
+        }
+
         private void CopyProjectToTempDir(string projectDir, TempDirectory tempDir)
         {
             // copy all the files to temp dir

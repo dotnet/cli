@@ -1,5 +1,5 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
@@ -67,7 +68,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             using (var client = new DthTestClient(server))
             {
                 client.Initialize(projectPath);
-                var messages = client.DrainAllMessages()
+                var messages = client.DrainMessage(12)
                                      .Select(message => message.MessageType)
                                      .ToArray();
 
@@ -260,7 +261,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                     Path.Combine(projectPath, "home", GlobalSettings.FileName),
                     JsonConvert.SerializeObject(new { project = new string[] { "src" } }));
 
-                client.SendPayLoad(testProject, "RefreshDependencies");
+                client.SendPayload(testProject, "RefreshDependencies");
 
                 client.DrainTillFirst("ProjectInformation")
                       .RetrievePayloadAs<JObject>()
@@ -293,7 +294,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             using (var client = new DthTestClient(server))
             {
                 client.Initialize(projectPath);
-                var messages = client.DrainAllMessages();
+                var messages = client.DrainMessage(12);
                 Assert.False(messages.Any(msg => msg.MessageType == MessageTypes.Error));
 
                 var dependencyDiagnostics = messages.Where(msg => msg.MessageType == MessageTypes.DependencyDiagnostics);
@@ -322,7 +323,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                 client.Initialize(testSource);
 
                 // Error for invalid project.json
-                var messages = client.DrainAllMessages();
+                var messages = client.DrainMessage(8);
                 messages.Single(msg => msg.MessageType == MessageTypes.Error)
                         .Payload.AsJObject()
                         .AssertProperty<string>("Path", v => v.Contains("IncorrectProjectJson"));
@@ -334,10 +335,9 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
 
                 // Successfully initialize another project afterwards
                 client.Initialize(Path.Combine(_testAssetsManager.AssetsRoot, "EmptyConsoleApp"));
-                messages = client.DrainAllMessages();
-                messages.Single(msg => msg.MessageType == MessageTypes.ProjectInformation)
-                        .Payload.AsJObject()
-                        .AssertProperty<string>("Name", v => string.Equals(v, "EmptyConsoleApp", StringComparison.Ordinal));
+                client.DrainTillFirst(MessageTypes.ProjectInformation)
+                      .Payload.AsJObject()
+                      .AssertProperty<string>("Name", v => string.Equals(v, "EmptyConsoleApp", StringComparison.Ordinal));
             }
         }
 
@@ -353,10 +353,9 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             {
                 client.Initialize(Path.Combine(testSource.TestRoot, "src", "Project1"));
 
-                var messages = client.DrainAllMessages();
-                messages.ContainsMessage(MessageTypes.Error)
-                        .Single().Payload.AsJObject()
-                        .AssertProperty<string>("Path", v => v.Contains("InvalidGlobalJson"));
+                client.DrainTillFirst(MessageTypes.Error)
+                      .Payload.AsJObject()
+                      .AssertProperty<string>("Path", v => v.Contains("InvalidGlobalJson"));
             }
         }
 
@@ -375,13 +374,13 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                 File.WriteAllText(projectFile, content + "}");
 
                 client.Initialize(testProject);
-                var messages = client.DrainAllMessages();
-                messages.ContainsMessage(MessageTypes.Error);
+                client.DrainTillFirst(MessageTypes.Error);
 
                 File.WriteAllText(projectFile, content);
-                client.SendPayLoad(testProject, MessageTypes.FilesChanged);
-                var clearError = client.DrainTillFirst(MessageTypes.Error);
-                clearError.Payload.AsJObject().AssertProperty("Message", null as string);
+                client.SendPayload(testProject, MessageTypes.FilesChanged);
+                client.DrainTillFirst(MessageTypes.Error)
+                      .Payload.AsJObject()
+                      .AssertProperty("Message", null as string);
             }
         }
 
@@ -416,14 +415,13 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                 });
 
                 client.Initialize(testProject);
-                var messages = client.DrainAllMessages();
                 if (expectSuccess)
                 {
-                    messages.AssertDoesNotContain(MessageTypes.Error);
+                    client.DrainMessage(12).AssertDoesNotContain(MessageTypes.Error);
                 }
                 else
                 {
-                    messages.ContainsMessage(MessageTypes.Error);
+                    client.DrainTillFirst(MessageTypes.Error);
                 }
             }
         }
@@ -450,9 +448,8 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             using (var client = new DthTestClient(server))
             {
                 client.Initialize(projectPath);
-                var messages = client.DrainAllMessages();
+                var messages = client.DrainMessage(7);
                 messages.AssertDoesNotContain(MessageTypes.Error);
-                // PrintAllMessages(new[] { messages.RetrieveSingleMessage(MessageTypes.Dependencies) });
                 messages.RetrieveSingleMessage(MessageTypes.Dependencies)
                         .RetrieveDependency("ClassLibrary4")
                         .AssertProperty<object>(
@@ -476,7 +473,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             using (var client = new DthTestClient(server))
             {
                 client.Initialize(testProject);
-                var messages = client.DrainAllMessages();
+                var messages = client.DrainMessage(7);
 
                 var classLibraries = new HashSet<string>(new string[] { "ClassLibrary1", "ClassLibrary2", "ClassLibrary3" });
                 var dependencies = messages.RetrieveSingleMessage(MessageTypes.Dependencies);
@@ -532,7 +529,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             {
                 client.Initialize(projectPath);
 
-                client.DrainAllMessages()
+                client.DrainMessage(7)
                       .AssertDoesNotContain(MessageTypes.Error)
                       .RetrieveSingleMessage(MessageTypes.Dependencies)
                       .RetrieveDependency(appName)
@@ -548,7 +545,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
 
                 File.WriteAllText(projectFilePath, JsonConvert.SerializeObject(projectJson));
 
-                client.SendPayLoad(projectPath, MessageTypes.RefreshDependencies);
+                client.SendPayload(projectPath, MessageTypes.RefreshDependencies);
 
                 var afterDependencies = client.DrainTillFirst(MessageTypes.Dependencies);
                 afterDependencies.RetrieveDependency(appName)
@@ -578,7 +575,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             {
                 client.Initialize(projectPath);
 
-                client.DrainAllMessages()
+                client.DrainMessage(7)
                       .AssertDoesNotContain(MessageTypes.Error)
                       .RetrieveSingleMessage(MessageTypes.Dependencies)
                       .RetrieveDependency("MainApp")
@@ -597,7 +594,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
 
                 File.WriteAllText(projectFilePath, JsonConvert.SerializeObject(projectJson));
 
-                client.SendPayLoad(projectPath, MessageTypes.RefreshDependencies);
+                client.SendPayload(projectPath, MessageTypes.RefreshDependencies);
 
                 var afterDependencies = client.DrainTillFirst(MessageTypes.Dependencies);
                 afterDependencies.RetrieveDependency("MainApp")
@@ -619,9 +616,83 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             using (var client = new DthTestClient(server))
             {
                 client.Initialize(projectPath);
+                client.DrainMessage(7).AssertDoesNotContain(MessageTypes.Error);
+            }
+        }
 
-                var messages = client.DrainAllMessages();
-                messages.AssertDoesNotContain(MessageTypes.Error);
+        [Fact]
+        public void TestTargetFrameworkChange()
+        {
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
+            {
+                var testProject = _testAssetsManager.CreateTestInstance("EmptyLibrary")
+                                                    .WithLockFiles()
+                                                    .TestRoot;
+
+                // initialize the project and drain all messages (7 message for project with one framework)
+                client.Initialize(testProject);
+                client.DrainMessage(7);
+
+                // update the target framework from netstandard1.3 to netstandard 1.5 so as to invalidate all
+                // dependencies
+                var projectJsonPath = Path.Combine(testProject, "project.json");
+                File.WriteAllText(projectJsonPath,
+                                  File.ReadAllText(projectJsonPath).Replace("netstandard1.3", "netstandard1.5"));
+
+                // send files change request to server to prompt update
+                client.SendPayload(testProject, MessageTypes.FilesChanged);
+
+                // assert project information is updated
+                client.DrainTillFirst(MessageTypes.ProjectInformation)
+                      .RetrievePayloadAs<JObject>()
+                      .RetrievePropertyAs<JArray>("Frameworks")
+                      .AssertJArrayCount(1)
+                      .RetrieveArraryElementAs<JObject>(0)
+                      .AssertProperty("ShortName", "netstandard1.5");
+
+                // the NETStandard.Library dependency should turn unresolved
+                var dependencies = client.DrainTillFirst(MessageTypes.Dependencies);
+
+                dependencies.RetrievePayloadAs<JObject>()
+                            .RetrievePropertyAs<JObject>("Framework")
+                            .AssertProperty("ShortName", "netstandard1.5");
+
+                dependencies.RetrieveDependency("NETStandard.Library")
+                            .RetrievePropertyAs<JArray>("Errors")
+                            .AssertJArrayCount(1)
+                            .RetrieveArraryElementAs<JObject>(0)
+                            .AssertProperty("ErrorCode", "NU1001");
+
+                // warning for project.json and project.lock.json out of sync
+                var diagnostics = client.DrainTillFirst(MessageTypes.DependencyDiagnostics);
+
+                diagnostics.RetrievePayloadAs<JObject>()
+                           .RetrievePropertyAs<JObject>("Framework")
+                           .AssertProperty("ShortName", "netstandard1.5");
+
+                diagnostics.RetrievePayloadAs<JObject>()
+                           .RetrievePropertyAs<JArray>("Warnings")
+                           .AssertJArrayCount(1)
+                           .RetrieveArraryElementAs<JObject>(0)
+                           .AssertProperty("ErrorCode", "NU1006");
+
+                // restore again
+                var restoreCommand = new RestoreCommand();
+                restoreCommand.WorkingDirectory = testProject;
+                restoreCommand.Execute().Should().Pass();
+
+                client.SendPayload(testProject, MessageTypes.RefreshDependencies);
+
+                client.DrainTillFirst(MessageTypes.Dependencies)
+                      .RetrieveDependency("NETStandard.Library")
+                      .RetrievePropertyAs<JArray>("Errors")
+                      .AssertJArrayCount(0);
+
+                client.DrainTillFirst(MessageTypes.DependencyDiagnostics)
+                      .RetrievePayloadAs<JObject>()
+                      .RetrievePropertyAs<JArray>("Warnings")
+                      .AssertJArrayCount(0);
             }
         }
 

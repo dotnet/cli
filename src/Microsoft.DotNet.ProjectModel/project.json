@@ -1,24 +1,17 @@
 {
-  "version": "1.0.0-*",
-  "compilationOptions": {
+  "version": "1.0.0-rc4-*",
+  "buildOptions": {
     "keyFile": "../../tools/Key.snk"
   },
   "description": "Types to model a .NET Project",
   "dependencies": {
-    "Microsoft.Extensions.DependencyModel": "1.0.0-*",
-    "Microsoft.Extensions.FileSystemGlobbing": "1.0.0-rc2-20581",
-    "Microsoft.Extensions.HashCodeCombiner.Sources": {
-      "type": "build",
-      "version": "1.0.0-rc2-20459"
-    },
-    "Microsoft.Extensions.JsonParser.Sources": {
-      "type": "build",
-      "version": "1.0.0-rc2-20221"
+    "Microsoft.Extensions.DependencyModel": {
+      "target": "project"
     },
     "Newtonsoft.Json": "7.0.1",
-    "NuGet.Packaging": "3.5.0-beta-1233",
-    "NuGet.RuntimeModel": "3.5.0-beta-1233",
-    "System.Reflection.Metadata": "1.3.0-rc2-24027"
+    "NuGet.Packaging": "3.5.0-rc-1285",
+    "NuGet.RuntimeModel": "3.5.0-rc-1285",
+    "System.Reflection.Metadata": "1.3.0-rc3-24131-00"
   },
   "frameworks": {
     "net451": {
@@ -34,19 +27,19 @@
         }
       }
     },
-    "netstandard1.5": {
+    "netstandard1.6": {
       "imports": [
         "portable-net45+wp80+win8+wpa81+dnxcore50",
         "dotnet5.4"
       ],
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-rc2-24027",
-        "System.Dynamic.Runtime": "4.0.11-rc2-24027",
-        "System.Runtime.Loader": "4.0.0-rc2-24027",
-        "System.Runtime.Serialization.Primitives": "4.1.1-rc2-24027",
-        "System.Security.Cryptography.Algorithms": "4.1.0-rc2-24027",
-        "System.Threading.Thread": "4.0.0-rc2-24027",
-        "System.Xml.XDocument": "4.0.11-rc2-24027"
+        "Microsoft.CSharp": "4.0.1-rc3-24131-00",
+        "System.Dynamic.Runtime": "4.0.11-rc3-24131-00",
+        "System.Runtime.Loader": "4.0.0-rc3-24131-00",
+        "System.Runtime.Serialization.Primitives": "4.1.1-rc3-24131-00",
+        "System.Security.Cryptography.Algorithms": "4.2.0-rc3-24131-00",
+        "System.Threading.Thread": "4.0.0-rc3-24131-00",
+        "System.Xml.XDocument": "4.0.11-rc3-24131-00"
       }
     }
   }

@@ -7,8 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel;
-using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Run
@@ -20,16 +20,26 @@ namespace Microsoft.DotNet.Tools.Run
         public string Project = null;
         public IReadOnlyList<string> Args = null;
 
+        private readonly ICommandFactory _commandFactory;
+        private ProjectContext _context;
+        private List<string> _args;
+        private BuildWorkspace _workspace;
+
         public static readonly string[] DefaultFrameworks = new[]
         {
             FrameworkConstants.FrameworkIdentifiers.NetCoreApp,
             FrameworkConstants.FrameworkIdentifiers.NetStandardApp,
         };
 
+        public RunCommand()
+            : this(new RunCommandFactory())
+        {
+        }
 
-        ProjectContext _context;
-        List<string> _args;
-        private WorkspaceContext _workspace;
+        public RunCommand(ICommandFactory commandFactory)
+        {
+            _commandFactory = commandFactory;
+        }
 
         public int Start()
         {
@@ -68,9 +78,11 @@ namespace Microsoft.DotNet.Tools.Run
                 Configuration = Constants.DefaultConfiguration;
             }
 
-            var frameworkContexts = _workspace.GetProjectContextCollection(Project).FrameworkOnlyContexts;
+            var frameworkContexts = _workspace.GetProjectContextCollection(Project)
+                .EnsureValid(Project)
+                .FrameworkOnlyContexts;
 
-            var rids = PlatformServices.Default.Runtime.GetAllCandidateRuntimeIdentifiers();
+            var rids = RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers();
 
             ProjectContext frameworkContext;
             if (Framework == null)
@@ -113,7 +125,7 @@ namespace Microsoft.DotNet.Tools.Run
         private int RunExecutable()
         {
             // Set up the workspace
-            _workspace = WorkspaceContext.Create(ProjectReaderSettings.ReadFromEnvironment(), designTime: false);
+            _workspace = new BuildWorkspace(ProjectReaderSettings.ReadFromEnvironment());
 
             CalculateDefaultsForNonAssigned();
 
@@ -125,7 +137,7 @@ namespace Microsoft.DotNet.Tools.Run
                 $"--configuration",
                 Configuration,
                 $"{_context.ProjectFile.ProjectDirectory}"
-            });
+            }, _workspace);
 
             if (result != 0)
             {
@@ -164,24 +176,22 @@ namespace Microsoft.DotNet.Tools.Run
                 }
             }
 
-            Command command;
+            ICommand command;
             if (outputName.EndsWith(FileNameSuffixes.DotNet.DynamicLib, StringComparison.OrdinalIgnoreCase))
             {
                 // The executable is a ".dll", we need to call it through dotnet.exe
                 var muxer = new Muxer();
 
-                command = Command.Create(muxer.MuxerPath, Enumerable.Concat(
+                command = _commandFactory.Create(muxer.MuxerPath, Enumerable.Concat(
                             Enumerable.Concat(new string[] { "exec" }, hostArgs),
                             Enumerable.Concat(new string[] { outputName }, _args)));
             }
             else
             {
-                command = Command.Create(outputName, Enumerable.Concat(hostArgs, _args));
+                command = _commandFactory.Create(outputName, Enumerable.Concat(hostArgs, _args));
             }
 
             result = command
-                .ForwardStdOut()
-                .ForwardStdErr()
                 .Execute()
                 .ExitCode;
 
@@ -195,6 +205,14 @@ namespace Microsoft.DotNet.Tools.Run
                 .ForwardStdErr();
             var result = command.Execute();
             return result.ExitCode;
+        }
+
+        private class RunCommandFactory : ICommandFactory
+        {
+            public ICommand Create(string commandName, IEnumerable<string> args, NuGetFramework framework = null, string configuration = "Debug")
+            {
+                return Command.Create(commandName, args, framework, configuration);
+            }
         }
     }
 }

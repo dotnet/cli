@@ -3,7 +3,7 @@
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.0-rc2-*"
+      "version": "1.0.0-rc3-004363"
     },
     "Microsoft.DotNet.ProjectModel": {
       "target": "project"
@@ -15,7 +15,7 @@
       "target": "project"
     },
     "xunit": "2.1.0",
-    "dotnet-test-xunit": "1.0.0-rc2-162081-13"
+    "dotnet-test-xunit": "1.0.0-rc2-192208-24"
   },
   "frameworks": {
     "netcoreapp1.0": {
@@ -25,8 +25,17 @@
       ]
     }
   },
-  "content": [
-    "../../TestAssets/TestProjects/TestApp/**/*"
-  ],
-  "testRunner": "xunit"
+  "testRunner": "xunit",
+  "publishOptions": {
+    "include": [
+      "../../TestAssets/TestProjects/TestApp/**/*"
+    ]
+  },
+  "buildOptions": {
+    "copyToOutput": {
+      "include": [
+        "../../TestAssets/TestProjects/TestApp/**/*"
+      ]
+    }
+  }
 }

@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Loader;
 using System.Text;
 using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.ProjectModel.Server;
 using Microsoft.DotNet.Tools.Build;
 using Microsoft.DotNet.Tools.Compiler;
@@ -17,7 +19,6 @@ using Microsoft.DotNet.Tools.Publish;
 using Microsoft.DotNet.Tools.Restore;
 using Microsoft.DotNet.Tools.Run;
 using Microsoft.DotNet.Tools.Test;
-using Microsoft.Extensions.PlatformAbstractions;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Cli
@@ -42,6 +43,8 @@ namespace Microsoft.DotNet.Cli
         {
             DebugHelper.HandleDebugSwitch(ref args);
 
+            new MulticoreJitActivator().TryActivateMulticoreJit();
+
             if (Env.GetEnvironmentVariableAsBool("DOTNET_CLI_CAPTURE_TIMING", false))
             {
                 PerfTrace.Enabled = true;
@@ -58,7 +61,8 @@ namespace Microsoft.DotNet.Cli
             }
             catch (GracefulException e)
             {
-                Console.WriteLine(e.Message.Red().Bold());
+                Reporter.Error.WriteLine(CommandContext.IsVerbose() ? e.ToString().Red().Bold() : e.Message.Red().Bold());
+
                 return 1;
             }
             finally
@@ -131,6 +135,8 @@ namespace Microsoft.DotNet.Cli
                 command = "help";
             }
 
+            telemetryClient.TrackEvent(command, null, null);
+
             int exitCode;
             Func<string[], int> builtIn;
             if (s_builtIns.TryGetValue(command, out builtIn))
@@ -146,13 +152,6 @@ namespace Microsoft.DotNet.Cli
                 exitCode = result.ExitCode;
             }
 
-            telemetryClient.TrackEvent(
-                command,
-                null,
-                new Dictionary<string, double>
-                {
-                    ["ExitCode"] = exitCode
-                });
 
             return exitCode;
 
@@ -183,15 +182,14 @@ namespace Microsoft.DotNet.Cli
             var commitSha = GetCommitSha() ?? "N/A";
             Reporter.Output.WriteLine();
             Reporter.Output.WriteLine("Product Information:");
-            Reporter.Output.WriteLine($" Version:     {Product.Version}");
-            Reporter.Output.WriteLine($" Commit Sha:  {commitSha}");
+            Reporter.Output.WriteLine($" Version:            {Product.Version}");
+            Reporter.Output.WriteLine($" Commit SHA-1 hash:  {commitSha}");
             Reporter.Output.WriteLine();
-            var runtimeEnvironment = PlatformServices.Default.Runtime;
             Reporter.Output.WriteLine("Runtime Environment:");
-            Reporter.Output.WriteLine($" OS Name:     {runtimeEnvironment.OperatingSystem}");
-            Reporter.Output.WriteLine($" OS Version:  {runtimeEnvironment.OperatingSystemVersion}");
-            Reporter.Output.WriteLine($" OS Platform: {runtimeEnvironment.OperatingSystemPlatform}");
-            Reporter.Output.WriteLine($" RID:         {runtimeEnvironment.GetRuntimeIdentifier()}");
+            Reporter.Output.WriteLine($" OS Name:     {RuntimeEnvironment.OperatingSystem}");
+            Reporter.Output.WriteLine($" OS Version:  {RuntimeEnvironment.OperatingSystemVersion}");
+            Reporter.Output.WriteLine($" OS Platform: {RuntimeEnvironment.OperatingSystemPlatform}");
+            Reporter.Output.WriteLine($" RID:         {RuntimeEnvironment.GetRuntimeIdentifier()}");
         }
 
         private static bool IsArg(string candidate, string longName)
