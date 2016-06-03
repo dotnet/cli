@@ -13,7 +13,7 @@
       "type": "platform",
       "version": "1.0.0-rc3-004385"
     },
-    "System.Runtime.Serialization.Primitives": "4.1.1-rc3-24131-00",
+    "System.Runtime.Serialization.Primitives": "4.1.1-rc3-24201-00",
     "Microsoft.DotNet.ProjectModel": {
       "target": "project"
     },
