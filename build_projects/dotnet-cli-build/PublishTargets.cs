@@ -21,6 +21,8 @@ namespace Microsoft.DotNet.Cli.Build
 
         private static string Channel { get; set; }
 
+        private static string Pointer { get; set; }
+
         private static string CliVersion { get; set; }
 
         private static string CliNuGetVersion { get; set; }
@@ -37,6 +39,7 @@ namespace Microsoft.DotNet.Cli.Build
             CliNuGetVersion = c.BuildContext.Get<BuildVersion>("BuildVersion").NuGetVersion;
             SharedFrameworkNugetVersion = CliDependencyVersions.SharedFrameworkVersion;
             Channel = c.BuildContext.Get<string>("Channel");
+            Pointer = "Latest";
 
             return c.Success();
         }
@@ -44,8 +47,8 @@ namespace Microsoft.DotNet.Cli.Build
         [Target(nameof(PrepareTargets.Init),
         nameof(PublishTargets.InitPublish),
         nameof(PublishTargets.PublishArtifacts),
-        nameof(PublishTargets.TriggerDockerHubBuilds),
-        nameof(PublishTargets.FinalizeBuild))]
+        nameof(PublishTargets.FinalizeBuild),
+        nameof(PublishTargets.TriggerDockerHubBuilds))]
         [Environment("PUBLISH_TO_AZURE_BLOB", "1", "true")] // This is set by CI systems
         public static BuildTargetResult Publish(BuildTargetContext c)
         {
@@ -53,142 +56,84 @@ namespace Microsoft.DotNet.Cli.Build
         }
 
         [Target]
-        public static BuildTargetResult FinalizeBuild(BuildTargetContext c)
+        public static BuildTargetResult PublishBuildFinalizationMoniker(BuildTargetContext c)
         {
-            if (CheckIfAllBuildsHavePublished())
-            {
-                string targetContainer = $"{Channel}/Binaries/Latest/";
-                string targetVersionFile = $"{targetContainer}{CliNuGetVersion}";
-                string semaphoreBlob = $"{Channel}/Binaries/publishSemaphore";
-                AzurePublisherTool.CreateBlobIfNotExists(semaphoreBlob);
-                string leaseId = AzurePublisherTool.AcquireLeaseOnBlob(semaphoreBlob);
-
-                // Prevent race conditions by dropping a version hint of what version this is. If we see this file
-                // and it is the same as our version then we know that a race happened where two+ builds finished 
-                // at the same time and someone already took care of publishing and we have no work to do.
-                if (AzurePublisherTool.IsLatestSpecifiedVersion(targetVersionFile))
-                {
-                    AzurePublisherTool.ReleaseLeaseOnBlob(semaphoreBlob, leaseId);
-                    return c.Success();
-                }
-                else
-                {
-                    Regex versionFileRegex = new Regex(@"(?<version>\d\.\d\.\d)-(?<release>.*)?");
-
-                    // Delete old version files
-                    AzurePublisherTool.ListBlobs($"{targetContainer}")
-                        .Select(s => s.Replace("/dotnet/", ""))
-                        .Where(s => versionFileRegex.IsMatch(s))
-                        .ToList()
-                        .ForEach(f => AzurePublisherTool.TryDeleteBlob(f));
-
-                    // Drop the version file signaling such for any race-condition builds (see above comment).
-                    AzurePublisherTool.DropLatestSpecifiedVersion(targetVersionFile);
-                }
-
-                try
-                {
-                    // Copy the latest CLI bits
-                    CopyBlobs($"{Channel}/Binaries/{CliNuGetVersion}/", targetContainer);
-
-                    // Copy the latest installer files
-                    CopyBlobs($"{Channel}/Installers/{CliNuGetVersion}/", $"{Channel}/Installers/Latest/");
-
-                    // Generate the CLI and SDK Version text files
-                    List<string> versionFiles = new List<string>()
-                    {
-                        "win.x86.version",
-                        "win.x64.version",
-                        "ubuntu.x64.version",
-                        "ubuntu.16.04.x64.version",
-                        "rhel.x64.version",
-                        "osx.x64.version",
-                        "debian.x64.version",
-                        "centos.x64.version",
-                        "fedora.23.x64.version",
-                        "opensuse.13.2.x64.version"
-                    };
-
-                    string cliVersion = Utils.GetCliVersionFileContent(c);
-                    foreach (string version in versionFiles)
-                    {
-                        AzurePublisherTool.PublishStringToBlob($"{Channel}/dnvm/latest.{version}", cliVersion);
-                    }
-                }
-                finally
-                {
-                    AzurePublisherTool.ReleaseLeaseOnBlob(semaphoreBlob, leaseId);
-                }
-            }
+            string moniker = Monikers.GetProductMoniker(c, "build", CliVersion);
+            string file = Path.Combine(Path.GetTempPath(), moniker);
+            System.IO.File.WriteAllText(file, "");
+            AzurePublisherTool.UploadFile(file, AzurePublisher.Product.SDK, CliVersion);
 
             return c.Success();
         }
 
-        private static void CopyBlobs(string sourceFolder, string destinationFolder)
+        [Target(nameof(PublishTargets.PublishBuildFinalizationMoniker))]
+        public static BuildTargetResult FinalizeBuild(BuildTargetContext c)
         {
-            foreach (string blob in AzurePublisherTool.ListBlobs(sourceFolder))
+            if (CheckIfAllBuildsHavePublished())
             {
-                string source = blob.Replace("/dotnet/", "");
-                string targetName = Path.GetFileName(blob)
-                                        .Replace(CliNuGetVersion, "latest");
-
-                string target = $"{destinationFolder}{targetName}";
-                AzurePublisherTool.CopyBlob(source, target);
+                PublishCliVersionInformation(c);
+                PublishCliNupkgs(c);
             }
-        }
 
+            return c.Success();
+        }
         private static bool CheckIfAllBuildsHavePublished()
         {
-            Dictionary<string, bool> badges = new Dictionary<string, bool>()
+            Dictionary<string, bool> monikers = new Dictionary<string, bool>()
              {
-                 { "Windows_x86", false },
-                 { "Windows_x64", false },
-                 { "Ubuntu_x64", false },
-                 { "Ubuntu_16_04_x64", false },
-                 { "RHEL_x64", false },
-                 { "OSX_x64", false },
-                 { "Debian_x64", false },
-                 { "CentOS_x64", false },
-                 { "Fedora_23_x64", false },
-                 { "openSUSE_13_2_x64", false }
+                 { "build-Windows_x86", false },
+                 { "build-Windows_x64", false },
+                 { "build-Ubuntu_x64", false },
+                 { "build-Ubuntu_16_04_x64", false },
+                 { "build-RHEL_x64", false },
+                 { "build-OSX_x64", false },
+                 { "build-Debian_x64", false },
+                 { "build-CentOS_x64", false },
+                 { "build-Fedora_23_x64", false },
+                 { "build-openSUSE_13_2_x64", false }
              };
 
-            List<string> blobs = new List<string>(AzurePublisherTool.ListBlobs($"{Channel}/Binaries/{CliNuGetVersion}/"));
+             IEnumerable<string> blobs = AzurePublisherTool.ListBlobs(AzurePublisher.Product.SDK, CliVersion);
+             foreach (string blob in blobs)
+             {
+                 if (blob.StartsWith("build"))
+                 {
+                     string name = blob.Substring(0, blob.IndexOf("."));
+                     if (monikers.ContainsKey(name))
+                     {
+                         monikers[name] = true;
+                     }
+                     else
+                     {
+                         throw new ArgumentOutOfRangeException("Unknown OS moniker found during build finalization");
+                     }
+                 }
+             }
 
-            var versionBadgeName = $"{Monikers.GetBadgeMoniker()}";
-            if (badges.ContainsKey(versionBadgeName) == false)
-            {
-                throw new ArgumentException("A new OS build was added without adding the moniker to the {nameof(badges)} lookup");
-            }
+             return monikers.Keys.All(k => monikers[k]);
+        }
+        
+        public static void PublishCliVersionInformation(BuildTargetContext c)
+        {
+            var VersionUpdater = new VersionRepoUpdater(EnvVars.EnsureVariable("GITHUB_PASSWORD"));
+            var versionBadge = c.BuildContext.Get<string>("VersionBadge");
+            VersionUpdater.PublishVersionBadge(versionBadge, Channel, CliVersion, Pointer).Wait();
+            VersionUpdater.PublishVersionFile("build.version", Utils.GetCliVersionFileContent(c), Channel, CliVersion, Pointer).Wait();
+        }
 
-            foreach (string file in blobs)
-            {
-                string name = Path.GetFileName(file);
-                string key = string.Empty;
-
-                foreach (string img in badges.Keys)
-                {
-                    if ((name.StartsWith($"{img}")) && (name.EndsWith(".svg")))
-                    {
-                        key = img;
-                        break;
-                    }
-                }
-
-                if (string.IsNullOrEmpty(key) == false)
-                {
-                    badges[key] = true;
-                }
-            }
-
-            return badges.Keys.All(key => badges[key]);
+        public static void PublishCliNupkgs(BuildTargetContext c)
+        {
+            var VersionUpdater = new VersionRepoUpdater(EnvVars.EnsureVariable("GITHUB_PASSWORD"));
+            string nupkgFilePath = EnvVars.EnsureVariable("NUPKG_FILE_PATH");
+            string versionsRepoPath = EnvVars.EnsureVariable("VERSIONS_REPO_PATH");
+            VersionUpdater.UpdatePublishedVersions(nupkgFilePath, versionsRepoPath).Wait();
         }
 
         [Target(
             nameof(PublishTargets.PublishInstallerFilesToAzure),
-            nameof(PublishTargets.PublishArchivesToAzure),
-            /*nameof(PublishTargets.PublishDebFilesToDebianRepo),*/ //https://github.com/dotnet/cli/issues/2973
-            nameof(PublishTargets.PublishCliVersionBadge))]
+            nameof(PublishTargets.PublishArchivesToAzure)
+            // nameof(PublishTargets.PublishDebFilesToDebianRepo), https://github.com/dotnet/cli/issues/2973
+                )]
         public static BuildTargetResult PublishArtifacts(BuildTargetContext c) => c.Success();
 
         [Target(
@@ -202,31 +147,19 @@ namespace Microsoft.DotNet.Cli.Build
             nameof(PublishTargets.PublishSDKSymbolsArchiveToAzure))]
         public static BuildTargetResult PublishArchivesToAzure(BuildTargetContext c) => c.Success();
 
-        [Target(
-            nameof(PublishSdkDebToDebianRepo))]
-        [BuildPlatforms(BuildPlatform.Ubuntu, "14.04")]
-        public static BuildTargetResult PublishDebFilesToDebianRepo(BuildTargetContext c)
-        {
-            return c.Success();
-        }
-
-        [Target]
-        public static BuildTargetResult PublishCliVersionBadge(BuildTargetContext c)
-        {
-            var versionBadge = c.BuildContext.Get<string>("VersionBadge");
-            var versionBadgeBlob = $"{Channel}/Binaries/{CliNuGetVersion}/{Path.GetFileName(versionBadge)}";
-            AzurePublisherTool.PublishFile(versionBadgeBlob, versionBadge);
-            return c.Success();
-        }
-        
         [Target]
         [BuildPlatforms(BuildPlatform.Ubuntu, "14.04")]
         public static BuildTargetResult PublishSdkInstallerFileToAzure(BuildTargetContext c)
         {
             var version = CliNuGetVersion;
             var installerFile = c.BuildContext.Get<string>("SdkInstallerFile");
+            var packageName = Monikers.GetSdkDebianPackageName(c);
+            string url = AzurePublisherTool.UploadFile(installerFile, AzurePublisher.Product.SDK, version);
 
-            AzurePublisherTool.PublishInstallerFile(installerFile, Channel, version);
+            DebRepoPublisherTool.PublishDebFileToDebianRepo(
+                packageName,
+                version,
+                url);
 
             return c.Success();
         }
@@ -237,8 +170,7 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var version = CliNuGetVersion;
             var installerFile = c.BuildContext.Get<string>("CombinedFrameworkSDKHostInstallerFile");
-
-            AzurePublisherTool.PublishInstallerFile(installerFile, Channel, version);
+            AzurePublisherTool.UploadFile(installerFile, AzurePublisher.Product.HostAndFrameworkAndSdk, version);
 
             return c.Success();
         }
@@ -249,8 +181,7 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var version = CliNuGetVersion;
             var archiveFile = c.BuildContext.Get<string>("CombinedFrameworkSDKCompressedFile");
-
-            AzurePublisherTool.PublishArchive(archiveFile, Channel, version);
+            AzurePublisherTool.UploadFile(archiveFile, AzurePublisher.Product.FrameworkAndSdk, version);
 
             return c.Success();
         }
@@ -260,8 +191,7 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var version = CliNuGetVersion;
             var archiveFile = c.BuildContext.Get<string>("CombinedFrameworkSDKHostCompressedFile");
-
-            AzurePublisherTool.PublishArchive(archiveFile, Channel, version);
+            AzurePublisherTool.UploadFile(archiveFile, AzurePublisher.Product.HostAndFrameworkAndSdk, version);
 
             return c.Success();
         }
@@ -271,26 +201,7 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var version = CliNuGetVersion;
             var archiveFile = c.BuildContext.Get<string>("SdkSymbolsCompressedFile");
-
-            AzurePublisherTool.PublishArchive(archiveFile, Channel, version);
-
-            return c.Success();
-        }
-
-        [Target]
-        [BuildPlatforms(BuildPlatform.Ubuntu, "14.04")]
-        public static BuildTargetResult PublishSdkDebToDebianRepo(BuildTargetContext c)
-        {
-            var version = CliNuGetVersion;
-
-            var packageName = Monikers.GetSdkDebianPackageName(c);
-            var installerFile = c.BuildContext.Get<string>("SdkInstallerFile");
-            var uploadUrl = AzurePublisherTool.CalculateInstallerUploadUrl(installerFile, Channel, version);
-
-            DebRepoPublisherTool.PublishDebFileToDebianRepo(
-                packageName,
-                version,
-                uploadUrl);
+            AzurePublisherTool.UploadFile(archiveFile, AzurePublisher.Product.SDK, version);
 
             return c.Success();
         }
@@ -331,19 +242,6 @@ namespace Microsoft.DotNet.Cli.Build
                     return c.Failed($"HTTP request to {dockerHubTriggerUri.ToString()} failed. {e.ToString()}");
                 }
             }
-            return c.Success();
-        }
-
-        [Target(nameof(PrepareTargets.Init))]
-        public static BuildTargetResult UpdateVersionsRepo(BuildTargetContext c)
-        {
-            string githubAuthToken = EnvVars.EnsureVariable("GITHUB_PASSWORD");
-            string nupkgFilePath = EnvVars.EnsureVariable("NUPKG_FILE_PATH");
-            string versionsRepoPath = EnvVars.EnsureVariable("VERSIONS_REPO_PATH");
-
-            VersionRepoUpdater repoUpdater = new VersionRepoUpdater(githubAuthToken);
-            repoUpdater.UpdatePublishedVersions(nupkgFilePath, versionsRepoPath).Wait();
-
             return c.Success();
         }
     }
