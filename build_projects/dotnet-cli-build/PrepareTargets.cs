@@ -487,8 +487,8 @@ cmake is required to build the native host 'corehost'";
         }
 
         private static void AddInstallerArtifactToContext(
-            BuildTargetContext c, 
-            string artifactPrefix, 
+            BuildTargetContext c,
+            string artifactPrefix,
             string contextPrefix,
             string version)
         {
