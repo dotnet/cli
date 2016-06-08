@@ -54,7 +54,8 @@
     "Microsoft.Win32.Registry": {
       "version": "4.0.0-rc3-24131-00",
       "exclude": "compile"
-    }
+    },
+	"System.Net.NetworkInformation": "4.1.0-rc2-*"
   },
   "frameworks": {
     "netcoreapp1.0": {

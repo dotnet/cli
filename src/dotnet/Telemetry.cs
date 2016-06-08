@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.InternalAbstractions;
+using System.Net.NetworkInformation;
+using System.Security.Cryptography;
+using System.Text;
+using System.Linq;
 
 namespace Microsoft.DotNet.Cli
 {
@@ -27,6 +31,8 @@ namespace Microsoft.DotNet.Cli
         private const string RuntimeId = "Runtime Id";
         private const string ProductVersion = "Product Version";
         private const string TelemetryProfile = "Telemetry Profile";
+        private const string MachineID = "Machine Id";
+        private const string AllMachineIDs = "All Machine Ids";
 
         public bool Enabled { get; }
 
@@ -72,6 +78,9 @@ namespace Microsoft.DotNet.Cli
                 _commonProperties.Add(RuntimeId, RuntimeEnvironment.GetRuntimeIdentifier());
                 _commonProperties.Add(ProductVersion, Product.Version);
                 _commonProperties.Add(TelemetryProfile, Environment.GetEnvironmentVariable(TelemetryProfileEnvironmentVariable));
+                var hashedmacs = GetHashSha256(GetMacs());
+                _commonProperties.Add(MachineID, hashedmacs.FirstOrDefault());
+                _commonProperties.Add(AllMachineIDs, string.Join(",", hashedmacs));
                 _commonMeasurements = new Dictionary<string, double>();
             }
             catch (Exception)
@@ -145,6 +154,48 @@ namespace Microsoft.DotNet.Cli
             {
                 return _commonProperties;
             }
+        }
+        
+        private List<string> GetMacs()
+        {
+            NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
+            
+            if (nics == null || nics.Length < 1)
+            {
+                return "";
+            }
+            var macs = new List<string>();
+            foreach (NetworkInterface adapter in nics)
+            {
+                IPInterfaceProperties properties = adapter.GetIPProperties();
+
+                PhysicalAddress address = adapter.GetPhysicalAddress();
+                byte[] bytes = address.GetAddressBytes();
+                macs.Add(string.Join("-", bytes.Select(x => x.ToString("X2"))))
+                if (macs.Length >= 10)
+                {
+                    break;
+                }
+            }
+            return macs;
+        }
+        
+        private List<string> GetHashSha256(List<string> strings)
+        {
+            var hashstring = SHA256.Create();
+            var hashedstrings = new List<string>();
+            foreach (var string in strings)
+            {
+                byte[] bytes = Encoding.Unicode.GetBytes(text);
+                byte[] hash = hashstring.ComputeHash(bytes);
+                string hashString = string.Empty;
+                foreach (byte x in hash)
+                {
+                    hashString += String.Format("{0:x2}", x);
+                }
+                hashedStrings.Add(hashString);
+            }
+            return hashedStrings;
         }
     }
 }
