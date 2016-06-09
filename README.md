@@ -109,3 +109,4 @@ License
 --------------------
 
 By downloading the .zip you are agreeing to the terms in the project [EULA](https://aka.ms/dotnet-cli-eula).
+Testing the state of our branch
