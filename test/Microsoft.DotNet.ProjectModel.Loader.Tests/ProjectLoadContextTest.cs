@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.ProjectModel.Loader.Tests
         [Fact]
         public void LoadContextCanLoadProjectOutput()
         {
-            var testInstance = TestAssetsManager.CreateTestInstance("TestProjectWithResource")
+            var testInstance = TestAssetsManager.CreateTestInstance("TestProjectWithCultureSpecificResource")
                 .WithLockFiles()
                 .WithBuildArtifacts();
 
@@ -23,10 +23,11 @@ namespace Microsoft.DotNet.ProjectModel.Loader.Tests
             var loadContext = context.CreateLoadContext(rid, Constants.DefaultConfiguration);
 
             // Load the project assembly
-            var asm = loadContext.LoadFromAssemblyName(new AssemblyName("TestProjectWithResource"));
+            var asm = loadContext.LoadFromAssemblyName(new AssemblyName("TestProjectWithCultureSpecificResource"));
 
             // Call Program.GetMessage() and assert the output
-            var message = (string)asm.GetType("TestProjectWithCultureSpecificResource").GetRuntimeMethod("GetMessage", Type.EmptyTypes).Invoke(null, new object[0]);
+            var typ = asm.GetType("TestProjectWithCultureSpecificResource.Program");
+            var message = (string)typ.GetRuntimeMethod("GetMessage", Type.EmptyTypes).Invoke(null, new object[0]);
             Assert.Equal("Hello World!" + Environment.NewLine + "Bonjour!", message);
         }
     }
