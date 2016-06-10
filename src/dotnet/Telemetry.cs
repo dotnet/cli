@@ -184,12 +184,12 @@ namespace Microsoft.DotNet.Cli
         
         private List<string> HashSha256(List<string> texts)
         {
-            var hashString = SHA256.Create();
+            var sha256 = SHA256.Create();
             var hashedStrings = new List<string>();
             foreach (var text in texts)
             {
                 byte[] bytes = Encoding.Unicode.GetBytes(text);
-                byte[] hash = hashString.ComputeHash(bytes);
+                byte[] hash = sha256.ComputeHash(bytes);
                 string hashString = string.Empty;
                 foreach (byte x in hash)
                 {
