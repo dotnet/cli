@@ -156,6 +156,9 @@ namespace Microsoft.DotNet.Cli
             }
         }
         
+		// Note:  Reason for byte->string->byte in following 2 functions.
+		// The Mac address must match the same format that `getmac` or `ifconfig -a || ip link` would present a mac address(e.g. FF-FF-FF-FF-FF-FF).  
+		// The hashed mac address needs to be the same hashed value as produced by the other distinct sources given the same input. (e.g. VsCode)
         private List<string> GetMacs()
         {
             NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
@@ -182,6 +185,7 @@ namespace Microsoft.DotNet.Cli
             return macs;
         }
         
+		// The hashed mac address needs to be the same hashed value as produced by the other distinct sources given the same input. (e.g. VsCode)
         private List<string> HashSha256(List<string> texts)
         {
             var sha256 = SHA256.Create();
