@@ -194,12 +194,12 @@ namespace Microsoft.DotNet.Cli
             {
                 byte[] bytes = Encoding.UTF8.GetBytes(text);
                 byte[] hash = sha256.ComputeHash(bytes);
-                string hashString = string.Empty;
+                StringBuilder hashString = new StringBuilder();
                 foreach (byte x in hash)
                 {
-                    hashString += String.Format("{0:x2}", x);
+                    hashString.AppendFormat("{0:x2}", x);
                 }
-                hashedStrings.Add(hashString);
+                hashedStrings.Add(hashString.ToString());
             }
             return hashedStrings;
         }
