@@ -78,9 +78,9 @@ namespace Microsoft.DotNet.Cli
                 _commonProperties.Add(RuntimeId, RuntimeEnvironment.GetRuntimeIdentifier());
                 _commonProperties.Add(ProductVersion, Product.Version);
                 _commonProperties.Add(TelemetryProfile, Environment.GetEnvironmentVariable(TelemetryProfileEnvironmentVariable));
-                var hashedmacs = GetHashSha256(GetMacs());
-                _commonProperties.Add(MachineID, hashedmacs.FirstOrDefault());
-                _commonProperties.Add(AllMachineIDs, string.Join(",", hashedmacs));
+                var hashedMacs = HashSha256(GetMacs());
+                _commonProperties.Add(MachineID, hashedMacs.FirstOrDefault());
+                _commonProperties.Add(AllMachineIDs, string.Join(",", hashedMacs));
                 _commonMeasurements = new Dictionary<string, double>();
             }
             catch (Exception)
@@ -159,20 +159,22 @@ namespace Microsoft.DotNet.Cli
         private List<string> GetMacs()
         {
             NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
+            var macs = new List<string>();
             
             if (nics == null || nics.Length < 1)
             {
-                return "";
+                macs.Add(string.Empty);
+                return macs;
             }
-            var macs = new List<string>();
+            
             foreach (NetworkInterface adapter in nics)
             {
                 IPInterfaceProperties properties = adapter.GetIPProperties();
 
                 PhysicalAddress address = adapter.GetPhysicalAddress();
                 byte[] bytes = address.GetAddressBytes();
-                macs.Add(string.Join("-", bytes.Select(x => x.ToString("X2"))))
-                if (macs.Length >= 10)
+                macs.Add(string.Join("-", bytes.Select(x => x.ToString("X2"))));
+                if (macs.Count() >= 10)
                 {
                     break;
                 }
@@ -180,14 +182,14 @@ namespace Microsoft.DotNet.Cli
             return macs;
         }
         
-        private List<string> GetHashSha256(List<string> strings)
+        private List<string> HashSha256(List<string> texts)
         {
-            var hashstring = SHA256.Create();
-            var hashedstrings = new List<string>();
-            foreach (var string in strings)
+            var hashString = SHA256.Create();
+            var hashedStrings = new List<string>();
+            foreach (var text in texts)
             {
                 byte[] bytes = Encoding.Unicode.GetBytes(text);
-                byte[] hash = hashstring.ComputeHash(bytes);
+                byte[] hash = hashString.ComputeHash(bytes);
                 string hashString = string.Empty;
                 foreach (byte x in hash)
                 {
