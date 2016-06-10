@@ -5,19 +5,19 @@
 
 param(
     [string]$Configuration="Debug",
-    [string]$Architecture="x64",
     [string[]]$Targets=@("Default"),
+    [string]$Architecture="x64",
     [switch]$NoPackage,
     [switch]$Help)
 
 if($Help)
 {
-    Write-Host "Usage: .\build.ps1 [-Configuration <CONFIGURATION>] [-NoPackage] [-Help] [-Targets <TARGETS...>]"
+    Write-Host "Usage: .\build.ps1 [-Configuration <CONFIGURATION>] [-Targets <TARGETS...>] [-Architecture <ARCHITECTURE>] [-NoPackage] [-Help]"
     Write-Host ""
     Write-Host "Options:"
     Write-Host "  -Configuration <CONFIGURATION>     Build the specified Configuration (Debug or Release, default: Debug)"
-    Write-Host "  -Architecture  <ARCHITECTURE>      Build the specified architecture (x64 or x86 (supported only on Windows), default: x64)"
     Write-Host "  -Targets <TARGETS...>              Comma separated build targets to run (Init, Compile, Publish, etc.; Default is a full build and publish)"
+    Write-Host "  -Architecture <ARCHITECTURE>       Build the specified architecture (x64 or x86 (supported only on Windows), default: x64)"
     Write-Host "  -NoPackage                         Skip packaging targets"
     Write-Host "  -Help                              Display this help message"
     exit 0
@@ -56,7 +56,9 @@ if (!(Test-Path $env:DOTNET_INSTALL_DIR))
 
 # Install a stage 0
 Write-Host "Installing .NET Core CLI Stage 0 from branchinfo channel"
-& "$RepoRoot\scripts\obtain\dotnet-install.ps1" -Channel $env:CHANNEL -Architecture $Architecture -Verbose
+    
+#TODO change 'preview' channel back to $env:CHANNEL when we have a first build in the current channel
+& "$RepoRoot\scripts\obtain\dotnet-install.ps1" -Channel preview -Architecture $Architecture -Verbose
 if($LASTEXITCODE -ne 0) { throw "Failed to install stage0" }
 
 # Put the stage0 on the path

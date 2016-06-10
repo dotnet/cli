@@ -37,16 +37,15 @@ while [[ $# > 0 ]]; do
             export DOTNET_INSTALL_SKIP_PREREQS=1
             ;;
         --help)
-            echo "Usage: $0 [--configuration <CONFIGURATION>] [--skip-prereqs] [--nopackage] [--docker <IMAGENAME>] [--help] [--targets <TARGETS...>]"
+            echo "Usage: $0 [--configuration <CONFIGURATION>] [--targets <TARGETS...>] [--skip-prereqs] [--nopackage] [--docker <IMAGENAME>] [--help]"
             echo ""
             echo "Options:"
             echo "  --configuration <CONFIGURATION>     Build the specified Configuration (Debug or Release, default: Debug)"
             echo "  --targets <TARGETS...>              Comma separated build targets to run (Init, Compile, Publish, etc.; Default is a full build and publish)"
-            echo "  --nopackage                         Skip packaging targets"
             echo "  --skip-prereqs                      Skip checks for pre-reqs in dotnet_install"
+            echo "  --nopackage                         Skip packaging targets"
             echo "  --docker <IMAGENAME>                Build in Docker using the Dockerfile located in scripts/docker/IMAGENAME"
             echo "  --help                              Display this help message"
-            echo "  <TARGETS...>                        The build targets to run (Init, Compile, Publish, etc.; Default is a full build and publish)"
             exit 0
             ;;
         *)
@@ -85,7 +84,8 @@ done < "$REPOROOT/branchinfo.txt"
 [ -z "$DOTNET_INSTALL_DIR" ] && export DOTNET_INSTALL_DIR=$REPOROOT/.dotnet_stage0/$(uname)
 [ -d "$DOTNET_INSTALL_DIR" ] || mkdir -p $DOTNET_INSTALL_DIR
 
-$REPOROOT/scripts/obtain/dotnet-install.sh --channel $CHANNEL --verbose
+#TODO change 'preview' channel back to $env:CHANNEL when we have a first build in the current channel
+$REPOROOT/scripts/obtain/dotnet-install.sh --channel preview --verbose
 
 # Put stage 0 on the PATH (for this shell only)
 PATH="$DOTNET_INSTALL_DIR:$PATH"
