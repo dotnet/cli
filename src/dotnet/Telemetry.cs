@@ -174,7 +174,7 @@ namespace Microsoft.DotNet.Cli
                 PhysicalAddress address = adapter.GetPhysicalAddress();
                 byte[] bytes = address.GetAddressBytes();
                 macs.Add(string.Join("-", bytes.Select(x => x.ToString("X2"))));
-                if (macs.Count() >= 10)
+                if (macs.Count >= 10)
                 {
                     break;
                 }
@@ -188,7 +188,7 @@ namespace Microsoft.DotNet.Cli
             var hashedStrings = new List<string>();
             foreach (var text in texts)
             {
-                byte[] bytes = Encoding.Unicode.GetBytes(text);
+                byte[] bytes = Encoding.UTF8.GetBytes(text);
                 byte[] hash = sha256.ComputeHash(bytes);
                 string hashString = string.Empty;
                 foreach (byte x in hash)
