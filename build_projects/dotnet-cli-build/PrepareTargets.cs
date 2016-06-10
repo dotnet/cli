@@ -139,7 +139,7 @@ namespace Microsoft.DotNet.Cli.Build
             c.BuildContext["VersionBadge"] = Path.Combine(Dirs.Output, versionBadgeName);
 
             var cliVersion = c.BuildContext.Get<BuildVersion>("BuildVersion").NuGetVersion;
-            var sharedFrameworkVersion = CliDependencyVersions.SharedFrameworkVersion;
+            var sharedFrameworkVersion = "1.0.0-rc3-004434";
             var hostVersion = CliDependencyVersions.SharedHostVersion;
 
             // Generated Installers + Archives
@@ -165,7 +165,7 @@ namespace Microsoft.DotNet.Cli.Build
         [Target]
         public static BuildTargetResult DownloadHostAndSharedFxArchives(BuildTargetContext c)
         {
-            var sharedFrameworkVersion = CliDependencyVersions.SharedFrameworkVersion;
+            var sharedFrameworkVersion = "1.0.0-rc3-004434";
             var sharedFrameworkChannel = CliDependencyVersions.SharedFrameworkChannel;
 
             var combinedSharedHostAndFrameworkArchiveDownloadFile =
@@ -212,7 +212,7 @@ namespace Microsoft.DotNet.Cli.Build
                 return c.Success();
             }
 
-            var sharedFrameworkVersion = CliDependencyVersions.SharedFrameworkVersion;
+            var sharedFrameworkVersion = "1.0.0-rc3-004434";
             var hostVersion = CliDependencyVersions.SharedHostVersion;
 
             var sharedFrameworkChannel = CliDependencyVersions.SharedFrameworkChannel;
