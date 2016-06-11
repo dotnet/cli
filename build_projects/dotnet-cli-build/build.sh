@@ -102,13 +102,7 @@ then
 fi
 
 # Temporary logic to turn core dumps on so we can catch exit code 138 errors on OSX
-if [ "$(uname -s)" == "Darwin" ]; then
-  # If there are no core files already in /cores/, we'll enable core dump
-  # generation for this shell.
-  if [ "$(ls -A /cores)" ]; then 
-    ulimit -c unlimited
-  fi
-fi
+ulimit -c unlimited
 
 # Restore the build scripts
 echo "Restoring Build Script projects..."
