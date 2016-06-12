@@ -57,6 +57,28 @@ while [[ $# > 0 ]]; do
     shift
 done
 
+function print_info_from_core_file {
+  local core_file_name=$1
+  local executable_name=$2
+
+  if ! [ -e $executable_name ]; then
+    echo "Unable to find executable $executable_name"
+    return
+  elif ! [ -e $core_file_name ]; then
+    echo "Unable to find core file $core_file_name"
+    return
+  fi
+
+  # Check for the existence of GDB on the path
+  hash gdb 2>/dev/null || { echo >&2 "GDB was not found. Unable to print core file."; return; }
+
+  echo "Printing info from core file $1"
+
+  # Open the dump in GDB and print the stack from each thread. We can add more
+  # commands here if desired.
+  gdb --batch -ex "thread apply all bt full" -ex "quit" $executable_name $core_file_name
+}
+
 # Set nuget package cache under the repo
 export NUGET_PACKAGES="$REPOROOT/.nuget/packages"
 
@@ -101,7 +123,7 @@ then
     ulimit -n 1024
 fi
 
-# Temporary logic to turn core dumps on so we can catch exit code 138 errors on OSX
+# Temporary logic to turn core dumps on so we can catch segfaults on Unix
 ulimit -c unlimited
 
 # Restore the build scripts
@@ -121,4 +143,27 @@ echo "Invoking Build Scripts..."
 echo "Configuration: $CONFIGURATION"
 
 $DIR/bin/dotnet-cli-build ${targets[@]}
+
+# ======================= BEGIN Core File Inspection =========================
+if [ "$(uname -s)" == "Linux" ]; then
+  # Depending on distro/configuration, the core files may either be named "core"
+  # or "core.<PID>" by default. We read /proc/sys/kernel/core_uses_pid to 
+  # determine which it is.
+  core_name_uses_pid=0
+  if [ -e /proc/sys/kernel/core_uses_pid ] && [ "1" == $(cat /proc/sys/kernel/core_uses_pid) ]; then
+    core_name_uses_pid=1
+  fi
+
+  if [ $core_name_uses_pid == "1" ]; then
+    # We don't know what the PID of the process was, so let's look at all core
+    # files whose name matches core.NUMBER
+    for f in core.*; do
+      [[ $f =~ core.[0-9]+ ]] && print_info_from_core_file "$f" "dotnet" && rm "$f"
+    done
+  elif [ -f core ]; then
+    print_info_from_core_file "core" "dotnet"
+    rm "core"
+  fi
+fi
+
 exit $?
