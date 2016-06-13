@@ -2,7 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using System.Reflection.Metadata;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
@@ -226,6 +229,42 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             new DirectoryInfo(outputDir).Should().HaveFiles(
                 new [] { "MyApp.dll", "MyApp" + buildCommand.GetExecutableExtension(),
                     "MyApp.runtimeconfig.json", "MyApp.deps.json" });
+        }
+
+        [Fact]
+        public void CompiledOutput_WithServiceableAttribute_CreateServiceableBinary()
+        {
+            const string appName = "EndToEndTestApp";
+            var testInstance = TestAssetsManager.CreateTestInstance(appName).WithLockFiles();
+            var root = testInstance.TestRoot;
+
+            // run compile
+            var outputDir = Path.Combine(root, "bin");
+            var testProject = ProjectUtils.GetProjectJson(root, appName);
+            var buildCommand = new BuildCommand(testProject, output: outputDir, framework: DefaultFramework);
+            var result = buildCommand.ExecuteWithCapturedOutput("--Serviceable");
+            result.Should().Pass();
+
+            bool found = false;
+            string resultFile = Path.Combine(outputDir, "Debug", "netcoreapp1.0", buildCommand.GetOutputExecutableName());
+            using (FileStream fs = new FileStream(resultFile, FileMode.Open, FileAccess.Read))
+            {
+                MetadataReader reader = MetadataReaderProvider.FromMetadataStream(fs).GetMetadataReader();
+                foreach (CustomAttributeHandle cah in reader.CustomAttributes)
+                {
+                    if (cah.As<AssemblyMetadataAttribute>() != null)
+                    {
+                        AssemblyMetadataAttribute a = cah.As<AssemblyMetadataAttribute>();
+                        if (a.Key == "Serviceable")
+                        {
+                            found = true;
+                            Assert.True(a.Value.ToLower() == "true");
+                        }
+                    }
+                }
+            }
+
+            Assert.True(found);
         }
 
         private void CopyProjectToTempDir(string projectDir, TempDirectory tempDir)
