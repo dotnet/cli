@@ -54,15 +54,21 @@ namespace Microsoft.DotNet.Tests
         }
 
         [Fact]
-        public void When_dotnet_new_is_invoked_mupliple_times()
+        public void When_dotnet_new_is_invoked_mupliple_times_it_should_fail()
         {
             var rootPath = Temp.CreateDirectory().Path;
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .Execute("new");
 
+            DateTime expectedState = Directory.GetLastWriteTime(rootPath);
+
             var result = new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .ExecuteWithCapturedOutput("new");
+
+            DateTime actualState = Directory.GetLastWriteTime(rootPath);
+
+            Assert.Equal(expectedState, actualState);
 
             result.Should().Fail();
             result.Should().HaveStdErr();

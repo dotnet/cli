@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.Tools.New
             // Check if project.json exists in the folder
             if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "project.json")))
             {
-                Reporter.Error.WriteLine($"Creating new {languageName} project failed, project.json already exists.");
+                Reporter.Error.WriteLine($"Creating new {languageName} project failed, project already exists.");
                 return 1;
             }
 
