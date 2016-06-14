@@ -12,6 +12,12 @@ brew install openssl
 brew link --force openssl
 ```
 
+Homebrew may also show the following warning:
+
+> Apple has deprecated use of OpenSSL in favor of its own TLS and crypto libraries
+
+This warning is meant for the software that uses OpenSSL (in this case, .NET Core) and not for the end-user that is installing said software. Homebrew installation doesn't touch either the existing Apple crypto libraries or existing OpenSSL 0.9.8 version, so there is no impact on any software that uses either one of those crypto solutions and is already installed.
+
 MacPorts doesn't have the concept of linking, so it is reccomended that you uninstall 0.9.8 version of OpenSSL using the following command:
 
 ```console
