@@ -1,9 +1,9 @@
 {
   "version": "1.0.0-*",
   "dependencies": {
-    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-rc2-20113",
-    "Microsoft.AspNetCore.Hosting": "1.0.0-rc2-20113",
-    "Microsoft.Extensions.Logging.Console": "1.0.0-rc2-20254"
+    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-rc3-21310",
+    "Microsoft.AspNetCore.Hosting": "1.0.0-rc3-21310",
+    "Microsoft.Extensions.Logging.Console": "1.0.0-rc3-21310"
   },
   "buildOptions": {
     "emitEntryPoint": true,

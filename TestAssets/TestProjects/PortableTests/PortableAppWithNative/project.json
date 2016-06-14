@@ -9,7 +9,7 @@
           "type": "platform",
           "version": "1.0.0-rc3-004459-00"
         },
-        "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-*",
+        "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-rc3-21310",
         "Libuv": "1.9.0-rc2-20896"
       },
       "imports": "dnxcore50"
