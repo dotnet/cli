@@ -94,7 +94,7 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
         }
 
         private void MakeCompilationOutputRunnableForCoreCLR()
-        {   
+        {
             WriteDepsFileAndCopyProjectDependencies(_exporter);
 
             var emitEntryPoint = _compilerOptions.EmitEntryPoint ?? false;
@@ -268,8 +268,16 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
 
         private void AddAdditionalProbingPaths(JObject runtimeOptions)
         {
-            var additionalProbingPaths = new JArray(_context.PackagesDirectory);
-            runtimeOptions.Add("additionalProbingPaths", additionalProbingPaths);
+            if (_context.LockFile != null)
+            {
+                var additionalProbingPaths = new JArray();
+                foreach (var packageFolder in _context.LockFile.PackageFolders)
+                {
+                    additionalProbingPaths.Add(packageFolder.Path);
+                }
+
+                runtimeOptions.Add("additionalProbingPaths", additionalProbingPaths);
+            }
         }
 
         public void WriteDeps(IEnumerable<LibraryExport> exports)
