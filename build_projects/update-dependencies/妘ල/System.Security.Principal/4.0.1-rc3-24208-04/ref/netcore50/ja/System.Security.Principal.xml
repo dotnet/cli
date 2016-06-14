@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Security.Principal</name>
+  </assembly>
+  <members>
+    <member name="T:System.Security.Principal.IIdentity">
+      <summary>ID オブジェクトの基本機能を定義します。</summary>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.AuthenticationType">
+      <summary>使用されている認証の種類を取得します。</summary>
+      <returns>ユーザーを識別するために使用する認証の種類。</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.IsAuthenticated">
+      <summary>ユーザーが認証されているかどうかを示す値を取得します。</summary>
+      <returns>ユーザーが認証されている場合は true。それ以外の場合は false。</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.Name">
+      <summary>現在のユーザーの名前を取得します。</summary>
+      <returns>コードが実行されている対象ユーザーの名前。</returns>
+    </member>
+    <member name="T:System.Security.Principal.IPrincipal">
+      <summary>プリンシパル オブジェクトの基本機能を定義します。</summary>
+    </member>
+    <member name="P:System.Security.Principal.IPrincipal.Identity">
+      <summary>現在のプリンシパルの ID を取得します。</summary>
+      <returns>現在のプリンシパルと関連付けられている <see cref="T:System.Security.Principal.IIdentity" /> オブジェクト。</returns>
+    </member>
+    <member name="M:System.Security.Principal.IPrincipal.IsInRole(System.String)">
+      <summary>現在のプリンシパルが、指定したロールに属しているかどうかを確認します。</summary>
+      <returns>現在のプリンシパルが、指定したロールのメンバーである場合は true。それ以外の場合は false。</returns>
+      <param name="role">メンバーシップを確認する対象のロールの名前。</param>
+    </member>
+    <member name="T:System.Security.Principal.TokenImpersonationLevel">
+      <summary>セキュリティ偽装レベルを定義します。セキュリティ偽装レベルは、サーバー プロセスがクライアント プロセスの代わりに動作できる程度を制御します。</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Anonymous">
+      <summary>サーバー プロセスは、クライアントの識別情報を取得することも、クライアントを偽装することもできません。</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Delegation">
+      <summary>サーバー プロセスは、リモート システム上にあるクライアントのセキュリティ コンテキストを偽装できます。</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Identification">
+      <summary>サーバー プロセスは、セキュリティ ID や特権などのクライアント情報を取得できますが、クライアントを偽装できません。このレベルは、テーブルとビューをエクスポートするデータベース製品のように独自のオブジェクトをエクスポートするサーバーなどに使用すると便利です。サーバーは、このクライアントのセキュリティ コンテキストを使用する他のサービスを使用できなくても、取得したクライアントのセキュリティ情報を使用してアクセス検証に関する決定を行うことができます。</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Impersonation">
+      <summary>サーバー プロセスは、ローカル システム上にあるクライアントのセキュリティ コンテキストを偽装できます。このサーバーは、リモート システムにあるクライアントを偽装できません。</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.None">
+      <summary>偽装レベルが割り当てられていません。</summary>
+    </member>
+  </members>
+</doc>

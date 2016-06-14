@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Security.Principal</name>
+  </assembly>
+  <members>
+    <member name="T:System.Security.Principal.IIdentity">
+      <summary>Definisce la funzionalità base di un oggetto identità.</summary>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.AuthenticationType">
+      <summary>Ottiene il tipo di autenticazione utilizzata.</summary>
+      <returns>Tipo di autenticazione utilizzata per identificare l'utente.</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.IsAuthenticated">
+      <summary>Ottiene un valore che indica se l'utente è stato autenticato.</summary>
+      <returns>true se l'utente è stato autenticato; in caso contrario, false.</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.Name">
+      <summary>Ottiene il nome dell'utente corrente.</summary>
+      <returns>Nome dell'utente per conto del quale è in esecuzione il codice.</returns>
+    </member>
+    <member name="T:System.Security.Principal.IPrincipal">
+      <summary>Definisce la funzionalità base di un oggetto Principal.</summary>
+    </member>
+    <member name="P:System.Security.Principal.IPrincipal.Identity">
+      <summary>Ottiene l'identità dell'oggetto Principal corrente.</summary>
+      <returns>Oggetto <see cref="T:System.Security.Principal.IIdentity" /> associato all'oggetto Principal corrente.</returns>
+    </member>
+    <member name="M:System.Security.Principal.IPrincipal.IsInRole(System.String)">
+      <summary>Determina se l'oggetto Principal corrente appartiene al ruolo specificato.</summary>
+      <returns>true se l'oggetto Principal corrente è un membro del ruolo specificato; in caso contrario, false.</returns>
+      <param name="role">Nome del ruolo per il quale verificare l'appartenenza. </param>
+    </member>
+    <member name="T:System.Security.Principal.TokenImpersonationLevel">
+      <summary>Definisce i livelli di rappresentazione di sicurezza.I livelli di rappresentazione di sicurezza stabiliscono le modalità in base alle quali un processo server può operare per conto di un processo client.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Anonymous">
+      <summary>Il processo server non può ottenere informazioni di identificazione sul client e non lo può rappresentare.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Delegation">
+      <summary>Il processo server può rappresentare il contesto di sicurezza del client nei sistemi remoti.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Identification">
+      <summary>Il processo server può ottenere informazioni sul client, quali gli ID di sicurezza e i privilegi, ma non lo può rappresentare.Questa impostazione è utile per i server che esportano oggetti propri, ad esempio prodotti di database che esportano tabelle e visualizzazioni.Utilizzando le informazioni di sicurezza del client recuperate, il server può decidere se convalidare l'accesso senza poter utilizzare altri servizi del contesto di sicurezza del client.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Impersonation">
+      <summary>Il processo server può rappresentare il contesto di sicurezza del client nel sistema locale.Il server non può rappresentare il client nei sistemi remoti.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.None">
+      <summary>Non è assegnato alcun livello di rappresentazione.</summary>
+    </member>
+  </members>
+</doc>

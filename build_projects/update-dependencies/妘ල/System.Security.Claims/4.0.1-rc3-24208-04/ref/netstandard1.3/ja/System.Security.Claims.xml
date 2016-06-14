@@ -1,0 +1,703 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Security.Claims</name>
+  </assembly>
+  <members>
+    <member name="T:System.Security.Claims.Claim">
+      <summary>クレームを表します。</summary>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.IO.BinaryReader,System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.Security.Claims.Claim)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.Security.Claims.Claim,System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String)">
+      <summary>指定したクレームの種類と値を使用して、<see cref="T:System.Security.Claims.Claim" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="type">クレームの種類。</param>
+      <param name="value">クレーム値。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> または <paramref name="value" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String)">
+      <summary>指定したクレームの種類、値、および値型を使用して、<see cref="T:System.Security.Claims.Claim" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="type">クレームの種類。</param>
+      <param name="value">クレーム値。</param>
+      <param name="valueType">クレーム値の型。このパラメーターが null の場合は <see cref="F:System.Security.Claims.ClaimValueTypes.String" /> が使用されます。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> または <paramref name="value" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String)">
+      <summary>指定したクレームの種類、値、値型、および発行元を使用して、<see cref="T:System.Security.Claims.Claim" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="type">クレームの種類。</param>
+      <param name="value">クレーム値。</param>
+      <param name="valueType">クレーム値の型。このパラメーターが null の場合は <see cref="F:System.Security.Claims.ClaimValueTypes.String" /> が使用されます。</param>
+      <param name="issuer">クレーム発行者。このパラメーターが空か null である場合は、<see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" /> が使用されます。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> または <paramref name="value" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String,System.String)">
+      <summary>指定されたクレームの種類、値、値型、発行元、および元の発行元を指定して、<see cref="T:System.Security.Claims.Claim" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="type">クレームの種類。</param>
+      <param name="value">クレーム値。</param>
+      <param name="valueType">クレーム値の型。このパラメーターが null の場合は <see cref="F:System.Security.Claims.ClaimValueTypes.String" /> が使用されます。</param>
+      <param name="issuer">クレーム発行者。このパラメーターが空か null である場合は、<see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" /> が使用されます。</param>
+      <param name="originalIssuer">クレームの元の発行元。このプロパティが空か null である場合、<see cref="P:System.Security.Claims.Claim.OriginalIssuer" /> プロパティは <see cref="P:System.Security.Claims.Claim.Issuer" /> プロパティの値に設定されます。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> または <paramref name="value" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String,System.String,System.Security.Claims.ClaimsIdentity)">
+      <summary>指定されたクレームの種類、値、値型、発行元、元の発行元、およびサブジェクトを指定して、<see cref="T:System.Security.Claims.Claim" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="type">クレームの種類。</param>
+      <param name="value">クレーム値。</param>
+      <param name="valueType">クレーム値の型。このパラメーターが null の場合は <see cref="F:System.Security.Claims.ClaimValueTypes.String" /> が使用されます。</param>
+      <param name="issuer">クレーム発行者。このパラメーターが空か null である場合は、<see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" /> が使用されます。</param>
+      <param name="originalIssuer">クレームの元の発行元。このプロパティが空か null である場合、<see cref="P:System.Security.Claims.Claim.OriginalIssuer" /> プロパティは <see cref="P:System.Security.Claims.Claim.Issuer" /> プロパティの値に設定されます。</param>
+      <param name="subject">このクレームが説明するサブジェクト。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> または <paramref name="value" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.Clone">
+      <summary>このオブジェクトからコピーされた新しい <see cref="T:System.Security.Claims.Claim" /> オブジェクトを返します。新しいクレームにサブジェクトがありません。</summary>
+      <returns>新しいクレーム オブジェクト。</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.Clone(System.Security.Claims.ClaimsIdentity)">
+      <summary>このオブジェクトからコピーされた新しい <see cref="T:System.Security.Claims.Claim" /> オブジェクトを返します。新しいクレームのサブジェクトは、指定された ClaimsIdentity に設定されます。</summary>
+      <returns>新しいクレーム オブジェクト。</returns>
+      <param name="identity">新しいクレームの意図したサブジェクト。</param>
+    </member>
+    <member name="P:System.Security.Claims.Claim.CustomSerializationData"></member>
+    <member name="P:System.Security.Claims.Claim.Issuer">
+      <summary>クレームの発行元を取得します。</summary>
+      <returns>クレームの発行元を示す名前。</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.OriginalIssuer">
+      <summary>クレームの元の発行元を取得します。</summary>
+      <returns>クレームの元の発行元を示す名前。</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Properties">
+      <summary>このクレームに関連付けられた追加のプロパティを含むディクショナリを取得します。</summary>
+      <returns>クレームに関連付けられた追加のプロパティを含むディクショナリ。プロパティは、名前と値のペアで表現されます。</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Subject">
+      <summary>クレームの対象を取得します。</summary>
+      <returns>クレームのサブジェクト。</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.ToString">
+      <summary>この <see cref="T:System.Security.Claims.Claim" /> オブジェクトの文字列形式を返します。</summary>
+      <returns>この <see cref="T:System.Security.Claims.Claim" /> オブジェクトの文字列形式。</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Type">
+      <summary>クレームの種類を取得します。</summary>
+      <returns>クレームの種類。</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Value">
+      <summary>クレームの値を取得します。</summary>
+      <returns>クレーム値。</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.ValueType">
+      <summary>クレームの値型を取得します。</summary>
+      <returns>クレーム値の型。</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.Claim.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimsIdentity">
+      <summary>クレームベース ID を表します。</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor">
+      <summary>空のクレーム コレクションを使用して、<see cref="T:System.Security.Claims.ClaimsIdentity" /> クラスの新しいインスタンスを初期化します。</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>
+        <see cref="T:System.Security.Claims.Claim" /> オブジェクトの列挙された配列を使用して、<see cref="T:System.Security.Claims.ClaimsIdentity" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="claims">クレーム ID の設定に使用するクレーム。</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String)">
+      <summary>指定したクレームと認証の種類を使用して <see cref="T:System.Security.Claims.ClaimsIdentity" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="claims">クレーム ID の設定に使用するクレーム。</param>
+      <param name="authenticationType">使用されている認証の種類。</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String,System.String,System.String)">
+      <summary>指定したクレーム、認証の種類、名前クレームの種類、およびロール クレームの種類を使用して、<see cref="T:System.Security.Claims.ClaimsIdentity" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="claims">クレーム ID の設定に使用するクレーム。</param>
+      <param name="authenticationType">使用されている認証の種類。</param>
+      <param name="nameType">名前のクレームに使用するクレームの種類。</param>
+      <param name="roleType">ロールのクレームに使用するクレームの種類。</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity)">
+      <summary>指定した <see cref="T:System.Security.Principal.IIdentity" /> の名前と認証の種類を使用して <see cref="T:System.Security.Claims.ClaimsIdentity" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="identity">新しいクレーム ID の基となる ID。</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity,System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>指定したクレームと指定した <see cref="T:System.Security.Principal.IIdentity" /> を使用して <see cref="T:System.Security.Claims.ClaimsIdentity" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="identity">新しいクレーム ID の基となる ID。</param>
+      <param name="claims">クレーム ID の設定に使用するクレーム。</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity,System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String,System.String,System.String)">
+      <summary>指定したクレーム、認証の種類、名前クレームの種類、およびロール クレームの種類を使用して、指定した <see cref="T:System.Security.Principal.IIdentity" /> から <see cref="T:System.Security.Claims.ClaimsIdentity" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="identity">新しいクレーム ID の基となる ID。</param>
+      <param name="claims">新規クレーム ID を設定するクレーム。</param>
+      <param name="authenticationType">使用されている認証の種類。</param>
+      <param name="nameType">名前のクレームに使用するクレームの種類。</param>
+      <param name="roleType">ロールのクレームに使用するクレームの種類。</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.String)">
+      <summary>空のクレームのコレクションと指定した認証の種類で <see cref="T:System.Security.Claims.ClaimsIdentity" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="authenticationType">使用されている認証の種類。</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.String,System.String,System.String)">
+      <summary>指定した認証の種類、名前クレームの種類、およびロール クレームの種類を使用して、<see cref="T:System.Security.Claims.ClaimsIdentity" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="authenticationType">使用されている認証の種類。</param>
+      <param name="nameType">名前のクレームに使用するクレームの種類。</param>
+      <param name="roleType">ロールのクレームに使用するクレームの種類。</param>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Actor">
+      <summary>デリゲート権限が付与された呼び出しパーティの ID を取得または設定します。</summary>
+      <returns>デリゲートする権限を付与された呼び出しパーティ。</returns>
+      <exception cref="T:System.InvalidOperationException">プロパティを現在のインスタンスに設定しようとしました。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.AddClaim(System.Security.Claims.Claim)">
+      <summary>このクレーム ID に単一のクレームを追加します。</summary>
+      <param name="claim">追加するクレーム。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="claim" /> は null なので、</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.AddClaims(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>このクレーム ID にクレームの一覧を追加します。</summary>
+      <param name="claims">追加するクレーム。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="claims" /> は null なので、</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.AuthenticationType">
+      <summary>認証の種類を取得します。</summary>
+      <returns>認証の種類。</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.BootstrapContext">
+      <summary>このクレーム ID を作成するために使用されたトークンを取得または設定します。</summary>
+      <returns>ブートストラップのコンテキスト。</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Claims">
+      <summary>このクレーム ID に関連付けられているクレームを取得します。</summary>
+      <returns>このクレーム ID に関連付けられたクレームのコレクション。</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.Clone">
+      <summary>このクレーム ID からコピーした新しい <see cref="T:System.Security.Claims.ClaimsIdentity" /> を返します。</summary>
+      <returns>現在のインスタンスのコピー。</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.CreateClaim(System.IO.BinaryReader)"></member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.CustomSerializationData"></member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer">
+      <summary>既定の発行者 “LOCAL AUTHORITY”。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultNameClaimType">
+      <summary>既定の名前クレームの種類、<see cref="F:System.Security.Claims.ClaimTypes.Name" />。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultRoleClaimType">
+      <summary>既定のロール クレームの種類、<see cref="F:System.Security.Claims.ClaimTypes.Role" />。</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindAll(System.Predicate{System.Security.Claims.Claim})">
+      <summary>指定した述語に一致するすべてのクレームを取得します。</summary>
+      <returns>一致するクレーム。リストは読み取り専用です。</returns>
+      <param name="match">一致ロジックを実行する関数。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindAll(System.String)">
+      <summary>指定されたクレーム型のすべてのクレームを取得します。</summary>
+      <returns>一致するクレーム。リストは読み取り専用です。</returns>
+      <param name="type">クレームに一致するクレームの種類。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindFirst(System.Predicate{System.Security.Claims.Claim})">
+      <summary>指定した述語に一致する最初のクレームを取得します。</summary>
+      <returns>最初に一致するクレーム。一致が見つからない場合は null。</returns>
+      <param name="match">一致ロジックを実行する関数。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindFirst(System.String)">
+      <summary>指定したクレームの種類の最初のクレームを取得します。</summary>
+      <returns>最初に一致するクレーム。一致が見つからない場合は null。</returns>
+      <param name="type">一致するクレームの種類。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.HasClaim(System.Predicate{System.Security.Claims.Claim})">
+      <summary>指定した述語に一致するクレーム ID がこのクレーム ID に含まれるかどうかを判断します。</summary>
+      <returns>一致するクレームが存在する場合は true。それ以外の場合は false。</returns>
+      <param name="match">一致ロジックを実行する関数。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.HasClaim(System.String,System.String)">
+      <summary>指定したクレームの種類と値を持つクレームがこのクレーム ID に含まれるかどうかを判断します。</summary>
+      <returns>一致が見つかった場合は true、それ以外の場合は false。</returns>
+      <param name="type">一致するクレームの種類。</param>
+      <param name="value">一致させるクレームの値。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> が null です。または<paramref name="value" /> が null です。</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.IsAuthenticated">
+      <summary>ID が認証されているかどうかを示す値を取得します。</summary>
+      <returns>ID が認証されている場合は true。それ以外の場合は false。</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Label">
+      <summary>このクレーム識別子のラベルを取得または設定します。</summary>
+      <returns>ラベル。</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Name">
+      <summary>このクレーム ID の名前を取得します。</summary>
+      <returns>名前または null。</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.NameClaimType">
+      <summary>このクレーム ID の <see cref="P:System.Security.Claims.ClaimsIdentity.Name" /> プロパティにどのクレームが値を提供するかを判断するために使用されるクレームの種類を取得します。</summary>
+      <returns>名前クレームの種類。</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.RemoveClaim(System.Security.Claims.Claim)">
+      <summary>クレーム ID からクレームを削除します。</summary>
+      <param name="claim">削除するクレーム。</param>
+      <exception cref="T:System.InvalidOperationException">クレームを削除できません。</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.RoleClaimType">
+      <summary>このクレーム ID のクレームのうちで .NET Framework のロールとして解釈されるクレームの種類を取得します。</summary>
+      <returns>ロール クレームの種類。</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.TryRemoveClaim(System.Security.Claims.Claim)">
+      <summary>クレーム ID からクレームを削除します。</summary>
+      <returns>クレームが正常に削除された場合は true。それ以外の場合は false。</returns>
+      <param name="claim">削除するクレーム。</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimsPrincipal">
+      <summary>複数のクレームベースの ID をサポートする <see cref="T:System.Security.Principal.IPrincipal" /> の実装。</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor">
+      <summary>
+        <see cref="T:System.Security.Claims.ClaimsPrincipal" /> クラスの新しいインスタンスを初期化します。</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.ClaimsIdentity})">
+      <summary>指定したクレーム ID を使用して、<see cref="T:System.Security.Claims.ClaimsPrincipal" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="identities">新しいクレーム プリンシパルの初期化元の ID。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identities" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Security.Principal.IIdentity)">
+      <summary>指定した ID から <see cref="T:System.Security.Claims.ClaimsPrincipal" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="identity">新しいクレーム プリンシパルの初期化元の ID。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identity" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Security.Principal.IPrincipal)">
+      <summary>指定したプリンシパルから <see cref="T:System.Security.Claims.ClaimsPrincipal" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="principal">新しいクレーム プリンシパルの初期化元であるプリンシパル。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="principal" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.AddIdentities(System.Collections.Generic.IEnumerable{System.Security.Claims.ClaimsIdentity})">
+      <summary>このクレーム プリンシパルに指定されたクレーム ID を追加します。</summary>
+      <param name="identities">追加する複数のクレーム ID。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identities" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.AddIdentity(System.Security.Claims.ClaimsIdentity)">
+      <summary>このクレーム プリンシパルに指定されたクレーム ID を追加します。</summary>
+      <param name="identity">追加するクレーム ID。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identity" /> が null です。</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Claims">
+      <summary>このクレーム プリンシパルに関連付けられたすべてのクレーム ID からのすべてのクレームを含むコレクションを取得します。</summary>
+      <returns>このプリンシパルに関連付けられているクレーム。</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.ClaimsPrincipalSelector">
+      <summary>
+        <see cref="P:System.Security.Claims.ClaimsPrincipal.Current" /> プロパティによって返されるクレーム プリンシパルを選択するために使用されるデリゲートを取得および設定します。</summary>
+      <returns>デリゲート。既定値は、null です。</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.Clone"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.CreateClaimsIdentity(System.IO.BinaryReader)"></member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Current">
+      <summary>現在のクレーム プリンシパルを取得します。</summary>
+      <returns>現在のクレーム プリンシパル。</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.CustomSerializationData"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindAll(System.Predicate{System.Security.Claims.Claim})">
+      <summary>指定した述語に一致するすべてのクレームを取得します。</summary>
+      <returns>一致するクレーム。</returns>
+      <param name="match">一致ロジックを実行する関数。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindAll(System.String)">
+      <summary>すべてのクレームまたは指定されたクレーム型のすべてのクレームを取得します。</summary>
+      <returns>一致するクレーム。</returns>
+      <param name="type">クレームに一致するクレームの種類。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindFirst(System.Predicate{System.Security.Claims.Claim})">
+      <summary>指定した述語に一致する最初のクレームを取得します。</summary>
+      <returns>最初に一致するクレーム。一致が見つからない場合は null。</returns>
+      <param name="match">一致ロジックを実行する関数。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindFirst(System.String)">
+      <summary>指定したクレームの種類の最初のクレームを取得します。</summary>
+      <returns>最初に一致するクレーム。一致が見つからない場合は null。</returns>
+      <param name="type">一致するクレームの種類。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.HasClaim(System.Predicate{System.Security.Claims.Claim})">
+      <summary>このクレーム プリンシパルに関連付けられたいずれかのクレーム ID が、指定した述語に一致するクレームを含んでいるかどうかを判断します。</summary>
+      <returns>一致するクレームが存在する場合は true。それ以外の場合は false。</returns>
+      <param name="match">一致ロジックを実行する関数。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> が null です。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.HasClaim(System.String,System.String)">
+      <summary>このクレーム プリンシパルに関連付けられたいずれかのクレーム ID が、指定したクレームの種類および値のクレームを含んでいるかどうかを判断します。</summary>
+      <returns>一致するクレームが存在する場合は true。それ以外の場合は false。</returns>
+      <param name="type">一致するクレームの種類。</param>
+      <param name="value">一致させるクレームの値。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> が null です。または<paramref name="value" /> が null です。</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Identities">
+      <summary>このクレーム プリンシパルに関連付けられたすべてのクレーム ID を含むコレクションを取得します。</summary>
+      <returns>クレーム ID のコレクション。</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Identity">
+      <summary>このクレーム プリンシパルに関連付けられているプライマリ クレーム ID を取得します。</summary>
+      <returns>このクレーム プリンシパルに関連付けられているプライマリ クレーム ID。</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.IsInRole(System.String)">
+      <summary>このクレーム プリンシパルによって表されるエンティティ (ユーザー) に指定されたロールが課されているかどうかを示す値を返します。</summary>
+      <returns>クレーム プリンシパルが指定したロールになっている場合は true。それ以外の場合は false。</returns>
+      <param name="role">確認対象のロール。</param>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.PrimaryIdentitySelector">
+      <summary>
+        <see cref="P:System.Security.Claims.ClaimsPrincipal.Identity" /> プロパティによって返されるクレーム ID を選択するために使用されるデリゲートを取得および設定します。</summary>
+      <returns>デリゲート。既定値は、null です。</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimTypes">
+      <summary>サブジェクトに割り当てることができる既知のクレーム タイプの定数を定義します。このクラスは継承できません。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Actor">
+      <summary>http://schemas.xmlsoap.org/ws/2009/09/identity/claims/actor</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Anonymous">
+      <summary>匿名ユーザーを指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/anonymous。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Authentication">
+      <summary>ID が認証されたかどうかに関する詳細を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/authenticated。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthenticationInstant">
+      <summary>エンティティが認証された瞬間を指定するクレームの URI、http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationinstant。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthenticationMethod">
+      <summary>エンティティが認証されたメソッドを指定するクレームの URI、http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthorizationDecision">
+      <summary>エンティティに対する承認決定を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/authorizationdecision。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.CookiePath">
+      <summary>クッキー パスを指定するクレームの URI、http://schemas.microsoft.com/ws/2008/06/identity/claims/cookiepath。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Country">
+      <summary>エンティティが存在する国/地域を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/country。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DateOfBirth">
+      <summary>エンティティの生年月日を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/dateofbirth。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyPrimaryGroupSid">
+      <summary>エンティティの拒否専用プライマリ グループ SID を指定するクレームの URI、http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarygroupsid。拒否専用 SID は、セキュリティで保護できるオブジェクトに対して指定されたエンティティを拒否します。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyPrimarySid">
+      <summary>エンティティの拒否専用プライマリ SID を指定するクレームの URI、http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarysid。拒否専用 SID は、セキュリティで保護できるオブジェクトに対して指定されたエンティティを拒否します。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlySid">
+      <summary>エンティティの拒否専用のセキュリティ識別子 (SID) を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/denyonlysid。拒否専用 SID は、セキュリティで保護できるオブジェクトに対して指定されたエンティティを拒否します。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyWindowsDeviceGroup">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlywindowsdevicegroup。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Dns">
+      <summary>X.509 証明書のサブジェクトまたは発行者のコンピューター名または代替名と関連付けられた DNS 名を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/dns。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Dsa">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/dsa。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Email">
+      <summary>エンティティの電子メール アドレスを指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Expiration">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/expiration。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Expired">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/expired。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Gender">
+      <summary>エンティティの性別を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/gender。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.GivenName">
+      <summary>エンティティの名を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.GroupSid">
+      <summary>エンティティのグループの SID を指定するクレームの URI、http://schemas.microsoft.com/ws/2008/06/identity/claims/groupsid。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Hash">
+      <summary>ハッシュ値を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/hash。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.HomePhone">
+      <summary>エンティティの自宅電話番号を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/homephone。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.IsPersistent">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/ispersistent。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Locality">
+      <summary>エンティティが存在するロケールを指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/locality。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.MobilePhone">
+      <summary>エンティティの携帯電話番号を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Name">
+      <summary>エンティティの名前を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.NameIdentifier">
+      <summary>エンティティの名前を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.OtherPhone">
+      <summary>エンティティの代替電話番号を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/otherphone。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PostalCode">
+      <summary>エンティティの郵便番号を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/postalcode。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PrimaryGroupSid">
+      <summary>エンティティのプライマリ グループ SID を指定するクレームの URI、http://schemas.microsoft.com/ws/2008/06/identity/claims/primarygroupsid。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PrimarySid">
+      <summary>エンティティのプライマリ SID を指定するクレームの URI、http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Role">
+      <summary>エンティティのロールを指定するクレームの URI、http://schemas.microsoft.com/ws/2008/06/identity/claims/role。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Rsa">
+      <summary>RSA キーを指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/rsa。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.SerialNumber">
+      <summary>シリアル値を指定するクレームの URI、http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Sid">
+      <summary>セキュリティ識別子 (SID) を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Spn">
+      <summary>サービス プリンシパル名 (SPN) クレームを指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/spn。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.StateOrProvince">
+      <summary>エンティティが存在する状態または領域を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/stateorprovince。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.StreetAddress">
+      <summary>エンティティの番地を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/streetaddress。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Surname">
+      <summary>エンティティの姓を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.System">
+      <summary>システム エンティティを識別するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/system。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Thumbprint">
+      <summary>サムプリントを指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/thumbprint。拇印は、X.509 証明書のグローバルに一意な SHA-1 ハッシュです。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Upn">
+      <summary>ユーザー プリンシパル名 (UPN) を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Uri">
+      <summary>URI を指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/uri。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.UserData">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/userdata。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Version">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/version。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Webpage">
+      <summary>エンティティの Web ページを指定するクレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/webpage。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsAccountName">
+      <summary>エンティティの Windows ドメイン アカウント名を指定するクレームの URI、http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsDeviceClaim">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsdeviceclaim。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsDeviceGroup">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsdevicegroup。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsFqbnVersion">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsfqbnversion。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsSubAuthority">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowssubauthority。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsUserClaim">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsuserclaim。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.X500DistinguishedName">
+      <summary>X.509 証明書の識別名クレームの URI、http://schemas.xmlsoap.org/ws/2005/05/identity/claims/x500distinguishedname。X.500 標準では、X.509 証明書で使用される識別名を定義する方法が定義されています。</summary>
+    </member>
+    <member name="T:System.Security.Claims.ClaimValueTypes">
+      <summary>W3C と OASIS によって定義された型 URI に従って、クレーム値の型を定義します。このクラスは継承できません。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Base64Binary">
+      <summary>base64Binary XML データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Base64Octet">
+      <summary>base64Octet XML データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Boolean">
+      <summary>boolean XML データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Date">
+      <summary>date XML データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DateTime">
+      <summary>dateTime XML データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DaytimeDuration">
+      <summary>daytimeDuration XQuery データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DnsName">
+      <summary>dns SOAP データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Double">
+      <summary>double XML データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DsaKeyValue">
+      <summary>DSAKeyValue XML Signature データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Email">
+      <summary>emailaddress SOAP データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Fqbn">
+      <summary>fqbn XML データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.HexBinary">
+      <summary>hexBinary XML データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer">
+      <summary>integer XML データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer32">
+      <summary>integer32 XML データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer64">
+      <summary>integer64 XML データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.KeyInfo">
+      <summary>KeyInfo XML Signature データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Rfc822Name">
+      <summary>rfc822Name XACML 1.0 データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Rsa">
+      <summary>rsa SOAP データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.RsaKeyValue">
+      <summary>RSAKeyValue XML Signature データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Sid">
+      <summary>sid XML データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.String">
+      <summary>string XML データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Time">
+      <summary>time XML データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UInteger32">
+      <summary>uinteger32 XML データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UInteger64">
+      <summary>uinteger64 XML データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UpnName">
+      <summary>UPN SOAP データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.X500Name">
+      <summary>x500Name XACML 1.0 データ型を表す URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.YearMonthDuration">
+      <summary>yearMonthDuration XQuery データ型を表す URI。</summary>
+    </member>
+    <member name="T:System.Security.Principal.GenericIdentity">
+      <summary>汎用ユーザーを表します。</summary>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.Security.Principal.GenericIdentity)">
+      <summary>指定した <see cref="T:System.Security.Principal.GenericIdentity" /> オブジェクトを使用して、<see cref="T:System.Security.Principal.GenericIdentity" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="identity">
+        <see cref="T:System.Security.Principal.GenericIdentity" /> の新しいインスタンスの生成元となるオブジェクト。</param>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.String)">
+      <summary>指定した名前のユーザーを表す <see cref="T:System.Security.Principal.GenericIdentity" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="name">コードが実行されている対象ユーザーの名前。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="name" /> パラメーターが null です。</exception>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.String,System.String)">
+      <summary>名前および認証の種類を指定して、ユーザーを表す <see cref="T:System.Security.Principal.GenericIdentity" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="name">コードが実行されている対象ユーザーの名前。</param>
+      <param name="type">ユーザーを識別するために使用する認証の種類。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="name" /> パラメーターが null です。または<paramref name="type" /> パラメーターが null です。</exception>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.AuthenticationType">
+      <summary>ユーザーを識別するために使用する認証の種類を取得します。</summary>
+      <returns>ユーザーを識別するために使用する認証の種類。</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.Claims">
+      <summary>この汎用 ID によって表されるユーザーのすべてのクレームを取得します。</summary>
+      <returns>この <see cref="T:System.Security.Principal.GenericIdentity" /> オブジェクトに対するクレームのコレクション。</returns>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.Clone">
+      <summary>現在のインスタンスのコピーである新しいオブジェクトを作成します。</summary>
+      <returns>現在のインスタンスのコピー。</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.IsAuthenticated">
+      <summary>ユーザーが認証されているかどうかを示す値を取得します。</summary>
+      <returns>ユーザーが認証されている場合は true。それ以外の場合は false。</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.Name">
+      <summary>ユーザーの名前を取得します。</summary>
+      <returns>コードが実行されている対象ユーザーの名前。</returns>
+    </member>
+    <member name="T:System.Security.Principal.GenericPrincipal">
+      <summary>汎用プリンシパルを表します。</summary>
+    </member>
+    <member name="M:System.Security.Principal.GenericPrincipal.#ctor(System.Security.Principal.IIdentity,System.String[])">
+      <summary>ユーザー ID と、その ID が表すユーザーが属しているロールの名前の配列から、<see cref="T:System.Security.Principal.GenericPrincipal" /> クラスの新しいインスタンスを初期化します。</summary>
+      <param name="identity">任意のユーザーを表す <see cref="T:System.Security.Principal.IIdentity" /> の基本実装。</param>
+      <param name="roles">
+        <paramref name="identity" /> パラメーターによって表されるユーザーが属しているロールの名前の配列。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identity" /> パラメーターが null です。</exception>
+    </member>
+    <member name="P:System.Security.Principal.GenericPrincipal.Identity">
+      <summary>現在の <see cref="T:System.Security.Principal.GenericPrincipal" /> によって表されるユーザーの <see cref="T:System.Security.Principal.GenericIdentity" /> を取得します。</summary>
+      <returns>
+        <see cref="T:System.Security.Principal.GenericPrincipal" /> によって表されるユーザーの <see cref="T:System.Security.Principal.GenericIdentity" />。</returns>
+    </member>
+    <member name="M:System.Security.Principal.GenericPrincipal.IsInRole(System.String)">
+      <summary>現在の <see cref="T:System.Security.Principal.GenericPrincipal" /> が、指定したロールに属しているかどうかを確認します。</summary>
+      <returns>現在の <see cref="T:System.Security.Principal.GenericPrincipal" /> が、指定したロールのメンバーの場合は true。それ以外の場合は false。</returns>
+      <param name="role">メンバーシップを確認する対象のロールの名前。</param>
+    </member>
+  </members>
+</doc>

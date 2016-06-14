@@ -1,0 +1,694 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Security.Claims</name>
+  </assembly>
+  <members>
+    <member name="T:System.Security.Claims.Claim">
+      <summary>Représente une revendication.</summary>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.IO.BinaryReader,System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.Security.Claims.Claim)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.Security.Claims.Claim,System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String)">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.Claim" /> avec le type de revendication et la valeur spécifiés.</summary>
+      <param name="type">Type de revendication.</param>
+      <param name="value">Valeur de revendication.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> ou <paramref name="value" /> est null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String)">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.Claim" /> avec le type de revendication, la valeur et le type de valeur spécifiés.</summary>
+      <param name="type">Type de revendication.</param>
+      <param name="value">Valeur de revendication.</param>
+      <param name="valueType">Type de valeur de revendication.Si ce paramètre a la valeur null, <see cref="F:System.Security.Claims.ClaimValueTypes.String" /> est utilisé.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> ou <paramref name="value" /> est null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String)">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.Claim" /> avec le type de revendication, la valeur, le type de valeur et l'émetteur spécifiés.</summary>
+      <param name="type">Type de revendication.</param>
+      <param name="value">Valeur de revendication.</param>
+      <param name="valueType">Type de valeur de revendication.Si ce paramètre a la valeur null, <see cref="F:System.Security.Claims.ClaimValueTypes.String" /> est utilisé.</param>
+      <param name="issuer">Émetteur de revendication.Si ce paramètre est vide ou null, l'<see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" /> est utilisé.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> ou <paramref name="value" /> est null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String,System.String)">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.Claim" /> avec le type de revendication, la valeur, le type de valeur, l'émetteur et l'émetteur d'origine spécifiés.</summary>
+      <param name="type">Type de revendication.</param>
+      <param name="value">Valeur de revendication.</param>
+      <param name="valueType">Type de valeur de revendication.Si ce paramètre a la valeur null, <see cref="F:System.Security.Claims.ClaimValueTypes.String" /> est utilisé.</param>
+      <param name="issuer">Émetteur de revendication.Si ce paramètre est vide ou null, l'<see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" /> est utilisé.</param>
+      <param name="originalIssuer">Émetteur d'origine de la revendication.Si ce paramètre est vide ou null, la propriété <see cref="P:System.Security.Claims.Claim.OriginalIssuer" /> prend la valeur de la propriété <see cref="P:System.Security.Claims.Claim.Issuer" />.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> ou <paramref name="value" /> est null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String,System.String,System.Security.Claims.ClaimsIdentity)">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.Claim" /> avec le type de revendication, la valeur, le type de valeur, l'émetteur, l'émetteur d'origine et l'objet spécifiés.</summary>
+      <param name="type">Type de revendication.</param>
+      <param name="value">Valeur de revendication.</param>
+      <param name="valueType">Type de valeur de revendication.Si ce paramètre a la valeur null, <see cref="F:System.Security.Claims.ClaimValueTypes.String" /> est utilisé.</param>
+      <param name="issuer">Émetteur de revendication.Si ce paramètre est vide ou null, l'<see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" /> est utilisé.</param>
+      <param name="originalIssuer">Émetteur d'origine de la revendication.Si ce paramètre est vide ou null, la propriété <see cref="P:System.Security.Claims.Claim.OriginalIssuer" /> prend la valeur de la propriété <see cref="P:System.Security.Claims.Claim.Issuer" />.</param>
+      <param name="subject">Objet que cette revendication décrit.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> ou <paramref name="value" /> est null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.Clone">
+      <summary>Retourne un nouvel objet <see cref="T:System.Security.Claims.Claim" /> copié à partir de cet objet.La nouvelle revendication n'a pas d'objet.</summary>
+      <returns>Nouvel objet de revendication.</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.Clone(System.Security.Claims.ClaimsIdentity)">
+      <summary>Retourne un nouvel objet <see cref="T:System.Security.Claims.Claim" /> copié à partir de cet objet.L'objet de la nouvelle revendication a la valeur ClaimsIdentity spécifiée.</summary>
+      <returns>Nouvel objet de revendication.</returns>
+      <param name="identity">Objet attendu de la nouvelle revendication.</param>
+    </member>
+    <member name="P:System.Security.Claims.Claim.CustomSerializationData"></member>
+    <member name="P:System.Security.Claims.Claim.Issuer">
+      <summary>Obtient l'émetteur de la revendication.</summary>
+      <returns>Nom qui fait référence à l'émetteur de la revendication.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.OriginalIssuer">
+      <summary>Obtient l'émetteur d'origine de la revendication. </summary>
+      <returns>Nom qui fait référence à l'émetteur d'origine de la revendication.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Properties">
+      <summary>Obtient un dictionnaire qui contient des propriétés supplémentaires associées à cette revendication.</summary>
+      <returns>Dictionnaire qui contient des propriétés supplémentaires associées à la revendication.Les propriétés sont représentées sous forme de paires nom-valeur.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Subject">
+      <summary>Obtient l'objet de la revendication.</summary>
+      <returns>Obtient de la revendication.</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.ToString">
+      <summary>Retourne une représentation sous forme de chaîne de cet objet <see cref="T:System.Security.Claims.Claim" />.</summary>
+      <returns>Représentation sous forme de chaîne de cet objet <see cref="T:System.Security.Claims.Claim" />.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Type">
+      <summary>Obtient le type de la revendication.</summary>
+      <returns>Type de revendication.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Value">
+      <summary>Obtient la valeur de la revendication.</summary>
+      <returns>Valeur de revendication.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.ValueType">
+      <summary>Obtient le type de valeur de la revendication.</summary>
+      <returns>Type de valeur de revendication.</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.Claim.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimsIdentity">
+      <summary>Représente une identité basée sur les revendications.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.ClaimsIdentity" /> avec une collection de revendications vides.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.ClaimsIdentity" /> avec une collection énumérée d'objets <see cref="T:System.Security.Claims.Claim" />.</summary>
+      <param name="claims">Revendications servant à renseigner l'identité basée sur les revendications.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String)">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.ClaimsIdentity" /> avec les revendications et le type d'authentification spécifiés.</summary>
+      <param name="claims">Revendications servant à renseigner l'identité basée sur les revendications.</param>
+      <param name="authenticationType">Type d'authentification utilisé.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String,System.String,System.String)">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.ClaimsIdentity" /> avec les revendications, le type d'authentification, le type de revendication de nom et le type de réclamation de rôle spécifiés.</summary>
+      <param name="claims">Revendications servant à renseigner l'identité basée sur les revendications.</param>
+      <param name="authenticationType">Type d'authentification utilisé.</param>
+      <param name="nameType">Type de revendication à utiliser pour les revendications de nom.</param>
+      <param name="roleType">Type de revendication à utiliser pour les revendications de rôle.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity)">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.ClaimsIdentity" /> à l'aide du nom et du type d'authentification du <see cref="T:System.Security.Principal.IIdentity" /> spécifié.</summary>
+      <param name="identity">Identité sur laquelle baser l'identité de la nouvelle revendication.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity,System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.ClaimsIdentity" /> à l'aide des revendications spécifiées et du <see cref="T:System.Security.Principal.IIdentity" /> spécifié.</summary>
+      <param name="identity">Identité sur laquelle baser l'identité de la nouvelle revendication.</param>
+      <param name="claims">Revendications servant à renseigner l'identité basée sur les revendications.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity,System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String,System.String,System.String)">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.ClaimsIdentity" /> à partir de l'<see cref="T:System.Security.Principal.IIdentity" /> spécifiée à l'aide des revendications, du type d'authentification, du type de revendication de nom, et du ype de revendication de rôle spécifiés.</summary>
+      <param name="identity">Identité sur laquelle baser l'identité de la nouvelle revendication.</param>
+      <param name="claims">Revendications servant à renseigner la nouvelle identité basée sur les revendications.</param>
+      <param name="authenticationType">Type d'authentification utilisé.</param>
+      <param name="nameType">Type de revendication à utiliser pour les revendications de nom.</param>
+      <param name="roleType">Type de revendication à utiliser pour les revendications de rôle.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.String)">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.ClaimsIdentity" /> avec une collection de revendications vides et le type d'authentification spécifié.</summary>
+      <param name="authenticationType">Type d'authentification utilisé.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.String,System.String,System.String)">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.ClaimsIdentity" /> avec le type d'authentification, le type de revendication de nom et le type de réclamation de rôle spécifiés.</summary>
+      <param name="authenticationType">Type d'authentification utilisé.</param>
+      <param name="nameType">Type de revendication à utiliser pour les revendications de nom.</param>
+      <param name="roleType">Type de revendication à utiliser pour les revendications de rôle.</param>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Actor">
+      <summary>Obtient ou définit l'identité de la partie appelante s'est vue accordée des droits de délégation.</summary>
+      <returns>Partie appelante qui s'est vue accorder des droits de délégation.</returns>
+      <exception cref="T:System.InvalidOperationException">Tentative d'affecter la propriété à l'instance actuelle se produit.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.AddClaim(System.Security.Claims.Claim)">
+      <summary>Ajoute une revendication unique à cette identité des revendications.</summary>
+      <param name="claim">Revendication à ajouter.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="claim" /> a la valeur null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.AddClaims(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>Ajoute une liste de revendications à cette identité de revendications.</summary>
+      <param name="claims">Revendications à ajouter.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="claims" /> a la valeur null.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.AuthenticationType">
+      <summary>Obtient le type d'authentification.</summary>
+      <returns>Type d'authentification.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.BootstrapContext">
+      <summary>Obtient ou définit le jeton qui a été utilisé pour créer cette identité basée sur les revendications.</summary>
+      <returns>Contexte de démarrage.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Claims">
+      <summary>Obtient les revendications associées à cette identité basée sur les revendications.</summary>
+      <returns>Collection des revendications associées à cette identité basée sur les revendications.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.Clone">
+      <summary>Retourne une nouvelle <see cref="T:System.Security.Claims.ClaimsIdentity" /> copiée à partir de cette identité basée sur les revendications.</summary>
+      <returns>Copie de l'instance actuelle.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.CreateClaim(System.IO.BinaryReader)"></member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.CustomSerializationData"></member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer">
+      <summary>Émetteur par défaut ; « LOCAL AUTHORITY ».</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultNameClaimType">
+      <summary>Type de revendication de nom par défaut ; <see cref="F:System.Security.Claims.ClaimTypes.Name" />.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultRoleClaimType">
+      <summary>Type de revendication de rôle par défaut ; <see cref="F:System.Security.Claims.ClaimTypes.Role" />.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindAll(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Récupère toutes les revendications qui sont mises en correspondance par le prédicat spécifié.</summary>
+      <returns>Revendications de correspondance.La liste est en lecture seule.</returns>
+      <param name="match">Fonction qui exécute la logique correspondante.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> a la valeur null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindAll(System.String)">
+      <summary>Récupère toutes les revendications qui ont le type de revendication spécifié.</summary>
+      <returns>Revendications de correspondance.La liste est en lecture seule.</returns>
+      <param name="type">Type de revendication auquel associer les revendications.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> a la valeur null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindFirst(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Extrait la première revendication qui est mise en correspondance par le prédicat spécifié.</summary>
+      <returns>Première revendication correspondante ou null, si aucune correspondance n'est trouvée.</returns>
+      <param name="match">Fonction qui exécute la logique correspondante.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> a la valeur null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindFirst(System.String)">
+      <summary>Extrait la première revendication avec le type de revendication spécifié.</summary>
+      <returns>Première revendication correspondante ou null, si aucune correspondance n'est trouvée.</returns>
+      <param name="type">Type de revendication à mettre en correspondance.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> a la valeur null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.HasClaim(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Détermine si cette identité des revendications a une revendication qui est mise en correspondance par l'attribut spécifié.</summary>
+      <returns>true si une revendication correspondante existe ; sinon, false.</returns>
+      <param name="match">Fonction qui exécute la logique correspondante.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> a la valeur null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.HasClaim(System.String,System.String)">
+      <summary>Détermine si cette identité des revendications a une revendication avec le type et la valeur de revendication spécifiques.</summary>
+      <returns>true en cas de correspondance ; sinon, false.</returns>
+      <param name="type">Type de la revendication à mettre en correspondance.</param>
+      <param name="value">Valeur de la revendication à mettre en correspondance.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> a la valeur null.ou<paramref name="value" /> a la valeur null.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.IsAuthenticated">
+      <summary>Obtient une valeur qui indique que l'identité a été authentifiée.</summary>
+      <returns>true si l'identité a été authentifiée ; sinon, false.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Label">
+      <summary>Obtient ou définit l'étiquette de cette identité basée sur les revendications.</summary>
+      <returns>Étiquette.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Name">
+      <summary>Obtient le nom de cette identité basée sur les revendications.</summary>
+      <returns>Nom ou null.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.NameClaimType">
+      <summary>Obtient le type de revendication utilisé pour déterminer les revendications qui fournissent la valeur de la propriété <see cref="P:System.Security.Claims.ClaimsIdentity.Name" /> de cette identité basée sur les revendications.</summary>
+      <returns>Type de revendication de nom.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.RemoveClaim(System.Security.Claims.Claim)">
+      <summary>Tente de supprimer une revendication dans l'identité basée sur les revendications.</summary>
+      <param name="claim">Revendication à supprimer.</param>
+      <exception cref="T:System.InvalidOperationException">Impossible de supprimer la revendication.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.RoleClaimType">
+      <summary>Obtient le type de revendication qui est interprétée comme un rôle .NET Framework entre les revendications dans cette identité basée sur les revendications.</summary>
+      <returns>Type de revendication du rôle.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.TryRemoveClaim(System.Security.Claims.Claim)">
+      <summary>Tente de supprimer une revendication dans l'identité basée sur les revendications.</summary>
+      <returns>true si la revendication a été correctement supprimée ; sinon, false.</returns>
+      <param name="claim">Revendication à supprimer.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimsPrincipal">
+      <summary>Une implémentation <see cref="T:System.Security.Principal.IPrincipal" /> qui prend en charge plusieurs identités basées sur les revendications.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.ClaimsPrincipal" />.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.ClaimsIdentity})">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.ClaimsPrincipal" /> avec les identités de revendications spécifiées.</summary>
+      <param name="identities">Identités à partir desquelles initialiser le nouveau principal des revendications.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identities" /> a la valeur null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Security.Principal.IIdentity)">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.ClaimsPrincipal" /> à partir de l'identité spécifiée.</summary>
+      <param name="identity">Identité à partir de laquelle initialiser le nouveau principal des revendications.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identity" /> a la valeur null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Security.Principal.IPrincipal)">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Claims.ClaimsPrincipal" /> à partir du principal spécifié.</summary>
+      <param name="principal">Principal à partir duquel initialiser le nouveau principal des revendications.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="principal" /> a la valeur null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.AddIdentities(System.Collections.Generic.IEnumerable{System.Security.Claims.ClaimsIdentity})">
+      <summary>Ajoute les identités spécifiées de revendications à ce principal des revendications.</summary>
+      <param name="identities">Identités de revendications à ajouter.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identities" /> a la valeur null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.AddIdentity(System.Security.Claims.ClaimsIdentity)">
+      <summary>Ajoute l'identité spécifiée de revendications à ce principal des revendications.</summary>
+      <param name="identity">Identité basée sur les revendications à ajouter.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identity" /> a la valeur null.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Claims">
+      <summary>Obtient une collection qui contient toutes les revendications de toutes les identités basées sur les revendications associées à ce principal des revendications.</summary>
+      <returns>Revendications associées à cette entité de sécurité.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.ClaimsPrincipalSelector">
+      <summary>Obtient et définit le délégué utilisé pour sélectionner le principal des revendications retourné par la propriété <see cref="P:System.Security.Claims.ClaimsPrincipal.Current" /> .</summary>
+      <returns>Délégué.La valeur par défaut est null.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.Clone"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.CreateClaimsIdentity(System.IO.BinaryReader)"></member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Current">
+      <summary>Obtient le principal des revendications actuel.</summary>
+      <returns>Principal actuel des revendications.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.CustomSerializationData"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindAll(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Récupère toutes les revendications qui sont mises en correspondance par le prédicat spécifié.</summary>
+      <returns>Revendications de correspondance.</returns>
+      <param name="match">Fonction qui exécute la logique correspondante.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> a la valeur null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindAll(System.String)">
+      <summary>Récupère toutes les revendications qui ont le type de revendication spécifié.</summary>
+      <returns>Revendications de correspondance.</returns>
+      <param name="type">Type de revendication auquel associer les revendications.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> a la valeur null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindFirst(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Extrait la première revendication qui est mise en correspondance par le prédicat spécifié.</summary>
+      <returns>Première revendication correspondante ou null, si aucune correspondance n'est trouvée.</returns>
+      <param name="match">Fonction qui exécute la logique correspondante.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> a la valeur null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindFirst(System.String)">
+      <summary>Extrait la première revendication avec le type de revendication spécifié.</summary>
+      <returns>Première revendication correspondante ou null, si aucune correspondance n'est trouvée.</returns>
+      <param name="type">Type de revendication à mettre en correspondance.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> a la valeur null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.HasClaim(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Détermine si certaines des identités basées sur les revendications associées à ce principal de revendications contient une revendication qui est mise en correspondance par le prédicat spécifié.</summary>
+      <returns>true si une revendication correspondante existe ; sinon, false.</returns>
+      <param name="match">Fonction qui exécute la logique correspondante.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> a la valeur null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.HasClaim(System.String,System.String)">
+      <summary>Détermine si certaines des identités basées sur les revendications associées à ce principal de revendications contient une revendication avec le type et la valeur de revendication spécifiques.</summary>
+      <returns>true si une revendication correspondante existe ; sinon, false.</returns>
+      <param name="type">Type de la revendication à mettre en correspondance.</param>
+      <param name="value">Valeur de la revendication à mettre en correspondance.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> a la valeur null.ou<paramref name="value" /> a la valeur null.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Identities">
+      <summary>Obtient une collection qui contient toutes les identités basées sur les revendications associées à ce principal des revendications.</summary>
+      <returns>Collection d'identités de revendications.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Identity">
+      <summary>Obtient l'identité principale des revendications associée à ce principal des revendications.</summary>
+      <returns>L'identité principale des revendications associée à ce principal des revendications.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.IsInRole(System.String)">
+      <summary>Retourne une valeur qui indique si l'entité (l'utilisateur) représentée par cette entité de sécurité basée sur les revendications est dans le rôle spécifié.</summary>
+      <returns>true si l'entité de sécurité des revendications est dans le rôle spécifié ; sinon false.</returns>
+      <param name="role">Rôle à vérifier.</param>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.PrimaryIdentitySelector">
+      <summary>Obtient et définit le délégué utilisé pour sélectionner l'identité basée sur les revendications retournée par la propriété <see cref="P:System.Security.Claims.ClaimsPrincipal.Identity" /> .</summary>
+      <returns>Délégué.La valeur par défaut est null.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimTypes">
+      <summary>Définit des constantes pour les types de revendication connus qui peuvent être assignés à un objet.Cette classe ne peut pas être héritée.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Actor">
+      <summary>http://schemas.xmlsoap.org/ws/2009/09/identity/claims/actor.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Anonymous">
+      <summary>URI d'une revendication qui spécifie l'utilisateur anonyme ; http://schemas.xmlsoap.org/ws/2005/05/identity/claims/anonymous.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Authentication">
+      <summary>URI d'une revendication qui spécifie les détails indiquant si une identité est authentifiée, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/authenticated.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthenticationInstant">
+      <summary>URI d'une revendication qui spécifie à quel moment une entité a été authentifiée ; http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationinstant.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthenticationMethod">
+      <summary>URI d'une revendication qui spécifie la méthode avec laquelle une entité a été authentifiée ; http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthorizationDecision">
+      <summary>URI d'une revendication qui spécifie une décision d'autorisation sur une entité, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/authorizationdecision.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.CookiePath">
+      <summary>URI d'une revendication qui spécifie le chemin d'accès du cookie ; http://schemas.microsoft.com/ws/2008/06/identity/claims/cookiepath.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Country">
+      <summary>URI d'une revendication qui spécifie le pays ou la région dans le ou laquelle une entité réside, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/country.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DateOfBirth">
+      <summary>URI d'une revendication qui spécifie la date de naissance d'une entité, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/dateofbirth.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyPrimaryGroupSid">
+      <summary>URI d'une revendication qui spécifie le SID de groupe principal en refus seul sur une entité ; http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarygroupsid.Un SID en refus seul refuse l'entité spécifiée à un objet sécurisable.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyPrimarySid">
+      <summary>URI d'une revendication qui spécifie le SID principal en refus seul sur une entité ; http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarysid.Un SID en refus seul refuse l'entité spécifiée à un objet sécurisable.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlySid">
+      <summary>URI d'une revendication qui spécifie un identificateur de sécurité (SID) en refus seul pour une entité, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/denyonlysid.Un SID en refus seul refuse l'entité spécifiée à un objet sécurisable.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyWindowsDeviceGroup">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlywindowsdevicegroup.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Dns">
+      <summary>URI pour une revendication qui spécifie le nom DNS associé au nom de l'ordinateur ou au nom alternatif de l'objet ou de l'émetteur d'un certificat X509, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/dns.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Dsa">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/dsa.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Email">
+      <summary>URI d'une revendication qui spécifie l'adresse de messagerie d'une entité, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Expiration">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/expiration.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Expired">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/expired.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Gender">
+      <summary>URI d'une revendication qui spécifie le genre/sexe d'une entité, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/gender.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.GivenName">
+      <summary>URI d'une revendication qui spécifie le nom donné d'une entité, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.GroupSid">
+      <summary>URI d'une revendication qui spécifie le SID du groupe d'une entité, http://schemas.microsoft.com/ws/2008/06/identity/claims/groupsid.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Hash">
+      <summary>URI d'une revendication qui spécifie une valeur de hachage, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/hash.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.HomePhone">
+      <summary>URI d'une revendication qui spécifie le numéro de téléphone personnel d'une entité, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/homephone.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.IsPersistent">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/ispersistent.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Locality">
+      <summary>URI d'une revendication qui spécifie les paramètres régionaux dans lesquels une entité réside, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/locality.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.MobilePhone">
+      <summary>URI d'une revendication qui spécifie le numéro de téléphone mobile d'une entité, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Name">
+      <summary>URI d'une revendication qui spécifie le nom d'une entité, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.NameIdentifier">
+      <summary>URI d'une revendication qui spécifie le nom d'une entité, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.OtherPhone">
+      <summary>URI d'une revendication qui spécifie l'autre numéro de téléphone d'une entité, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/otherphone.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PostalCode">
+      <summary>URI d'une revendication qui spécifie le code postal d'une entité, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/postalcode.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PrimaryGroupSid">
+      <summary>URI d'une revendication qui spécifie le SID de groupe principal d'une entité, http://schemas.microsoft.com/ws/2008/06/identity/claims/primarygroupsid.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PrimarySid">
+      <summary>URI d'une revendication qui spécifie le SID principal d'une entité, http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Role">
+      <summary>URI d'une revendication qui spécifie le rôle d'une entité, http://schemas.microsoft.com/ws/2008/06/identity/claims/role.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Rsa">
+      <summary>URI d'une revendication qui spécifie une clé RSA, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/rsa.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.SerialNumber">
+      <summary>URI d'une revendication qui spécifie un numéro de série, http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Sid">
+      <summary>URI d'une revendication qui spécifie un identificateur de sécurité (SID), http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Spn">
+      <summary>URI d'une revendication qui spécifie une revendication de nom de principal du service (SPN), http://schemas.xmlsoap.org/ws/2005/05/identity/claims/spn.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.StateOrProvince">
+      <summary>URI d'une revendication qui spécifie l'état ou la province de résidence d'une entité, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/stateorprovince.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.StreetAddress">
+      <summary>URI d'une revendication qui spécifie l'adresse postale d'une entité, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/streetaddress.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Surname">
+      <summary>URI d'une revendication qui spécifie le nom de famille d'une entité, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.System">
+      <summary>URI d'une revendication qui identifie l'entité du système, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/system.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Thumbprint">
+      <summary>URI d'une revendication qui spécifie une empreinte numérique, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/thumbprint.Une empreinte numérique est un hachage SHA-1 globalement unique d'un certificat X.509.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Upn">
+      <summary>URI d'une revendication qui spécifie un nom d'utilisateur principal (UPN), http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Uri">
+      <summary>URI d'une revendication qui spécifie un URI, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/uri.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.UserData">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/userdata.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Version">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/version.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Webpage">
+      <summary>URI d'une revendication qui spécifie la page Web d'une entité, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/webpage.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsAccountName">
+      <summary>URI d'une revendication qui spécifie le nom du compte de domaine Windows d'une entité, http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsDeviceClaim">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsdeviceclaim.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsDeviceGroup">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsdevicegroup.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsFqbnVersion">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsfqbnversion.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsSubAuthority">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowssubauthority.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsUserClaim">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsuserclaim.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.X500DistinguishedName">
+      <summary>URI d'une revendication de nom unique d'un certificat X.509, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/x500distinguishedname.La norme X.500 définit la méthodologie pour définir des noms uniques qui sont utilisés par les certificats X.509.</summary>
+    </member>
+    <member name="T:System.Security.Claims.ClaimValueTypes">
+      <summary>Définit les types de valeurs de revendication en fonction des URI de type définis par W3C et OASIS.Cette classe ne peut pas être héritée.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Base64Binary">
+      <summary>URI qui représente le type de données XML base64Binary.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Base64Octet">
+      <summary>URI qui représente le type de données XML base64Octet.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Boolean">
+      <summary>URI qui représente le type de données XML boolean.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Date">
+      <summary>URI qui représente le type de données XML date.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DateTime">
+      <summary>URI qui représente le type de données XML dateTime.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DaytimeDuration">
+      <summary>URI qui représente le type de données XQuery daytimeDuration.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DnsName">
+      <summary>URI qui représente le type de données SOAP dns.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Double">
+      <summary>URI qui représente le type de données XML double.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DsaKeyValue">
+      <summary>URI qui représente le type de données de signature XML DSAKeyValue.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Email">
+      <summary>URI qui représente le type de données SOAP emailaddress.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Fqbn">
+      <summary>URI qui représente le type de données XML fqbn.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.HexBinary">
+      <summary>URI qui représente le type de données XML hexBinary.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer">
+      <summary>URI qui représente le type de données XML integer.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer32">
+      <summary>URI qui représente le type de données XML integer32.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer64">
+      <summary>URI qui représente le type de données XML integer64.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.KeyInfo">
+      <summary>URI qui représente le type de données de signature XML KeyInfo.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Rfc822Name">
+      <summary>URI qui représente le type de données XACML 1.0 rfc822Name.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Rsa">
+      <summary>URI qui représente le type de données SOAP rsa.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.RsaKeyValue">
+      <summary>URI qui représente le type de données de signature XML RSAKeyValue.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Sid">
+      <summary>URI qui représente le type de données XML sid.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.String">
+      <summary>URI qui représente le type de données XML string.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Time">
+      <summary>URI qui représente le type de données XML time.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UInteger32">
+      <summary>URI qui représente le type de données XML uinteger32.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UInteger64">
+      <summary>URI qui représente le type de données XML uinteger64.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UpnName">
+      <summary>URI qui représente le type de données SOAP UPN.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.X500Name">
+      <summary>URI qui représente le type de données XACML 1.0 x500Name.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.YearMonthDuration">
+      <summary>URI qui représente le type de données XQuery yearMonthDuration.</summary>
+    </member>
+    <member name="T:System.Security.Principal.GenericIdentity">
+      <summary>Représente un utilisateur générique.</summary>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.Security.Principal.GenericIdentity)">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Principal.GenericIdentity" /> à l'aide de l'objet <see cref="T:System.Security.Principal.GenericIdentity" /> spécifié.</summary>
+      <param name="identity">Objet à partir duquel la nouvelle instance de <see cref="T:System.Security.Principal.GenericIdentity" /> doit être créée.</param>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.String)">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Principal.GenericIdentity" /> représentant l'utilisateur avec le nom spécifié.</summary>
+      <param name="name">Nom de l'utilisateur au nom duquel le code est en cours d'exécution. </param>
+      <exception cref="T:System.ArgumentNullException">Le paramètre <paramref name="name" /> est null. </exception>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.String,System.String)">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Principal.GenericIdentity" /> représentant l'utilisateur avec le nom et le type d'authentification spécifiés.</summary>
+      <param name="name">Nom de l'utilisateur au nom duquel le code est en cours d'exécution. </param>
+      <param name="type">Type d'authentification utilisé pour identifier l'utilisateur. </param>
+      <exception cref="T:System.ArgumentNullException">Le paramètre <paramref name="name" /> est null.ou Le paramètre <paramref name="type" /> est null. </exception>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.AuthenticationType">
+      <summary>Obtient le type d'authentification utilisé pour identifier l'utilisateur.</summary>
+      <returns>Type d'authentification utilisé pour identifier l'utilisateur.</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.Claims">
+      <summary>Obtient toutes les revendications pour l'utilisateur représenté par cette identité générique.</summary>
+      <returns>Collection de revendications pour cet objet <see cref="T:System.Security.Principal.GenericIdentity" />.</returns>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.Clone">
+      <summary>Crée un objet qui est une copie de l'instance actuelle.</summary>
+      <returns>Copie de l'instance actuelle.</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.IsAuthenticated">
+      <summary>Obtient une valeur indiquant si l'utilisateur a été authentifié.</summary>
+      <returns>true si l'utilisateur a été authentifié ; sinon, false.</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.Name">
+      <summary>Obtient le nom de l'utilisateur.</summary>
+      <returns>Nom de l'utilisateur au nom duquel le code est en cours d'exécution.</returns>
+    </member>
+    <member name="T:System.Security.Principal.GenericPrincipal">
+      <summary>Représente une entité de sécurité générique.</summary>
+    </member>
+    <member name="M:System.Security.Principal.GenericPrincipal.#ctor(System.Security.Principal.IIdentity,System.String[])">
+      <summary>Initialise une nouvelle instance de la classe <see cref="T:System.Security.Principal.GenericPrincipal" /> à partir d'une identité d'utilisateur et d'un tableau de noms de rôles auquel l'utilisateur représenté par cette identité appartient.</summary>
+      <param name="identity">Implémentation de base de <see cref="T:System.Security.Principal.IIdentity" /> qui représente n'importe quel utilisateur. </param>
+      <param name="roles">Tableau de noms de rôles auquel l'utilisateur représenté par le paramètre <paramref name="identity" /> appartient. </param>
+      <exception cref="T:System.ArgumentNullException">Le paramètre <paramref name="identity" /> est null. </exception>
+    </member>
+    <member name="P:System.Security.Principal.GenericPrincipal.Identity">
+      <summary>Obtient le <see cref="T:System.Security.Principal.GenericIdentity" /> de l'utilisateur représenté par le <see cref="T:System.Security.Principal.GenericPrincipal" /> en cours.</summary>
+      <returns>
+        <see cref="T:System.Security.Principal.GenericIdentity" /> de l'utilisateur représenté par le <see cref="T:System.Security.Principal.GenericPrincipal" />.</returns>
+    </member>
+    <member name="M:System.Security.Principal.GenericPrincipal.IsInRole(System.String)">
+      <summary>Détermine si le <see cref="T:System.Security.Principal.GenericPrincipal" /> en cours appartient au rôle spécifié.</summary>
+      <returns>true si le <see cref="T:System.Security.Principal.GenericPrincipal" /> en cours est un membre du rôle spécifié ; sinon, false.</returns>
+      <param name="role">Nom du rôle pour lequel l'appartenance (membership) doit être vérifiée. </param>
+    </member>
+  </members>
+</doc>

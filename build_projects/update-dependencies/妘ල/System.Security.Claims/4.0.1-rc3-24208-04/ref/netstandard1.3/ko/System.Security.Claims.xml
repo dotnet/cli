@@ -1,0 +1,703 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Security.Claims</name>
+  </assembly>
+  <members>
+    <member name="T:System.Security.Claims.Claim">
+      <summary>클레임을 나타냅니다.</summary>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.IO.BinaryReader,System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.Security.Claims.Claim)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.Security.Claims.Claim,System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String)">
+      <summary>지정된 클레임 형식과 값을 사용하여 <see cref="T:System.Security.Claims.Claim" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="type">클레임 형식입니다.</param>
+      <param name="value">클레임 값입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> 또는 <paramref name="value" />가 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String)">
+      <summary>지정된 클레임 형식, 값 및 값 형식을 사용하여 <see cref="T:System.Security.Claims.Claim" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="type">클레임 형식입니다.</param>
+      <param name="value">클레임 값입니다.</param>
+      <param name="valueType">클레임 값 형식입니다.이 매개 변수가 null인 경우 <see cref="F:System.Security.Claims.ClaimValueTypes.String" />이 사용됩니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> 또는 <paramref name="value" />가 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String)">
+      <summary>지정된 클레임 형식, 값, 값 형식 및 발급자를 사용하여 <see cref="T:System.Security.Claims.Claim" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="type">클레임 형식입니다.</param>
+      <param name="value">클레임 값입니다.</param>
+      <param name="valueType">클레임 값 형식입니다.이 매개 변수가 null인 경우 <see cref="F:System.Security.Claims.ClaimValueTypes.String" />이 사용됩니다.</param>
+      <param name="issuer">클레임 발급자입니다.이 매개 변수가 비었거나 null인 경우 <see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" />가 사용됩니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> 또는 <paramref name="value" />가 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String,System.String)">
+      <summary>지정된 클레임 형식, 값, 값 형식, 발급자 및 원래 발급자를 사용하여 <see cref="T:System.Security.Claims.Claim" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="type">클레임 형식입니다.</param>
+      <param name="value">클레임 값입니다.</param>
+      <param name="valueType">클레임 값 형식입니다.이 매개 변수가 null인 경우 <see cref="F:System.Security.Claims.ClaimValueTypes.String" />이 사용됩니다.</param>
+      <param name="issuer">클레임 발급자입니다.이 매개 변수가 비었거나 null인 경우 <see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" />가 사용됩니다.</param>
+      <param name="originalIssuer">클레임의 원래 발급자입니다.이 매개 변수가 비어 있거나 null인 경우 <see cref="P:System.Security.Claims.Claim.OriginalIssuer" /> 속성은 <see cref="P:System.Security.Claims.Claim.Issuer" /> 속성 값으로 설정됩니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> 또는 <paramref name="value" />가 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String,System.String,System.Security.Claims.ClaimsIdentity)">
+      <summary>지정한 클레임 형식, 값, 값 유형, 발급자, 원래 발급자, 제목을 사용하여 <see cref="T:System.Security.Claims.Claim" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="type">클레임 형식입니다.</param>
+      <param name="value">클레임 값입니다.</param>
+      <param name="valueType">클레임 값 형식입니다.이 매개 변수가 null인 경우 <see cref="F:System.Security.Claims.ClaimValueTypes.String" />이 사용됩니다.</param>
+      <param name="issuer">클레임 발급자입니다.이 매개 변수가 비었거나 null인 경우 <see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" />가 사용됩니다.</param>
+      <param name="originalIssuer">클레임의 원래 발급자입니다.이 매개 변수가 비어 있거나 null인 경우 <see cref="P:System.Security.Claims.Claim.OriginalIssuer" /> 속성은 <see cref="P:System.Security.Claims.Claim.Issuer" /> 속성 값으로 설정됩니다.</param>
+      <param name="subject">이 클레임이 설명하는 제목입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> 또는 <paramref name="value" />가 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.Clone">
+      <summary>이 개체에서 새 <see cref="T:System.Security.Claims.Claim" /> 개체를 반환합니다.새 클레임에 주체가 없습니다.</summary>
+      <returns>새 클레임 개체입니다.</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.Clone(System.Security.Claims.ClaimsIdentity)">
+      <summary>이 개체에서 새 <see cref="T:System.Security.Claims.Claim" /> 개체를 반환합니다.새 클레임의 제목이 ClaimsIdentity로 설정됩니다.</summary>
+      <returns>새 클레임 개체입니다.</returns>
+      <param name="identity">새 클레임에 예정된 제목입니다.</param>
+    </member>
+    <member name="P:System.Security.Claims.Claim.CustomSerializationData"></member>
+    <member name="P:System.Security.Claims.Claim.Issuer">
+      <summary>클레임의 발급자를 가져옵니다.</summary>
+      <returns>클레임의 발급자를 참조하는 이름입니다.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.OriginalIssuer">
+      <summary>클레임의 원래 발급자를 가져옵니다. </summary>
+      <returns>클레임의 원래 발급자를 참조하는 이름입니다.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Properties">
+      <summary>이 클레임과 연결된 추가 속성을 포함하는 사전을 가져옵니다.</summary>
+      <returns>클레임과 연결된 추가 속성을 포함하는 사전입니다.속성은 이름-값 쌍으로 표시됩니다.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Subject">
+      <summary>클레임의 제목을 가져옵니다.</summary>
+      <returns>클레임의 제목입니다.</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.ToString">
+      <summary>이 <see cref="T:System.Security.Claims.Claim" /> 개체의 문자열 표현을 반환합니다.</summary>
+      <returns>이 <see cref="T:System.Security.Claims.Claim" /> 개체를 나타내는 문자열 표현입니다.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Type">
+      <summary>클레임의 클레임 형식을 가져옵니다.</summary>
+      <returns>클레임 형식입니다.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Value">
+      <summary>클레임의 값을 가져옵니다.</summary>
+      <returns>클레임 값입니다.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.ValueType">
+      <summary>클레임의 값 형식을 가져옵니다.</summary>
+      <returns>클레임 값 형식입니다.</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.Claim.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimsIdentity">
+      <summary>클레임 기반 ID를 나타냅니다.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor">
+      <summary>빈 클레임 컬렉션으로 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>
+        <see cref="T:System.Security.Claims.Claim" /> 개체의 열거된 컬렉션을 사용하여 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="claims">클레임 ID를 채울 클레임입니다.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String)">
+      <summary>지정된 클레임 및 인증 형식을 사용하여 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="claims">클레임 ID를 채울 클레임입니다.</param>
+      <param name="authenticationType">사용한 인증 형식입니다.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String,System.String,System.String)">
+      <summary>지정된 클레임, 인증 형식, 이름 클레임 형식 및 역할 클레임 형식을 사용하여 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="claims">클레임 ID를 채울 클레임입니다.</param>
+      <param name="authenticationType">사용한 인증 형식입니다.</param>
+      <param name="nameType">이름 클레임에 사용할 클레임 형식입니다.</param>
+      <param name="roleType">역할 클레임에 사용할 클레임 형식입니다.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity)">
+      <summary>지정된 <see cref="T:System.Security.Principal.IIdentity" />에서 이름 및 인증 형식을 사용하여 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="identity">새 클레임 ID의 기반이 되는 ID입니다.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity,System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>지정된 클레임 및 지정된 <see cref="T:System.Security.Principal.IIdentity" />를 사용하여 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="identity">새 클레임 ID의 기반이 되는 ID입니다.</param>
+      <param name="claims">클레임 ID를 채울 클레임입니다.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity,System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String,System.String,System.String)">
+      <summary>지정된 클레임, 인증 형식, 이름 클레임 형식 및 역할 클레임 형식을 사용하여 지정된 <see cref="T:System.Security.Principal.IIdentity" />에서 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="identity">새 클레임 ID의 기반이 되는 ID입니다.</param>
+      <param name="claims">새 클레임 ID를 채울 클레임입니다.</param>
+      <param name="authenticationType">사용한 인증 형식입니다.</param>
+      <param name="nameType">이름 클레임에 사용할 클레임 형식입니다.</param>
+      <param name="roleType">역할 클레임에 사용할 클레임 형식입니다.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.String)">
+      <summary>빈 클레임 컬렉션과 지정된 인증 형식을 사용하여 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="authenticationType">사용한 인증 형식입니다.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.String,System.String,System.String)">
+      <summary>지정된 인증 형식, 이름 클레임 형식 및 역할 클레임 형식을 사용하여 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="authenticationType">사용한 인증 형식입니다.</param>
+      <param name="nameType">이름 클레임에 사용할 클레임 형식입니다.</param>
+      <param name="roleType">역할 클레임에 사용할 클레임 형식입니다.</param>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Actor">
+      <summary>위임 권한이 부여된 발신자의 ID를 가져오거나 설정합니다.</summary>
+      <returns>위임 권한이 부여된 호출자입니다.</returns>
+      <exception cref="T:System.InvalidOperationException">속성을 현재 인스턴스로 설정하려는 시도가 발생합니다.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.AddClaim(System.Security.Claims.Claim)">
+      <summary>이 클레임 ID에 단일 클레임을 추가합니다.</summary>
+      <param name="claim">추가할 클레임입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="claim" />가 null입니다.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.AddClaims(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>이 클레임 ID에 클레임 목록을 추가합니다.</summary>
+      <param name="claims">추가할 클레임입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="claims" />가 null입니다.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.AuthenticationType">
+      <summary>인증 형식을 가져옵니다.</summary>
+      <returns>인증 형식입니다.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.BootstrapContext">
+      <summary>이 클레임 ID를 만드는 데 사용된 토큰을 가져오거나 설정합니다.</summary>
+      <returns>부트스트랩 컨텍스트입니다.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Claims">
+      <summary>이 클레임 ID에 연결된 클레임을 가져옵니다.</summary>
+      <returns>이 클레임 ID에 연결된 클레임의 컬렉션입니다.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.Clone">
+      <summary>이 클레임 ID에서 복사한 새 <see cref="T:System.Security.Claims.ClaimsIdentity" />를 반환합니다.</summary>
+      <returns>현재 인스턴스의 복사본입니다.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.CreateClaim(System.IO.BinaryReader)"></member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.CustomSerializationData"></member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer">
+      <summary>기본 발급자, "로컬 인증 기관"입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultNameClaimType">
+      <summary>기본 이름 클레임 형식은 <see cref="F:System.Security.Claims.ClaimTypes.Name" />입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultRoleClaimType">
+      <summary>기본 역할 클레임 형식은 <see cref="F:System.Security.Claims.ClaimTypes.Role" />입니다.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindAll(System.Predicate{System.Security.Claims.Claim})">
+      <summary>지정된 조건자와 일치하는 클레임을 모두 검색합니다.</summary>
+      <returns>일치하는 클레임입니다.목록은 읽기 전용입니다.</returns>
+      <param name="match">일치 논리를 수행하는 함수입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" />이 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindAll(System.String)">
+      <summary>지정된 클레임 형식이 있는 클레임을 모두 검색합니다.</summary>
+      <returns>일치하는 클레임입니다.목록은 읽기 전용입니다.</returns>
+      <param name="type">클레임과 일치하는 클레임 형식입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" />이 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindFirst(System.Predicate{System.Security.Claims.Claim})">
+      <summary>지정된 조건자와 일치하는 첫 번째 클레임을 검색합니다.</summary>
+      <returns>첫 번째 일치하는 클레임 또는 일치가 발견되지 않은 경우 null입니다.</returns>
+      <param name="match">일치 논리를 수행하는 함수입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" />이 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindFirst(System.String)">
+      <summary>지정된 클레임 형식으로 첫 번째 클레임을 검색합니다.</summary>
+      <returns>첫 번째 일치하는 클레임 또는 일치가 발견되지 않은 경우 null입니다.</returns>
+      <param name="type">일치시킬 클레임 형식입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" />이 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.HasClaim(System.Predicate{System.Security.Claims.Claim})">
+      <summary>이 클레임에 지정된 조건자와 일치하는 클레임이 있는지 여부를 확인합니다.</summary>
+      <returns>일치하는 클레임이 있으면 true이고, 그렇지 않으면 false입니다.</returns>
+      <param name="match">일치 논리를 수행하는 함수입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" />이 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.HasClaim(System.String,System.String)">
+      <summary>이 클레임 ID에 지정된 클레임 형식 및 값을 가진 클레임이 있는지 여부를 확인합니다.</summary>
+      <returns>일치하는 항목이 있으면 true이고, 그렇지 않으면 false입니다.</returns>
+      <param name="type">일치시킬 클레임의 형식입니다.</param>
+      <param name="value">일치시킬 클레임의 값입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" />이 null인 경우또는<paramref name="value" />이 null인 경우</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.IsAuthenticated">
+      <summary>ID가 인증되었는지 여부를 나타내는 값을 가져옵니다.</summary>
+      <returns>ID가 인증되었으면 true이고, 그렇지 않으면 false입니다.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Label">
+      <summary>이 클레임 ID에 대한 레이블을 가져오거나 설정합니다.</summary>
+      <returns>레이블입니다.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Name">
+      <summary>이 클레임 ID의 이름을 가져옵니다.</summary>
+      <returns>이름 또는 null입니다.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.NameClaimType">
+      <summary>이 클레임 ID의 <see cref="P:System.Security.Claims.ClaimsIdentity.Name" /> 속성 값을 제공하는 클레임을 확인하는 데 사용되는 클레임 형식을 가져옵니다.</summary>
+      <returns>이름 클레임 형식입니다.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.RemoveClaim(System.Security.Claims.Claim)">
+      <summary>클레임 ID에서 클레임을 제거하려고 시도합니다.</summary>
+      <param name="claim">제거할 클레임입니다.</param>
+      <exception cref="T:System.InvalidOperationException">클레임을 제거할 수 없는 경우</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.RoleClaimType">
+      <summary>이 클레임 ID의 클레임 중에서 .NET Framework 역할로 해석될 클레임 형식을 가져옵니다.</summary>
+      <returns>역할 클레임 형식입니다.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.TryRemoveClaim(System.Security.Claims.Claim)">
+      <summary>클레임 ID에서 클레임을 제거하려고 시도합니다.</summary>
+      <returns>클레임이 성공적으로 제거되면 true이고, 그렇지 않으면 false입니다.</returns>
+      <param name="claim">제거할 클레임입니다.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimsPrincipal">
+      <summary>여러 클레임 기반 ID를 지원하는 <see cref="T:System.Security.Principal.IPrincipal" /> 구현입니다.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor">
+      <summary>
+        <see cref="T:System.Security.Claims.ClaimsPrincipal" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.ClaimsIdentity})">
+      <summary>지정된 클레임 ID를 사용하여 <see cref="T:System.Security.Claims.ClaimsPrincipal" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="identities">새 클레임 보안 주체를 초기화할 ID입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identities" />이 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Security.Principal.IIdentity)">
+      <summary>지정된 ID에서 <see cref="T:System.Security.Claims.ClaimsPrincipal" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="identity">새 클레임 보안 주체를 초기화할 ID입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identity" />이 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Security.Principal.IPrincipal)">
+      <summary>지정된 보안 주체에서 <see cref="T:System.Security.Claims.ClaimsPrincipal" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="principal">새 클레임 보안 주체를 초기화할 보안 주체입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="principal" />이 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.AddIdentities(System.Collections.Generic.IEnumerable{System.Security.Claims.ClaimsIdentity})">
+      <summary>지정된 클레임 ID를 이 클레임 주체에 추가합니다.</summary>
+      <param name="identities">추가할 클레임 ID입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identities" />이 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.AddIdentity(System.Security.Claims.ClaimsIdentity)">
+      <summary>지정된 클레임 ID를 이 클레임 주체에 추가합니다.</summary>
+      <param name="identity">추가할 클레임 ID입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identity" />이 null인 경우</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Claims">
+      <summary>이 클레임 보안 주체와 연결된 모든 클레임 ID의 모든 클레임을 포함하는 컬렉션을 가져옵니다.</summary>
+      <returns>이 보안 주체와 관련된 클레임입니다.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.ClaimsPrincipalSelector">
+      <summary>
+        <see cref="P:System.Security.Claims.ClaimsPrincipal.Current" /> 속성이 반환하는 클레임 보안 주체를 선택하는 데 사용되는 대리자를 가져오고 설정합니다.</summary>
+      <returns>대리자입니다.기본값은 null입니다.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.Clone"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.CreateClaimsIdentity(System.IO.BinaryReader)"></member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Current">
+      <summary>현재 클레임 보안 주체를 가져옵니다.</summary>
+      <returns>현재 클레임 보안 주체입니다.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.CustomSerializationData"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindAll(System.Predicate{System.Security.Claims.Claim})">
+      <summary>지정된 조건자와 일치하는 클레임을 모두 검색합니다.</summary>
+      <returns>일치하는 클레임입니다.</returns>
+      <param name="match">일치 논리를 수행하는 함수입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" />이 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindAll(System.String)">
+      <summary>지정된 클레임 형식이 있는 모든 클레임 또는 해당 클레임을 검색합니다.</summary>
+      <returns>일치하는 클레임입니다.</returns>
+      <param name="type">클레임과 일치하는 클레임 형식입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" />이 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindFirst(System.Predicate{System.Security.Claims.Claim})">
+      <summary>지정된 조건자와 일치하는 첫 번째 클레임을 검색합니다.</summary>
+      <returns>첫 번째 일치하는 클레임 또는 일치가 발견되지 않은 경우 null입니다.</returns>
+      <param name="match">일치 논리를 수행하는 함수입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" />이 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindFirst(System.String)">
+      <summary>지정된 클레임 형식으로 첫 번째 클레임을 검색합니다.</summary>
+      <returns>첫 번째 일치하는 클레임 또는 일치가 발견되지 않은 경우 null입니다.</returns>
+      <param name="type">일치시킬 클레임 형식입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" />이 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.HasClaim(System.Predicate{System.Security.Claims.Claim})">
+      <summary>이 클레임 보안 주체와 연결된 클레임 ID가 지정된 조건자로 일치되는 클레임을 포함하는지 여부를 확인합니다.</summary>
+      <returns>일치하는 클레임이 있으면 true이고, 그렇지 않으면 false입니다.</returns>
+      <param name="match">일치 논리를 수행하는 함수입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" />이 null인 경우</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.HasClaim(System.String,System.String)">
+      <summary>이 클레임 보안 주체와 연결된 클레임 ID가 지정된 클레임 형식 및 값을 사용하는 클레임을 포함하는지 여부를 확인합니다.</summary>
+      <returns>일치하는 클레임이 있으면 true이고, 그렇지 않으면 false입니다.</returns>
+      <param name="type">일치시킬 클레임의 형식입니다.</param>
+      <param name="value">일치시킬 클레임의 값입니다.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" />이 null인 경우또는<paramref name="value" />이 null인 경우</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Identities">
+      <summary>이 클레임 보안 주체와 연결된 모든 클레임 ID를 포함하는 컬렉션을 가져옵니다.</summary>
+      <returns>클레임 ID의 컬렉션입니다.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Identity">
+      <summary>이 클레임 보안 주체와 연결된 기본 클레임 ID를 가져옵니다.</summary>
+      <returns>이 클레임 보안 주체와 연결된 기본 클레임 ID입니다.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.IsInRole(System.String)">
+      <summary>이 클레임 주체로 표시된 엔터티(사용자)가 지정된 역할에 속하는지 여부를 나타내는 값을 반환합니다.</summary>
+      <returns>클레임 보안 주체가 지정된 역할에 있으면 true이고, 그렇지 않으면 false입니다.</returns>
+      <param name="role">확인할 역할입니다.</param>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.PrimaryIdentitySelector">
+      <summary>
+        <see cref="P:System.Security.Claims.ClaimsPrincipal.Identity" /> 속성이 반환하는 클레임 ID를 선택하는 데 사용되는 대리자를 가져오고 설정합니다.</summary>
+      <returns>대리자입니다.기본값은 null입니다.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimTypes">
+      <summary>제목에 할당할 수 있는 잘 알려진 클레임 형식에 대한 상수를 정의합니다.이 클래스는 상속될 수 없습니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Actor">
+      <summary>http://schemas.xmlsoap.org/ws/2009/09/identity/claims/actor.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Anonymous">
+      <summary>익명 사용자를 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/anonymous).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Authentication">
+      <summary>ID의 인증 여부에 대한 정보를 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/authenticated).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthenticationInstant">
+      <summary>엔터티가 인증된 인스턴트를 지정하는 클레임의 URI입니다(http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationinstant).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthenticationMethod">
+      <summary>엔터티가 인증된 메서드를 지정하는 클레임의 URI입니다(http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthorizationDecision">
+      <summary>엔터티에 대해 권한 부여 결정을 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/authorizationdecision).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.CookiePath">
+      <summary>쿠키 경로를 지정하는 클레임의 URI입니다(http://schemas.microsoft.com/ws/2008/06/identity/claims/cookiepath).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Country">
+      <summary>엔터티가 있는 국가/지역을 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/country).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DateOfBirth">
+      <summary>엔터티의 생년월일을 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/dateofbirth).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyPrimaryGroupSid">
+      <summary>엔터티의 거부 전용 주 그룹 SID를 지정하는 클레임의 URI입니다(http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarygroupsid).거부 전용 SID는 보안 가능한 개체에 대해 지정된 엔터티를 거부합니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyPrimarySid">
+      <summary>엔터티의 거부 전용 주 SID를 지정하는 클레임의 URI입니다(http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarysid).거부 전용 SID는 보안 가능한 개체에 대해 지정된 엔터티를 거부합니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlySid">
+      <summary>엔터티에 대해 거부 전용 보안 식별자(SID)를 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/denyonlysid).거부 전용 SID는 보안 가능한 개체에 대해 지정된 엔터티를 거부합니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyWindowsDeviceGroup">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlywindowsdevicegroup.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Dns">
+      <summary>컴퓨터 이름이나 X.509 인증서의 발급자 또는 주체의 대체 이름과 연결된 DNS 이름을 지정하는 클레임에 대한 URI(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/dns)입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Dsa">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/dsa.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Email">
+      <summary>엔터티의 전자 메일 주소를 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Expiration">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/expiration.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Expired">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/expired.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Gender">
+      <summary>엔터티의 성별을 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/gender).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.GivenName">
+      <summary>엔터티의 이름을 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.GroupSid">
+      <summary>엔터티의 그룹의 SID를 지정하는 클레임의 URI입니다(http://schemas.microsoft.com/ws/2008/06/identity/claims/groupsid).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Hash">
+      <summary>해시 값을 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/hash).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.HomePhone">
+      <summary>엔터티의 집 전화 번호를 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/homephone).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.IsPersistent">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/ispersistent.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Locality">
+      <summary>엔터티가 있는 로캘을 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/locality).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.MobilePhone">
+      <summary>엔터티의 휴대폰 번호를 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Name">
+      <summary>엔터티의 이름을 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.NameIdentifier">
+      <summary>엔터티의 이름을 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.OtherPhone">
+      <summary>엔터티의 대체 전화 번호를 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/otherphone).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PostalCode">
+      <summary>엔터티의 우편 번호를 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/postalcode).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PrimaryGroupSid">
+      <summary>엔터티의 주 그룹 SID를 지정하는 클레임의 URI입니다(http://schemas.microsoft.com/ws/2008/06/identity/claims/primarygroupsid).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PrimarySid">
+      <summary>엔터티의 주 SID를 지정하는 URI입니다(http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Role">
+      <summary>엔터티의 역할을 지정하는 클레임의 URI입니다(http://schemas.microsoft.com/ws/2008/06/identity/claims/role).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Rsa">
+      <summary>RSA 키를 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/rsa).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.SerialNumber">
+      <summary>일련 번호를 지정하는 클레임의 URI입니다(http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Sid">
+      <summary>SID(보안 식별자)를 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Spn">
+      <summary>SPN(서비스 사용자 이름) 클레임을 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/spn).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.StateOrProvince">
+      <summary>엔터티가 있는 시/도를 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/stateorprovince).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.StreetAddress">
+      <summary>엔터티의 주소를 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/streetaddress).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Surname">
+      <summary>엔터티의 성을 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.System">
+      <summary>시스템 엔터티를 식별하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/system).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Thumbprint">
+      <summary>지문을 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/thumbprint).지문은 X.509 인증서의 고유한 전역 SHA-1 해시입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Upn">
+      <summary>UPN(사용자 이름)을 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Uri">
+      <summary>URI를 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/uri).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.UserData">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/userdata.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Version">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/version.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Webpage">
+      <summary>엔터티의 웹 페이지를 지정하는 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/webpage).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsAccountName">
+      <summary>엔터티의 Windows 도메인 계정 이름을 지정하는 클레임의 URI입니다(http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsDeviceClaim">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsdeviceclaim.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsDeviceGroup">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsdevicegroup.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsFqbnVersion">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsfqbnversion.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsSubAuthority">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowssubauthority.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsUserClaim">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsuserclaim.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.X500DistinguishedName">
+      <summary>X.509 인증서의 고유 이름 클레임의 URI입니다(http://schemas.xmlsoap.org/ws/2005/05/identity/claims/x500distinguishedname).X.500 표준은 X.509 인증서에서 사용하는 고유 이름을 정의하기 위한 방법을 정의합니다.</summary>
+    </member>
+    <member name="T:System.Security.Claims.ClaimValueTypes">
+      <summary>W3C 및 OASIS로 정의된 형식 URI에 따라 클레임 값 형식을 정의합니다.이 클래스는 상속될 수 없습니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Base64Binary">
+      <summary>base64Binary XML 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Base64Octet">
+      <summary>base64Octet XML 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Boolean">
+      <summary>boolean XML 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Date">
+      <summary>date XML 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DateTime">
+      <summary>dateTime XML 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DaytimeDuration">
+      <summary>daytimeDuration XQuery 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DnsName">
+      <summary>dns SOAP 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Double">
+      <summary>double XML 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DsaKeyValue">
+      <summary>DSAKeyValue XML Signature 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Email">
+      <summary>emailaddress SOAP 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Fqbn">
+      <summary>fqbn XML 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.HexBinary">
+      <summary>hexBinary XML 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer">
+      <summary>integer XML 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer32">
+      <summary>integer32 XML 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer64">
+      <summary>integer64 XML 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.KeyInfo">
+      <summary>KeyInfo XML Signature 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Rfc822Name">
+      <summary>rfc822Name XACML 1.0 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Rsa">
+      <summary>rsa SOAP 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.RsaKeyValue">
+      <summary>RSAKeyValue XML Signature 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Sid">
+      <summary>sid XML 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.String">
+      <summary>string XML 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Time">
+      <summary>time XML 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UInteger32">
+      <summary>uinteger32 XML 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UInteger64">
+      <summary>uinteger64 XML 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UpnName">
+      <summary>UPN SOAP 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.X500Name">
+      <summary>x500Name XACML 1.0 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.YearMonthDuration">
+      <summary>yearMonthDuration XQuery 데이터 형식을 나타내는 URI입니다.</summary>
+    </member>
+    <member name="T:System.Security.Principal.GenericIdentity">
+      <summary>일반 사용자를 나타냅니다.</summary>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.Security.Principal.GenericIdentity)">
+      <summary>지정된 <see cref="T:System.Security.Principal.GenericIdentity" /> 개체를 사용하여 <see cref="T:System.Security.Principal.GenericIdentity" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="identity">
+        <see cref="T:System.Security.Principal.GenericIdentity" />의 새 인스턴스를 만들 개체입니다.</param>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.String)">
+      <summary>지정된 이름의 사용자를 나타내는 <see cref="T:System.Security.Principal.GenericIdentity" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="name">코드를 실행하고 있는 사용자의 이름입니다. </param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="name" /> 매개 변수가 null인 경우 </exception>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.String,System.String)">
+      <summary>지정된 이름 및 인증 형식의 사용자를 나타내는 <see cref="T:System.Security.Principal.GenericIdentity" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="name">코드를 실행하고 있는 사용자의 이름입니다. </param>
+      <param name="type">사용자를 식별하는 데 사용되는 인증 형식입니다. </param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="name" /> 매개 변수가 null인 경우또는 <paramref name="type" /> 매개 변수가 null입니다. </exception>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.AuthenticationType">
+      <summary>사용자를 식별하는 데 사용되는 인증 형식을 가져옵니다.</summary>
+      <returns>사용자를 식별하는 데 사용되는 인증 형식입니다.</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.Claims">
+      <summary>이 제네릭 ID가 나타내는 사용자의 모든 클레임을 가져옵니다.</summary>
+      <returns>이 <see cref="T:System.Security.Principal.GenericIdentity" /> 개체에 대한 클레임의 컬렉션입니다.</returns>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.Clone">
+      <summary>현재 인스턴스의 복사본인 새 개체를 만듭니다.</summary>
+      <returns>현재 인스턴스의 복사본입니다.</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.IsAuthenticated">
+      <summary>사용자가 인증되었는지 여부를 나타내는 값을 가져옵니다.</summary>
+      <returns>사용자가 인증되었으면 true이고, 그렇지 않으면 false입니다.</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.Name">
+      <summary>사용자 이름을 가져옵니다.</summary>
+      <returns>코드를 실행하고 있는 사용자의 이름입니다.</returns>
+    </member>
+    <member name="T:System.Security.Principal.GenericPrincipal">
+      <summary>일반 보안 주체를 나타냅니다.</summary>
+    </member>
+    <member name="M:System.Security.Principal.GenericPrincipal.#ctor(System.Security.Principal.IIdentity,System.String[])">
+      <summary>사용자 ID와 해당 ID가 나타내는 사용자가 속한 역할 이름 배열에서 <see cref="T:System.Security.Principal.GenericPrincipal" /> 클래스의 새 인스턴스를 초기화합니다.</summary>
+      <param name="identity">모든 사용자를 나타내는 <see cref="T:System.Security.Principal.IIdentity" />의 기본 구현입니다. </param>
+      <param name="roles">
+        <paramref name="identity" /> 매개 변수가 나타내는 사용자가 속한 역할 이름 배열입니다. </param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identity" /> 매개 변수가 null입니다. </exception>
+    </member>
+    <member name="P:System.Security.Principal.GenericPrincipal.Identity">
+      <summary>현재 <see cref="T:System.Security.Principal.GenericPrincipal" />이 나타내는 사용자의 <see cref="T:System.Security.Principal.GenericIdentity" />를 가져옵니다.</summary>
+      <returns>
+        <see cref="T:System.Security.Principal.GenericPrincipal" />이 나타내는 사용자의 <see cref="T:System.Security.Principal.GenericIdentity" />입니다.</returns>
+    </member>
+    <member name="M:System.Security.Principal.GenericPrincipal.IsInRole(System.String)">
+      <summary>현재 <see cref="T:System.Security.Principal.GenericPrincipal" />이 지정된 역할에 속하는지 여부를 확인합니다.</summary>
+      <returns>현재 <see cref="T:System.Security.Principal.GenericPrincipal" />이 지정된 역할의 멤버이면 true이고, 그렇지 않으면 false입니다.</returns>
+      <param name="role">멤버 여부를 확인하기 위한 역할의 이름입니다. </param>
+    </member>
+  </members>
+</doc>

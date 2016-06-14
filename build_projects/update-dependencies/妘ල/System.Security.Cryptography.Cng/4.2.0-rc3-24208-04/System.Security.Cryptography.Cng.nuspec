@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2016/06/nuspec.xsd">
+  <metadata minClientVersion="2.12">
+    <id>System.Security.Cryptography.Cng</id>
+    <version>4.2.0-rc3-24208-04</version>
+    <title>System.Security.Cryptography.Cng</title>
+    <authors>Microsoft</authors>
+    <owners>microsoft,dotnetframework</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>http://go.microsoft.com/fwlink/?LinkId=329770</licenseUrl>
+    <projectUrl>https://dot.net/</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <description>Provides cryptographic algorithm implementations and key management with Windows Cryptographic Next Generation API (CNG).
+
+Commonly Used Types:
+System.Security.Cryptography.RSACng
+System.Security.Cryptography.ECDsaCng
+System.Security.Cryptography.CngKey
+ 
+When using NuGet 3.x this package requires at least version 3.4.</description>
+    <releaseNotes>https://go.microsoft.com/fwlink/?LinkID=799417</releaseNotes>
+    <copyright>© Microsoft Corporation.  All rights reserved.</copyright>
+    <serviceable>true</serviceable>
+    <dependencies>
+      <group targetFramework=".NETFramework4.6">
+        <dependency id="System.Security.Cryptography.Algorithms" version="4.2.0-rc3-24208-04" />
+        <dependency id="System.Security.Cryptography.Primitives" version="4.0.0-rc3-24208-04" />
+      </group>
+      <group targetFramework=".NETFramework4.6.1">
+        <dependency id="System.Security.Cryptography.Algorithms" version="4.2.0-rc3-24208-04" />
+        <dependency id="System.Security.Cryptography.Primitives" version="4.0.0-rc3-24208-04" />
+      </group>
+      <group targetFramework=".NETFramework4.6.3">
+        <dependency id="System.Security.Cryptography.Algorithms" version="4.2.0-rc3-24208-04" />
+        <dependency id="System.Security.Cryptography.Primitives" version="4.0.0-rc3-24208-04" />
+      </group>
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="System.IO" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Runtime" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Runtime.Handles" version="4.0.1-rc3-24208-04" />
+        <dependency id="System.Security.Cryptography.Algorithms" version="4.2.0-rc3-24208-04" />
+        <dependency id="System.Security.Cryptography.Primitives" version="4.0.0-rc3-24208-04" />
+      </group>
+      <group targetFramework=".NETStandard1.4">
+        <dependency id="Microsoft.NETCore.Platforms" version="1.0.1-rc3-24208-04" />
+        <dependency id="System.IO" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Resources.ResourceManager" version="4.0.1-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Runtime.Extensions" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime.Handles" version="4.0.1-rc3-24208-04" />
+        <dependency id="System.Runtime.InteropServices" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Security.Cryptography.Algorithms" version="4.2.0-rc3-24208-04" />
+        <dependency id="System.Security.Cryptography.Encoding" version="4.0.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Security.Cryptography.Primitives" version="4.0.0-rc3-24208-04" />
+        <dependency id="System.Text.Encoding" version="4.0.11-rc3-24208-04" exclude="Compile" />
+      </group>
+      <group targetFramework=".NETStandard1.6">
+        <dependency id="Microsoft.NETCore.Platforms" version="1.0.1-rc3-24208-04" />
+        <dependency id="System.IO" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Resources.ResourceManager" version="4.0.1-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Runtime.Extensions" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime.Handles" version="4.0.1-rc3-24208-04" />
+        <dependency id="System.Runtime.InteropServices" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Security.Cryptography.Algorithms" version="4.2.0-rc3-24208-04" />
+        <dependency id="System.Security.Cryptography.Encoding" version="4.0.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Security.Cryptography.Primitives" version="4.0.0-rc3-24208-04" />
+        <dependency id="System.Text.Encoding" version="4.0.11-rc3-24208-04" exclude="Compile" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="mscorlib" targetFramework=".NETFramework4.6" />
+      <frameworkAssembly assemblyName="mscorlib" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="mscorlib" targetFramework=".NETFramework4.6.3" />
+      <frameworkAssembly assemblyName="System.Core" targetFramework=".NETFramework4.6" />
+      <frameworkAssembly assemblyName="System.Core" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Core" targetFramework=".NETFramework4.6.3" />
+    </frameworkAssemblies>
+  </metadata>
+</package>

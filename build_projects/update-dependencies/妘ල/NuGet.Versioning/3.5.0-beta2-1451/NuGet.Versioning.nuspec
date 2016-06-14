@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>NuGet.Versioning</id>
+    <version>3.5.0-beta2-1451</version>
+    <authors>NuGet</authors>
+    <owners>NuGet</owners>
+    <licenseUrl>https://raw.githubusercontent.com/NuGet/NuGet.Client/dev/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/NuGet/NuGet.Client</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>NuGet's implementation of Semantic Versioning.</description>
+    <copyright>Copyright .NET Foundation. All rights reserved.</copyright>
+    <tags>semver,semantic versioning</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.5" />
+      <group targetFramework=".NETStandard1.0">
+        <dependency id="NETStandard.Library" version="[1.6.0-rc3-24208-04, )" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

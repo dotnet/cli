@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Security.Principal</name>
+  </assembly>
+  <members>
+    <member name="T:System.Security.Principal.IIdentity">
+      <summary>Definiert die Grundfunktionen eines Identitätsobjekts.</summary>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.AuthenticationType">
+      <summary>Ruft den Typ der verwendeten Authentifizierung ab.</summary>
+      <returns>Der zur Identifizierung des Benutzers verwendete Authentifizierungstyp.</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.IsAuthenticated">
+      <summary>Ruft einen Wert ab, der angibt, ob der Benutzer authentifiziert wurde.</summary>
+      <returns>true, wenn der Benutzer authentifiziert wurde, andernfalls false.</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.Name">
+      <summary>Ruft den Namen des aktuellen Benutzers ab.</summary>
+      <returns>Der Name des Benutzers, für den der Code ausgeführt wird.</returns>
+    </member>
+    <member name="T:System.Security.Principal.IPrincipal">
+      <summary>Definiert die Grundfunktionen eines Hauptobjekts.</summary>
+    </member>
+    <member name="P:System.Security.Principal.IPrincipal.Identity">
+      <summary>Ruft die Identität des aktuellen Principals ab.</summary>
+      <returns>Das dem aktuellen Principal zugeordnete <see cref="T:System.Security.Principal.IIdentity" />-Objekt.</returns>
+    </member>
+    <member name="M:System.Security.Principal.IPrincipal.IsInRole(System.String)">
+      <summary>Bestimmt, ob der aktuelle Principal zur angegebenen Rolle gehört.</summary>
+      <returns>true, wenn der aktuelle Principal ein Member der angegebenen Rolle ist, andernfalls false.</returns>
+      <param name="role">Der Name der Rolle, für die die Mitgliedschaft überprüft werden soll. </param>
+    </member>
+    <member name="T:System.Security.Principal.TokenImpersonationLevel">
+      <summary>Definiert Ebenen des Sicherheitsidentitätswechsels.Die Ebenen des Sicherheitsidentitätswechsels steuern den Umfang, in dem ein Serverprozess für einen Clientprozess Vorgänge ausführen kann.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Anonymous">
+      <summary>Der Serverprozess kann keine Identifikationsinformationen zum Client abrufen, und er kann nicht die Identität des Clients annehmen.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Delegation">
+      <summary>Der Serverprozess kann den Sicherheitskontext des Clients in Remotesystemen imitieren.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Identification">
+      <summary>Vom Serverprozess können Informationen zum Client abgerufen werden, z. B. die Sicherheits-IDs und Sicherheitsberechtigungen. Der Client kann jedoch nicht imitiert werden.Dies ist nützlich für Server, die eigene Objekte exportieren (z. B. Datenbankprodukte, von denen Tabellen und Ansichten exportiert werden).Mit den abgerufenen Informationen zur Clientsicherheit können vom Server Entscheidungen im Rahmen der Zugriffsvalidierung getroffen werden, ohne dass andere Dienste verwendet werden können, die den Sicherheitskontext des Clients verwenden.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Impersonation">
+      <summary>Der Serverprozess kann den Sicherheitskontext des Clients im lokalen System imitieren.Der Client kann vom Server nicht in Remotesystemen imitiert werden.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.None">
+      <summary>Es ist keine Ebene des Identitätswechsels zugeordnet.</summary>
+    </member>
+  </members>
+</doc>

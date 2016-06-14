@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Security.Principal</name>
+  </assembly>
+  <members>
+    <member name="T:System.Security.Principal.IIdentity">
+      <summary>Defines the basic functionality of an identity object.</summary>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.AuthenticationType">
+      <summary>Gets the type of authentication used.</summary>
+      <returns>The type of authentication used to identify the user.</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.IsAuthenticated">
+      <summary>Gets a value that indicates whether the user has been authenticated.</summary>
+      <returns>true if the user was authenticated; otherwise, false.</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.Name">
+      <summary>Gets the name of the current user.</summary>
+      <returns>The name of the user on whose behalf the code is running.</returns>
+    </member>
+    <member name="T:System.Security.Principal.IPrincipal">
+      <summary>Defines the basic functionality of a principal object.</summary>
+    </member>
+    <member name="P:System.Security.Principal.IPrincipal.Identity">
+      <summary>Gets the identity of the current principal.</summary>
+      <returns>The <see cref="T:System.Security.Principal.IIdentity" /> object associated with the current principal.</returns>
+    </member>
+    <member name="M:System.Security.Principal.IPrincipal.IsInRole(System.String)">
+      <summary>Determines whether the current principal belongs to the specified role.</summary>
+      <returns>true if the current principal is a member of the specified role; otherwise, false.</returns>
+      <param name="role">The name of the role for which to check membership. </param>
+    </member>
+    <member name="T:System.Security.Principal.TokenImpersonationLevel">
+      <summary>Defines security impersonation levels. Security impersonation levels govern the degree to which a server process can act on behalf of a client process.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Anonymous">
+      <summary>The server process cannot obtain identification information about the client, and it cannot impersonate the client.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Delegation">
+      <summary>The server process can impersonate the client's security context on remote systems.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Identification">
+      <summary>The server process can obtain information about the client, such as security identifiers and privileges, but it cannot impersonate the client. This is useful for servers that export their own objects, for example, database products that export tables and views. Using the retrieved client-security information, the server can make access-validation decisions without being able to use other services that are using the client's security context.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Impersonation">
+      <summary>The server process can impersonate the client's security context on its local system. The server cannot impersonate the client on remote systems.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.None">
+      <summary>An impersonation level is not assigned.</summary>
+    </member>
+  </members>
+</doc>

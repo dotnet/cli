@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Security.Principal</name>
+  </assembly>
+  <members>
+    <member name="T:System.Security.Principal.IIdentity">
+      <summary>Définit la fonctionnalité de base d'un objet d'identité.</summary>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.AuthenticationType">
+      <summary>Obtient le type d'authentification utilisé.</summary>
+      <returns>Type d'authentification utilisé pour identifier l'utilisateur.</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.IsAuthenticated">
+      <summary>Obtient une valeur qui indique si l'utilisateur a été authentifié.</summary>
+      <returns>true si l'utilisateur a été identifié ; sinon false.</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.Name">
+      <summary>Obtient le nom de l'utilisateur en cours.</summary>
+      <returns>Nom de l'utilisateur au nom duquel le code est en cours d'exécution.</returns>
+    </member>
+    <member name="T:System.Security.Principal.IPrincipal">
+      <summary>Définit la fonctionnalité de base d'un objet principal.</summary>
+    </member>
+    <member name="P:System.Security.Principal.IPrincipal.Identity">
+      <summary>Obtient l'identité de l'objet Principal actuel.</summary>
+      <returns>Objet <see cref="T:System.Security.Principal.IIdentity" /> associé à l'entité de sécurité actuelle.</returns>
+    </member>
+    <member name="M:System.Security.Principal.IPrincipal.IsInRole(System.String)">
+      <summary>Détermine si l'entité de sécurité actuelle appartient au rôle spécifié.</summary>
+      <returns>true si l'entité de sécurité actuelle est un membre du rôle spécifié ; sinon, false.</returns>
+      <param name="role">Nom du rôle pour lequel l'appartenance (membership) doit être vérifiée. </param>
+    </member>
+    <member name="T:System.Security.Principal.TokenImpersonationLevel">
+      <summary>Définit des niveaux d'emprunt d'identité de sécurité.Les niveaux d'emprunt d'identité de sécurité régissent le degré auquel un processus serveur peut agir au nom d'un processus client.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Anonymous">
+      <summary>Le processus serveur ne peut pas obtenir d'informations d'identification à propos du client et ne peut pas emprunter l'identité du client.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Delegation">
+      <summary>Le processus serveur peut emprunter l'identité du contexte de sécurité du client sur les systèmes distants.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Identification">
+      <summary>Le processus serveur peut obtenir des informations à propos du client, tels que les identificateurs de sécurité et les privilèges, mais il ne peut pas emprunter l'identité du client.Cela est utile pour les serveurs qui exportent leurs propres objets, par exemple les produits de base de données qui exportent des tables et des vues.À l'aide des informations de sécurité de client récupérées, le serveur peut prendre des décisions concernant la validation d'accès sans pouvoir utiliser d'autres services utilisant le contexte de sécurité du client.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Impersonation">
+      <summary>Le processus serveur peut emprunter l'identité du contexte de sécurité du client sur le système local.Le serveur ne peut pas emprunter l'identité du client sur les systèmes distants.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.None">
+      <summary>Aucun niveau d'emprunt d'identité n'est assigné.</summary>
+    </member>
+  </members>
+</doc>

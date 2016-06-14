@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Security.Principal</name>
+  </assembly>
+  <members>
+    <member name="T:System.Security.Principal.IIdentity">
+      <summary>定義識別 (Identity) 物件的基本功能。</summary>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.AuthenticationType">
+      <summary>取得所使用的驗證 (Authentication) 類型。</summary>
+      <returns>用來識別使用者的驗證類型。</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.IsAuthenticated">
+      <summary>取得值，表示使用者是否已經驗證。</summary>
+      <returns>如果使用者已驗證，則為 true，否則為 false。</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.Name">
+      <summary>取得目前使用者的名稱。</summary>
+      <returns>程式碼正在代表其執行的使用者名稱。</returns>
+    </member>
+    <member name="T:System.Security.Principal.IPrincipal">
+      <summary>定義原則物件的基本功能。</summary>
+    </member>
+    <member name="P:System.Security.Principal.IPrincipal.Identity">
+      <summary>取得目前主要物件的識別。</summary>
+      <returns>與目前原則物件相關聯的 <see cref="T:System.Security.Principal.IIdentity" />。</returns>
+    </member>
+    <member name="M:System.Security.Principal.IPrincipal.IsInRole(System.String)">
+      <summary>判斷目前的原則物件是否屬於指定的角色。</summary>
+      <returns>如果目前的原則物件是指定角色的成員，則為 true，否則為 false。</returns>
+      <param name="role">用來檢查成員資格的角色名稱。</param>
+    </member>
+    <member name="T:System.Security.Principal.TokenImpersonationLevel">
+      <summary>定義安全性模擬等級。安全性模擬等級管理伺服器處理序可以代表用戶端處理序執行動作的程度。</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Anonymous">
+      <summary>伺服器處理序無法取得用戶端的識別資訊，也無法模擬用戶端。</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Delegation">
+      <summary>伺服器處理序可在遠端系統上模擬用戶端的安全性內容。</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Identification">
+      <summary>伺服器處理序可以取得關於用戶端的資訊，例如安全識別項 (Security Identifier) 和權限，但無法模擬用戶端。對於匯出其自己的物件之伺服器 (例如匯出資料表和檢視表的資料庫產品) 而言，這將會很有用。藉由使用所擷取的用戶端安全性資訊，伺服器便可做出存取驗證決策，而不用具備使用其他服務的能力，這些服務使用用戶端的安全性內容。</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Impersonation">
+      <summary>伺服器處理序可在其本機系統上模擬用戶端的安全性內容。伺服器無法在遠端系統上模擬用戶端。</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.None">
+      <summary>未指派模擬等級。</summary>
+    </member>
+  </members>
+</doc>

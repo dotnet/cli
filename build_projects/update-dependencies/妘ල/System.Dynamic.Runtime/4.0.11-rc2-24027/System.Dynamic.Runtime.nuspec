@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata minClientVersion="3.4">
+    <id>System.Dynamic.Runtime</id>
+    <version>4.0.11-rc2-24027</version>
+    <title>System.Dynamic.Runtime</title>
+    <authors>Microsoft</authors>
+    <owners>microsoft,dotnetframework</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>http://go.microsoft.com/fwlink/?LinkId=329770</licenseUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <description>Provides classes and interfaces that support the Dynamic Language Runtime (DLR).
+
+Commonly Used Types:
+System.Runtime.CompilerServices.CallSite
+System.Runtime.CompilerServices.CallSite&lt;T&gt;
+System.Dynamic.IDynamicMetaObjectProvider
+System.Dynamic.DynamicMetaObject
+System.Dynamic.SetMemberBinder
+System.Dynamic.GetMemberBinder
+System.Dynamic.ExpandoObject
+System.Dynamic.DynamicObject
+System.Runtime.CompilerServices.CallSiteBinder
+System.Runtime.CompilerServices.ConditionalWeakTable&lt;TKey, TValue&gt;
+ \r\n TFS ID: 1599443, GitHub SHA: https://github.com/dotnet/corefx/tree/eede273a4dfabcea608621f5e1bbf8ad00584cfb</description>
+    <copyright>© Microsoft Corporation.  All rights reserved.</copyright>
+    <dependencies>
+      <group targetFramework="MonoAndroid1.0" />
+      <group targetFramework="MonoTouch1.0" />
+      <group targetFramework=".NETFramework4.5" />
+      <group targetFramework=".NETCore5.0">
+        <dependency id="System.Collections" version="4.0.11-rc2-24027" exclude="Compile" />
+        <dependency id="System.Diagnostics.Debug" version="4.0.11-rc2-24027" exclude="Compile" />
+        <dependency id="System.Globalization" version="4.0.11-rc2-24027" exclude="Compile" />
+        <dependency id="System.Linq" version="4.1.0-rc2-24027" exclude="Compile" />
+        <dependency id="System.Linq.Expressions" version="4.0.11-rc2-24027" />
+        <dependency id="System.ObjectModel" version="4.0.12-rc2-24027" />
+        <dependency id="System.Reflection" version="4.1.0-rc2-24027" />
+        <dependency id="System.Reflection.TypeExtensions" version="4.1.0-rc2-24027" exclude="Compile" />
+        <dependency id="System.Resources.ResourceManager" version="4.0.1-rc2-24027" exclude="Compile" />
+        <dependency id="System.Runtime" version="4.1.0-rc2-24027" />
+        <dependency id="System.Runtime.Extensions" version="4.1.0-rc2-24027" exclude="Compile" />
+        <dependency id="System.Threading" version="4.0.11-rc2-24027" exclude="Compile" />
+      </group>
+      <group targetFramework=".NETStandard1.0">
+        <dependency id="System.Linq.Expressions" version="4.0.11-rc2-24027" />
+        <dependency id="System.ObjectModel" version="4.0.12-rc2-24027" />
+        <dependency id="System.Reflection" version="4.1.0-rc2-24027" />
+        <dependency id="System.Runtime" version="4.1.0-rc2-24027" />
+      </group>
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="System.Collections" version="4.0.11-rc2-24027" exclude="Compile" />
+        <dependency id="System.Diagnostics.Debug" version="4.0.11-rc2-24027" exclude="Compile" />
+        <dependency id="System.Globalization" version="4.0.11-rc2-24027" exclude="Compile" />
+        <dependency id="System.Linq" version="4.1.0-rc2-24027" exclude="Compile" />
+        <dependency id="System.Linq.Expressions" version="4.0.11-rc2-24027" />
+        <dependency id="System.ObjectModel" version="4.0.12-rc2-24027" />
+        <dependency id="System.Reflection" version="4.1.0-rc2-24027" />
+        <dependency id="System.Reflection.Emit" version="4.0.1-rc2-24027" exclude="Compile" />
+        <dependency id="System.Reflection.Emit.ILGeneration" version="4.0.1-rc2-24027" exclude="Compile" />
+        <dependency id="System.Reflection.Primitives" version="4.0.1-rc2-24027" exclude="Compile" />
+        <dependency id="System.Reflection.TypeExtensions" version="4.1.0-rc2-24027" exclude="Compile" />
+        <dependency id="System.Resources.ResourceManager" version="4.0.1-rc2-24027" exclude="Compile" />
+        <dependency id="System.Runtime" version="4.1.0-rc2-24027" />
+        <dependency id="System.Runtime.Extensions" version="4.1.0-rc2-24027" exclude="Compile" />
+        <dependency id="System.Threading" version="4.0.11-rc2-24027" exclude="Compile" />
+      </group>
+      <group targetFramework=".NETPortable0.0-Profile259" />
+      <group targetFramework="Windows8.0" />
+      <group targetFramework="WindowsPhone8.0" />
+      <group targetFramework="WindowsPhoneApp8.1" />
+      <group targetFramework="Xamarin.iOS1.0" />
+      <group targetFramework="Xamarin.Mac2.0" />
+      <group targetFramework="Xamarin.TVOS1.0" />
+      <group targetFramework="Xamarin.WatchOS1.0" />
+    </dependencies>
+  </metadata>
+</package>

@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Threading.ThreadPool</name>
+  </assembly>
+  <members>
+    <member name="T:System.Threading.RegisteredWaitHandle">
+      <summary>表示在调用 <see cref="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.UInt32,System.Boolean)" /> 时已注册的句柄。此类不能被继承。</summary>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="M:System.Threading.RegisteredWaitHandle.Unregister(System.Threading.WaitHandle)">
+      <summary>取消由 <see cref="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.UInt32,System.Boolean)" /> 方法发出的已注册等待操作。</summary>
+      <returns>如果函数成功，则为 true；否则为 false。</returns>
+      <param name="waitObject">要发出信号的 <see cref="T:System.Threading.WaitHandle" />。</param>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="T:System.Threading.ThreadPool">
+      <summary>提供一个线程池，该线程池可用于执行任务、发送工作项、处理异步 I/O、代表其他线程等待以及处理计时器。</summary>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.BindHandle(System.Runtime.InteropServices.SafeHandle)">
+      <summary>[SECURITY CRITICAL] 将操作系统句柄绑定到 <see cref="T:System.Threading.ThreadPool" />。</summary>
+      <returns>如果绑定了句柄，则为 true；否则为 false。</returns>
+      <param name="osHandle">保存操作系统句柄的 <see cref="T:System.Runtime.InteropServices.SafeHandle" />。在非托管端必须为重叠 I/O 打开该句柄。</param>
+    </member>
+    <member name="M:System.Threading.ThreadPool.QueueUserWorkItem(System.Threading.WaitCallback)">
+      <summary>将方法排入队列以便执行。此方法在有线程池线程变得可用时执行。</summary>
+      <returns>如果此方法成功排队，则为 true；如果无法将该工作项排队，则引发 <see cref="T:System.NotSupportedException" />。</returns>
+      <param name="callBack">一个 <see cref="T:System.Threading.WaitCallback" />，表示要执行的方法。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="callBack" /> is null.</exception>
+      <exception cref="T:System.NotSupportedException">The common language runtime (CLR) is hosted, and the host does not support this action.</exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.QueueUserWorkItem(System.Threading.WaitCallback,System.Object)">
+      <summary>将方法排入队列以便执行，并指定包含该方法所用数据的对象。此方法在有线程池线程变得可用时执行。</summary>
+      <returns>如果此方法成功排队，则为 true；如果无法将该工作项排队，则引发 <see cref="T:System.NotSupportedException" />。</returns>
+      <param name="callBack">
+        <see cref="T:System.Threading.WaitCallback" />，它表示要执行的方法。</param>
+      <param name="state">包含方法所用数据的对象。</param>
+      <exception cref="T:System.NotSupportedException">The common language runtime (CLR) is hosted, and the host does not support this action.</exception>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="callBack" /> is null.</exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.Int32,System.Boolean)">
+      <summary>注册一个等待 <see cref="T:System.Threading.WaitHandle" /> 的委托，并指定一个 32 位有符号整数来表示超时值（以毫秒为单位）。</summary>
+      <returns>封装本机句柄的 <see cref="T:System.Threading.RegisteredWaitHandle" />。</returns>
+      <param name="waitObject">要注册的 <see cref="T:System.Threading.WaitHandle" />。使用 <see cref="T:System.Threading.WaitHandle" /> 而非 <see cref="T:System.Threading.Mutex" />。</param>
+      <param name="callBack">向 <paramref name="waitObject" /> 参数发出信号时调用的 <see cref="T:System.Threading.WaitOrTimerCallback" /> 委托。</param>
+      <param name="state">传递给委托的对象。</param>
+      <param name="millisecondsTimeOutInterval">以毫秒为单位的超时。如果 <paramref name="millisecondsTimeOutInterval" /> 参数为 0（零），函数将测试对象的状态并立即返回。如果 <paramref name="millisecondsTimeOutInterval" /> 为 -1，则函数的超时间隔永远不过期。</param>
+      <param name="executeOnlyOnce">如果为 true，表示在调用了委托后，线程将不再在 <paramref name="waitObject" /> 参数上等待；如果为 false，表示每次完成等待操作后都重置计时器，直到注销等待。</param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="millisecondsTimeOutInterval" /> parameter is less than -1. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.Int64,System.Boolean)">
+      <summary>注册一个等待 <see cref="T:System.Threading.WaitHandle" /> 的委托，并指定一个 64 位有符号整数来表示超时值（以毫秒为单位）。</summary>
+      <returns>封装本机句柄的 <see cref="T:System.Threading.RegisteredWaitHandle" />。</returns>
+      <param name="waitObject">要注册的 <see cref="T:System.Threading.WaitHandle" />。使用 <see cref="T:System.Threading.WaitHandle" /> 而非 <see cref="T:System.Threading.Mutex" />。</param>
+      <param name="callBack">向 <paramref name="waitObject" /> 参数发出信号时调用的 <see cref="T:System.Threading.WaitOrTimerCallback" /> 委托。</param>
+      <param name="state">传递给委托的对象。</param>
+      <param name="millisecondsTimeOutInterval">以毫秒为单位的超时。如果 <paramref name="millisecondsTimeOutInterval" /> 参数为 0（零），函数将测试对象的状态并立即返回。如果 <paramref name="millisecondsTimeOutInterval" /> 为 -1，则函数的超时间隔永远不过期。</param>
+      <param name="executeOnlyOnce">如果为 true，表示在调用了委托后，线程将不再在 <paramref name="waitObject" /> 参数上等待；如果为 false，表示每次完成等待操作后都重置计时器，直到注销等待。</param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="millisecondsTimeOutInterval" /> parameter is less than -1. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.TimeSpan,System.Boolean)">
+      <summary>注册一个等待 <see cref="T:System.Threading.WaitHandle" /> 的委托，并指定一个 <see cref="T:System.TimeSpan" /> 值来表示超时时间。</summary>
+      <returns>封装本机句柄的 <see cref="T:System.Threading.RegisteredWaitHandle" />。</returns>
+      <param name="waitObject">要注册的 <see cref="T:System.Threading.WaitHandle" />。使用 <see cref="T:System.Threading.WaitHandle" /> 而非 <see cref="T:System.Threading.Mutex" />。</param>
+      <param name="callBack">向 <paramref name="waitObject" /> 参数发出信号时调用的 <see cref="T:System.Threading.WaitOrTimerCallback" /> 委托。</param>
+      <param name="state">传递给委托的对象。</param>
+      <param name="timeout">
+        <see cref="T:System.TimeSpan" /> 表示的超时时间。如果 <paramref name="timeout" /> 为 0（零），则函数将测试对象的状态并立即返回。如果 <paramref name="timeout" /> 为 -1，则函数的超时间隔永远不过期。</param>
+      <param name="executeOnlyOnce">如果为 true，表示在调用了委托后，线程将不再在 <paramref name="waitObject" /> 参数上等待；如果为 false，表示每次完成等待操作后都重置计时器，直到注销等待。</param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="timeout" /> parameter is less than -1. </exception>
+      <exception cref="T:System.NotSupportedException">The <paramref name="timeout" /> parameter is greater than <see cref="F:System.Int32.MaxValue" />. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.UInt32,System.Boolean)">
+      <summary>指定表示超时（以毫秒为单位）的 32 位无符号整数，注册一个委托等待 <see cref="T:System.Threading.WaitHandle" />。</summary>
+      <returns>
+        <see cref="T:System.Threading.RegisteredWaitHandle" />，可用于取消已注册的等待操作。</returns>
+      <param name="waitObject">要注册的 <see cref="T:System.Threading.WaitHandle" />。使用 <see cref="T:System.Threading.WaitHandle" /> 而非 <see cref="T:System.Threading.Mutex" />。</param>
+      <param name="callBack">向 <paramref name="waitObject" /> 参数发出信号时调用的 <see cref="T:System.Threading.WaitOrTimerCallback" /> 委托。</param>
+      <param name="state">传递给委托的对象。</param>
+      <param name="millisecondsTimeOutInterval">以毫秒为单位的超时。如果 <paramref name="millisecondsTimeOutInterval" /> 参数为 0（零），函数将测试对象的状态并立即返回。如果 <paramref name="millisecondsTimeOutInterval" /> 为 -1，则函数的超时间隔永远不过期。</param>
+      <param name="executeOnlyOnce">如果为 true，表示在调用了委托后，线程将不再在 <paramref name="waitObject" /> 参数上等待；如果为 false，表示每次完成等待操作后都重置计时器，直到注销等待。</param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="millisecondsTimeOutInterval" /> parameter is less than -1. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="T:System.Threading.WaitCallback">
+      <summary>表示线程池线程要执行的回调方法。</summary>
+      <param name="state">包含回调方法要使用的信息的对象。</param>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="T:System.Threading.WaitOrTimerCallback">
+      <summary>表示当 <see cref="T:System.Threading.WaitHandle" /> 超时或终止时要调用的方法。</summary>
+      <param name="state">一个对象，包含回调方法在每次执行时要使用的信息。</param>
+      <param name="timedOut">如果 <see cref="T:System.Threading.WaitHandle" /> 超时，则为 true；如果其终止，则为 false。</param>
+      <filterpriority>2</filterpriority>
+    </member>
+  </members>
+</doc>

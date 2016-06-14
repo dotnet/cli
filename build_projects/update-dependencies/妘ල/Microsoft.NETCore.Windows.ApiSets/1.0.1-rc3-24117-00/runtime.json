@@ -1,0 +1,37 @@
+{
+  "runtimes": {
+    "win10": {
+      "Microsoft.NETCore.Windows.ApiSets": {}
+    },
+    "win7-x64": {
+      "Microsoft.NETCore.Windows.ApiSets": {
+        "runtime.win7-x64.Microsoft.NETCore.Windows.ApiSets": "1.0.1-rc3-24117-00"
+      }
+    },
+    "win7-x86": {
+      "Microsoft.NETCore.Windows.ApiSets": {
+        "runtime.win7-x86.Microsoft.NETCore.Windows.ApiSets": "1.0.1-rc3-24117-00"
+      }
+    },
+    "win8-x64": {
+      "Microsoft.NETCore.Windows.ApiSets": {
+        "runtime.win8-x64.Microsoft.NETCore.Windows.ApiSets": "1.0.1-rc3-24117-00"
+      }
+    },
+    "win8-x86": {
+      "Microsoft.NETCore.Windows.ApiSets": {
+        "runtime.win8-x86.Microsoft.NETCore.Windows.ApiSets": "1.0.1-rc3-24117-00"
+      }
+    },
+    "win81-x64": {
+      "Microsoft.NETCore.Windows.ApiSets": {
+        "runtime.win81-x64.Microsoft.NETCore.Windows.ApiSets": "1.0.1-rc3-24117-00"
+      }
+    },
+    "win81-x86": {
+      "Microsoft.NETCore.Windows.ApiSets": {
+        "runtime.win81-x86.Microsoft.NETCore.Windows.ApiSets": "1.0.1-rc3-24117-00"
+      }
+    }
+  }
+}

@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2016/06/nuspec.xsd">
+  <metadata minClientVersion="2.12">
+    <id>System.IO.Compression</id>
+    <version>4.1.0-rc3-24208-04</version>
+    <title>System.IO.Compression</title>
+    <authors>Microsoft</authors>
+    <owners>microsoft,dotnetframework</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>http://go.microsoft.com/fwlink/?LinkId=329770</licenseUrl>
+    <projectUrl>https://dot.net/</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <description>Provides classes that support the compression and decompression of streams.
+
+Commonly Used Types:
+System.IO.Compression.DeflateStream
+System.IO.Compression.GZipStream
+System.IO.Compression.CompressionMode
+System.IO.Compression.CompressionLevel
+System.IO.Compression.ZipArchiveEntry
+System.IO.Compression.ZipArchive
+System.IO.Compression.ZipArchiveMode
+ 
+When using NuGet 3.x this package requires at least version 3.4.</description>
+    <releaseNotes>https://go.microsoft.com/fwlink/?LinkID=799417</releaseNotes>
+    <copyright>© Microsoft Corporation.  All rights reserved.</copyright>
+    <serviceable>true</serviceable>
+    <dependencies>
+      <group targetFramework="MonoAndroid1.0" />
+      <group targetFramework="MonoTouch1.0" />
+      <group targetFramework=".NETFramework4.5" />
+      <group targetFramework=".NETFramework4.6" />
+      <group targetFramework=".NETCore5.0">
+        <dependency id="System.IO" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Runtime" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Text.Encoding" version="4.0.11-rc3-24208-04" />
+        <dependency id="System.Threading.Tasks" version="4.0.11-rc3-24208-04" />
+      </group>
+      <group targetFramework=".NETStandard1.1">
+        <dependency id="System.IO" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Runtime" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Text.Encoding" version="4.0.11-rc3-24208-04" />
+      </group>
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="Microsoft.NETCore.Platforms" version="1.0.1-rc3-24208-04" />
+        <dependency id="runtime.native.System" version="4.0.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="runtime.native.System.IO.Compression" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Collections" version="4.0.11-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Diagnostics.Debug" version="4.0.11-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.IO" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Resources.ResourceManager" version="4.0.1-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Runtime.Extensions" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime.Handles" version="4.0.1-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime.InteropServices" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Text.Encoding" version="4.0.11-rc3-24208-04" />
+        <dependency id="System.Threading" version="4.0.11-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Threading.Tasks" version="4.0.11-rc3-24208-04" />
+      </group>
+      <group targetFramework=".NETPortable0.0-Profile111" />
+      <group targetFramework="Windows8.0" />
+      <group targetFramework="WindowsPhoneApp8.1" />
+      <group targetFramework="Xamarin.iOS1.0" />
+      <group targetFramework="Xamarin.Mac2.0" />
+      <group targetFramework="Xamarin.TVOS1.0" />
+      <group targetFramework="Xamarin.WatchOS1.0" />
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="mscorlib" targetFramework=".NETFramework4.6" />
+      <frameworkAssembly assemblyName="System" targetFramework=".NETFramework4.6" />
+      <frameworkAssembly assemblyName="System.IO.Compression" targetFramework=".NETFramework4.5" />
+      <frameworkAssembly assemblyName="System.IO.Compression" targetFramework="MonoAndroid1.0" />
+      <frameworkAssembly assemblyName="System.IO.Compression" targetFramework="MonoTouch1.0" />
+      <frameworkAssembly assemblyName="System.IO.Compression" targetFramework="Xamarin.iOS1.0" />
+      <frameworkAssembly assemblyName="System.IO.Compression" targetFramework="Xamarin.Mac2.0" />
+      <frameworkAssembly assemblyName="System.IO.Compression" targetFramework="Xamarin.TVOS1.0" />
+      <frameworkAssembly assemblyName="System.IO.Compression" targetFramework="Xamarin.WatchOS1.0" />
+    </frameworkAssemblies>
+  </metadata>
+</package>
