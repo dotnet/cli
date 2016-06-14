@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Security.Principal</name>
+  </assembly>
+  <members>
+    <member name="T:System.Security.Principal.IIdentity">
+      <summary>Define la funcionalidad básica de un objeto de identidad.</summary>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.AuthenticationType">
+      <summary>Obtiene el tipo de autenticación utilizado.</summary>
+      <returns>Tipo de autenticación utilizado para identificar al usuario.</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.IsAuthenticated">
+      <summary>Obtiene un valor que indica si el usuario se ha autenticado.</summary>
+      <returns>true si se ha autenticado al usuario; en caso contrario, false.</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.Name">
+      <summary>Obtiene el nombre del usuario actual.</summary>
+      <returns>Usuario en cuyo nombre se ejecuta el código.</returns>
+    </member>
+    <member name="T:System.Security.Principal.IPrincipal">
+      <summary>Define la funcionalidad básica de un objeto de entidad de seguridad.</summary>
+    </member>
+    <member name="P:System.Security.Principal.IPrincipal.Identity">
+      <summary>Obtiene la identidad de la entidad de seguridad actual.</summary>
+      <returns>Objeto <see cref="T:System.Security.Principal.IIdentity" /> asociado a la entidad de seguridad actual.</returns>
+    </member>
+    <member name="M:System.Security.Principal.IPrincipal.IsInRole(System.String)">
+      <summary>Determina si la entidad de seguridad actual pertenece al rol especificado.</summary>
+      <returns>Es true si la entidad de seguridad actual es un miembro del rol especificado; en caso contrario, es false.</returns>
+      <param name="role">Nombre del rol cuya condición de pertenencia se va a comprobar. </param>
+    </member>
+    <member name="T:System.Security.Principal.TokenImpersonationLevel">
+      <summary>Define los niveles de suplantación de seguridad.Los niveles de suplantación de seguridad determinan el grado en el que un proceso de servidor puede actuar en nombre de un proceso de cliente.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Anonymous">
+      <summary>El proceso de servidor no puede obtener información de identificación del cliente y no puede suplantarlo.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Delegation">
+      <summary>El proceso de servidor puede suplantar el contexto de seguridad del cliente en sistemas remotos.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Identification">
+      <summary>El proceso de servidor puede obtener información sobre el cliente, como identificadores de seguridad y privilegios, pero no puede suplantarlo.Esto es útil en el caso de servidores que exportan sus propios objetos, como productos de base de datos que exportan tablas y vistas.Con la información de seguridad del cliente recuperada, el servidor puede tomar decisiones de validación de acceso sin poder usar otros servicios que están utilizando el contexto de seguridad del cliente.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Impersonation">
+      <summary>El proceso de servidor puede suplantar el contexto de seguridad del cliente en su sistema local.El servidor no puede suplantar al cliente en sistemas remotos.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.None">
+      <summary>No se ha asignado un nivel de suplantación.</summary>
+    </member>
+  </members>
+</doc>

@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Threading.ThreadPool</name>
+  </assembly>
+  <members>
+    <member name="T:System.Threading.RegisteredWaitHandle">
+      <summary>代表呼叫 <see cref="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.UInt32,System.Boolean)" /> 時已經登錄的控制代碼。此類別無法被繼承。</summary>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="M:System.Threading.RegisteredWaitHandle.Unregister(System.Threading.WaitHandle)">
+      <summary>將 <see cref="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.UInt32,System.Boolean)" /> 方法所發出之已登錄等候作業取消。</summary>
+      <returns>如果函式成功，則為 true，否則為 false。</returns>
+      <param name="waitObject">要通知的 <see cref="T:System.Threading.WaitHandle" />。</param>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="T:System.Threading.ThreadPool">
+      <summary>提供執行緒的集區，可用來執行工作、張貼工作項目、處理非同步 I/O、代表其他執行緒等候，以及處理計時器。</summary>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.BindHandle(System.Runtime.InteropServices.SafeHandle)">
+      <summary>[安全性關鍵] 可將作業系統的控制代碼繫結至 <see cref="T:System.Threading.ThreadPool" />。</summary>
+      <returns>如果控制代碼已繫結，則為 true；否則為 false。</returns>
+      <param name="osHandle">
+        <see cref="T:System.Runtime.InteropServices.SafeHandle" />，持有作業系統控制代碼。控制代碼必須已經對 Unmanaged 側的重疊 I/O 開啟。</param>
+    </member>
+    <member name="M:System.Threading.ThreadPool.QueueUserWorkItem(System.Threading.WaitCallback)">
+      <summary>將方法排入佇列，以等候執行。可以使用執行緒集區執行緒時，即可執行這個方法。</summary>
+      <returns>如果方法已成功排入佇列，則為 true；如果無法將工作項目排入佇列，則會擲回 <see cref="T:System.NotSupportedException" />。</returns>
+      <param name="callBack">
+        <see cref="T:System.Threading.WaitCallback" />，代表要執行的方法。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="callBack" /> is null.</exception>
+      <exception cref="T:System.NotSupportedException">The common language runtime (CLR) is hosted, and the host does not support this action.</exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.QueueUserWorkItem(System.Threading.WaitCallback,System.Object)">
+      <summary>將方法排入佇列，以等候執行，並指定包含這個方法所要使用之資料的物件。可以使用執行緒集區執行緒時，即可執行這個方法。</summary>
+      <returns>如果方法已成功排入佇列，則為 true；如果無法將工作項目排入佇列，則會擲回 <see cref="T:System.NotSupportedException" />。</returns>
+      <param name="callBack">
+        <see cref="T:System.Threading.WaitCallback" />，代表要執行的方法。</param>
+      <param name="state">物件，包含這個方法所要使用的資料。</param>
+      <exception cref="T:System.NotSupportedException">The common language runtime (CLR) is hosted, and the host does not support this action.</exception>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="callBack" /> is null.</exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.Int32,System.Boolean)">
+      <summary>指定 32 位元帶正負號的整數表示逾時值 (以毫秒為單位)，藉此註冊要等候 <see cref="T:System.Threading.WaitHandle" /> 的委派。</summary>
+      <returns>封裝原生控制代碼的 <see cref="T:System.Threading.RegisteredWaitHandle" />。</returns>
+      <param name="waitObject">要註冊的 <see cref="T:System.Threading.WaitHandle" />。使用 <see cref="T:System.Threading.WaitHandle" />，而不要使用 <see cref="T:System.Threading.Mutex" />。</param>
+      <param name="callBack">通知 <paramref name="waitObject" /> 參數時要呼叫的 <see cref="T:System.Threading.WaitOrTimerCallback" /> 委派。</param>
+      <param name="state">傳遞至委派的物件。</param>
+      <param name="millisecondsTimeOutInterval">逾時以毫秒為單位。如果 <paramref name="millisecondsTimeOutInterval" /> 參數為 0 (零)，函式會測試物件的狀態並立即傳回。如果 <paramref name="millisecondsTimeOutInterval" /> 為 -1，則絕對不會耗用函式的逾時間隔。</param>
+      <param name="executeOnlyOnce">true 表示在呼叫委派之後，執行緒將不再等候 <paramref name="waitObject" /> 參數；false 表示每當等候作業完成即重設計時器，直到移除註冊等候作業為止。</param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="millisecondsTimeOutInterval" /> parameter is less than -1. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.Int64,System.Boolean)">
+      <summary>指定 64 位元帶正負號的整數表示逾時值 (以毫秒為單位)，藉此註冊要等候 <see cref="T:System.Threading.WaitHandle" /> 的委派。</summary>
+      <returns>封裝原生控制代碼的 <see cref="T:System.Threading.RegisteredWaitHandle" />。</returns>
+      <param name="waitObject">要註冊的 <see cref="T:System.Threading.WaitHandle" />。使用 <see cref="T:System.Threading.WaitHandle" />，而不要使用 <see cref="T:System.Threading.Mutex" />。</param>
+      <param name="callBack">通知 <paramref name="waitObject" /> 參數時要呼叫的 <see cref="T:System.Threading.WaitOrTimerCallback" /> 委派。</param>
+      <param name="state">傳送至委派的物件。</param>
+      <param name="millisecondsTimeOutInterval">逾時以毫秒為單位。如果 <paramref name="millisecondsTimeOutInterval" /> 參數為 0 (零)，函式會測試物件的狀態並立即傳回。如果 <paramref name="millisecondsTimeOutInterval" /> 為 -1，則絕對不會耗用函式的逾時間隔。</param>
+      <param name="executeOnlyOnce">true 表示在呼叫委派之後，執行緒將不再等候 <paramref name="waitObject" /> 參數；false 表示每當等候作業完成即重設計時器，直到移除註冊等候作業為止。</param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="millisecondsTimeOutInterval" /> parameter is less than -1. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.TimeSpan,System.Boolean)">
+      <summary>指定 <see cref="T:System.TimeSpan" /> 值表示逾時值，藉此註冊要等候 <see cref="T:System.Threading.WaitHandle" /> 的委派。</summary>
+      <returns>封裝原生控制代碼的 <see cref="T:System.Threading.RegisteredWaitHandle" />。</returns>
+      <param name="waitObject">要註冊的 <see cref="T:System.Threading.WaitHandle" />。使用 <see cref="T:System.Threading.WaitHandle" />，而不要使用 <see cref="T:System.Threading.Mutex" />。</param>
+      <param name="callBack">通知 <paramref name="waitObject" /> 參數時要呼叫的 <see cref="T:System.Threading.WaitOrTimerCallback" /> 委派。</param>
+      <param name="state">傳送至委派的物件。</param>
+      <param name="timeout">以 <see cref="T:System.TimeSpan" /> 表示的逾時值。如果 <paramref name="timeout" /> 為 0 (零)，則函式會測試物件的狀態並立即傳回。如果 <paramref name="timeout" /> 為 -1，則絕對不會耗用函式的逾時間隔。</param>
+      <param name="executeOnlyOnce">true 表示在呼叫委派之後，執行緒將不再等候 <paramref name="waitObject" /> 參數；false 表示每當等候作業完成即重設計時器，直到移除註冊等候作業為止。</param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="timeout" /> parameter is less than -1. </exception>
+      <exception cref="T:System.NotSupportedException">The <paramref name="timeout" /> parameter is greater than <see cref="F:System.Int32.MaxValue" />. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.UInt32,System.Boolean)">
+      <summary>指定 32 位元帶正負號的整數表示逾時值 (以毫秒為單位)，藉此註冊要等候 <see cref="T:System.Threading.WaitHandle" /> 的委派。</summary>
+      <returns>可用來取消已註冊之等候作業的 <see cref="T:System.Threading.RegisteredWaitHandle" />。</returns>
+      <param name="waitObject">要註冊的 <see cref="T:System.Threading.WaitHandle" />。使用 <see cref="T:System.Threading.WaitHandle" />，而不要使用 <see cref="T:System.Threading.Mutex" />。</param>
+      <param name="callBack">通知 <paramref name="waitObject" /> 參數時要呼叫的 <see cref="T:System.Threading.WaitOrTimerCallback" /> 委派。</param>
+      <param name="state">傳送至委派的物件。</param>
+      <param name="millisecondsTimeOutInterval">逾時以毫秒為單位。如果 <paramref name="millisecondsTimeOutInterval" /> 參數為 0 (零)，函式會測試物件的狀態並立即傳回。如果 <paramref name="millisecondsTimeOutInterval" /> 為 -1，則絕對不會耗用函式的逾時間隔。</param>
+      <param name="executeOnlyOnce">true 表示在呼叫委派之後，執行緒將不再等候 <paramref name="waitObject" /> 參數；false 表示每當等候作業完成即重設計時器，直到移除註冊等候作業為止。</param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="millisecondsTimeOutInterval" /> parameter is less than -1. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="T:System.Threading.WaitCallback">
+      <summary>表示執行緒集區執行緒執行的回呼方法。</summary>
+      <param name="state">物件，它包含回呼方法所使用的資訊。</param>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="T:System.Threading.WaitOrTimerCallback">
+      <summary>表示 <see cref="T:System.Threading.WaitHandle" /> 收到信號或逾時時呼叫的方法。</summary>
+      <param name="state">物件，它包含回呼方法所使用的資訊。</param>
+      <param name="timedOut">true，表示 <see cref="T:System.Threading.WaitHandle" /> 逾時；false，表示收到信號。</param>
+      <filterpriority>2</filterpriority>
+    </member>
+  </members>
+</doc>

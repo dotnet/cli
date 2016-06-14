@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2016/06/nuspec.xsd">
+  <metadata minClientVersion="2.12">
+    <id>System.Security.Cryptography.Encoding</id>
+    <version>4.0.0-rc3-24208-04</version>
+    <title>System.Security.Cryptography.Encoding</title>
+    <authors>Microsoft</authors>
+    <owners>microsoft,dotnetframework</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>http://go.microsoft.com/fwlink/?LinkId=329770</licenseUrl>
+    <projectUrl>https://dot.net/</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <description>Provides types for representing Abstract Syntax Notation One (ASN.1)-encoded data.
+
+Commonly Used Types:
+System.Security.Cryptography.AsnEncodedData
+System.Security.Cryptography.Oid
+System.Security.Cryptography.OidCollection
+ 
+When using NuGet 3.x this package requires at least version 3.4.</description>
+    <releaseNotes>https://go.microsoft.com/fwlink/?LinkID=799417</releaseNotes>
+    <copyright>© Microsoft Corporation.  All rights reserved.</copyright>
+    <serviceable>true</serviceable>
+    <dependencies>
+      <group targetFramework="MonoAndroid1.0" />
+      <group targetFramework="MonoTouch1.0" />
+      <group targetFramework=".NETFramework4.6" />
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="Microsoft.NETCore.Platforms" version="1.0.1-rc3-24208-04" />
+        <dependency id="runtime.native.System.Security.Cryptography" version="4.0.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Collections" version="4.0.11-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Collections.Concurrent" version="4.0.12-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Linq" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Resources.ResourceManager" version="4.0.1-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Runtime.Extensions" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime.Handles" version="4.0.1-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime.InteropServices" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Security.Cryptography.Primitives" version="4.0.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Text.Encoding" version="4.0.11-rc3-24208-04" exclude="Compile" />
+      </group>
+      <group targetFramework="Xamarin.iOS1.0" />
+      <group targetFramework="Xamarin.Mac2.0" />
+      <group targetFramework="Xamarin.TVOS1.0" />
+      <group targetFramework="Xamarin.WatchOS1.0" />
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="mscorlib" targetFramework=".NETFramework4.6" />
+      <frameworkAssembly assemblyName="System" targetFramework=".NETFramework4.6" />
+    </frameworkAssemblies>
+  </metadata>
+</package>

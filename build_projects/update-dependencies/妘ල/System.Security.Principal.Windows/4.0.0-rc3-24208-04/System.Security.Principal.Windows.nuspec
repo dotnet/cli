@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2016/06/nuspec.xsd">
+  <metadata minClientVersion="2.12">
+    <id>System.Security.Principal.Windows</id>
+    <version>4.0.0-rc3-24208-04</version>
+    <title>System.Security.Principal.Windows</title>
+    <authors>Microsoft</authors>
+    <owners>microsoft,dotnetframework</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>http://go.microsoft.com/fwlink/?LinkId=329770</licenseUrl>
+    <projectUrl>https://dot.net/</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <description>Provides classes for retrieving the current Windows user and for interacting with Windows users and groups.
+
+Commonly Used Types:
+System.Security.Principal.WindowsIdentity
+System.Security.Principal.SecurityIdentifier
+System.Security.Principal.NTAccount
+System.Security.Principal.WindowsPrincipal
+System.Security.Principal.IdentityReference
+System.Security.Principal.IdentityNotMappedException
+System.Security.Principal.WindowsBuiltInRole
+System.Security.Principal.WellKnownSidType
+ 
+When using NuGet 3.x this package requires at least version 3.4.</description>
+    <releaseNotes>https://go.microsoft.com/fwlink/?LinkID=799417</releaseNotes>
+    <copyright>© Microsoft Corporation.  All rights reserved.</copyright>
+    <serviceable>true</serviceable>
+    <dependencies>
+      <group targetFramework=".NETFramework4.6">
+        <dependency id="System.Security.Claims" version="4.0.1-rc3-24208-04" />
+      </group>
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="Microsoft.NETCore.Platforms" version="1.0.1-rc3-24208-04" />
+        <dependency id="Microsoft.Win32.Primitives" version="4.0.1-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Collections" version="4.0.11-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Diagnostics.Debug" version="4.0.11-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Reflection" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Resources.ResourceManager" version="4.0.1-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Runtime.Extensions" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime.Handles" version="4.0.1-rc3-24208-04" />
+        <dependency id="System.Runtime.InteropServices" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Security.Claims" version="4.0.1-rc3-24208-04" />
+        <dependency id="System.Security.Principal" version="4.0.1-rc3-24208-04" />
+        <dependency id="System.Text.Encoding" version="4.0.11-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Threading" version="4.0.11-rc3-24208-04" exclude="Compile" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="mscorlib" targetFramework=".NETFramework4.6" />
+    </frameworkAssemblies>
+  </metadata>
+</package>

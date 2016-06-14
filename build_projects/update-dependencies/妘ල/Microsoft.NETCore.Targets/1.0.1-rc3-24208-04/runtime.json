@@ -1,0 +1,337 @@
+{
+  "runtimes": {
+    "win": {
+      "Microsoft.Win32.Primitives": {
+        "runtime.win.Microsoft.Win32.Primitives": "4.0.1-rc3-24208-04"
+      },
+      "System.Console": {
+        "runtime.win.System.Console": "4.0.0-rc3-24208-04"
+      },
+      "System.Diagnostics.Debug": {
+        "runtime.win.System.Diagnostics.Debug": "4.0.11-rc3-24208-04"
+      },
+      "System.IO.FileSystem": {
+        "runtime.win.System.IO.FileSystem": "4.0.1-rc3-24208-04"
+      },
+      "System.Net.Primitives": {
+        "runtime.win.System.Net.Primitives": "4.0.11-rc3-24208-04"
+      },
+      "System.Net.Sockets": {
+        "runtime.win.System.Net.Sockets": "4.1.0-rc3-24208-04"
+      },
+      "System.Runtime.Extensions": {
+        "runtime.win.System.Runtime.Extensions": "4.1.0-rc3-24208-04"
+      }
+    },
+    "unix": {
+      "Microsoft.Win32.Primitives": {
+        "runtime.unix.Microsoft.Win32.Primitives": "4.0.1-rc3-24208-04"
+      },
+      "System.Console": {
+        "runtime.unix.System.Console": "4.0.0-rc3-24208-04"
+      },
+      "System.Diagnostics.Debug": {
+        "runtime.unix.System.Diagnostics.Debug": "4.0.11-rc3-24208-04"
+      },
+      "System.IO.FileSystem": {
+        "runtime.unix.System.IO.FileSystem": "4.0.1-rc3-24208-04"
+      },
+      "System.Net.Primitives": {
+        "runtime.unix.System.Net.Primitives": "4.0.11-rc3-24208-04"
+      },
+      "System.Net.Sockets": {
+        "runtime.unix.System.Net.Sockets": "4.1.0-rc3-24208-04"
+      },
+      "System.Runtime.Extensions": {
+        "runtime.unix.System.Runtime.Extensions": "4.1.0-rc3-24208-04"
+      },
+      "System.Private.Uri": {
+        "runtime.unix.System.Private.Uri": "4.0.1-rc3-24208-04"
+      }
+    },
+    "any": {
+      "System.Collections": {
+        "runtime.any.System.Collections": "4.0.11-rc3-24208-04"
+      },
+      "System.Diagnostics.Tools": {
+        "runtime.any.System.Diagnostics.Tools": "4.0.1-rc3-24208-04"
+      },
+      "System.Diagnostics.Tracing": {
+        "runtime.any.System.Diagnostics.Tracing": "4.1.0-rc3-24208-04"
+      },
+      "System.Globalization": {
+        "runtime.any.System.Globalization": "4.0.11-rc3-24208-04"
+      },
+      "System.Globalization.Calendars": {
+        "runtime.any.System.Globalization.Calendars": "4.0.1-rc3-24208-04"
+      },
+      "System.IO": {
+        "runtime.any.System.IO": "4.1.0-rc3-24208-04"
+      },
+      "System.Reflection": {
+        "runtime.any.System.Reflection": "4.1.0-rc3-24208-04"
+      },
+      "System.Reflection.Extensions": {
+        "runtime.any.System.Reflection.Extensions": "4.0.1-rc3-24208-04"
+      },
+      "System.Reflection.Primitives": {
+        "runtime.any.System.Reflection.Primitives": "4.0.1-rc3-24208-04"
+      },
+      "System.Resources.ResourceManager": {
+        "runtime.any.System.Resources.ResourceManager": "4.0.1-rc3-24208-04"
+      },
+      "System.Runtime": {
+        "runtime.any.System.Runtime": "4.1.0-rc3-24208-04"
+      },
+      "System.Runtime.Handles": {
+        "runtime.any.System.Runtime.Handles": "4.0.1-rc3-24208-04"
+      },
+      "System.Runtime.InteropServices": {
+        "runtime.any.System.Runtime.InteropServices": "4.1.0-rc3-24208-04"
+      },
+      "System.Text.Encoding": {
+        "runtime.any.System.Text.Encoding": "4.0.11-rc3-24208-04"
+      },
+      "System.Text.Encoding.Extensions": {
+        "runtime.any.System.Text.Encoding.Extensions": "4.0.11-rc3-24208-04"
+      },
+      "System.Threading.Tasks": {
+        "runtime.any.System.Threading.Tasks": "4.0.11-rc3-24208-04"
+      },
+      "System.Threading.Timer": {
+        "runtime.any.System.Threading.Timer": "4.0.1-rc3-24208-04"
+      }
+    },
+    "aot": {
+      "System.Collections": {
+        "runtime.aot.System.Collections": "4.0.10-rc3-24208-04"
+      },
+      "System.Diagnostics.Tools": {
+        "runtime.aot.System.Diagnostics.Tools": "4.0.1-rc3-24208-04"
+      },
+      "System.Diagnostics.Tracing": {
+        "runtime.aot.System.Diagnostics.Tracing": "4.0.20-rc3-24208-04"
+      },
+      "System.Globalization": {
+        "runtime.aot.System.Globalization": "4.0.11-rc3-24208-04"
+      },
+      "System.Globalization.Calendars": {
+        "runtime.aot.System.Globalization.Calendars": "4.0.1-rc3-24208-04"
+      },
+      "System.IO": {
+        "runtime.aot.System.IO": "4.1.0-rc3-24208-04"
+      },
+      "System.Reflection": {
+        "runtime.aot.System.Reflection": "4.0.10-rc3-24208-04"
+      },
+      "System.Reflection.Extensions": {
+        "runtime.aot.System.Reflection.Extensions": "4.0.0-rc3-24208-04"
+      },
+      "System.Reflection.Primitives": {
+        "runtime.aot.System.Reflection.Primitives": "4.0.0-rc3-24208-04"
+      },
+      "System.Resources.ResourceManager": {
+        "runtime.aot.System.Resources.ResourceManager": "4.0.0-rc3-24208-04"
+      },
+      "System.Runtime": {
+        "runtime.aot.System.Runtime": "4.0.20-rc3-24208-04"
+      },
+      "System.Runtime.Handles": {
+        "runtime.aot.System.Runtime.Handles": "4.0.1-rc3-24208-04"
+      },
+      "System.Runtime.InteropServices": {
+        "runtime.aot.System.Runtime.InteropServices": "4.0.20-rc3-24208-04"
+      },
+      "System.Text.Encoding": {
+        "runtime.aot.System.Text.Encoding": "4.0.11-rc3-24208-04"
+      },
+      "System.Text.Encoding.Extensions": {
+        "runtime.aot.System.Text.Encoding.Extensions": "4.0.11-rc3-24208-04"
+      },
+      "System.Threading.Tasks": {
+        "runtime.aot.System.Threading.Tasks": "4.0.11-rc3-24208-04"
+      },
+      "System.Threading.Timer": {
+        "runtime.aot.System.Threading.Timer": "4.0.1-rc3-24208-04"
+      }
+    },
+    "win7": {
+      "System.Private.Uri": {
+        "runtime.win7.System.Private.Uri": "4.0.1-rc3-24208-04"
+      }
+    },
+    "win10-amd64-aot": {
+      "runtime.native.System.IO.Compression": {
+        "runtime.win10-amd64-aot.runtime.native.System.IO.Compression": "4.0.1-rc3-24206-00"
+      }
+    },
+    "win10-arm-aot": {
+      "runtime.native.System.IO.Compression": {
+        "runtime.win10-arm-aot.runtime.native.System.IO.Compression": "4.0.1-rc3-24206-00"
+      }
+    },
+    "win10-x86-aot": {
+      "runtime.native.System.IO.Compression": {
+        "runtime.win10-x86-aot.runtime.native.System.IO.Compression": "4.0.1-rc3-24206-00"
+      }
+    },
+    "rhel.7-x64": {
+      "runtime.native.System.IO.Compression": {
+        "runtime.rhel.7-x64.runtime.native.System.IO.Compression": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System": {
+        "runtime.rhel.7-x64.runtime.native.System": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Net.Http": {
+        "runtime.rhel.7-x64.runtime.native.System.Net.Http": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Security.Cryptography": {
+        "runtime.rhel.7-x64.runtime.native.System.Security.Cryptography": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Net.Security": {
+        "runtime.rhel.7-x64.runtime.native.System.Net.Security": "1.0.1-rc3-24208-04"
+      }
+    },
+    "debian.8-x64": {
+      "runtime.native.System.IO.Compression": {
+        "runtime.debian.8-x64.runtime.native.System.IO.Compression": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System": {
+        "runtime.debian.8-x64.runtime.native.System": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Net.Http": {
+        "runtime.debian.8-x64.runtime.native.System.Net.Http": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Security.Cryptography": {
+        "runtime.debian.8-x64.runtime.native.System.Security.Cryptography": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Net.Security": {
+        "runtime.debian.8-x64.runtime.native.System.Net.Security": "1.0.1-rc3-24208-04"
+      }
+    },
+    "fedora.23-x64": {
+      "runtime.native.System.IO.Compression": {
+        "runtime.fedora.23-x64.runtime.native.System.IO.Compression": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System": {
+        "runtime.fedora.23-x64.runtime.native.System": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Net.Http": {
+        "runtime.fedora.23-x64.runtime.native.System.Net.Http": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Security.Cryptography": {
+        "runtime.fedora.23-x64.runtime.native.System.Security.Cryptography": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Net.Security": {
+        "runtime.fedora.23-x64.runtime.native.System.Net.Security": "1.0.1-rc3-24208-04"
+      }
+    },
+    "osx.10.10-x64": {
+      "runtime.native.System.IO.Compression": {
+        "runtime.osx.10.10-x64.runtime.native.System.IO.Compression": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System": {
+        "runtime.osx.10.10-x64.runtime.native.System": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Net.Http": {
+        "runtime.osx.10.10-x64.runtime.native.System.Net.Http": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Security.Cryptography": {
+        "runtime.osx.10.10-x64.runtime.native.System.Security.Cryptography": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Net.Security": {
+        "runtime.osx.10.10-x64.runtime.native.System.Net.Security": "1.0.1-rc3-24208-04"
+      }
+    },
+    "opensuse.13.2-x64": {
+      "runtime.native.System.IO.Compression": {
+        "runtime.opensuse.13.2-x64.runtime.native.System.IO.Compression": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System": {
+        "runtime.opensuse.13.2-x64.runtime.native.System": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Net.Http": {
+        "runtime.opensuse.13.2-x64.runtime.native.System.Net.Http": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Security.Cryptography": {
+        "runtime.opensuse.13.2-x64.runtime.native.System.Security.Cryptography": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Net.Security": {
+        "runtime.opensuse.13.2-x64.runtime.native.System.Net.Security": "1.0.1-rc3-24208-04"
+      }
+    },
+    "ubuntu.14.04-x64": {
+      "runtime.native.System.IO.Compression": {
+        "runtime.ubuntu.14.04-x64.runtime.native.System.IO.Compression": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System": {
+        "runtime.ubuntu.14.04-x64.runtime.native.System": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Net.Http": {
+        "runtime.ubuntu.14.04-x64.runtime.native.System.Net.Http": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Security.Cryptography": {
+        "runtime.ubuntu.14.04-x64.runtime.native.System.Security.Cryptography": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Net.Security": {
+        "runtime.ubuntu.14.04-x64.runtime.native.System.Net.Security": "1.0.1-rc3-24208-04"
+      }
+    },
+    "ubuntu.16.04-x64": {
+      "runtime.native.System.IO.Compression": {
+        "runtime.ubuntu.16.04-x64.runtime.native.System.IO.Compression": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System": {
+        "runtime.ubuntu.16.04-x64.runtime.native.System": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Net.Http": {
+        "runtime.ubuntu.16.04-x64.runtime.native.System.Net.Http": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Security.Cryptography": {
+        "runtime.ubuntu.16.04-x64.runtime.native.System.Security.Cryptography": "1.0.1-rc3-24208-04"
+      },
+      "runtime.native.System.Net.Security": {
+        "runtime.ubuntu.16.04-x64.runtime.native.System.Net.Security": "1.0.1-rc3-24208-04"
+      }
+    },
+    "win7-x86": {
+      "runtime.native.System.IO.Compression": {
+        "runtime.win7-x86.runtime.native.System.IO.Compression": "4.0.1-rc3-24208-04"
+      }
+    },
+    "win7-x64": {
+      "runtime.native.System.IO.Compression": {
+        "runtime.win7-x64.runtime.native.System.IO.Compression": "4.0.1-rc3-24208-04"
+      }
+    },
+    "win8-arm": {
+      "runtime.native.System.IO.Compression": {
+        "runtime.win8-arm.runtime.native.System.IO.Compression": "4.0.1-rc3-24208-04"
+      }
+    }
+  },
+  "supports": {
+    "uwp.10.0.app": {
+      "uap10.0": [
+        "win10-x86",
+        "win10-x86-aot",
+        "win10-x64",
+        "win10-x64-aot",
+        "win10-arm",
+        "win10-arm-aot"
+      ]
+    },
+    "net46.app": {
+      "net46": [
+        "win-x86",
+        "win-x64"
+      ]
+    },
+    "dnxcore50.app": {
+      "dnxcore50": [
+        "win7-x86",
+        "win7-x64"
+      ]
+    }
+  }
+}

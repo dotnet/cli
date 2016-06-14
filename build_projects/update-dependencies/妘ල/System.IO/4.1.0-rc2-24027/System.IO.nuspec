@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata minClientVersion="3.4">
+    <id>System.IO</id>
+    <version>4.1.0-rc2-24027</version>
+    <title>System.IO</title>
+    <authors>Microsoft</authors>
+    <owners>microsoft,dotnetframework</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>http://go.microsoft.com/fwlink/?LinkId=329770</licenseUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <description>Provides base input and output (I/O) types, including System.IO.Stream, System.IO.StreamReader and System.IO.StreamWriter, that allow reading and writing to data streams
+
+Commonly Used Types:
+System.IO.Stream
+System.IO.EndOfStreamException
+System.IO.MemoryStream
+System.IO.StreamReader
+System.IO.StreamWriter
+System.IO.StringWriter
+System.IO.TextWriter
+System.IO.TextReader
+ \r\n TFS ID: 1599443, GitHub SHA: https://github.com/dotnet/corefx/tree/eede273a4dfabcea608621f5e1bbf8ad00584cfb</description>
+    <copyright>© Microsoft Corporation.  All rights reserved.</copyright>
+    <dependencies>
+      <group targetFramework="MonoAndroid1.0" />
+      <group targetFramework="MonoTouch1.0" />
+      <group targetFramework=".NETFramework4.5" />
+      <group targetFramework=".NETFramework4.6.2" />
+      <group targetFramework=".NETCore5.0">
+        <dependency id="System.Runtime" version="4.1.0-rc2-24027" />
+        <dependency id="System.Text.Encoding" version="4.0.11-rc2-24027" />
+        <dependency id="System.Threading.Tasks" version="4.0.11-rc2-24027" />
+      </group>
+      <group targetFramework=".NETStandard1.0">
+        <dependency id="System.Runtime" version="4.1.0-rc2-24027" />
+        <dependency id="System.Text.Encoding" version="4.0.11-rc2-24027" />
+        <dependency id="System.Threading.Tasks" version="4.0.11-rc2-24027" />
+      </group>
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="System.Runtime" version="4.1.0-rc2-24027" />
+        <dependency id="System.Text.Encoding" version="4.0.11-rc2-24027" />
+        <dependency id="System.Threading.Tasks" version="4.0.11-rc2-24027" />
+      </group>
+      <group targetFramework=".NETStandard1.5">
+        <dependency id="System.Runtime" version="4.1.0-rc2-24027" />
+        <dependency id="System.Text.Encoding" version="4.0.11-rc2-24027" />
+        <dependency id="System.Threading.Tasks" version="4.0.11-rc2-24027" />
+      </group>
+      <group targetFramework=".NETPortable0.0-Profile259" />
+      <group targetFramework="Windows8.0" />
+      <group targetFramework="WindowsPhone8.0" />
+      <group targetFramework="WindowsPhoneApp8.1" />
+      <group targetFramework="Xamarin.iOS1.0" />
+      <group targetFramework="Xamarin.Mac2.0" />
+      <group targetFramework="Xamarin.TVOS1.0" />
+      <group targetFramework="Xamarin.WatchOS1.0" />
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="mscorlib" targetFramework=".NETFramework4.6.2" />
+      <frameworkAssembly assemblyName="System" targetFramework=".NETFramework4.6.2" />
+    </frameworkAssemblies>
+  </metadata>
+</package>

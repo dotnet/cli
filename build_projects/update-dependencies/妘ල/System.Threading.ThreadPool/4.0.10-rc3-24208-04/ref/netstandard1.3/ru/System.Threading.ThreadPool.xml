@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Threading.ThreadPool</name>
+  </assembly>
+  <members>
+    <member name="T:System.Threading.RegisteredWaitHandle">
+      <summary>Представляет дескриптор, который регистрируется при вызове метода <see cref="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.UInt32,System.Boolean)" />.Этот класс не наследуется.</summary>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="M:System.Threading.RegisteredWaitHandle.Unregister(System.Threading.WaitHandle)">
+      <summary>Отменяет зарегистрированную операцию ожидания, вызванную методом <see cref="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.UInt32,System.Boolean)" />.</summary>
+      <returns>true, если функция выполнилась успешно; в противном случае — false.</returns>
+      <param name="waitObject">Объект <see cref="T:System.Threading.WaitHandle" />, которому посылается сигнал. </param>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="T:System.Threading.ThreadPool">
+      <summary>Предоставляет пул потоков, который можно использовать для выполнения задач, отправки рабочих элементов, обработки асинхронного ввода-вывода, ожидания от имени других потоков и обработки таймеров.</summary>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.BindHandle(System.Runtime.InteropServices.SafeHandle)">
+      <summary>[SECURITY CRITICAL] Связывает дескриптор операционной системы с объектом <see cref="T:System.Threading.ThreadPool" />.</summary>
+      <returns>Значение true, если дескриптор является связанным; в противном случае — значение false.</returns>
+      <param name="osHandle">Объект <see cref="T:System.Runtime.InteropServices.SafeHandle" />, содержащий дескриптор операционной системы.Дескриптор должен быть открыт для перекрывающегося ввода-вывода в неуправляемой области.</param>
+    </member>
+    <member name="M:System.Threading.ThreadPool.QueueUserWorkItem(System.Threading.WaitCallback)">
+      <summary>Помещает метод в очередь на выполнение.Метод выполняется, когда становится доступен поток из пула потоков.</summary>
+      <returns>Значение true, если метод успешно помещен в очередь. Если рабочий элемент не может быть помещен в очередь, создается исключение <see cref="T:System.NotSupportedException" />.</returns>
+      <param name="callBack">Делегат <see cref="T:System.Threading.WaitCallback" />, представляющий метод, который требуется выполнить. </param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="callBack" /> is null.</exception>
+      <exception cref="T:System.NotSupportedException">The common language runtime (CLR) is hosted, and the host does not support this action.</exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.QueueUserWorkItem(System.Threading.WaitCallback,System.Object)">
+      <summary>Помещает метод в очередь на выполнение и указывает объект, содержащий данные для использования методом.Метод выполняется, когда становится доступен поток из пула потоков.</summary>
+      <returns>Значение true, если метод успешно помещен в очередь. Если рабочий элемент не может быть помещен в очередь, создается исключение <see cref="T:System.NotSupportedException" />.</returns>
+      <param name="callBack">Делегат <see cref="T:System.Threading.WaitCallback" />, представляющий выполняемый метод. </param>
+      <param name="state">Объект, содержащий данные, используемые методом. </param>
+      <exception cref="T:System.NotSupportedException">The common language runtime (CLR) is hosted, and the host does not support this action.</exception>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="callBack" /> is null.</exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.Int32,System.Boolean)">
+      <summary>Регистрирует делегат для ожидания объекта <see cref="T:System.Threading.WaitHandle" />, задавая время ожидания в миллисекундах в виде 32-разрядного целого числа со знаком.</summary>
+      <returns>Объект <see cref="T:System.Threading.RegisteredWaitHandle" />, инкапсулирующий собственный дескриптор.</returns>
+      <param name="waitObject">Регистрируемый объект <see cref="T:System.Threading.WaitHandle" />.Используйте объект <see cref="T:System.Threading.WaitHandle" />, отличный от <see cref="T:System.Threading.Mutex" />.</param>
+      <param name="callBack">Делегат <see cref="T:System.Threading.WaitOrTimerCallback" />, который вызывается при получении сигнала объектом, указанным в параметре <paramref name="waitObject" />. </param>
+      <param name="state">Передаваемый делегату объект. </param>
+      <param name="millisecondsTimeOutInterval">Время ожидания в миллисекундах.Если параметр <paramref name="millisecondsTimeOutInterval" /> равен 0 (нулю), функция проверяет состояние объекта и немедленно возвращает значение.Если параметр <paramref name="millisecondsTimeOutInterval" /> равен -1, время ожидания функции никогда не истекает.</param>
+      <param name="executeOnlyOnce">Значение true указывает, что после вызова делегата поток не будет ожидать параметр <paramref name="waitObject" />; значение false указывает, что таймер сбрасывается всякий раз по завершении операции ожидания до тех пор, пока регистрация ожидания не будет отменена. </param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="millisecondsTimeOutInterval" /> parameter is less than -1. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.Int64,System.Boolean)">
+      <summary>Регистрирует делегат для ожидания объекта <see cref="T:System.Threading.WaitHandle" />, задавая время ожидания в миллисекундах в виде 64-разрядного целого числа со знаком.</summary>
+      <returns>Объект <see cref="T:System.Threading.RegisteredWaitHandle" />, инкапсулирующий собственный дескриптор.</returns>
+      <param name="waitObject">Регистрируемый объект <see cref="T:System.Threading.WaitHandle" />.Используйте объект <see cref="T:System.Threading.WaitHandle" />, отличный от <see cref="T:System.Threading.Mutex" />.</param>
+      <param name="callBack">Делегат <see cref="T:System.Threading.WaitOrTimerCallback" />, который вызывается при получении сигнала объектом, указанным в параметре <paramref name="waitObject" />. </param>
+      <param name="state">Передаваемый делегату объект. </param>
+      <param name="millisecondsTimeOutInterval">Время ожидания в миллисекундах.Если параметр <paramref name="millisecondsTimeOutInterval" /> равен 0 (нулю), функция проверяет состояние объекта и немедленно возвращает значение.Если параметр <paramref name="millisecondsTimeOutInterval" /> равен -1, время ожидания функции никогда не истекает.</param>
+      <param name="executeOnlyOnce">Значение true указывает, что после вызова делегата поток не будет ожидать параметр <paramref name="waitObject" />; значение false указывает, что таймер сбрасывается всякий раз по завершении операции ожидания до тех пор, пока регистрация ожидания не будет отменена. </param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="millisecondsTimeOutInterval" /> parameter is less than -1. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.TimeSpan,System.Boolean)">
+      <summary>Регистрирует делегат для ожидания объекта <see cref="T:System.Threading.WaitHandle" />, задавая значение <see cref="T:System.TimeSpan" /> для времени ожидания.</summary>
+      <returns>Объект <see cref="T:System.Threading.RegisteredWaitHandle" />, инкапсулирующий собственный дескриптор.</returns>
+      <param name="waitObject">Регистрируемый объект <see cref="T:System.Threading.WaitHandle" />.Используйте объект <see cref="T:System.Threading.WaitHandle" />, отличный от <see cref="T:System.Threading.Mutex" />.</param>
+      <param name="callBack">Делегат <see cref="T:System.Threading.WaitOrTimerCallback" />, который вызывается при получении сигнала объектом, указанным в параметре <paramref name="waitObject" />. </param>
+      <param name="state">Передаваемый делегату объект. </param>
+      <param name="timeout">Время ожидания, представленное объектом <see cref="T:System.TimeSpan" />.Если параметр <paramref name="timeout" /> равен 0 (нулю), функция проверяет состояние объекта и немедленно возвращает значение.Если параметр <paramref name="timeout" /> равен -1, время ожидания функции никогда не истекает.</param>
+      <param name="executeOnlyOnce">Значение true указывает, что после вызова делегата поток не будет ожидать параметр <paramref name="waitObject" />; значение false указывает, что таймер сбрасывается всякий раз по завершении операции ожидания до тех пор, пока регистрация ожидания не будет отменена. </param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="timeout" /> parameter is less than -1. </exception>
+      <exception cref="T:System.NotSupportedException">The <paramref name="timeout" /> parameter is greater than <see cref="F:System.Int32.MaxValue" />. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.UInt32,System.Boolean)">
+      <summary>Регистрирует делегат для ожидания объекта <see cref="T:System.Threading.WaitHandle" />, задавая время ожидания в миллисекундах в виде 32-разрядного целого числа без знака.</summary>
+      <returns>Объект <see cref="T:System.Threading.RegisteredWaitHandle" />, который можно использовать для отмены зарегистрированной операции ожидания.</returns>
+      <param name="waitObject">Регистрируемый объект <see cref="T:System.Threading.WaitHandle" />.Используйте объект <see cref="T:System.Threading.WaitHandle" />, отличный от <see cref="T:System.Threading.Mutex" />.</param>
+      <param name="callBack">Делегат <see cref="T:System.Threading.WaitOrTimerCallback" />, который вызывается при получении сигнала объектом, указанным в параметре <paramref name="waitObject" />. </param>
+      <param name="state">Передаваемый делегату объект. </param>
+      <param name="millisecondsTimeOutInterval">Время ожидания в миллисекундах.Если параметр <paramref name="millisecondsTimeOutInterval" /> равен 0 (нулю), функция проверяет состояние объекта и немедленно возвращает значение.Если параметр <paramref name="millisecondsTimeOutInterval" /> равен -1, время ожидания функции никогда не истекает.</param>
+      <param name="executeOnlyOnce">Значение true указывает, что после вызова делегата поток не будет ожидать параметр <paramref name="waitObject" />; значение false указывает, что таймер сбрасывается всякий раз по завершении операции ожидания до тех пор, пока регистрация ожидания не будет отменена. </param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="millisecondsTimeOutInterval" /> parameter is less than -1. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="T:System.Threading.WaitCallback">
+      <summary>Представляет метод обратного вызова, выполняющегося потоком из пула потоков.</summary>
+      <param name="state">Объект, содержащий информацию, используемую методом обратного вызова. </param>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="T:System.Threading.WaitOrTimerCallback">
+      <summary>Представляет метод, который вызывается при получении объектом <see cref="T:System.Threading.WaitHandle" /> сигнала или истечении времени ожидания.</summary>
+      <param name="state">Объект, содержащий информацию, используемую всякий раз методом обратного вызова при каждом выполнении. </param>
+      <param name="timedOut">Значение true, если истекло время ожидания объекта <see cref="T:System.Threading.WaitHandle" />; false, если объект получил сигнал. </param>
+      <filterpriority>2</filterpriority>
+    </member>
+  </members>
+</doc>

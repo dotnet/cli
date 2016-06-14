@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Octokit</id>
+    <version>0.18.0</version>
+    <authors>GitHub</authors>
+    <owners>GitHub</owners>
+    <licenseUrl>https://github.com/octokit/octokit.net/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/octokit/octokit.net</projectUrl>
+    <iconUrl>https://f.cloud.github.com/assets/19977/1441274/160fba8c-41a9-11e3-831d-61d88fa886f4.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>An async-based GitHub API client library for .NET</description>
+    <summary>An async-based GitHub API client library for .NET</summary>
+    <releaseNotes>New: support for User Administration API (GitHub Enterprise) - #1068 via @paladique
+New: support for Admin Stats API (GitHub Enterprise) - - #1049 via @ryangribble
+New: support for Repository Pages API - #1061 via @M-Zuber
+New: get stargazer creation timestamps - #1060 via @daveaglick
+New: support for Protected Branches API - #996 via @ryangribble
+New: support for creating Personal Access Tokens - #990 via @alfhenrik
+Fixed: `Milestone` property added to `PullRequest` response - #1075 via @Eilon
+Fixed: Add member role filter to `OrganizationMembersClient.GetAll()` - #1072 via @ryangribble
+Fixed: `Repository.Content.GetAllContents` now support the root of the repository - #1064 via @naveensrinivasan, @shiftkey
+Fixed: added `Id` and `Locked` to `Issue`, added `CommitUrl` to `IssueEvent` - #1039 via @gabrielweyer
+Fixed: additional fields on `Release` and `ReleaseAsset` - #1009 via @gabrielweyer
+Fixed: `ApiException` now includes JSON payload when `.ToString()`- #974 via @asizikov
+Breaking Changes:**
+As part of reaching 1.0 we went through to audit the current implementation
+and identify areas that didn't align with our conventions. For this release,
+we're marking the endpoints as `[Obsolete]` and indicating the new location.
+These will be cleaned up in the next release:
+- `IGitHubClient.Notifications` -&gt; `IGitHubClient.Activity.Notifications` - #1019 via @M-Zuber
+- `IGitHubClient.Repository.CommitStatus` -&gt; `IGitHubClient.Repository.Status` - #1043 via @RobPethick
+- `IGitHubClient.Repository.Commits` -&gt; `IGitHubClient.Repository.Commit` - #1057 via @M-Zuber
+- `IGitHubClient.Repository.RepoCollaborators` -&gt; `IGitHubClient.Repository.Collaborator` - #1040 via @M-Zuber
+- `IGitHubClient.Repository.RepositoryComments` -&gt; `IGitHubClient.Repository.Comment` - #1044 via @M-Zuber
+- `IGitHubClient.Release` -&gt; `IGitHubClient.Repository.Release` - #1058 via @RobPethick
+- `IGitHubClient.GitDatabase` -&gt; `IGitHubClient.Git` - #1048 via @RobPethick
+Other breaking changes:
+- a public `ApiExtensions.Get&lt;T&gt;` extension method was causing a bunch of
+tests to be written in a confusing way. This has been ported to an interface
+method on `IApiConnection` but hopefully you're not referencing this method
+externally - see #1063 for more information.
+- `IRepositoryContentsClient.GetArchiveLink` is no longer correct, as the HTTP
+behaviour in Octokit was updated to follow redirects received from the server.
+See #986 for the last bits of cleanup.
+- `IRepositoryContentsClient.GetAllContents(string owner, string name, string path, string reference)`
+has been renamed to `GetAllContentsByRef(string owner, string name, string path, string reference)`
+to prevent overlap with methods on `IRepositoryContentsClient` which do not
+specify a path - and thus look at the root of the repository.
+- `IssueEventPayload` has two fields which are never populated from the API -
+`Assignee` and `Label` - these are now removed. You should use
+`Issue.Assignee` and `Issue.Labels` instead. See #1039 for more details.
+- `PullRequest.MergeCommitSha` is marked as obsolete by the GitHub API - we
+are cleaning up the behaviour for determining whether a PR has been
+merged in #997 - see the PR for more information.
+- `IAuthorizationsClient.RevokeAllApplicationAuthentications` is no longer
+available through the GitHub API - this will be removed in the next
+release.
+Shout outs**
+A lot of extra work went into this release, and I wanted to thank those people
+who helped out - without their efforts we wouldn't be at this point:
+- @naveensrinivasan - for helping set up our Travis CI builds to test this on
+Mono - see #995 for the details
+- @hahmed - for contributing a bunch of documentation around the Octokit search
+APIs - see #955, #954 and #951
+- @JakesCode - for clarifying some documentation after he reported an issue - #1054
+- @ryangribble - for helping get our GitHub Enterprise testing off the ground - #987
+- @naveensrinivasan - for catching and addressing an issue with our LINQPad snippets - #987</releaseNotes>
+    <copyright>Copyright GitHub 2013</copyright>
+    <tags>GitHub API Octokit linqpad-samples</tags>
+    <dependencies>
+      <group>
+        <dependency id="Microsoft.Net.Http" />
+      </group>
+      <group targetFramework=".NETFramework4.5" />
+      <group targetFramework=".NETCore4.5" />
+      <group targetFramework=".NETPortable0.0-win81+wpa81" />
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System" targetFramework=".NETFramework4.5" />
+      <frameworkAssembly assemblyName="System.Net.Http" targetFramework=".NETFramework4.5, .NETCore4.5" />
+    </frameworkAssemblies>
+  </metadata>
+</package>

@@ -1,0 +1,693 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Security.Claims</name>
+  </assembly>
+  <members>
+    <member name="T:System.Security.Claims.Claim">
+      <summary>Stellt einen Anspruch dar.</summary>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.IO.BinaryReader,System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.Security.Claims.Claim)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.Security.Claims.Claim,System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String)">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Claims.Claim" />-Klasse mit dem angegebenen Anspruchstyp und Wert.</summary>
+      <param name="type">Der Anspruchstyp.</param>
+      <param name="value">Der Anspruchswert.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> oder <paramref name="value" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String)">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Claims.Claim" />-Klasse mit dem angegebenen Anspruchstyp, Wert und Werttyp.</summary>
+      <param name="type">Der Anspruchstyp.</param>
+      <param name="value">Der Anspruchswert.</param>
+      <param name="valueType">Der Anspruchswerttyp.Wenn dieser Parameter null ist, wird <see cref="F:System.Security.Claims.ClaimValueTypes.String" /> verwendet.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> oder <paramref name="value" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String)">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Claims.Claim" />-Klasse mit dem angegebenen Anspruchstyp, Wert, Werttyp und Aussteller.</summary>
+      <param name="type">Der Anspruchstyp.</param>
+      <param name="value">Der Anspruchswert.</param>
+      <param name="valueType">Der Anspruchswerttyp.Wenn dieser Parameter null ist, wird <see cref="F:System.Security.Claims.ClaimValueTypes.String" /> verwendet.</param>
+      <param name="issuer">Der Anspruchsaussteller.Wenn dieser Parameter leer ist oder null lautet, wird <see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" /> verwendet.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> oder <paramref name="value" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String,System.String)">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Claims.Claim" />-Klasse mit dem angegebenen Anspruchstyp, dem Wert, dem Werttyp, dem Aussteller und dem ursprünglichen Aussteller.</summary>
+      <param name="type">Der Anspruchstyp.</param>
+      <param name="value">Der Anspruchswert.</param>
+      <param name="valueType">Der Anspruchswerttyp.Wenn dieser Parameter null ist, wird <see cref="F:System.Security.Claims.ClaimValueTypes.String" /> verwendet.</param>
+      <param name="issuer">Der Anspruchsaussteller.Wenn dieser Parameter leer ist oder null lautet, wird <see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" /> verwendet.</param>
+      <param name="originalIssuer">Der ursprüngliche Aussteller des Anspruchs.Wenn dieser Parameter leer ist oder null lautet, wird die <see cref="P:System.Security.Claims.Claim.OriginalIssuer" />-Eigenschaft auf den Wert der <see cref="P:System.Security.Claims.Claim.Issuer" />-Eigenschaft festgelegt.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> oder <paramref name="value" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String,System.String,System.Security.Claims.ClaimsIdentity)">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Claims.Claim" />-Klasse mit dem angegebenen Anspruchstyp, dem Wert, dem Werttyp, dem Aussteller, dem ursprünglichen Aussteller und dem Thema.</summary>
+      <param name="type">Der Anspruchstyp.</param>
+      <param name="value">Der Anspruchswert.</param>
+      <param name="valueType">Der Anspruchswerttyp.Wenn dieser Parameter null ist, wird <see cref="F:System.Security.Claims.ClaimValueTypes.String" /> verwendet.</param>
+      <param name="issuer">Der Anspruchsaussteller.Wenn dieser Parameter leer ist oder null lautet, wird <see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" /> verwendet.</param>
+      <param name="originalIssuer">Der ursprüngliche Aussteller des Anspruchs.Wenn dieser Parameter leer ist oder null lautet, wird die <see cref="P:System.Security.Claims.Claim.OriginalIssuer" />-Eigenschaft auf den Wert der <see cref="P:System.Security.Claims.Claim.Issuer" />-Eigenschaft festgelegt.</param>
+      <param name="subject">Der Betreff, den dieser Anspruch beschreibt.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> oder <paramref name="value" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.Clone">
+      <summary>Gibt ein neues <see cref="T:System.Security.Claims.Claim" />-Objekt zurück, das aus diesem Objekt kopiert wird.Der neue Anspruch besitzt kein Subjekt.</summary>
+      <returns>Das neue Anspruch-Objekt.</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.Clone(System.Security.Claims.ClaimsIdentity)">
+      <summary>Gibt ein neues <see cref="T:System.Security.Claims.Claim" />-Objekt zurück, das aus diesem Objekt kopiert wird.Der Betreff des neuen Anspruchs ist auf die angegebene ClaimsIdentity festgelegt.</summary>
+      <returns>Das neue Anspruch-Objekt.</returns>
+      <param name="identity">Der beabsichtigte Antragsteller des neuen Anspruchs.</param>
+    </member>
+    <member name="P:System.Security.Claims.Claim.CustomSerializationData"></member>
+    <member name="P:System.Security.Claims.Claim.Issuer">
+      <summary>Ruft den Aussteller des Anspruchs ab.</summary>
+      <returns>Ein Name, der den Aussteller des Anspruchs angibt.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.OriginalIssuer">
+      <summary>Ruft den Originalaussteller des Anspruchs ab. </summary>
+      <returns>Ein Name, der den ursprünglichen Aussteller des Anspruchs angibt.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Properties">
+      <summary>Ruft ein Wörterbuch ab, das zusätzliche Eigenschaften enthält, die diesem Anspruch zugeordnet sind.</summary>
+      <returns>Ein Wörterbuch, das zusätzliche Eigenschaften enthält, die dem Anspruch zugeordnet sind.Die Eigenschaften werden als Name/Wert-Paare dargestellt.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Subject">
+      <summary>Ruft den Antragsteller des Anspruchs ab.</summary>
+      <returns>Der Antragsteller des Anspruchs.</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.ToString">
+      <summary>Gibt eine Zeichenfolgenentsprechung dieses <see cref="T:System.Security.Claims.Claim" />-Objekts zurück.</summary>
+      <returns>Die Zeichenfolgenentsprechung dieses <see cref="T:System.Security.Claims.Claim" />-Objekts.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Type">
+      <summary>Ruft den Typ des Anspruchs ab.</summary>
+      <returns>Der Anspruchstyp.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Value">
+      <summary>Ruft den Wert des Anspruchs ab.</summary>
+      <returns>Der Anspruchswert.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.ValueType">
+      <summary>Ruft den Wert des Anspruchs ab.</summary>
+      <returns>Der Anspruchswerttyp.</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.Claim.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimsIdentity">
+      <summary>Stellt eine anspruchsbasierte Identität dar.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Claims.ClaimsIdentity" />-Klasse mit einer leeren Anspruchauflistung.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>Initialisiert mithilfe einer enumerierten Auflistung von <see cref="T:System.Security.Claims.Claim" />-Objekten eine neue Instanz der <see cref="T:System.Security.Claims.ClaimsIdentity" />-Klasse.</summary>
+      <param name="claims">Die Ansprüche, mit denen die Anspruchsidentität zu füllen ist.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String)">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Claims.ClaimsIdentity" />-Klasse mit dem angegebenen Ansprüchen und Authentifizierungstypen.</summary>
+      <param name="claims">Die Ansprüche, mit denen die Anspruchsidentität zu füllen ist.</param>
+      <param name="authenticationType">Der Typ, der verwendeten Authentifizierung.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String,System.String,System.String)">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Claims.ClaimsIdentity" />-Klasse mit den angegebenen Werten für Ansprüche, Authentifizierungstyp, Namensanspruchstyp und Typ des Rollenanspruchs.</summary>
+      <param name="claims">Die Ansprüche, mit denen die Anspruchsidentität zu füllen ist.</param>
+      <param name="authenticationType">Der Typ, der verwendeten Authentifizierung.</param>
+      <param name="nameType">Der für Namensansprüche zu verwendende Anspruchstyp.</param>
+      <param name="roleType">Der für Rollenansprüche zu verwendende Anspruchstyp.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity)">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Claims.ClaimsIdentity" />-Klasse mithilfe des Namens und Authentifizierungstyps aus der angegebenen <see cref="T:System.Security.Principal.IIdentity" />.</summary>
+      <param name="identity">Die Identität, auf der die neuen Anspruchsidentitäten basieren sollen.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity,System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>Initialisiert mit den angegebenen Ansprüchen und dem angegebenen <see cref="T:System.Security.Principal.IIdentity" /> eine neue Instanz der <see cref="T:System.Security.Claims.ClaimsIdentity" />-Klasse.</summary>
+      <param name="identity">Die Identität, auf der die neuen Anspruchsidentitäten basieren sollen.</param>
+      <param name="claims">Die Ansprüche, mit denen die Anspruchsidentität zu füllen ist.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity,System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String,System.String,System.String)">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Claims.ClaimsIdentity" />-Klasse aus dem angegebenen <see cref="T:System.Security.Principal.IIdentity" /> unter Verwendung der angegebenen Werte für Ansprüche, Authentifizierungstyp, Namensanspruchstyp und Rollenanspruchstyp.</summary>
+      <param name="identity">Die Identität, auf der die neuen Anspruchsidentitäten basieren sollen.</param>
+      <param name="claims">Die Ansprüche, mit denen die neue Anspruchsidentität zu füllen ist.</param>
+      <param name="authenticationType">Der Typ, der verwendeten Authentifizierung.</param>
+      <param name="nameType">Der für Namensansprüche zu verwendende Anspruchstyp.</param>
+      <param name="roleType">Der für Rollenansprüche zu verwendende Anspruchstyp.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.String)">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Claims.ClaimsIdentity" />-Klasse mit einer leeren Anspruchsauflistung und dem angegebenen Authentifizierungstyp.</summary>
+      <param name="authenticationType">Der Typ, der verwendeten Authentifizierung.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.String,System.String,System.String)">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Claims.ClaimsIdentity" />-Klasse mit den angegebenen Werten für Ansprüche, Authentifizierungstyp, Namensanspruchstyp und Typ des Rollenanspruchs.</summary>
+      <param name="authenticationType">Der Typ, der verwendeten Authentifizierung.</param>
+      <param name="nameType">Der für Namensansprüche zu verwendende Anspruchstyp.</param>
+      <param name="roleType">Der für Rollenansprüche zu verwendende Anspruchstyp.</param>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Actor">
+      <summary>Ruft die Identität des Aufrufers ab, dem Übertragungsrechte erteilt wurden, oder legt diese fest.</summary>
+      <returns>Der anrufende Teilnehmer, dem Delegierungsrechte erteilt wurden.</returns>
+      <exception cref="T:System.InvalidOperationException">Es wurde versucht, die Eigenschaft auf die aktuelle Instanz festzulegen.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.AddClaim(System.Security.Claims.Claim)">
+      <summary>Fügt einen einzelnen Anspruch dieser Anspruchsidentität hinzu.</summary>
+      <param name="claim">Der hinzuzufügende Anspruch.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="claim" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.AddClaims(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>Fügt eine Liste von Ansprüchen dieser Anspruchsidentität hinzu.</summary>
+      <param name="claims">Die hinzuzufügenden Ansprüche.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="claims" /> ist null.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.AuthenticationType">
+      <summary>Ruft den Authentifizierungstyp ab.</summary>
+      <returns>Der Authentifizierungstyp.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.BootstrapContext">
+      <summary>Ruft das Token ab, das verwendet wurde, um diese Anspruchsidentität zu erstellen, oder legt dieses fest.</summary>
+      <returns>Der Bootstrap-Kontext.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Claims">
+      <summary>Ruft die Ansprüche ab, die dieser Anspruchsidentität zugeordnet sind.</summary>
+      <returns>Die Auflistung von Ansprüchen, die dieser Anspruchsidentität zugeordnet sind.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.Clone">
+      <summary>Gibt eine neue <see cref="T:System.Security.Claims.ClaimsIdentity" /> zurück, die von dieser Anspruchsidentität kopiert wird.</summary>
+      <returns>Eine Kopie der aktuellen Instanz.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.CreateClaim(System.IO.BinaryReader)"></member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.CustomSerializationData"></member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer">
+      <summary>Der Standardaussteller; "LOCAL AUTHORITY".</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultNameClaimType">
+      <summary>Der Anspruchstyp für den Standardnamen; <see cref="F:System.Security.Claims.ClaimTypes.Name" />.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultRoleClaimType">
+      <summary>Der standardmäßige Rollenanspruchstyps; <see cref="F:System.Security.Claims.ClaimTypes.Role" />.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindAll(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Ruft alle Ansprüche ab, die dem angegebenen Prädikat entsprechen.</summary>
+      <returns>Die übereinstimmenden Ansprüche.Die Liste ist schreibgeschützt.</returns>
+      <param name="match">Die Funktion, die die entsprechende Logik ausführt.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindAll(System.String)">
+      <summary>Ruft alle Ansprüche ab, die über den angegebenen Anspruchstyp verfügen.</summary>
+      <returns>Die übereinstimmenden Ansprüche.Die Liste ist schreibgeschützt.</returns>
+      <param name="type">Der Anspruchstyp, mit dem Ansprüche verglichen werden.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindFirst(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Ruft den ersten Anspruch ab, der dem angegebenen Prädikat entspricht.</summary>
+      <returns>Der erste übereinstimmende Anspruch oder null, wenn keine Übereinstimmung gefunden wird.</returns>
+      <param name="match">Die Funktion, die die entsprechende Logik ausführt.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindFirst(System.String)">
+      <summary>Ruft den ersten Anspruch mit dem angegebenen Anspruchstyp ab.</summary>
+      <returns>Der erste übereinstimmende Anspruch oder null, wenn keine Übereinstimmung gefunden wird.</returns>
+      <param name="type">Der Anspruchsstyp, mit dem eine Übereinstimmung gefunden werden soll.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.HasClaim(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Bestimmt, ob diese Anspruchsidentität einen Anspruch besitzt, der durch das angegebene Prädikat erfüllt ist.</summary>
+      <returns>true, wenn ein übereinstimmender Anspruch vorhanden ist; andernfalls false.</returns>
+      <param name="match">Die Funktion, die die entsprechende Logik ausführt.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.HasClaim(System.String,System.String)">
+      <summary>Bestimmt, ob diese Anspruchsdentität einen Anspruch besitzt mit dem angegebenen Typ und dem angegebenen Wert.</summary>
+      <returns>true, wenn eine Übereinstimmung gefunden wird, andernfalls false.</returns>
+      <param name="type">Der Typ des Anspruchs, der übereinstimmen soll.</param>
+      <param name="value">Der Wert des Anspruchs, der übereinstimmen soll.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> ist null.- oder -<paramref name="value" /> ist null.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.IsAuthenticated">
+      <summary>Ruft einen Wert ab, der angibt, ob die Identität authentifiziert wurde.</summary>
+      <returns>true, wenn die Identität authentifiziert wurde, andernfalls false.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Label">
+      <summary>Ruft die Bezeichnung für diese Anspruchsidentität ab oder legt diese fest.</summary>
+      <returns>Die Bezeichnung.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Name">
+      <summary>Ruft den Namen dieser Anspruchsidentität ab.</summary>
+      <returns>Der Name oder null.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.NameClaimType">
+      <summary>Ruft den Anspruchstyp ab, der verwendet wird, um zu bestimmen, welche Ansprüche den Wert für die <see cref="P:System.Security.Claims.ClaimsIdentity.Name" /> -Eigenschaft der Identität dieses Anspruchs bereitstellen.</summary>
+      <returns>Der Typ des Namensanspruchs.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.RemoveClaim(System.Security.Claims.Claim)">
+      <summary>Versucht, einen Anspruch aus der Anspruchsidentität zu entfernenden .</summary>
+      <param name="claim">Die zu entfernende Anforderung.</param>
+      <exception cref="T:System.InvalidOperationException">Der Anspruch kann nicht entfernt werden.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.RoleClaimType">
+      <summary>Ruft den Anspruchstyp ab, der als .NET Framework-Rolle unter den Ansprüchen in dieser Anspruchsidentität interpretiert wird.</summary>
+      <returns>Der Typ des Rollenanspruchs.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.TryRemoveClaim(System.Security.Claims.Claim)">
+      <summary>Versucht, einen Anspruch aus der Anspruchsidentität zu entfernenden .</summary>
+      <returns>true, wenn der Anspruch erfolgreich entfernt wurde, andernfalls false.</returns>
+      <param name="claim">Die zu entfernende Anforderung.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimsPrincipal">
+      <summary>Eine <see cref="T:System.Security.Principal.IPrincipal" /> Implementierung, die mehrere anspruchsbasierte Identitäten unterstützt.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Claims.ClaimsPrincipal" />-Klasse.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.ClaimsIdentity})">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Claims.ClaimsPrincipal" />-Klasse unter Verwendung der angegebenen Anspruchidentitäten.</summary>
+      <param name="identities">Die Identitäten, mit denen der neue Anspruchsprinzipal initialisiert werden soll.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identities" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Security.Principal.IIdentity)">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Claims.ClaimsPrincipal" />-Klasse aus der angegebenen Identität.</summary>
+      <param name="identity">Die Identität, mit der der neue Anspruchsprinzipal initialisiert werden soll.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identity" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Security.Principal.IPrincipal)">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Claims.ClaimsPrincipal" />-Klasse mit dem angegebenen Prinzipal .</summary>
+      <param name="principal">Der Prinzipal, mit dem der neue Anspruchsprinzipal initialisiert werden soll.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="principal" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.AddIdentities(System.Collections.Generic.IEnumerable{System.Security.Claims.ClaimsIdentity})">
+      <summary>Fügt die angegebenen Anspruchsidentitäten diesem Anspruchsprinzipal hinzu.</summary>
+      <param name="identities">Die hinzuzufügenden Anspruchsidentitäten.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identities" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.AddIdentity(System.Security.Claims.ClaimsIdentity)">
+      <summary>Fügt die angegebene Anspruchsidentität diesem Anspruchsprinzipal hinzu.</summary>
+      <param name="identity">Die hinzuzufügende Anspruchsidentität.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identity" /> ist null.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Claims">
+      <summary>Ruft eine Auflistung ab, die alle Ansprüche aller Anspruchsidentitäten enthält, die diesem Anspruchsprinzipal zugeordnet sind.</summary>
+      <returns>Die Ansprüche, die diesem Prinzipal zugeordnet ist.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.ClaimsPrincipalSelector">
+      <summary>Ruft den Delegaten ab oder legt diesen fest, der verwendet wird, um den Anspruchs-Principal auszuwählen, der von der <see cref="P:System.Security.Claims.ClaimsPrincipal.Current" />-Eigenschaft zurückgegeben wurde.</summary>
+      <returns>Der Delegat.Die Standardeinstellung ist null.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.Clone"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.CreateClaimsIdentity(System.IO.BinaryReader)"></member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Current">
+      <summary>Ruft den Prinzipal des aktuellen Anspruchs ab.</summary>
+      <returns>Der Prinzipal des aktuellen Anspruchs.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.CustomSerializationData"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindAll(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Ruft alle Ansprüche ab, die dem angegebenen Prädikat entsprechen.</summary>
+      <returns>Die übereinstimmenden Ansprüche.</returns>
+      <param name="match">Die Funktion, die die entsprechende Logik ausführt.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindAll(System.String)">
+      <summary>Ruft alle bzw. die Ansprüche ab, die über den angegebenen Anspruchstyp verfügen.</summary>
+      <returns>Die übereinstimmenden Ansprüche.</returns>
+      <param name="type">Der Anspruchstyp, mit dem Ansprüche verglichen werden.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindFirst(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Ruft den ersten Anspruch ab, der dem angegebenen Prädikat entspricht.</summary>
+      <returns>Der erste übereinstimmende Anspruch oder null, wenn keine Übereinstimmung gefunden wird.</returns>
+      <param name="match">Die Funktion, die die entsprechende Logik ausführt.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindFirst(System.String)">
+      <summary>Ruft den ersten Anspruch mit dem angegebenen Anspruchstyp ab.</summary>
+      <returns>Der erste übereinstimmende Anspruch oder null, wenn keine Übereinstimmung gefunden wird.</returns>
+      <param name="type">Der Anspruchsstyp, mit dem eine Übereinstimmung gefunden werden soll.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.HasClaim(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Bestimmt, ob Anspruchsidentitäten, die diesem Anspruchsprinzipal zugeordnet sind, einen Anspruch, der durch das angegebene Prädikat erfüllt ist, enthalten.</summary>
+      <returns>true, wenn ein übereinstimmender Anspruch vorhanden ist; andernfalls false.</returns>
+      <param name="match">Die Funktion, die die entsprechende Logik ausführt.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> ist null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.HasClaim(System.String,System.String)">
+      <summary>Bestimmt, ob Anspruchsidentitäten, die diesem Anspruchsprinzipal zugeordnet sind, einen Anspruch mit dem angegebenen Anspruchstyp und dem angegebenen Wert enthält.</summary>
+      <returns>true, wenn ein übereinstimmender Anspruch vorhanden ist; andernfalls false.</returns>
+      <param name="type">Der Typ des Anspruchs, der übereinstimmen soll.</param>
+      <param name="value">Der Wert des Anspruchs, der übereinstimmen soll.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> ist null.- oder -<paramref name="value" /> ist null.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Identities">
+      <summary>Ruft eine Auflistung ab, die alle Anspruchsidentitäten enthält, die diesem Anspruchsprinzipal zugeordnet sind.</summary>
+      <returns>Die Auflistung der Anspruchsidentitäten.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Identity">
+      <summary>Ruft die primäre Anspruchsidentität ab, die mit diesem Anspruchsprinzipal verknüpft ist.</summary>
+      <returns>Die primäre Anspruchsidentität, die mit diesem Anspruchsprinzipal verknüpft ist.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.IsInRole(System.String)">
+      <summary>Gibt einen Wert zurück, der angibt, ob sich die Entität (Benutzer), die von diesem Anspruchsprinzipal dargestellt wird, in der angegebenen Rolle befindet.</summary>
+      <returns>true, wenn sich der Anspruchs-Prinzipal in der angegebenen Rolle befindet, andernfalls false.</returns>
+      <param name="role">Das zu suchende Rolle.</param>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.PrimaryIdentitySelector">
+      <summary>Ruft den Delegaten ab oder legt diesen fest, der verwendet wird, um die Anspruchs-Identität auszuwählen, die von der <see cref="P:System.Security.Claims.ClaimsPrincipal.Identity" />-Eigenschaft zurückgegeben wurde.</summary>
+      <returns>Der Delegat.Die Standardeinstellung ist null.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimTypes">
+      <summary>Definiert Konstanten für die bekannten Anspruchstypen, die einem Antragsteller zugewiesen werden können.Diese Klasse kann nicht vererbt werden.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Actor">
+      <summary>http://schemas.xmlsoap.org/ws/2009/09/identity/claims/actor.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Anonymous">
+      <summary>Der URI für einen Anspruch, der den anonymen Benutzer angibt; http://schemas.xmlsoap.org/ws/2005/05/identity/claims/anonymous (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Authentication">
+      <summary>Der URI für einen Anspruch, der Details darüber angibt, ob eine Identität authentifiziert wird, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/authenticated (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthenticationInstant">
+      <summary>Der URI für einen Anspruch, der den Zeitpunkt angibt, zu dem eine Entität authentifiziert wurde; http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationinstant (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthenticationMethod">
+      <summary>Der URI für einen Anspruch, der die Methode angibt, mit der eine Entität authentifiziert wurde; http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthorizationDecision">
+      <summary>Der URI für einen Anspruch, der eine Autorisierungsentscheidung zu einer Entität angibt; http://schemas.xmlsoap.org/ws/2005/05/identity/claims/authorizationdecision (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.CookiePath">
+      <summary>Der URI für einen Anspruch, der den Cookiepfad angibt; http://schemas.microsoft.com/ws/2008/06/identity/claims/cookiepath (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Country">
+      <summary>Der URI für einen Anspruch, der das Land bzw. die Region angibt, unter der sich eine Entität befindet, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/country (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DateOfBirth">
+      <summary>Der URI für einen Anspruch, der das Geburtsdatum einer Entität angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/dateofbirth (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyPrimaryGroupSid">
+      <summary>Der URI für einen Anspruch, der die primäre Gruppen-SID nur zum Ablehnen auf einer Entität angibt; http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarygroupsid (möglicherweise in englischer Sprache).Eine SID nur zum Ablehnen lehnt die angegebene Entität für ein sicherungsfähiges Objekt ab.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyPrimarySid">
+      <summary>Der URI für einen Anspruch, der die primäre SID nur zum Ablehnen auf einer Entität angibt; http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarysid (möglicherweise in englischer Sprache).Eine SID nur zum Ablehnen lehnt die angegebene Entität für ein sicherungsfähiges Objekt ab.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlySid">
+      <summary>Der URI für einen Anspruch, der eine Sicherheits-ID (SID) nur zum Ablehnen für eine Entität angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/denyonlysid (möglicherweise in englischer Sprache).Eine SID nur zum Ablehnen lehnt die angegebene Entität für ein sicherungsfähiges Objekt ab.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyWindowsDeviceGroup">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlywindowsdevicegroup.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Dns">
+      <summary>Der URI für einen Anspruch, der den DNS-Namen angibt, der dem Computernamen oder dem alternativen Namen des Antragstellers oder des Ausstellers eines X.509-Zertifikats zugeordnet ist (http://schemas.xmlsoap.org/ws/2005/05/identity/claims/).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Dsa">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/dsa</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Email">
+      <summary>Der URI für einen Anspruch, der die E-Mail-Adresse einer Entität angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Expiration">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/expiration.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Expired">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/expired.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Gender">
+      <summary>Der URI für einen Anspruch, der das Geschlecht einer Entität angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/gender (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.GivenName">
+      <summary>Der URI für einen Anspruch, der den Vornamen einer Entität angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.GroupSid">
+      <summary>Der URI für einen Anspruch, der die SID für die Gruppe einer Entität angibt; http://schemas.microsoft.com/ws/2008/06/identity/claims/groupsid (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Hash">
+      <summary>Der URI für einen Anspruch, der einen Hashwert angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/hash (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.HomePhone">
+      <summary>Der URI für einen Anspruch, der die private Telefonnummer einer Entität angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/homephone (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.IsPersistent">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/ispersistent.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Locality">
+      <summary>Der URI für einen Anspruch, der das Gebietsschema angibt, in dem sich eine Entität befindet, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/locality (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.MobilePhone">
+      <summary>Der URI für einen Anspruch, der die mobile Telefonnummer einer Entität angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Name">
+      <summary>Der URI für einen Anspruch, der den Namen einer Entität angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.NameIdentifier">
+      <summary>Der URI für einen Anspruch, der den Namen einer Entität angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.OtherPhone">
+      <summary>Der URI für einen Anspruch, der die alternative Telefonnummer einer Entität angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/otherphone (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PostalCode">
+      <summary>Der URI für einen Anspruch, der die Postleitzahl einer Entität angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/postalcode (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PrimaryGroupSid">
+      <summary>Der URI für einen Anspruch, der die primäre Gruppen-SID einer Entität angibt; http://schemas.microsoft.com/ws/2008/06/identity/claims/primarygroupsid (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PrimarySid">
+      <summary>Der URI für einen Anspruch, der die primäre SID einer Entität angibt; http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Role">
+      <summary>Der URI für einen Anspruch, der die Rolle einer Entität angibt; http://schemas.microsoft.com/ws/2008/06/identity/claims/role (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Rsa">
+      <summary>Der URI für einen Anspruch, der einen RSA-Schlüssel angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/rsa (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.SerialNumber">
+      <summary>Der URI für einen Anspruch, der eine Seriennummer angibt, http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Sid">
+      <summary>Der URI für einen Anspruch, der eine Sicherheits-ID (SID) angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Spn">
+      <summary>Der URI für einen Anspruch, der einen Anspruch des Dienstprinzipalnamens (SPN) angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/spn (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.StateOrProvince">
+      <summary>Der URI für einen Anspruch, der das Bundesland bzw. den Kanton angibt, in dem sich eine Entität befindet, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/stateorprovince (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.StreetAddress">
+      <summary>Der URI für einen Anspruch, der die Straße einer Entität angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/streetaddress (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Surname">
+      <summary>Der URI für einen Anspruch, der den Nachnamen einer Entität angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.System">
+      <summary>Der URI für einen Anspruch, der die Systementität bezeichnet, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/system (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Thumbprint">
+      <summary>Der URI für einen Anspruch, der einen Fingerabdruck angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/thumbprint (möglicherweise in englischer Sprache).Ein Fingerabdruck ist ein global eindeutiger SHA-1-Hash eines X.509-Zertifikats.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Upn">
+      <summary>Der URI für einen Anspruch, der einen Benutzerprinzipalnamen (UPN) angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Uri">
+      <summary>Der URI für einen Anspruch, der einen URI angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/uri (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.UserData">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/userdata.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Version">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/version.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Webpage">
+      <summary>Der URI für einen Anspruch, der die Webseite einer Entität angibt, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/webpage (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsAccountName">
+      <summary>Der URI für einen Anspruch, der den Windows-Domänenkontonamen einer Entität angibt, http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname (möglicherweise in englischer Sprache).</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsDeviceClaim">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsdeviceclaim.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsDeviceGroup">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsdevicegroup.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsFqbnVersion">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsfqbnversion.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsSubAuthority">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowssubauthority.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsUserClaim">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsuserclaim.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.X500DistinguishedName">
+      <summary>Der URI für einen Distinguished Name eines X.509-Zertifikats, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/x500distinguishedname (möglicherweise in englischer Sprache).Der X.500-Standard definiert die Methodik dazu, Distinguished Names zu definieren, die von X.509-Zertifikaten verwendet werden.</summary>
+    </member>
+    <member name="T:System.Security.Claims.ClaimValueTypes">
+      <summary>Definiert Anspruchswerttypen entsprechend dem URI-Typen, die von OASIS und W3C definiert werden.Diese Klasse kann nicht vererbt werden.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Base64Binary">
+      <summary>Ein URI, der den base64Binary XML-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Base64Octet">
+      <summary>Ein URI, der den base64Octet XML-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Boolean">
+      <summary>Ein URI, der den boolean XML-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Date">
+      <summary>Ein URI, der den date XML-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DateTime">
+      <summary>Ein URI, der den dateTime XML-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DaytimeDuration">
+      <summary>Ein URI, der den daytimeDuration XQuery-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DnsName">
+      <summary>Ein URI, der den dns SOAP-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Double">
+      <summary>Ein URI, der den double XML-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DsaKeyValue">
+      <summary>Ein URI, der den DSAKeyValue Datentyp der XML-Signatur darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Email">
+      <summary>Ein URI, der den emailaddress SOAP-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Fqbn">
+      <summary>Ein URI, der den fqbn XML-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.HexBinary">
+      <summary>Ein URI, der den hexBinary XML-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer">
+      <summary>Ein URI, der den integer XML-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer32">
+      <summary>Ein URI, der den integer32 XML-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer64">
+      <summary>Ein URI, der den integer64 XML-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.KeyInfo">
+      <summary>Ein URI, der den KeyInfo Datentyp der XML-Signatur darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Rfc822Name">
+      <summary>Ein URI, der den rfc822Name XACML 1.0-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Rsa">
+      <summary>Ein URI, der den rsa SOAP-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.RsaKeyValue">
+      <summary>Ein URI, der den RSAKeyValue Datentyp der XML-Signatur darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Sid">
+      <summary>Ein URI, der den sid XML-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.String">
+      <summary>Ein URI, der den string XML-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Time">
+      <summary>Ein URI, der den time XML-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UInteger32">
+      <summary>Ein URI, der den uinteger32 XML-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UInteger64">
+      <summary>Ein URI, der den uinteger64 XML-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UpnName">
+      <summary>Ein URI, der den UPN SOAP-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.X500Name">
+      <summary>Ein URI, der den x500Name XACML 1.0-Datentyp darstellt.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.YearMonthDuration">
+      <summary>Ein URI, der den yearMonthDuration XQuery-Datentyp darstellt.</summary>
+    </member>
+    <member name="T:System.Security.Principal.GenericIdentity">
+      <summary>Stellt einen allgemeinen Benutzer dar.</summary>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.Security.Principal.GenericIdentity)">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Principal.GenericIdentity" />-Klasse unter Verwendung des angegebenen <see cref="T:System.Security.Principal.GenericIdentity" />-Objekts.</summary>
+      <param name="identity">Das Objekt, aus dem die neue Instanz von <see cref="T:System.Security.Principal.GenericIdentity" /> erstellt werden soll.</param>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.String)">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Principal.GenericIdentity" />-Klasse, die den Benutzer mit dem angegebenen Namen darstellt.</summary>
+      <param name="name">Der Name des Benutzers, für den der Code ausgeführt wird. </param>
+      <exception cref="T:System.ArgumentNullException">Der <paramref name="name" />-Parameter ist null. </exception>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.String,System.String)">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Principal.GenericIdentity" />-Klasse, die den Benutzer mit dem angegebenen Namen und Authentifizierungstyp darstellt.</summary>
+      <param name="name">Der Name des Benutzers, für den der Code ausgeführt wird. </param>
+      <param name="type">Der zur Identifizierung des Benutzers verwendete Authentifizierungstyp. </param>
+      <exception cref="T:System.ArgumentNullException">Der <paramref name="name" />-Parameter ist null.– oder – Der <paramref name="type" />-Parameter ist null. </exception>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.AuthenticationType">
+      <summary>Ruft den zur Identifizierung des Benutzers verwendeten Authentifizierungstyp ab.</summary>
+      <returns>Der zur Identifizierung des Benutzers verwendete Authentifizierungstyp.</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.Claims">
+      <summary>Ruft alle Ansprüche für den Benutzer ab, der durch diese generische Identität dargestellt wird.</summary>
+      <returns>Eine Sammlung von Ansprüchen für dieses <see cref="T:System.Security.Principal.GenericIdentity" />-Objekt.</returns>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.Clone">
+      <summary>Erstellt ein neues Objekt, das eine Kopie der aktuellen Instanz darstellt.</summary>
+      <returns>Eine Kopie der aktuellen Instanz.</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.IsAuthenticated">
+      <summary>Ruft einen Wert ab, der angibt, ob der Benutzer authentifiziert wurde.</summary>
+      <returns>true, wenn der Benutzer authentifiziert wurde, andernfalls false.</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.Name">
+      <summary>Ruft den Namen des Benutzers ab.</summary>
+      <returns>Der Name des Benutzers, für den der Code ausgeführt wird.</returns>
+    </member>
+    <member name="T:System.Security.Principal.GenericPrincipal">
+      <summary>Stellt einen allgemeinen Prinzipal dar.</summary>
+    </member>
+    <member name="M:System.Security.Principal.GenericPrincipal.#ctor(System.Security.Principal.IIdentity,System.String[])">
+      <summary>Initialisiert eine neue Instanz der <see cref="T:System.Security.Principal.GenericPrincipal" />-Klasse aus einer Benutzeridentität und einem Array mit den Namen der Rollen, zu denen der von dieser Identität dargestellte Benutzer gehört.</summary>
+      <param name="identity">Eine grundlegende Implementierung der <see cref="T:System.Security.Principal.IIdentity" />-Schnittstelle, die einen beliebigen Benutzer darstellt. </param>
+      <param name="roles">Ein Array mit Namen von Rollen, zu denen der durch den <paramref name="identity" />-Parameter dargestellte Benutzer gehört. </param>
+      <exception cref="T:System.ArgumentNullException">Der <paramref name="identity" />-Parameter ist null. </exception>
+    </member>
+    <member name="P:System.Security.Principal.GenericPrincipal.Identity">
+      <summary>Ruft die <see cref="T:System.Security.Principal.GenericIdentity" />-Klasse des durch die aktuellen <see cref="T:System.Security.Principal.GenericPrincipal" />-Klasse dargestellten Benutzers ab.</summary>
+      <returns>Die <see cref="T:System.Security.Principal.GenericIdentity" />-Klasse des durch die <see cref="T:System.Security.Principal.GenericPrincipal" />-Klasse dargestellten Benutzers.</returns>
+    </member>
+    <member name="M:System.Security.Principal.GenericPrincipal.IsInRole(System.String)">
+      <summary>Bestimmt, ob die aktuelle <see cref="T:System.Security.Principal.GenericPrincipal" />-Klasse zur angegebenen Rolle gehört.</summary>
+      <returns>true, wenn die aktuelle <see cref="T:System.Security.Principal.GenericPrincipal" />-Klasse ein Member der angegebenen Rolle ist, andernfalls false.</returns>
+      <param name="role">Der Name der Rolle, für die die Mitgliedschaft überprüft werden soll. </param>
+    </member>
+  </members>
+</doc>

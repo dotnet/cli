@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata minClientVersion="3.4">
+    <id>System.Reflection.Emit.Lightweight</id>
+    <version>4.0.1-rc2-24027</version>
+    <title>System.Reflection.Emit.Lightweight</title>
+    <authors>Microsoft</authors>
+    <owners>microsoft,dotnetframework</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>http://go.microsoft.com/fwlink/?LinkId=329770</licenseUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <description>Provides the System.Reflection.Emit.DynamicMethod class, which represents a dynamic method that can be compiled, executed, and discarded. Discarded methods are available for garbage collection.
+
+Commonly Used Types:
+System.Reflection.Emit.DynamicMethod
+ \r\n TFS ID: 1599443, GitHub SHA: https://github.com/dotnet/corefx/tree/eede273a4dfabcea608621f5e1bbf8ad00584cfb</description>
+    <copyright>© Microsoft Corporation.  All rights reserved.</copyright>
+    <dependencies>
+      <group targetFramework="MonoAndroid1.0">
+        <dependency id="System.Reflection.Emit.ILGeneration" version="4.0.1-rc2-24027" />
+      </group>
+      <group targetFramework="MonoTouch1.0">
+        <dependency id="System.Reflection.Emit.ILGeneration" version="4.0.1-rc2-24027" />
+      </group>
+      <group targetFramework=".NETFramework4.5" />
+      <group targetFramework=".NETStandard1.0">
+        <dependency id="System.Reflection" version="4.1.0-rc2-24027" />
+        <dependency id="System.Reflection.Emit.ILGeneration" version="4.0.1-rc2-24027" />
+        <dependency id="System.Reflection.Primitives" version="4.0.1-rc2-24027" />
+        <dependency id="System.Runtime" version="4.1.0-rc2-24027" />
+      </group>
+      <group targetFramework=".NETPortable0.0-Profile49" />
+      <group targetFramework="WindowsPhone8.0" />
+      <group targetFramework="Xamarin.iOS1.0">
+        <dependency id="System.Reflection.Emit.ILGeneration" version="4.0.1-rc2-24027" />
+      </group>
+      <group targetFramework="Xamarin.Mac2.0">
+        <dependency id="System.Reflection.Emit.ILGeneration" version="4.0.1-rc2-24027" />
+      </group>
+      <group targetFramework="Xamarin.TVOS1.0">
+        <dependency id="System.Reflection.Emit.ILGeneration" version="4.0.1-rc2-24027" />
+      </group>
+      <group targetFramework="Xamarin.WatchOS1.0">
+        <dependency id="System.Reflection.Emit.ILGeneration" version="4.0.1-rc2-24027" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

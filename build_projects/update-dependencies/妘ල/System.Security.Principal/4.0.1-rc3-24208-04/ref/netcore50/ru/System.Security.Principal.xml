@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Security.Principal</name>
+  </assembly>
+  <members>
+    <member name="T:System.Security.Principal.IIdentity">
+      <summary>Определяет базовые функциональные возможности объекта идентификации.</summary>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.AuthenticationType">
+      <summary>Получает тип используемой проверки подлинности.</summary>
+      <returns>Тип проверки подлинности, применяемой для идентификации пользователя.</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.IsAuthenticated">
+      <summary>Получает значение, определяющее, прошел ли пользователь проверку подлинности.</summary>
+      <returns>true, если пользователь прошел проверку подлинности; в противном случае — false.</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.Name">
+      <summary>Получает имя текущего пользователя.</summary>
+      <returns>Имя пользователя, от лица которого выполняется код программы.</returns>
+    </member>
+    <member name="T:System.Security.Principal.IPrincipal">
+      <summary>Определяет базовые функциональные возможности объекта-участника.</summary>
+    </member>
+    <member name="P:System.Security.Principal.IPrincipal.Identity">
+      <summary>Возвращает удостоверение текущего участника.</summary>
+      <returns>Объект <see cref="T:System.Security.Principal.IIdentity" />, связанный с текущим участником.</returns>
+    </member>
+    <member name="M:System.Security.Principal.IPrincipal.IsInRole(System.String)">
+      <summary>Определяет, относится ли текущий участник к указанной роли.</summary>
+      <returns>true, если текущий участник является элементом указанной роли; в противном случае — false.</returns>
+      <param name="role">Имя роли, для которой требуется проверить членство. </param>
+    </member>
+    <member name="T:System.Security.Principal.TokenImpersonationLevel">
+      <summary>Определяет уровни олицетворения безопасности.Уровни олицетворения безопасности определяют степень, до которой серверный процесс может действовать от лица клиентского процесса.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Anonymous">
+      <summary>Серверный процесс не может получать идентификационную информацию о клиенте и не может олицетворять клиента.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Delegation">
+      <summary>Серверный процесс может олицетворять контекст безопасности клиента в удаленных системах.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Identification">
+      <summary>Серверный процесс может получать информацию о клиенте, например, идентификаторы и привилегии безопасности, но не может олицетворять клиента.Это полезно для серверов, экспортирующих свои собственные объекты, например, продукты баз данных, которые экспортируют таблицы и виды.Используя полученную информацию безопасности клиента, сервер может принимать решения в отношении проверки доступа, не имея возможности применять другие службы, использующие контекст безопасности клиента.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Impersonation">
+      <summary>Серверный процесс может олицетворять контекст безопасности клиента в своей локальной системе.Олицетворение клиента сервером в удаленных системах невозможно.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.None">
+      <summary>Уровень олицетворения не назначается.</summary>
+    </member>
+  </members>
+</doc>

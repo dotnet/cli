@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Threading.ThreadPool</name>
+  </assembly>
+  <members>
+    <member name="T:System.Threading.RegisteredWaitHandle">
+      <summary>
+        <see cref="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.UInt32,System.Boolean)" /> を呼び出すときに登録されたハンドルを表します。このクラスは継承できません。</summary>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="M:System.Threading.RegisteredWaitHandle.Unregister(System.Threading.WaitHandle)">
+      <summary>
+        <see cref="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.UInt32,System.Boolean)" /> メソッドで実行した登録済みの待機操作を取り消します。</summary>
+      <returns>関数が成功した場合は true。それ以外の場合は false。</returns>
+      <param name="waitObject">シグナル状態になる <see cref="T:System.Threading.WaitHandle" />。</param>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="T:System.Threading.ThreadPool">
+      <summary>タスクの実行、作業項目のポスト、非同期 I/O の処理、他のスレッドの代理で行う待機、およびタイマーの処理に使用できるスレッドのプールを提供します。</summary>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.BindHandle(System.Runtime.InteropServices.SafeHandle)">
+      <summary>[セキュリティ クリティカル] オペレーティング システム ハンドルを <see cref="T:System.Threading.ThreadPool" /> にバインドします。</summary>
+      <returns>ハンドルがバインドされている場合は true、それ以外の場合は false。</returns>
+      <param name="osHandle">オペレーティング システム ハンドルを保持する <see cref="T:System.Runtime.InteropServices.SafeHandle" />。ハンドルは、アンマネージ側の重複 I/O 用に開かれている必要があります。</param>
+    </member>
+    <member name="M:System.Threading.ThreadPool.QueueUserWorkItem(System.Threading.WaitCallback)">
+      <summary>メソッドを実行するためのキューに置きます。メソッドは、スレッド プール スレッドが使用可能になったときに実行されます。</summary>
+      <returns>メソッドが正常にキューに配置された場合は true。作業項目をキューに配置できなかった場合は <see cref="T:System.NotSupportedException" /> がスローされます。</returns>
+      <param name="callBack">実行するメソッドを表す <see cref="T:System.Threading.WaitCallback" />。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="callBack" /> is null.</exception>
+      <exception cref="T:System.NotSupportedException">The common language runtime (CLR) is hosted, and the host does not support this action.</exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.QueueUserWorkItem(System.Threading.WaitCallback,System.Object)">
+      <summary>実行するためのキューにメソッドを置き、そのメソッドが使用するデータを含んだオブジェクトを指定します。メソッドは、スレッド プール スレッドが使用可能になったときに実行されます。</summary>
+      <returns>メソッドが正常にキューに配置された場合は true。作業項目をキューに配置できなかった場合は <see cref="T:System.NotSupportedException" /> がスローされます。</returns>
+      <param name="callBack">実行するメソッドを表す <see cref="T:System.Threading.WaitCallback" />。</param>
+      <param name="state">メソッドが使用するデータを格納したオブジェクト。</param>
+      <exception cref="T:System.NotSupportedException">The common language runtime (CLR) is hosted, and the host does not support this action.</exception>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="callBack" /> is null.</exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.Int32,System.Boolean)">
+      <summary>ミリ秒単位のタイムアウトとして 32 ビット符号付き整数を指定して、<see cref="T:System.Threading.WaitHandle" /> を待機するデリゲートを登録します。</summary>
+      <returns>ネイティブ ハンドルをカプセル化する <see cref="T:System.Threading.RegisteredWaitHandle" />。</returns>
+      <param name="waitObject">登録する <see cref="T:System.Threading.WaitHandle" />。<see cref="T:System.Threading.Mutex" /> 以外の <see cref="T:System.Threading.WaitHandle" /> を使用します。</param>
+      <param name="callBack">
+        <paramref name="waitObject" /> パラメーターがシグナル通知されたときに呼び出す <see cref="T:System.Threading.WaitOrTimerCallback" /> デリゲート。</param>
+      <param name="state">デリゲートに渡されるオブジェクト。</param>
+      <param name="millisecondsTimeOutInterval">ミリ秒単位のタイムアウト。<paramref name="millisecondsTimeOutInterval" /> パラメーターが 0 (ゼロ) の場合、関数はオブジェクトの状態をテストして、すぐに制御を戻します。<paramref name="millisecondsTimeOutInterval" /> が -1 の場合、関数はタイムアウトしません。</param>
+      <param name="executeOnlyOnce">デリゲートの呼び出し後、スレッドが <paramref name="waitObject" /> パラメーターを待機しなくなる場合は true。待機が登録解除されるまでは、待機操作が完了するたびにタイマーをリセットする場合は false。</param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="millisecondsTimeOutInterval" /> parameter is less than -1. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.Int64,System.Boolean)">
+      <summary>64 ビット符号付き整数でミリ秒単位のタイムアウトを指定して、<see cref="T:System.Threading.WaitHandle" /> を待機するデリゲートを登録します。</summary>
+      <returns>ネイティブ ハンドルをカプセル化する <see cref="T:System.Threading.RegisteredWaitHandle" />。</returns>
+      <param name="waitObject">登録する <see cref="T:System.Threading.WaitHandle" />。<see cref="T:System.Threading.Mutex" /> 以外の <see cref="T:System.Threading.WaitHandle" /> を使用します。</param>
+      <param name="callBack">
+        <paramref name="waitObject" /> パラメーターがシグナル通知されたときに呼び出す <see cref="T:System.Threading.WaitOrTimerCallback" /> デリゲート。</param>
+      <param name="state">デリゲートに渡されたオブジェクト。</param>
+      <param name="millisecondsTimeOutInterval">ミリ秒単位のタイムアウト。<paramref name="millisecondsTimeOutInterval" /> パラメーターが 0 (ゼロ) の場合、関数はオブジェクトの状態をテストして、すぐに制御を戻します。<paramref name="millisecondsTimeOutInterval" /> が -1 の場合、関数はタイムアウトしません。</param>
+      <param name="executeOnlyOnce">デリゲートの呼び出し後、スレッドが <paramref name="waitObject" /> パラメーターを待機しなくなる場合は true。待機が登録解除されるまでは、待機操作が完了するたびにタイマーをリセットする場合は false。</param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="millisecondsTimeOutInterval" /> parameter is less than -1. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.TimeSpan,System.Boolean)">
+      <summary>
+        <see cref="T:System.TimeSpan" /> 値をタイムアウトとして指定して、<see cref="T:System.Threading.WaitHandle" /> を待機するデリゲートを登録します。</summary>
+      <returns>ネイティブ ハンドルをカプセル化する <see cref="T:System.Threading.RegisteredWaitHandle" />。</returns>
+      <param name="waitObject">登録する <see cref="T:System.Threading.WaitHandle" />。<see cref="T:System.Threading.Mutex" /> 以外の <see cref="T:System.Threading.WaitHandle" /> を使用します。</param>
+      <param name="callBack">
+        <paramref name="waitObject" /> パラメーターがシグナル通知されたときに呼び出す <see cref="T:System.Threading.WaitOrTimerCallback" /> デリゲート。</param>
+      <param name="state">デリゲートに渡されたオブジェクト。</param>
+      <param name="timeout">
+        <see cref="T:System.TimeSpan" /> で表されるタイムアウト。<paramref name="timeout" /> が 0 (ゼロ) の場合、関数はオブジェクトの状態をテストして、すぐに制御を戻します。<paramref name="timeout" /> が -1 の場合、関数はタイムアウトしません。</param>
+      <param name="executeOnlyOnce">デリゲートの呼び出し後、スレッドが <paramref name="waitObject" /> パラメーターを待機しなくなる場合は true。待機が登録解除されるまでは、待機操作が完了するたびにタイマーをリセットする場合は false。</param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="timeout" /> parameter is less than -1. </exception>
+      <exception cref="T:System.NotSupportedException">The <paramref name="timeout" /> parameter is greater than <see cref="F:System.Int32.MaxValue" />. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.UInt32,System.Boolean)">
+      <summary>32 ビット符号なし整数でミリ秒単位のタイムアウトを指定して、<see cref="T:System.Threading.WaitHandle" /> を待機するデリゲートを登録します。</summary>
+      <returns>登録された待機操作をキャンセルするために使用できる <see cref="T:System.Threading.RegisteredWaitHandle" />。</returns>
+      <param name="waitObject">登録する <see cref="T:System.Threading.WaitHandle" />。<see cref="T:System.Threading.Mutex" /> 以外の <see cref="T:System.Threading.WaitHandle" /> を使用します。</param>
+      <param name="callBack">
+        <paramref name="waitObject" /> パラメーターがシグナル通知されたときに呼び出す <see cref="T:System.Threading.WaitOrTimerCallback" /> デリゲート。</param>
+      <param name="state">デリゲートに渡されたオブジェクト。</param>
+      <param name="millisecondsTimeOutInterval">ミリ秒単位のタイムアウト。<paramref name="millisecondsTimeOutInterval" /> パラメーターが 0 (ゼロ) の場合、関数はオブジェクトの状態をテストして、すぐに制御を戻します。<paramref name="millisecondsTimeOutInterval" /> が -1 の場合、関数はタイムアウトしません。</param>
+      <param name="executeOnlyOnce">デリゲートの呼び出し後、スレッドが <paramref name="waitObject" /> パラメーターを待機しなくなる場合は true。待機が登録解除されるまでは、待機操作が完了するたびにタイマーをリセットする場合は false。</param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="millisecondsTimeOutInterval" /> parameter is less than -1. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="T:System.Threading.WaitCallback">
+      <summary>スレッド プール スレッドが実行するコールバック メソッドを表します。</summary>
+      <param name="state">コールバック メソッドが使用する情報を格納したオブジェクト。</param>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="T:System.Threading.WaitOrTimerCallback">
+      <summary>
+        <see cref="T:System.Threading.WaitHandle" /> がシグナル通知されたとき、またはタイムアウトしたときに呼び出されるメソッドを表します。</summary>
+      <param name="state">コールバック メソッドが実行されるたびに使用する情報を格納したオブジェクト。</param>
+      <param name="timedOut">
+        <see cref="T:System.Threading.WaitHandle" /> がタイムアウトした場合は true。シグナル通知された場合は false。</param>
+      <filterpriority>2</filterpriority>
+    </member>
+  </members>
+</doc>

@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2016/06/nuspec.xsd">
+  <metadata minClientVersion="2.12">
+    <id>System.Security.Cryptography.Algorithms</id>
+    <version>4.2.0-rc3-24208-04</version>
+    <title>System.Security.Cryptography.Algorithms</title>
+    <authors>Microsoft</authors>
+    <owners>microsoft,dotnetframework</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>http://go.microsoft.com/fwlink/?LinkId=329770</licenseUrl>
+    <projectUrl>https://dot.net/</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <description>Provides base types for cryptographic algorithms, including hashing, encryption, and signing operations.
+
+Commonly Used Types:
+System.Security.Cryptography.Aes
+System.Security.Cryptography.RSA
+System.Security.Cryptography.RSAParameters
+System.Security.Cryptography.HMACSHA1
+System.Security.Cryptography.SHA256
+System.Security.Cryptography.SHA1
+System.Security.Cryptography.SHA512
+System.Security.Cryptography.SHA384
+System.Security.Cryptography.HMACSHA256
+System.Security.Cryptography.MD5
+System.Security.Cryptography.HMACSHA384
+System.Security.Cryptography.HMACSHA512
+ 
+When using NuGet 3.x this package requires at least version 3.4.</description>
+    <releaseNotes>https://go.microsoft.com/fwlink/?LinkID=799417</releaseNotes>
+    <copyright>© Microsoft Corporation.  All rights reserved.</copyright>
+    <serviceable>true</serviceable>
+    <dependencies>
+      <group targetFramework="MonoAndroid1.0" />
+      <group targetFramework="MonoTouch1.0" />
+      <group targetFramework=".NETFramework4.6">
+        <dependency id="System.Security.Cryptography.Primitives" version="4.0.0-rc3-24208-04" />
+      </group>
+      <group targetFramework=".NETFramework4.6.1">
+        <dependency id="System.Security.Cryptography.Primitives" version="4.0.0-rc3-24208-04" />
+      </group>
+      <group targetFramework=".NETFramework4.6.3">
+        <dependency id="System.IO" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Runtime" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Security.Cryptography.Encoding" version="4.0.0-rc3-24208-04" />
+        <dependency id="System.Security.Cryptography.Primitives" version="4.0.0-rc3-24208-04" />
+      </group>
+      <group targetFramework=".NETCore5.0">
+        <dependency id="Microsoft.NETCore.Platforms" version="1.0.1-rc3-24208-04" />
+        <dependency id="System.IO" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Resources.ResourceManager" version="4.0.1-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime.Extensions" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime.Handles" version="4.0.1-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime.InteropServices" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Security.Cryptography.Encoding" version="4.0.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Security.Cryptography.Primitives" version="4.0.0-rc3-24208-04" />
+        <dependency id="System.Text.Encoding" version="4.0.11-rc3-24208-04" exclude="Compile" />
+      </group>
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="System.IO" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Runtime" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Security.Cryptography.Primitives" version="4.0.0-rc3-24208-04" />
+      </group>
+      <group targetFramework=".NETStandard1.4">
+        <dependency id="System.IO" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Runtime" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Security.Cryptography.Primitives" version="4.0.0-rc3-24208-04" />
+      </group>
+      <group targetFramework=".NETStandard1.6">
+        <dependency id="Microsoft.NETCore.Platforms" version="1.0.1-rc3-24208-04" />
+        <dependency id="runtime.native.System.Security.Cryptography" version="4.0.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Collections" version="4.0.11-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.IO" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Resources.ResourceManager" version="4.0.1-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime" version="4.1.0-rc3-24208-04" />
+        <dependency id="System.Runtime.Extensions" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime.Handles" version="4.0.1-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime.InteropServices" version="4.1.0-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Runtime.Numerics" version="4.0.1-rc3-24208-04" exclude="Compile" />
+        <dependency id="System.Security.Cryptography.Encoding" version="4.0.0-rc3-24208-04" />
+        <dependency id="System.Security.Cryptography.Primitives" version="4.0.0-rc3-24208-04" />
+        <dependency id="System.Text.Encoding" version="4.0.11-rc3-24208-04" exclude="Compile" />
+      </group>
+      <group targetFramework="Xamarin.iOS1.0" />
+      <group targetFramework="Xamarin.Mac2.0" />
+      <group targetFramework="Xamarin.TVOS1.0" />
+      <group targetFramework="Xamarin.WatchOS1.0" />
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="mscorlib" targetFramework=".NETFramework4.6" />
+      <frameworkAssembly assemblyName="mscorlib" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="mscorlib" targetFramework=".NETFramework4.6.3" />
+      <frameworkAssembly assemblyName="System.Core" targetFramework=".NETFramework4.6" />
+      <frameworkAssembly assemblyName="System.Core" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Core" targetFramework=".NETFramework4.6.3" />
+    </frameworkAssemblies>
+  </metadata>
+</package>

@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Security.Principal</name>
+  </assembly>
+  <members>
+    <member name="T:System.Security.Principal.IIdentity">
+      <summary>定义标识对象的基本功能。</summary>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.AuthenticationType">
+      <summary>获取所使用的身份验证的类型。</summary>
+      <returns>用于标识用户的身份验证的类型。</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.IsAuthenticated">
+      <summary>获取一个值，该值指示是否验证了用户。</summary>
+      <returns>如果用户已经过验证，则为 true；否则为 false。</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.Name">
+      <summary>获取当前用户的名称。</summary>
+      <returns>用户名，代码当前即以该用户的名义运行。</returns>
+    </member>
+    <member name="T:System.Security.Principal.IPrincipal">
+      <summary>定义用户对象的基本功能。</summary>
+    </member>
+    <member name="P:System.Security.Principal.IPrincipal.Identity">
+      <summary>获取当前用户的标识。</summary>
+      <returns>与当前用户关联的 <see cref="T:System.Security.Principal.IIdentity" /> 对象。</returns>
+    </member>
+    <member name="M:System.Security.Principal.IPrincipal.IsInRole(System.String)">
+      <summary>确定当前用户是否属于指定的角色。</summary>
+      <returns>如果当前用户是指定角色的成员，则为 true；否则为 false。</returns>
+      <param name="role">要检查其成员资格的角色的名称。</param>
+    </member>
+    <member name="T:System.Security.Principal.TokenImpersonationLevel">
+      <summary>定义安全模拟级别。安全模拟级别控制服务器进程可以在何种程度上代表客户端进程执行操作。</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Anonymous">
+      <summary>服务器进程无法获取有关客户端的标识信息，且无法模拟客户端。</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Delegation">
+      <summary>服务器进程可以在远程系统上模拟客户端的安全上下文。</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Identification">
+      <summary>服务器进程可以获取有关客户端的信息（如安全标识符和特权），但是无法模拟客户端。这对于导出自己的对象的服务器（如导出表和视图的数据库产品）十分有用。在不能使用其他正使用客户端安全上下文的服务的情况下，服务器可以使用检索到的客户端安全信息做出访问验证决策。</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Impersonation">
+      <summary>服务器进程可以在其本地系统上模拟客户端的安全上下文。服务器无法在远程系统上模拟客户端。</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.None">
+      <summary>未指定模拟级别。</summary>
+    </member>
+  </members>
+</doc>

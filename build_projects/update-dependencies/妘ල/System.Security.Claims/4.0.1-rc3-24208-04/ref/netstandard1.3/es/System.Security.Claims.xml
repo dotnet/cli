@@ -1,0 +1,677 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Security.Claims</name>
+  </assembly>
+  <members>
+    <member name="T:System.Security.Claims.Claim">
+      <summary>Representa una notificación.</summary>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.IO.BinaryReader,System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.Security.Claims.Claim)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.Security.Claims.Claim,System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String)">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.Claim" /> con tipo de reclamación y valor especificados.</summary>
+      <param name="type">Tipo de notificación.</param>
+      <param name="value">Valor de notificación.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> o <paramref name="value" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String)">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.Claim" /> con el tipo de reclamación, valor y tipo de valor especificados.</summary>
+      <param name="type">Tipo de notificación.</param>
+      <param name="value">Valor de notificación.</param>
+      <param name="valueType">Tipo de valor de la reclamación.Si este parámetro es null, se usa <see cref="F:System.Security.Claims.ClaimValueTypes.String" />.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> o <paramref name="value" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String)">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.Claim" /> con el tipo de reclamación, valor, tipo de valor y emisor especificados.</summary>
+      <param name="type">Tipo de notificación.</param>
+      <param name="value">Valor de notificación.</param>
+      <param name="valueType">Tipo de valor de la reclamación.Si este parámetro es null, se usa <see cref="F:System.Security.Claims.ClaimValueTypes.String" />.</param>
+      <param name="issuer">El emisor de la notificación.Si este parámetro está vacío o null, se usa <see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" /> .</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> o <paramref name="value" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String,System.String)">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.Claim" /> con el tipo de reclamación, valor, tipo de valor, emisor y emisor original especificados.</summary>
+      <param name="type">Tipo de notificación.</param>
+      <param name="value">Valor de notificación.</param>
+      <param name="valueType">Tipo de valor de la reclamación.Si este parámetro es null, se usa <see cref="F:System.Security.Claims.ClaimValueTypes.String" />.</param>
+      <param name="issuer">El emisor de la notificación.Si este parámetro está vacío o null, se usa <see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" /> .</param>
+      <param name="originalIssuer">Emisor original de la notificación.Si este parámetro está vacío o es null, la propiedad <see cref="P:System.Security.Claims.Claim.OriginalIssuer" /> se establece en el valor de la propiedad <see cref="P:System.Security.Claims.Claim.Issuer" /> .</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> o <paramref name="value" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String,System.String,System.Security.Claims.ClaimsIdentity)">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.Claim" /> con el tipo de notificación, valor, tipo de valor, emisor, emisor original y asunto especificados.</summary>
+      <param name="type">Tipo de notificación.</param>
+      <param name="value">Valor de notificación.</param>
+      <param name="valueType">Tipo de valor de la reclamación.Si este parámetro es null, se usa <see cref="F:System.Security.Claims.ClaimValueTypes.String" />.</param>
+      <param name="issuer">El emisor de la notificación.Si este parámetro está vacío o null, se usa <see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" /> .</param>
+      <param name="originalIssuer">Emisor original de la notificación.Si este parámetro está vacío o es null, la propiedad <see cref="P:System.Security.Claims.Claim.OriginalIssuer" /> se establece en el valor de la propiedad <see cref="P:System.Security.Claims.Claim.Issuer" /> .</param>
+      <param name="subject">El asunto que esta notificación describe.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> o <paramref name="value" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.Clone">
+      <summary>Devuelve un objeto <see cref="T:System.Security.Claims.Claim" /> nuevo copiado de este objeto.La nueva notificación no tiene un asunto.</summary>
+      <returns>Nuevo objeto de reclamación.</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.Clone(System.Security.Claims.ClaimsIdentity)">
+      <summary>Devuelve un objeto <see cref="T:System.Security.Claims.Claim" /> nuevo copiado de este objeto.El asunto de la nueva solicitud se establece en la ClaimsIdentity especificada.</summary>
+      <returns>Nuevo objeto de reclamación.</returns>
+      <param name="identity">Asunto previsto de la nueva notificación.</param>
+    </member>
+    <member name="P:System.Security.Claims.Claim.CustomSerializationData"></member>
+    <member name="P:System.Security.Claims.Claim.Issuer">
+      <summary>Obtiene el emisor de la notificación.</summary>
+      <returns>Nombre que hace referencia al emisor de la notificación.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.OriginalIssuer">
+      <summary>Obtiene el emisor original de la notificación. </summary>
+      <returns>Nombre que hace referencia al emisor original de la notificación.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Properties">
+      <summary>Obtiene un diccionario que contiene propiedades adicionales asociadas a esta notificación.</summary>
+      <returns>Diccionario que contiene propiedades adicionales asociadas a la notificación.Las propiedades se representan como pares de nombre y valor.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Subject">
+      <summary>Obtiene el asunto de la notificación.</summary>
+      <returns>Asunto de la reclamación.</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.ToString">
+      <summary>Devuelve una representación de cadena de este objeto <see cref="T:System.Security.Claims.Claim" />.</summary>
+      <returns>Representación de cadena del objeto <see cref="T:System.Security.Claims.Claim" /> en cuestión.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Type">
+      <summary>Obtiene el tipo de la reclamación.</summary>
+      <returns>Tipo de notificación.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Value">
+      <summary>Obtiene el valor de la notificación.</summary>
+      <returns>Valor de notificación.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.ValueType">
+      <summary>Obtiene el tipo de valor de la notificación.</summary>
+      <returns>Tipo de valor de la reclamación.</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.Claim.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimsIdentity">
+      <summary>Representa una identidad basada en notificaciones.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.ClaimsIdentity" /> con una colección de reclamaciones vacía.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.ClaimsIdentity" /> usando una colección enumerada de objetos <see cref="T:System.Security.Claims.Claim" />.</summary>
+      <param name="claims">Notificaciones con las que se va a rellenar la identidad de notificación.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String)">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.ClaimsIdentity" /> con las reclamaciones y tipo de autenticación especificados.</summary>
+      <param name="claims">Notificaciones con las que se va a rellenar la identidad de notificación.</param>
+      <param name="authenticationType">Tipo de autenticación usado.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String,System.String,System.String)">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.ClaimsIdentity" /> con las notificaciones, tipo de autenticación, tipo de notificación de nombre y tipo de notificación de rol especificados.</summary>
+      <param name="claims">Notificaciones con las que se va a rellenar la identidad de notificación.</param>
+      <param name="authenticationType">Tipo de autenticación usado.</param>
+      <param name="nameType">El tipo de notificación que se usa para las notificaciones de nombre.</param>
+      <param name="roleType">El tipo de notificación que se usa para las notificaciones de rol.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity)">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.ClaimsIdentity" /> usando el tipo de nombre y autenticación a partir del <see cref="T:System.Security.Principal.IIdentity" /> especificado.</summary>
+      <param name="identity">Identidad en la que se basará la nueva identidad de notificaciones.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity,System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.ClaimsIdentity" /> usando las reclamaciones especificadas y el <see cref="T:System.Security.Principal.IIdentity" /> especificado.</summary>
+      <param name="identity">Identidad en la que se basará la nueva identidad de notificaciones.</param>
+      <param name="claims">Notificaciones con las que se va a rellenar la identidad de notificación.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity,System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String,System.String,System.String)">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.ClaimsIdentity" /> a partir de la <see cref="T:System.Security.Principal.IIdentity" /> especificada y usa las notificaciones, tipo de autenticación, tipo de notificación de nombre y tipo de notificación de rol especificados.</summary>
+      <param name="identity">Identidad en la que se basará la nueva identidad de notificaciones.</param>
+      <param name="claims">Notificaciones con las que se va a rellenar la nueva identidad de notificación.</param>
+      <param name="authenticationType">Tipo de autenticación usado.</param>
+      <param name="nameType">El tipo de notificación que se usa para las notificaciones de nombre.</param>
+      <param name="roleType">El tipo de notificación que se usa para las notificaciones de rol.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.String)">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.ClaimsIdentity" /> con una colección de notificaciones vacía y el tipo de autenticación especificado.</summary>
+      <param name="authenticationType">Tipo de autenticación usado.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.String,System.String,System.String)">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.ClaimsIdentity" /> con el tipo de autenticación, tipo de reclamación de nombre y tipo de reclamación de rol especificados.</summary>
+      <param name="authenticationType">Tipo de autenticación usado.</param>
+      <param name="nameType">El tipo de notificación que se usa para las notificaciones de nombre.</param>
+      <param name="roleType">El tipo de notificación que se usa para las notificaciones de rol.</param>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Actor">
+      <summary>Obtiene o establece la identidad del usuario que llama al que se han concedido derechos de delegación.</summary>
+      <returns>La parte que llama a la que se le concedieron derechos de delegación.</returns>
+      <exception cref="T:System.InvalidOperationException">Se intenta establecer la propiedad en la instancia actual.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.AddClaim(System.Security.Claims.Claim)">
+      <summary>Agrega una sola reclamación a esta identidad de reclamaciones.</summary>
+      <param name="claim">Reclamación que se va a agregar.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="claim" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.AddClaims(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>Agrega una lista de reclamaciones a esta identidad de reclamaciones.</summary>
+      <param name="claims">Reclamaciones que se van a agregar.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="claims" /> es null.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.AuthenticationType">
+      <summary>Obtiene el tipo de autenticación.</summary>
+      <returns>Tipo de autenticación.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.BootstrapContext">
+      <summary>Obtiene o establece el token que se usó para crear estas notificaciones de identidad.</summary>
+      <returns>El contexto de arranque.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Claims">
+      <summary>Obtiene las notificaciones asociadas con esta identidad de notificación.</summary>
+      <returns>La colección de notificaciones asociada a esta identidad de notificaciones.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.Clone">
+      <summary>Devuelve un objeto <see cref="T:System.Security.Claims.ClaimsIdentity" /> nuevo copiado de esta identidad de reclamaciones.</summary>
+      <returns>Copia de la instancia actual.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.CreateClaim(System.IO.BinaryReader)"></member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.CustomSerializationData"></member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer">
+      <summary>Emisor predeterminado; “LOCAL AUTHORITY”.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultNameClaimType">
+      <summary>Tipo de notificación de nombre predeterminado; <see cref="F:System.Security.Claims.ClaimTypes.Name" />.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultRoleClaimType">
+      <summary>Tipo de notificación de rol predeterminado; <see cref="F:System.Security.Claims.ClaimTypes.Role" />.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindAll(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Recupera todas las notificaciones que coinciden con el predicado especificado.</summary>
+      <returns>Notificaciones coincidentes.Se trata de una lista de solo lectura.</returns>
+      <param name="match">Función que realiza la lógica coincidente.</param>
+      <exception cref="T:System.ArgumentNullException">El valor de <paramref name="match" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindAll(System.String)">
+      <summary>Recupera todas las notificaciones con el tipo de notificación especificado.</summary>
+      <returns>Notificaciones coincidentes.Se trata de una lista de solo lectura.</returns>
+      <param name="type">El tipo de notificación con el que se hacen coincidir las notificaciones.</param>
+      <exception cref="T:System.ArgumentNullException">El valor de <paramref name="type" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindFirst(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Recupera la primera reclamación con la que coincide el predicado especificado.</summary>
+      <returns>Primera notificación coincidente o null si no se encuentra ninguna coincidencia.</returns>
+      <param name="match">Función que realiza la lógica coincidente.</param>
+      <exception cref="T:System.ArgumentNullException">El valor de <paramref name="match" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindFirst(System.String)">
+      <summary>Recupera la primera reclamación con el tipo especificado.</summary>
+      <returns>Primera notificación coincidente o null si no se encuentra ninguna coincidencia.</returns>
+      <param name="type">Tipo reclamación con el que deben coincidir.</param>
+      <exception cref="T:System.ArgumentNullException">El valor de <paramref name="type" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.HasClaim(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Determina si esta identidad de notificaciones tiene una notificación que coincide con el predicado especificado.</summary>
+      <returns>true si existe una notificación coincidente; si no, false.</returns>
+      <param name="match">Función que realiza la lógica coincidente.</param>
+      <exception cref="T:System.ArgumentNullException">El valor de <paramref name="match" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.HasClaim(System.String,System.String)">
+      <summary>Determina si esta identidad de notificaciones tiene una notificación con el tipo y el valor especificados.</summary>
+      <returns>true si se encuentra una coincidencia; si no, false.</returns>
+      <param name="type">Tipo de la reclamación con el que deben coincidir.</param>
+      <param name="value">Valor de la reclamación que debe coincidir.</param>
+      <exception cref="T:System.ArgumentNullException">El valor de <paramref name="type" /> es null.O bienEl valor de <paramref name="value" /> es null.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.IsAuthenticated">
+      <summary>Obtiene un valor que indica si la identidad se ha autenticado.</summary>
+      <returns>Es true si el valor de la identidad está autenticado; en caso contrario, es false.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Label">
+      <summary>Obtiene o establece la etiqueta para esta identidad de notificaciones.</summary>
+      <returns>Etiqueta.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Name">
+      <summary>Obtiene el nombre de esta identidad de notificación.</summary>
+      <returns>Nombre o null.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.NameClaimType">
+      <summary>Obtiene el tipo de notificación que se usa para determinar qué notificaciones proporcionan el valor de la propiedad <see cref="P:System.Security.Claims.ClaimsIdentity.Name" /> de esta identidad de notificación.</summary>
+      <returns>Tipo de reclamación del nombre.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.RemoveClaim(System.Security.Claims.Claim)">
+      <summary>Se intenta quitar una reclamación de la identidad de reclamaciones.</summary>
+      <param name="claim">Reclamación que se va a quitar.</param>
+      <exception cref="T:System.InvalidOperationException">No se puede quitar la reclamación.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.RoleClaimType">
+      <summary>Obtiene el tipo de notificación que se interpreta como rol de .NET Framework entre las notificaciones en esta identidad de notificación.</summary>
+      <returns>Tipo de reclamación del rol.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.TryRemoveClaim(System.Security.Claims.Claim)">
+      <summary>Se intenta quitar una reclamación de la identidad de reclamaciones.</summary>
+      <returns>true si la reclamación se quitó correctamente; de lo contrario, false.</returns>
+      <param name="claim">Reclamación que se va a quitar.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimsPrincipal">
+      <summary>Una implementación de <see cref="T:System.Security.Principal.IPrincipal" /> que admite varias identidades basadas en reclamaciones.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.ClaimsPrincipal" />.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.ClaimsIdentity})">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.ClaimsPrincipal" /> usando las identidades de reclamación especificadas.</summary>
+      <param name="identities">Identidades desde las que se va a inicializar la nueva entidad de seguridad de notificaciones.</param>
+      <exception cref="T:System.ArgumentNullException">El valor de <paramref name="identities" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Security.Principal.IIdentity)">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.ClaimsPrincipal" /> a partir de la identidad especificada.</summary>
+      <param name="identity">Identidad desde la que se va a inicializar la nueva entidad de seguridad de notificaciones.</param>
+      <exception cref="T:System.ArgumentNullException">El valor de <paramref name="identity" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Security.Principal.IPrincipal)">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Claims.ClaimsPrincipal" /> a partir de la entidad de seguridad especificada.</summary>
+      <param name="principal">Entidad de seguridad desde la que se va a inicializar la nueva entidad de seguridad de notificaciones.</param>
+      <exception cref="T:System.ArgumentNullException">El valor de <paramref name="principal" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.AddIdentities(System.Collections.Generic.IEnumerable{System.Security.Claims.ClaimsIdentity})">
+      <summary>Agrega las identidades de notificaciones especificadas a esta entidad de seguridad de notificaciones.</summary>
+      <param name="identities">Las identidades de notificaciones para agregar.</param>
+      <exception cref="T:System.ArgumentNullException">El valor de <paramref name="identities" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.AddIdentity(System.Security.Claims.ClaimsIdentity)">
+      <summary>Agrega la identidad de notificaciones especificada a esta entidad de seguridad de notificaciones.</summary>
+      <param name="identity">La identidad de notificaciones que se va a agregar.</param>
+      <exception cref="T:System.ArgumentNullException">El valor de <paramref name="identity" /> es null.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Claims">
+      <summary>Obtiene una colección que contiene todas las notificaciones de todas las identidades de notificaciones asociadas a esta entidad de seguridad de notificaciones.</summary>
+      <returns>Reclamaciones asociadas a esta entidad de seguridad.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.ClaimsPrincipalSelector">
+      <summary>Obtiene y establece el delegado que se utiliza para seleccionar la entidad de seguridad de notificaciones devuelta por la propiedad <see cref="P:System.Security.Claims.ClaimsPrincipal.Current" />.</summary>
+      <returns>El delegado.El valor predeterminado es null.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.Clone"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.CreateClaimsIdentity(System.IO.BinaryReader)"></member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Current">
+      <summary>Obtiene la entidad de seguridad de notificaciones actual.</summary>
+      <returns>Entidad de seguridad de notificaciones actual.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.CustomSerializationData"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindAll(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Recupera todas las notificaciones que coinciden con el predicado especificado.</summary>
+      <returns>Notificaciones coincidentes.</returns>
+      <param name="match">Función que realiza la lógica coincidente.</param>
+      <exception cref="T:System.ArgumentNullException">El valor de <paramref name="match" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindAll(System.String)">
+      <summary>Recupera todas las notificaciones o aquellas con el tipo de notificación especificado.</summary>
+      <returns>Notificaciones coincidentes.</returns>
+      <param name="type">El tipo de notificación con el que se hacen coincidir las notificaciones.</param>
+      <exception cref="T:System.ArgumentNullException">El valor de <paramref name="type" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindFirst(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Recupera la primera reclamación con la que coincide el predicado especificado.</summary>
+      <returns>Primera notificación coincidente o null si no se encuentra ninguna coincidencia.</returns>
+      <param name="match">Función que realiza la lógica coincidente.</param>
+      <exception cref="T:System.ArgumentNullException">El valor de <paramref name="match" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindFirst(System.String)">
+      <summary>Recupera la primera reclamación con el tipo especificado.</summary>
+      <returns>Primera notificación coincidente o null si no se encuentra ninguna coincidencia.</returns>
+      <param name="type">Tipo reclamación con el que deben coincidir.</param>
+      <exception cref="T:System.ArgumentNullException">El valor de <paramref name="type" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.HasClaim(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Determina si alguna de las identidades de notificaciones asociadas a esta entidad de seguridad de notificaciones contiene una notificación que coincide con el predicado especificado.</summary>
+      <returns>true si existe una notificación coincidente; si no, false.</returns>
+      <param name="match">Función que realiza la lógica coincidente.</param>
+      <exception cref="T:System.ArgumentNullException">El valor de <paramref name="match" /> es null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.HasClaim(System.String,System.String)">
+      <summary>Determina si alguna de las identidades de notificaciones asociadas a esta entidad de seguridad de notificaciones contiene una notificación con el tipo y el valor especificados.</summary>
+      <returns>true si existe una notificación coincidente; si no, false.</returns>
+      <param name="type">Tipo de la reclamación con el que deben coincidir.</param>
+      <param name="value">Valor de la reclamación que debe coincidir.</param>
+      <exception cref="T:System.ArgumentNullException">El valor de <paramref name="type" /> es null.O bienEl valor de <paramref name="value" /> es null.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Identities">
+      <summary>Obtiene una colección que contiene todas las identidades de notificaciones asociadas a esta entidad de seguridad de notificaciones.</summary>
+      <returns>Colección de identidades de reclamaciones.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Identity">
+      <summary>Obtiene la identidad primaria de las notificaciones asociada a esta entidad de seguridad de notificaciones.</summary>
+      <returns>La identidad primaria de las notificaciones asociada a esta entidad de seguridad de notificaciones.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.IsInRole(System.String)">
+      <summary>Devuelve un valor que indica si la entidad (usuario) representada por esta entidad de seguridad de notificaciones está en el rol especificado.</summary>
+      <returns>true si la entidad de seguridad de reclamaciones se incluye en el rol específico; de lo contrario, false.</returns>
+      <param name="role">Rol que se va a comprobar.</param>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.PrimaryIdentitySelector">
+      <summary>Obtiene y establece el delegado que se utiliza para seleccionar la identidad de notificaciones devuelta por la propiedad <see cref="P:System.Security.Claims.ClaimsPrincipal.Identity" />.</summary>
+      <returns>El delegado.El valor predeterminado es null.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimTypes">
+      <summary>Define constantes para los tipos de notificación conocidos que se pueden asignar un sujeto.Esta clase no puede heredarse.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Actor">
+      <summary>http://schemas.xmlsoap.org/ws/2009/09/identity/claims/actor.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Anonymous">
+      <summary>El URI para una notificación que especifica el usuario anónimo; http://schemas.xmlsoap.org/ws/2005/05/identity/claims/anonymous.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Authentication">
+      <summary>El URI para una notificación que especifica detalles sobre si una identidad está autenticada, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/authenticated.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthenticationInstant">
+      <summary>El URI para una notificación que especifica el instante en que se autenticó una entidad; http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationinstant.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthenticationMethod">
+      <summary>El URI para una notificación que especifica el método con el que se autenticó una entidad; http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthorizationDecision">
+      <summary>El URI para una notificación que especifica una decisión de autorización en una entidad; http://schemas.xmlsoap.org/ws/2005/05/identity/claims/authorizationdecision.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.CookiePath">
+      <summary>El URI para una notificación que especifica la ruta de acceso de la cookie; http://schemas.microsoft.com/ws/2008/06/identity/claims/cookiepath.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Country">
+      <summary>El URI para una notificación que especifica el país o la región donde reside una entidad, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/country.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DateOfBirth">
+      <summary>El URI para una notificación que especifica la fecha de nacimiento de una entidad, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/dateofbirth.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyPrimaryGroupSid">
+      <summary>El URI para una notificación que especifica el SID de grupo primario de solo denegación de una entidad; http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarygroupsid.Un SID de sólo denegación deniega la entidad especificada para un objeto protegible.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyPrimarySid">
+      <summary>El URI para una notificación que especifica el SID primario de solo denegación de una entidad; http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarysid.Un SID de sólo denegación deniega la entidad especificada para un objeto protegible.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlySid">
+      <summary>El URI para una notificación que especifica un identificador de seguridad (SID) de solo denegación para una entidad, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/denyonlysid.Un SID de sólo denegación deniega la entidad especificada para un objeto protegible.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyWindowsDeviceGroup">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlywindowsdevicegroup.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Dns">
+      <summary>URI de una notificación que especifica el nombre DNS asociado al nombre del equipo o al nombre alternativo del asunto o del emisor de un certificado X.509, , http://schemas.xmlsoap.org/ws/2005/05/identity/claims/dns.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Dsa">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/dsa.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Email">
+      <summary>El URI para una notificación que especifica la dirección de correo electrónico de una entidad, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Expiration">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/expiration.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Expired">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/expired.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Gender">
+      <summary>El URI para una notificación que especifica el género de una entidad, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/gender.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.GivenName">
+      <summary>El URI para una notificación que especifica el nombre de una entidad, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.GroupSid">
+      <summary>El URI para una notificación que especifica el SID para el grupo de una entidad; http://schemas.microsoft.com/ws/2008/06/identity/claims/groupsid.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Hash">
+      <summary>El URI para una notificación que especifica un valor hash, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/hash.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.HomePhone">
+      <summary>El URI para una notificación que especifica el número de teléfono particular de una entidad, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/homephone.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.IsPersistent">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/ispersistent.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Locality">
+      <summary>El URI para una notificación que especifica la configuración regional en la que una entidad reside, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/locality.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.MobilePhone">
+      <summary>El URI para una notificación que especifica el número de teléfono móvil de una entidad, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Name">
+      <summary>El URI para una notificación que especifica el nombre de una entidad, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.NameIdentifier">
+      <summary>El URI para una notificación que especifica el nombre de una entidad, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.OtherPhone">
+      <summary>El URI para una notificación que especifica el número de teléfono alternativo de una entidad, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/otherphone.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PostalCode">
+      <summary>El URI para una notificación que especifica el código postal de una entidad, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/postalcode.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PrimaryGroupSid">
+      <summary>El URI para una notificación que especifica el SID de grupo primario de una entidad; http://schemas.microsoft.com/ws/2008/06/identity/claims/primarygroupsid.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PrimarySid">
+      <summary>El URI para una notificación que especifica el SID primario de una entidad; http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Role">
+      <summary>El URI para una notificación que especifica el rol de una entidad; http://schemas.microsoft.com/ws/2008/06/identity/claims/role.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Rsa">
+      <summary>El URI para una notificación que especifica una clave RSA, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/rsa.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.SerialNumber">
+      <summary>El URI para una notificación que especifica un número de serie, http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Sid">
+      <summary>El URI para una notificación que especifica un identificador de seguridad (SID), http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Spn">
+      <summary>El URI para una notificación que especifica una notificación de nombre de entidad de seguridad de servicio (SPN), http://schemas.xmlsoap.org/ws/2005/05/identity/claims/spn.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.StateOrProvince">
+      <summary>El URI para una notificación que especifica el estado o la provincia donde una entidad reside, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/stateorprovince.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.StreetAddress">
+      <summary>El URI para una notificación que especifica la dirección postal de una entidad, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/streetaddress.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Surname">
+      <summary>El URI para una notificación que especifica el apellido de una entidad, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.System">
+      <summary>El URI para una notificación que identifica la entidad del sistema, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/system.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Thumbprint">
+      <summary>El URI para una notificación que especifica una huella digital, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/thumbprint.Una huella digital es un hash SHA-1 único en el mundo de un certificado X.509.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Upn">
+      <summary>El URI para una notificación que especifica un nombre de entidad de seguridad de usuario (UPN), http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Uri">
+      <summary>El URI para una notificación que especifica un URI, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/uri.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.UserData">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/userdata.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Version">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/version.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Webpage">
+      <summary>El URI para una notificación que especifica la página web de una entidad, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/webpage.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsAccountName">
+      <summary>El URI para una notificación que especifica el nombre de cuenta de dominio de Windows de una entidad, http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsDeviceClaim">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsdeviceclaim.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsDeviceGroup">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsdevicegroup.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsFqbnVersion">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsfqbnversion.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsSubAuthority">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowssubauthority.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsUserClaim">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsuserclaim.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.X500DistinguishedName">
+      <summary>El URI para una notificación del nombre distintivo de un certificado X.509, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/x500distinguishedname.La norma X.500 define la metodología para definir nombres distintivos (DN) que usan los certificados X.509.</summary>
+    </member>
+    <member name="T:System.Security.Claims.ClaimValueTypes">
+      <summary>Define los tipos de valor de notificación según los URI de tipo definidos por el W3C y OASIS.Esta clase no puede heredarse.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Base64Binary">
+      <summary>URI que representa el tipo de datos XML base64Binary.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Base64Octet">
+      <summary>URI que representa un tipo de datos XML base64Octet.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Boolean">
+      <summary>URI que representa el tipo de datos XML boolean.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Date">
+      <summary>URI que representa el tipo de datos XML date.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DateTime">
+      <summary>URI que representa el tipo de datos XML dateTime.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DaytimeDuration">
+      <summary>URI que representa el tipo de datos XQuery daytimeDuration.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DnsName">
+      <summary>URI que representa el tipo de datos SOAP dns.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Double">
+      <summary>URI que representa el tipo de datos XML double.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DsaKeyValue">
+      <summary>URI que representa el tipo de datos de signatura XML DSAKeyValue.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Email">
+      <summary>URI que representa el tipo de datos SOAP emailaddress.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Fqbn">
+      <summary>URI que representa el tipo de datos XML fqbn.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.HexBinary">
+      <summary>URI que representa el tipo de datos XML hexBinary.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer">
+      <summary>URI que representa el tipo de datos XML integer.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer32">
+      <summary>URI que representa el tipo de datos XML integer32.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer64">
+      <summary>URI que representa el tipo de datos XML integer64.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.KeyInfo">
+      <summary>URI que representa el tipo de datos de signatura XML KeyInfo.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Rfc822Name">
+      <summary>URI que representa el tipo de datos XACML 1.0 rfc822Name.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Rsa">
+      <summary>URI que representa el tipo de datos SOAP rsa.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.RsaKeyValue">
+      <summary>URI que representa el tipo de datos de signatura XML RSAKeyValue.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Sid">
+      <summary>URI que representa el tipo de datos XML sid.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.String">
+      <summary>URI que representa el tipo de datos XML string.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Time">
+      <summary>URI que representa el tipo de datos XML time.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UInteger32">
+      <summary>URI que representa el tipo de datos XML uinteger32.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UInteger64">
+      <summary>URI que representa el tipo de datos XML uinteger64.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UpnName">
+      <summary>URI que representa el tipo de datos SOAP UPN.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.X500Name">
+      <summary>URI que representa el tipo de datos XACML 1.0 x500Name.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.YearMonthDuration">
+      <summary>URI que representa el tipo de datos XQuery yearMonthDuration.</summary>
+    </member>
+    <member name="T:System.Security.Principal.GenericIdentity">
+      <summary>Representa un usuario genérico.</summary>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.Security.Principal.GenericIdentity)">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Principal.GenericIdentity" /> mediante el objeto <see cref="T:System.Security.Principal.GenericIdentity" /> especificado.</summary>
+      <param name="identity">Objeto a partir del cual se construye una nueva instancia de <see cref="T:System.Security.Principal.GenericIdentity" />.</param>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.String)">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Principal.GenericIdentity" /> que representa al usuario con el nombre especificado.</summary>
+      <param name="name">Usuario en cuyo nombre se ejecuta el código. </param>
+      <exception cref="T:System.ArgumentNullException">El valor del parámetro <paramref name="name" /> es null. </exception>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.String,System.String)">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Principal.GenericIdentity" /> que representa al usuario con el tipo de autenticación y el nombre que se haya especificado.</summary>
+      <param name="name">Usuario en cuyo nombre se ejecuta el código. </param>
+      <param name="type">Tipo de autenticación utilizado para identificar al usuario. </param>
+      <exception cref="T:System.ArgumentNullException">El valor del parámetro <paramref name="name" /> es null.O bien El valor del parámetro <paramref name="type" /> es null. </exception>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.AuthenticationType">
+      <summary>Obtiene el tipo de autenticación utilizado para identificar al usuario.</summary>
+      <returns>Tipo de autenticación utilizado para identificar al usuario.</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.Claims">
+      <summary>Obtiene todas las notificaciones para el usuario representado por esta identidad genérica.</summary>
+      <returns>Colección de notificaciones de este objeto <see cref="T:System.Security.Principal.GenericIdentity" />.</returns>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.Clone">
+      <summary>Crea un nuevo objeto copiado de la instancia actual.</summary>
+      <returns>Copia de la instancia actual.</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.IsAuthenticated">
+      <summary>Obtiene un valor que indica si el usuario se autenticó.</summary>
+      <returns>Es true si el usuario está autenticado; en caso contrario, es false.</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.Name">
+      <summary>Obtiene el nombre de usuario.</summary>
+      <returns>Usuario en cuyo nombre se ejecuta el código.</returns>
+    </member>
+    <member name="T:System.Security.Principal.GenericPrincipal">
+      <summary>Representa una entidad de seguridad genérica.</summary>
+    </member>
+    <member name="M:System.Security.Principal.GenericPrincipal.#ctor(System.Security.Principal.IIdentity,System.String[])">
+      <summary>Inicializa una nueva instancia de la clase <see cref="T:System.Security.Principal.GenericPrincipal" /> a partir de una identidad de usuario y una matriz de nombres de roles a los que pertenece el usuario representado por dicho identidad.</summary>
+      <param name="identity">Implementación básica de <see cref="T:System.Security.Principal.IIdentity" /> que representa a cualquier usuario. </param>
+      <param name="roles">Matriz de nombres de roles a las que pertenece el usuario representado por el parámetro <paramref name="identity" />. </param>
+      <exception cref="T:System.ArgumentNullException">El valor del parámetro <paramref name="identity" /> es null. </exception>
+    </member>
+    <member name="P:System.Security.Principal.GenericPrincipal.Identity">
+      <summary>Obtiene el objeto <see cref="T:System.Security.Principal.GenericIdentity" /> del usuario representado por <see cref="T:System.Security.Principal.GenericPrincipal" /> actual.</summary>
+      <returns>
+        <see cref="T:System.Security.Principal.GenericIdentity" /> del usuario representado por <see cref="T:System.Security.Principal.GenericPrincipal" />.</returns>
+    </member>
+    <member name="M:System.Security.Principal.GenericPrincipal.IsInRole(System.String)">
+      <summary>Determina si <see cref="T:System.Security.Principal.GenericPrincipal" /> actual pertenece al rol especificado.</summary>
+      <returns>Es true si <see cref="T:System.Security.Principal.GenericPrincipal" /> actual es un miembro del rol especificado; en caso contrario, es false.</returns>
+      <param name="role">Nombre del rol cuya condición de pertenencia se va a comprobar. </param>
+    </member>
+  </members>
+</doc>

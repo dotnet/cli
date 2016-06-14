@@ -1,0 +1,698 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Security.Claims</name>
+  </assembly>
+  <members>
+    <member name="T:System.Security.Claims.Claim">
+      <summary>表示声明。</summary>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.IO.BinaryReader,System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.Security.Claims.Claim)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.Security.Claims.Claim,System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String)">
+      <summary>初始化指定声称类型和值的 <see cref="T:System.Security.Claims.Claim" /> 类的新实例。</summary>
+      <param name="type">声明类型。</param>
+      <param name="value">声明值。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> 或 <paramref name="value" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String)">
+      <summary>初始化指定声称类型、值类型和值的 <see cref="T:System.Security.Claims.Claim" /> 类的新实例。</summary>
+      <param name="type">声明类型。</param>
+      <param name="value">声明值。</param>
+      <param name="valueType">声明值类型。当 null 为<see cref="F:System.Security.Claims.ClaimValueTypes.String" /> 时，才使用此参数。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> 或 <paramref name="value" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String)">
+      <summary>初始化指定声称类型，值，值类型和颁发者的 <see cref="T:System.Security.Claims.Claim" /> 类的新实例。</summary>
+      <param name="type">声明类型。</param>
+      <param name="value">声明值。</param>
+      <param name="valueType">声明值类型。当 null 为<see cref="F:System.Security.Claims.ClaimValueTypes.String" /> 时，才使用此参数。</param>
+      <param name="issuer">声明颁发者。如果该参数为空或为 null， 则 <see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" /> 将被使用。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> 或 <paramref name="value" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String,System.String)">
+      <summary>使用指定声明类型、值、值类型、颁发者和原始颁发者初始化 <see cref="T:System.Security.Claims.Claim" /> 类的新实例。</summary>
+      <param name="type">声明类型。</param>
+      <param name="value">声明值。</param>
+      <param name="valueType">声明值类型。当 null 为<see cref="F:System.Security.Claims.ClaimValueTypes.String" /> 时，才使用此参数。</param>
+      <param name="issuer">声明颁发者。如果该参数为空或为 null， 则 <see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" /> 将被使用。</param>
+      <param name="originalIssuer">声明的原始颁发者。如果该参数为空或为 null ，则将 <see cref="P:System.Security.Claims.Claim.OriginalIssuer" /> 设置为 <see cref="P:System.Security.Claims.Claim.Issuer" /> 的值。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> 或 <paramref name="value" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String,System.String,System.Security.Claims.ClaimsIdentity)">
+      <summary>使用指定的声明类型、值、值类型、颁发者、原始颁发者和主题初始化 <see cref="T:System.Security.Claims.Claim" /> 类的新实例。</summary>
+      <param name="type">声明类型。</param>
+      <param name="value">声明值。</param>
+      <param name="valueType">声明值类型。当 null 为<see cref="F:System.Security.Claims.ClaimValueTypes.String" /> 时，才使用此参数。</param>
+      <param name="issuer">声明颁发者。如果该参数为空或为 null， 则 <see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" /> 将被使用。</param>
+      <param name="originalIssuer">声明的原始颁发者。如果该参数为空或为 null ，则将 <see cref="P:System.Security.Claims.Claim.OriginalIssuer" /> 设置为 <see cref="P:System.Security.Claims.Claim.Issuer" /> 的值。</param>
+      <param name="subject">该声明说明的主题。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> 或 <paramref name="value" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.Clone">
+      <summary>返回从此对象中复制的新 <see cref="T:System.Security.Claims.Claim" /> 对象。新的声明不具有主题。</summary>
+      <returns>新声明对象。</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.Clone(System.Security.Claims.ClaimsIdentity)">
+      <summary>返回从此对象中复制的新 <see cref="T:System.Security.Claims.Claim" /> 对象。新声明的主题设置为指定的 ClaimsIdentity。</summary>
+      <returns>新声明对象。</returns>
+      <param name="identity">新声明的期望主题。</param>
+    </member>
+    <member name="P:System.Security.Claims.Claim.CustomSerializationData"></member>
+    <member name="P:System.Security.Claims.Claim.Issuer">
+      <summary>获取声明的颁发者。</summary>
+      <returns>引用声明颁发者的名称。</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.OriginalIssuer">
+      <summary>获取声明的最初颁发者。</summary>
+      <returns>引用声明原始颁发者的名称。</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Properties">
+      <summary>获取包含与此声明关联的附加属性的字典。</summary>
+      <returns>包含与声明关联的附加属性的字典。作为名称-值对表示的属性。</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Subject">
+      <summary>获取声明的主题。</summary>
+      <returns>声明的主题。</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.ToString">
+      <summary>返回此 <see cref="T:System.Security.Claims.Claim" /> 对象的字符串表示形式。</summary>
+      <returns>此 <see cref="T:System.Security.Claims.Claim" /> 对象的字符串表示形式。</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Type">
+      <summary>获取声称的声称类型。</summary>
+      <returns>声明类型。</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Value">
+      <summary>获取声明的值。</summary>
+      <returns>声明值。</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.ValueType">
+      <summary>获取声明的值类型。</summary>
+      <returns>声明值类型。</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.Claim.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimsIdentity">
+      <summary>委托基于声明的标识。</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor">
+      <summary>用空声称集合初始化 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 类的新实例。</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>使用枚举集合 <see cref="T:System.Security.Claims.Claim" /> 对象的初始化 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 类的新实例。</summary>
+      <param name="claims">传播声明标识的声明。</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String)">
+      <summary>用指定的声称和身份验证类型初始化 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 类的新实例。</summary>
+      <param name="claims">传播声明标识的声明。</param>
+      <param name="authenticationType">所使用的身份验证的类型。</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String,System.String,System.String)">
+      <summary>用指定的声明、身份验证的类型、名称声明类型、角色声明类型来初始化 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 类的新实例。</summary>
+      <param name="claims">传播声明标识的声明。</param>
+      <param name="authenticationType">所使用的身份验证的类型。</param>
+      <param name="nameType">要用于名称声明的声明类型。</param>
+      <param name="roleType">要用于角色声明的声明类型。</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity)">
+      <summary>初始化 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 类的新实例，该类表示具有指定的 <see cref="T:System.Security.Principal.IIdentity" /> 用户。</summary>
+      <param name="identity">新声明标识所基于的标识。</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity,System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>使用指定的 <see cref="T:System.Security.Principal.IIdentity" /> 和类型提供程序初始化 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 类的新实例。</summary>
+      <param name="identity">新声明标识所基于的标识。</param>
+      <param name="claims">传播声明标识的声明。</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity,System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String,System.String,System.String)">
+      <summary>从指定的 <see cref="T:System.Security.Principal.IIdentity" /> 用指定的声明、身份验证的类型、名称声明类型、角色声明类型来初始化 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 类的新实例。</summary>
+      <param name="identity">新声明标识所基于的标识。</param>
+      <param name="claims">传播新声明标识的声明。</param>
+      <param name="authenticationType">所使用的身份验证的类型。</param>
+      <param name="nameType">要用于名称声明的声明类型。</param>
+      <param name="roleType">要用于角色声明的声明类型。</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.String)">
+      <summary>用空的声明集合和指定的身份验证类型初始化 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 类的新实例。</summary>
+      <param name="authenticationType">所使用的身份验证的类型。</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.String,System.String,System.String)">
+      <summary>用指定的声明、身份验证的类型、名称声明类型、角色声明类型来初始化 <see cref="T:System.Security.Claims.ClaimsIdentity" /> 类的新实例。</summary>
+      <param name="authenticationType">所使用的身份验证的类型。</param>
+      <param name="nameType">要用于名称声明的声明类型。</param>
+      <param name="roleType">要用于角色声明的声明类型。</param>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Actor">
+      <summary>获取或设置被授予委派权利的调用方的标识。</summary>
+      <returns>授予委托权利的调用方。</returns>
+      <exception cref="T:System.InvalidOperationException">尝试设置当前实例的属性。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.AddClaim(System.Security.Claims.Claim)">
+      <summary>添加单个声明到此声明标识。</summary>
+      <param name="claim">要添加的声明。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="claim" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.AddClaims(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>添加声明列表到此声明标识。</summary>
+      <param name="claims">要添加的声明。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="claims" /> 为 null。</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.AuthenticationType">
+      <summary>获取身份验证类型。</summary>
+      <returns>身份验证类型。</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.BootstrapContext">
+      <summary>获取或设置用于创建此声明标识的令牌。</summary>
+      <returns>启动上下文。</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Claims">
+      <summary>获取与此声明标识关联的声明。</summary>
+      <returns>与此声明标识相关联的声明的集合。</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.Clone">
+      <summary>返回从此声明标识中复制的新 <see cref="T:System.Security.Claims.ClaimsIdentity" />。</summary>
+      <returns>当前实例的副本。</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.CreateClaim(System.IO.BinaryReader)"></member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.CustomSerializationData"></member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer">
+      <summary>默认颁发者；“地方当局”。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultNameClaimType">
+      <summary>默认名称声明类型；<see cref="F:System.Security.Claims.ClaimTypes.Name" />。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultRoleClaimType">
+      <summary>默认角色声明类型；<see cref="F:System.Security.Claims.ClaimTypes.Role" />。</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindAll(System.Predicate{System.Security.Claims.Claim})">
+      <summary>检索所有与指定谓词相匹配的声明。</summary>
+      <returns>匹配声明。列表为只读。</returns>
+      <param name="match">执行匹配逻辑的函数。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindAll(System.String)">
+      <summary>检索所有有指定声明类型的声明。</summary>
+      <returns>匹配声明。列表为只读。</returns>
+      <param name="type">要对其匹配声明的声明类型。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindFirst(System.Predicate{System.Security.Claims.Claim})">
+      <summary>检所由指定谓词匹配的第一个声明。</summary>
+      <returns>如果未找到匹配，则为第一个匹配声明或 null。</returns>
+      <param name="match">执行匹配逻辑的函数。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindFirst(System.String)">
+      <summary>检索有指定声明类型的第一个声明。</summary>
+      <returns>如果未找到匹配，则为第一个匹配声明或 null。</returns>
+      <param name="type">要匹配的声明类型。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.HasClaim(System.Predicate{System.Security.Claims.Claim})">
+      <summary>确定该声明标识是否拥有与指定条件相匹配的声明。</summary>
+      <returns>如果存在匹配的声明，则为 true；否则，为 false。</returns>
+      <param name="match">执行匹配逻辑的函数。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.HasClaim(System.String,System.String)">
+      <summary>确定该声明标识是否具备指定声明类型和值。</summary>
+      <returns>如果找到匹配项，则为 true；否则为 false。</returns>
+      <param name="type">要匹配的声明类型。</param>
+      <param name="value">要匹配的声明的值。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> 为 null。- 或 -<paramref name="value" /> 为 null。</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.IsAuthenticated">
+      <summary>获取一个值，该值指示是否验证了标识。</summary>
+      <returns>如果标识已经验证，则为 true；否则，为 false。</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Label">
+      <summary>获取或设置此声明标识的标签。</summary>
+      <returns>标签。</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Name">
+      <summary>获取此声明标识的名称。</summary>
+      <returns>姓名或 null。</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.NameClaimType">
+      <summary>获取用于确定为此声明标识的 <see cref="P:System.Security.Claims.ClaimsIdentity.Name" /> 属性提供值的声明的声明类型。</summary>
+      <returns>名称声明类型。</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.RemoveClaim(System.Security.Claims.Claim)">
+      <summary>尝试从声明标识中移除一个声明。</summary>
+      <param name="claim">要移除的声明。</param>
+      <exception cref="T:System.InvalidOperationException">无法移除声明。</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.RoleClaimType">
+      <summary>获取将解释为此声明标识中声明的 .NET Framework 角色的声明类型。</summary>
+      <returns>角色声明类型。</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.TryRemoveClaim(System.Security.Claims.Claim)">
+      <summary>尝试从声明标识中移除一个声明。</summary>
+      <returns>如果已成功移除了声明，则为 true；否则为 false。</returns>
+      <param name="claim">要移除的声明。</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimsPrincipal">
+      <summary>支持多个基于声明的标识的 <see cref="T:System.Security.Principal.IPrincipal" /> 实现。</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor">
+      <summary>初始化 <see cref="T:System.Security.Claims.ClaimsPrincipal" /> 类的新实例。</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.ClaimsIdentity})">
+      <summary>使用指定的声明标识初始化 <see cref="T:System.Security.Claims.ClaimsPrincipal" /> 类的新实例。</summary>
+      <param name="identities">初始化新的声明原则的标示符。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identities" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Security.Principal.IIdentity)">
+      <summary>从指定的标识初始化 <see cref="T:System.Security.Claims.ClaimsPrincipal" /> 类的新实例。</summary>
+      <param name="identity">初始化新的声明原则的标识。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identity" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Security.Principal.IPrincipal)">
+      <summary>从指定的主体初始化 <see cref="T:System.Security.Claims.ClaimsPrincipal" /> 类的新实例。</summary>
+      <param name="principal">从其初始化新的声明主体的主体。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="principal" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.AddIdentities(System.Collections.Generic.IEnumerable{System.Security.Claims.ClaimsIdentity})">
+      <summary>添加指定的声明标识到此声明主体。</summary>
+      <param name="identities">要添加的声明标识。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identities" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.AddIdentity(System.Security.Claims.ClaimsIdentity)">
+      <summary>添加指定的声明标识到此声明主体。</summary>
+      <param name="identity">要添加的声明标识。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identity" /> 为 null。</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Claims">
+      <summary>获取包含所有声明的集合，这些声明都来自于此声明主体关联的声明标识符。</summary>
+      <returns>与此主体关联的声明。</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.ClaimsPrincipalSelector">
+      <summary>获取并设置用于选择由 <see cref="P:System.Security.Claims.ClaimsPrincipal.Current" /> 属性返回的声明主体的委托。</summary>
+      <returns>委托。默认值为 null。</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.Clone"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.CreateClaimsIdentity(System.IO.BinaryReader)"></member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Current">
+      <summary>获取当前声明主体。</summary>
+      <returns>当前声明主体。</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.CustomSerializationData"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindAll(System.Predicate{System.Security.Claims.Claim})">
+      <summary>检索所有与指定谓词相匹配的声明。</summary>
+      <returns>匹配声明。</returns>
+      <param name="match">执行匹配逻辑的函数。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindAll(System.String)">
+      <summary>检索所有声明或有指定声明类型的声明。</summary>
+      <returns>匹配声明。</returns>
+      <param name="type">要对其匹配声明的声明类型。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindFirst(System.Predicate{System.Security.Claims.Claim})">
+      <summary>检所由指定谓词匹配的第一个声明。</summary>
+      <returns>如果未找到匹配，则为第一个匹配声明或 null。</returns>
+      <param name="match">执行匹配逻辑的函数。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindFirst(System.String)">
+      <summary>检索有指定声明类型的第一个声明。</summary>
+      <returns>如果未找到匹配，则为第一个匹配声明或 null。</returns>
+      <param name="type">要匹配的声明类型。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.HasClaim(System.Predicate{System.Security.Claims.Claim})">
+      <summary>确定与此声明主体关联的声明标识是否包含与指定谓语匹配的声明。</summary>
+      <returns>如果存在匹配的声明，则为 true；否则，为 false。</returns>
+      <param name="match">执行匹配逻辑的函数。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> 为 null。</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.HasClaim(System.String,System.String)">
+      <summary>确定与此声明主体关联的声明标识包含与指定谓语匹配的声明。</summary>
+      <returns>如果存在匹配的声明，则为 true；否则，为 false。</returns>
+      <param name="type">要匹配的声明类型。</param>
+      <param name="value">要匹配的声明的值。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> 为 null。- 或 -<paramref name="value" /> 为 null。</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Identities">
+      <summary>获取包含与此声明主体关联的所有声明标识符的集合。</summary>
+      <returns>声明标识的集合。</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Identity">
+      <summary>获取与此声明主体相关联的主要声明标识。</summary>
+      <returns>与此声明主体相关联的主要声明标识。</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.IsInRole(System.String)">
+      <summary>返回指定的由声明主体表示的实体(用户)是否在指定的角色的值。</summary>
+      <returns>如果声明主体属于指定角色，则为 true；否则为 false。</returns>
+      <param name="role">要检查的角色。</param>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.PrimaryIdentitySelector">
+      <summary>获取并设置用于选择由 <see cref="P:System.Security.Claims.ClaimsPrincipal.Identity" /> 属性返回的声明标识符的委托。</summary>
+      <returns>委托。默认值为 null。</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimTypes">
+      <summary>定义可分配到主题上的显着的声明类型的常量。此类不能被继承。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Actor">
+      <summary>http://schemas.xmlsoap.org/ws/2009/09/identity/claims/actor。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Anonymous">
+      <summary>指定用户主体名称 (UPN)；http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Authentication">
+      <summary>指定特定有关标识是否已授权的细节，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/authenticated 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthenticationInstant">
+      <summary>指定授权的实例实体；http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationinstant 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthenticationMethod">
+      <summary>指定授权的实体方法；http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthorizationDecision">
+      <summary>指定对于实体的授权决定，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/authorizationdecision 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.CookiePath">
+      <summary>指定 cookie 路径；http://schemas.microsoft.com/ws/2008/06/identity/claims/cookiepath 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Country">
+      <summary>指定对于国家/地区实体驻留，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/authorizationdecision 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DateOfBirth">
+      <summary>指定实体的备用电话号码，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/otherphone URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyPrimaryGroupSid">
+      <summary>指定 deny-only 主要团队 SID 的实体；http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarygroupsid 的 URI 声明。deny-only SID 禁止指定的实体访问可保护对象。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyPrimarySid">
+      <summary>指定 deny-only 主要 SID 的实体；http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarysid 的 URI 声明。deny-only SID 禁止指定的实体访问可保护对象。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlySid">
+      <summary>为实体指定拒绝安全标识符 (SID) 要求，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/denyonlysid 的 URI 声明。deny-only SID 禁止指定的实体访问可保护对象。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyWindowsDeviceGroup">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlywindowsdevicegroup.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Dns">
+      <summary>获取声明的 URI，该 URI 指定与计算机名称关联的 DNS 名称或者与 X.509 证书的使用者或颁发者的备用名称关联的 DNS 名称，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/dns 。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Dsa">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/dsa。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Email">
+      <summary>指定实体的电子邮件地址，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Expiration">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/expiration。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Expired">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/expired。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Gender">
+      <summary>指定实体的性别，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/gender 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.GivenName">
+      <summary>指定实体的给定名称，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.GroupSid">
+      <summary>为团队指定 SID 的实体，http://schemas.microsoft.com/ws/2008/06/identity/claims/groupsid 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Hash">
+      <summary>指定哈希值，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/system/hash 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.HomePhone">
+      <summary>指定实体的住宅电话号码，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/homephone 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.IsPersistent">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/ispersistent。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Locality">
+      <summary>指定区域实体驻留，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/locality 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.MobilePhone">
+      <summary>指定实体的移动电话号码，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Name">
+      <summary>指定实体的名称，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.NameIdentifier">
+      <summary>指定实体的名称，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.OtherPhone">
+      <summary>指定实体的备用电话号码，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/otherphone 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PostalCode">
+      <summary>指定实体的邮政编码，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/postalcode 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PrimaryGroupSid">
+      <summary>指定实体主要团队 SID，http://schemas.microsoft.com/ws/2008/06/identity/claims/primarygroupsid 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PrimarySid">
+      <summary>指定实体的主要 SID，http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Role">
+      <summary>指定实体的角色，http://schemas.microsoft.com/ws/2008/06/identity/claims/role 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Rsa">
+      <summary>指定 RSA 密钥，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/rsa 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.SerialNumber">
+      <summary>指定序列号，http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Sid">
+      <summary>指定安全标识符 （SID），http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid 的URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Spn">
+      <summary>指定服务主体名称 (SPN) 声明，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/spn 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.StateOrProvince">
+      <summary>指定省/直辖市/自治区实体驻留，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/stateorprovince 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.StreetAddress">
+      <summary>指定实体的街道地址，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/streetaddress 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Surname">
+      <summary>指定实体的姓氏，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.System">
+      <summary>确认系统实体，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/system 的声明 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Thumbprint">
+      <summary>指定指纹，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/thumbprint 的 URI 声明。指纹是 X.509 证书的全局唯一 SHA-1 哈希。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Upn">
+      <summary>指定用户主体名称 (UPN)，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Uri">
+      <summary>指定 URI，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/uri 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.UserData">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/userdata。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Version">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/version。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Webpage">
+      <summary>指定实体的网页，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/webpage 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsAccountName">
+      <summary>指定 Windows 域帐户名，http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname 的 URI 声明。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsDeviceClaim">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsdeviceclaim。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsDeviceGroup">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsdevicegroup.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsFqbnVersion">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsfqbnversion。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsSubAuthority">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowssubauthority。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsUserClaim">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsuserclaim。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.X500DistinguishedName">
+      <summary>X.509 证书的识别名名称，http://schemas.xmlsoap.org/ws/2005/05/identity/claims/x500distinguishedname 的 URI 声明。X.500 标准规定了用于定义 X.509 证书所使用的可分辨名称的方法。</summary>
+    </member>
+    <member name="T:System.Security.Claims.ClaimValueTypes">
+      <summary>基于 URI 类型定义了 W3C 和 OASIS.的声明值类型。此类不能被继承。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Base64Binary">
+      <summary>表示 base64Binary XML 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Base64Octet">
+      <summary>表示 base64Octet XML 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Boolean">
+      <summary>表示 boolean XML 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Date">
+      <summary>表示 date XML 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DateTime">
+      <summary>表示 dateTime XML 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DaytimeDuration">
+      <summary>表示 daytimeDuration XQuery 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DnsName">
+      <summary>表示 dns SOAP 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Double">
+      <summary>表示 double XML 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DsaKeyValue">
+      <summary>表示 DSAKeyValue XML 签名数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Email">
+      <summary>表示 emailaddress SOAP 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Fqbn">
+      <summary>表示 fqbn XML 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.HexBinary">
+      <summary>表示 hexBinary XML 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer">
+      <summary>表示 integer XML 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer32">
+      <summary>表示 integer32 XML 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer64">
+      <summary>表示 integer64 XML 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.KeyInfo">
+      <summary>表示 KeyInfo XML 签名数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Rfc822Name">
+      <summary>表示 rfc822Name XQuery 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Rsa">
+      <summary>表示 rsa SOAP 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.RsaKeyValue">
+      <summary>表示 RSAKeyValue XML 签名数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Sid">
+      <summary>表示 sid XML 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.String">
+      <summary>表示 string XML 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Time">
+      <summary>表示 time XML 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UInteger32">
+      <summary>表示 uinteger32 XML 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UInteger64">
+      <summary>表示 uinteger64 XML 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UpnName">
+      <summary>表示 UPN SOAP 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.X500Name">
+      <summary>表示 x500Name XACML 1.0 数据类型的 URI。</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.YearMonthDuration">
+      <summary>表示 yearMonthDuration XQuery 数据类型的 URI。</summary>
+    </member>
+    <member name="T:System.Security.Principal.GenericIdentity">
+      <summary>表示一般用户。</summary>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.Security.Principal.GenericIdentity)">
+      <summary>使用指定的 <see cref="T:System.Security.Principal.GenericIdentity" /> 对象初始化 <see cref="T:System.Security.Principal.GenericIdentity" /> 类的新实例。</summary>
+      <param name="identity">根据其构造 <see cref="T:System.Security.Principal.GenericIdentity" /> 新实例的对象。</param>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.String)">
+      <summary>初始化 <see cref="T:System.Security.Principal.GenericIdentity" /> 类的新实例，该类表示具有指定名称的用户。</summary>
+      <param name="name">用户名，代码当前即以该用户的名义运行。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="name" /> 参数为 null。</exception>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.String,System.String)">
+      <summary>初始化 <see cref="T:System.Security.Principal.GenericIdentity" /> 类的新实例，该类表示具有指定名称和身份验证类型的用户。</summary>
+      <param name="name">用户名，代码当前即以该用户的名义运行。</param>
+      <param name="type">用于标识用户的身份验证的类型。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="name" /> 参数为 null。- 或 -<paramref name="type" /> 参数为 null。</exception>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.AuthenticationType">
+      <summary>获取用于标识用户的身份验证的类型。</summary>
+      <returns>用于标识用户的身份验证的类型。</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.Claims">
+      <summary>为用户获取此最常用标识表示的所有声明。</summary>
+      <returns>表示该 <see cref="T:System.Security.Principal.GenericIdentity" /> 对象的请求的集合。</returns>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.Clone">
+      <summary>创建作为当前实例副本的新对象。</summary>
+      <returns>当前实例的副本。</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.IsAuthenticated">
+      <summary>获取一个值，该值指示是否验证了用户。</summary>
+      <returns>如果已验证了用户，则为 true；否则为 false。</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.Name">
+      <summary>获取用户的名称。</summary>
+      <returns>用户名，代码当前即以该用户的名义运行。</returns>
+    </member>
+    <member name="T:System.Security.Principal.GenericPrincipal">
+      <summary>表示一般主体。</summary>
+    </member>
+    <member name="M:System.Security.Principal.GenericPrincipal.#ctor(System.Security.Principal.IIdentity,System.String[])">
+      <summary>从用户标识和角色名称数组（标识表示的用户属于该数组）初始化 <see cref="T:System.Security.Principal.GenericPrincipal" /> 类的新实例。</summary>
+      <param name="identity">表示任何用户的 <see cref="T:System.Security.Principal.IIdentity" /> 的基实现。</param>
+      <param name="roles">
+        <paramref name="identity" /> 参数表示的用户所属的角色名称数组。</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identity" /> 参数为 null。</exception>
+    </member>
+    <member name="P:System.Security.Principal.GenericPrincipal.Identity">
+      <summary>获取当前 <see cref="T:System.Security.Principal.GenericPrincipal" /> 表示的用户的 <see cref="T:System.Security.Principal.GenericIdentity" />。</summary>
+      <returns>
+        <see cref="T:System.Security.Principal.GenericPrincipal" /> 表示的用户的 <see cref="T:System.Security.Principal.GenericIdentity" />。</returns>
+    </member>
+    <member name="M:System.Security.Principal.GenericPrincipal.IsInRole(System.String)">
+      <summary>确定当前 <see cref="T:System.Security.Principal.GenericPrincipal" /> 是否属于指定的角色。</summary>
+      <returns>如果当前 <see cref="T:System.Security.Principal.GenericPrincipal" /> 是指定角色的成员，则为 true；否则为 false。</returns>
+      <param name="role">要检查其成员资格的角色的名称。</param>
+    </member>
+  </members>
+</doc>

@@ -1,0 +1,686 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Security.Claims</name>
+  </assembly>
+  <members>
+    <member name="T:System.Security.Claims.Claim">
+      <summary>Представляет утверждение.</summary>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.IO.BinaryReader,System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.Security.Claims.Claim)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.Security.Claims.Claim,System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String)">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.Claim" /> с заданным типом требования и значением.</summary>
+      <param name="type">Тип утверждения.</param>
+      <param name="value">Значение утверждения.</param>
+      <exception cref="T:System.ArgumentNullException">Значение параметра <paramref name="type" /> или <paramref name="value" /> — null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String)">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.Claim" /> с заданным типом требования, значением и типом значения.</summary>
+      <param name="type">Тип утверждения.</param>
+      <param name="value">Значение утверждения.</param>
+      <param name="valueType">Тип значения требования.Если этот параметр имеет значение null, используется <see cref="F:System.Security.Claims.ClaimValueTypes.String" />.</param>
+      <exception cref="T:System.ArgumentNullException">Значение параметра <paramref name="type" /> или <paramref name="value" /> — null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String)">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.Claim" /> с заданным типом требования, значением, типом значения и поставщиком.</summary>
+      <param name="type">Тип утверждения.</param>
+      <param name="value">Значение утверждения.</param>
+      <param name="valueType">Тип значения требования.Если этот параметр имеет значение null, используется <see cref="F:System.Security.Claims.ClaimValueTypes.String" />.</param>
+      <param name="issuer">Отправитель утверждения.Если этот параметр пуст или имеет значение null, используется <see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" />.</param>
+      <exception cref="T:System.ArgumentNullException">Значение параметра <paramref name="type" /> или <paramref name="value" /> — null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String,System.String)">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.Claim" /> с заданным типом требования, значением, типом значения, поставщиком и исходным поставщиком.</summary>
+      <param name="type">Тип утверждения.</param>
+      <param name="value">Значение утверждения.</param>
+      <param name="valueType">Тип значения требования.Если этот параметр имеет значение null, используется <see cref="F:System.Security.Claims.ClaimValueTypes.String" />.</param>
+      <param name="issuer">Отправитель утверждения.Если этот параметр пуст или имеет значение null, используется <see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" />.</param>
+      <param name="originalIssuer">Исходный издатель требования.Если этот параметр пуст или имеет значение null, свойству <see cref="P:System.Security.Claims.Claim.OriginalIssuer" /> присваивается значение свойства <see cref="P:System.Security.Claims.Claim.Issuer" />.</param>
+      <exception cref="T:System.ArgumentNullException">Значение параметра <paramref name="type" /> или <paramref name="value" /> — null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.#ctor(System.String,System.String,System.String,System.String,System.String,System.Security.Claims.ClaimsIdentity)">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.Claim" /> указанным типом требования, значением, типом значения, издателем, исходным издателем и субъектом.</summary>
+      <param name="type">Тип утверждения.</param>
+      <param name="value">Значение утверждения.</param>
+      <param name="valueType">Тип значения требования.Если этот параметр имеет значение null, используется <see cref="F:System.Security.Claims.ClaimValueTypes.String" />.</param>
+      <param name="issuer">Отправитель утверждения.Если этот параметр пуст или имеет значение null, используется <see cref="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer" />.</param>
+      <param name="originalIssuer">Исходный издатель требования.Если этот параметр пуст или имеет значение null, свойству <see cref="P:System.Security.Claims.Claim.OriginalIssuer" /> присваивается значение свойства <see cref="P:System.Security.Claims.Claim.Issuer" />.</param>
+      <param name="subject">Субъект, который описывает это утверждение.</param>
+      <exception cref="T:System.ArgumentNullException">Значение параметра <paramref name="type" /> или <paramref name="value" /> — null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.Claim.Clone">
+      <summary>Возвращает новый объект <see cref="T:System.Security.Claims.Claim" />, скопированный из данного объекта.Новое утверждение не имеет субъекта.</summary>
+      <returns>Новый объект требования.</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.Clone(System.Security.Claims.ClaimsIdentity)">
+      <summary>Возвращает новый объект <see cref="T:System.Security.Claims.Claim" />, скопированный из данного объекта.Субъект нового утверждения устанавливается в соответствии с заданным значением ClaimsIdentity.</summary>
+      <returns>Новый объект требования.</returns>
+      <param name="identity">Предполагаемая тема нового утверждения.</param>
+    </member>
+    <member name="P:System.Security.Claims.Claim.CustomSerializationData"></member>
+    <member name="P:System.Security.Claims.Claim.Issuer">
+      <summary>Получает поставщика требования.</summary>
+      <returns>Имя, которое ссылается на издателя утверждения.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.OriginalIssuer">
+      <summary>Получает исходный издатель требования. </summary>
+      <returns>Имя, которое ссылается на исходного издателя утверждения.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Properties">
+      <summary>Получает словарь, содержащий дополнительные свойства, связанные с этим утверждением.</summary>
+      <returns>Словарь, содержащий дополнительные свойства, связанные с требованием.Свойства представляются в виде пар "имя-значение".</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Subject">
+      <summary>Возвращает субъект требования.</summary>
+      <returns>Субъект требования.</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.ToString">
+      <summary>Возвращает строковое представление этого объекта <see cref="T:System.Security.Claims.Claim" />.</summary>
+      <returns>Строковое представление данного объекта <see cref="T:System.Security.Claims.Claim" />.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Type">
+      <summary>Получает тип требования.</summary>
+      <returns>Тип утверждения.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.Value">
+      <summary>Получает значение требования.</summary>
+      <returns>Значение утверждения.</returns>
+    </member>
+    <member name="P:System.Security.Claims.Claim.ValueType">
+      <summary>Получает тип значения требования.</summary>
+      <returns>Тип значения требования.</returns>
+    </member>
+    <member name="M:System.Security.Claims.Claim.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.Claim.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimsIdentity">
+      <summary>Представляет идентификатор на основе утверждений.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.ClaimsIdentity" /> с пустой коллекцией требований.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.ClaimsIdentity" />, используя перечисляемую коллекцию объектов <see cref="T:System.Security.Claims.Claim" />.</summary>
+      <param name="claims">Утверждения, которыми будет заполняться удостоверение утверждений.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String)">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.ClaimsIdentity" /> с указанными требованиями и типом аутентификации.</summary>
+      <param name="claims">Утверждения, которыми будет заполняться удостоверение утверждений.</param>
+      <param name="authenticationType">Тип используемой аутентификации.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String,System.String,System.String)">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.ClaimsIdentity" /> указанными требованиями, типом аутентификации, типом требования имени и типом требования роли.</summary>
+      <param name="claims">Утверждения, которыми будет заполняться удостоверение утверждений.</param>
+      <param name="authenticationType">Тип используемой аутентификации.</param>
+      <param name="nameType">Тип утверждения, используемый для утверждений имен.</param>
+      <param name="roleType">Тип утверждения, используемый для утверждений ролей.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Claims.ClaimsIdentity)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity)">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.ClaimsIdentity" />, используя имя и тип аутентификации из заданного объекта <see cref="T:System.Security.Principal.IIdentity" />.</summary>
+      <param name="identity">Удостоверение, из которого следует создать новое удостоверение утверждений.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity,System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.ClaimsIdentity" />, используя указанные требования и заданный объект <see cref="T:System.Security.Principal.IIdentity" />.</summary>
+      <param name="identity">Удостоверение, из которого следует создать новое удостоверение утверждений.</param>
+      <param name="claims">Утверждения, которыми будет заполняться удостоверение утверждений.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.Security.Principal.IIdentity,System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.String,System.String,System.String)">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.ClaimsIdentity" /> из указанного <see cref="T:System.Security.Principal.IIdentity" />, используя указанные требования, тип аутентификации, тип требования имени и тип требования роли.</summary>
+      <param name="identity">Удостоверение, из которого следует создать новое удостоверение утверждений.</param>
+      <param name="claims">Утверждения, которыми будет заполняться новое удостоверение утверждений.</param>
+      <param name="authenticationType">Тип используемой аутентификации.</param>
+      <param name="nameType">Тип утверждения, используемый для утверждений имен.</param>
+      <param name="roleType">Тип утверждения, используемый для утверждений ролей.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.String)">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.ClaimsIdentity" /> пустой коллекцией требований и указанным типом аутентификации.</summary>
+      <param name="authenticationType">Тип используемой аутентификации.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.#ctor(System.String,System.String,System.String)">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.ClaimsIdentity" /> с указанным типом аутентификации, типом требования имени и типом требования роли.</summary>
+      <param name="authenticationType">Тип используемой аутентификации.</param>
+      <param name="nameType">Тип утверждения, используемый для утверждений имен.</param>
+      <param name="roleType">Тип утверждения, используемый для утверждений ролей.</param>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Actor">
+      <summary>Получает или задает удостоверение вызывающей стороны, которой были предоставлены права делегирования.</summary>
+      <returns>Вызывающая сторона, которой предоставлены права делегирования.</returns>
+      <exception cref="T:System.InvalidOperationException">Предпринята попытка установить свойство на текущий экземпляр.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.AddClaim(System.Security.Claims.Claim)">
+      <summary>Добавляет одно требование к этому идентификатору требований.</summary>
+      <param name="claim">Добавляемое требование.</param>
+      <exception cref="T:System.ArgumentNullException">Параметр <paramref name="claim" /> имеет значение null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.AddClaims(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+      <summary>Добавляет список требований к этому идентификатору требований.</summary>
+      <param name="claims">Добавляемые требования.</param>
+      <exception cref="T:System.ArgumentNullException">Параметр <paramref name="claims" /> имеет значение null.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.AuthenticationType">
+      <summary>Возвращает тип проверки подлинности.</summary>
+      <returns>Тип проверки подлинности.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.BootstrapContext">
+      <summary>Получает или задает токен, который использовался для создания данного удостоверения на основе требований.</summary>
+      <returns>Контекст начальной загрузки.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Claims">
+      <summary>Получает требования, связанные с данным удостоверением на основе требований.</summary>
+      <returns>Коллекция утверждений, связанных с данным удостоверением утверждений.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.Clone">
+      <summary>Возвращает новый объект <see cref="T:System.Security.Claims.ClaimsIdentity" />, скопированный из данного удостоверение утверждений.</summary>
+      <returns>Копия текущего экземпляра.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.CreateClaim(System.IO.BinaryReader)"></member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.CustomSerializationData"></member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultIssuer">
+      <summary>Издатель по умолчанию; "ЛОКАЛЬНАЯ СИСТЕМА".</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultNameClaimType">
+      <summary>Тип утверждения имени по умолчанию; <see cref="F:System.Security.Claims.ClaimTypes.Name" />.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimsIdentity.DefaultRoleClaimType">
+      <summary>Тип утверждения роли по умолчанию; <see cref="F:System.Security.Claims.ClaimTypes.Role" />.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindAll(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Извлекает все утверждения, соответствующие указанного предикату.</summary>
+      <returns>Утверждения соответствия.Список доступен только для чтения.</returns>
+      <param name="match">Функция, выполняющая логику сопоставления.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> имеет значение null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindAll(System.String)">
+      <summary>Извлекает все утверждения, которые имеют указанный тип утверждения.</summary>
+      <returns>Утверждения соответствия.Список доступен только для чтения.</returns>
+      <param name="type">Тип утверждения, с которым сопоставляются утверждения.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> имеет значение null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindFirst(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Извлекает первое утверждение, соответствующие указанному предикату.</summary>
+      <returns>Первое утверждение соответствия или значение null, если соответствие не найдено.</returns>
+      <param name="match">Функция, выполняющая логику сопоставления.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> имеет значение null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.FindFirst(System.String)">
+      <summary>Извлекает первое утверждение с указанным типом утверждения.</summary>
+      <returns>Первое утверждение соответствия или значение null, если соответствие не найдено.</returns>
+      <param name="type">Тип требования для выполнения сравнения.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> имеет значение null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.HasClaim(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Определяет, имеет ли этот идентификатор утверждения утверждение, что соответствует заданному предикату.</summary>
+      <returns>Значение true, если существует сопоставленное утверждение; в противном случае — значение false.</returns>
+      <param name="match">Функция, выполняющая логику сопоставления.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> имеет значение null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.HasClaim(System.String,System.String)">
+      <summary>Определяет, имеет ли этот идентификатор утверждения утверждение с заданным типом и значением утверждения.</summary>
+      <returns>Значение true, если соответствие найдено; в противном случае — значение false.</returns>
+      <param name="type">Тип требования для выполнения сравнения.</param>
+      <param name="value">Значение требования для сопоставления.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> имеет значение null.– или –<paramref name="value" /> имеет значение null.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.IsAuthenticated">
+      <summary>Получает значение, определяющее, прошло ли удостоверение аутентификацию.</summary>
+      <returns>Значение true, если удостоверение прошло аутентификацию; в противном случае — значение false.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Label">
+      <summary>Получает или задает метку для данного удостоверения на основе требований.</summary>
+      <returns>Метка.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.Name">
+      <summary>Получает имя данного удостоверения на основе требований.</summary>
+      <returns>Имя или null.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.NameClaimType">
+      <summary>Получает тип требования, используемый для определения того, какие требования предоставляют значение для свойства <see cref="P:System.Security.Claims.ClaimsIdentity.Name" /> данного удостоверения на основе требований.</summary>
+      <returns>Тип требования имени.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.RemoveClaim(System.Security.Claims.Claim)">
+      <summary>Пытается удалить утверждение на основе идентификатора утверждений.</summary>
+      <param name="claim">Удаляемое требование.</param>
+      <exception cref="T:System.InvalidOperationException">Невозможно удалить требования.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsIdentity.RoleClaimType">
+      <summary>Получает тип требования, который будет интерпретироваться как роль .NET Framework среди требований в данном удостоверении на основе требований.</summary>
+      <returns>Тип требования роли.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.TryRemoveClaim(System.Security.Claims.Claim)">
+      <summary>Пытается удалить утверждение на основе идентификатора утверждений.</summary>
+      <returns>Значение true, если требование успешно удалено; в противном случае — значение false.</returns>
+      <param name="claim">Удаляемое требование.</param>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.ClaimsIdentity.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimsPrincipal">
+      <summary>Реализация <see cref="T:System.Security.Principal.IPrincipal" />, которая поддерживает несколько идентификаторов на основе утверждений.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.ClaimsPrincipal" />.</summary>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Collections.Generic.IEnumerable{System.Security.Claims.ClaimsIdentity})">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.ClaimsPrincipal" />, используя указанные удостоверения требований.</summary>
+      <param name="identities">Удостоверения, из которых требуется инициализировать новый субъект требований.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identities" /> имеет значение null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.IO.BinaryReader)"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Security.Principal.IIdentity)">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.ClaimsPrincipal" /> из указанного удостоверения.</summary>
+      <param name="identity">Удостоверение, из которого требуется инициализировать новый субъект требований.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identity" /> имеет значение null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.#ctor(System.Security.Principal.IPrincipal)">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Claims.ClaimsPrincipal" /> из указанного субъекта.</summary>
+      <param name="principal">Субъект, из которого требуется инициализировать новый субъект утверждений.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="principal" /> имеет значение null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.AddIdentities(System.Collections.Generic.IEnumerable{System.Security.Claims.ClaimsIdentity})">
+      <summary>Добавляет заданные идентификаторы требований к данному субъекту требований.</summary>
+      <param name="identities">Добавляемые удостоверения утверждений.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identities" /> имеет значение null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.AddIdentity(System.Security.Claims.ClaimsIdentity)">
+      <summary>Добавляет заданный идентификатор требований к данному субъекту требований.</summary>
+      <param name="identity">Добавляемое удостоверение утверждений.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="identity" /> имеет значение null.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Claims">
+      <summary>Получает коллекцию, которая содержит все утверждения из всех идентификаторов утверждений, связанных с этим субъектом утверждений.</summary>
+      <returns>Требования, связанные с субъектом.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.ClaimsPrincipalSelector">
+      <summary>Получает и задает делегат, который используется чтобы выбрать идентификатор субъекта, возвращенный свойством <see cref="P:System.Security.Claims.ClaimsPrincipal.Current" />.</summary>
+      <returns>Делегат.Значение по умолчанию — null.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.Clone"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.CreateClaimsIdentity(System.IO.BinaryReader)"></member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Current">
+      <summary>Получает текущий субъект требований.</summary>
+      <returns>Текущий субъект утверждений.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.CustomSerializationData"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindAll(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Извлекает все утверждения, соответствующие указанного предикату.</summary>
+      <returns>Утверждения соответствия.</returns>
+      <param name="match">Функция, выполняющая логику сопоставления.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> имеет значение null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindAll(System.String)">
+      <summary>Извлекает все утверждения, которые имеют указанный тип утверждения.</summary>
+      <returns>Утверждения соответствия.</returns>
+      <param name="type">Тип утверждения, с которым сопоставляются утверждения.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> имеет значение null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindFirst(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Извлекает первое утверждение, соответствующие указанному предикату.</summary>
+      <returns>Первое утверждение соответствия или значение null, если соответствие не найдено.</returns>
+      <param name="match">Функция, выполняющая логику сопоставления.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> имеет значение null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.FindFirst(System.String)">
+      <summary>Извлекает первое утверждение с указанным типом утверждения.</summary>
+      <returns>Первое утверждение соответствия или значение null, если соответствие не найдено.</returns>
+      <param name="type">Тип требования для выполнения сравнения.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> имеет значение null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.HasClaim(System.Predicate{System.Security.Claims.Claim})">
+      <summary>Определяет, содержат ли какие-либо идентификаторы утверждений, связанные с данным субъектом утверждений, утверждение, соответствующее указанному предикату.</summary>
+      <returns>Значение true, если существует сопоставленное утверждение; в противном случае — значение false.</returns>
+      <param name="match">Функция, выполняющая логику сопоставления.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="match" /> имеет значение null.</exception>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.HasClaim(System.String,System.String)">
+      <summary>Определяет, содержат ли какие-либо идентификаторы утверждений, связанные с данным субъектом утверждений, утверждение с заданным типом и значением утверждения.</summary>
+      <returns>Значение true, если существует сопоставленное утверждение; в противном случае — значение false.</returns>
+      <param name="type">Тип требования для выполнения сравнения.</param>
+      <param name="value">Значение требования для сопоставления.</param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="type" /> имеет значение null.– или –<paramref name="value" /> имеет значение null.</exception>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Identities">
+      <summary>Получает коллекцию, которая содержит все идентификаторы утверждений, связанных с этим субъектом утверждений.</summary>
+      <returns>Коллекция удостоверений требований.</returns>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.Identity">
+      <summary>Получает первичный идентификатор утверждений, связанный с субъектом утверждений.</summary>
+      <returns>Первичный идентификатор утверждений, связанный с субъектом утверждений.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.IsInRole(System.String)">
+      <summary>Возвращает значение, указывающее, находится ли сущность (пользователь), представленная данным субъектом утверждений, в указанной роли.</summary>
+      <returns>Значение true, если субъект требований имеет указанную роль; в противном случае — значение false.</returns>
+      <param name="role">Роль, для которой выполняется проверка.</param>
+    </member>
+    <member name="P:System.Security.Claims.ClaimsPrincipal.PrimaryIdentitySelector">
+      <summary>Получает и задает делегат, который используется чтобы выбрать идентификатор утверждений, возвращенный свойством <see cref="P:System.Security.Claims.ClaimsPrincipal.Identity" />.</summary>
+      <returns>Делегат.Значение по умолчанию — null.</returns>
+    </member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.WriteTo(System.IO.BinaryWriter)"></member>
+    <member name="M:System.Security.Claims.ClaimsPrincipal.WriteTo(System.IO.BinaryWriter,System.Byte[])"></member>
+    <member name="T:System.Security.Claims.ClaimTypes">
+      <summary>Определяет константы для известных типов утверждений, которые могут быть присвоены подчиненному объекту.Этот класс не наследуется.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Actor">
+      <summary>http://schemas.xmlsoap.org/ws/2009/09/identity/claims/actor.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Anonymous">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего анонимного пользователя; http://schemas.xmlsoap.org/ws/2005/05/identity/claims/anonymous.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Authentication">
+      <summary>Универсальный код ресурса (URI) для утверждения, которое указывает сведения о том, прошло ли удостоверение аутентификацию, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/authenticated.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthenticationInstant">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего момент времени, когда сущность была аутентифицирована; http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationinstant.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthenticationMethod">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего способ, которым была выполнена аутентификация сущности; http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.AuthorizationDecision">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего решение об авторизации для сущности; http://schemas.xmlsoap.org/ws/2005/05/identity/claims/authorizationdecision.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.CookiePath">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего путь к файлу cookie; http://schemas.microsoft.com/ws/2008/06/identity/claims/cookiepath.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Country">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего страну/регион нахождения сущности, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/country.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DateOfBirth">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего дату рождения сущности, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/dateofbirth.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyPrimaryGroupSid">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего идентификатор безопасности (SID) первичной группы "только запрет" для сущности; http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarygroupsid.SID "только запрет" запрещает указанному утверждению доступ к защищаемому объекту.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyPrimarySid">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего первичный идентификатор безопасности (SID) "только запрет" для сущности; http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarysid.SID "только запрет" запрещает указанному утверждению доступ к защищаемому объекту.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlySid">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего идентификатор безопасности (SID) "только запрет" для сущности, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/denyonlysid.SID "только запрет" запрещает указанному утверждению доступ к защищаемому объекту.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.DenyOnlyWindowsDeviceGroup">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlywindowsdevicegroup.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Dns">
+      <summary>Универсальный код ресурса (URI) для требования, указывающего DNS-имя, связанное с именем компьютера или с альтернативным именем субъекта или поставщика сертификата X.509, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/dns.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Dsa">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/dsa.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Email">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего адрес электронной почты сущности, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Expiration">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/expiration.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Expired">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/expired.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Gender">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего пол сущности, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/gender.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.GivenName">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего имя сущности, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.GroupSid">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего идентификатор безопасности (SID) для группы сущности, http://schemas.microsoft.com/ws/2008/06/identity/claims/groupsid.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Hash">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего значение хэша, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/hash.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.HomePhone">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего домашний номер телефона сущности, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/homephone.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.IsPersistent">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/ispersistent.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Locality">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего языковой стандарт места нахождения сущности, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/locality.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.MobilePhone">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего мобильный номер телефона сущности, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Name">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего имя сущности, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.NameIdentifier">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего имя сущности, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.OtherPhone">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего альтернативный номер телефона сущности, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/otherphone.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PostalCode">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего почтовый индекс сущности, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/postalcode.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PrimaryGroupSid">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего идентификатор безопасности (SID) первичной группы сущности, http://schemas.microsoft.com/ws/2008/06/identity/claims/primarygroupsid.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.PrimarySid">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего первичный идентификатор безопасности (SID) сущности, http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Role">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего роль сущности, http://schemas.microsoft.com/ws/2008/06/identity/claims/role.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Rsa">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего ключ RSA, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/rsa.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.SerialNumber">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего серийный номер, http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Sid">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего идентификатор безопасности (SID), http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Spn">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего утверждение имени субъекта-службы (SPN), http://schemas.xmlsoap.org/ws/2005/05/identity/claims/spn.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.StateOrProvince">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего область или край нахождения сущности, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/stateorprovince.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.StreetAddress">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего почтовый адрес сущности, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/streetaddress.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Surname">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего фамилию сущности, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.System">
+      <summary>Универсальный код ресурса (URI) для утверждения, идентифицирующего системную сущность, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/system.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Thumbprint">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего отпечаток, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/thumbprint.Отпечаток — это глобальный уникальный хэш SHA-1 сертификата X.509.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Upn">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего утверждение имени субъекта-пользователя (UPN), http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Uri">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего код URI, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/uri.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.UserData">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/userdata.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Version">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/version.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.Webpage">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего веб-страницу сущности, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/webpage.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsAccountName">
+      <summary>Универсальный код ресурса (URI) для утверждения, указывающего имя учетной записи домена Windows для сущности, http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsDeviceClaim">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsdeviceclaim.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsDeviceGroup">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsdevicegroup.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsFqbnVersion">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsfqbnversion.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsSubAuthority">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowssubauthority.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.WindowsUserClaim">
+      <summary>http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsuserclaim.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimTypes.X500DistinguishedName">
+      <summary>Универсальный код ресурса (URI) для утверждения различающего имени сертификата X.509, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/x500distinguishedname.В стандарте X.500 определена методика определения различающихся имен, используемая в сертификатах X.509.</summary>
+    </member>
+    <member name="T:System.Security.Claims.ClaimValueTypes">
+      <summary>Определяет типы значений утверждений, соответствующих URI типа, определенным W3C и OASIS.Этот класс не наследуется.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Base64Binary">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XML base64Binary.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Base64Octet">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XML base64Octet.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Boolean">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XML boolean.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Date">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XML date.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DateTime">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XML dateTime.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DaytimeDuration">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XQuery daytimeDuration.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DnsName">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных SOAP dns.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Double">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XML double.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.DsaKeyValue">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных сигнатуры XML DSAKeyValue.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Email">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных SOAP emailaddress.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Fqbn">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XML fqbn.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.HexBinary">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XML hexBinary.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XML integer.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer32">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XML integer32.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Integer64">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XML integer64.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.KeyInfo">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных сигнатуры XML KeyInfo.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Rfc822Name">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XACML 1.0 rfc822Name.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Rsa">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных SOAP rsa.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.RsaKeyValue">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных сигнатуры XML RSAKeyValue.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Sid">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XML sid.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.String">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XML string.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.Time">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XML time.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UInteger32">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XML uinteger32.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UInteger64">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XML uinteger64.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.UpnName">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных SOAP UPN.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.X500Name">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XACML 1.0 x500Name.</summary>
+    </member>
+    <member name="F:System.Security.Claims.ClaimValueTypes.YearMonthDuration">
+      <summary>Универсальный код ресурса (URI), представляющий тип данных XQuery yearMonthDuration.</summary>
+    </member>
+    <member name="T:System.Security.Principal.GenericIdentity">
+      <summary>Представляет обобщенного пользователя.</summary>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.Security.Principal.GenericIdentity)">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Principal.GenericIdentity" />, используя указанный объект <see cref="T:System.Security.Principal.GenericIdentity" />.</summary>
+      <param name="identity">Объект, из которого создается новый экземпляр <see cref="T:System.Security.Principal.GenericIdentity" />.</param>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.String)">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Principal.GenericIdentity" />, представляющий пользователя с указанным именем.</summary>
+      <param name="name">Имя пользователя, от лица которого выполняется код программы. </param>
+      <exception cref="T:System.ArgumentNullException">Значение параметра <paramref name="name" /> — null. </exception>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.#ctor(System.String,System.String)">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Principal.GenericIdentity" />, представляющий пользователя с указанными именем и типом проверки подлинности.</summary>
+      <param name="name">Имя пользователя, от лица которого выполняется код программы. </param>
+      <param name="type">Тип проверки подлинности, применяемой для идентификации пользователя. </param>
+      <exception cref="T:System.ArgumentNullException">Значение параметра <paramref name="name" /> — null.– или – Значение параметра <paramref name="type" /> — null. </exception>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.AuthenticationType">
+      <summary>Получает тип проверки подлинности, применяемой для идентификации пользователя.</summary>
+      <returns>Тип проверки подлинности, применяемой для идентификации пользователя.</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.Claims">
+      <summary>Получает все утверждения для пользователя, представленного этим общим идентификатором.</summary>
+      <returns>Коллекция требований для этого объекта <see cref="T:System.Security.Principal.GenericIdentity" />.</returns>
+    </member>
+    <member name="M:System.Security.Principal.GenericIdentity.Clone">
+      <summary>Создает новый объект, являющийся копией текущего экземпляра.</summary>
+      <returns>Копия текущего экземпляра.</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.IsAuthenticated">
+      <summary>Возвращает значение, позволяющее определить, прошел ли пользователь проверку подлинности.</summary>
+      <returns>true, если пользователь прошел проверку подлинности; в противном случае — false.</returns>
+    </member>
+    <member name="P:System.Security.Principal.GenericIdentity.Name">
+      <summary>Получает имя пользователя.</summary>
+      <returns>Имя пользователя, от лица которого выполняется код программы.</returns>
+    </member>
+    <member name="T:System.Security.Principal.GenericPrincipal">
+      <summary>Представляет обобщенного участника.</summary>
+    </member>
+    <member name="M:System.Security.Principal.GenericPrincipal.#ctor(System.Security.Principal.IIdentity,System.String[])">
+      <summary>Инициализирует новый экземпляр класса <see cref="T:System.Security.Principal.GenericPrincipal" /> из удостоверения пользователя и массива имен ролей, к которым относится пользователь, представленный этим удостоверением.</summary>
+      <param name="identity">Базовая реализация объекта <see cref="T:System.Security.Principal.IIdentity" />, представляющего любого пользователя. </param>
+      <param name="roles">Массив имен ролей, к которым относится пользователь, представленный параметром <paramref name="identity" />. </param>
+      <exception cref="T:System.ArgumentNullException">Значение параметра <paramref name="identity" /> — null. </exception>
+    </member>
+    <member name="P:System.Security.Principal.GenericPrincipal.Identity">
+      <summary>Получает удостоверение <see cref="T:System.Security.Principal.GenericIdentity" /> пользователя, представленного текущим элементом <see cref="T:System.Security.Principal.GenericPrincipal" />.</summary>
+      <returns>Удостоверение <see cref="T:System.Security.Principal.GenericIdentity" /> пользователя, представленного элементом <see cref="T:System.Security.Principal.GenericPrincipal" />.</returns>
+    </member>
+    <member name="M:System.Security.Principal.GenericPrincipal.IsInRole(System.String)">
+      <summary>Определяет, относится ли текущий элемент <see cref="T:System.Security.Principal.GenericPrincipal" /> к указанной роли.</summary>
+      <returns>true, если текущий элемент <see cref="T:System.Security.Principal.GenericPrincipal" /> является элементом указанной роли; в противном случае — false.</returns>
+      <param name="role">Имя роли, для которой требуется проверить членство. </param>
+    </member>
+  </members>
+</doc>

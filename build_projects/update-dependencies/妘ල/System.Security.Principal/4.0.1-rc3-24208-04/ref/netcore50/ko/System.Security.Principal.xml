@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Security.Principal</name>
+  </assembly>
+  <members>
+    <member name="T:System.Security.Principal.IIdentity">
+      <summary>Identity 개체의 기본 기능을 정의합니다.</summary>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.AuthenticationType">
+      <summary>사용한 인증 형식을 가져옵니다.</summary>
+      <returns>사용자를 식별하는 데 사용되는 인증 형식입니다.</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.IsAuthenticated">
+      <summary>사용자가 인증되었는지 여부를 나타내는 값을 가져옵니다.</summary>
+      <returns>사용자가 인증되었으면 true이고, 그렇지 않으면 false입니다.</returns>
+    </member>
+    <member name="P:System.Security.Principal.IIdentity.Name">
+      <summary>현재 사용자의 이름을 가져옵니다.</summary>
+      <returns>코드를 실행하고 있는 사용자의 이름입니다.</returns>
+    </member>
+    <member name="T:System.Security.Principal.IPrincipal">
+      <summary>Principal 개체의 기본 기능을 정의합니다.</summary>
+    </member>
+    <member name="P:System.Security.Principal.IPrincipal.Identity">
+      <summary>현재 보안 주체(principal)의 ID를 가져옵니다.</summary>
+      <returns>현재 Principal과 관련된 <see cref="T:System.Security.Principal.IIdentity" /> 개체입니다.</returns>
+    </member>
+    <member name="M:System.Security.Principal.IPrincipal.IsInRole(System.String)">
+      <summary>현재 Principal이 지정된 역할에 속하는지 여부를 확인합니다.</summary>
+      <returns>현재 Principal이 지정된 역할의 멤버이면 true이고, 그렇지 않으면 false입니다.</returns>
+      <param name="role">멤버 여부를 확인하기 위한 역할의 이름입니다. </param>
+    </member>
+    <member name="T:System.Security.Principal.TokenImpersonationLevel">
+      <summary>보안 가장 수준을 정의합니다.보안 가장 수준은 서버 프로세스가 클라이언트 프로세스를 대신하여 작업을 수행할 수 있는 정도를 제어합니다.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Anonymous">
+      <summary>서버 프로세스는 클라이언트에 대한 ID 정보를 얻을 수 없으며 클라이언트를 가장할 수 없습니다.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Delegation">
+      <summary>서버 프로세스는 원격 시스템에서 클라이언트의 보안 컨텍스트를 가장할 수 있습니다.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Identification">
+      <summary>서버 프로세스는 보안 식별자 및 권한과 같은 클라이언트에 대한 정보를 얻을 수 있지만 클라이언트를 가장할 수 없습니다.이 멤버는 테이블 및 뷰를 내보내는 데이터베이스 제품과 같이 자체의 개체를 내보내는 서버에 유용합니다.서버는 검색된 클라이언트 보안 정보를 사용하여 클라이언트의 보안 컨텍스트를 사용하는 다른 서비스를 사용할 수는 없지만 액세스 위반 결정을 내릴 수 있습니다.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.Impersonation">
+      <summary>서버 프로세스는 로컬 시스템에서 클라이언트의 보안 컨텍스트를 가장할 수 있습니다.원격 시스템에서는 서버가 클라이언트를 가장할 수 없습니다.</summary>
+    </member>
+    <member name="F:System.Security.Principal.TokenImpersonationLevel.None">
+      <summary>가장 수준이 지정되지 않습니다.</summary>
+    </member>
+  </members>
+</doc>

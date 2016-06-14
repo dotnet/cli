@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>System.Threading.ThreadPool</name>
+  </assembly>
+  <members>
+    <member name="T:System.Threading.RegisteredWaitHandle">
+      <summary>Représente un handle inscrit lors de l'appel à <see cref="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.UInt32,System.Boolean)" />.Cette classe ne peut pas être héritée.</summary>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="M:System.Threading.RegisteredWaitHandle.Unregister(System.Threading.WaitHandle)">
+      <summary>Annule une opération d'attente inscrite émise par la méthode <see cref="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.UInt32,System.Boolean)" />.</summary>
+      <returns>true si la fonction aboutit ; sinon, false.</returns>
+      <param name="waitObject">
+        <see cref="T:System.Threading.WaitHandle" /> à signaler. </param>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="T:System.Threading.ThreadPool">
+      <summary>Fournit un pool de threads qui peuvent servir à exécuter des tâches, publier des éléments de travail, traiter des E/S asynchrones, attendre au nom d'autres threads et traiter des minuteries.</summary>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.BindHandle(System.Runtime.InteropServices.SafeHandle)">
+      <summary>[ESSENTIEL POUR LA SÉCURITÉ] Lie un handle de système d'exploitation à <see cref="T:System.Threading.ThreadPool" />.</summary>
+      <returns>true si le handle est lié ; sinon, false.</returns>
+      <param name="osHandle">
+        <see cref="T:System.Runtime.InteropServices.SafeHandle" /> qui contient le handle du système d'exploitation.Il faut que le handle ait été ouvert pour des E/S avec chevauchement du côté non managé.</param>
+    </member>
+    <member name="M:System.Threading.ThreadPool.QueueUserWorkItem(System.Threading.WaitCallback)">
+      <summary>Place une méthode en file d'attente pour exécution.La méthode s'exécute lorsqu'un thread du pool devient disponible.</summary>
+      <returns>true si la méthode est placée en file d'attente avec succès ; <see cref="T:System.NotSupportedException" /> est levée si l'élément de travail n'a pas pu être placé en file d'attente.</returns>
+      <param name="callBack">
+        <see cref="T:System.Threading.WaitCallback" /> qui représente la méthode à exécuter. </param>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="callBack" /> is null.</exception>
+      <exception cref="T:System.NotSupportedException">The common language runtime (CLR) is hosted, and the host does not support this action.</exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.QueueUserWorkItem(System.Threading.WaitCallback,System.Object)">
+      <summary>Place une méthode en file d'attente pour exécution et spécifie un objet contenant les données que la méthode doit utiliser.La méthode s'exécute lorsqu'un thread du pool devient disponible.</summary>
+      <returns>true si la méthode est placée en file d'attente avec succès ; <see cref="T:System.NotSupportedException" /> est levée si l'élément de travail n'a pas pu être placé en file d'attente.</returns>
+      <param name="callBack">
+        <see cref="T:System.Threading.WaitCallback" /> représentant la méthode à exécuter. </param>
+      <param name="state">Objet contenant les données que la méthode doit utiliser. </param>
+      <exception cref="T:System.NotSupportedException">The common language runtime (CLR) is hosted, and the host does not support this action.</exception>
+      <exception cref="T:System.ArgumentNullException">
+        <paramref name="callBack" /> is null.</exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.Int32,System.Boolean)">
+      <summary>Inscrit un délégué pour attendre un <see cref="T:System.Threading.WaitHandle" />, en utilisant, pour indiquer le délai en millisecondes, un entier 32 bits signé.</summary>
+      <returns>
+        <see cref="T:System.Threading.RegisteredWaitHandle" /> qui encapsule le handle natif.</returns>
+      <param name="waitObject">
+        <see cref="T:System.Threading.WaitHandle" /> à inscrire.Utilisez un <see cref="T:System.Threading.WaitHandle" /> autre que <see cref="T:System.Threading.Mutex" />.</param>
+      <param name="callBack">Délégué <see cref="T:System.Threading.WaitOrTimerCallback" /> à appeler lorsque le paramètre <paramref name="waitObject" /> est signalé. </param>
+      <param name="state">Objet passé au délégué. </param>
+      <param name="millisecondsTimeOutInterval">Délai en millisecondes.Si le paramètre <paramref name="millisecondsTimeOutInterval" /> a la valeur zéro (0), la fonction teste l'état de l'objet et procède à un retour immédiat.Si <paramref name="millisecondsTimeOutInterval" /> a la valeur -1, le délai d'expiration de la fonction ne prend jamais fin.</param>
+      <param name="executeOnlyOnce">true pour indiquer que le thread ne tiendra plus compte du paramètre <paramref name="waitObject" /> une fois le délégué appelé ; false pour indiquer que la minuterie sera réinitialisée à chaque achèvement d'opération d'attente, jusqu'à annulation de l'inscription de l'attente. </param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="millisecondsTimeOutInterval" /> parameter is less than -1. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.Int64,System.Boolean)">
+      <summary>Inscrit un délégué pour attendre un <see cref="T:System.Threading.WaitHandle" />, en utilisant, pour indiquer le délai en millisecondes, un entier 64 bits signé.</summary>
+      <returns>
+        <see cref="T:System.Threading.RegisteredWaitHandle" /> qui encapsule le handle natif.</returns>
+      <param name="waitObject">
+        <see cref="T:System.Threading.WaitHandle" /> à inscrire.Utilisez un <see cref="T:System.Threading.WaitHandle" /> autre que <see cref="T:System.Threading.Mutex" />.</param>
+      <param name="callBack">Délégué <see cref="T:System.Threading.WaitOrTimerCallback" /> à appeler lorsque le paramètre <paramref name="waitObject" /> est signalé. </param>
+      <param name="state">Objet passé au délégué. </param>
+      <param name="millisecondsTimeOutInterval">Délai en millisecondes.Si le paramètre <paramref name="millisecondsTimeOutInterval" /> a la valeur zéro (0), la fonction teste l'état de l'objet et procède à un retour immédiat.Si <paramref name="millisecondsTimeOutInterval" /> a la valeur -1, le délai d'expiration de la fonction ne prend jamais fin.</param>
+      <param name="executeOnlyOnce">true pour indiquer que le thread ne tiendra plus compte du paramètre <paramref name="waitObject" /> une fois le délégué appelé ; false pour indiquer que la minuterie sera réinitialisée à chaque achèvement d'opération d'attente, jusqu'à annulation de l'inscription de l'attente. </param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="millisecondsTimeOutInterval" /> parameter is less than -1. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.TimeSpan,System.Boolean)">
+      <summary>Inscrit un délégué en attente de <see cref="T:System.Threading.WaitHandle" />, en spécifiant une valeur <see cref="T:System.TimeSpan" /> pour indiquer le délai.</summary>
+      <returns>
+        <see cref="T:System.Threading.RegisteredWaitHandle" /> qui encapsule le handle natif.</returns>
+      <param name="waitObject">
+        <see cref="T:System.Threading.WaitHandle" /> à inscrire.Utilisez un <see cref="T:System.Threading.WaitHandle" /> autre que <see cref="T:System.Threading.Mutex" />.</param>
+      <param name="callBack">Délégué <see cref="T:System.Threading.WaitOrTimerCallback" /> à appeler lorsque le paramètre <paramref name="waitObject" /> est signalé. </param>
+      <param name="state">Objet passé au délégué. </param>
+      <param name="timeout">Délai représenté par <see cref="T:System.TimeSpan" />.Si le paramètre <paramref name="timeout" /> a la valeur zéro, la fonction teste l'état de l'objet et procède à un retour immédiat.Si <paramref name="timeout" /> a la valeur -1, le délai d'expiration de la fonction ne prend jamais fin.</param>
+      <param name="executeOnlyOnce">true pour indiquer que le thread ne tiendra plus compte du paramètre <paramref name="waitObject" /> une fois le délégué appelé ; false pour indiquer que la minuterie sera réinitialisée à chaque achèvement d'opération d'attente, jusqu'à annulation de l'inscription de l'attente. </param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="timeout" /> parameter is less than -1. </exception>
+      <exception cref="T:System.NotSupportedException">The <paramref name="timeout" /> parameter is greater than <see cref="F:System.Int32.MaxValue" />. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="M:System.Threading.ThreadPool.RegisterWaitForSingleObject(System.Threading.WaitHandle,System.Threading.WaitOrTimerCallback,System.Object,System.UInt32,System.Boolean)">
+      <summary>Inscrit un délégué pour attendre un <see cref="T:System.Threading.WaitHandle" />, en utilisant, pour indiquer le délai en millisecondes, un entier 32 bits non signé.</summary>
+      <returns>
+        <see cref="T:System.Threading.RegisteredWaitHandle" /> pouvant être utilisé pour annuler l'opération d'attente inscrite.</returns>
+      <param name="waitObject">
+        <see cref="T:System.Threading.WaitHandle" /> à inscrire.Utilisez un <see cref="T:System.Threading.WaitHandle" /> autre que <see cref="T:System.Threading.Mutex" />.</param>
+      <param name="callBack">Délégué <see cref="T:System.Threading.WaitOrTimerCallback" /> à appeler lorsque le paramètre <paramref name="waitObject" /> est signalé. </param>
+      <param name="state">Objet passé au délégué. </param>
+      <param name="millisecondsTimeOutInterval">Délai en millisecondes.Si le paramètre <paramref name="millisecondsTimeOutInterval" /> a la valeur zéro (0), la fonction teste l'état de l'objet et procède à un retour immédiat.Si <paramref name="millisecondsTimeOutInterval" /> a la valeur -1, le délai d'expiration de la fonction ne prend jamais fin.</param>
+      <param name="executeOnlyOnce">true pour indiquer que le thread ne tiendra plus compte du paramètre <paramref name="waitObject" /> une fois le délégué appelé ; false pour indiquer que la minuterie sera réinitialisée à chaque achèvement d'opération d'attente, jusqu'à annulation de l'inscription de l'attente. </param>
+      <exception cref="T:System.ArgumentOutOfRangeException">The <paramref name="millisecondsTimeOutInterval" /> parameter is less than -1. </exception>
+      <filterpriority>1</filterpriority>
+    </member>
+    <member name="T:System.Threading.WaitCallback">
+      <summary>Représente une méthode de rappel qu'un thread du pool doit exécuter.</summary>
+      <param name="state">Objet contenant les informations que la méthode de rappel doit utiliser. </param>
+      <filterpriority>2</filterpriority>
+    </member>
+    <member name="T:System.Threading.WaitOrTimerCallback">
+      <summary>Représente une méthode à appeler lorsqu'un <see cref="T:System.Threading.WaitHandle" /> est signalé ou expire.</summary>
+      <param name="state">Objet contenant les informations que la méthode de rappel doit utiliser à chacune de ses exécutions. </param>
+      <param name="timedOut">true si le <see cref="T:System.Threading.WaitHandle" /> a expiré ; false s'il a été signalé. </param>
+      <filterpriority>2</filterpriority>
+    </member>
+  </members>
+</doc>
