@@ -22,12 +22,7 @@ namespace SampleApp
 
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
-            var ksi = app.ServerFeatures.Get<IKestrelServerInformation>();
-            ksi.NoDelay = true;
-
             loggerFactory.AddConsole(LogLevel.Error);
-
-            app.UseKestrelConnectionLogging();
 
             app.Run(async context =>
             {
@@ -64,7 +59,11 @@ namespace SampleApp
             Args = string.Join(" ", args);
 
             var host = new WebHostBuilder()
-                .UseServer("Microsoft.AspNetCore.Server.Kestrel")
+                .UseKestrel(options =>
+                {
+                    options.NoDelay = true;
+                    options.UseConnectionLogging();
+                })
                 .UseUrls(url.ToString())
                 .UseStartup<Startup>()
                 .Build();
