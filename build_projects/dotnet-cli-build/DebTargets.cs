@@ -74,8 +74,16 @@ namespace Microsoft.DotNet.Cli.Build
             
             return c.Success();
         }
-        
+
         [Target(nameof(InstallSharedHost))]
+        public static BuildTargetResult InstallHostFxr(BuildTargetContext c)
+        {
+            InstallPackage(c.BuildContext.Get<string>("HostFxrInstallerFile"));
+            
+            return c.Success();
+        }
+        
+        [Target(nameof(InstallHostFxr))]
         public static BuildTargetResult InstallSharedFramework(BuildTargetContext c)
         {
             InstallPackage(c.BuildContext.Get<string>("SharedFrameworkInstallerFile"));
@@ -118,6 +126,7 @@ namespace Microsoft.DotNet.Cli.Build
             {
                 Monikers.GetSdkDebianPackageName(c),
                 Monikers.GetDebianSharedFrameworkPackageName(CliDependencyVersions.SharedFrameworkVersion),
+                Monikers.GetDebianHostFxrPackageName(CliDependencyVersions.HostFxrVersion),
                 Monikers.GetDebianSharedHostPackageName(c)
             };
             
