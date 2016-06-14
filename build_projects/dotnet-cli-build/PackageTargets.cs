@@ -159,6 +159,14 @@ namespace Microsoft.DotNet.Cli.Build
             string hostFxrPublishRoot = c.BuildContext.Get<string>("HostFxrPublishRoot");
             Utils.CopyDirectoryRecursively(hostFxrPublishRoot, combinedRoot);
 
+            string licenseSource = Path.Combine(Dirs.RepoRoot, "packaging", "LICENSE.txt");
+            string licenseDestination = Path.Combine(combinedRoot, "LICENSE.txt");
+            File.Copy(licenseSource, licenseDestination);
+
+            string tpnSource = Path.Combine(Dirs.RepoRoot, "THIRD-PARTY-NOTICES");
+            string tpnDestination = Path.Combine(combinedRoot, "THIRD-PARTY-NOTICES");
+            File.Copy(tpnSource, tpnDestination);
+
             c.BuildContext["CombinedFrameworkSDKHostRoot"] = combinedRoot;
             return c.Success();
         }
@@ -177,6 +185,14 @@ namespace Microsoft.DotNet.Cli.Build
 
             string sharedFrameworkPublishRoot = c.BuildContext.Get<string>("SharedFrameworkPublishRoot");
             Utils.CopyDirectoryRecursively(sharedFrameworkPublishRoot, combinedRoot);
+
+            string licenseSource = Path.Combine(Dirs.RepoRoot, "packaging", "LICENSE.txt");
+            string licenseDestination = Path.Combine(combinedRoot, "LICENSE.txt");
+            File.Copy(licenseSource, licenseDestination);
+
+            string tpnSource = Path.Combine(Dirs.RepoRoot, "THIRD-PARTY-NOTICES");
+            string tpnDestination = Path.Combine(combinedRoot, "THIRD-PARTY-NOTICES");
+            File.Copy(tpnSource, tpnDestination);
 
             c.BuildContext["CombinedFrameworkSDKRoot"] = combinedRoot;
             return c.Success();
