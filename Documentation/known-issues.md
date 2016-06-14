@@ -55,7 +55,7 @@ When using non-release versions of the CLI, `dotnet restore` will fail to restor
 ```
 
 ## `dotnet restore` times out on Win7 x64
-If you have Virtual Box and you try to use the CLI on a Win7 x64 machine, `dotnet restore` will be really slow and will eventually time out without doing much restoring. 
+If you have any virtualization software (so far we've confirmed VMWare and Virtual Box) and you try to use the CLI on a Win7 SP1 x64 machine, `dotnet restore` will be really slow and will eventually time out without doing much restoring. The issue is in the virtual networking adapters that usually get installed with said software. 
 
 **Issues tracking this:** 
 
@@ -63,7 +63,7 @@ If you have Virtual Box and you try to use the CLI on a Win7 x64 machine, `dotne
 
 **Affects:** `dotnet restore`
 
-**Workaround:** disable the VirtualBox network interface and do the restore.   
+**Workaround:** disable the virtual network interface and do the restore.   
 
 ## Resolving the Standard library packages
 The StdLib package is on a MyGet feed. In order to restore it, a MyGet feed needs to be added 
