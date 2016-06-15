@@ -27,6 +27,16 @@ sudo port -f uninstall openssl @0.9.8
 
 You can verify whether you have the right version using the  `openssl version` command from the Terminal. 
 
+## Running .NET Core CLI on Nano Server
+
+If you’re using Nano Server Technical Preview 5 with .NET Core CLI, you will need to copy all DLL files from c:\windows\system32\forwarders to c:\windows\system32, due to a bug that has since been fixed in later releases.
+ 
+If you use “dotnet publish”, make sure to copy all DLL files from c:\windows\system32\forwarders to your publish directory as well.
+ 
+If your Nano Server Technical Preview 5 build is updated or serviced, please make sure to repeat this process, in case any of the DLLs have been updated as well.
+ 
+Apologies for any inconvenience. Again, this has been fixed in later releases.
+
 ## Users of zsh (z shell) don't get `dotnet` on the path after install
 There is a known issue in oh-my-zsh installer that interferes with how `path_helper` works on OS X systems. In short, 
 the said installer creates a `.zshrc` file which contains the exploded path at the time of installation. This clobbers 
