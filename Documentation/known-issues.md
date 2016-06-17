@@ -29,7 +29,7 @@ You can verify whether you have the right version using the  `openssl version` c
 
 ## Running .NET Core CLI on Nano Server
 
-If you’re using Nano Server Technical Preview 5 with .NET Core CLI, you will need to copy forwarders' DLLs due to a bug in the forwarders' resolve logic (the bug has been fixed in later releases). The forwarders' location is in `c:\windows\system32\forwarders`. The destination depends on the [type of deployment](https://dotnet.github.io/docs/core-concepts/app-types.html) that you are choosing for your application. 
+If you’re using Nano Server Technical Preview 5 with .NET Core CLI, due to a bug in the product, you will need to copy binaries from  `c:\windows\system32\forwarders`. The destination depends on the [type of deployment](https://dotnet.github.io/docs/core-concepts/app-types.html) that you are choosing for your application. 
 
 For portable applications, the forwarders need to be copied to the shared runtime location. The shared runtime can be found wherever you installed .NET Core (by default, it is `C:\Program Files\dotnet`) under the following path: `shared\Microsoft.NETCore.App\<version>\`. 
 
