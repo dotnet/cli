@@ -214,6 +214,8 @@ namespace Microsoft.DotNet.Cli.Build
                     File.Delete(Path.Combine(binaryToCorehostifyOutDir, $"{binaryToCorehostify}.exe"));
                     var binaryToCoreHostifyDeps = Path.Combine(sdkOutputDirectory, binaryToCorehostify + ".deps.json");
 
+
+
                     File.Copy(compilersDeps, Path.Combine(sdkOutputDirectory, binaryToCorehostify + ".deps.json"));
                     File.Copy(compilersRuntimeConfig, Path.Combine(sdkOutputDirectory, binaryToCorehostify + ".runtimeconfig.json"));
                     PublishMutationUtilties.ChangeEntryPointLibraryName(binaryToCoreHostifyDeps, binaryToCorehostify);
@@ -221,6 +223,8 @@ namespace Microsoft.DotNet.Cli.Build
                     {
                         var assetPath = Path.Combine(binaryToCorehostifyRelDir, $"{binaryToRemove}.exe").Replace(Path.DirectorySeparatorChar, '/');
                         RemoveAssetFromDepsPackages(binaryToCoreHostifyDeps, "runtimeTargets", assetPath);
+                        RemoveAssetFromDepsPackages(
+                            Path.Combine(sdkOutputDirectory, "dotnet.deps.json"), "runtimeTargets", assetPath);
                     }
                 }
                 catch (Exception ex)
@@ -270,7 +274,29 @@ namespace Microsoft.DotNet.Cli.Build
                 GenerateNuGetPackagesArchive(c, dotnet, sdkOutputDirectory);
             }
 
+            CopyMSBuildTargetsToSDKRoot(sdkOutputDirectory);
+
             return c.Success();
+        }
+
+        private static void CopyMSBuildTargetsToSDKRoot(string sdkOutputDirectory)
+        {
+            var msbuildTargetsDirectory = Path.Combine(sdkOutputDirectory, "runtimes", "any", "native");
+            
+            var filesToCopy = new List<string>();
+            filesToCopy.AddRange(Directory.EnumerateFiles(msbuildTargetsDirectory, "*.targets", SearchOption.AllDirectories));
+            filesToCopy.AddRange(Directory.EnumerateFiles(msbuildTargetsDirectory, "*.Targets", SearchOption.AllDirectories));
+            filesToCopy.AddRange(Directory.EnumerateFiles(msbuildTargetsDirectory, "*.props", SearchOption.AllDirectories));
+            filesToCopy.AddRange(Directory.EnumerateFiles(msbuildTargetsDirectory, "*.overridetasks", SearchOption.AllDirectories));
+            filesToCopy.AddRange(Directory.EnumerateFiles(msbuildTargetsDirectory, "*.tasks", SearchOption.AllDirectories));
+
+            foreach (var fileFullPath in filesToCopy)
+            {
+                var fileRelativePath = fileFullPath.Substring(msbuildTargetsDirectory.Length + 1);
+                var destinationFilePath = Path.Combine(sdkOutputDirectory, fileRelativePath);
+
+                File.Copy(fileFullPath, destinationFilePath, true);
+            }
         }
 
         private static void GenerateNuGetPackagesArchive(
