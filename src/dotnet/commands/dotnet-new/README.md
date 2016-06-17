@@ -41,15 +41,15 @@ Valid values for F# are:
 
 `dotnet new`
     
-    Drops a sample C## project in the current directory.
+    Drops a sample C# project in the current directory.
 
-`dotnet new --lang f##`
+`dotnet new --lang f#`
     
-    Drops a sample F## project in the current directory.
+    Drops a sample F# project in the current directory.
 
-`dotnet new --lang c##`
+`dotnet new --lang c#`
     
-    Drops a sample C## project in the current directory.
+    Drops a sample C# project in the current directory.
 
 # SEE ALSO
 dotnet-run(1)
