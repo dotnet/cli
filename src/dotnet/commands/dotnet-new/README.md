@@ -22,7 +22,7 @@ After this, the project is ready to be compiled and/or edited further.
 
 `-l`, `--lang [C#|F#]`
 
-Language of the project. Defaults to `C#`. `csharp` (`fsharp`) or `cs` (`fs`) are also valid options.
+Language of the project. Defaults to `C#`. `csharp` ( or `cs` ) and `fsharp` ( or `fs` ) are also valid options.
 
 `-t`, `--type`
 
