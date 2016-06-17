@@ -5,13 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectModel.Graph;
 using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using Microsoft.Extensions.PlatformAbstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -55,6 +54,38 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
 
                 Assert.Contains("netcoreapp1.0", frameworkShortNames);
                 Assert.Contains("dnx451", frameworkShortNames);
+            }
+        }
+
+        [Theory]
+        [InlineData(MessageTypes.RefreshDependencies, null)]
+        [InlineData(MessageTypes.RestoreComplete, null)]
+        [InlineData(MessageTypes.RestoreComplete, true)]
+        [InlineData(MessageTypes.RestoreComplete, false)]
+        public void RefreshDependenciesResultsAreConsistent(string messageType, bool? clearCache)
+        {
+            var projectPath = Path.Combine(_testAssetsManager.AssetsRoot, "EmptyNetCoreApp");
+            Assert.True(Directory.Exists(projectPath));
+
+            using (var server = new DthTestServer())
+            using (var client = new DthTestClient(server))
+            {
+                client.Initialize(projectPath);
+                var originalDependencies = client.DrainMessage(7).Single(m => m.MessageType == MessageTypes.Dependencies)
+                                 .RetrievePayloadAs<JObject>();
+
+                if (clearCache.HasValue)
+                {
+                    client.SendPayload(projectPath, messageType, new { Reset = clearCache.Value });
+                }
+                else
+                {
+                    client.SendPayload(projectPath, messageType);
+                }
+
+                var refreshedDependencies = client.DrainTillFirst(MessageTypes.Dependencies).Payload.ToString();
+
+                Assert.Equal(originalDependencies.ToString(), refreshedDependencies.ToString());
             }
         }
 
@@ -137,7 +168,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                                                                    string expectedUnresolvedDependency,
                                                                    string expectedUnresolvedType)
         {
-            if (PlatformServices.Default.Runtime.OperatingSystemPlatform == Platform.Linux)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 Console.WriteLine("Test is skipped on Linux");
                 return;
@@ -226,11 +257,11 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
             }
         }
 
-        [Fact(Skip = "Require dotnet restore integration test")]
+        [Fact]
         public void DthDependencies_UpdateGlobalJson_RefreshDependencies()
         {
-            var assets = new TestAssetsManager(Path.Combine(AppContext.BaseDirectory, "TestAssets", "ProjectModelServer"));
-            var projectPath = assets.CreateTestInstance("DthUpdateSearchPathSample").WithLockFiles().TestRoot;
+            var assetsManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "ProjectModelServer"));
+            var projectPath = assetsManager.CreateTestInstance("DthUpdateSearchPathSample").WithLockFiles().TestRoot;
             Assert.True(Directory.Exists(projectPath));
 
             using (var server = new DthTestServer())
@@ -259,7 +290,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                 // Overwrite the global.json to remove search path to ext
                 File.WriteAllText(
                     Path.Combine(projectPath, "home", GlobalSettings.FileName),
-                    JsonConvert.SerializeObject(new { project = new string[] { "src" } }));
+                    JsonConvert.SerializeObject(new { projects = new string[] { "src" } }));
 
                 client.SendPayload(testProject, "RefreshDependencies");
 
@@ -271,17 +302,63 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
 
                 client.DrainTillFirst("Dependencies")
                       .RetrieveDependency("Newtonsoft.Json")
-                      .AssertProperty("Type", "")
                       .AssertProperty("Resolved", false)
+                      .AssertProperty("Type", "Project")
                       .RetrievePropertyAs<JArray>("Errors")
                       .AssertJArrayCount(1)
                       .RetrieveArraryElementAs<JObject>(0)
-                      .AssertProperty("ErrorCode", "NU1010");
+                      .AssertProperty("ErrorCode", ErrorCodes.NU1010);
 
                 client.DrainTillFirst("DependencyDiagnostics")
                       .RetrieveDependencyDiagnosticsCollection()
                       .RetrieveDependencyDiagnosticsErrorAt<JObject>(0)
-                      .AssertProperty("ErrorCode", "NU1010");
+                      .AssertProperty("ErrorCode", ErrorCodes.NU1010);
+
+                var restoreCommand = new RestoreCommand();
+                restoreCommand.WorkingDirectory = projectPath;
+                restoreCommand.Execute().Should().Pass();
+
+                client.SendPayload(testProject, "RefreshDependencies");
+
+                client.DrainTillFirst("Dependencies")
+                      .RetrieveDependency("Newtonsoft.Json")
+                      .AssertProperty("Resolved", true)
+                      .AssertProperty("Type", "Package")
+                      .RetrievePropertyAs<JArray>("Errors")
+                      .AssertJArrayCount(0);
+
+                client.DrainTillFirst("DependencyDiagnostics")
+                      .RetrievePayloadAs<JObject>()
+                      .AssertProperty<JArray>("Errors", array => array.Count == 0)
+                      .AssertProperty<JArray>("Warnings", array => array.Count == 0);
+
+                // Overwrite the global.json to add search path to ext back
+                File.WriteAllText(
+                    Path.Combine(projectPath, "home", GlobalSettings.FileName),
+                    JsonConvert.SerializeObject(new { projects = new string[] { "src", "../ext" } }));
+
+                client.SendPayload(testProject, "RefreshDependencies");
+                
+                client.DrainTillFirst("ProjectInformation")
+                      .RetrievePayloadAs<JObject>()
+                      .RetrievePropertyAs<JArray>("ProjectSearchPaths")
+                      .AssertJArrayCount(2)
+                      .AssertJArrayElement(0, Path.Combine(projectPath, "home", "src"))
+                      .AssertJArrayElement(1, Path.Combine(projectPath, "ext"));
+
+                client.DrainTillFirst("Dependencies")
+                      .RetrieveDependency("Newtonsoft.Json")
+                      .AssertProperty("Resolved", false)
+                      .AssertProperty("Type", "Package")
+                      .RetrievePropertyAs<JArray>("Errors")
+                      .AssertJArrayCount(1)
+                      .RetrieveArraryElementAs<JObject>(0)
+                      .AssertProperty("ErrorCode", ErrorCodes.NU1010);
+
+                client.DrainTillFirst("DependencyDiagnostics")
+                      .RetrieveDependencyDiagnosticsCollection()
+                      .RetrieveDependencyDiagnosticsErrorAt<JObject>(0)
+                      .AssertProperty("ErrorCode", ErrorCodes.NU1010);
             }
         }
 
