@@ -144,9 +144,8 @@ namespace Microsoft.DotNet.Cli.Build
             var hostFxrVersion = CliDependencyVersions.HostFxrVersion;
 
             // Generated Installers + Archives
-            AddInstallerArtifactToContext(c, "dotnet-sdk", "Sdk", cliVersion);
             AddInstallerArtifactToContext(c, "dotnet-dev", "CombinedFrameworkSDKHost", cliVersion);
-            AddInstallerArtifactToContext(c, "dotnet-sharedframework-sdk", "CombinedFrameworkSDK", cliVersion);
+            AddInstallerArtifactToContext(c, "dotnet-sdk", "Sdk", cliVersion);
             AddInstallerArtifactToContext(c, "dotnet-sdk-debug", "SdkSymbols", cliVersion);
 
             //Downloaded Installers + Archives
