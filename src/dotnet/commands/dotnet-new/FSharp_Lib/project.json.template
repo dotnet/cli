@@ -2,11 +2,10 @@
   "version": "1.0.0-*",
   "buildOptions": {
     "debugType": "portable",
-    "emitEntryPoint": true,
     "compilerName": "fsc",
     "compile": {
       "includeFiles": [
-        "Program.fs"
+        "Library.fs"
       ]
     }
   },
@@ -24,17 +23,10 @@
     }
   },
   "frameworks": {
-    "netcoreapp1.0": {
+    "netstandard1.6": {
       "dependencies": {
-        "Microsoft.NETCore.App": {
-          "type": "platform",
-          "version": "1.0.0"
-        }
-      },
-      "imports": [
-        "portable-net45+win8",
-        "dnxcore50"
-      ]
+        "NETStandard.Library": "1.6.0"
+      }
     }
   }
 }
