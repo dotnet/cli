@@ -9,7 +9,7 @@ RC2 and Preview 1 bits
 To get the latest released bits (RC2 for .NET Core and Preview for tooling), 
 check out our [Getting started page](http://go.microsoft.com/fwlink/?LinkID=798306&clcid=0x409).
 
-Also, don't forget to check out [the documentation](http://dotnet.github.io/docs/core-concepts/core-sdk/index.html). 
+Also, don't forget to check out [the documentation](https://aka.ms/dotnet-cli-docs). 
 
 Release schedule
 ----------------
@@ -98,7 +98,7 @@ Compiling to IL is done using:
 This will drop an IL assembly in `./bin/[configuration]/[framework]/[binary name]` 
 that you can run using `dotnet bin/[configuration]/[framework]/[binaryname.dll]`.
 
-For more details, please refer to the [documentation](http://dotnet.github.io/docs/core-concepts/core-sdk/index.html).
+For more details, please refer to the [documentation](https://aka.ms/dotnet-cli-docs).
 
 Building from source
 --------------------
