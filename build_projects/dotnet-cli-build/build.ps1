@@ -47,27 +47,27 @@ cat "$RepoRoot\branchinfo.txt" | ForEach-Object {
 }
 
 # Use a repo-local install directory (but not the artifacts directory because that gets cleaned a lot
-if (!$env:DOTNET_INSTALL_DIR)
-{
-    $env:DOTNET_INSTALL_DIR="$RepoRoot\.dotnet_stage0\Windows\$Architecture"
-}
+#if (!$env:DOTNET_INSTALL_DIR)
+#{
+#    $env:DOTNET_INSTALL_DIR="$RepoRoot\.dotnet_stage0\Windows\$Architecture"
+#}
 
-if (!(Test-Path $env:DOTNET_INSTALL_DIR))
-{
-    mkdir $env:DOTNET_INSTALL_DIR | Out-Null
-}
+#if (!(Test-Path $env:DOTNET_INSTALL_DIR))
+#{
+#    mkdir $env:DOTNET_INSTALL_DIR | Out-Null
+#}
 
 # Install a stage 0
-Write-Host "Installing .NET Core CLI Stage 0 from branchinfo channel"
+#Write-Host "Installing .NET Core CLI Stage 0 from branchinfo channel"
     
-& "$RepoRoot\scripts\obtain\dotnet-install.ps1" -Channel $env:CHANNEL -Architecture $Architecture -Verbose
-if($LASTEXITCODE -ne 0) { throw "Failed to install stage0" }
+#& "$RepoRoot\scripts\obtain\dotnet-install.ps1" -Channel $env:CHANNEL -Architecture $Architecture -Verbose
+#if($LASTEXITCODE -ne 0) { throw "Failed to install stage0" }
 
 # Put the stage0 on the path
-$env:PATH = "$env:DOTNET_INSTALL_DIR;$env:PATH"
+#$env:PATH = "$env:DOTNET_INSTALL_DIR;$env:PATH"
 
 # Disable first run since we want to control all package sources
-$env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+#$env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 
 # Restore the build scripts
 Write-Host "Restoring Build Script projects..."
