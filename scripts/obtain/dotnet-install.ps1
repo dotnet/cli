@@ -355,4 +355,3 @@ else {
 }
 
 Say "Installation finished"
-exit 0
