@@ -16,6 +16,13 @@ set PROJECT_JSON_PATH=%TOOLRUNTIME_DIR%\%BUILDTOOLS_VERSION%
 set PROJECT_JSON_FILE=%PROJECT_JSON_PATH%\project.json
 set PROJECT_JSON_CONTENTS={ "dependencies": { "Microsoft.DotNet.BuildTools": "%BUILDTOOLS_VERSION%" }, "frameworks": { "netcoreapp1.0": { } } }
 set BUILD_TOOLS_SEMAPHORE=%PROJECT_JSON_PATH%\init-tools.completed
+set DOTNET_INSTALL_DIR=%~dp0.dotnet_stage0
+
+if DEFINED "%CHANNEL%" (
+  set SCRIPT="%~dp0scripts\obtain\dotnet-install.ps1 -Channel %CHANNEL% -Architecture %bit% -InstallDir \"%DOTNET_PATH%\""
+) else (
+  set SCRIPT="%~dp0scripts\obtain\dotnet-install.ps1 -Architecture %bit% -InstallDir \"%DOTNET_PATH%\""
+)
 
 :: if force option is specified then clean the tool runtime and build tools package directory to force it to get recreated
 if [%1]==[force] (
@@ -36,13 +43,13 @@ echo %PROJECT_JSON_CONTENTS% > "%PROJECT_JSON_FILE%"
 echo Running %0 > "%INIT_TOOLS_LOG%"
 
 if NOT exist "%DOTNET_CMD%" (
-  set DOTNET_INSTALL_DIR=%~dp0.dotnet_stage0
   if NOT exist "%DOTNET_INSTALL_DIR%" mkdir "%DOTNET_INSTALL_DIR%"
   if NOT exist "%PACKAGES_DIR%" mkdir "%PACKAGES_DIR%"
-  powershell -NoProfile -NoLogo -Command "%~dp0scripts\obtain\dotnet-install.ps1 -Channel \"%CHANNEL%\" -Architecture \"%bit%\" -Verbose; exit $LastExitCode;"
+
+  echo %SCRIPT%
+  powershell -NoProfile -NoLogo -Command %SCRIPT% "-Verbose; exit $LastExitCode;"
   if %errorlevel% neq 0 exit /b %errorlevel%
-  setx PATH="%DOTNET_INSTALL_DIR%;%PATH%"
-  setx DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+  setx DOTNET_SKIP_FIRST_TIME_EXPERIENCE 1
 )
 
 :afterdotnetrestore
