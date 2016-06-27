@@ -329,7 +329,7 @@ $IsSdkInstalled = Is-Dotnet-Package-Installed -InstallRoot $InstallRoot -Relativ
 Say-Verbose ".NET SDK installed? $IsSdkInstalled"
 if ($IsSdkInstalled) {
     Say ".NET SDK version $SpecificVersion is already installed."
-    exit 0
+    return
 }
 
 New-Item -ItemType Directory -Force -Path $InstallRoot | Out-Null
