@@ -4,17 +4,12 @@
 
 This repo contains the source code for cross-platform [.NET Core](http://github.com/dotnet/core) command line toolchain. It contains the implementation of each command, the native packages for various supported platforms as well as documentation. 
 
-RC2 and Preview 1 bits
+RTM and Preview 2 bits
 ---------------------
-To get the latest released bits (RC2 for .NET Core and Preview for tooling), 
+To get the latest released bits (RTM for .NET Core and Preview 2 for tooling), 
 check out our [Getting started page](http://go.microsoft.com/fwlink/?LinkID=798306&clcid=0x409).
 
 Also, don't forget to check out [the documentation](https://aka.ms/dotnet-cli-docs). 
-
-Release schedule
-----------------
-
-There have been some changes in the schedule for .NET Core and .NET Core CLI tools. You can read more about them in the [.NET Core RC2 Improvements, Schedule, and Roadmap](https://blogs.msdn.microsoft.com/dotnet/2016/05/06/net-core-rc2-improvements-schedule-and-roadmap/) blog post. 
 
 Found an issue?
 ---------------
