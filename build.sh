@@ -52,6 +52,9 @@ dockerbuild()
     BUILD_COMMAND=/opt/code/build_projects/dotnet-cli-build/build.sh $DIR/scripts/dockerrun.sh --non-interactive "$@"
 }
 
+# Initialize the tooling
+$DIR/init-tools.sh "${args[@]}"
+
 # Check if we need to build in docker
 if [ ! -z "$BUILD_IN_DOCKER" ]; then
     dockerbuild "${args[@]}"

@@ -45,8 +45,6 @@ echo Running %0 > "%INIT_TOOLS_LOG%"
 if NOT exist "%DOTNET_CMD%" (
   if NOT exist "%DOTNET_INSTALL_DIR%" mkdir "%DOTNET_INSTALL_DIR%"
   if NOT exist "%PACKAGES_DIR%" mkdir "%PACKAGES_DIR%"
-
-  echo %SCRIPT%
   powershell -NoProfile -NoLogo -Command %SCRIPT% "-Verbose; exit $LastExitCode;"
   if %errorlevel% neq 0 exit /b %errorlevel%
   setx DOTNET_SKIP_FIRST_TIME_EXPERIENCE 1

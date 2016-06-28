@@ -87,22 +87,9 @@ while read line; do
     fi
 done < "$REPOROOT/branchinfo.txt"
 
-# Use a repo-local install directory (but not the artifacts directory because that gets cleaned a lot
-[ -z "$DOTNET_INSTALL_DIR" ] && export DOTNET_INSTALL_DIR=$REPOROOT/.dotnet_stage0/$(uname)
-[ -d "$DOTNET_INSTALL_DIR" ] || mkdir -p $DOTNET_INSTALL_DIR
-
-$REPOROOT/scripts/obtain/dotnet-install.sh --channel $CHANNEL --verbose
-
 # Put stage 0 on the PATH (for this shell only)
+export DOTNET_INSTALL_DIR=$REPOROOT/.dotnet_stage0/$(uname)
 PATH="$DOTNET_INSTALL_DIR:$PATH"
-
-# Increases the file descriptors limit for this bash. It prevents an issue we were hitting during restore
-FILE_DESCRIPTOR_LIMIT=$( ulimit -n )
-if [ $FILE_DESCRIPTOR_LIMIT -lt 1024 ]
-then
-    echo "Increasing file description limit to 1024"
-    ulimit -n 1024
-fi
 
 # Disable first run since we want to control all package sources
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
