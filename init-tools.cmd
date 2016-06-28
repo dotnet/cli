@@ -1,11 +1,16 @@
-@if "%_echo%" neq "on" echo off
+REM@if "%_echo%" neq "on" echo off
 setlocal
 
 :CheckOS
-IF "%PROCESSOR_ARCHITECTURE%"=="x86" (set bit=x86) else (set bit=x64)
+REM Check if we have an architecture passed in from build.cmd...it will be an unnamed first parameter
+IF "%1"=="" (
+  IF "%PROCESSOR_ARCHITECTURE%"=="x86" (set bit=x86) else (set bit=x64)
+) else (
+  set bit=%1
+)
 
 set INIT_TOOLS_LOG=%~dp0init-tools.log
-if [%PACKAGES_DIR%]==[] set PACKAGES_DIR=%~dp0packages\
+if [%PACKAGES_DIR%]==[] set PACKAGES_DIR=%~dp0.nuget\
 if [%TOOLRUNTIME_DIR%]==[] set TOOLRUNTIME_DIR=%~dp0build_tools
 set DOTNET_PATH=%~dp0.dotnet_stage0\Windows\%bit%\
 if [%DOTNET_CMD%]==[] set DOTNET_CMD=%DOTNET_PATH%dotnet.exe
@@ -16,7 +21,7 @@ set PROJECT_JSON_PATH=%TOOLRUNTIME_DIR%\%BUILDTOOLS_VERSION%
 set PROJECT_JSON_FILE=%PROJECT_JSON_PATH%\project.json
 set PROJECT_JSON_CONTENTS={ "dependencies": { "Microsoft.DotNet.BuildTools": "%BUILDTOOLS_VERSION%" }, "frameworks": { "netcoreapp1.0": { } } }
 set BUILD_TOOLS_SEMAPHORE=%PROJECT_JSON_PATH%\init-tools.completed
-set DOTNET_INSTALL_DIR=%~dp0.dotnet_stage0
+set DOTNET_INSTALL_ROOT_DIR=%~dp0.dotnet_stage0
 
 if DEFINED "%CHANNEL%" (
   set SCRIPT="%~dp0scripts\obtain\dotnet-install.ps1 -Channel %CHANNEL% -Architecture %bit% -InstallDir \"%DOTNET_PATH%\""
@@ -43,14 +48,12 @@ echo %PROJECT_JSON_CONTENTS% > "%PROJECT_JSON_FILE%"
 echo Running %0 > "%INIT_TOOLS_LOG%"
 
 if NOT exist "%DOTNET_CMD%" (
-  if NOT exist "%DOTNET_INSTALL_DIR%" mkdir "%DOTNET_INSTALL_DIR%"
+  if NOT exist "%DOTNET_INSTALL_ROOT_DIR%" mkdir "%DOTNET_INSTALL_ROOT_DIR%"
   if NOT exist "%PACKAGES_DIR%" mkdir "%PACKAGES_DIR%"
   powershell -NoProfile -NoLogo -Command %SCRIPT% "-Verbose; exit $LastExitCode;"
   if %errorlevel% neq 0 exit /b %errorlevel%
   setx DOTNET_SKIP_FIRST_TIME_EXPERIENCE 1
 )
-
-:afterdotnetrestore
 
 if exist "%BUILD_TOOLS_PATH%" goto :afterbuildtoolsrestore
 echo Restoring BuildTools version %BUILDTOOLS_VERSION%...

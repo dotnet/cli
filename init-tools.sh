@@ -2,7 +2,7 @@
 
 __scriptpath=$(cd "$(dirname "$0")"; pwd -P)
 __init_tools_log=$__scriptpath/init-tools.log
-__PACKAGES_DIR=$__scriptpath/packages
+__PACKAGES_DIR=$__scriptpath/.nuget
 __TOOLRUNTIME_DIR=$__scriptpath/build_tools
 __DOTNET_PATH=$__scriptpath/.dotnet_stage0/$(uname -s)
 __DOTNET_CMD=$__DOTNET_PATH/dotnet
