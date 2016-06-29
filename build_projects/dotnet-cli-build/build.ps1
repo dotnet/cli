@@ -44,7 +44,7 @@ cat "$RepoRoot\branchinfo.txt" | ForEach-Object {
     }
 }
 
-$env:path = "$RepoRoot\.dotnet_stage0\Windows;" + $env:path
+$env:path = "$RepoRoot\.dotnet_stage0;" + $env:path
 
 # Restore the build scripts
 Write-Host "Restoring Build Script projects..."
