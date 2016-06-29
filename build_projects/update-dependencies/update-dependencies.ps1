@@ -17,20 +17,18 @@ if($Help)
     exit 0
 }
 
-$Architecture='x64'
-
 $RepoRoot = "$PSScriptRoot\..\.."
 $AppPath = "$PSScriptRoot"
 
 # Use a repo-local install directory (but not the artifacts directory because that gets cleaned a lot
 if (!$env:DOTNET_INSTALL_DIR)
 {
-    $env:DOTNET_INSTALL_DIR="$RepoRoot\.dotnet_stage0\Windows\$Architecture"
+    $env:DOTNET_INSTALL_DIR="$RepoRoot\.dotnet_stage0\Windows"
 }
 
 # Install a stage 0
 Write-Host "Installing .NET Core CLI Stage 0"
-& "$RepoRoot\scripts\obtain\dotnet-install.ps1" -Architecture $Architecture
+& "$RepoRoot\scripts\obtain\dotnet-install.ps1"
 if($LASTEXITCODE -ne 0) { throw "Failed to install stage0" }
 
 # Put the stage0 on the path

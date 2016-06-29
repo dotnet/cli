@@ -1,18 +1,10 @@
-REM@if "%_echo%" neq "on" echo off
+@if "%_echo%" neq "on" echo off
 setlocal
-
-:CheckOS
-REM Check if we have an architecture passed in from build.cmd...it will be an unnamed first parameter
-IF "%1"=="" (
-  IF "%PROCESSOR_ARCHITECTURE%"=="x86" (set bit=x86) else (set bit=x64)
-) else (
-  set bit=%1
-)
 
 set INIT_TOOLS_LOG=%~dp0init-tools.log
 if [%PACKAGES_DIR%]==[] set PACKAGES_DIR=%~dp0.nuget\
 if [%TOOLRUNTIME_DIR%]==[] set TOOLRUNTIME_DIR=%~dp0build_tools
-set DOTNET_PATH=%~dp0.dotnet_stage0\Windows\%bit%\
+set DOTNET_PATH=%~dp0.dotnet_stage0\Windows\
 if [%DOTNET_CMD%]==[] set DOTNET_CMD=%DOTNET_PATH%dotnet.exe
 if [%BUILDTOOLS_SOURCE%]==[] set BUILDTOOLS_SOURCE=https://dotnet.myget.org/F/dotnet-buildtools/api/v3/index.json
 set /P BUILDTOOLS_VERSION=< "%~dp0BuildToolsVersion.txt"
@@ -24,9 +16,9 @@ set BUILD_TOOLS_SEMAPHORE=%PROJECT_JSON_PATH%\init-tools.completed
 set DOTNET_INSTALL_ROOT_DIR=%~dp0.dotnet_stage0
 
 if DEFINED "%CHANNEL%" (
-  set SCRIPT="%~dp0scripts\obtain\dotnet-install.ps1 -Channel %CHANNEL% -Architecture %bit% -InstallDir \"%DOTNET_PATH%\""
+  set SCRIPT="%~dp0scripts\obtain\dotnet-install.ps1 -Channel %CHANNEL% -InstallDir \"%DOTNET_PATH%\""
 ) else (
-  set SCRIPT="%~dp0scripts\obtain\dotnet-install.ps1 -Architecture %bit% -InstallDir \"%DOTNET_PATH%\""
+  set SCRIPT="%~dp0scripts\obtain\dotnet-install.ps1 -InstallDir \"%DOTNET_PATH%\""
 )
 
 :: if force option is specified then clean the tool runtime and build tools package directory to force it to get recreated

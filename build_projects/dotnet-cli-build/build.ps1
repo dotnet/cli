@@ -6,7 +6,6 @@
 param(
     [string]$Configuration="Debug",
     [string[]]$Targets=@("Default"),
-    [string]$Architecture="x64",
     [switch]$NoPackage,
     [switch]$NoRun,
     [switch]$Help)
@@ -18,7 +17,6 @@ if($Help)
     Write-Host "Options:"
     Write-Host "  -Configuration <CONFIGURATION>     Build the specified Configuration (Debug or Release, default: Debug)"
     Write-Host "  -Targets <TARGETS...>              Comma separated build targets to run (Init, Compile, Publish, etc.; Default is a full build and publish)"
-    Write-Host "  -Architecture <ARCHITECTURE>       Build the specified architecture (x64 or x86 (supported only on Windows), default: x64)"
     Write-Host "  -NoPackage                         Skip packaging targets"
     Write-Host "  -NoRun                             Skip running the build"
     Write-Host "  -Help                              Display this help message"
@@ -45,6 +43,8 @@ cat "$RepoRoot\branchinfo.txt" | ForEach-Object {
         Set-Content "env:\$($splat[0])" -Value $splat[1]
     }
 }
+
+$env:path = "$RepoRoot\.dotnet_stage0\Windows;" + $env:path
 
 # Restore the build scripts
 Write-Host "Restoring Build Script projects..."
