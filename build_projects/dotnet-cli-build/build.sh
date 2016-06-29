@@ -88,7 +88,7 @@ while read line; do
 done < "$REPOROOT/branchinfo.txt"
 
 # Put stage 0 on the PATH (for this shell only)
-export DOTNET_INSTALL_DIR=$REPOROOT/.dotnet_stage0/$(uname)
+export DOTNET_INSTALL_DIR=$REPOROOT/.dotnet_stage0
 PATH="$DOTNET_INSTALL_DIR:$PATH"
 
 # Disable first run since we want to control all package sources
