@@ -27,9 +27,15 @@ platformList.each { platform ->
     // Calculate the build command
     if (os == 'Windows_NT') {
         buildCommand = ".\\build.cmd -Configuration ${configuration} -Targets Default"
+        if (architecture == "x86") {
+            buildCommand = "%WinDir%\SysWOW64\cmd.exe /C " + buildCommand;
+        }
     }
     else if (os == 'Windows_2016') {
         buildCommand = ".\\build.cmd -Configuration ${configuration} -RunInstallerTestsInDocker -Targets Default"
+        if (architecture == "x86") {
+            buildCommand = "%WinDir%\SysWOW64\cmd.exe /C " + buildCommand;
+        }
     }
     else if (os == 'Ubuntu') {
         buildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --docker ubuntu.14.04 --targets Default"

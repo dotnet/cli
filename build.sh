@@ -50,7 +50,7 @@ args=($temp)
 dockerbuild()
 {
     # Initialize the tooling and build
-    BUILD_COMMAND="/opt/code/init-tools.sh && /opt/code/build_projects/dotnet-cli-build/build.sh $DIR/scripts/dockerrun.sh --non-interactive "$@""
+    BUILD_COMMAND="/opt/code/init-tools.sh && /opt/code/build_projects/dotnet-cli-build/build.sh" $DIR/scripts/dockerrun.sh --non-interactive "$@"
 }
 
 # Check if we need to build in docker

@@ -44,6 +44,9 @@ cat "$RepoRoot\branchinfo.txt" | ForEach-Object {
     }
 }
 
+# Disable first run since we want to control all package sources
+export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+
 $env:path = "$RepoRoot\.dotnet_stage0;" + $env:path
 
 # Restore the build scripts
