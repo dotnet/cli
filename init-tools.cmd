@@ -15,11 +15,8 @@ set PROJECT_JSON_CONTENTS={ "dependencies": { "Microsoft.DotNet.BuildTools": "%B
 set BUILD_TOOLS_SEMAPHORE=%PROJECT_JSON_PATH%\init-tools.completed
 set DOTNET_INSTALL_ROOT_DIR=%~dp0.dotnet_stage0
 
-if DEFINED "%CHANNEL%" (
-  set SCRIPT="%~dp0scripts\obtain\dotnet-install.ps1 -Channel %CHANNEL% -InstallDir \"%DOTNET_PATH%\""
-) else (
-  set SCRIPT="%~dp0scripts\obtain\dotnet-install.ps1 -InstallDir \"%DOTNET_PATH%\""
-)
+for /F "tokens=*" %%I in (%~dp0branchinfo.txt) do set %%I
+set SCRIPT="%~dp0scripts\obtain\dotnet-install.ps1 -Channel %CHANNEL% -InstallDir \"%DOTNET_PATH%\""
 
 :: if force option is specified then clean the tool runtime and build tools package directory to force it to get recreated
 if [%1]==[force] (
