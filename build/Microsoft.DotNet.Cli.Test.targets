@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Layout" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="Microsoft.DotNet.Cli.Prepare.targets" /> 
+  <Import Project="Microsoft.DotNet.Cli.Utils.targets" /> 
+  <Import Project="test/ProjectsToTest.props" />
+  <Import Project="test/TestPackageProjects.props" />
+
+  <Target Name="SetupTestTargetProperties"
+          DependsOnTargets="Init">
+    <PropertyGroup>
+      <TestPackagesDir>$(RepoRoot)\artifacts\$(Rid)\tests\packages</TestPackagesDir>
+    </PropertyGroup>    
+
+  </Target>
+
+  <Target Name="Test" 
+          DependsOnTargets="SetupTestTargetProperties;
+                            SetupTests;
+                            RestoreTests;
+                            BuildTests;
+                            RunTests;
+                            ValidateDependencies;" />
+
+  <Target Name="SetupTests"
+          DependsOnTargets="SetupTestPackages;
+                            SetupTestProjects" />
+
+  <Target Name="SetupTestPackages"
+          DependsOnTargets="RestoreTestAssetPackages;
+                            BuildTestAssetPackages" />
+
+  <Target Name="SetupTestProjects"
+          DependsOnTargets="RestoreTestAssetProjects;
+                            RestoreDesktopTestAssetProjects;
+                            BuildTestAssetProjects;
+                            BuildDesktopTestAssetProjects" />
+
+  <Target Name="RestoreTestAssetPackages" >
+    <Exec Command="dotnet restore $(RepoRoot)/TestAssets/TestPackages/" />
+  </Target>
+
+  <Target Name="RestoreTestAssetProjects" >
+    <Exec Command="dotnet restore $(RepoRoot)/TestAssets/TestProjects/ --fallbacksource $(TestPackagesDir)" />
+  </Target>
+
+  <Target Name="RestoreDesktopTestAssetProjects" >
+    <Exec Command="dotnet restore $(RepoRoot)/TestAssets/DesktopTestProjects/" />
+  </Target>
+
+  <Target Name="BuildTestAssetPackages" >
+    <Message Text="BuildTestAssetPackages" />
+  </Target>
+
+  <Target Name="BuildTestAssetProjects" >
+    <Message Text="BuildTestAssetProjects" />
+  </Target>
+
+  <Target Name="BuildDesktopTestAssetProjects" >
+    <Message Text="BuildDesktopTestAssetProjects" />
+  </Target>
+
+  <Target Name="RestoreTests" >
+    <Message Text="RestoreTests" />
+  </Target>
+
+  <Target Name="BuildTests" >
+    <Message Text="BuildTests" />
+  </Target>
+
+  <Target Name="RunTests" >
+    <Message Text="RunTests" />
+  </Target>
+
+  <Target Name="ValidateDependencies" >
+    <Message Text="ValidateDependencies" />
+  </Target>
+</Project>
