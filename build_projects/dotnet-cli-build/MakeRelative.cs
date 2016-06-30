@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.Cli.Build
                 SeparatorChar = Path.DirectorySeparatorChar;
             }
 
-            var relativePath = MakeRelative(Path1, Path2, SeparatorChar);
+            var relativePath = GetRelativePath(Path1, Path2, SeparatorChar);
 
             RelativePath = ToTaskItem(Path1, Path2, relativePath);
 
@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.Cli.Build
             return framework;
         }
 
-        private static string MakeRelative(string path1, string path2, char separator = default(char))
+        private static string GetRelativePath(string path1, string path2, char separator = default(char))
         {
 
             StringComparison compare;
