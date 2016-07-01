@@ -12,7 +12,6 @@
             <!-- TODO: https://github.com/dotnet/cli/issues/3558 /><ProjectsToTest Include="/ "dotnet-compile-fsc.Tests" />-->
             <ProjectsToTest Include="dotnet-new.Tests"/>
             <ProjectsToTest Include="dotnet-pack.Tests"/>
-            <ProjectsToTest Include="dotnet-projectmodel-server.Tests"/>
             <ProjectsToTest Include="dotnet-publish.Tests"/>
             <ProjectsToTest Include="dotnet-resgen.Tests"/>
             <ProjectsToTest Include="dotnet-run.Tests"/>
