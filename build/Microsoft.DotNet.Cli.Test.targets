@@ -23,8 +23,7 @@
                             RunTests;" />
 
   <Target Name="SetupTests"
-          DependsOnTargets="SetupTestPackages;
-                            SetupTestProjects;" />
+          DependsOnTargets="SetupTestProjects;" />
 
   <Target Name="SetupTestProjects"
           DependsOnTargets="RestoreTestAssetProjects;
@@ -38,16 +37,45 @@
   </Target>
 
   <Target Name="RestoreTestAssetPackages" 
-          DependsOnTargets="PrepareTests" >
+          DependsOnTargets="PrepareTests;
+                            SetupRestoreTestAssetPackagesInputs;" 
+          Inputs="@(RestoreTestAssetPackagesInputs)"
+          Outputs="@(RestoreTestAssetPackagesInputs->'%(RelativeDir)/project.lock.json')">
     <Exec Command="dotnet restore $(RepoRoot)/TestAssets/TestPackages/" />
   </Target>
 
-  <Target Name="RestoreTestAssetProjects" >
+  <Target Name="SetupRestoreTestAssetPackagesInputs">
+    <ItemGroup>
+      <RestoreTestAssetPackagesInputs Include="$(RepoRoot)/TestAssets/TestPackages/**/project.json" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="RestoreTestAssetProjects"
+          DependsOnTargets="SetupTestPackages;
+                            SetupRestoreTestAssetProjectsInputs;"
+          Inputs="@(RestoreTestAssetProjectsInputs)"
+          Outputs="@(RestoreTestAssetProjectsInputs->'%(RelativeDir)/project.lock.json')">
     <Exec Command="dotnet restore $(RepoRoot)/TestAssets/TestProjects/ --fallbacksource $(TestPackagesDir)" />
   </Target>
 
-  <Target Name="RestoreDesktopTestAssetProjects" >
-    <Exec Command="dotnet restore $(RepoRoot)/TestAssets/DesktopTestProjects/" />
+  <Target Name="SetupRestoreTestAssetProjectsInputs">
+    <ItemGroup>
+      <RestoreTestAssetProjectsInputs Include="$(RepoRoot)/TestAssets/TestProjects/**/project.json" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="RestoreDesktopTestAssetProjects"
+          DependsOnTargets="SetupTestPackages;
+                            SetupRestoreDesktopTestAssetProjectsInputs;"
+          Inputs="@(RestoreDesktopTestAssetProjectsInputs)"
+          Outputs="@(RestoreDesktopTestAssetProjectsInputs->'%(RelativeDir)/project.lock.json')">
+    <Exec Command="dotnet restore $(RepoRoot)/TestAssets/DesktopTestProjects/ --fallbacksource $(TestPackagesDir)" />
+  </Target>
+
+  <Target Name="SetupRestoreDesktopTestAssetProjectsInputs">
+    <ItemGroup>
+      <RestoreDesktopTestAssetProjectsInputs Include="$(RepoRoot)/TestAssets/TestProjects/**/project.json" />
+    </ItemGroup>
   </Target>
 
   <Target Name="BuildTestAssetProjects" >
