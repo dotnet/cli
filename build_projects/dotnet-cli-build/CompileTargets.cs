@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.Cli.Build
             return c.Success();
         }
 
-        [Target(nameof(PrepareTargets.Init), nameof(CompileStage1), nameof(CompileStage2))]
+        [Target(nameof(PrepareTargets.Prepare), nameof(CompileStage1), nameof(CompileStage2))]
         public static BuildTargetResult Compile(BuildTargetContext c)
         {
             return c.Success();
