@@ -64,6 +64,8 @@ namespace Microsoft.DotNet.ProjectModel
 
         public string TestRunner { get; set; }
 
+        public string Type { get; set; }
+
         public ProjectFilesCollection Files { get; set; }
 
         public PackOptions PackOptions { get; set; }

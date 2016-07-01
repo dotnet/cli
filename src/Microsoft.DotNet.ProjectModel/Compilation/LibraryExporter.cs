@@ -280,6 +280,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         {
             var builder = LibraryExportBuilder.Create(project);
             var compilerOptions = project.Project.GetCompilerOptions(project.TargetFrameworkInfo.FrameworkName, _configuration);
+            var libraryAsset = default(LibraryAsset);
 
             if (!string.IsNullOrEmpty(project.TargetFrameworkInfo?.AssemblyPath))
             {
@@ -294,6 +295,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
 
                 builder.AddCompilationAssembly(compileAsset);
                 builder.AddRuntimeAssemblyGroup(new LibraryAssetGroup(new[] { compileAsset }));
+                libraryAsset = compileAsset;
                 if (File.Exists(pdbPath))
                 {
                     builder.AddRuntimeAsset(new LibraryAsset(Path.GetFileName(pdbPath), Path.GetFileName(pdbPath), pdbPath));
@@ -309,6 +311,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                     compilationAssembly);
 
                 builder.AddCompilationAssembly(compilationAssemblyAsset);
+                libraryAsset = compilationAssemblyAsset;
 
                 if (ExportsRuntime(project))
                 {
@@ -333,6 +336,18 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             builder.WithSourceReferences(project.Project.Files.SharedFiles.Select(f =>
                 LibraryAsset.CreateFromAbsolutePath(project.Path, f)
             ));
+
+            if (string.Equals(project.Project.Type, "analyzer", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(libraryAsset.ResolvedPath))
+            {
+                builder.WithAnalyzerReference(new[]
+                {
+                    new AnalyzerReference(
+                        assembly: libraryAsset.ResolvedPath,
+                        framework: project.Framework,
+                        language: null,
+                        runtimeIdentifier: null)
+                });
+            }
 
             return builder.Build();
         }

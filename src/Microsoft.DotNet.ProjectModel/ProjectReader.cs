@@ -145,6 +145,7 @@ namespace Microsoft.DotNet.ProjectModel
             project.Title = rawProject.Value<string>("title");
             project.EntryPoint = rawProject.Value<string>("entryPoint");
             project.TestRunner = rawProject.Value<string>("testRunner");
+            project.Type = rawProject.Value<string>("type");
             project.Authors =
                 rawProject.Value<JToken>("authors")?.Values<string>().ToArray() ?? EmptyArray<string>.Value;
             project.Language = rawProject.Value<string>("language");
