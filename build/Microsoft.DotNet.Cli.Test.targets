@@ -5,37 +5,40 @@
   <Import Project="test/ProjectsToTest.props" />
   <Import Project="test/TestPackageProjects.props" />
 
-  <Target Name="SetupTestTargetProperties"
-          DependsOnTargets="Init">
+  <Target Name="PrepareTests"
+          DependsOnTargets="Prepare">
+
     <PropertyGroup>
+      <TestPackageBuildVersionSuffix>$(TestPackageBuildVersionSuffix)</TestPackageBuildVersionSuffix>
       <TestPackagesDir>$(RepoRoot)\artifacts\$(Rid)\tests\packages</TestPackagesDir>
     </PropertyGroup>    
 
   </Target>
 
   <Target Name="Test" 
-          DependsOnTargets="SetupTestTargetProperties;
+          DependsOnTargets="PrepareTests;
                             SetupTests;
                             RestoreTests;
                             BuildTests;
-                            RunTests;
-                            ValidateDependencies;" />
+                            RunTests;" />
 
   <Target Name="SetupTests"
           DependsOnTargets="SetupTestPackages;
-                            SetupTestProjects" />
-
-  <Target Name="SetupTestPackages"
-          DependsOnTargets="RestoreTestAssetPackages;
-                            BuildTestAssetPackages" />
+                            SetupTestProjects;" />
 
   <Target Name="SetupTestProjects"
           DependsOnTargets="RestoreTestAssetProjects;
                             RestoreDesktopTestAssetProjects;
                             BuildTestAssetProjects;
-                            BuildDesktopTestAssetProjects" />
+                            BuildDesktopTestAssetProjects;" />
 
-  <Target Name="RestoreTestAssetPackages" >
+  <Target Name="SetupTestPackages" 
+          DependsOnTargets="RestoreTestAssetPackages">
+    <Exec Command="dotnet pack %(TestPackageProject.FullPath) --output $(TestPackagesDir)" />
+  </Target>
+
+  <Target Name="RestoreTestAssetPackages" 
+          DependsOnTargets="PrepareTests" >
     <Exec Command="dotnet restore $(RepoRoot)/TestAssets/TestPackages/" />
   </Target>
 
@@ -45,10 +48,6 @@
 
   <Target Name="RestoreDesktopTestAssetProjects" >
     <Exec Command="dotnet restore $(RepoRoot)/TestAssets/DesktopTestProjects/" />
-  </Target>
-
-  <Target Name="BuildTestAssetPackages" >
-    <Message Text="BuildTestAssetPackages" />
   </Target>
 
   <Target Name="BuildTestAssetProjects" >
