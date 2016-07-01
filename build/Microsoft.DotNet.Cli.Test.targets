@@ -26,14 +26,22 @@
           DependsOnTargets="SetupTestProjects;" />
 
   <Target Name="SetupTestProjects"
-          DependsOnTargets="RestoreTestAssetProjects;
+          DependsOnTargets="SetupTestPackageProjectData;
+                            RestoreTestAssetProjects;
                             RestoreDesktopTestAssetProjects;
                             BuildTestAssetProjects;
                             BuildDesktopTestAssetProjects;" />
 
   <Target Name="SetupTestPackages" 
-          DependsOnTargets="RestoreTestAssetPackages">
-    <Exec Command="dotnet pack %(TestPackageProject.FullPath) --output $(TestPackagesDir)" />
+          DependsOnTargets="RestoreTestAssetPackages"
+          Outputs="%(TestPackageProject.Identity)">
+    <PropertyGroup>
+      <VersionSuffixOption></VersionSuffixOption>
+      <VersionSuffixOption Condition="'%(TestPackageProject.VersionSuffix)' != ''">--version-suffix %(TestPackageProject.VersionSuffix)</VersionSuffixOption>
+    </PropertyGroup>
+    <Message Text="VERSION: %(TestPackageProject.VersionSuffix)" />
+    <Message Text="VERSION: $(VersionSuffixOption)" />
+    <Exec Command="dotnet pack %(TestPackageProject.FullPath) --output $(TestPackagesDir) $(VersionSuffixOption)" />
   </Target>
 
   <Target Name="RestoreTestAssetPackages" 
