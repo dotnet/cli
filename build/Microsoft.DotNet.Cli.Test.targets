@@ -8,8 +8,12 @@
 
     <PropertyGroup>
       <TestPackageBuildVersionSuffix>$(CommitCount)</TestPackageBuildVersionSuffix>
-      <TestPackagesDir>$(BaseOutputDirectory)/tests/packages</TestPackagesDir>
+      <TestOutputDir>$(BaseOutputDirectory)/tests</TestOutputDir>
+      <TestPackagesDir>$(TestOutputDir)/packages</TestPackagesDir>
+      <TestArtifactsDir>$(TestOutputDir)/artifacts</TestArtifactsDir>
+      <TestResultXmlDir>$(TestOutputDir)/results</TestResultXmlDir>
       <TestDirectory>$(RepoRoot)/test</TestDirectory>
+      <DotnetUnderTest>$(DotnetStage2)</DotnetUnderTest>
     </PropertyGroup>    
 
   </Target>
@@ -39,7 +43,7 @@
       <VersionSuffixOption></VersionSuffixOption>
       <VersionSuffixOption Condition="'%(TestPackageProject.VersionSuffix)' != ''">--version-suffix %(TestPackageProject.VersionSuffix)</VersionSuffixOption>
     </PropertyGroup>
-    <Exec Command="dotnet pack %(TestPackageProject.FullPath) --output $(TestPackagesDir) $(VersionSuffixOption)" />
+    <Exec Command="$(DotnetUnderTest) pack %(TestPackageProject.FullPath) --output $(TestPackagesDir) $(VersionSuffixOption)" />
   </Target>
 
   <Target Name="RestoreTestAssetPackages" 
@@ -47,7 +51,7 @@
                             SetupRestoreTestAssetPackagesInputs;" 
           Inputs="@(RestoreTestAssetPackagesInputs)"
           Outputs="@(RestoreTestAssetPackagesInputs->'%(RelativeDir)/project.lock.json')">
-    <Exec Command="dotnet restore $(RepoRoot)/TestAssets/TestPackages/" />
+    <Exec Command="$(DotnetUnderTest) restore $(RepoRoot)/TestAssets/TestPackages/" />
   </Target>
 
   <Target Name="SetupRestoreTestAssetPackagesInputs">
@@ -61,7 +65,7 @@
                             SetupRestoreTestAssetProjectsInputs;"
           Inputs="@(RestoreTestAssetProjectsInputs)"
           Outputs="@(RestoreTestAssetProjectsInputs->'%(RelativeDir)/project.lock.json')">
-    <Exec Command="dotnet restore $(RepoRoot)/TestAssets/TestProjects/ --fallbacksource $(TestPackagesDir)" />
+    <Exec Command="$(DotnetUnderTest) restore $(RepoRoot)/TestAssets/TestProjects/ --fallbacksource $(TestPackagesDir)" />
   </Target>
 
   <Target Name="SetupRestoreTestAssetProjectsInputs" >
@@ -82,7 +86,7 @@
                             SetupRestoreDesktopTestAssetProjectsInputs;"
           Inputs="@(RestoreDesktopTestAssetProjectsInputs)"
           Outputs="@(RestoreDesktopTestAssetProjectsInputs->'%(RelativeDir)/project.lock.json')">
-    <Exec Command="dotnet restore $(RepoRoot)/TestAssets/DesktopTestProjects/ --fallbacksource $(TestPackagesDir)" />
+    <Exec Command="$(DotnetUnderTest) restore $(RepoRoot)/TestAssets/DesktopTestProjects/ --fallbacksource $(TestPackagesDir)" />
   </Target>
 
   <Target Name="SetupRestoreDesktopTestAssetProjectsInputs">
@@ -101,7 +105,7 @@
     <Message Text="Skipping projects with .noautobuild files:" />
     <Message Text="%(NoAutoBuildTestAssetProjects.FullPath)" />
 
-    <Exec Command="dotnet build %(BuildableTestAssetProjects.FullPath) --framework netcoreapp1.0" WorkingDirectory="%(BuildableTestAssetProjects.RelativeDir)" />
+    <Exec Command="$(DotnetUnderTest) build %(BuildableTestAssetProjects.FullPath) --framework netcoreapp1.0" WorkingDirectory="%(BuildableTestAssetProjects.RelativeDir)" />
   </Target>
 
   <Target Name="BuildDesktopTestAssetProjects" Condition=" '$(IsDesktopAvailable)' == 'True' " >
@@ -114,14 +118,14 @@
     <Message Text="Skipping projects with .noautobuild files:" />
     <Message Text="%(NoAutoBuildTestAssetProjects.FullPath)" />
 
-    <Exec Command="dotnet build %(BuildableTestAssetProjects.FullPath) --framework net451" WorkingDirectory="%(BuildableTestAssetProjects.RelativeDir)" />
+    <Exec Command="$(DotnetUnderTest) build %(BuildableTestAssetProjects.FullPath) --framework net451" WorkingDirectory="%(BuildableTestAssetProjects.RelativeDir)" />
   </Target>
 
   <Target Name="RestoreTests"
           DependsOnTargets="SetupRestoreTestsInputs;"
           Inputs="@(RestoreTestsInputs)"
           Outputs="@(RestoreTestsInputs->'%(RelativeDir)/project.lock.json')">
-    <Exec Command="dotnet restore $(TestDirectory) --fallbacksource $(TestPackagesDir)" WorkingDirectory="$(TestDirectory)" />
+    <Exec Command="$(DotnetUnderTest) restore $(TestDirectory) --fallbacksource $(TestPackagesDir)" WorkingDirectory="$(TestDirectory)" />
   </Target>
 
   <Target Name="SetupRestoreTestsInputs"
@@ -133,14 +137,21 @@
 
   <Target Name="BuildTests" 
           DependsOnTargets="PrepareTests;">
-    <Exec Command="dotnet build --configuration $(Configuration)" WorkingDirectory="$(TestDirectory)/%(ProjectsToTest.Identity)/" />
+    <Exec Command="$(DotnetUnderTest) build --configuration $(Configuration)" WorkingDirectory="$(TestDirectory)/%(ProjectsToTest.Identity)/" />
   </Target>
 
-  <Target Name="RunTests" >
-    <Message Text="RunTests" />
-  </Target>
-
-  <Target Name="ValidateDependencies" >
-    <Message Text="ValidateDependencies" />
+  <Target Name="RunTests" 
+          DependsOnTargets="PrepareTests;">
+    <PropertyGroup>
+      <PathSeparator>:</PathSeparator>
+      <PathSeparator Condition=" '$(OSName)' == 'win' ">;</PathSeparator>
+      <ExecPath>$(DotnetStage2)$(PathSeparator)$(PATH)</ExecPath>
+      <TestArtifactsEnv>$(TestArtifactsDir)</TestArtifactsEnv>
+      <EnvPrefix>PATH=$(ExecPath) TEST_ARTIFACTS=$(TestArtifactsEnv)</EnvPrefix>
+      <EnvPrefix>(set PATH=$(ExecPath)) &amp; (set TEST_ARTIFACTS=$(TestArtifactsEnv)) &amp;</EnvPrefix>
+    </PropertyGroup>
+    
+    <Exec Command="$(EnvPrefix) $(DotnetUnderTest) test --configuration $(Configuration) -xml $(TestResultXmlDir)/%(ProjectsToTest.Identity)-testResults.xml -notrait catagory=failing" 
+          WorkingDirectory="$(TestDirectory)/%(ProjectsToTest.Identity)/" />
   </Target>
 </Project>
