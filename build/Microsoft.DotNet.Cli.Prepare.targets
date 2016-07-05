@@ -111,7 +111,7 @@
     <CheckPrereqs />
 
     <!-- SetTelemetryProfile -->
-    <SetEnvVar Name="DOTNET_CLI_TELEMETRY_PROFILE" Value="https://github.com/dotnet/cli;$(CommitHash)" />
+    <SetEnvVar Name="DOTNET_CLI_TELEMETRY_PROFILE" Value="$(DOTNET_CLI_TELEMETRY_PROFILE);https://github.com/dotnet/cli;$(CommitHash)" />
   </Target>
 
   <Target Name="SetupDownloadHostAndSharedFxInputsOutputs" DependsOnTargets="Init">
