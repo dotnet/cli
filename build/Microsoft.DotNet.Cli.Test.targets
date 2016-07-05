@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Layout" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="Microsoft.DotNet.Cli.Prepare.targets" /> 
-  <Import Project="Microsoft.DotNet.Cli.Utils.targets" /> 
   <Import Project="test/ProjectsToTest.props" />
   <Import Project="test/TestPackageProjects.props" />
 
@@ -9,7 +7,7 @@
           DependsOnTargets="Prepare">
 
     <PropertyGroup>
-      <TestPackageBuildVersionSuffix>$(TestPackageBuildVersionSuffix)</TestPackageBuildVersionSuffix>
+      <TestPackageBuildVersionSuffix>$(CommitCount)</TestPackageBuildVersionSuffix>
       <TestPackagesDir>$(RepoRoot)\artifacts\$(Rid)\tests\packages</TestPackagesDir>
     </PropertyGroup>    
 
@@ -33,14 +31,13 @@
                             BuildDesktopTestAssetProjects;" />
 
   <Target Name="SetupTestPackages" 
-          DependsOnTargets="RestoreTestAssetPackages"
+          DependsOnTargets="RestoreTestAssetPackages;
+                            SetupTestPackageProjectData"
           Outputs="%(TestPackageProject.Identity)">
     <PropertyGroup>
       <VersionSuffixOption></VersionSuffixOption>
       <VersionSuffixOption Condition="'%(TestPackageProject.VersionSuffix)' != ''">--version-suffix %(TestPackageProject.VersionSuffix)</VersionSuffixOption>
     </PropertyGroup>
-    <Message Text="VERSION: %(TestPackageProject.VersionSuffix)" />
-    <Message Text="VERSION: $(VersionSuffixOption)" />
     <Exec Command="dotnet pack %(TestPackageProject.FullPath) --output $(TestPackagesDir) $(VersionSuffixOption)" />
   </Target>
 
@@ -70,6 +67,13 @@
     <ItemGroup>
       <RestoreTestAssetProjectsInputs Include="$(RepoRoot)/TestAssets/TestProjects/**/project.json" />
     </ItemGroup>
+  </Target>
+
+  <Target Name="CleanTestAssetProjectsLockFiles">
+    <ItemGroup>
+      <TestAssetProjectsLockFiles Include="$(RepoRoot)/TestAssets/TestProjects/**/project.lock.json" />
+    </ItemGroup>
+    <Delete Files="@(TestAssetProjectsLockFiles)" /> 
   </Target>
 
   <Target Name="RestoreDesktopTestAssetProjects"
