@@ -8,7 +8,8 @@
 
     <PropertyGroup>
       <TestPackageBuildVersionSuffix>$(CommitCount)</TestPackageBuildVersionSuffix>
-      <TestPackagesDir>$(RepoRoot)\artifacts\$(Rid)\tests\packages</TestPackagesDir>
+      <TestPackagesDir>$(BaseOutputDirectory)/tests/packages</TestPackagesDir>
+      <TestDirectory>$(RepoRoot)/test</TestDirectory>
     </PropertyGroup>    
 
   </Target>
@@ -63,13 +64,13 @@
     <Exec Command="dotnet restore $(RepoRoot)/TestAssets/TestProjects/ --fallbacksource $(TestPackagesDir)" />
   </Target>
 
-  <Target Name="SetupRestoreTestAssetProjectsInputs">
+  <Target Name="SetupRestoreTestAssetProjectsInputs" >
     <ItemGroup>
       <RestoreTestAssetProjectsInputs Include="$(RepoRoot)/TestAssets/TestProjects/**/project.json" />
     </ItemGroup>
   </Target>
 
-  <Target Name="CleanTestAssetProjectsLockFiles">
+  <Target Name="CleanTestAssetProjectsLockFiles" >
     <ItemGroup>
       <TestAssetProjectsLockFiles Include="$(RepoRoot)/TestAssets/TestProjects/**/project.lock.json" />
     </ItemGroup>
@@ -91,15 +92,43 @@
   </Target>
 
   <Target Name="BuildTestAssetProjects" >
-    <Message Text="BuildTestAssetProjects" />
+    <ItemGroup>
+      <NoAutoBuildTestAssets Include="$(RepoRoot)/TestAssets/TestProjects/**/.noautobuild" />
+      <NoAutoBuildTestAssetProjects Include="%(NoAutoBuildTestAssets.RelativeDir)/project.json" />
+      <BuildableTestAssetProjects Include="$(RepoRoot)/TestAssets/TestProjects/**/project.json" Exclude="@(NoAutoBuildTestAssetProjects)" />
+    </ItemGroup>
+
+    <Message Text="Skipping projects with .noautobuild files:" />
+    <Message Text="%(NoAutoBuildTestAssetProjects.FullPath)" />
+
+    <Exec Command="dotnet build %(BuildableTestAssetProjects.FullPath) --framework netcoreapp1.0" WorkingDirectory="%(BuildableTestAssetProjects.RelativeDir)" />
   </Target>
 
-  <Target Name="BuildDesktopTestAssetProjects" >
-    <Message Text="BuildDesktopTestAssetProjects" />
+  <Target Name="BuildDesktopTestAssetProjects" Condition=" '$(IsDesktopAvailable)' == 'True' " >
+    <ItemGroup>
+      <NoAutoBuildDesktopTestAssets Include="$(RepoRoot)/TestAssets/TestProjects/**/.noautobuild" />
+      <NoAutoBuildDesktopTestAssetProjects Include="%(NoAutoBuildDesktopTestAssets.RelativeDir)/project.json" />
+      <BuildableDesktopTestAssetProjects Include="$(RepoRoot)/TestAssets/DesktopTestProjects/**/project.json" Exclude="@(NoAutoBuildTestAssetProjects)" />
+    </ItemGroup>
+
+    <Message Text="Skipping projects with .noautobuild files:" />
+    <Message Text="%(NoAutoBuildTestAssetProjects.FullPath)" />
+
+    <Exec Command="dotnet build %(BuildableTestAssetProjects.FullPath) --framework net451" WorkingDirectory="%(BuildableTestAssetProjects.RelativeDir)" />
   </Target>
 
-  <Target Name="RestoreTests" >
-    <Message Text="RestoreTests" />
+  <Target Name="RestoreTests"
+          DependsOnTargets="SetupRestoreTestsInputs;"
+          Inputs="@(RestoreTestsInputs)"
+          Outputs="@(RestoreTestsInputs->'%(RelativeDir)/project.lock.json')">
+    <Exec Command="dotnet restore $(TestDirectory) --fallbacksource $(TestPackagesDir)" WorkingDirectory="$(TestDirectory)" />
+  </Target>
+
+  <Target Name="SetupRestoreTestsInputs"
+          DependsOnTargets="PrepareTests;" >
+    <ItemGroup>
+      <RestoreTestsInputs Include="$(TestDirectory)/**/project.json" />
+    </ItemGroup>
   </Target>
 
   <Target Name="BuildTests" >

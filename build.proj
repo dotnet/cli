@@ -66,14 +66,6 @@
   <UsingTask TaskName="TestTargets" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="PublishTargets" AssemblyFile="$(CLIBuildDll)" />
 
-  <Target DependsOnTargets="BuildDotnetCliBuildFramework" Name="Test">
-    <TestTargets />
-  </Target>
-
-  <Target DependsOnTargets="BuildDotnetCliBuildFramework" Name="Package">
-    <PackageTargets />
-  </Target>
-
   <Target DependsOnTargets="BuildDotnetCliBuildFramework" Name="Publish">
     <PublishTargets />
   </Target>
