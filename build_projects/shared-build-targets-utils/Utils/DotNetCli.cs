@@ -55,7 +55,7 @@ namespace Microsoft.DotNet.Cli.Build
 
         private static string GetStage0Path()
         {
-            return Path.Combine(Directory.GetCurrentDirectory(), ".dotnet_stage0");
+            return Path.Combine(Directory.GetCurrentDirectory(), ".dotnet_stage0", RuntimeEnvironment.RuntimeArchitecture);
         }
     }
 }

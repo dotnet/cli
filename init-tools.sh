@@ -17,7 +17,7 @@ SOURCE="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 __init_tools_log=$SOURCE/init-tools.log
 __PACKAGES_DIR=$SOURCE/.nuget/packages
 __TOOLRUNTIME_DIR=$SOURCE/build_tools
-__DOTNET_PATH=$SOURCE/.dotnet_stage0
+__DOTNET_PATH=$SOURCE/.dotnet_stage0/x64
 __DOTNET_CMD=$__DOTNET_PATH/dotnet
 if [ -z "$__BUILDTOOLS_SOURCE" ]; then __BUILDTOOLS_SOURCE=https://dotnet.myget.org/F/dotnet-buildtools/api/v3/index.json; fi
 __BUILD_TOOLS_PACKAGE_VERSION=$(cat $SOURCE/BuildToolsVersion.txt)
@@ -38,8 +38,9 @@ fi
 # Disable first run since we want to control all package sources
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 
+"$SOURCE/scripts/obtain/dotnet-install.sh" --install-dir "$__DOTNET_PATH" --channel $__CHANNEL
+
 if [ ! -e "$__PROJECT_JSON_FILE" ]; then
-    "$SOURCE/scripts/obtain/dotnet-install.sh" --install-dir "$__DOTNET_PATH" --channel $__CHANNEL
 
     mkdir -p "$__PROJECT_JSON_PATH"
     echo "$__PROJECT_JSON_CONTENTS" > "$__PROJECT_JSON_FILE"

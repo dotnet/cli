@@ -4,10 +4,26 @@ REM Licensed under the MIT license. See LICENSE file in the project root for ful
 @if "%_echo%" neq "on" echo off
 setlocal
 
+REM Quick and dirty command line parser: make a variable for each
+REM key and value so we can check for existence without knowning
+REM where each key or value is stored
+for %%a in (%*) do set %%a=%%a
+
 set INIT_TOOLS_LOG=%~dp0init-tools.log
 if [%PACKAGES_DIR%]==[] set PACKAGES_DIR=%~dp0.nuget\
 if [%TOOLRUNTIME_DIR%]==[] set TOOLRUNTIME_DIR=%~dp0build_tools
-set DOTNET_PATH=%~dp0.dotnet_stage0\
+if defined x64 (
+  set DOTNET_PATH=%~dp0.dotnet_stage0\x64\
+  set bit=x64
+) else (
+  if defined x86 (
+    set DOTNET_PATH=%~dp0.dotnet_stage0\x86\
+    set bit=x86
+  ) else (
+    set DOTNET_PATH=%~dp0.dotnet_stage0\%PROCESSOR_ARCHITECTURE%\
+    set bit=%PROCESSOR_ARCHITECTURE%
+  )
+)
 if [%DOTNET_CMD%]==[] set DOTNET_CMD=%DOTNET_PATH%dotnet.exe
 if [%BUILDTOOLS_SOURCE%]==[] set BUILDTOOLS_SOURCE=https://dotnet.myget.org/F/dotnet-buildtools/api/v3/index.json
 set /P BUILDTOOLS_VERSION=< "%~dp0BuildToolsVersion.txt"
@@ -19,7 +35,7 @@ set BUILD_TOOLS_SEMAPHORE=%PROJECT_JSON_PATH%\init-tools.completed
 set DOTNET_INSTALL_ROOT_DIR=%~dp0.dotnet_stage0
 
 for /F "tokens=*" %%I in (%~dp0branchinfo.txt) do set %%I
-set SCRIPT="%~dp0scripts\obtain\dotnet-install.ps1 -Channel %CHANNEL% -InstallDir \"%DOTNET_PATH%\""
+set SCRIPT="%~dp0scripts\obtain\dotnet-install.ps1 -Channel %CHANNEL% -Architecture %bit% -InstallDir \"%DOTNET_PATH%\""
 
 :: if force option is specified then clean the tool runtime and build tools package directory to force it to get recreated
 if [%1]==[force] (

@@ -6,6 +6,7 @@
 param(
     [string]$Configuration="Debug",
     [string[]]$Targets=@("Default"),
+    [string]$Architecture="$env:PROCESSOR_ARCHITECTURE",
     [switch]$NoPackage,
     [switch]$NoRun,
     [switch]$Help)
@@ -17,6 +18,7 @@ if($Help)
     Write-Host "Options:"
     Write-Host "  -Configuration <CONFIGURATION>     Build the specified Configuration (Debug or Release, default: Debug)"
     Write-Host "  -Targets <TARGETS...>              Comma separated build targets to run (Init, Compile, Publish, etc.; Default is a full build and publish)"
+    Write-Host "  -Architecture <ARCHITECTURE>       Build the specified architecture (x64 or x86 (supported only on Windows), default: x64)"
     Write-Host "  -NoPackage                         Skip packaging targets"
     Write-Host "  -NoRun                             Skip running the build"
     Write-Host "  -Help                              Display this help message"
@@ -44,10 +46,18 @@ cat "$RepoRoot\branchinfo.txt" | ForEach-Object {
     }
 }
 
-# Disable first run since we want to control all package sources
-export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+# Use a repo-local install directory (but not the artifacts directory because that gets cleaned a lot
+$env:DOTNET_INSTALL_DIR="$RepoRoot\.dotnet_stage0\$Architecture"
 
-$env:path = "$RepoRoot\.dotnet_stage0;" + $env:path
+if (!(Test-Path $env:DOTNET_INSTALL_DIR))
+{
+    mkdir $env:DOTNET_INSTALL_DIR | Out-Null
+}
+
+# Disable first run since we want to control all package sources
+$env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+
+$env:path = "$env:DOTNET_INSTALL_DIR;" + $env:path
 
 # Restore the build scripts
 Write-Host "Restoring Build Script projects..."
