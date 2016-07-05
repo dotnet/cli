@@ -131,8 +131,9 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="BuildTests" >
-    <Message Text="BuildTests" />
+  <Target Name="BuildTests" 
+          DependsOnTargets="PrepareTests;">
+    <Exec Command="dotnet build --configuration $(Configuration)" WorkingDirectory="$(TestDirectory)/%(ProjectsToTest.Identity)/" />
   </Target>
 
   <Target Name="RunTests" >
