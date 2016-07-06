@@ -13,7 +13,7 @@
       <ExecPath>$(DotnetStage2)$(PathSeparator)$(PATH)</ExecPath>
       <TestArtifactsEnv>$(TestArtifactsDir)</TestArtifactsEnv>
       <EnvPrefix>PATH=$(ExecPath) TEST_ARTIFACTS=$(TestArtifactsEnv)</EnvPrefix>
-      <EnvPrefix>(set PATH=$(ExecPath)) &amp; (set TEST_ARTIFACTS=$(TestArtifactsEnv)) &amp;</EnvPrefix>
+      <EnvPrefix Condition=" '$(OSName)' == 'win' ">(set PATH=$(ExecPath)) &amp; (set TEST_ARTIFACTS=$(TestArtifactsEnv)) &amp;</EnvPrefix>
     </PropertyGroup>
     
     <Exec Command="$(EnvPrefix) $(DotnetUnderTest) test --configuration $(Configuration) -xml $(TestResultXmlDir)/%(ProjectsToTest.Identity)-testResults.xml -notrait catagory=failing" 
@@ -125,16 +125,8 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="RestoreTestAssetPackages" 
-          DependsOnTargets="PrepareTests;
-                            SetupRestoreTestAssetPackagesInputs;" 
-          Inputs="@(RestoreTestAssetPackagesInputs)"
-          Outputs="@(RestoreTestAssetPackagesInputs->'%(RelativeDir)/project.lock.json')">
-    <Exec Command="$(DotnetUnderTest) restore $(RepoRoot)/TestAssets/TestPackages/" />
-  </Target>
-
   <Target Name="CreateTestAssetPackageNuPkgs" 
-          DependsOnTargets="RestoreTestAssetPackages;
+          DependsOnTargets="RestoreTestAssetPackageProjects;
                             SetupTestPackageProjectData"
           Outputs="%(TestPackageProject.Identity)">
     <PropertyGroup>
@@ -144,10 +136,18 @@
     <Exec Command="$(DotnetUnderTest) pack %(TestPackageProject.FullPath) --output $(TestPackagesDir) $(VersionSuffixOption)" />
   </Target>
 
-  <Target Name="SetupRestoreTestAssetPackagesInputs"
+  <Target Name="RestoreTestAssetPackageProjects" 
+          DependsOnTargets="PrepareTests;
+                            SetupRestoreTestAssetPackageProjectsInputs;" 
+          Inputs="@(RestoreTestAssetPackageProjectsInputs)"
+          Outputs="@(RestoreTestAssetPackageProjectsInputs->'%(RelativeDir)/project.lock.json')">
+    <Exec Command="$(DotnetUnderTest) restore $(RepoRoot)/TestAssets/TestPackages/" />
+  </Target>
+
+  <Target Name="SetupRestoreTestAssetPackageProjectsInputs"
           DependsOnTargets="Init;">
     <ItemGroup>
-      <RestoreTestAssetPackagesInputs Include="$(RepoRoot)/TestAssets/TestPackages/**/project.json" />
+      <RestoreTestAssetPackageProjectsInputs Include="$(RepoRoot)/TestAssets/TestPackages/**/project.json" />
     </ItemGroup>
   </Target>
 </Project>
