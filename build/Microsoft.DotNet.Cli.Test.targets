@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Layout" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Test" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="test/ProjectsToTest.props" />
   <Import Project="test/TestPackageProjects.props" />
 
   <Target Name="Test" 
           DependsOnTargets="PrepareTests;
-                            SetupTests;
-                            RestoreTests;
-                            BuildTests;
-                            RunTests;" />
+                            BuildTestAssets;
+                            BuildTests;">
+    <PropertyGroup>
+      <PathSeparator>:</PathSeparator>
+      <PathSeparator Condition=" '$(OSName)' == 'win' ">;</PathSeparator>
+      <ExecPath>$(DotnetStage2)$(PathSeparator)$(PATH)</ExecPath>
+      <TestArtifactsEnv>$(TestArtifactsDir)</TestArtifactsEnv>
+      <EnvPrefix>PATH=$(ExecPath) TEST_ARTIFACTS=$(TestArtifactsEnv)</EnvPrefix>
+      <EnvPrefix>(set PATH=$(ExecPath)) &amp; (set TEST_ARTIFACTS=$(TestArtifactsEnv)) &amp;</EnvPrefix>
+    </PropertyGroup>
+    
+    <Exec Command="$(EnvPrefix) $(DotnetUnderTest) test --configuration $(Configuration) -xml $(TestResultXmlDir)/%(ProjectsToTest.Identity)-testResults.xml -notrait catagory=failing" 
+          WorkingDirectory="$(TestDirectory)/%(ProjectsToTest.Identity)/" />
+  </Target>
 
   <Target Name="PrepareTests"
-          DependsOnTargets="Prepare">
+          DependsOnTargets="Init">
     <PropertyGroup>
       <TestPackageBuildVersionSuffix>$(CommitCount)</TestPackageBuildVersionSuffix>
       <TestOutputDir>$(BaseOutputDirectory)/tests</TestOutputDir>
@@ -23,30 +33,49 @@
     </PropertyGroup>
   </Target>
 
-  <Target Name="SetupTests"
-          DependsOnTargets="RestoreTestAssetProjects;
-                            RestoreDesktopTestAssetProjects;" />
-
-  <Target Name="BuildTestAssets"
-          DependsOnTargets="BuildTestAssetProjects;
-                            BuildDesktopTestAssetProjects;" />
-
-  <Target Name="RestoreTestAssetPackages" 
-          DependsOnTargets="PrepareTests;
-                            SetupRestoreTestAssetPackagesInputs;" 
-          Inputs="@(RestoreTestAssetPackagesInputs)"
-          Outputs="@(RestoreTestAssetPackagesInputs->'%(RelativeDir)/project.lock.json')">
-    <Exec Command="$(DotnetUnderTest) restore $(RepoRoot)/TestAssets/TestPackages/" />
+  <Target Name="BuildTests" 
+          DependsOnTargets="RestoreTests;">
+    <Exec Command="$(DotnetUnderTest) build --configuration $(Configuration)" WorkingDirectory="$(TestDirectory)/%(ProjectsToTest.Identity)/" />
   </Target>
 
-  <Target Name="SetupRestoreTestAssetPackagesInputs">
+  <Target Name="RestoreTests"
+          DependsOnTargets="CreateTestAssetPackageNuPkgs;
+                            SetupRestoreTestsInputs;"
+          Inputs="@(RestoreTestsInputs)"
+          Outputs="@(RestoreTestsInputs->'%(RelativeDir)/project.lock.json')">
+    <Exec Command="$(DotnetUnderTest) restore $(TestDirectory) --fallbacksource $(TestPackagesDir)" WorkingDirectory="$(TestDirectory)" />
+  </Target>
+
+  <Target Name="SetupRestoreTestsInputs"
+          DependsOnTargets="PrepareTests;" >
     <ItemGroup>
-      <RestoreTestAssetPackagesInputs Include="$(RepoRoot)/TestAssets/TestPackages/**/project.json" />
+      <RestoreTestsInputs Include="$(TestDirectory)/**/project.json" />
     </ItemGroup>
   </Target>
 
+  <Target Name="BuildTestAssets"
+          DependsOnTargets="BuildTestAssetProjects;
+                            BuildDesktopTestAssetProjects;">
+  </Target>
+
+  <Target Name="BuildTestAssetProjects"
+          DependsOnTargets="RestoreTestAssetProjects">
+    <ItemGroup>
+      <NoAutoBuildTestAssets Include="$(RepoRoot)/TestAssets/TestProjects/**/.noautobuild" />
+      <NoAutoBuildTestAssetProjects Include="%(NoAutoBuildTestAssets.RelativeDir)/project.json" />
+      <BuildableTestAssetProjects Include="$(RepoRoot)/TestAssets/TestProjects/**/project.json" 
+                                  Exclude="@(NoAutoBuildTestAssetProjects)" />
+    </ItemGroup>
+
+    <Message Text="Skipping projects with .noautobuild files:" />
+    <Message Text="%(NoAutoBuildTestAssetProjects.FullPath)" />
+
+    <Exec Command="$(DotnetUnderTest) build %(BuildableTestAssetProjects.FullPath) --framework netcoreapp1.0" 
+          WorkingDirectory="%(BuildableTestAssetProjects.RelativeDir)" />
+  </Target>
+
   <Target Name="RestoreTestAssetProjects"
-          DependsOnTargets="CreateTestPackageNuPkgs;
+          DependsOnTargets="CreateTestAssetPackageNuPkgs;
                             SetupRestoreTestAssetProjectsInputs;"
           Inputs="@(RestoreTestAssetProjectsInputs)"
           Outputs="@(RestoreTestAssetProjectsInputs->'%(RelativeDir)/project.lock.json')">
@@ -66,9 +95,24 @@
     <Delete Files="@(TestAssetProjectsLockFiles)" /> 
   </Target>
 
+  <Target Name="BuildDesktopTestAssetProjects" 
+          Condition=" '$(IsDesktopAvailable)' == 'True' " 
+          DependsOnTargets="RestoreDesktopTestAssetProjects">
+    <ItemGroup>
+      <NoAutoBuildDesktopTestAssets Include="$(RepoRoot)/TestAssets/TestProjects/**/.noautobuild" />
+      <NoAutoBuildDesktopTestAssetProjects Include="%(NoAutoBuildDesktopTestAssets.RelativeDir)/project.json" />
+      <BuildableDesktopTestAssetProjects Include="$(RepoRoot)/TestAssets/DesktopTestProjects/**/project.json" Exclude="@(NoAutoBuildTestAssetProjects)" />
+    </ItemGroup>
+
+    <Message Text="Skipping projects with .noautobuild files:" />
+    <Message Text="%(NoAutoBuildTestAssetProjects.FullPath)" />
+
+    <Exec Command="$(DotnetUnderTest) build %(BuildableTestAssetProjects.FullPath) --framework net451" WorkingDirectory="%(BuildableTestAssetProjects.RelativeDir)" />
+  </Target>
+
   <Target Name="RestoreDesktopTestAssetProjects"
           Condition=" '$(IsDesktopAvailable)' == 'True' " 
-          DependsOnTargets="CreateTestPackageNuPkgs;
+          DependsOnTargets="CreateTestAssetPackageNuPkgs;
                             SetupRestoreDesktopTestAssetProjectsInputs;"
           Inputs="@(RestoreDesktopTestAssetProjectsInputs)"
           Outputs="@(RestoreDesktopTestAssetProjectsInputs->'%(RelativeDir)/project.lock.json')">
@@ -77,11 +121,19 @@
 
   <Target Name="SetupRestoreDesktopTestAssetProjectsInputs">
     <ItemGroup>
-      <RestoreDesktopTestAssetProjectsInputs Include="$(RepoRoot)/TestAssets/DesktopTestProjects/**/project.json" />
+      <RestoreDesktopTestAssetProjectsInputs Include="$(RepoRoot)/TestAssets/TestProjects/**/project.json" />
     </ItemGroup>
   </Target>
 
-  <Target Name="CreateTestPackageNuPkgs" 
+  <Target Name="RestoreTestAssetPackages" 
+          DependsOnTargets="PrepareTests;
+                            SetupRestoreTestAssetPackagesInputs;" 
+          Inputs="@(RestoreTestAssetPackagesInputs)"
+          Outputs="@(RestoreTestAssetPackagesInputs->'%(RelativeDir)/project.lock.json')">
+    <Exec Command="$(DotnetUnderTest) restore $(RepoRoot)/TestAssets/TestPackages/" />
+  </Target>
+
+  <Target Name="CreateTestAssetPackageNuPkgs" 
           DependsOnTargets="RestoreTestAssetPackages;
                             SetupTestPackageProjectData"
           Outputs="%(TestPackageProject.Identity)">
@@ -92,63 +144,10 @@
     <Exec Command="$(DotnetUnderTest) pack %(TestPackageProject.FullPath) --output $(TestPackagesDir) $(VersionSuffixOption)" />
   </Target>
 
-  <Target Name="BuildTestAssetProjects" >
+  <Target Name="SetupRestoreTestAssetPackagesInputs"
+          DependsOnTargets="Init;">
     <ItemGroup>
-      <NoAutoBuildTestAssets Include="$(RepoRoot)/TestAssets/TestProjects/**/.noautobuild" />
-      <NoAutoBuildTestAssetProjects Include="%(NoAutoBuildTestAssets.RelativeDir)/project.json" />
-      <BuildableTestAssetProjects Include="$(RepoRoot)/TestAssets/TestProjects/**/project.json" Exclude="@(NoAutoBuildTestAssetProjects)" />
-    </ItemGroup>
-
-    <Message Text="Skipping projects with .noautobuild files:" />
-    <Message Text="%(NoAutoBuildTestAssetProjects.FullPath)" />
-
-    <Exec Command="$(DotnetUnderTest) build %(BuildableTestAssetProjects.FullPath) --framework netcoreapp1.0" WorkingDirectory="%(BuildableTestAssetProjects.RelativeDir)" />
-  </Target>
-
-  <Target Name="BuildDesktopTestAssetProjects" Condition=" '$(IsDesktopAvailable)' == 'True' " >
-    <ItemGroup>
-      <NoAutoBuildDesktopTestAssets Include="$(RepoRoot)/TestAssets/DesktopTestProjects/**/.noautobuild" />
-      <NoAutoBuildDesktopTestAssetProjects Include="%(NoAutoBuildDesktopTestAssets.RelativeDir)/project.json" />
-      <BuildableDesktopTestAssetProjects Include="$(RepoRoot)/TestAssets/DesktopTestProjects/**/project.json" Exclude="@(NoAutoBuildDesktopTestAssetProjects)" />
-    </ItemGroup>
-
-    <Message Text="Skipping projects with .noautobuild files:" />
-    <Message Text="%(NoAutoBuildTestAssetProjects.FullPath)" />
-
-    <Exec Command="$(DotnetUnderTest) build %(BuildableDesktopTestAssetProjects.FullPath) --framework net451" WorkingDirectory="%(BuildableDesktopTestAssetProjects.RelativeDir)" />
-  </Target>
-
-  <Target Name="RunTests" 
-          DependsOnTargets="BuildTests;">
-    <PropertyGroup>
-      <PathSeparator>:</PathSeparator>
-      <PathSeparator Condition=" '$(OSName)' == 'win' ">;</PathSeparator>
-      <ExecPath>$(DotnetStage2)$(PathSeparator)$(PATH)</ExecPath>
-      <TestArtifactsEnv>$(TestArtifactsDir)</TestArtifactsEnv>
-      <EnvPrefix>PATH=$(ExecPath) TEST_ARTIFACTS=$(TestArtifactsEnv)</EnvPrefix>
-      <EnvPrefix Condition=" '$(OSName)' == 'win' ">(set PATH=$(ExecPath)) &amp; (set TEST_ARTIFACTS=$(TestArtifactsEnv)) &amp;</EnvPrefix>
-    </PropertyGroup>
-    
-    <Exec Command="$(EnvPrefix) $(DotnetUnderTest) test --configuration $(Configuration) -xml $(TestResultXmlDir)/%(ProjectsToTest.Identity)-testResults.xml -notrait catagory=failing" 
-          WorkingDirectory="$(TestDirectory)/%(ProjectsToTest.Identity)/" />
-  </Target>
-
-  <Target Name="BuildTests" 
-          DependsOnTargets="RestoreTests;">
-    <Exec Command="$(DotnetUnderTest) build --configuration $(Configuration)" WorkingDirectory="$(TestDirectory)/%(ProjectsToTest.Identity)/" />
-  </Target>
-
-  <Target Name="RestoreTests"
-          DependsOnTargets="SetupRestoreTestsInputs;"
-          Inputs="@(RestoreTestsInputs)"
-          Outputs="@(RestoreTestsInputs->'%(RelativeDir)/project.lock.json')">
-    <Exec Command="$(DotnetUnderTest) restore --fallbacksource $(TestPackagesDir)" WorkingDirectory="$(TestDirectory)" />
-  </Target>
-
-  <Target Name="SetupRestoreTestsInputs"
-          DependsOnTargets="PrepareTests;" >
-    <ItemGroup>
-      <RestoreTestsInputs Include="$(TestDirectory)/**/project.json" />
+      <RestoreTestAssetPackagesInputs Include="$(RepoRoot)/TestAssets/TestPackages/**/project.json" />
     </ItemGroup>
   </Target>
 </Project>

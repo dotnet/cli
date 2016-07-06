@@ -34,7 +34,8 @@
         <Clean>True</Clean>
         <Frameworks>net451,netcoreapp1.0</Frameworks>
       </TestPackageProject>
-      <TestPackageProject Include="$(RepoRoot)/TestAssets/TestPackages/dotnet-desktop-binding-redirects/project.json">
+      <TestPackageProject Include="$(RepoRoot)/TestAssets/TestPackages/dotnet-desktop-binding-redirects/project.json"
+                          Condition=" '$(IsDesktopAvailable)' == 'True' ">
         <Name>dotnet-desktop-binding-redirects</Name>
         <IsTool>True</IsTool>
         <IsApplicable>$(DesktopAvailable)</IsApplicable>
