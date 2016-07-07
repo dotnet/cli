@@ -3,6 +3,8 @@
   <Import Project="test/ProjectsToTest.props" />
   <Import Project="test/TestPackageProjects.props" />
 
+  <UsingTask TaskName="DotNetTest" AssemblyFile="$(CLIBuildDll)" />
+
   <Target Name="Test" 
           DependsOnTargets="PrepareTests;
                             BuildTestAssets;
@@ -10,14 +12,22 @@
     <PropertyGroup>
       <PathSeparator>:</PathSeparator>
       <PathSeparator Condition=" '$(OSName)' == 'win' ">;</PathSeparator>
-      <ExecPath>$(DotnetStage2)$(PathSeparator)$(PATH)</ExecPath>
+      <ExecPath>$(Stage2Directory)$(PathSeparator)$(PATH)</ExecPath>
       <TestArtifactsEnv>$(TestArtifactsDir)</TestArtifactsEnv>
       <EnvPrefix>PATH=$(ExecPath) TEST_ARTIFACTS=$(TestArtifactsEnv)</EnvPrefix>
       <EnvPrefix Condition=" '$(OSName)' == 'win' ">(set PATH=$(ExecPath)) &amp; (set TEST_ARTIFACTS=$(TestArtifactsEnv)) &amp;</EnvPrefix>
     </PropertyGroup>
-    
-    <Exec Command="$(EnvPrefix) $(DotnetUnderTest) test --configuration $(Configuration) -xml $(TestResultXmlDir)/%(ProjectsToTest.Identity)-testResults.xml -notrait catagory=failing" 
-          WorkingDirectory="$(TestDirectory)/%(ProjectsToTest.Identity)/" />
+    <ItemGroup>
+      <TaskEnvironmentVariables Include="PATH=$(ExecPath)" />
+      <TaskEnvironmentVariables Include="TEST_ARTIFACTS=$(TestArtifactsEnv)" />
+    </ItemGroup>
+<Message Text="EENV VARS: @(TaskEnvironmentVariables)" />
+    <DotNetTest WorkingDirectory="$(TestDirectory)/%(ProjectsToTest.Identity)/"
+                EnvironmentVariables="@(TaskEnvironmentVariables)"
+                ToolPath="$(Stage2Directory)"
+                Configuration="$(Configuration)"
+                NoTrait="category=failing"
+                Xml="$(TestResultXmlDir)/%(ProjectsToTest.Identity)-testResults.xml" />
   </Target>
 
   <Target Name="PrepareTests"
