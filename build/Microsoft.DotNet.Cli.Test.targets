@@ -10,13 +10,14 @@
                             BuildTestAssets;
                             BuildTests;">
     <PropertyGroup>
-      <PathSeparator>:</PathSeparator>
-      <PathSeparator Condition=" '$(OSName)' == 'win' ">;</PathSeparator>
-      <ExecPath>$(Stage2Directory)$(PathSeparator)$(PATH)</ExecPath>
+      <PathListSeparator>:</PathListSeparator>
+      <PathListSeparator Condition=" '$(OSName)' == 'win' ">;</PathListSeparator>
+      <ExecPath>$(Stage2Directory)$(PathListSeparator)$(PATH)</ExecPath>
       <TestArtifactsEnv>$(TestArtifactsDir)</TestArtifactsEnv>
       <EnvPrefix>PATH=$(ExecPath) TEST_ARTIFACTS=$(TestArtifactsEnv)</EnvPrefix>
       <EnvPrefix Condition=" '$(OSName)' == 'win' ">(set PATH=$(ExecPath)) &amp; (set TEST_ARTIFACTS=$(TestArtifactsEnv)) &amp;</EnvPrefix>
     </PropertyGroup>
+
     <ItemGroup>
       <TaskEnvironmentVariables Include="PATH=$(ExecPath)" />
       <TaskEnvironmentVariables Include="TEST_ARTIFACTS=$(TestArtifactsEnv)" />
@@ -33,6 +34,8 @@
   <Target Name="PrepareTests"
           DependsOnTargets="Init">
     <PropertyGroup>
+      <PathSeparator>/</PathSeparator>
+      <PathSeparator Condition=" '$(OSName)' == 'win' ">\</PathSeparator>
       <TestPackageBuildVersionSuffix>$(CommitCount)</TestPackageBuildVersionSuffix>
       <TestOutputDir>$(BaseOutputDirectory)/tests</TestOutputDir>
       <TestPackagesDir>$(TestOutputDir)/packages</TestPackagesDir>
@@ -71,9 +74,9 @@
   <Target Name="BuildTestAssetProjects"
           DependsOnTargets="RestoreTestAssetProjects">
     <ItemGroup>
-      <NoAutoBuildTestAssets Include="$(RepoRoot)/TestAssets/TestProjects/**/.noautobuild" />
-      <NoAutoBuildTestAssetProjects Include="%(NoAutoBuildTestAssets.RelativeDir)/project.json" />
-      <BuildableTestAssetProjects Include="$(RepoRoot)/TestAssets/TestProjects/**/project.json" 
+      <NoAutoBuildTestAssets Include="$(RepoRoot)$(PathSeparator)TestAssets$(PathSeparator)TestProjects$(PathSeparator)**$(PathSeparator).noautobuild" />
+      <NoAutoBuildTestAssetProjects Include="%(NoAutoBuildTestAssets.RelativeDir)$(PathSeparator)project.json" />
+      <BuildableTestAssetProjects Include="$(RepoRoot)$(PathSeparator)TestAssets$(PathSeparator)TestProjects$(PathSeparator)**$(PathSeparator)project.json" 
                                   Exclude="@(NoAutoBuildTestAssetProjects)" />
     </ItemGroup>
 
