@@ -25,9 +25,6 @@
     <PropertyGroup>
       <IsDesktopAvailable>False</IsDesktopAvailable>
       <IsDesktopAvailable Condition=" '$(OSName)' == 'win' ">True</IsDesktopAvailable>
-      <Stage0Path Condition=" '$(OSName)' == 'win' ">$(RepoRoot)/.dotnet_stage0/Windows/$(Architecture)</Stage0Path>
-      <Stage0Path Condition=" '$(OSName)' == 'osx' ">$(RepoRoot)/.dotnet_stage0/Darwin</Stage0Path>
-      <Stage0Path Condition=" '$(Stage0Path)' == '' ">$(RepoRoot)/.dotnet_stage0/Linux</Stage0Path>
       <ExeExtension>.exe</ExeExtension>
       <ExeExtension Condition="'$(OSName)' != 'win' "></ExeExtension>
       <DotNetPath>$(Stage0Path)</DotNetPath>
