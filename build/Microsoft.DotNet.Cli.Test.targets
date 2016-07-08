@@ -21,7 +21,7 @@
       <TaskEnvironmentVariables Include="PATH=$(ExecPath)" />
       <TaskEnvironmentVariables Include="TEST_ARTIFACTS=$(TestArtifactsEnv)" />
     </ItemGroup>
-<Message Text="EENV VARS: @(TaskEnvironmentVariables)" />
+
     <DotNetTest WorkingDirectory="$(TestDirectory)/%(ProjectsToTest.Identity)/"
                 EnvironmentVariables="@(TaskEnvironmentVariables)"
                 ToolPath="$(Stage2Directory)"
