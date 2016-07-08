@@ -32,7 +32,7 @@
         <IsApplicable>True</IsApplicable>
         <VersionSuffix>$(TestPackageBuildVersionSuffix)</VersionSuffix>
         <Clean>True</Clean>
-        <Frameworks>net451,netcoreapp1.0</Frameworks>
+        <Frameworks>net451;netcoreapp1.0</Frameworks>
       </TestPackageProject>
       <TestPackageProject Include="$(RepoRoot)/TestAssets/TestPackages/dotnet-desktop-binding-redirects/project.json"
                           Condition=" '$(IsDesktopAvailable)' == 'True' ">
@@ -81,7 +81,7 @@
         <IsApplicable>True</IsApplicable>
         <VersionSuffix>$(TestPackageBuildVersionSuffix)</VersionSuffix>
         <Clean>False</Clean>
-        <Frameworks>net451,netstandard1.6</Frameworks>
+        <Frameworks>net451;netstandard1.6</Frameworks>
       </TestPackageProject>
       <TestPackageProject Include="$(RepoRoot)/src/Microsoft.DotNet.ProjectModel/project.json">
         <Name>Microsoft.DotNet.ProjectModel</Name>
@@ -89,7 +89,7 @@
         <IsApplicable>True</IsApplicable>
         <VersionSuffix>$(TestPackageBuildVersionSuffix)</VersionSuffix>
         <Clean>False</Clean>
-        <Frameworks>net451,netstandard1.6</Frameworks>
+        <Frameworks>net451;netstandard1.6</Frameworks>
       </TestPackageProject>
       <TestPackageProject Include="$(RepoRoot)/src/Microsoft.DotNet.ProjectModel.Loader/project.json">
         <Name>Microsoft.DotNet.ProjectModel.Loader</Name>
@@ -113,7 +113,7 @@
         <IsApplicable>True</IsApplicable>
         <VersionSuffix>$(TestPackageBuildVersionSuffix)</VersionSuffix>
         <Clean>False</Clean>
-        <Frameworks>net451,netstandard1.3</Frameworks>
+        <Frameworks>net451;netstandard1.3</Frameworks>
       </TestPackageProject>
       <TestPackageProject Include="$(RepoRoot)/src/Microsoft.Extensions.DependencyModel/project.json">
         <Name>Microsoft.Extensions.DependencyModel</Name>
@@ -121,7 +121,7 @@
         <IsApplicable>True</IsApplicable>
         <VersionSuffix>$(TestPackageBuildVersionSuffix)</VersionSuffix>
         <Clean>False</Clean>
-        <Frameworks>net451,netstandard1.6</Frameworks>
+        <Frameworks>net451;netstandard1.6</Frameworks>
       </TestPackageProject>
       <TestPackageProject Include="$(RepoRoot)/src/Microsoft.Extensions.Testing.Abstractions/project.json">
         <Name>Microsoft.Extensions.Testing.Abstractions</Name>
@@ -129,7 +129,7 @@
         <IsApplicable>True</IsApplicable>
         <VersionSuffix>$(TestPackageBuildVersionSuffix)</VersionSuffix>
         <Clean>False</Clean>
-        <Frameworks>net451,netstandard1.6</Frameworks>
+        <Frameworks>net451;netstandard1.6</Frameworks>
       </TestPackageProject>
       <TestPackageProject Include="$(RepoRoot)/src/Microsoft.DotNet.Compiler.Common/project.json">
         <Name>Microsoft.DotNet.Compiler.Common</Name>
@@ -155,6 +155,12 @@
         <Clean>True</Clean>
         <Frameworks>netcoreapp1.0</Frameworks>
       </TestPackageProject>
+    </ItemGroup>
+
+    <ItemGroup>
+      <TestPackageProjectFrameworksExcludes Condition=" '$(IsDesktopAvailable)' != 'True' " Include="net45" />
+      <TestPackageProjectFrameworksExcludes Condition=" '$(IsDesktopAvailable)' != 'True' " Include="net451" />
+      <TestPackageProjectFrameworks Include="%(TestPackageProject.Frameworks)" Exclude="@(TestPackageProjectFrameworksExcludes)" />
     </ItemGroup>
   </Target>
 </Project>

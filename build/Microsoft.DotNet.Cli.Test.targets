@@ -38,6 +38,7 @@
       <PathSeparator Condition=" '$(OSName)' == 'win' ">\</PathSeparator>
       <TestPackageBuildVersionSuffix>$(CommitCount)</TestPackageBuildVersionSuffix>
       <TestOutputDir>$(BaseOutputDirectory)/tests</TestOutputDir>
+      <TestPackagesBuildDir>$(TestOutputDir)/packagesBuild</TestPackagesBuildDir>
       <TestPackagesDir>$(TestOutputDir)/packages</TestPackagesDir>
       <TestArtifactsDir>$(TestOutputDir)/artifacts</TestArtifactsDir>
       <TestResultXmlDir>$(TestOutputDir)/results</TestResultXmlDir>
@@ -53,10 +54,19 @@
 
   <Target Name="RestoreTests"
           DependsOnTargets="CreateTestAssetPackageNuPkgs;
+                            CleanTestProjectsBinObj;
                             SetupRestoreTestsInputs;"
           Inputs="@(RestoreTestsInputs)"
-          Outputs="@(RestoreTestsInputs->'%(RelativeDir)/project.lock.json')">
+          Outputs="@(RestoreTestsInputs->'%(RelativeDir)project.lock.json')">
     <Exec Command="$(DotnetUnderTest) restore $(TestDirectory) --fallbacksource $(TestPackagesDir)" WorkingDirectory="$(TestDirectory)" />
+  </Target>
+ 
+  <Target Name="CleanTestProjectsBinObj" 
+          DependsOnTargets="SetupRestoreTestsInputs;" 
+          Inputs="@(RestoreTestsInputs)"
+          Outputs="@(RestoreTestsInputs->'%(RelativeDir)project.lock.json')">
+    <Delete Files="$(TestDirectory)/**/bin/**/*.*')" />
+    <Delete Files="$(TestDirectory)/**/obj/**/*.*')" />
   </Target>
 
   <Target Name="SetupRestoreTestsInputs"
@@ -139,16 +149,29 @@
   </Target>
 
   <Target Name="CreateTestAssetPackageNuPkgs" 
-          DependsOnTargets="RestoreTestAssetPackageProjects;
-                            SetupTestPackageProjectData"
+          DependsOnTargets="BuildTestAssetPackageProjects;
+                            SetupTestPackageProjectData;"
           Outputs="%(TestPackageProject.Identity)">
     <PropertyGroup>
       <VersionSuffixOption></VersionSuffixOption>
       <VersionSuffixOption Condition="'%(TestPackageProject.VersionSuffix)' != ''">--version-suffix %(TestPackageProject.VersionSuffix)</VersionSuffixOption>
     </PropertyGroup>
-    <Exec Command="$(DotnetUnderTest) pack %(TestPackageProject.FullPath) --output $(TestPackagesDir) $(VersionSuffixOption)" />
+
+    <Exec Command="$(DotnetUnderTest) pack %(TestPackageProject.FullPath) --no-build --build-base-path $(TestPackagesBuildDir) --output $(TestPackagesDir) $(VersionSuffixOption)" />
   </Target>
 
+  <Target Name="BuildTestAssetPackageProjects"
+          DependsOnTargets="RestoreTestAssetPackageProjects;
+                            SetupTestPackageProjectData;"
+          Outputs="%(TestPackageProjectFrameworks.Identity)">
+    <PropertyGroup>
+      <CurrentBuildFramework>%(TestPackageProjectFrameworks.Identity)</CurrentBuildFramework>
+    </PropertyGroup>
+
+    <Exec Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('%(TestPackageProject.Frameworks)', '(^|;)$(CurrentBuildFramework)($|;)'))"
+          Command="$(DotnetUnderTest) build --framework $(CurrentBuildFramework) --build-base-path $(TestPackagesBuildDir) %(TestPackageProject.FullPath)" />
+  </Target>
+ 
   <Target Name="RestoreTestAssetPackageProjects" 
           DependsOnTargets="PrepareTests;
                             SetupRestoreTestAssetPackageProjectsInputs;" 
