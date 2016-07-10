@@ -10,6 +10,10 @@ using Microsoft.ApplicationInsights;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Configurer;
 using Microsoft.DotNet.InternalAbstractions;
+using System.Net.NetworkInformation;
+using System.Security.Cryptography;
+using System.Text;
+using System.Linq;
 
 namespace Microsoft.DotNet.Cli
 {
@@ -29,6 +33,8 @@ namespace Microsoft.DotNet.Cli
         private const string RuntimeId = "Runtime Id";
         private const string ProductVersion = "Product Version";
         private const string TelemetryProfile = "Telemetry Profile";
+        private const string MachineID = "Machine Id";
+        private const string AllMachineIDs = "All Machine Ids";
 
         public bool Enabled { get; }
 
@@ -86,6 +92,9 @@ namespace Microsoft.DotNet.Cli
                 _commonProperties.Add(RuntimeId, RuntimeEnvironment.GetRuntimeIdentifier());
                 _commonProperties.Add(ProductVersion, Product.Version);
                 _commonProperties.Add(TelemetryProfile, Environment.GetEnvironmentVariable(TelemetryProfileEnvironmentVariable));
+                var hashedMacs = HashSha256(GetMacs());
+                _commonProperties.Add(MachineID, hashedMacs.FirstOrDefault());
+                _commonProperties.Add(AllMachineIDs, string.Join(",", hashedMacs));
                 _commonMeasurements = new Dictionary<string, double>();
             }
             catch (Exception)
@@ -159,6 +168,54 @@ namespace Microsoft.DotNet.Cli
             {
                 return _commonProperties;
             }
+        }
+        
+		// Note:  Reason for byte->string->byte in following 2 functions.
+		// The Mac address must match the same format that `getmac` or `ifconfig -a || ip link` would present a mac address(e.g. FF-FF-FF-FF-FF-FF).  
+		// The hashed mac address needs to be the same hashed value as produced by the other distinct sources given the same input. (e.g. VsCode)
+        private List<string> GetMacs()
+        {
+            NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
+            var macs = new List<string>();
+            
+            if (nics == null || nics.Length < 1)
+            {
+                macs.Add(string.Empty);
+                return macs;
+            }
+            
+            foreach (NetworkInterface adapter in nics)
+            {
+                IPInterfaceProperties properties = adapter.GetIPProperties();
+
+                PhysicalAddress address = adapter.GetPhysicalAddress();
+                byte[] bytes = address.GetAddressBytes();
+                macs.Add(string.Join("-", bytes.Select(x => x.ToString("X2"))));
+                if (macs.Count >= 10)
+                {
+                    break;
+                }
+            }
+            return macs;
+        }
+        
+		// The hashed mac address needs to be the same hashed value as produced by the other distinct sources given the same input. (e.g. VsCode)
+        private List<string> HashSha256(List<string> texts)
+        {
+            var sha256 = SHA256.Create();
+            var hashedStrings = new List<string>();
+            foreach (var text in texts)
+            {
+                byte[] bytes = Encoding.UTF8.GetBytes(text);
+                byte[] hash = sha256.ComputeHash(bytes);
+                StringBuilder hashString = new StringBuilder();
+                foreach (byte x in hash)
+                {
+                    hashString.AppendFormat("{0:x2}", x);
+                }
+                hashedStrings.Add(hashString.ToString());
+            }
+            return hashedStrings;
         }
     }
 }
