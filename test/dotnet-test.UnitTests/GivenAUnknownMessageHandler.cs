@@ -15,8 +15,6 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
         [Fact]
         public void It_throws_InvalidOperationException_and_sends_an_error_when_the_message_is_not_handled()
         {
-            // We need to re-think the tracing story. For the time being, enabling this hack to get around
-            // MSBuild failures.
             TestHostTracing.ClearListeners();
 
             const string expectedError = "No handler for message 'Test Message' when at state 'InitialState'";

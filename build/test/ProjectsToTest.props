@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Layout" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ProjectsToTest Include="ArgumentForwardingTests"/>
     <ProjectsToTest Include="crossgen.Tests"/>
@@ -18,7 +18,7 @@
     <ProjectsToTest Include="dotnet-run.UnitTests"/>
     <ProjectsToTest Include="dotnet-test.Tests"/>
     <ProjectsToTest Include="dotnet-test.UnitTests"/>
-    <!-- TODO: https://github.com/dotnet/cli/issues/321 /><ProjectsToTest Include="/"Kestrel.Tests" />-->
+    <!-- TODO: https://github.com/dotnet/cli/issues/3216 /><ProjectsToTest Include="/"Kestrel.Tests" />-->
     <ProjectsToTest Include="Microsoft.DotNet.Cli.Utils.Tests"/>
     <ProjectsToTest Include="Microsoft.DotNet.Compiler.Common.Tests"/>
     <ProjectsToTest Include="Microsoft.DotNet.ProjectModel.Tests"/>
