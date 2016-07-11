@@ -14,6 +14,7 @@ namespace Microsoft.DotNet.ProjectModel.Files
     {
         private readonly List<PatternGroup> _excludeGroups = new List<PatternGroup>();
         private readonly Matcher _matcher = new Matcher();
+        static readonly Dictionary<string, IEnumerable<string>> Cache = new Dictionary<string, IEnumerable<string>>();
 
         internal PatternGroup(IEnumerable<string> includePatterns)
         {
@@ -82,37 +83,58 @@ namespace Microsoft.DotNet.ProjectModel.Files
 
         public IEnumerable<string> SearchFiles(string rootPath)
         {
-            // literal included files are added at the last, but the search happens early
-            // so as to make the process fail early in case there is missing file. fail early
-            // helps to avoid unnecessary globing for performance optimization
-            var literalIncludedFiles = new List<string>();
-            foreach (var literalRelativePath in IncludeLiterals)
+            var key = rootPath
+                + (IncludePatterns.Any() ? " ++ " + string.Join(", ", IncludePatterns): "")
+                + (IncludeLiterals.Any() ? " + " + string.Join(", ", IncludeLiterals) : "")
+                + (ExcludePatterns.Any() ? " -- " + string.Join(", ", ExcludePatterns) : "");
+            IEnumerable<string> result;
+            lock (Cache)
             {
-                var fullPath = Path.GetFullPath(Path.Combine(rootPath, literalRelativePath));
-
-                if (!File.Exists(fullPath))
+                if (Cache.TryGetValue(key, out result))
                 {
-                    throw new InvalidOperationException(string.Format("Can't find file {0}", literalRelativePath));
-                }
-
-                // TODO: extract utility like NuGet.PathUtility.GetPathWithForwardSlashes()
-                literalIncludedFiles.Add(fullPath.Replace('\\', '/'));
-            }
-
-            // globing files
-            var globbingResults = _matcher.GetResultsInFullPath(rootPath);
-
-            // if there is no results generated in globing, skip excluding other groups 
-            // for performance optimization.
-            if (globbingResults.Any())
-            {
-                foreach (var group in _excludeGroups)
-                {
-                    globbingResults = globbingResults.Except(group.SearchFiles(rootPath));
+                    return result;
                 }
             }
 
-            return globbingResults.Concat(literalIncludedFiles).Distinct();
+            using (PerfTrace.Current.CaptureTiming(key))
+            {
+                // literal included files are added at the last, but the search happens early
+                // so as to make the process fail early in case there is missing file. fail early
+                // helps to avoid unnecessary globing for performance optimization
+                var literalIncludedFiles = new List<string>();
+                foreach (var literalRelativePath in IncludeLiterals)
+                {
+                    var fullPath = Path.GetFullPath(Path.Combine(rootPath, literalRelativePath));
+
+                    if (!File.Exists(fullPath))
+                    {
+                        throw new InvalidOperationException(string.Format("Can't find file {0}", literalRelativePath));
+                    }
+
+                    // TODO: extract utility like NuGet.PathUtility.GetPathWithForwardSlashes()
+                    literalIncludedFiles.Add(fullPath.Replace('\\', '/'));
+                }
+
+                // globing files
+                var globbingResults = _matcher.GetResultsInFullPath(rootPath);
+
+                // if there is no results generated in globing, skip excluding other groups 
+                // for performance optimization.
+                if (globbingResults.Any())
+                {
+                    foreach (var group in _excludeGroups)
+                    {
+                        globbingResults = globbingResults.Except(group.SearchFiles(rootPath));
+                    }
+                }
+
+                result =  globbingResults.Concat(literalIncludedFiles).Distinct();
+                lock (Cache)
+                {
+                    Cache.Add(key, result);
+                }
+            }
+            return result;
         }
 
         public override string ToString()

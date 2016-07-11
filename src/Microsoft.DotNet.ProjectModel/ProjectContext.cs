@@ -15,6 +15,7 @@ namespace Microsoft.DotNet.ProjectModel
     public class ProjectContext
     {
         private string[] _runtimeFallbacks;
+        private LibraryExporter _exporter;
 
         public ProjectContextIdentity Identity { get; }
 
@@ -71,12 +72,16 @@ namespace Microsoft.DotNet.ProjectModel
 
         public LibraryExporter CreateExporter(string configuration, string buildBasePath = null)
         {
+            if (_exporter != null)
+            {
+                return _exporter;
+            }
             if (IsPortable && RuntimeIdentifier != null && _runtimeFallbacks == null)
             {
                 var graph = RuntimeGraphCollector.Collect(LibraryManager.GetLibraries());
                 _runtimeFallbacks = graph.ExpandRuntime(RuntimeIdentifier).ToArray();
             }
-            return new LibraryExporter(RootProject,
+            return _exporter = new LibraryExporter(RootProject,
                 LibraryManager,
                 configuration,
                 RuntimeIdentifier,
