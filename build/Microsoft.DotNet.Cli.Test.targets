@@ -71,8 +71,16 @@
           DependsOnTargets="SetupRestoreTestsInputs;" 
           Inputs="@(RestoreTestsInputs)"
           Outputs="@(RestoreTestsInputs->'%(RelativeDir)project.lock.json')">
-    <Delete Files="$(TestDirectory)**/bin/**/*.*')" />
-    <Delete Files="$(TestDirectory)**/obj/**/*.*')" />
+    <ItemGroup>
+      <FilesToDelete Include="$(TestDirectory)**/bin/**/*.*" />
+      <FilesToDelete Include="$(TestDirectory)**/obj/**/*.*" />
+    </ItemGroup>  
+    
+    <Delete Files="@(FilesToDelete)" />
+
+    <ItemGroup>
+      <FilesToDelete Remove="*" />
+    </ItemGroup>
   </Target>
 
   <Target Name="SetupRestoreTestsInputs"
