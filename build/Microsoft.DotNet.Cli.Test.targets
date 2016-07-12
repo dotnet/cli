@@ -75,7 +75,7 @@
       <FilesToDelete Include="$(TestDirectory)**/bin/**/*.*" />
       <FilesToDelete Include="$(TestDirectory)**/obj/**/*.*" />
     </ItemGroup>  
-    
+
     <Delete Files="@(FilesToDelete)" />
 
     <ItemGroup>
@@ -207,8 +207,7 @@
           Inputs="@(RestoreTestAssetPackageProjectsInputs)"
           Outputs="@(RestoreTestAssetPackageProjectsInputs->'%(RelativeDir)/project.lock.json')">
 
-    <DotNetRestore  FallbackSource="$(TestPackagesDir)"
-                    ToolPath="$(DotnetUnderTest)" 
+    <DotNetRestore  ToolPath="$(DotnetUnderTest)" 
                     WorkingDirectory="$(RepoRoot)/TestAssets/TestPackages/" />
   </Target>
 
