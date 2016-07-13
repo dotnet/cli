@@ -101,7 +101,6 @@
                   WorkingDirectory="%(TestAssetProjects.RelativeDir)" />
   </Target>
 
-
   <Target Name="RestoreTestAssetProjects"
           DependsOnTargets="CreateTestAssetPackageNuPkgs;
                             SetupRestoreTestAssetProjectsInputs;"
