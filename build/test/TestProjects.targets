@@ -66,6 +66,8 @@
         <ProjectDir>$([System.IO.Directory]::GetParent(%(Identity)))</ProjectDir>
         <ProjectPath>%(Identity)</ProjectPath>
         <Framework>netcoreapp1.0</Framework>
+        <Framework Condition=" '%(RelativeDir)' == 'test\binding-redirects.Tests\' ">net451</Framework>
+        <Framework Condition=" '%(RelativeDir)' == 'test\Installer\Microsoft.DotNet.Cli.Msi.Tests\' ">net46</Framework>
       </TestProjects>
 
       <TestProjects>
