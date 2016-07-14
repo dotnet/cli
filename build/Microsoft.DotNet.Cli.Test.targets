@@ -6,7 +6,6 @@
     <PathSeparator Condition=" '$(OSName)' == 'win' ">\</PathSeparator>
   </PropertyGroup>
 
-  <Import Project="test/ProjectsToTest.props" />
   <Import Project="test/TestPackageProjects.targets" />
   <Import Project="test/TestAssetProjects.targets" />
   <Import Project="test/TestProjects.targets" />
