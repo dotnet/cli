@@ -92,6 +92,9 @@ get_current_os_name() {
                 echo "opensuse.13.2"
                 return 0
             fi
+	elif [ "$(uname -s | grep -cim1 freebsd)" -eq 1 ]; then
+            echo "freebsd"
+            return 0
         fi
     fi
     
