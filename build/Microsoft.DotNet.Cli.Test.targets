@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Test" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <PathSeparator>/</PathSeparator>
+    <PathSeparator Condition=" '$(OSName)' == 'win' ">\</PathSeparator>
+  </PropertyGroup>
+
   <Import Project="test/ProjectsToTest.props" />
   <Import Project="test/TestPackageProjects.targets" />
   <Import Project="test/TestAssetProjects.targets" />

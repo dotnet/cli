@@ -30,11 +30,6 @@
   </Target>
 
   <Target Name="SetupBuildTestAssetProjectInputs">
-    <PropertyGroup>
-      <PathSeparator>/</PathSeparator>
-      <PathSeparator Condition=" '$(OSName)' == 'win' ">\</PathSeparator>
-    </PropertyGroup>
-
     <ItemGroup>
       <NoAutoBuildTestAssets Include="TestAssets$(PathSeparator)TestProjects$(PathSeparator)**$(PathSeparator).noautobuild" />
       <NoAutoBuildTestAssetProjects Include="%(NoAutoBuildTestAssets.RelativeDir)project.json" />

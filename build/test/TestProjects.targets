@@ -35,26 +35,26 @@
                              Include="test/binding-redirects.Tests/project.json;" />
 
       <TestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3864' != 'fixed' "
-                             Include="test/TestingAbstractions/Microsoft.Extensions.Testing.Abstractions.Tests/project.json;
-                                      test/TestingAbstractions/Microsoft.Extensions.Testing.Abstractions.UnitTests/project.json;" />
+                             Include="test$(PathSeparator)TestingAbstractions$(PathSeparator)Microsoft.Extensions.Testing.Abstractions.Tests/$(PathSeparator)roject.json;
+                                      test$(PathSeparator)TestingAbstractions$(PathSeparator)Microsoft.Extensions.Testing.Abstractions.UnitTests$(PathSeparator)project.json;" />
 
       <TestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3558' != 'fixed' "
-                             Include="test/dotnet-compile-fsc.Tests/project.json" />
+                             Include="test$(PathSeparator)dotnet-compile-fsc.Tests$(PathSeparator)project.json" />
 
       <TestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3216' != 'fixed' "
-                             Include="test/Kestrel.Tests/project.json" />
+                             Include="test$(PathSeparator)Kestrel.Tests$(PathSeparator)project.json" />
 
       <TestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3865' != 'fixed' "
-                             Include="test/ScriptExecutorTests/project.json" />
+                             Include="test$(PathSeparator)ScriptExecutorTests$(PathSeparator)project.json" />
       
       <TestProjectsToExclude Condition=" 'Non-test projects in test directory' != 'consider moving elsewhere' "
-                             Include="test/ArgumentsReflector/project.json;
-                                      test/Microsoft.DotNet.Tools.Tests.Utilities/project.json;
-                                      test/TestingAbstractions/TestAppWithFullPdbs/project.json;
-                                      test/TestingAbstractions/TestAppWithPortablePdbs/project.json" />
+                             Include="test$(PathSeparator)ArgumentsReflector$(PathSeparator)project.json;
+                                      test$(PathSeparator)Microsoft.DotNet.Tools.Tests.Utilities$(PathSeparator)project.json;
+                                      test$(PathSeparator)TestingAbstractions$(PathSeparator)TestAppWithFullPdbs$(PathSeparator)project.json;
+                                      test$(PathSeparator)TestingAbstractions$(PathSeparator)TestAppWithPortablePdbs$(PathSeparator)project.json" />
 
       <TestProjectsToExclude Condition=" 'Executed after primary test phase.' != ' Consider moving.' "
-                             Include="test/Installer/Microsoft.DotNet.Cli.Msi.Tests/project.json;" />
+                             Include="test$(PathSeparator)Installer$(PathSeparator)Microsoft.DotNet.Cli.Msi.Tests$(PathSeparator)project.json;" />
 
       <TestProjects Include="test/**/project.json;"
                     Exclude="@(TestProjectsToExclude);
@@ -66,8 +66,8 @@
         <ProjectDir>$([System.IO.Directory]::GetParent(%(Identity)))</ProjectDir>
         <ProjectPath>%(Identity)</ProjectPath>
         <Framework>netcoreapp1.0</Framework>
-        <Framework Condition=" '%(RelativeDir)' == 'test\binding-redirects.Tests\' ">net451</Framework>
-        <Framework Condition=" '%(RelativeDir)' == 'test\Installer\Microsoft.DotNet.Cli.Msi.Tests\' ">net46</Framework>
+        <Framework Condition=" '%(RelativeDir)' == 'test$(PathSeparator)binding-redirects.Tests$(PathSeparator)' ">net451</Framework>
+        <Framework Condition=" '%(RelativeDir)' == 'test$(PathSeparator)Installer$(PathSeparator)Microsoft.DotNet.Cli.Msi.Tests$(PathSeparator)' ">net46</Framework>
       </TestProjects>
 
       <TestProjects>
