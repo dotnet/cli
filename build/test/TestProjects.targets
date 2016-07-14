@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Test" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="SetupTestProjectData" 
+          DependsOnTargets="AssociateTestInputFilesWithProject">                          
+  </Target>
+
+  <Target Name="AssociateTestInputFilesWithProject" 
+          DependsOnTargets="IdentifyTestInputFilesForProject;" 
+          Outputs="%(TestProjects.ProjectPath)">
+    <PropertyGroup>
+      <CurrentProject>%(TestProjects.ProjectPath)</CurrentProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <TestProjects Condition=" '%(ProjectPath)' == '$(CurrentProject)' ">
+        <BuildInputs>@(TestProjectInputs)</BuildInputs>
+      </TestProjects>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="IdentifyTestInputFilesForProject" 
+          DependsOnTargets="SetupBuildTestProjectInputs;" 
+          Outputs="%(TestProjects.ProjectPath)">
+    <ItemGroup>
+      <TestProjectInputs Include="%(TestProjects.BuildInputIncludeFilter)" 
+                              Exclude="%(TestProjects.BuildInputExcludeFilter)">
+        <ProjectPath>%(TestProjects.ProjectPath)</ProjectPath>
+      </TestProjectInputs>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="SetupBuildTestProjectInputs">
+    <ItemGroup>
+      <TestProjects Include="test/**/.Tests/project.json" />
+      <TestProjects Include="test/**/.UnitTests/project.json" />
+
+      <TestProjects>
+        <BuildInputIncludeFilter>%(RelativeDir)**/*.*</BuildInputIncludeFilter>
+        <BuildInputExcludeFilter>%(RelativeDir)bin/**/*.*;%(RelativeDir)obj/**/*.*</BuildInputExcludeFilter>
+        <ProjectDir>$([System.IO.Directory]::GetParent(%(Identity)))</ProjectDir>
+        <ProjectPath>%(Identity)</ProjectPath>
+        <Framework>netcoreapp1.0</Framework>
+      </TestProjects>
+
+      <TestProjects>
+        <OutputName>$([System.IO.Path]::GetFileName(%(ProjectDir)))</OutputName>
+      </TestProjects>
+
+      <TestProjects>
+        <BuildOutput>%(TestProjects.RelativeDir)bin/$(Configuration)/$(Framework)/%(TestProjects.OutputName).dll</BuildOutput>
+      </TestProjects>
+    </ItemGroup>
+  </Target>
+</Project>

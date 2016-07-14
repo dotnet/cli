@@ -3,6 +3,7 @@
   <Import Project="test/ProjectsToTest.props" />
   <Import Project="test/TestPackageProjects.targets" />
   <Import Project="test/TestAssetProjects.targets" />
+  <Import Project="test/TestProjects.targets" />
 
   <Target Name="Test" 
           DependsOnTargets="PrepareTests;
@@ -44,10 +45,14 @@
   </Target>
 
   <Target Name="BuildTests" 
-          DependsOnTargets="RestoreTests;">
+          DependsOnTargets="RestoreTests;
+                            SetupTestProjectData;"
+          Inputs="%(TestProjects.BuildInputs)"
+          Outputs="%(TestProjects.BuildOutput)">
     <DotNetBuild  Configuration="$(Configuration)"
+                  Framework="%(TestProjects.Framework)"
                   ToolPath="$(DotnetUnderTest)"
-                  WorkingDirectory="$(TestDirectory)/%(ProjectsToTest.Identity)/" />
+                  WorkingDirectory="%(TestProjects.RelativeDir)/" />
   </Target>
 
   <Target Name="RestoreTests"
@@ -56,6 +61,8 @@
                             SetupRestoreTestsInputs;"
           Inputs="@(RestoreTestsInputs)"
           Outputs="@(RestoreTestsInputs->'%(RelativeDir)project.lock.json')">
+    <CallTarget Targets="CleanTestProjectsLockFiles"/>
+
     <DotNetRestore  FallbackSource="$(TestPackagesDir)"
                     ToolPath="$(DotnetUnderTest)" 
                     WorkingDirectory="$(TestDirectory)" />
@@ -80,7 +87,8 @@
   <Target Name="SetupRestoreTestsInputs"
           DependsOnTargets="PrepareTests;" >
     <ItemGroup>
-      <RestoreTestsInputs Include="$(TestDirectory)/**/project.json" />
+      <RestoreTestsInputs Include="$(TestDirectory)/**/project.json"
+                          Exclude="$(TestDirectory)/**/bin/**/project.json" />
     </ItemGroup>
   </Target>
 
@@ -123,6 +131,13 @@
       <TestAssetProjectsLockFiles Include="$(RepoRoot)/TestAssets/TestProjects/**/project.lock.json" />
     </ItemGroup>
     <Delete Files="@(TestAssetProjectsLockFiles)" /> 
+  </Target>
+
+  <Target Name="CleanTestProjectsLockFiles" >
+    <ItemGroup>
+      <TestProjectsLockFiles Include="$(RepoRoot)/test/**/project.lock.json" />
+    </ItemGroup>
+    <Delete Files="@(TestProjectsLockFiles)" /> 
   </Target>
 
   <Target Name="BuildDesktopTestAssetProjects" 
