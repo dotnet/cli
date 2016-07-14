@@ -31,23 +31,34 @@
 
   <Target Name="SetupBuildTestProjectInputs">
     <ItemGroup>
-      <TestProjectsToExclude Condition=" '$(IsDesktopAvailable)' == 'False' " 
-                             Include="test/binding-redirects.Tests/project.json;
-                                      test/Installer/Microsoft.DotNet.Cli.Msi.Tests/project.json;
-                                      test/TestingAbstractions/Microsoft.Extensions.Testing.Abstractions.Tests/project.json;
-                                      test/TestingAbstractions/Microsoft.Extensions.Testing.Abstractions.UnitTests/project.json" />
+      <TestProjectsToExclude Condition=" '$(IsDesktopAvailable)' != 'True' " 
+                             Include="test/binding-redirects.Tests/project.json;" />
+
+      <TestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3864' != 'fixed' "
+                             Include="test/TestingAbstractions/Microsoft.Extensions.Testing.Abstractions.Tests/project.json;
+                                      test/TestingAbstractions/Microsoft.Extensions.Testing.Abstractions.UnitTests/project.json;" />
+
       <TestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3558' != 'fixed' "
                              Include="test/dotnet-compile-fsc.Tests/project.json" />
+
       <TestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3216' != 'fixed' "
                              Include="test/Kestrel.Tests/project.json" />
 
-      <TestProjects Include="test/**/*.Tests/project.json;
-                             test/**/*.UnitTests/project.json;
-                             tests/ArgumentForwardingTests/project.json;
-                             test/EndToEnd/project.json;
-                             test/Performance/project.json;"
-                    Exclude="@(TestProjectsToExclude)" />
-      <TestProjects Include="test/**/*.UnitTests/project.json" />
+      <TestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3865' != 'fixed' "
+                             Include="test/ScriptExecutorTests/project.json" />
+      
+      <TestProjectsToExclude Condition=" 'Non-test projects in test directory' != 'consider moving elsewhere' "
+                             Include="test/ArgumentsReflector/project.json;
+                                      test/Microsoft.DotNet.Tools.Tests.Utilities/project.json;
+                                      test/TestingAbstractions/TestAppWithFullPdbs/project.json;
+                                      test/TestingAbstractions/TestAppWithPortablePdbs/project.json" />
+
+      <TestProjectsToExclude Condition=" 'Executed after primary test phase.' != ' Consider moving.' "
+                             Include="test/Installer/Microsoft.DotNet.Cli.Msi.Tests/project.json;" />
+
+      <TestProjects Include="test/**/project.json;"
+                    Exclude="@(TestProjectsToExclude);
+                             test/**/bin/**/project.json" />
 
       <TestProjects>
         <BuildInputIncludeFilter>%(RelativeDir)**/*.*</BuildInputIncludeFilter>
