@@ -23,7 +23,7 @@
           Outputs="%(TestProjects.ProjectPath)">
     <ItemGroup>
       <TestProjectInputs Include="%(TestProjects.BuildInputIncludeFilter)" 
-                              Exclude="%(TestProjects.BuildInputExcludeFilter)">
+                         Exclude="%(TestProjects.BuildInputExcludeFilter)">
         <ProjectPath>%(TestProjects.ProjectPath)</ProjectPath>
       </TestProjectInputs>
     </ItemGroup>
@@ -31,8 +31,23 @@
 
   <Target Name="SetupBuildTestProjectInputs">
     <ItemGroup>
-      <TestProjects Include="test/**/.Tests/project.json" />
-      <TestProjects Include="test/**/.UnitTests/project.json" />
+      <TestProjectsToExclude Condition=" '$(IsDesktopAvailable)' == 'False' " 
+                             Include="test/binding-redirects.Tests/project.json;
+                                      test/Installer/Microsoft.DotNet.Cli.Msi.Tests/project.json;
+                                      test/TestingAbstractions/Microsoft.Extensions.Testing.Abstractions.Tests/project.json;
+                                      test/TestingAbstractions/Microsoft.Extensions.Testing.Abstractions.UnitTests/project.json" />
+      <TestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3558' != 'fixed' "
+                             Include="test/dotnet-compile-fsc.Tests/project.json" />
+      <TestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3216' != 'fixed' "
+                             Include="test/Kestrel.Tests/project.json" />
+
+      <TestProjects Include="test/**/*.Tests/project.json;
+                             test/**/*.UnitTests/project.json;
+                             tests/ArgumentForwardingTests/project.json;
+                             test/EndToEnd/project.json;
+                             test/Performance/project.json;"
+                    Exclude="@(TestProjectsToExclude)" />
+      <TestProjects Include="test/**/*.UnitTests/project.json" />
 
       <TestProjects>
         <BuildInputIncludeFilter>%(RelativeDir)**/*.*</BuildInputIncludeFilter>
@@ -47,7 +62,7 @@
       </TestProjects>
 
       <TestProjects>
-        <BuildOutput>%(TestProjects.RelativeDir)bin/$(Configuration)/$(Framework)/%(TestProjects.OutputName).dll</BuildOutput>
+        <BuildOutput>$(RepoRoot)%(TestProjects.RelativeDir)bin/$(Configuration)/%(TestProjects.Framework)/%(TestProjects.OutputName).dll</BuildOutput>
       </TestProjects>
     </ItemGroup>
   </Target>

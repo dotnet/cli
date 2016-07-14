@@ -22,13 +22,13 @@
       <TestTaskEnvironmentVariables Include="TEST_ARTIFACTS=$(TestArtifactsEnv)" />
     </ItemGroup>
 
-    <DotNetTest WorkingDirectory="$(TestDirectory)/%(ProjectsToTest.Identity)/"
+    <DotNetTest WorkingDirectory="%(TestProjects.ProjectDir)"
                 EnvironmentVariables="@(TestTaskEnvironmentVariables)"
                 ToolPath="$(Stage2Directory)"
                 Configuration="$(Configuration)"
                 NoBuild="True"
                 NoTrait="category=failing"
-                Xml="$(TestResultXmlDir)/%(ProjectsToTest.Identity)-testResults.xml" />
+                Xml="$(TestResultXmlDir)/%(TestProjects.OutputName)-testResults.xml" />
   </Target>
 
   <Target Name="PrepareTests"
