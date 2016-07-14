@@ -26,6 +26,7 @@
                 EnvironmentVariables="@(TestTaskEnvironmentVariables)"
                 ToolPath="$(Stage2Directory)"
                 Configuration="$(Configuration)"
+                NoBuild="True"
                 NoTrait="category=failing"
                 Xml="$(TestResultXmlDir)/%(ProjectsToTest.Identity)-testResults.xml" />
   </Target>
