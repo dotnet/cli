@@ -205,7 +205,7 @@ namespace Microsoft.DotNet.Tools.Publish
 
             RunScripts(context, ScriptNames.PostPublish, contextVariables);
 
-            Reporter.Output.WriteLine($"publish: Published to {outputPath}".Green().Bold());
+            Reporter.Output.WriteLine($"publish: Published to {Path.Combine(ProjectPath, outputPath)}".Green().Bold());
 
             return true;
         }
