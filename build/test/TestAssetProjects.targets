@@ -34,8 +34,11 @@
       <NoAutoBuildTestAssets Include="TestAssets$(PathSeparator)TestProjects$(PathSeparator)**$(PathSeparator).noautobuild" />
       <NoAutoBuildTestAssetProjects Include="%(NoAutoBuildTestAssets.RelativeDir)project.json" />
 
-      <TestAssetProjects Include="TestAssets$(PathSeparator)TestProjects$(PathSeparator)**$(PathSeparator)project.json" 
+      <PreTestAssetProjects Include="TestAssets$(PathSeparator)TestProjects$(PathSeparator)**$(PathSeparator)project.json"/>
+                         
+      <TestAssetProjects Include="%(PreTestAssetProjects.RelativeDir)project.json"
                          Exclude="@(NoAutoBuildTestAssetProjects)"/>
+
       <TestAssetProjects>
         <BuildInputIncludeFilter>%(RelativeDir)**/*.*</BuildInputIncludeFilter>
         <BuildInputExcludeFilter>%(RelativeDir)bin/**/*.*;%(RelativeDir)obj/**/*.*</BuildInputExcludeFilter>
