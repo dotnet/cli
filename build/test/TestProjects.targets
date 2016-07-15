@@ -80,5 +80,7 @@
         <BuildOutput>$(RepoRoot)%(TestProjects.RelativeDir)bin/$(Configuration)/%(TestProjects.Framework)/%(TestProjects.OutputName).dll</BuildOutput>
       </TestProjects>
     </ItemGroup>
+
+    <Message Text="%(TestProjects.Identity) %(TestProjects.RelativeDir) %(TestProjects.Framework)" />
   </Target>
 </Project>

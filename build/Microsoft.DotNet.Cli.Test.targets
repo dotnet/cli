@@ -58,7 +58,7 @@
     <DotNetBuild  Configuration="$(Configuration)"
                   Framework="%(TestProjects.Framework)"
                   ToolPath="$(DotnetUnderTest)"
-                  WorkingDirectory="%(TestProjects.RelativeDir)/" />
+                  WorkingDirectory="%(TestProjects.RelativeDir)" />
   </Target>
 
   <Target Name="RestoreTests"
@@ -108,9 +108,6 @@
                             SetupTestAssetProjectData;"
           Inputs="%(TestAssetProjects.BuildInputs)"
           Outputs="%(TestAssetProjects.BuildOutput)">
-
-    <Message Text="Skipping projects with .noautobuild files:" />
-    <Message Text="%(NoAutoBuildTestAssetProjects.Identity)" />
 
     <DotNetBuild  Framework="netcoreapp1.0"
                   ProjectPath="$(RepoRoot)%(TestAssetProjects.ProjectPath)"
