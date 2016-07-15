@@ -68,8 +68,6 @@
         <ProjectDir>$([System.IO.Directory]::GetParent(%(Identity)))</ProjectDir>
         <ProjectPath>%(Identity)</ProjectPath>
         <Framework>netcoreapp1.0</Framework>
-        <Framework Condition=" '%(RelativeDir)' == 'test\binding-redirects.Tests\' ">net451</Framework>
-        <Framework Condition=" '%(RelativeDir)' == 'test\Installer\Microsoft.DotNet.Cli.Msi.Tests' ">net46</Framework>
       </TestProjects>
 
       <TestProjects>
@@ -79,15 +77,11 @@
       <TestProjects>
         <BuildOutput>$(RepoRoot)%(TestProjects.RelativeDir)bin/$(Configuration)/%(TestProjects.Framework)/%(TestProjects.OutputName).dll</BuildOutput>
       </TestProjects>
-    </ItemGroup>
 
-    <Message Text="%(TestProjects.Identity) %(TestProjects.RelativeDir) %(TestProjects.Framework)" />
-
-    <ItemGroup>
       <TestProjects Condition=" '%(RelativeDir)' == 'test\binding-redirects.Tests\' ">
         <Framework>net451</Framework>
       </TestProjects>
-      <TestProjects Condition=" '%(RelativeDir)' == 'test\Installer\Microsoft.DotNet.Cli.Msi.Tests' ">
+      <TestProjects Condition=" '%(RelativeDir)' == 'test\Installer\Microsoft.DotNet.Cli.Msi.Tests\' ">
         <Framework>net46</Framework>
       </TestProjects>
     </ItemGroup>
