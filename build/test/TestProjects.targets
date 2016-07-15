@@ -31,36 +31,39 @@
 
   <Target Name="SetupBuildTestProjectInputs">
     <ItemGroup>
-      <TestProjectsToExclude Condition=" '$(IsDesktopAvailable)' != 'True' " 
+      <PreTestProjectsToExclude Condition=" '$(IsDesktopAvailable)' != 'True' " 
                              Include="test/binding-redirects.Tests/project.json;" />
 
-      <TestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3864' != 'fixed' "
+      <PreTestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3864' != 'fixed' "
                              Include="test$(PathSeparator)TestingAbstractions$(PathSeparator)Microsoft.Extensions.Testing.Abstractions.Tests$(PathSeparator)project.json;
                                       test$(PathSeparator)TestingAbstractions$(PathSeparator)Microsoft.Extensions.Testing.Abstractions.UnitTests$(PathSeparator)project.json;" />
 
-      <TestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3558' != 'fixed' "
+      <PreTestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3558' != 'fixed' "
                              Include="test$(PathSeparator)dotnet-compile-fsc.Tests$(PathSeparator)project.json" />
 
-      <TestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3216' != 'fixed' "
+      <PreTestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3216' != 'fixed' "
                              Include="test$(PathSeparator)Kestrel.Tests$(PathSeparator)project.json" />
 
-      <TestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3865' != 'fixed' "
+      <PreTestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3865' != 'fixed' "
                              Include="test$(PathSeparator)ScriptExecutorTests$(PathSeparator)project.json" />
       
-      <TestProjectsToExclude Condition=" 'Non-test projects in test directory' != 'consider moving elsewhere' "
+      <PreTestProjectsToExclude Condition=" 'Non-test projects in test directory' != 'consider moving elsewhere' "
                              Include="test$(PathSeparator)ArgumentsReflector$(PathSeparator)project.json;
                                       test$(PathSeparator)Microsoft.DotNet.Tools.Tests.Utilities$(PathSeparator)project.json;
                                       test$(PathSeparator)TestingAbstractions$(PathSeparator)TestAppWithFullPdbs$(PathSeparator)project.json;
                                       test$(PathSeparator)TestingAbstractions$(PathSeparator)TestAppWithPortablePdbs$(PathSeparator)project.json" />
 
-      <TestProjectsToExclude Condition=" 'Executed after primary test phase.' != ' Consider moving.' "
+      <PreTestProjectsToExclude Condition=" 'Executed after primary test phase.' != ' Consider moving.' "
                              Include="test$(PathSeparator)Installer$(PathSeparator)Microsoft.DotNet.Cli.Msi.Tests$(PathSeparator)project.json;" />
+
+      <PreTestProjectsToExclude Include="test$(PathSeparator)**$(PathSeparator)bin$(PathSeparator)**$(PathSeparator)project.json" />
+
+      <TestProjectsToExclude Include="%(PreTestProjectsToExclude.RelativeDir)project.json" />
 
       <PreTestProjects Include="test$(PathSeparator)**$(PathSeparator)project.json;" />
 
       <TestProjects Include="%(PreTestProjects.RelativeDir)project.json;"
-                    Exclude="@(TestProjectsToExclude);
-                             test$(PathSeparator)**$(PathSeparator)bin$(PathSeparator)**$(PathSeparator)project.json" />
+                    Exclude="@(TestProjectsToExclude)" />
 
       <TestProjects>
         <BuildInputIncludeFilter>%(RelativeDir)**/*.*</BuildInputIncludeFilter>
