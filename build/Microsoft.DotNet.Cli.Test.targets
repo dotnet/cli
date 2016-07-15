@@ -111,8 +111,6 @@
 
     <Message Text="Skipping projects with .noautobuild files:" />
     <Message Text="%(NoAutoBuildTestAssetProjects.Identity)" />
-    <Message Text="Out of:" />
-    <Message Text="%(TestAssetProjects.Identity)" />
 
     <DotNetBuild  Framework="netcoreapp1.0"
                   ProjectPath="$(RepoRoot)%(TestAssetProjects.ProjectPath)"
