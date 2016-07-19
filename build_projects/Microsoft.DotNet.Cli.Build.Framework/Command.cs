@@ -184,6 +184,7 @@ namespace Microsoft.DotNet.Cli.Build.Framework
             _process.EnableRaisingEvents = true;
 
             var sw = Stopwatch.StartNew();
+            ReportExecBegin();
 
             _process.Start();
 
@@ -200,6 +201,8 @@ namespace Microsoft.DotNet.Cli.Build.Framework
             _process.WaitForExit();
 
             var exitCode = _process.ExitCode;
+
+            ReportExecEnd(exitCode); 
 
             return new CommandResult(
                 _process.StartInfo,
@@ -273,6 +276,26 @@ namespace Microsoft.DotNet.Cli.Build.Framework
 
             return prefix + " " + info.Arguments;
         }
+
+        private void ReportExecBegin() 
+        { 
+            if (!_quietBuildReporter) 
+            { 
+                Console.WriteLine($"[> EXEC] {FormatProcessInfo(_process.StartInfo, includeWorkingDirectory: false)}"); 
+            } 
+        } 
+ 
+        private void ReportExecEnd(int exitCode) 
+        { 
+            if (!_quietBuildReporter) 
+            { 
+                bool success = exitCode == 0; 
+ 
+                var message = $"{FormatProcessInfo(_process.StartInfo, includeWorkingDirectory: !success)} exited with {exitCode}"; 
+ 
+                Console.WriteLine("[< EXEC] {message}"); 
+            } 
+        } 
 
         private void ThrowIfRunning([CallerMemberName] string memberName = null)
         {

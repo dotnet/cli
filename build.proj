@@ -13,11 +13,11 @@
     <PlatformScriptExtension Condition=" '$(OS)' != 'Windows_NT' ">.sh</PlatformScriptExtension>
 
     <CLITargets Condition=" '$(CLITargets)' == '' ">Prepare;Compile;Test;Package;Publish</CLITargets>
-    <CLIBuildFileName>$(MSBuildThisFileDirectory)/build_projects/dotnet-cli-build/bin/dotnet-cli-build</CLIBuildFileName>
-    <CLIBuildDll>$(CLIBuildFileName).dll</CLIBuildDll>
 
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
+    <CLIBuildFileName>$(RepoRoot)/build_projects/dotnet-cli-build/bin/dotnet-cli-build</CLIBuildFileName>
+    <CLIBuildDll>$(CLIBuildFileName).dll</CLIBuildDll>
     <BuildToolsDir>$(RepoRoot)/build_tools</BuildToolsDir>
 
     <CoreSetupChannel>preview</CoreSetupChannel>
@@ -34,7 +34,7 @@
     <ExeExtension Condition=" '$(OS)' != 'Windows_NT' "></ExeExtension>
     <DotnetStage0>$(Stage0Path)/dotnet$(ExeExtension)</DotnetStage0>
 
-    <DotnetCliBuildDirectory>$(MSBuildThisFileDirectory)/build_projects/dotnet-cli-build/</DotnetCliBuildDirectory>
+    <DotnetCliBuildDirectory>$(RepoRoot)/build_projects/dotnet-cli-build</DotnetCliBuildDirectory>
   </PropertyGroup>
 
   <ItemGroup>
@@ -58,12 +58,12 @@
     <ItemGroup>
       <DotnetSdkDirectories Include="$([System.IO.Directory]::GetDirectories(&quot;$(Stage0Path)/sdk&quot;))" />
       <AzureStorageToCopy Include="@(DotnetSdkDirectories)">
-        <Source>$(DotnetCliBuildDirectory)bin/Microsoft.WindowsAzure.Storage.dll</Source>
+        <Source>$(DotnetCliBuildDirectory)/bin/Microsoft.WindowsAzure.Storage.dll</Source>
         <Destination>%(Identity)/Microsoft.WindowsAzure.Storage.dll</Destination>
       </AzureStorageToCopy>
     </ItemGroup>
 
-    <Exec Command="$(DotnetStage0) publish -o $(DotnetCliBuildDirectory)bin --framework netcoreapp1.0" WorkingDirectory="$(DotnetCliBuildDirectory)"/>
+    <Exec Command="$(DotnetStage0) publish -o $(DotnetCliBuildDirectory)/bin --framework netcoreapp1.0" WorkingDirectory="$(DotnetCliBuildDirectory)"/>
 
     <!-- This is a work around to issue https://github.com/Microsoft/msbuild/issues/658 -->
     <Copy SourceFiles="%(AzureStorageToCopy.Source)"
@@ -71,8 +71,8 @@
   </Target>
 
   <Target Name="RestoreDotnetCliBuildFramework"
-          Inputs="$(DotnetCliBuildDirectory)project.json"
-          Outputs="$(DotnetCliBuildDirectory)project.lock.json">
+          Inputs="$(DotnetCliBuildDirectory)/project.json"
+          Outputs="$(DotnetCliBuildDirectory)/project.lock.json">
 
     <Exec Command="$(DotnetStage0) restore" WorkingDirectory="$(DotnetCliBuildDirectory)"/>
   </Target>
