@@ -2,7 +2,6 @@
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <UsingTask TaskName="GetCurrentRuntimeInformation" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="GenerateBuildVersionInfo" AssemblyFile="$(CLIBuildDll)" />
-  <UsingTask TaskName="CheckPrereqs" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="SetEnvVar" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="DotNetBuild" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="DotNetPack" AssemblyFile="$(CLIBuildDll)" />
@@ -12,11 +11,14 @@
   <UsingTask TaskName="ExtractArchive" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="ArchiveDirectory" AssemblyFile="$(CLIBuildDll)" />
 
+  <Import Project="prepare/CheckPrereqs.targets" />
+
   <Target Name="Prepare"
           DependsOnTargets="Init;DownloadHostAndSharedFxArtifacts;RestorePackages;ZipTemplates" />
 
   <Target Name="Init"
-          DependsOnTargets="BuildDotnetCliBuildFramework">
+          DependsOnTargets="CheckPrereqs;
+                            BuildDotnetCliBuildFramework;">
     <!-- Current Runtime Information -->
     <GetCurrentRuntimeInformation>
       <Output TaskParameter="Rid" PropertyName="Rid" />
@@ -105,8 +107,6 @@
 
       <CombinedFrameworkHostCompressedFileName>dotnet-$(ProductMonikerRid).$(SharedFrameworkVersion)$(ArchiveExtension)</CombinedFrameworkHostCompressedFileName>
     </PropertyGroup>
-
-    <CheckPrereqs />
 
     <!-- SetTelemetryProfile -->
     <SetEnvVar Name="DOTNET_CLI_TELEMETRY_PROFILE" Value="$(DOTNET_CLI_TELEMETRY_PROFILE);https://github.com/dotnet/cli;$(CommitHash)" />
