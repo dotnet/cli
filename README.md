@@ -13,14 +13,14 @@ Also, don't forget to check out [the documentation](https://aka.ms/dotnet-cli-do
 
 Changes in issue triaging
 -------------------------
-As it was explained in the ["Changes to project.json" blog post](https://blogs.msdn.microsoft.com/dotnet/2016/05/23/changes-to-project-json/), we are making significant changes to the CLI tooling by supporting MSBuild as the build engine and `csproj` as the project format. As we are starting that work, we've realized that this also means that many of the shortcomings of the current tooling will be solved by this move. Given this, we've decided to introduce two new labels for issues to indicate that. These labels are: 
+As it was explained in the ["Changes to project.json" blog post](https://blogs.msdn.microsoft.com/dotnet/2016/05/23/changes-to-project-json/), we are making significant changes to the CLI tooling by supporting MSBuild as the build engine and `csproj` as the project format. We've realized that this also means that many of the shortcomings of the current tooling will be solved by this move. Given this, we've decided to introduce two new labels for issues to indicate that. These labels are: 
 
 * `msbuild-mitigated` label - this label indicates that we belive the issue in question will be mitigated via move to MSBuild. 
-* `msbuild-notapplicable` label - this label indicates that we believe the issue in question is will not be applicable after the move to MSBuild. 
+* `msbuild-notapplicable` label - this label indicates the issue will not be applicable after moving to MSBuild.
 
-We will be triaging and applying these labels to issues in the coming days and we will be closing issues we label. This is done so we can decrease the number of overall issues and move the focus towards those issues that we need to fix in the CLI "proper", so to speak. 
+We will close issues that are labelled with one of these labels. Proactive triaging will help us reduce the number of issues and enable us to focus on issues that require fixing independent of the move to msbuild.
 
-If your issue is closed as part of this effort and you believe that it was in error, please feel free to reopen and comment on why the move to MSBuild would not mitigate and/or make the behavior you are describing not applicable. 
+Please feel free to re-open and comment on any issue that you believe was triaged incorrectly.
 
 Found an issue?
 ---------------
