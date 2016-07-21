@@ -26,18 +26,27 @@
           Inputs="%(GenerateArchivesInputsOutputs.Inputs)"
           Outputs="%(GenerateArchivesInputsOutputs.Outputs)">
 
+    <PropertyGroup>
+      <GenerateArchivesDestinationArchive>
+        $(ArchiveOutputDirectory)/%(GenerateArchivesInputsOutputs.OutFileName).tar.gz
+      </GenerateArchivesDestinationArchive>
+      <GenerateArchivesDestinationArchive Condition=" '$(OSName)' == 'win' ">
+        $(ArchiveOutputDirectory)/%(GenerateArchivesInputsOutputs.OutFileName).zip
+      </GenerateArchivesDestinationArchive>
+    </PropertyGroup>
+
     <ZipFileCreateFromDirectory
         Condition=" '$(OSName)' == 'win' "
         SourceDirectory="%(GenerateArchivesInputsOutputs.InputDirectory)"
-        DestinationArchive="$(ArchiveOutputDirectory)/%(GenerateArchivesInputsOutputs.OutFileName)" />
+        DestinationArchive="$(GenerateArchivesDestinationArchive)" />
 
     <TarGzFileCreateFromDirectory
         Condition=" '$(OSName)' != 'win' "
         SourceDirectory="%(GenerateArchivesInputsOutputs.InputDirectory)"
-        DestinationArchive="$(ArchiveOutputDirectory)/%(GenerateArchivesInputsOutputs.OutFileName)" />
+        DestinationArchive="$(GenerateArchivesDestinationArchive)" />
 
     <ItemGroup>
-      <Archives Include="$(ArchiveOutputDirectory)/%(GenerateArchivesInputsOutputs.OutFileName)" />
+      <Archives Include="$(GenerateArchivesDestinationArchive)" />
     </ItemGroup>
 
   </Target>
