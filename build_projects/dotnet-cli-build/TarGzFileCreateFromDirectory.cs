@@ -124,11 +124,14 @@ namespace Microsoft.DotNet.Build.Tasks
         {
             var excludes = String.Empty;
 
-            foreach (var excludeTaskItem in ExcludePatterns)
+            if (ExcludePatterns != null)
             {
-                excludes += $" --exclude {excludeTaskItem.ItemSpec}";
+                foreach (var excludeTaskItem in ExcludePatterns)
+                {
+                    excludes += $" --exclude {excludeTaskItem.ItemSpec}";
+                }
             }
-
+            
             return excludes;
         }
         
