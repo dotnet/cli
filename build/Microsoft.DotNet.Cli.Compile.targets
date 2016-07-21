@@ -5,8 +5,7 @@
   <UsingTask TaskName="FixModeFlags" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="ChangeEntryPointLibraryName" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="RemoveAssetFromDepsPackages" AssemblyFile="$(CLIBuildDll)" />
-  <UsingTask TaskName="CleanPublishOutput" AssemblyFile="$(CLIBuildDll)" />
-  <UsingTask TaskName="CrossgenDirectory" AssemblyFile="$(CLIBuildDll)" />    
+  <UsingTask TaskName="CrossgenDirectory" AssemblyFile="$(CLIBuildDll)" />
 
   <Target Name="Compile" DependsOnTargets="Prepare;
                                            SetupStage;
@@ -34,9 +33,9 @@
         <StageDirectory>$(Stage2Directory)</StageDirectory>
         <StageSymbolsDirectory>$(Stage2SymbolsDirectory)</StageSymbolsDirectory>
         <DotnetExe>$(DotnetStage1)</DotnetExe>
-      </Stage>          
-    </ItemGroup>    
-  </Target>    
+      </Stage>
+    </ItemGroup>
+  </Target>
 
   <Target Name="CompileStage"
           Inputs="%(Stage.Inputs)"
@@ -55,11 +54,11 @@
 
         <StageDirectory>%(Stage.StageDirectory)</StageDirectory>
         <StageSymbolsDirectory>%(Stage.StageSymbolsDirectory)</StageSymbolsDirectory>
-        <SdkOutputDirectory>$(StageDirectory)/sdk/$(SdkVersion)</SdkOutputDirectory>            
+        <SdkOutputDirectory>$(StageDirectory)/sdk/$(SdkVersion)</SdkOutputDirectory>
         <BinaryToCorehostifyRelDir>runtimes/any/native</BinaryToCorehostifyRelDir>
         <BinaryToCorehostifyOutDir>$(SdkOutputDirectory)/$(BinaryToCorehostifyRelDir)</BinaryToCorehostifyOutDir>
         <MSBuildTargetsDirectory>$(SdkOutputDirectory)/runtimes/any/native</MSBuildTargetsDirectory>
-        
+
         <SharedFrameworkNameVersionPath>$(StageDirectory)/shared/$(SharedFrameworkName)/$(SharedFrameworkVersion)</SharedFrameworkNameVersionPath>
       </PropertyGroup>
 
@@ -83,7 +82,7 @@
       <!-- CopySharedFramework -->
       <Copy SourceFiles="@(SharedFramework)"
             DestinationFiles="@(SharedFramework->'$(StageDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
-    
+
       <!-- Publish DotNet -->
       <Exec Command="%(Stage.DotnetExe) publish
                      --native-subdirectory
@@ -112,7 +111,7 @@
       <Copy SourceFiles="$(SdkOutputDirectory)/compilers.runtimeconfig.json"
             DestinationFiles="$(SdkOutputDirectory)/csc.runtimeconfig.json" />
 
-      <ChangeEntryPointLibraryName 
+      <ChangeEntryPointLibraryName
             DepsFile="$(SdkOutputDirectory)/csc.deps.json"
             NewName="csc.deps.json" />
 
@@ -124,10 +123,11 @@
                                    AssetPath="$(BinaryToCorehostifyRelDir)/%(BinariesToRemove.Identity).exe" />
 
       <!-- cleanup compilers project output we don't need -->
-      <CleanPublishOutput Path="$(SdkOutputDirectory)"
-                          Name="compilers"
-                          DeleteRuntimeConfigJson="true"
-                          DeleteDepsJson="true" />
+      <Delete Files="$(SdkOutputDirectory)/compilers$(ExeExtension)" />
+      <Delete Files="$(SdkOutputDirectory)/compilers.dll" />
+      <Delete Files="$(SdkOutputDirectory)/compilers.pdb" />
+      <Delete Files="$(SdkOutputDirectory)/compilers.runtimeconfig.json" />
+      <Delete Files="$(SdkOutputDirectory)/compilers.deps.json" />
 
       <!-- Copy Host to SDK Directory -->
       <Copy SourceFiles="$(SharedFrameworkNameVersionPath)/$(DotnetHostBaseName)"
