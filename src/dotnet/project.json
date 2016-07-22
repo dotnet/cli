@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-feature-antares-*",
+  "version": "1.0.0-featantares-*",
   "buildOptions": {
     "emitEntryPoint": true,
     "embed": {

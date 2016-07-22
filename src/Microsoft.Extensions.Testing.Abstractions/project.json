@@ -1,6 +1,6 @@
 {
   "description": "Abstractions for test runners to communicate to a tool, such as Visual Studio.",
-  "version": "1.0.0-feature-antares-*",
+  "version": "1.0.0-featantares-*",
   "buildOptions": {
     "warningsAsErrors": true,
     "allowUnsafe": true,
