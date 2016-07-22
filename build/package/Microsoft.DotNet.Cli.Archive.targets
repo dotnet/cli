@@ -4,25 +4,11 @@
   <UsingTask TaskName="ZipFileCreateFromDirectory" AssemblyFile="$(BuildToolsDir)/Microsoft.DotNet.Build.dll"/>
   <UsingTask TaskName="TarGzFileCreateFromDirectory" AssemblyFile="$(CLIBuildDll)" />
 
-  <Target Name="SetupGenerateArchivesInputsOutputs" DependsOnTargets="Init">
-    <PropertyGroup>
-      <ArchiveOutputDirectory>$(PackagesDirectory)</ArchiveOutputDirectory>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <GeneratedArchives Include="$(ArchiveOutputDirectory)/%(LayoutDefinition.NameWithVersion)$(ArchiveExtension)" />
-
-      <GenerateArchivesInputsOutputs Include="%(LayoutDefinition.Name)">
-        <Inputs>%(LayoutDefinition.OutputFiles)</Inputs>
-        <Outputs>$(ArchiveOutputDirectory)/%(LayoutDefinition.NameWithVersion)$(ArchiveExtension)</Outputs>
-        <InputDirectory>$(LayoutDirectory)/%(LayoutDefinition.Name)</InputDirectory>
-        <OutFileName>%(LayoutDefinition.NameWithVersion)</OutFileName>
-      </GenerateArchivesInputsOutputs>
-    </ItemGroup>
-  </Target>
-
   <Target Name="GenerateArchives"
-          DependsOnTargets="Init;Layout;SetupGenerateArchivesInputsOutputs"
+          DependsOnTargets="Init;
+                            Layout;
+                            SetupGenerateArchivesInputsOutputs;
+                            MakePackagesDir;"
           Inputs="%(GenerateArchivesInputsOutputs.Inputs)"
           Outputs="%(GenerateArchivesInputsOutputs.Outputs)">
 
@@ -45,6 +31,28 @@
       <Archives Include="$(GenerateArchivesDestinationArchive)" />
     </ItemGroup>
 
+  </Target>
+
+  <Target Name="SetupGenerateArchivesInputsOutputs" 
+          DependsOnTargets="Init">
+    <PropertyGroup>
+      <ArchiveOutputDirectory>$(PackagesDirectory)</ArchiveOutputDirectory>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <GeneratedArchives Include="$(ArchiveOutputDirectory)/%(LayoutDefinition.NameWithVersion)$(ArchiveExtension)" />
+
+      <GenerateArchivesInputsOutputs Include="%(LayoutDefinition.Name)">
+        <Inputs>%(LayoutDefinition.OutputFiles)</Inputs>
+        <Outputs>$(ArchiveOutputDirectory)/%(LayoutDefinition.NameWithVersion)$(ArchiveExtension)</Outputs>
+        <InputDirectory>$(LayoutDirectory)/%(LayoutDefinition.Name)</InputDirectory>
+        <OutFileName>%(LayoutDefinition.NameWithVersion)</OutFileName>
+      </GenerateArchivesInputsOutputs>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="MakePackagesDir">
+    <MakeDir Directories="$(PackagesDirectory)" />
   </Target>
 
 </Project>
