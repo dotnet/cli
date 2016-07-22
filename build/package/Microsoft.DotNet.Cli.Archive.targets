@@ -13,8 +13,7 @@
           Outputs="%(GenerateArchivesInputsOutputs.Outputs)">
 
     <PropertyGroup>
-      <GenerateArchivesDestinationArchive>$(ArchiveOutputDirectory)/%(GenerateArchivesInputsOutputs.OutFileName).tar.gz</GenerateArchivesDestinationArchive>
-      <GenerateArchivesDestinationArchive Condition=" '$(OSName)' == 'win' ">$(ArchiveOutputDirectory)/%(GenerateArchivesInputsOutputs.OutFileName).zip</GenerateArchivesDestinationArchive>
+      <GenerateArchivesDestinationArchive>$(ArchiveOutputDirectory)/%(GenerateArchivesInputsOutputs.OutFileName)$(ArchiveExtension)</GenerateArchivesDestinationArchive>
     </PropertyGroup>
 
     <ZipFileCreateFromDirectory
@@ -40,8 +39,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <GeneratedArchives Include="$(ArchiveOutputDirectory)/%(LayoutDefinition.NameWithVersion)$(ArchiveExtension)" />
-
       <GenerateArchivesInputsOutputs Include="%(LayoutDefinition.Name)">
         <Inputs>%(LayoutDefinition.OutputFiles)</Inputs>
         <Outputs>$(ArchiveOutputDirectory)/%(LayoutDefinition.NameWithVersion)$(ArchiveExtension)</Outputs>
