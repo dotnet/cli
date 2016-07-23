@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <UsingTask TaskName="GetCurrentRuntimeInformation" AssemblyFile="$(CLIBuildDll)" />
+  <UsingTask TaskName="GetNuGetInformation" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="GenerateBuildVersionInfo" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="SetEnvVar" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="DotNetBuild" AssemblyFile="$(CLIBuildDll)" />
@@ -31,6 +32,11 @@
       <Output TaskParameter="Architecture" PropertyName="Architecture" />
       <Output TaskParameter="OSName" PropertyName="OSName" />
     </GetCurrentRuntimeInformation>
+
+    <!-- NuGet Information -->
+    <GetNuGetInformation>
+      <Output TaskParameter="PackagesDir" PropertyName="NuGetPackagesDir" />
+    </GetNuGetInformation>
 
     <!-- Common Properties -->
     <PropertyGroup>
@@ -90,6 +96,12 @@
 
       <ProductMonikerRid Condition=" '$(Rid)' == 'ubuntu.16.04-x64' Or '$(Rid)' == 'fedora.23-x64' Or '$(Rid)' == 'opensuse.13.2-x64' ">$(Rid)</ProductMonikerRid>
       <ProductMonikerRid Condition=" '$(ProductMonikerRid)' == '' ">$(OSName)-$(Architecture)</ProductMonikerRid>
+
+      <DynamicLibPrefix>lib</DynamicLibPrefix>
+      <DynamicLibPrefix Condition=" '$(OSName)' == 'win' "></DynamicLibPrefix>
+      <DynamicLibExtension>.so</DynamicLibExtension>
+      <DynamicLibExtension Condition=" '$(OSName)' == 'win' ">.dll</DynamicLibExtension>
+      <DynamicLibExtension Condition=" '$(OSName)' == 'osx' ">.dylib</DynamicLibExtension>
 
       <ArtifactNameSdk>dotnet-sdk</ArtifactNameSdk>
       <ArtifactNameSdkDebug>dotnet-sdk-debug</ArtifactNameSdkDebug>

@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="compile/Microsoft.DotNet.Cli.LzmaArchive.targets" />
+  <Import Project="crossgen/Microsoft.DotNet.Cli.Crossgen.targets" />
 
+  <UsingTask TaskName="AddMetadataIsPE" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="FixModeFlags" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="ChangeEntryPointLibraryName" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="RemoveAssetFromDepsPackages" AssemblyFile="$(CLIBuildDll)" />
-  <UsingTask TaskName="CrossgenDirectory" AssemblyFile="$(CLIBuildDll)" />
+  <UsingTask TaskName="Crossgen" AssemblyFile="$(CLIBuildDll)" />
 
   <Target Name="Compile" DependsOnTargets="Prepare;
                                            SetupStage;
@@ -13,7 +15,8 @@
                                            BuildProjectsForNuGetPackages;
                                            GenerateNuGetPackagesArchive" />
 
-  <Target Name="SetupStage">
+  <Target Name="SetupStage"
+          DependsOnTargets="Prepare">
     <PropertyGroup>
       <SrcDirectory>$(RepoRoot)/src</SrcDirectory>
     </PropertyGroup>
@@ -38,6 +41,8 @@
   </Target>
 
   <Target Name="CompileStage"
+          DependsOnTargets="SetupStage;
+                            InitCrossgenProps;"
           Inputs="%(Stage.Inputs)"
           Outputs="%(StageDirectory)/sdk/$(SdkVersion)/dotnet.dll">
       <PropertyGroup>
@@ -63,12 +68,17 @@
       </PropertyGroup>
 
       <ItemGroup>
+        <BinObj Remove="*" />
         <BinObj Include="$(SrcDirectory)/**/bin/**/*" />
         <BinObj Include="$(SrcDirectory)/**/obj/**/*" />
+
+        <FilesToRemoveFromStageDirectory Remove="*" />
         <FilesToRemoveFromStageDirectory Include="$(StageDirectory)/**/*" />
 
+        <SharedFramework Remove="*" />
         <SharedFramework Include="$(SharedFrameworkPublishDirectory)/**/*" />
 
+        <BinariesToRemove Remove="*" />
         <BinariesToRemove Include="csc" />
         <BinariesToRemove Include="vbc" />
       </ItemGroup>
@@ -139,10 +149,37 @@
       <Copy SourceFiles="$(SharedFrameworkNameVersionPath)/$(HostPolicyBaseName)"
             DestinationFiles="$(SdkOutputDirectory)/$(HostPolicyBaseName)" />
 
-      <CrossgenDirectory CoreCLRVersion="$(CoreCLRVersion)"
-                         JitVersion="$(JitVersion)"
-                         SharedFrameworkNameVersionPath="$(SharedFrameworkNameVersionPath)"
-                         SdkOutputDirectory="$(SdkOutputDirectory)" />
+      <!-- Crossgen the Shared Framework -->
+      <ItemGroup>
+        <SdkFiles Remove="*" />
+        <SdkFiles Include="$(SdkOutputDirectory)/**/*" />
+        <SdkFilesWithPEMarker Remove="*" />
+      </ItemGroup>
+
+      <AddMetadataIsPE Items="@(SdkFiles)">
+        <Output TaskParameter="ResultItems" ItemName="SdkFilesWithPEMarker" />
+      </AddMetadataIsPE>
+
+      <ItemGroup>
+        <CrossgenTargets Remove="*" />
+        <CrossgenTargets Include="%(SdkFilesWithPEMarker.FullPath)" Condition=" '%(SdkFilesWithPEMarker.IsPE)' == 'True' " />
+
+        <CompileStageSdkDirectories Remove="*" />
+      </ItemGroup>
+
+      <RemoveDuplicates Inputs="@(SdkFiles->'%(RootDir)%(Directory)')">
+        <Output TaskParameter="Filtered" ItemName="CompileStageSdkDirectories" />
+      </RemoveDuplicates>
+
+      <Crossgen Condition=" '$(DISABLE_CROSSGEN)' != '1' "
+                SourceAssembly="%(CrossgenTargets.FullPath)"
+                DestinationPath="%(CrossgenTargets.FullPath)"
+                JITPath="$(LibCLRJitPath)"
+                CrossgenPath="$(CrossgenPath)"
+                ReadyToRun="True"
+                PlatformAssemblyPaths="@(PlatformAssemblies);
+                                       $(SharedFrameworkNameVersionPath);
+                                       @(CompileStageSdkDirectories)" />
 
       <!-- Generate .version file -->
       <WriteLinesToFile File="$(SdkOutputDirectory)/.version"
