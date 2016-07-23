@@ -24,6 +24,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         private readonly ProjectDescription _rootProject;
         private readonly string _buildBasePath;
         private readonly string _solutionRootPath;
+
         private IEnumerable<LibraryExport> _cachedExports;
 
         public LibraryExporter(ProjectDescription rootProject,
@@ -85,11 +86,9 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         /// </summary>
         private IEnumerable<LibraryExport> ExportLibraries(Func<LibraryDescription, bool> condition)
         {
-            if (_cachedExports == null)
-            {
-                _cachedExports =  GetAllExportsImpl().ToArray();
-            }
-            foreach (var export in _cachedExports)
+            IEnumerable<LibraryExport> exports = _cachedExports ?? (_cachedExports = CalculateAllExports().ToArray());
+
+            foreach (var export in exports)
             {
                 if (!condition(export.Library))
                 {
@@ -99,11 +98,9 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             }
         }
 
-        private IEnumerable<LibraryExport> GetAllExportsImpl()
+        private IEnumerable<LibraryExport> CalculateAllExports()
         {
-            using (PerfTrace.Current.CaptureTiming())
-            {
-                var seenMetadataReferences = new HashSet<string>();
+            var seenMetadataReferences = new HashSet<string>();
 
             // Iterate over libraries in the library manager
             foreach (var library in LibraryManager.GetLibraries())
