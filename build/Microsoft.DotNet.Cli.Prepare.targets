@@ -9,6 +9,7 @@
   <UsingTask TaskName="DotNetRestore" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="DotNetTest" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="DownloadFile" AssemblyFile="$(CLIBuildDll)" />
+  <UsingTask TaskName="TarGzFileExtractToDirectory" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="ZipFileCreateFromDirectory" AssemblyFile="$(BuildToolsDir)/Microsoft.DotNet.Build.Tasks.dll"/>
   <UsingTask TaskName="ZipFileExtractToDirectory" AssemblyFile="$(BuildToolsDir)/Microsoft.DotNet.Build.Tasks.dll"/>
 
@@ -145,14 +146,14 @@
                                Condition="!Exists('$(CombinedSharedHostAndFrameworkArchive)')">
         <Url>$(SharedFrameworkArchiveBlobRootUrl)/$(CombinedFrameworkHostCompressedFileName)</Url>
         <DownloadFileName>$(CombinedSharedHostAndFrameworkArchive)</DownloadFileName>
-        <ExtractDestintation>$(SharedFrameworkPublishDirectory)</ExtractDestintation>
+        <ExtractDestination>$(SharedFrameworkPublishDirectory)</ExtractDestination>
       </_DownloadAndExtractItem>
 
       <_DownloadAndExtractItem Include="DownloadedSharedFrameworkInstallerFile"
                                Condition="!Exists('$(DownloadedSharedFrameworkInstallerFile)') And '$(InstallerExtension)' != ''">
         <Url>$(CoreSetupInstallerBlobRootUrl)/$(SharedFrameworkVersion)/$(DownloadedSharedFrameworkInstallerFileName)</Url>
         <DownloadFileName>$(DownloadedSharedFrameworkInstallerFile)</DownloadFileName>
-        <ExtractDestintation></ExtractDestintation>
+        <ExtractDestination></ExtractDestination>
       </_DownloadAndExtractItem>
 
       <_DownloadAndExtractItem Include="DownloadedSharedHostInstallerFile"
@@ -178,9 +179,14 @@
                   Uri="%(_DownloadAndExtractItem.Url)"
                   DestinationPath="%(_DownloadAndExtractItem.DownloadFileName)" />
 
-    <ZipFileExtractToDirectory Condition=" '%(_DownloadAndExtractItem.ExtractDestintation)' != '' "
+    <ZipFileExtractToDirectory Condition=" '%(_DownloadAndExtractItem.ExtractDestination)' != '' AND '$(OSName)' == 'win' "
                                SourceArchive="%(_DownloadAndExtractItem.DownloadFileName)"
-                               DestinationDirectory="%(_DownloadAndExtractItem.ExtractDestintation)"
+                               DestinationDirectory="%(_DownloadAndExtractItem.ExtractDestination)"
+                               OverwriteDestination="True" />
+
+    <TarGzFileExtractToDirectory Condition=" '%(_DownloadAndExtractItem.ExtractDestination)' != '' AND '$(OSName)' != 'win' "
+                               SourceArchive="%(_DownloadAndExtractItem.DownloadFileName)"
+                               DestinationDirectory="%(_DownloadAndExtractItem.ExtractDestination)"
                                OverwriteDestination="True" />
   </Target>
 
