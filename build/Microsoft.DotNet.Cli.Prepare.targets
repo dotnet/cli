@@ -9,8 +9,8 @@
   <UsingTask TaskName="DotNetRestore" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="DotNetTest" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="DownloadFile" AssemblyFile="$(CLIBuildDll)" />
-  <UsingTask TaskName="ExtractArchive" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="ZipFileCreateFromDirectory" AssemblyFile="$(BuildToolsDir)/Microsoft.DotNet.Build.Tasks.dll"/>
+  <UsingTask TaskName="ZipFileExtractToDirectory" AssemblyFile="$(BuildToolsDir)/Microsoft.DotNet.Build.Tasks.dll"/>
 
   <Import Project="prepare/CheckPrereqs.targets" />
 
@@ -178,9 +178,10 @@
                   Uri="%(_DownloadAndExtractItem.Url)"
                   DestinationPath="%(_DownloadAndExtractItem.DownloadFileName)" />
 
-    <ExtractArchive Condition=" '%(_DownloadAndExtractItem.ExtractDestintation)' != '' "
-                    InputFile="%(_DownloadAndExtractItem.DownloadFileName)"
-                    DestinationDirectory="%(_DownloadAndExtractItem.ExtractDestintation)" />
+    <ZipFileExtractToDirectory Condition=" '%(_DownloadAndExtractItem.ExtractDestintation)' != '' "
+                               SourceArchive="%(_DownloadAndExtractItem.DownloadFileName)"
+                               DestinationDirectory="%(_DownloadAndExtractItem.ExtractDestintation)"
+                               OverwriteDestination="True" />
   </Target>
 
   <Target Name="RestorePackages"
