@@ -21,7 +21,7 @@
   <UsingTask TaskName="ReplaceFileContents" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="SetBlobPropertiesBasedOnFileType" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="SetEnvVar" AssemblyFile="$(CLIBuildDll)" />
-  <UsingTask TaskName="TarGzFileCreateFromDirectory" AssemblyFile="$(CLIBuildDll)" />
+  <UsingTask TaskName="TarGzFileCreateFromDirectory" AssemblyFile="$(BuildToolsDir)/Microsoft.DotNet.Build.Tasks.dll" />
   <UsingTask TaskName="TarGzFileExtractToDirectory" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="UploadToAzure" AssemblyFile="$(BuildToolsTaskDir)/Microsoft.DotNet.Build.CloudTestTasks.dll"/>
   <UsingTask TaskName="ZipFileCreateFromDirectory" AssemblyFile="$(BuildToolsDir)/Microsoft.DotNet.Build.Tasks.dll"/>
