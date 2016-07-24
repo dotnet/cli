@@ -4,7 +4,7 @@
   <Import Project="crossgen/Microsoft.DotNet.Cli.Crossgen.targets" />
 
   <UsingTask TaskName="AddMetadataIsPE" AssemblyFile="$(CLIBuildDll)" />
-  <UsingTask TaskName="FixModeFlags" AssemblyFile="$(CLIBuildDll)" />
+  <UsingTask TaskName="ChMod" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="ChangeEntryPointLibraryName" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="RemoveAssetFromDepsPackages" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="Crossgen" AssemblyFile="$(CLIBuildDll)" />
@@ -102,7 +102,29 @@
                      $(SrcDirectory)/dotnet" />
 
       <!-- Corehostify Binaries -->
-      <FixModeFlags Dir="$(SdkOutputDirectory)" />
+      <ItemGroup Condition=" '$(OSName)' != 'win' ">
+        <SdkOutputChModTargets Remove="*" />
+        <SdkOutputChModTargets Include="$(SdkOutputDirectory)/**/*.exe;
+                                      $(SdkOutputDirectory)/**/*.dll" >
+          <!-- Managed assemblies do not need execute -->
+          <Mode>u=rw,g=r,o=r</Mode>
+        </SdkOutputChModTargets>
+
+        <SdkOutputChModTargets Include="$(SdkOutputDirectory)/**/*.dylib;
+                                      $(SdkOutputDirectory)/**/*.so" >
+          <!-- Generally, dylibs and sos have 'x' -->
+          <Mode>u=rwx,g=rx,o=rx</Mode>
+        </SdkOutputChModTargets>
+
+        <SdkOutputChModTargets Include="$(SdkOutputDirectory)/**/*"
+                             Exclude="$(SdkOutputDirectory)/**/*.*" >
+          <!-- Executables need x -->
+          <Mode>u=rwx,g=rx,o=rx</Mode>
+        </SdkOutputChModTargets>
+      </ItemGroup>
+
+      <ChMod File="%(SdkOutputChModTargets.FullPath)"
+             Mode="%(SdkOutputChModTargets.Mode)" />
 
       <Exec Command="%(Stage.DotnetExe) publish
                      --output $(SdkOutputDirectory)
