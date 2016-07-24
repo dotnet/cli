@@ -32,8 +32,8 @@
     <ExeExtension>.exe</ExeExtension>
     <ExeExtension Condition=" '$(OS)' != 'Windows_NT' "></ExeExtension>
 
-    <Stage0Path>$(RepoRoot)/.dotnet_stage0/$(Architecture)</Stage0Path>
-    <DotnetStage0>$(Stage0Path)/dotnet$(ExeExtension)</DotnetStage0>
+    <Stage0Directory>$(RepoRoot)/.dotnet_stage0/$(Architecture)</Stage0Directory>
+    <DotnetStage0>$(Stage0Directory)/dotnet$(ExeExtension)</DotnetStage0>
 
     <DotnetCliBuildDirectory>$(RepoRoot)/build_projects/dotnet-cli-build</DotnetCliBuildDirectory>
   </PropertyGroup>
@@ -57,7 +57,7 @@
                             RestoreDotnetCliBuildFramework">
 
     <ItemGroup>
-      <DotnetSdkDirectories Include="$([System.IO.Directory]::GetDirectories(&quot;$(Stage0Path)/sdk&quot;))" />
+      <DotnetSdkDirectories Include="$([System.IO.Directory]::GetDirectories(&quot;$(Stage0Directory)/sdk&quot;))" />
       <AzureStorageToCopy Include="@(DotnetSdkDirectories)">
         <Source>$(DotnetCliBuildDirectory)/bin/Microsoft.WindowsAzure.Storage.dll</Source>
         <Destination>%(Identity)/Microsoft.WindowsAzure.Storage.dll</Destination>

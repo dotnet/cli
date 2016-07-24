@@ -3,12 +3,6 @@
   <Import Project="compile/Microsoft.DotNet.Cli.LzmaArchive.targets" />
   <Import Project="crossgen/Microsoft.DotNet.Cli.Crossgen.targets" />
 
-  <UsingTask TaskName="AddMetadataIsPE" AssemblyFile="$(CLIBuildDll)" />
-  <UsingTask TaskName="ChMod" AssemblyFile="$(CLIBuildDll)" />
-  <UsingTask TaskName="ChangeEntryPointLibraryName" AssemblyFile="$(CLIBuildDll)" />
-  <UsingTask TaskName="RemoveAssetFromDepsPackages" AssemblyFile="$(CLIBuildDll)" />
-  <UsingTask TaskName="Crossgen" AssemblyFile="$(CLIBuildDll)" />
-
   <Target Name="Compile" DependsOnTargets="Prepare;
                                            SetupStage;
                                            CompileStage;
@@ -29,13 +23,13 @@
         <Inputs>@(CompileStageInputs)</Inputs>
         <StageDirectory>$(Stage1Directory)</StageDirectory>
         <StageSymbolsDirectory>$(Stage1SymbolsDirectory)</StageSymbolsDirectory>
-        <DotnetExe>$(DotnetStage0)</DotnetExe>
+        <DotnetDir>$(Stage0Directory)</DotnetDir>
       </Stage>
       <Stage Include="Stage2">
         <Inputs>@(CompileStageInputs)</Inputs>
         <StageDirectory>$(Stage2Directory)</StageDirectory>
         <StageSymbolsDirectory>$(Stage2SymbolsDirectory)</StageSymbolsDirectory>
-        <DotnetExe>$(DotnetStage1)</DotnetExe>
+        <DotnetDir>$(Stage1Directory)</DotnetDir>
       </Stage>
     </ItemGroup>
   </Target>
@@ -94,12 +88,12 @@
             DestinationFiles="@(SharedFramework->'$(StageDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
 
       <!-- Publish DotNet -->
-      <Exec Command="%(Stage.DotnetExe) publish
-                     --native-subdirectory
-                     --output $(SdkOutputDirectory)
-                     --configuration $(Configuration)
-                     --version-suffix $(CommitCount)
-                     $(SrcDirectory)/dotnet" />
+      <DotNetPublish ToolPath="%(Stage.DotnetDir)"
+                     NativeSubdirectory="True"
+                     Output="$(SdkOutputDirectory)"
+                     Configuration="$(Configuration)"
+                     VersionSuffix="$(CommitCount)"
+                     ProjectPath="$(SrcDirectory)/dotnet" />
 
       <!-- Corehostify Binaries -->
       <ItemGroup Condition=" '$(OSName)' != 'win' ">
@@ -126,10 +120,10 @@
       <ChMod File="%(SdkOutputChModTargets.FullPath)"
              Mode="%(SdkOutputChModTargets.Mode)" />
 
-      <Exec Command="%(Stage.DotnetExe) publish
-                     --output $(SdkOutputDirectory)
-                     --framework netcoreapp1.0
-                     $(SrcDirectory)/compilers" />
+      <DotNetPublish ToolPath="%(Stage.DotnetDir)"
+                     Output="$(SdkOutputDirectory)"
+                     Framework="netcoreapp1.0"
+                     ProjectPath="$(SrcDirectory)/compilers" />
 
       <Copy SourceFiles="$(BinaryToCorehostifyOutDir)/csc.exe"
             DestinationFiles="$(SdkOutputDirectory)/csc.dll" />
