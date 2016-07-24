@@ -4,8 +4,6 @@ using System;
 
 using Microsoft.DotNet.Cli.Build.Framework;
 
-using static Microsoft.DotNet.Cli.Build.Framework.BuildHelpers;
-
 namespace Microsoft.DotNet.Cli.Build
 {
     public static class FS

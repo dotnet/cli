@@ -48,11 +48,14 @@
       <SharedFrameworkPublishDirectory>$(IntermediateDirectory)/sharedFrameworkPublish</SharedFrameworkPublishDirectory>
     </PropertyGroup>
 
+    <GetCommitHash RepoRoot="$(RepoRoot)">
+      <Output TaskParameter="CommitHash" PropertyName="CommitHash" />
+    </GetCommitHash>
+
     <GenerateBuildVersionInfo RepoRoot="$(RepoRoot)">
       <Output TaskParameter="VersionMajor" PropertyName="VersionMajor" />
       <Output TaskParameter="VersionMinor" PropertyName="VersionMinor" />
       <Output TaskParameter="VersionPatch" PropertyName="VersionPatch" />
-      <Output TaskParameter="CommitHash" PropertyName="CommitHash" />
       <Output TaskParameter="CommitCount" PropertyName="CommitCount" />
       <Output TaskParameter="ReleaseSuffix" PropertyName="ReleaseSuffix" />
       <Output TaskParameter="VersionSuffix" PropertyName="VersionSuffix" />
