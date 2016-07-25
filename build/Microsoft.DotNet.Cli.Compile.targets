@@ -117,7 +117,8 @@
         </SdkOutputChModTargets>
       </ItemGroup>
 
-      <ChMod File="%(SdkOutputChModTargets.FullPath)"
+      <ChMod Condition=" '$(OSName)' != 'win' "
+             File="%(SdkOutputChModTargets.FullPath)"
              Mode="%(SdkOutputChModTargets.Mode)" />
 
       <DotNetPublish ToolPath="%(Stage.DotnetDir)"
