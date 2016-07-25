@@ -78,9 +78,9 @@
             Condition=" '$(OS)' == 'Windows_NT' ">
         <MakeDir Directories="$(PackagingBuildBasePath)" />
 
-        <DotNetBuild ToolPath="$(DotnetStage2)"
+        <DotNetBuild ToolPath="$(Stage2Directory)"
                      BuildBasePath="$(PackagingBuildBasePath)"
                      Configuration="$(Configuration)"
-                     Project="%(ProjectsToPack.Identity)" />
+                     ProjectPath="%(ProjectsToPack.Identity)" />
   </Target>
 </Project>
