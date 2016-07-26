@@ -16,7 +16,6 @@
   <UsingTask TaskName="GenerateGuidFromName" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="GetCommitHash" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="GetCurrentRuntimeInformation" AssemblyFile="$(CLIBuildDll)" />
-  <UsingTask TaskName="GetNuGetInformation" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="MakeRelative" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="RemoveAssetFromDepsPackages" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="ReplaceFileContents" AssemblyFile="$(CLIBuildDll)" />

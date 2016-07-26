@@ -23,10 +23,11 @@
     </GetCurrentRuntimeInformation>
 
     <!-- NuGet Information -->
-    <GetNuGetInformation>
-      <Output TaskParameter="PackagesDir" PropertyName="NuGetPackagesDir" />
-    </GetNuGetInformation>
-
+    <PropertyGroup>
+      <NuGetPackagesDir>$(NUGET_PACKAGES)</NuGetPackagesDir>
+      <NuGetPackagesDir Condition=" '$(NuGetPackagesDir)' == '' ">$(RepoRoot)/.nuget/packages</NuGetPackagesDir>
+    </PropertyGroup>
+    
     <!-- Common Properties -->
     <PropertyGroup>
       <IsDesktopAvailable>False</IsDesktopAvailable>

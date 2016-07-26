@@ -3,6 +3,10 @@
   <Import Project="compile/Microsoft.DotNet.Cli.LzmaArchive.targets" />
   <Import Project="crossgen/Microsoft.DotNet.Cli.Crossgen.targets" />
 
+  <ItemGroup>
+    <PublishOutputExtensions Include="$(ExeExtension);.dll;.pdb;.deps.json;.runtimeconfig.json" />
+  </ItemGroup>
+
   <Target Name="Compile" DependsOnTargets="Prepare;
                                            SetupStage;
                                            CompileStage;
@@ -97,27 +101,27 @@
 
       <!-- Corehostify Binaries -->
       <ItemGroup Condition=" '$(OSName)' != 'win' ">
-        <SdkOutputChModTargets Remove="*" />
-        <SdkOutputChModTargets Include="$(SdkOutputDirectory)/**/*.exe;
+        <SdkOutputChmodTargets Remove="*" />
+        <SdkOutputChmodTargets Include="$(SdkOutputDirectory)/**/*.exe;
                                       $(SdkOutputDirectory)/**/*.dll" >
           <!-- Managed assemblies do not need execute -->
           <Mode>u=rw,g=r,o=r</Mode>
-        </SdkOutputChModTargets>
+        </SdkOutputChmodTargets>
 
-        <SdkOutputChModTargets Include="$(SdkOutputDirectory)/**/*.dylib;
+        <SdkOutputChmodTargets Include="$(SdkOutputDirectory)/**/*.dylib;
                                       $(SdkOutputDirectory)/**/*.so" >
           <!-- Generally, dylibs and sos have 'x' -->
           <Mode>u=rwx,g=rx,o=rx</Mode>
-        </SdkOutputChModTargets>
+        </SdkOutputChmodTargets>
 
-        <SdkOutputChModTargets Include="$(SdkOutputDirectory)/**/*"
+        <SdkOutputChmodTargets Include="$(SdkOutputDirectory)/**/*"
                              Exclude="$(SdkOutputDirectory)/**/*.*" >
           <!-- Executables need x -->
           <Mode>u=rwx,g=rx,o=rx</Mode>
-        </SdkOutputChModTargets>
+        </SdkOutputChmodTargets>
       </ItemGroup>
 
-      <ChMod Condition=" '$(OSName)' != 'win' "
+      <Chmod Condition=" '$(OSName)' != 'win' "
              File="%(SdkOutputChModTargets.FullPath)"
              Mode="%(SdkOutputChModTargets.Mode)" />
 
@@ -150,11 +154,7 @@
                                    AssetPath="$(BinaryToCorehostifyRelDir)/%(BinariesToRemove.Identity).exe" />
 
       <!-- cleanup compilers project output we don't need -->
-      <Delete Files="$(SdkOutputDirectory)/compilers$(ExeExtension)" />
-      <Delete Files="$(SdkOutputDirectory)/compilers.dll" />
-      <Delete Files="$(SdkOutputDirectory)/compilers.pdb" />
-      <Delete Files="$(SdkOutputDirectory)/compilers.runtimeconfig.json" />
-      <Delete Files="$(SdkOutputDirectory)/compilers.deps.json" />
+      <Delete Files="$(SdkOutputDirectory)/compilers%(PublishOutputExtensions.Identity)" />
 
       <!-- Copy Host to SDK Directory -->
       <Copy SourceFiles="$(SharedFrameworkNameVersionPath)/$(DotnetHostBaseName)"

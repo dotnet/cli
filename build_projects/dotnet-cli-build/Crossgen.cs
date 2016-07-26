@@ -34,7 +34,7 @@ namespace Microsoft.DotNet.Build.Tasks
 
             if (!File.Exists(SourceAssembly))
             {
-                Log.LogError($"SourceAssembly '{SourceAssembly} does not exist.");
+                Log.LogError($"SourceAssembly '{SourceAssembly}' does not exist.");
 
                 return false;
             }

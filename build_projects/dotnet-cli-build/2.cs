@@ -6,7 +6,7 @@ using Microsoft.Build.Utilities;
 
 namespace Microsoft.DotNet.Cli.Build
 {
-    public class ChMod : ToolTask
+    public class Chmod : ToolTask
     {
         [Required]
         public string File { get; set; }

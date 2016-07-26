@@ -13,11 +13,5 @@ namespace Microsoft.DotNet.Cli.Build
             "artifacts",
             RuntimeEnvironment.GetRuntimeIdentifier());
         public static readonly string Packages = Path.Combine(Output, "packages");
-        public static string NuGetPackages = Environment.GetEnvironmentVariable("NUGET_PACKAGES") ?? GetNuGetPackagesDir();
-
-        private static string GetNuGetPackagesDir()
-        {
-            return Path.Combine(Dirs.RepoRoot, ".nuget", "packages");
-        }
     }
 }
