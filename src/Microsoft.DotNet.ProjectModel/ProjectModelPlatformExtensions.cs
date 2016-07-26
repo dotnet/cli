@@ -2,7 +2,6 @@
 using System.Linq;
 using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Graph;
-using Microsoft.DotNet.Cli.Utils;
 using System;
 
 namespace Microsoft.DotNet.ProjectModel
