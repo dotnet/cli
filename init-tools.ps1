@@ -25,7 +25,6 @@ $BUILD_TOOLS_VERSION = Get-Content "$RepoRoot\BuildToolsVersion.txt"
 $BUILD_TOOLS_PATH=$RepoRoot + "\build_tools"
 $BUILD_TOOLS_SOURCE='https://dotnet.myget.org/F/dotnet-buildtools/api/v3/index.json'
 $BUILD_TOOLS_SEMAPHORE=$BUILD_TOOLS_PATH + "\init-tools.completed"
-$INIT_TOOLS_LOG=$RepoRoot + "\init-tools.log"
 $PROJECT_JSON_FILE=$BUILD_TOOLS_PATH + "\project.json"
 $PROJECT_JSON_CONTENTS="{ `"dependencies`": { `"Microsoft.DotNet.BuildTools`": `"" + $BUILD_TOOLS_VERSION + "`" }, `"frameworks`": { `"netcoreapp1.0`": { } } }"
 $PACKAGES_DIR=$RepoRoot + "\.nuget\packages"
@@ -50,10 +49,10 @@ if (!(Test-Path "$BUILD_TOOLS_PATH"))
 
 # Restore build tools
 $args="restore $PROJECT_JSON_FILE --packages $PACKAGES_DIR --source $BUILD_TOOLS_SOURCE"
-Start-Process -FilePath $DOTNET_EXE_CMD -ArgumentList $args -Wait -RedirectStandardOutput $INIT_TOOLS_LOG -NoNewWindow
+Start-Process -FilePath $DOTNET_EXE_CMD -ArgumentList $args -Wait -NoNewWindow
 if (!(Test-Path "$BUILD_TOOLS_PACKAGE_PATH\init-tools.cmd"))
 {
-    Write-Host "ERROR: Could not restore build tools correctly. See '$INIT_TOOLS_LOG' for more details"
+    Write-Host "ERROR: Could not restore build tools correctly."
     exit 1
 }
 
@@ -77,6 +76,6 @@ if (!(Test-Path "$DOTNET_LOCAL_PATH"))
 }
 
 # Initialize build tools
-cmd /c "$BUILD_TOOLS_PACKAGE_PATH\init-tools.cmd $RepoRoot $env:DOTNET_INSTALL_DIR\dotnet.exe $BUILD_TOOLS_PATH" >> "$INIT_TOOLS_LOG"
+cmd /c "$BUILD_TOOLS_PACKAGE_PATH\init-tools.cmd $RepoRoot $env:DOTNET_INSTALL_DIR\dotnet.exe $BUILD_TOOLS_PATH"
 Write-Host "Done initializing tools."
 Write-Host "Init-Tools completed for BuildTools Version: $BUILD_TOOLS_VERSION" > $BUILD_TOOLS_SEMAPHORE

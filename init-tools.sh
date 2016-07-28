@@ -16,13 +16,12 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 $DIR/scripts/obtain/dotnet-install.sh --channel $CHANNEL --verbose
 
-__init_tools_log=$DIR/init-tools.log
 __BUILD_TOOLS_CLI_VERSION=$(cat "$DIR/BuildToolsCliVersion.txt")
 __BUILD_TOOLS_DIR=$DIR/build_tools
 __BUILD_TOOLS_CLI_DIR=$__BUILD_TOOLS_DIR/dotnetcli/
 __BUILD_TOOLS_SOURCE=https://dotnet.myget.org/F/dotnet-buildtools/api/v3/index.json
 __BUILD_TOOLS_PACKAGE_VERSION=$(cat $DIR/BuildToolsVersion.txt)
-__BUILD_TOOLS_PATH=$NUGET_PACKAGES/Microsoft.DotNet.BuildTools/$__BUILD_TOOLS_PACKAGE_VERSION/lib
+__BUILD_TOOLS_PATH=$NUGET_PACKAGES/microsoft.dotnet.buildtools/$__BUILD_TOOLS_PACKAGE_VERSION/lib
 __BUILD_TOOLS_SEMAPHORE=$__BUILD_TOOLS_DIR/init-tools.completed
 __DOTNET_CMD=$DOTNET_INSTALL_DIR/dotnet
 __PROJECT_JSON_PATH=$__BUILD_TOOLS_DIR/$__BUILD_TOOLS_PACKAGE_VERSION
@@ -37,8 +36,7 @@ if [ ! -e "$__PROJECT_JSON_FILE" ]; then
     echo "Restoring build tools version $__BUILD_TOOLS_PACKAGE_VERSION..."
     "$__DOTNET_CMD" restore "$__PROJECT_JSON_FILE" --packages "$NUGET_PACKAGES" --source "$__BUILD_TOOLS_SOURCE"
 
-    if [ ! -e "$__BUILD_TOOLS_PATH/init-tools.sh" ]; then echo "ERROR: Could not restore build tools correctly. See '$__init_tools_log' for more details."; fi
-    find .  
+    if [ ! -e "$__BUILD_TOOLS_PATH/init-tools.sh" ]; then echo "ERROR: Could not restore build tools correctly."; fi
   fi
 
   if [ ! -d "$__BUILD_TOOLS_CLI_DIR" ]; then
@@ -47,7 +45,7 @@ if [ ! -e "$__PROJECT_JSON_FILE" ]; then
   fi
 
   echo "Initializing build tools..."
-  "$__BUILD_TOOLS_PATH/init-tools.sh" "$DIR" "$__DOTNET_CMD" "$__BUILD_TOOLS_DIR" >> "$__init_tools_log" 2>&1
+  "$__BUILD_TOOLS_PATH/init-tools.sh" "$DIR" "$__DOTNET_CMD" "$__BUILD_TOOLS_DIR"
   echo "Init-Tools completed for BuildTools Version: $__BUILD_TOOLS_PACKAGE_VERSION" > "$__BUILD_TOOLS_SEMAPHORE"
   echo "Done initializing tools"
 else
