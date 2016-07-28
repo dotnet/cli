@@ -22,7 +22,7 @@ __BUILD_TOOLS_DIR=$DIR/build_tools
 __BUILD_TOOLS_CLI_DIR=$__BUILD_TOOLS_DIR/dotnetcli/
 __BUILD_TOOLS_SOURCE=https://dotnet.myget.org/F/dotnet-buildtools/api/v3/index.json
 __BUILD_TOOLS_PACKAGE_VERSION=$(cat $DIR/BuildToolsVersion.txt)
-__BUILD_TOOLS_PATH=$NUGET_PACKAGES/Microsoft.DotNet.BuildTools/$__BUILD_TOOLS_PACKAGE_VERSION/lib
+__BUILD_TOOLS_PATH=$NUGET_PACKAGES/microsoft.dotnet.buildtools/$__BUILD_TOOLS_PACKAGE_VERSION/lib
 __BUILD_TOOLS_SEMAPHORE=$__BUILD_TOOLS_DIR/init-tools.completed
 __DOTNET_CMD=$DOTNET_INSTALL_DIR/dotnet
 __PROJECT_JSON_PATH=$__BUILD_TOOLS_DIR/$__BUILD_TOOLS_PACKAGE_VERSION
@@ -38,7 +38,6 @@ if [ ! -e "$__PROJECT_JSON_FILE" ]; then
     "$__DOTNET_CMD" restore "$__PROJECT_JSON_FILE" --packages "$NUGET_PACKAGES" --source "$__BUILD_TOOLS_SOURCE"
 
     if [ ! -e "$__BUILD_TOOLS_PATH/init-tools.sh" ]; then echo "ERROR: Could not restore build tools correctly. See '$__init_tools_log' for more details."; fi
-    find .  
   fi
 
   if [ ! -d "$__BUILD_TOOLS_CLI_DIR" ]; then
