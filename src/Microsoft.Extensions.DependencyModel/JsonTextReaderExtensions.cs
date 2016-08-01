@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.Extensions.DependencyModel.Internal
+namespace Microsoft.Extensions.DependencyModel
 {
     internal static class JsonTextReaderExtensions
     {
@@ -10,7 +10,6 @@ namespace Microsoft.Extensions.DependencyModel.Internal
         {
             name = null;
             value = null;
-
             if (reader.Read() && reader.TokenType == JsonToken.PropertyName)
             {
                 name = (string)reader.Value;
@@ -21,95 +20,55 @@ namespace Microsoft.Extensions.DependencyModel.Internal
             return false;
         }
 
-
-
         internal static void ReadStartObject(this JsonTextReader reader)
         {
             reader.Read();
             CheckStartObject(reader);
         }
 
-
-
         internal static void CheckStartObject(this JsonTextReader reader)
         {
             if (reader.TokenType != JsonToken.StartObject)
             {
-                throw new FormatException($"Excepted '{{' line {reader.LineNumber}");
+                throw CreateUnexpectedException(reader, "{");
             }
         }
-
 
         internal static void CheckEndObject(this JsonTextReader reader)
         {
             if (reader.TokenType != JsonToken.EndObject)
             {
-                throw new FormatException($"Excepted '}}' line {reader.LineNumber}");
+                throw CreateUnexpectedException(reader, "}");
             }
         }
-
-
 
         internal static string[] ReadStringArray(this JsonTextReader reader)
         {
             reader.Read();
             if (reader.TokenType != JsonToken.StartArray)
             {
-                throw new FormatException($"Excepted '[' line {reader.LineNumber}");
+                throw CreateUnexpectedException(reader,"[");
             }
 
-            var l = new List<string>();
+            var items = new List<string>();
 
             while (reader.Read() && reader.TokenType == JsonToken.String)
             {
-                l.Add((string)reader.Value);
+                items.Add((string)reader.Value);
             }
 
             if (reader.TokenType != JsonToken.EndArray)
             {
-                throw new FormatException($"Excepted ']' line {reader.LineNumber}");
+                throw CreateUnexpectedException(reader, "]");
             }
 
-            return l.ToArray();
+            return items.ToArray();
         }
 
-
-
-        internal static Dictionary<string, string> ReadStringDictionary(this JsonTextReader reader)
+        internal static Exception CreateUnexpectedException(JsonTextReader reader, string expected)
         {
-            reader.ReadStartObject();
-
-            Dictionary<string, string> d = null;
-
-            string name = null;
-            string value = null;
-            while (reader.TryReadStringProperty(out name, out value))
-            {
-                if (d == null)
-                {
-                    d = new Dictionary<string, string>();
-                }
-                d.Add(name, value);
-            }
-
-            CheckEndObject(reader);
-
-            return d;
-        }
-
-
-
-        internal static void IgnoreStringDictionary(this JsonTextReader reader)
-        {
-            reader.ReadStartObject();
-
-            string name = null;
-            string value = null;
-            while (reader.TryReadStringProperty(out name, out value))
-            {
-            }
-
-            CheckEndObject(reader);
+            return new FormatException($"Unexpected character encountered, excepted '{expected}' " +
+                                       $"at line {reader.LineNumber} position {reader.LinePosition} path {reader.Path}");
         }
     }
 }

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
-using Microsoft.Extensions.DependencyModel.Internal;
 
 namespace Microsoft.Extensions.DependencyModel
 {
@@ -14,10 +13,21 @@ namespace Microsoft.Extensions.DependencyModel
     {
         private readonly IDictionary<string, string> _stringPool = new Dictionary<string, string>();
 
-        public DependencyContextJsonReader()
+        public DependencyContext Read(Stream stream)
         {
-        }
+            if (stream == null)
+            {
+                throw new ArgumentNullException(nameof(stream));
+            }
 
+            using (var streamReader = new StreamReader(stream))
+            {
+                using (var reader = new JsonTextReader(streamReader))
+                {
+                    return Read(reader);
+                }
+            }
+        }
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
@@ -31,23 +41,7 @@ namespace Microsoft.Extensions.DependencyModel
             Dispose(true);
         }
 
-        public DependencyContext Read(Stream stream)
-        {
-            if (stream == null)
-            {
-                throw new ArgumentNullException(nameof(stream));
-            }
-
-            using (var streamReader = new StreamReader(stream))
-            {
-                using (var reader = new JsonTextReader(streamReader))
-                {
-                    return ReadRoot(reader);
-                }
-            }
-        }
-
-        private DependencyContext ReadRoot(JsonTextReader reader)
+        private DependencyContext Read(JsonTextReader reader)
         {
             var runtime = string.Empty;
             var framework = string.Empty;
@@ -90,7 +84,7 @@ namespace Microsoft.Extensions.DependencyModel
                 compilationOptions = CompilationOptions.Default;
             }
 
-            Target runtimeTarget = SearchRightTarget(targets, runtimeTargetName);
+            Target runtimeTarget = SelectRuntimeTarget(targets, runtimeTargetName);
             runtimeTargetName = runtimeTarget?.Name;
 
             if (runtimeTargetName != null)
@@ -129,14 +123,14 @@ namespace Microsoft.Extensions.DependencyModel
             return new DependencyContext(
                 new TargetInfo(framework, runtime, runtimeSignature, isPortable),
                 compilationOptions,
-                CreateLibraries(compileTarget.Libraries, false, libraryStubs).Cast<CompilationLibrary>().ToArray(),
+                CreateLibraries(compileTarget?.Libraries, false, libraryStubs).Cast<CompilationLibrary>().ToArray(),
                 CreateLibraries(runtimeTarget.Libraries, true, libraryStubs).Cast<RuntimeLibrary>().ToArray(),
                 runtimeFallbacks ?? Enumerable.Empty<RuntimeFallbacks>());
         }
 
-        private Target SearchRightTarget(List<Target> targets, string runtimeTargetName)
+        private Target SelectRuntimeTarget(List<Target> targets, string runtimeTargetName)
         {
-            Target target = null;
+            Target target;
 
             if (targets == null || targets.Count == 0)
             {
@@ -219,7 +213,6 @@ namespace Microsoft.Extensions.DependencyModel
 
             while (reader.Read() && reader.TokenType == JsonToken.PropertyName)
             {
-                var propertyName = (string)reader.Value;
                 switch ((string)reader.Value)
                 {
                     case DependencyContextStrings.DefinesPropertyName:
@@ -265,7 +258,8 @@ namespace Microsoft.Extensions.DependencyModel
 
             reader.CheckEndObject();
 
-            return new CompilationOptions(defines,
+            return new CompilationOptions(
+                defines ?? Enumerable.Empty<string>(),
                 languageVersion,
                 platform,
                 allowUnsafe,
@@ -287,7 +281,7 @@ namespace Microsoft.Extensions.DependencyModel
 
             while (reader.Read() && reader.TokenType == JsonToken.PropertyName)
             {
-                targets.Add(ReadOneTarget(reader, (string)reader.Value));
+                targets.Add(ReadTarget(reader, (string)reader.Value));
             }
 
             reader.CheckEndObject();
@@ -295,7 +289,7 @@ namespace Microsoft.Extensions.DependencyModel
             return targets;
         }
 
-        private Target ReadOneTarget(JsonTextReader reader, string targetName)
+        private Target ReadTarget(JsonTextReader reader, string targetName)
         {
             reader.ReadStartObject();
 
@@ -303,8 +297,6 @@ namespace Microsoft.Extensions.DependencyModel
 
             while (reader.Read() && reader.TokenType == JsonToken.PropertyName)
             {
-                var targetLibraryName = (string)reader.Value;
-
                 libraries.Add(ReadTargetLibrary(reader, (string)reader.Value));
             }
 
@@ -337,13 +329,13 @@ namespace Microsoft.Extensions.DependencyModel
                         dependencies = ReadTargetLibraryDependencies(reader);
                         break;
                     case DependencyContextStrings.RuntimeAssembliesKey:
-                        runtimes = ReadTargetLibraryRuntime(reader);
+                        runtimes = ReadPropertyNames(reader);
                         break;
                     case DependencyContextStrings.NativeLibrariesKey:
-                        natives = ReadTargetLibraryNative(reader);
+                        natives = ReadPropertyNames(reader);
                         break;
                     case DependencyContextStrings.CompileTimeAssembliesKey:
-                        compilations = ReadTargetLibraryCompilation(reader);
+                        compilations = ReadPropertyNames(reader);
                         break;
                     case DependencyContextStrings.RuntimeTargetsPropertyName:
                         runtimeTargets = ReadTargetLibraryRuntimeTargets(reader);
@@ -378,27 +370,23 @@ namespace Microsoft.Extensions.DependencyModel
 
         public IEnumerable<Dependency> ReadTargetLibraryDependencies(JsonTextReader reader)
         {
+            var dependencies = new List<Dependency>();
+            string name;
+            string version;
+
             reader.ReadStartObject();
 
-            var l = new List<Dependency>();
-
-            string name = null;
-            string version = null;
             while (reader.TryReadStringProperty(out name, out version))
             {
-                if (l == null)
-                {
-                    l = new List<Dependency>();
-                }
-                l.Add(new Dependency(Pool(name), Pool(version)));
+                dependencies.Add(new Dependency(Pool(name), Pool(version)));
             }
 
             reader.CheckEndObject();
 
-            return l;
+            return dependencies;
         }
 
-        private List<string> ReadTargetLibraryRuntime(JsonTextReader reader)
+        private List<string> ReadPropertyNames(JsonTextReader reader)
         {
             var runtimes = new List<string>();
 
@@ -407,7 +395,7 @@ namespace Microsoft.Extensions.DependencyModel
             while (reader.Read() && reader.TokenType == JsonToken.PropertyName)
             {
                 var libraryName = (string)reader.Value;
-                reader.IgnoreStringDictionary();
+                reader.Skip();
 
                 runtimes.Add(libraryName);
             }
@@ -415,44 +403,6 @@ namespace Microsoft.Extensions.DependencyModel
             reader.CheckEndObject();
 
             return runtimes;
-        }
-
-        private List<string> ReadTargetLibraryNative(JsonTextReader reader)
-        {
-            var natives = new List<string>();
-
-            reader.ReadStartObject();
-
-            while (reader.Read() && reader.TokenType == JsonToken.PropertyName)
-            {
-                var libraryName = (string)reader.Value;
-                reader.IgnoreStringDictionary();
-
-                natives.Add(libraryName);
-            }
-
-            reader.CheckEndObject();
-
-            return natives;
-        }
-
-        private List<string> ReadTargetLibraryCompilation(JsonTextReader reader)
-        {
-            var compilations = new List<string>();
-
-            reader.ReadStartObject();
-
-            while (reader.Read() && reader.TokenType == JsonToken.PropertyName)
-            {
-                var libraryName = (string)reader.Value;
-                reader.IgnoreStringDictionary();
-
-                compilations.Add(libraryName);
-            }
-
-            reader.CheckEndObject();
-
-            return compilations;
         }
 
         private List<RuntimeTargetEntryStub> ReadTargetLibraryRuntimeTargets(JsonTextReader reader)
@@ -468,8 +418,8 @@ namespace Microsoft.Extensions.DependencyModel
 
                 reader.ReadStartObject();
 
-                string propertyName = null;
-                string propertyValue = null;
+                string propertyName;
+                string propertyValue;
                 while (reader.TryReadStringProperty(out propertyName, out propertyValue))
                 {
                     switch (propertyName)
@@ -588,7 +538,7 @@ namespace Microsoft.Extensions.DependencyModel
 
         private List<RuntimeFallbacks> ReadRuntimes(JsonTextReader reader)
         {
-            var l = new List<RuntimeFallbacks>();
+            var runtimeFallbacks = new List<RuntimeFallbacks>();
 
             reader.ReadStartObject();
 
@@ -597,12 +547,12 @@ namespace Microsoft.Extensions.DependencyModel
                 var runtime = (string)reader.Value;
                 var fallbacks = reader.ReadStringArray();
 
-                l.Add(new RuntimeFallbacks(runtime, fallbacks));
+                runtimeFallbacks.Add(new RuntimeFallbacks(runtime, fallbacks));
             }
 
             reader.CheckEndObject();
 
-            return l;
+            return runtimeFallbacks;
         }
 
         private IEnumerable<Library> CreateLibraries(IEnumerable<TargetLibrary> libraries, bool runtime, Dictionary<string, LibraryStub> libraryStubs)
