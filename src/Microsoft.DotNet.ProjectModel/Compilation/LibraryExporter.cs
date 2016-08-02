@@ -27,6 +27,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         private HashSet<string> _seenMetadataReferences;
 
         private List<LibraryExport> _cachedExports;
+        private List<int> _projectExportIndices;
 
         public LibraryExporter(ProjectDescription rootProject,
             LibraryManager manager,
@@ -107,21 +108,17 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             if (_cachedExports == null)
             {
                 _cachedExports = CalculateAllExports().ToList();
+
+                _cachedProjectExportIndices = _cachedExports
+                    .Where(export => Equals(export.Library.Identity.Type, LibraryType.Project))
+                    .Select((export, index) => index);
             }
 
-            var refreshedExports = new LibraryExport[_cachedExports.Count()];
-
-            int index = 0;
-            foreach (var export in _cachedExports)
+            foreach(var index in _cachedProjectExportIndices)
             {
-                if (Equals(export.Library.Identity.Type, LibraryType.Project))
-                {
-                    refreshedExports[index++] = export;
-                }
-                else
-                {
-                    refreshedExports[index++] = GenerateExportFromLibrary(_seenMetadataReferences, export.Library);
-                }
+                var export = _cachedExports[index];
+
+                _cachedExports[index] = GenerateExportFromLibrary(_seenMetadataReferences, export.Library);
             }
 
             return refreshedExports;
