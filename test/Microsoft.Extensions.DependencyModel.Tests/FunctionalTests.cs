@@ -100,7 +100,7 @@ namespace Microsoft.Extensions.DependencyModel
 
         private void CleanBinObj(string rootPath)
         {
-            var dirs = new string{} ["bin", "obj"];
+            var dirs = new string[] {"bin", "obj"};
 
             foreach (var dir in dirs)
             {

@@ -103,13 +103,24 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         {
             if (_cachedExports == null)
             {
-                return (_cachedExports = CalculateAllExports().ToList());
+                _cachedExports = CalculateAllExports().ToList();
             }
 
-            var nonProjectExports = _cachedExports.Where(export => !Equals(export.Library.Identity.Type, LibraryType.Project));
-            var projectExports = _cachedExports.Where(export => Equals(export.Library.Identity.Type, LibraryType.Project));
-            var refreshedProjectExports = projectExports.Select(export => GenerateExportFromLibrary(_seenMetadataReferences, export.Library));
+            var refreshedExports = new string[_cachedExports.Count()];
 
+            int index = 0;
+            foreach (var export in _cachedExports)
+            {
+                if (Equals(export.Library.Identity.Type, LibraryType.Project))
+                {
+                    refreshedExports[index++] = export;
+                }
+                else
+                {
+                    refreshedExports[index++] = GenerateExportFromLibrary(_seenMetadataReferences, export.Library);
+                }
+            }
+            
             return nonProjectExports.Concat(refreshedProjectExports);
         }
 
