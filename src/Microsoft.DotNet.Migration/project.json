@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0-featmsbuild-*",
+  "buildOptions": {
+    "keyFile": "../../tools/Key.snk",
+    "warningsAsErrors": true
+  },
+  "dependencies": {
+    "Microsoft.DotNet.ProjectModel": {
+      "target": "project"
+    },
+    "MSBuild": "0.1.0-preview-00024-160610",
+    "Microsoft.Build.Framework": "0.1.0-preview-00024-160610",
+    "Microsoft.Build.Tasks.Core": "0.1.0-preview-00024-160610",
+    "Microsoft.Build.Utilities.Core": "0.1.0-preview-00024-160610",
+    "Microsoft.Build.Targets": "0.1.0-preview-00024-160610",
+    "Microsoft.Build": "0.1.0-preview-00024-160610"
+  },
+  "frameworks": {
+    "net451": {
+      "frameworkAssemblies": {
+        "System.Runtime": {
+          "type": "build"
+        }
+      }
+    },
+    "netstandard1.3": {
+      "imports": [
+        "portable-net45+wp80+win8+wpa81+dnxcore50"
+      ],
+      "dependencies": {
+        "System.Diagnostics.Process": "4.1.0"
+      }
+    }
+  }
+}
