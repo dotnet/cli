@@ -114,14 +114,12 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                     .Select((export, index) => index);
             }
 
-            foreach(var index in _cachedProjectExportIndices)
-            {
-                var export = _cachedExports[index];
-
-                _cachedExports[index] = GenerateExportFromLibrary(_seenMetadataReferences, export.Library);
-            }
-
-            return _cachedExports;
+            return _cachedExports.Select(export =>
+                {
+                    return Equals(export.Library.Identity.Type, LibraryType.Project)
+                        ? GenerateExportFromLibrary(_seenMetadataReferences, export.Library)
+                        : export;
+                });
         }
 
         private IEnumerable<LibraryExport> CalculateAllExports()
