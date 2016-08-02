@@ -301,7 +301,9 @@ namespace Microsoft.Extensions.DependencyModel.Tests
         {
             var context = Read(
 @"{
-    ""runtimeTarget"": "".NETCoreApp,Version=v1.0"",
+    ""runtimeTarget"": {
+        ""name"": "".NETCoreApp,Version=v1.0""
+    },
     ""targets"": {
         "".NETCoreApp,Version=v1.0"": {
             ""System.Banana/1.0.0"": {

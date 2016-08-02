@@ -163,35 +163,26 @@ namespace Microsoft.Extensions.DependencyModel
             runtimeTargetName = null;
             runtimeSignature = null;
 
-            reader.Read();
-            if (reader.TokenType == JsonToken.String)
-            {
-                // This fallback is temporary
-                runtimeTargetName = (string)reader.Value;
-            }
-            else
-            {
-                reader.CheckStartObject();
+            reader.ReadStartObject();
 
-                string propertyName;
-                string propertyValue;
-                while (reader.TryReadStringProperty(out propertyName, out propertyValue))
+            string propertyName;
+            string propertyValue;
+            while (reader.TryReadStringProperty(out propertyName, out propertyValue))
+            {
+                switch (propertyName)
                 {
-                    switch (propertyName)
-                    {
-                        case DependencyContextStrings.RuntimeTargetNamePropertyName:
-                            runtimeTargetName = propertyValue;
-                            break;
-                        case DependencyContextStrings.RuntimeTargetSignaturePropertyName:
-                            runtimeSignature = propertyValue;
-                            break;
-                        default:
-                            throw new FormatException($"Unknown property name '{propertyName}'");
-                    }
+                    case DependencyContextStrings.RuntimeTargetNamePropertyName:
+                        runtimeTargetName = propertyValue;
+                        break;
+                    case DependencyContextStrings.RuntimeTargetSignaturePropertyName:
+                        runtimeSignature = propertyValue;
+                        break;
+                    default:
+                        throw new FormatException($"Unknown property name '{propertyName}'");
                 }
-
-                reader.CheckEndObject();
             }
+
+            reader.CheckEndObject();
         }
 
         private CompilationOptions ReadCompilationOptions(JsonTextReader reader)
