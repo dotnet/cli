@@ -115,11 +115,6 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             int index = 0;
             foreach (var export in _cachedExports)
             {
-                foreach (var reference in export.CompilationAssemblies)
-                {
-                    seenMetadataReferences.Add(reference.Name);
-                }
-
                 if (Equals(export.Library.Identity.Type, LibraryType.Project))
                 {
                     refreshedCache[index++] = GenerateExportFromLibrary(seenMetadataReferences, export.Library);
@@ -129,6 +124,10 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                     refreshedCache[index++] = export;
                 }
 
+                foreach (var reference in export.CompilationAssemblies)
+                {
+                    seenMetadataReferences.Add(reference.Name);
+                }
             }
 
             return refreshedCache;
