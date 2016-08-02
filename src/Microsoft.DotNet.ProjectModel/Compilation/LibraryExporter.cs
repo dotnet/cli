@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         private HashSet<string> _seenMetadataReferences;
 
         private List<LibraryExport> _cachedExports;
-        private List<int> _projectExportIndices;
+        private IEnumerable<int> _cachedProjectExportIndices;
 
         public LibraryExporter(ProjectDescription rootProject,
             LibraryManager manager,
@@ -121,7 +121,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                 _cachedExports[index] = GenerateExportFromLibrary(_seenMetadataReferences, export.Library);
             }
 
-            return refreshedExports;
+            return _cachedExports;
         }
 
         private IEnumerable<LibraryExport> CalculateAllExports()
