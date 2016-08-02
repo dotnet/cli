@@ -14,8 +14,8 @@ namespace Microsoft.DotNet.ProjectModel
 {
     public class ProjectContext
     {
-        private readonly Dictionary<Tuple<string, string>, LibraryExporter> _cachedExporters = 
-            new Dictionary<Tuple<string, string>, LibraryExporter>();
+        private readonly Dictionary<Tuple<string, string, string>, LibraryExporter> _cachedExporters = 
+            new Dictionary<Tuple<string, string, string>, LibraryExporter>();
         
         private string[] _runtimeFallbacks;
 
@@ -75,7 +75,10 @@ namespace Microsoft.DotNet.ProjectModel
         public LibraryExporter CreateExporter(string configuration, string buildBasePath = null)
         {
             LibraryExporter exporter;
-            var libraryExporterCacheKey = Tuple.Create(configuration ?? "" , buildBasePath ?? "");
+            var libraryExporterCacheKey = Tuple.Create(
+                configuration ?? "", 
+                buildBasePath ?? "",
+                RootDirectory);
 
             if (_cachedExporters.TryGetValue(libraryExporterCacheKey, out exporter))
             {
