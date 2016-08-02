@@ -24,7 +24,6 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         private readonly ProjectDescription _rootProject;
         private readonly string _buildBasePath;
         private readonly string _solutionRootPath;
-        private HashSet<string> _seenMetadataReferences;
 
         private List<LibraryExport> _cachedExports;
         private IEnumerable<int> _cachedProjectExportIndices;
@@ -108,28 +107,41 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             if (_cachedExports == null)
             {
                 _cachedExports = CalculateAllExports().ToList();
-
-                _cachedProjectExportIndices = _cachedExports
-                    .Where(export => Equals(export.Library.Identity.Type, LibraryType.Project))
-                    .Select((export, index) => index);
             }
 
-            return _cachedExports.Select(export =>
+            var seenMetadataReferences = new HashSet<string>();
+            var refreshedCache = new LibraryExport[_cachedExports.Count()];
+
+            int index = 0;
+            foreach (var export in _cachedExports)
+            {
+                foreach (var reference in export.CompilationAssemblies)
                 {
-                    return Equals(export.Library.Identity.Type, LibraryType.Project)
-                        ? GenerateExportFromLibrary(_seenMetadataReferences, export.Library)
-                        : export;
-                });
+                    seenMetadataReferences.Add(reference.Name);
+                }
+
+                if (Equals(export.Library.Identity.Type, LibraryType.Project))
+                {
+                    refreshedCache[index++] = GenerateExportFromLibrary(seenMetadataReferences, export.Library);
+                }
+                else
+                {
+                    refreshedCache[index++] = export;
+                }
+
+            }
+
+            return refreshedCache;
         }
 
         private IEnumerable<LibraryExport> CalculateAllExports()
         {
-            _seenMetadataReferences = new HashSet<string>();
+            var seenMetadataReferences = new HashSet<string>();
 
             // Iterate over libraries in the library manager
             foreach (var library in LibraryManager.GetLibraries())
             {
-                yield return GenerateExportFromLibrary(_seenMetadataReferences, library);
+                yield return GenerateExportFromLibrary(seenMetadataReferences, library);
             }
         }
 
