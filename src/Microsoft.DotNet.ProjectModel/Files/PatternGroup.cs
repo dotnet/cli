@@ -8,11 +8,14 @@ using System.Linq;
 using Microsoft.DotNet.ProjectModel.FileSystemGlobbing;
 using Newtonsoft.Json.Linq;
 
+using FourStringTuple = System.Tuple<string, string, string, string>;
+
 namespace Microsoft.DotNet.ProjectModel.Files
 {
     public class PatternGroup
     {
-        private static readonly Dictionary<string, IEnumerable<string>> s_resolvedFilesCache = new Dictionary<string, IEnumerable<string>>();
+        private static readonly Dictionary<FourStringTuple, IEnumerable<string>> s_resolvedFilesCache = 
+            new Dictionary<FourStringTuple, IEnumerable<string>>();
         
         private readonly List<PatternGroup> _excludeGroups = new List<PatternGroup>();
         private readonly Matcher _matcher = new Matcher();
@@ -84,10 +87,10 @@ namespace Microsoft.DotNet.ProjectModel.Files
 
         public IEnumerable<string> SearchFiles(string rootDirectory)
         {
-            var patternUnionKey = rootDirectory
-                + (IncludePatterns.Any() ? " ++ " + string.Join(", ", IncludePatterns): "")
-                + (IncludeLiterals.Any() ? " + " + string.Join(", ", IncludeLiterals) : "")
-                + (ExcludePatterns.Any() ? " -- " + string.Join(", ", ExcludePatterns) : "");
+            var patternUnionKey = new FourStringTuple(rootDirectory, 
+                (IncludePatterns.Any() ? string.Join(", ", IncludePatterns): ""),
+                (IncludeLiterals.Any() ? string.Join(", ", IncludeLiterals) : ""),
+                (ExcludePatterns.Any() ? string.Join(", ", ExcludePatterns) : ""));
 
             IEnumerable<string> resolvedFiles;
             lock (s_resolvedFilesCache)
@@ -153,6 +156,14 @@ namespace Microsoft.DotNet.ProjectModel.Files
         public override string ToString()
         {
             return string.Format("Pattern group: Literals [{0}] Includes [{1}] Excludes [{2}]", string.Join(", ", IncludeLiterals), string.Join(", ", IncludePatterns), string.Join(", ", ExcludePatterns));
+        }
+
+        public static void ClearCache()
+        {
+            if (s_resolvedFilesCache != null)
+            {
+                s_resolvedFilesCache.Clear();
+            }
         }
     }
 }

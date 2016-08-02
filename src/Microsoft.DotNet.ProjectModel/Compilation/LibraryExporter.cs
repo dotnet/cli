@@ -86,9 +86,9 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         /// </summary>
         private IEnumerable<LibraryExport> ExportLibraries(Func<LibraryDescription, bool> condition)
         {
-            IEnumerable<LibraryExport> exports = _cachedExports ?? (_cachedExports = CalculateAllExports().ToArray());
+            _cachedExports = _cachedExports ?? CalculateAllExports().ToArray();
 
-            foreach (var export in exports)
+            foreach (var export in _cachedExports)
             {
                 if (!condition(export.Library))
                 {

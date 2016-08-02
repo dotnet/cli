@@ -26,6 +26,9 @@ namespace Microsoft.DotNet.ProjectModel.Server
 
         public static ProjectContextSnapshot Create(ProjectContext context, string configuration, IEnumerable<string> previousSearchPaths)
         {
+            // Clear cached file glob results
+            PatternGroup.ClearCache();
+
             var snapshot = new ProjectContextSnapshot();
 
             var allDependencyDiagnostics = new List<DiagnosticMessage>();
@@ -78,6 +81,9 @@ namespace Microsoft.DotNet.ProjectModel.Server
 
         private static IEnumerable<string> GetSourceFiles(ProjectContext context, string configuration)
         {
+            // Clear cached glob results
+            PatternGroup.ClearCache();
+
             var compilerOptions = context.ProjectFile.GetCompilerOptions(context.TargetFramework, configuration);
 
             if (compilerOptions.CompileInclude == null)

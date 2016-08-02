@@ -2,7 +2,6 @@
 using System.Linq;
 using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Graph;
-using System;
 
 namespace Microsoft.DotNet.ProjectModel
 {
@@ -29,11 +28,12 @@ namespace Microsoft.DotNet.ProjectModel
             foreach (var dependency in dependencies)
             {
                 var export = exports[dependency.Name];
-                if (export.Library.Identity.Version.Equals(dependency.VersionRange.MinVersion) 
-                    && !exclusionList.Contains(dependency.Name))
+                if (export.Library.Identity.Version.Equals(dependency.VersionRange.MinVersion))
                 {
-                    exclusionList.Add(export.Library.Identity.Name);
-                    CollectDependencies(exports, export.Library.Dependencies, exclusionList);
+                    if (exclusionList.Add(export.Library.Identity.Name))
+                    {
+                        CollectDependencies(exports, export.Library.Dependencies, exclusionList);
+                    }
                 }
             }
         }
