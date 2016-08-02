@@ -106,7 +106,7 @@ namespace Microsoft.Extensions.DependencyModel
             {
                 if (Directory.Exists(Path.Combine(rootPath, dir)))
                 {
-                    Directory.Delete(Path.Combine(rootPath, dir));
+                    Directory.Delete(Path.Combine(rootPath, dir), true);
                 }
             }
         }

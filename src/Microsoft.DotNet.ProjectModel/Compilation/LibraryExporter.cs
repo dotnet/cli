@@ -87,6 +87,9 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         /// </summary>
         private IEnumerable<LibraryExport> ExportLibraries(Func<LibraryDescription, bool> condition)
         {
+            // Project Exports cannot be cached because the binding redirect file
+            // for desktop apps is not added to runtimeassets of the project
+            // until after the project is built.
             var cache = GetCacheWithRefreshedProjectExports();
 
             foreach (var export in cache)
@@ -106,7 +109,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                 _cachedExports = CalculateAllExports().ToList();
             }
 
-            var refreshedExports = new string[_cachedExports.Count()];
+            var refreshedExports = new LibraryExport[_cachedExports.Count()];
 
             int index = 0;
             foreach (var export in _cachedExports)
@@ -120,8 +123,8 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                     refreshedExports[index++] = GenerateExportFromLibrary(_seenMetadataReferences, export.Library);
                 }
             }
-            
-            return nonProjectExports.Concat(refreshedProjectExports);
+
+            return refreshedExports;
         }
 
         private IEnumerable<LibraryExport> CalculateAllExports()
