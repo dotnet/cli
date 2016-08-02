@@ -26,7 +26,6 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         private readonly string _solutionRootPath;
 
         private List<LibraryExport> _cachedExports;
-        private IEnumerable<int> _cachedProjectExportIndices;
 
         public LibraryExporter(ProjectDescription rootProject,
             LibraryManager manager,
