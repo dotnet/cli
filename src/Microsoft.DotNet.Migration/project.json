@@ -1,10 +1,12 @@
 {
   "version": "1.0.0-featmsbuild-*",
   "buildOptions": {
-    "keyFile": "../../tools/Key.snk",
     "warningsAsErrors": true
   },
   "dependencies": {
+    "dotnet": {
+      "target": "project"
+    },
     "Microsoft.DotNet.ProjectModel": {
       "target": "project"
     },

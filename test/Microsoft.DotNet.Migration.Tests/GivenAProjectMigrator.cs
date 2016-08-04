@@ -5,15 +5,18 @@ using System.Linq;
 using FluentAssertions;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
+using Microsoft.DotNet.Migration;
+using System;
+using System.IO;
 
-namespace Microsoft.DotNet.Cli.Utils.Tests
+namespace Microsoft.DotNet.Migration.Tests
 {
     public class GivenAScriptCommandResolver : TestBase
     {
         [Fact]
         public void It_has_a_count_proto()
         {
-            var migrator = new ProjectMigrator()
+            var migrator = new ProjectMigrator();
 
             var testProjectPath = Path.Combine(RepoRoot, "TestAssets", "TestProjects", "PortableTests", "PortableApp");
             var output = Path.Combine(AppContext.BaseDirectory, "out");

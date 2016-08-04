@@ -5,18 +5,23 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Construction;
+using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.Cli;
+using System.Linq;
+using System.IO;
 
 namespace Microsoft.DotNet.Migration
 {
     public class ProjectMigrator
     {
-        public ProjectMigrator()
-        {
-
-        }
-
         public int Migrate(string projectDirectory, string outputDirectory)
         {
+            if (!Directory.Exists(outputDirectory))
+            {
+                Directory.CreateDirectory(outputDirectory);
+            }
+
             var projectContexts = ProjectContext.CreateContextForEachTarget(projectDirectory);
 
             if (projectContexts.Count() > 1)
@@ -29,25 +34,42 @@ namespace Microsoft.DotNet.Migration
                 throw new Exception("No projects found");
             }
 
+            var projectContext = projectContexts.First();
+
+            // Get template
+            var csproj = GetDefaultMSBuildProject();
+
+            // Apply Transformations
+            var ruleset = new DefaultMigrationRuleSet();
+            ruleset.Apply(projectContext, csproj, outputDirectory);
+
+            csproj.Save(Path.Combine(outputDirectory, "output.csproj"));
+
+            return 1;
+        }
+
+        private ProjectRootElement GetDefaultMSBuildProject()
+        {
             // Get template
             var projectName = "someproject";
-            var tempDir = Path.Combine(Path.GetTempPath(), ProjectMigrator.GetType().Namespace, projectName);
+            var tempDir = Path.Combine(Path.GetTempPath(), this.GetType().Namespace, projectName);
 
-            Directory.Delete(tempDir, true);
-            Directory.Create(tempDir);
+            if (Directory.Exists(tempDir))
+            {
+                Directory.Delete(tempDir, true);
+            }
+            Directory.CreateDirectory(tempDir);
 
             RunCommand("new", new string[] {"-t", "msbuild"}, tempDir);
 
             var csprojPath = Path.Combine(tempDir, projectName + ".csproj");
-            var cproj = ProjectElementRoot.Open(csprojPath);
-
-            Console.WriteLine(csproj.Count);
-            return csproj.Count;
+            var csproj = ProjectRootElement.Open(csprojPath);
+            return csproj;
         }
 
         private bool RunCommand(string commandToExecute, IEnumerable<string> args, string workingDirectory)
         {
-            var command = _commandFactory
+            var command = new DotNetCommandFactory()
                 .Create(commandToExecute, args)
                 .WorkingDirectory(workingDirectory)
                 .CaptureStdOut()
