@@ -169,16 +169,6 @@ namespace Microsoft.DotNet.Cli.Build
             },
             new TestPackageProject()
             {
-                Name = "Microsoft.Extensions.DependencyModel",
-                IsTool = true,
-                Path = "src/Microsoft.Extensions.DependencyModel",
-                IsApplicable = true,
-                VersionSuffix = s_testPackageBuildVersionSuffix,
-                Clean = false,
-                Frameworks = new [] { "net451", "netstandard1.6" }
-            },
-            new TestPackageProject()
-            {
                 Name = "Microsoft.Extensions.Testing.Abstractions",
                 IsTool = true,
                 Path = "src/Microsoft.Extensions.Testing.Abstractions",
