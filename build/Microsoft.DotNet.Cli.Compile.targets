@@ -5,6 +5,8 @@
 
   <ItemGroup>
     <PublishOutputExtensions Include="$(ExeExtension);.dll;.pdb;.deps.json;.runtimeconfig.json" />
+
+    <BundledTools Include="csc;msbuild" />
   </ItemGroup>
 
   <Target Name="Compile" DependsOnTargets="Prepare;
@@ -76,6 +78,7 @@
         <BinariesToRemove Remove="*" />
         <BinariesToRemove Include="csc" />
         <BinariesToRemove Include="vbc" />
+        <BinariesToRemove Include="msbuild" />
       </ItemGroup>
 
       <Delete Files="@(BinObj)" />
@@ -124,25 +127,25 @@
       <DotNetPublish ToolPath="%(Stage.DotnetDir)"
                      Output="$(SdkOutputDirectory)"
                      Framework="netcoreapp1.0"
-                     ProjectPath="$(SrcDirectory)/compilers" />
+                     ProjectPath="$(SrcDirectory)/redist" />
 
-      <Copy SourceFiles="$(BinaryToCorehostifyOutDir)/csc.exe"
-            DestinationFiles="$(SdkOutputDirectory)/csc.dll" />
+      <Copy SourceFiles="$(BinaryToCorehostifyOutDir)/%(BundledTools.Identity).exe"
+            DestinationFiles="$(SdkOutputDirectory)/%(BundledTools.Identity).dll" />
 
-      <Move SourceFiles="$(BinaryToCorehostifyOutDir)/csc.exe"
-            DestinationFiles="$(SdkOutputDirectory)/csc.exe" />
+      <Move SourceFiles="$(BinaryToCorehostifyOutDir)/%(BundledTools.Identity).exe"
+            DestinationFiles="$(SdkOutputDirectory)/%(BundledTools.Identity).exe" />
 
-      <Copy SourceFiles="$(SdkOutputDirectory)/compilers.deps.json"
-            DestinationFiles="$(SdkOutputDirectory)/csc.deps.json" />
+      <Copy SourceFiles="$(SdkOutputDirectory)/redist.deps.json"
+            DestinationFiles="$(SdkOutputDirectory)/%(BundledTools.Identity).deps.json" />
 
-      <Copy SourceFiles="$(SdkOutputDirectory)/compilers.runtimeconfig.json"
-            DestinationFiles="$(SdkOutputDirectory)/csc.runtimeconfig.json" />
+      <Copy SourceFiles="$(SdkOutputDirectory)/redist.runtimeconfig.json"
+            DestinationFiles="$(SdkOutputDirectory)/%(BundledTools.Identity).runtimeconfig.json" />
 
       <ChangeEntryPointLibraryName
-            DepsFile="$(SdkOutputDirectory)/csc.deps.json"
-            NewName="csc.deps.json" />
+            DepsFile="$(SdkOutputDirectory)/%(BundledTools.Identity).deps.json"
+            NewName="%(BundledTools.Identity).deps.json" />
 
-      <RemoveAssetFromDepsPackages DepsFile="$(SdkOutputDirectory)/csc.deps.json"
+      <RemoveAssetFromDepsPackages DepsFile="$(SdkOutputDirectory)/%(BinariesToRemove.Identity).deps.json"
                                    SectionName="runtimeTargets"
                                    AssetPath="$(BinaryToCorehostifyRelDir)/%(BinariesToRemove.Identity).exe" />
       <RemoveAssetFromDepsPackages DepsFile="$(SdkOutputDirectory)/dotnet.deps.json"
