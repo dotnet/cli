@@ -6,7 +6,7 @@
   <ItemGroup>
     <PublishOutputExtensions Include="$(ExeExtension);.dll;.pdb;.deps.json;.runtimeconfig.json" />
 
-    <BundledTools Include="csc;msbuild" />
+    <BundledTools Include="csc;msbuild;NuGet.CommandLine.XPlat" />
   </ItemGroup>
 
   <Target Name="Compile" DependsOnTargets="Prepare;
@@ -96,7 +96,7 @@
                      Output="$(SdkOutputDirectory)"
                      Configuration="$(Configuration)"
                      VersionSuffix="$(CommitCount)"
-                     ProjectPath="$(SrcDirectory)/dotnet" />
+                     ProjectPath="$(SrcDirectory)/redist" />
 
       <!-- Corehostify Binaries -->
       <ItemGroup Condition=" '$(OSName)' != 'win' ">
@@ -124,15 +124,14 @@
              File="%(SdkOutputChModTargets.FullPath)"
              Mode="%(SdkOutputChModTargets.Mode)" />
 
-      <DotNetPublish ToolPath="%(Stage.DotnetDir)"
-                     Output="$(SdkOutputDirectory)"
-                     Framework="netcoreapp1.0"
-                     ProjectPath="$(SrcDirectory)/redist" />
+      <RemoveAssetFromDepsPackages DepsFile="$(SdkOutputDirectory)/redist.deps.json"
+                                   SectionName="runtimeTargets"
+                                   AssetPath="$(BinaryToCorehostifyRelDir)/%(BinariesToRemove.Identity).exe" />
 
       <Copy SourceFiles="$(BinaryToCorehostifyOutDir)/%(BundledTools.Identity).exe"
             DestinationFiles="$(SdkOutputDirectory)/%(BundledTools.Identity).dll" />
 
-      <Move SourceFiles="$(BinaryToCorehostifyOutDir)/%(BundledTools.Identity).exe"
+      <Copy SourceFiles="$(BinaryToCorehostifyOutDir)/%(BundledTools.Identity).exe"
             DestinationFiles="$(SdkOutputDirectory)/%(BundledTools.Identity).exe" />
 
       <Copy SourceFiles="$(SdkOutputDirectory)/redist.deps.json"
@@ -141,19 +140,18 @@
       <Copy SourceFiles="$(SdkOutputDirectory)/redist.runtimeconfig.json"
             DestinationFiles="$(SdkOutputDirectory)/%(BundledTools.Identity).runtimeconfig.json" />
 
+      <Copy SourceFiles="$(SdkOutputDirectory)/redist.deps.json"
+            DestinationFiles="$(SdkOutputDirectory)/dotnet.deps.json" />
+
+      <Copy SourceFiles="$(SdkOutputDirectory)/redist.runtimeconfig.json"
+            DestinationFiles="$(SdkOutputDirectory)/dotnet.runtimeconfig.json" />
+
       <ChangeEntryPointLibraryName
             DepsFile="$(SdkOutputDirectory)/%(BundledTools.Identity).deps.json"
             NewName="%(BundledTools.Identity).deps.json" />
 
-      <RemoveAssetFromDepsPackages DepsFile="$(SdkOutputDirectory)/%(BinariesToRemove.Identity).deps.json"
-                                   SectionName="runtimeTargets"
-                                   AssetPath="$(BinaryToCorehostifyRelDir)/%(BinariesToRemove.Identity).exe" />
-      <RemoveAssetFromDepsPackages DepsFile="$(SdkOutputDirectory)/dotnet.deps.json"
-                                   SectionName="runtimeTargets"
-                                   AssetPath="$(BinaryToCorehostifyRelDir)/%(BinariesToRemove.Identity).exe" />
-
-      <!-- cleanup compilers project output we don't need -->
-      <Delete Files="$(SdkOutputDirectory)/compilers%(PublishOutputExtensions.Identity)" />
+      <!-- cleanup redist project output we don't need -->
+      <Delete Files="$(SdkOutputDirectory)/redist%(PublishOutputExtensions.Identity)" />
 
       <!-- Copy Host to SDK Directory -->
       <Copy SourceFiles="$(SharedFrameworkNameVersionPath)/$(DotnetHostBaseName)"

@@ -8,15 +8,19 @@
       "type": "platform",
       "version": "1.0.0"
     },
-    "Microsoft.CodeAnalysis.CSharp": "1.3.0",
-    "Microsoft.Net.Compilers.netcore": "1.3.0",
-    "Microsoft.DiaSymReader.Native": "1.4.0-rc2"
+    "NuGet.Commands": {
+      "version": "3.5.0-rc1-1697",
+      "exclude": "compile"
+    },
+    "NuGet.CommandLine.XPlat": "3.5.0-rc1-1697"
   },
   "frameworks": {
     "netcoreapp1.0": {
       "imports": [
         "dnxcore50",
-        "portable-net45+win8"
+        "netstandardapp1.5",
+        "portable-net45+win8",
+        "portable-net45+wp80+win8+wpa81+dnxcore50"
       ]
     }
   }

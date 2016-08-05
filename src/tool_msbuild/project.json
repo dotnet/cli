@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-*",
+  "version": "1.0.0-featmsbuild-*",
   "buildOptions": {
     "emitEntryPoint": true
   },
@@ -27,5 +27,12 @@
         "portable-net45+win8"
       ]
     }
+  },
+  "publishOptions": {
+    "include": [
+      "14.1/**",
+      "*.props",
+      "*.targets"
+    ]
   }
 }

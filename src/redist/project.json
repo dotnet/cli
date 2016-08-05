@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-*",
+  "version": "1.0.0-featmsbuild-*",
   "buildOptions": {
     "emitEntryPoint": true
   },
@@ -8,9 +8,10 @@
       "type": "platform",
       "version": "1.0.0"
     },
-    "csc": "1.0.0-*",
-    "dotnet": "1.0.0-*",
-    "tool_msbuild": "1.0.0-*"
+    "csc": "1.0.0-featmsbuild-*",
+    "dotnet": "1.0.0-featmsbuild-*",
+    "nuget": "1.0.0-featmsbuild-*",    
+    "tool_msbuild": "1.0.0-featmsbuild-*"
   },
   "frameworks": {
     "netcoreapp1.0": {
@@ -21,5 +22,10 @@
         "portable-net45+wp80+win8+wpa81+dnxcore50"
       ]
     }
+  },
+  "publishOptions": {
+    "include": [
+      "../resources/core-sdk/**"
+    ]
   }
 }
