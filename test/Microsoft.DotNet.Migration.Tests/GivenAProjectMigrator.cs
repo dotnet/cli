@@ -11,10 +11,10 @@ using System.IO;
 
 namespace Microsoft.DotNet.Migration.Tests
 {
-    public class GivenAScriptCommandResolver : TestBase
+    public class GivenAProjectMigrator : TestBase
     {
         [Fact]
-        public void It_has_a_count_proto()
+        public void It_passes_a_smoke_test()
         {
             var migrator = new ProjectMigrator();
 

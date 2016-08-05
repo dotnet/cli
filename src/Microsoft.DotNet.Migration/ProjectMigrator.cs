@@ -55,7 +55,7 @@ namespace Microsoft.DotNet.Migration
 
             csproj.Save(Path.Combine(outputDirectory, projectContext.ProjectFile.Name + ".csproj"));
 
-            return 1;
+            return csproj.Count;
         }
 
         private ProjectRootElement GetDefaultMSBuildProject()
