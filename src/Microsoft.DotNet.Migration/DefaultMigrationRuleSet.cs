@@ -17,10 +17,11 @@ namespace Microsoft.DotNet.Migration
 {
     public class DefaultMigrationRuleSet : IMigrationRule
     {
-        private IMigrationRule[] Rules => new MigrationRule[]
+        private IMigrationRule[] Rules => new IMigrationRule[]
         {
             new MigrateBuildOptionsRule(),
-            new MigrateRuntimeOptionsRule()
+            new MigrateRuntimeOptionsRule(),
+            new MigratePublishOptionsRule()
         };
 
         public void Apply(ProjectContext projectContext, ProjectRootElement csproj, string outputDirectory)

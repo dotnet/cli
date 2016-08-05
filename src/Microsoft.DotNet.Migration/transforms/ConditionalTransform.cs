@@ -16,9 +16,9 @@ namespace Microsoft.DotNet.Migration.Transforms
 {
     public abstract class ConditionalTransform<T> : ITransform<T> 
     {
-        private Func<T,Bool> _condition;
+        private Func<T,bool> _condition;
 
-        public ConditionalTransform(Func<T,Bool> condition)
+        public ConditionalTransform(Func<T,bool> condition)
         {
             _condition = condition;
         }

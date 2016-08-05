@@ -11,72 +11,91 @@ using Microsoft.DotNet.Cli;
 using System.Linq;
 using System.IO;
 using Newtonsoft.Json;
+using Microsoft.DotNet.Migration.Transforms;
+using Microsoft.DotNet.ProjectModel.Files;
 
 namespace Microsoft.DotNet.Migration.Rules
 {
     public class MigrateBuildOptionsRule : IMigrationRule
     {
-        // TODO: Migrate Compile, Embed, CopyToOutput items...
+        
         public void Apply(ProjectContext projectContext, ProjectRootElement csproj, string outputDirectory)
         {
+            // Map Properties
             var propertyGroup = csproj.AddPropertyGroup();
+            var compilerOptions = projectContext.ProjectFile.GetCompilerOptions(null, null);
 
-            var compilerOptions = projectContext.ProjectFile.GetCompilerOptions(null, null).EmitEntryPoint ?? false;
-
-            EmitEntryPointTransform.Execute(compilerOptions.EmitEntryPoint, csproj, propertyGroup);
+            EmitEntryPointTransform.Execute(compilerOptions.EmitEntryPoint ?? false, csproj, propertyGroup);
             DefineTransform.Execute(compilerOptions.Defines, csproj, propertyGroup);
             NoWarnTransform.Execute(compilerOptions.SuppressWarnings, csproj, propertyGroup);
-            WarningsAsErrorsTransform.Execute(compilerOptions.WarningsAsErrors, csproj, propertyGroup);
-            AllowUnsafeTransform.Execute(compilerOptions.AllowUnsafe, csproj, propertyGroup);
-            OptimizeTransform.Execute(compilerOptions.Optimize, csproj, propertyGroup);
+            WarningsAsErrorsTransform.Execute(compilerOptions.WarningsAsErrors ?? false, csproj, propertyGroup);
+            AllowUnsafeTransform.Execute(compilerOptions.AllowUnsafe ?? false, csproj, propertyGroup);
+            OptimizeTransform.Execute(compilerOptions.Optimize ?? false, csproj, propertyGroup);
             PlatformTransform.Execute(compilerOptions.Platform, csproj, propertyGroup);
             LanguageVersionTransform.Execute(compilerOptions.LanguageVersion, csproj, propertyGroup);
             KeyFileTransform.Execute(compilerOptions.KeyFile, csproj, propertyGroup);
-            DelaySignTransform.Execute(compilerOptions.DelaySign, csproj, propertyGroup);
-            PublicSignTransform.Execute(compilerOptions.PublicSign, csproj, propertyGroup);
+            DelaySignTransform.Execute(compilerOptions.DelaySign ?? false, csproj, propertyGroup);
+            PublicSignTransform.Execute(compilerOptions.PublicSign ?? false, csproj, propertyGroup);
             DebugTypeTransform.Execute(compilerOptions.DebugType, csproj, propertyGroup);
-            XmlDocTransform.Execute(compilerOptions.GenerateXmlDocumentation, csproj, propertyGroup);
+            XmlDocTransform.Execute(compilerOptions.GenerateXmlDocumentation ?? false, csproj, propertyGroup);
             OutputNameTransform.Execute(compilerOptions.OutputName, csproj, propertyGroup);
+            PreserveCompilationContextTransform.Execute(compilerOptions.PreserveCompilationContext ?? false, csproj, propertyGroup);
+
+            // Map Compile, Embed, CopyToOutput
+            var itemGroup = csproj.AddItemGroup();
+
+            CompileFilesTransform.Execute(compilerOptions.CompileInclude, csproj, itemGroup);
+            EmbedFilesTransform.Execute(compilerOptions.EmbedInclude, csproj, itemGroup);
+            CopyToOutputFilesTransform.Execute(compilerOptions.CopyToOutputInclude, csproj, itemGroup);
         }
 
+        private ITransform<bool> EmitEntryPointTransform => new AggregateTransform<bool>(
+            new AddPropertyTransform<bool>("OutputType", "Exe", emitEntryPoint => emitEntryPoint),
+            new AddPropertyTransform<bool>("TargetExt", "Dll", emitEntryPoint => emitEntryPoint),
+            new AddPropertyTransform<bool>("OutputType", "Library", emitEntryPoint => !emitEntryPoint));
 
-        private ITransform EmitEntryPointTransform => new AggregateTransform<bool>(
-            new AddPropertyTransform<bool>("OutputType", "Exe", e => e),
-            new AddPropertyTransform<bool>("TargetExt", "Dll", e => e),
-            new AddPropertyTransform<bool>("OutputType", "Library", e => !e));
-
-        private ITransform DefineTransform => new AddPropertyTransform<IEnumerable<string>>(
+        private ITransform<IEnumerable<string>> DefineTransform => new AddPropertyTransform<IEnumerable<string>>(
             "DefineConstants", 
             defines => string.Join(";", defines), 
             defines => defines.Count() > 0);
 
-        private ITransform NoWarnTransform => new AddPropertyTransform<IEnumerable<string>>(
+        private ITransform<IEnumerable<string>> NoWarnTransform => new AddPropertyTransform<IEnumerable<string>>(
             "NoWarn", 
             nowarn => string.Join(";", nowarn), 
             nowarn => nowarn.Count() > 0);
 
-        private ITransform WarningsAsErrorsTransform = new AddBoolPropertyTransform("WarningsAsErrors");
+        private ITransform<bool> PreserveCompilationContextTransform => new AddBoolPropertyTransform("PreserveCompilationContext");
 
-        private ITransform AllowUnsafeTransform = new AddBoolPropertyTransform("AllowUnsafeBlocks");
+        private ITransform<bool> WarningsAsErrorsTransform => new AddBoolPropertyTransform("WarningsAsErrors");
 
-        private ITransform OptimizeTransform = new AddBoolPropertyTransform("Optimize");
+        private ITransform<bool> AllowUnsafeTransform => new AddBoolPropertyTransform("AllowUnsafeBlocks");
 
-        private ITransform PlatformTransform = new AddStringPropertyTransform("PlatformTarget");
+        private ITransform<bool> OptimizeTransform => new AddBoolPropertyTransform("Optimize");
 
-        private ITransform LanguageVersionTransform = new AddStringPropertyTransform("LanguageVersion");
+        private ITransform<string> PlatformTransform => new AddStringPropertyTransform("PlatformTarget");
 
-        private ITransform KeyFileTransform = new AggregateTransform<string>(
+        private ITransform<string> LanguageVersionTransform => new AddStringPropertyTransform("LanguageVersion");
+
+        private ITransform<string> KeyFileTransform => new AggregateTransform<string>(
             new AddStringPropertyTransform("AssemblyOriginatorKeyFile"),
             new AddPropertyTransform<string>("SignAssembly", "true", s => !string.IsNullOrEmpty(s)));
 
-        private ITransform DelaySignTransform = new AddBoolPropertyTransform("DelaySign");
+        private ITransform<bool> DelaySignTransform => new AddBoolPropertyTransform("DelaySign");
 
-        private ITransform PublicSignTransform = new AddBoolPropertyTransform("PublicSign");
+        private ITransform<bool> PublicSignTransform => new AddBoolPropertyTransform("PublicSign");
 
-        private ITransform DebugTypeTransform = new AddStringPropertyTransform("DebugType");
+        private ITransform<string> DebugTypeTransform => new AddStringPropertyTransform("DebugType");
 
-        private ITransform XmlDocTransform = new AddBoolPropertyTransform("GenerateDocumentationFile");
+        private ITransform<bool> XmlDocTransform => new AddBoolPropertyTransform("GenerateDocumentationFile");
 
-        private ITransform OutputNameTransform = new AddStringPropertyTransform("AssemblyName");  
+        private ITransform<string> OutputNameTransform => new AddStringPropertyTransform("AssemblyName");
+
+        private ITransform<IncludeContext> CompileFilesTransform => new IncludeContextTransform("Compile", transformMappings: false);
+
+        private ITransform<IncludeContext> EmbedFilesTransform => new IncludeContextTransform("EmbeddedResource", transformMappings: false);
+
+        private ITransform<IncludeContext> CopyToOutputFilesTransform => 
+            new IncludeContextTransform("Content", transformMappings: true)
+            .WithMetadata("CopyToOutputDirectory", "PreserveNewest");
     }
 }

@@ -14,12 +14,12 @@ using Newtonsoft.Json;
 
 namespace Microsoft.DotNet.Migration.Transforms
 {
-    public abstract class AddBoolPropertyTransform : AddPropertyTransform<bool> 
+    public class AddBoolPropertyTransform : AddPropertyTransform<bool> 
     {
         public AddBoolPropertyTransform(string propertyName)
-            : base(propertyName, b => b.ToString(), b => b != null) { }
+            : base(propertyName, b => b.ToString(), b => b) { }
 
-        public AddBoolPropertyTransform(string propertyName, Func<bool, Bool> condition)
+        public AddBoolPropertyTransform(string propertyName, Func<bool, bool> condition)
             : base(propertyName, b => b.ToString(), condition) { }
     }
 }

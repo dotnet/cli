@@ -15,6 +15,16 @@ namespace Microsoft.DotNet.Migration
 {
     public class ProjectMigrator
     {
+        // TODO: Migrate P2Ps
+        // TODO: Migrate AssemblyInfo
+        // TODO: Migrate PackOptions
+        // TODO: Migrate Scripts
+        // TODO: Migrate Configurations
+        // TODO: Support Mappings in IncludeContext Transformations
+        // TODO: Support Removal of default items/properties from template when appropriate
+        // TODO: Specify ordering of generated property/item groups (append at end of file in most cases)
+        // TODO: 
+
         public int Migrate(string projectDirectory, string outputDirectory)
         {
             if (!Directory.Exists(outputDirectory))
@@ -43,16 +53,17 @@ namespace Microsoft.DotNet.Migration
             var ruleset = new DefaultMigrationRuleSet();
             ruleset.Apply(projectContext, csproj, outputDirectory);
 
-            csproj.Save(Path.Combine(outputDirectory, "output.csproj"));
+            csproj.Save(Path.Combine(outputDirectory, projectContext.ProjectFile.Name + ".csproj"));
 
             return 1;
         }
 
         private ProjectRootElement GetDefaultMSBuildProject()
         {
-            // Get template
-            var projectName = "someproject";
-            var tempDir = Path.Combine(Path.GetTempPath(), this.GetType().Namespace, projectName);
+            var guid = Guid.NewGuid().ToString();
+            var projectName = "p";
+
+            var tempDir = Path.Combine(Path.GetTempPath(), this.GetType().Namespace, guid, projectName);
 
             if (Directory.Exists(tempDir))
             {
@@ -64,6 +75,9 @@ namespace Microsoft.DotNet.Migration
 
             var csprojPath = Path.Combine(tempDir, projectName + ".csproj");
             var csproj = ProjectRootElement.Open(csprojPath);
+
+            Directory.Delete(tempDir, true);
+
             return csproj;
         }
 

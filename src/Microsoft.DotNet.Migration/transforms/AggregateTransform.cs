@@ -14,9 +14,9 @@ using Newtonsoft.Json;
 
 namespace Microsoft.DotNet.Migration.Transforms
 {
-    public abstract class AggregateTransform<T> : ITransform<T> 
+    public class AggregateTransform<T> : ITransform<T> 
     {
-        private ITransform<T>[] _transforms;
+        protected ITransform<T>[] _transforms;
 
         public AggregateTransform(params ITransform<T>[] transforms)
         {

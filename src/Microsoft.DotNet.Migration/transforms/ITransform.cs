@@ -16,6 +16,6 @@ namespace Microsoft.DotNet.Migration.Transforms
 {
     public interface ITransform<T> 
     {
-        void Execute(T source, ProjectRootElement destinationProject);
+        void Execute(T source, ProjectRootElement destinationProject, ProjectElement destinationElement = null);
     }
 }

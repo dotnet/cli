@@ -14,20 +14,20 @@ using Newtonsoft.Json;
 
 namespace Microsoft.DotNet.Migration.Transforms
 {
-    public abstract class AddPropertyTransform<T> : ConditionalTransform<T> 
+    public class AddPropertyTransform<T> : ConditionalTransform<T> 
     {
         private string _propertyName;
         private string _propertyValue;
         private Func<T,string> _propertyValueFunc;
 
-        public AddPropertyTransform(string propertyName, string propertyValue, Func<T,Bool> condition)
+        public AddPropertyTransform(string propertyName, string propertyValue, Func<T,bool> condition)
             : base(condition)
         {
             _propertyName = propertyName;
             _propertyValue = propertyValue;
         }
 
-        public AddPropertyTransform(string propertyName, Func<T, string> propertyValueFunc, Func<T,Bool> condition)
+        public AddPropertyTransform(string propertyName, Func<T, string> propertyValueFunc, Func<T,bool> condition)
             : base(condition)
         {
             _propertyName = propertyName;
