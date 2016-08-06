@@ -3,10 +3,14 @@
   <Import Project="compile/Microsoft.DotNet.Cli.LzmaArchive.targets" />
   <Import Project="crossgen/Microsoft.DotNet.Cli.Crossgen.targets" />
 
+  <PropertyGroup>
+    <BinaryToCorehostifyRelDir>runtimes/any/native</BinaryToCorehostifyRelDir>
+  </PropertyGroup>
+
   <ItemGroup>
     <PublishOutputExtensions Include="$(ExeExtension);.dll;.pdb;.deps.json;.runtimeconfig.json" />
-
-    <BundledTools Include="csc;msbuild;NuGet.CommandLine.XPlat" />
+    <FilesToMove Include="$(BinaryToCorehostifyRelDir)/csc.exe;$(BinaryToCorehostifyRelDir)/MSBuild.exe;" />
+    <BundledTools Include="csc;MSBuild;NuGet.CommandLine.XPlat;dotnet" />
   </ItemGroup>
 
   <Target Name="Compile" DependsOnTargets="Prepare;
@@ -60,7 +64,6 @@
         <StageDirectory>%(Stage.StageDirectory)</StageDirectory>
         <StageSymbolsDirectory>%(Stage.StageSymbolsDirectory)</StageSymbolsDirectory>
         <SdkOutputDirectory>$(StageDirectory)/sdk/$(SdkVersion)</SdkOutputDirectory>
-        <BinaryToCorehostifyRelDir>runtimes/any/native</BinaryToCorehostifyRelDir>
         <BinaryToCorehostifyOutDir>$(SdkOutputDirectory)/$(BinaryToCorehostifyRelDir)</BinaryToCorehostifyOutDir>
         <MSBuildTargetsDirectory>$(SdkOutputDirectory)/runtimes/any/native</MSBuildTargetsDirectory>
 
@@ -128,23 +131,14 @@
                                    SectionName="runtimeTargets"
                                    AssetPath="$(BinaryToCorehostifyRelDir)/%(BinariesToRemove.Identity).exe" />
 
-      <Copy SourceFiles="$(BinaryToCorehostifyOutDir)/%(BundledTools.Identity).exe"
-            DestinationFiles="$(SdkOutputDirectory)/%(BundledTools.Identity).dll" />
-
-      <Copy SourceFiles="$(BinaryToCorehostifyOutDir)/%(BundledTools.Identity).exe"
-            DestinationFiles="$(SdkOutputDirectory)/%(BundledTools.Identity).exe" />
+      <Copy SourceFiles="$(SdkOutputDirectory)/%(FilesToMove.Identity)"
+            DestinationFiles="$(SdkOutputDirectory)/%(FilesToMove.Filename).dll" />
 
       <Copy SourceFiles="$(SdkOutputDirectory)/redist.deps.json"
             DestinationFiles="$(SdkOutputDirectory)/%(BundledTools.Identity).deps.json" />
 
       <Copy SourceFiles="$(SdkOutputDirectory)/redist.runtimeconfig.json"
             DestinationFiles="$(SdkOutputDirectory)/%(BundledTools.Identity).runtimeconfig.json" />
-
-      <Copy SourceFiles="$(SdkOutputDirectory)/redist.deps.json"
-            DestinationFiles="$(SdkOutputDirectory)/dotnet.deps.json" />
-
-      <Copy SourceFiles="$(SdkOutputDirectory)/redist.runtimeconfig.json"
-            DestinationFiles="$(SdkOutputDirectory)/dotnet.runtimeconfig.json" />
 
       <ChangeEntryPointLibraryName
             DepsFile="$(SdkOutputDirectory)/%(BundledTools.Identity).deps.json"

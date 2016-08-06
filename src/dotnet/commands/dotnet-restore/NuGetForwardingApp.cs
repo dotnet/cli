@@ -1,6 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.InternalAbstractions;
 using System;
@@ -9,7 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Microsoft.DotNet.Cli
+namespace Microsoft.DotNet.Tools.Restore
 {
     public class NuGetForwardingApp
     {
@@ -20,8 +21,7 @@ namespace Microsoft.DotNet.Cli
         {
             _forwardingApp = new ForwardingApp(
                 GetNuGetExePath(),
-                argsToForward,
-                environmentVariables: GetEnvironmentVariables());
+                argsToForward);
         }
 
         public int Execute()
