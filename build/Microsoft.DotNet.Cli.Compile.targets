@@ -5,12 +5,14 @@
 
   <PropertyGroup>
     <BinaryToCorehostifyRelDir>runtimes/any/native</BinaryToCorehostifyRelDir>
+    <CoreSDKDir>$(RepoRoot)/resources/core-sdk</CoreSDKDir>
   </PropertyGroup>
 
   <ItemGroup>
     <PublishOutputExtensions Include="$(ExeExtension);.dll;.pdb;.deps.json;.runtimeconfig.json" />
     <FilesToMove Include="$(BinaryToCorehostifyRelDir)/csc.exe;$(BinaryToCorehostifyRelDir)/MSBuild.exe;" />
     <BundledTools Include="csc;MSBuild;NuGet.CommandLine.XPlat;dotnet" />
+    <CoreSDKContent Include="$(CoreSDKDir)/**/*" />
   </ItemGroup>
 
   <Target Name="Compile" DependsOnTargets="Prepare;
@@ -91,7 +93,7 @@
 
       <!-- CopySharedFramework -->
       <Copy SourceFiles="@(SharedFramework)"
-            DestinationFiles="@(SharedFramework->'$(StageDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
+            DestinationFiles="@(SharedFramework->'$(StageDirectory)/%(RecursiveDir)%(Filename)%(Extension)')" />
 
       <!-- Publish DotNet -->
       <DotNetPublish ToolPath="%(Stage.DotnetDir)"
@@ -144,8 +146,9 @@
             DepsFile="$(SdkOutputDirectory)/%(BundledTools.Identity).deps.json"
             NewName="%(BundledTools.Identity).deps.json" />
 
-      <!-- cleanup redist project output we don't need -->
+      <!-- cleanup project output we don't need -->
       <Delete Files="$(SdkOutputDirectory)/redist%(PublishOutputExtensions.Identity)" />
+      <Delete Files="$(SdkOutputDirectory)/tool_msbuild%(PublishOutputExtensions.Identity)" />
 
       <!-- Copy Host to SDK Directory -->
       <Copy SourceFiles="$(SharedFrameworkNameVersionPath)/$(DotnetHostBaseName)"
@@ -156,6 +159,10 @@
 
       <Copy SourceFiles="$(SharedFrameworkNameVersionPath)/$(HostPolicyBaseName)"
             DestinationFiles="$(SdkOutputDirectory)/$(HostPolicyBaseName)" />
+
+      <!-- copy core sdk -->
+      <Copy SourceFiles="@(CoreSDKContent)"
+            DestinationFolder="$(SdkOutputDirectory)/%(RecursiveDir)" />
 
       <!-- Crossgen the Shared Framework -->
       <ItemGroup>
@@ -203,7 +210,7 @@
       </ItemGroup>
 
       <Copy SourceFiles="@(MSBuildTargetsToCopy)"
-            DestinationFiles="@(MSBuildTargetsToCopy->'$(SdkOutputDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
+            DestinationFiles="@(MSBuildTargetsToCopy->'$(SdkOutputDirectory)/%(RecursiveDir)%(Filename)%(Extension)')" />
 
     <!-- Temporary workaround for MSBuild placing their .props files in the old 14.1 directory -->
     <Move SourceFiles="$(SdkOutputDirectory)/14.1/Microsoft.Common.props"
