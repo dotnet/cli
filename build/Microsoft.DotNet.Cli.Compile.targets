@@ -182,7 +182,7 @@
         <CompileStageSdkDirectories Remove="*" />
       </ItemGroup>
 
-      <RemoveDuplicates Inputs="@(SdkFiles->'%(RootDir)%(Directory)')">
+      <RemoveDuplicates Inputs="@(SdkFiles->'%(Directory)')">
         <Output TaskParameter="Filtered" ItemName="CompileStageSdkDirectories" />
       </RemoveDuplicates>
 
