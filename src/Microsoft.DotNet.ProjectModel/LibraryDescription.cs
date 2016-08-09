@@ -22,7 +22,8 @@ namespace Microsoft.DotNet.ProjectModel
             IEnumerable<LibraryRange> dependencies,
             NuGetFramework framework,
             bool resolved,
-            bool compatible)
+            bool compatible,
+            string packagesDirectoryPath)
         {
             Path = path;
             Identity = identity;
@@ -31,6 +32,7 @@ namespace Microsoft.DotNet.ProjectModel
             Framework = framework;
             Resolved = resolved;
             Compatible = compatible;
+            PackagesDirectoryPath = packagesDirectoryPath;
         }
 
         public LibraryIdentity Identity { get; }
@@ -40,6 +42,7 @@ namespace Microsoft.DotNet.ProjectModel
         public string Path { get; }
         public IEnumerable<LibraryRange> Dependencies { get; }
         public bool Compatible { get; }
+        public string PackagesDirectoryPath { get; }
 
         public NuGetFramework Framework { get; set; }
         public bool Resolved { get; set; }

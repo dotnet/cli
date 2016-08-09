@@ -146,8 +146,8 @@ namespace Microsoft.Extensions.DependencyModel
                     export.NativeLibraryGroups.Select(CreateRuntimeAssetGroup).ToArray(),
                     export.ResourceAssemblies.Select(CreateResourceAssembly),
                     libraryDependencies,
-                    serviceable
-                    );
+                    serviceable,
+                    export.Library.PackagesDirectoryPath);
             }
             else
             {
@@ -168,7 +168,8 @@ namespace Microsoft.Extensions.DependencyModel
                     export.Library.Hash,
                     assemblies,
                     libraryDependencies,
-                    serviceable);
+                    serviceable,
+                    export.Library.PackagesDirectoryPath);
             }
         }
 

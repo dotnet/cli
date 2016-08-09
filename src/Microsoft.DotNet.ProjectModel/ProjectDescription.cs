@@ -18,8 +18,10 @@ namespace Microsoft.DotNet.ProjectModel
                   Enumerable.Empty<LibraryRange>(),
                   framework: null,
                   resolved: false,
-                  compatible: false)
-        { }
+                  compatible: false,
+                  packagesDirectoryPath: null)
+        {
+        }
 
         public ProjectDescription(
             LibraryRange libraryRange,
@@ -34,7 +36,8 @@ namespace Microsoft.DotNet.ProjectModel
                     dependencies,
                     targetFrameworkInfo.FrameworkName,
                     resolved,
-                    compatible: true)
+                    compatible: true,
+                    packagesDirectoryPath: null)
         {
             Project = project;
             TargetFrameworkInfo = targetFrameworkInfo;
