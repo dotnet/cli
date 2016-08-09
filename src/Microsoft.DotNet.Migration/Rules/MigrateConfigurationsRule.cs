@@ -12,7 +12,7 @@ using System.Linq;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace Microsoft.DotNet.Migration.Rules
+namespace Microsoft.DotNet.ProjectJsonMigration.Rules
 {
     public class MigrateConfigurationsRule : IMigrationRule
     {
@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.Migration.Rules
 
             foreach (var configuration in configurations)
             {
-                MigrateConfiguration(configuration);
+                MigrateConfiguration(configuration, projectContext, csproj, outputDirectory);
             }
         }
 

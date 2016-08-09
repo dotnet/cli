@@ -5,11 +5,11 @@ using System.Linq;
 using FluentAssertions;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
-using Microsoft.DotNet.Migration;
+using Microsoft.DotNet.ProjectJsonMigration;
 using System;
 using System.IO;
 
-namespace Microsoft.DotNet.Migration.Tests
+namespace Microsoft.DotNet.ProjectJsonMigration.Tests
 {
     public class GivenAProjectMigrator : TestBase
     {

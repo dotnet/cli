@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Build.Construction;
-using Microsoft.DotNet.Migration.Models;
+using Microsoft.DotNet.ProjectJsonMigration.Models;
 
-namespace Microsoft.DotNet.Migration.Transforms
+namespace Microsoft.DotNet.ProjectJsonMigration.Transforms
 {
     public class IncludeContextTransform : AggregateTransform<IncludeContext>
     {

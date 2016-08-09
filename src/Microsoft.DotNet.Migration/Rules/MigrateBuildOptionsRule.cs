@@ -10,10 +10,10 @@ using Microsoft.DotNet.Cli;
 using System.Linq;
 using System.IO;
 using Newtonsoft.Json;
-using Microsoft.DotNet.Migration.Transforms;
+using Microsoft.DotNet.ProjectJsonMigration.Transforms;
 using Microsoft.DotNet.ProjectModel.Files;
 
-namespace Microsoft.DotNet.Migration.Rules
+namespace Microsoft.DotNet.ProjectJsonMigration.Rules
 {
     public class MigrateBuildOptionsRule : IMigrationRule
     {
@@ -87,7 +87,7 @@ namespace Microsoft.DotNet.Migration.Rules
 
             foreach (var itemName in existingItemsToRemove)
             {
-                var items = csproj.Items.Where(p => p.Name == itemName);
+                var items = csproj.Items.Where(p => p.ItemType == itemName);
 
                 foreach (var item in items)
                 {

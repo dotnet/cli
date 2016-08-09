@@ -11,7 +11,7 @@ using Microsoft.DotNet.Cli;
 using System.Linq;
 using System.IO;
 
-namespace Microsoft.DotNet.Migration
+namespace Microsoft.DotNet.ProjectJsonMigration
 {
     public class MigrationSettings
     {

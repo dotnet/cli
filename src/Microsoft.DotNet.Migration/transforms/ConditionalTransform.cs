@@ -12,7 +12,7 @@ using System.Linq;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace Microsoft.DotNet.Migration.Transforms
+namespace Microsoft.DotNet.ProjectJsonMigration.Transforms
 {
     public abstract class ConditionalTransform<T> : ITransform<T> 
     {

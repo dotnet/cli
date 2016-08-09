@@ -10,9 +10,9 @@ using Microsoft.DotNet.Cli;
 using System.Linq;
 using System.IO;
 using Newtonsoft.Json;
-using Microsoft.DotNet.Migration.Rules;
+using Microsoft.DotNet.ProjectJsonMigration.Rules;
 
-namespace Microsoft.DotNet.Migration
+namespace Microsoft.DotNet.ProjectJsonMigration
 {
     public class DefaultMigrationRuleSet : IMigrationRule
     {
