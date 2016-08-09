@@ -20,7 +20,9 @@ namespace Microsoft.DotNet.Migration
         {
             new MigrateBuildOptionsRule(),
             new MigrateRuntimeOptionsRule(),
-            new MigratePublishOptionsRule()
+            new MigratePublishOptionsRule(),
+            new MigrateProjectDependenciesRule(),
+            new MigrateConfigurationsRule()
         };
 
         public void Apply(ProjectContext projectContext, ProjectRootElement csproj, string outputDirectory)
