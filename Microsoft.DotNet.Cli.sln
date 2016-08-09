@@ -153,7 +153,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.DotNet.Tools.Test
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.DotNet.Core.Build.Tasks.Tests", "test\Microsoft.DotNet.Core.Build.Tasks.Tests\Microsoft.DotNet.Core.Build.Tasks.Tests.xproj", "{EDD6C92D-0A58-4FCB-A0E9-9D0FFC045177}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.DotNet.Migration", "src\Microsoft.DotNet.Migration\Microsoft.DotNet.Migration.xproj", "{0FB00AD1-EAB6-4E86-9FF7-90FD1702AA15}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.DotNet.ProjectJson.Migration", "src\Microsoft.DotNet.Migration\Microsoft.DotNet.ProjectJson.Migration.xproj", "{0FB00AD1-EAB6-4E86-9FF7-90FD1702AA15}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.DotNet.Migration.Tests", "test\Microsoft.DotNet.Migration.Tests\Microsoft.DotNet.Migration.Tests.xproj", "{0FF745DD-A35E-4BD0-8653-9BE2C258F9EA}"
 EndProject

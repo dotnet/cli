@@ -23,6 +23,8 @@ namespace Microsoft.DotNet.Migration.Transforms
 
         private Func<T, string> _includeValueFunc;
         private Func<T, string> _excludeValueFunc;
+        
+        private bool _mergeExisting;
 
         private List<ItemMetadataValue<T>> _metadata = new List<ItemMetadataValue<T>>();
 
@@ -30,55 +32,64 @@ namespace Microsoft.DotNet.Migration.Transforms
             string itemName,
             IEnumerable<string> includeValues,
             IEnumerable<string> excludeValues,
-            Func<T, bool> condition)
-            : this(itemName, string.Join(";", includeValues), string.Join(";", excludeValues), condition) { }
+            Func<T, bool> condition,
+            bool mergeExisting = false)
+            : this(itemName, string.Join(";", includeValues), string.Join(";", excludeValues), condition, mergeExisting) { }
 
         public AddItemTransform(
             string itemName,
             Func<T, string> includeValueFunc,
             Func<T, string> excludeValueFunc,
-            Func<T, bool> condition)
+            Func<T, bool> condition,
+            bool mergeExisting = false)
             : base(condition)
         {
             _itemName = itemName;
             _includeValueFunc = includeValueFunc;
             _excludeValueFunc = excludeValueFunc;
+            _mergeExisting = mergeExisting;
         }
 
         public AddItemTransform(
             string itemName,
             string includeValue,
             Func<T, string> excludeValueFunc,
-            Func<T, bool> condition)
+            Func<T, bool> condition,
+            bool mergeExisting = false)
             : base(condition)
         {
             _itemName = itemName;
             _includeValue = includeValue;
             _excludeValueFunc = excludeValueFunc;
+            _mergeExisting = mergeExisting;
         }
 
         public AddItemTransform(
             string itemName,
             Func<T, string> includeValueFunc,
             string excludeValue,
-            Func<T, bool> condition)
+            Func<T, bool> condition,
+            bool mergeExisting = false)
             : base(condition)
         {
             _itemName = itemName;
             _includeValueFunc = includeValueFunc;
             _excludeValue = excludeValue;
+            _mergeExisting = mergeExisting;
         }
 
         public AddItemTransform(
             string itemName,
             string includeValue,
             string excludeValue,
-            Func<T, bool> condition)
+            Func<T, bool> condition,
+            bool mergeExisting=false)
             : base(condition)
         {
             _itemName = itemName;
             _includeValue = includeValue;
             _excludeValue = excludeValue;
+            _mergeExisting = mergeExisting;
         }
 
         public AddItemTransform<T> WithMetadata(string metadataName, string metadataValue)
@@ -101,11 +112,30 @@ namespace Microsoft.DotNet.Migration.Transforms
 
         public override void ConditionallyExecute(T source, ProjectRootElement destinationProject, ProjectElement destinationElement = null)
         {
-            ProjectItemGroupElement itemGroup = (ProjectItemGroupElement)destinationElement
-                ?? destinationProject.AddItemGroup();
-
             string includeValue = _includeValue ?? _includeValueFunc(source);
             string excludeValue = _excludeValue ?? _excludeValueFunc(source);
+
+            var item = FindExistingItem(destinationProject, includeValue);
+            if (item != default(ProjectItemElement) && !_mergeExisting)
+            {
+                throw new Exception("Existing item found, expected no item. Set mergeExisting to merge new metadata with existing items.");
+            }
+
+            // There is an existing item, merge exclude + metadata, with non-existing metadata being preferred in case of conflict
+            if (item != default(ProjectItemElement))
+            {
+                excludeValue += item.Exclude;
+                
+                foreach (var existingMetadata in item.Metadata)
+                {
+                    _metadata.Insert(0, new ItemMetadataValue<T>(existingMetadata.Name, existingMetadata.Value));
+                }
+
+                item.Parent.RemoveChild(item);
+            }
+
+            ProjectItemGroupElement itemGroup = (ProjectItemGroupElement)destinationElement
+                ?? destinationProject.AddItemGroup();
 
             var item = itemGroup.AddItem(_itemName, includeValue);
             item.Exclude = excludeValue;
@@ -114,6 +144,13 @@ namespace Microsoft.DotNet.Migration.Transforms
             {
                 item.AddMetadata(metadata.MetadataName, metadata.GetMetadataValue(source));
             }
+        }
+
+        private ProjectItemElement FindExistingItem(ProjectRootElement destinationProject, string includeValue)
+        {
+            return destinationProject.Items
+                .Where(item => string.Equals(item.Include, includeValue, StringComparison.Ordinal))
+                .FirstOrDefault();
         }
     }
 }

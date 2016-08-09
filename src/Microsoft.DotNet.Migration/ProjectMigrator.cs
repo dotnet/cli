@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Construction;
 using Microsoft.DotNet.ProjectModel;
-using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Cli;
 using System.Linq;
 using System.IO;
@@ -23,7 +22,8 @@ namespace Microsoft.DotNet.Migration
         // TODO: Support Mappings in IncludeContext Transformations
         // TODO: Support Removal of default items/properties from template when appropriate
         // TODO: Specify ordering of generated property/item groups (append at end of file in most cases)
-        // TODO: 
+        // TODO: Migrate Multi-TFM projects
+        // TODO: Migrate RID projects
 
         public int Migrate(string projectDirectory, string outputDirectory)
         {

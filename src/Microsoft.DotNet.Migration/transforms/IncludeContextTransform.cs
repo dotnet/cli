@@ -1,5 +1,6 @@
 ﻿using Microsoft.DotNet.ProjectModel.Files;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +12,8 @@ namespace Microsoft.DotNet.Migration.Transforms
     public class IncludeContextTransform : AggregateTransform<IncludeContext>
     {
         // TODO: If a directory is specified in project.json does this need to be replaced with a glob in msbuild?
+        //     - Partially solved, what if the resolved glob is a directory?
+        // TODO: Support mappings
 
         private string _itemName;
         private bool _transformMappings;
@@ -40,8 +43,8 @@ namespace Microsoft.DotNet.Migration.Transforms
         {
             var includeFilesExcludeFilesTransformation = new AddItemTransform<IncludeContext>(
                 _itemName,
-                includeContext => FormatPatterns(includeContext.IncludeFiles),
-                includeContext => FormatPatterns(includeContext.ExcludeFiles),
+                includeContext => FormatPatterns(includeContext.IncludeFiles, includeContext.SourceBasePath),
+                includeContext => FormatPatterns(includeContext.ExcludeFiles, includeContext.SourceBasePath),
                 includeContext => true);
 
             var includeExcludeTransformation = new AddItemTransform<IncludeContext>(
@@ -51,14 +54,14 @@ namespace Microsoft.DotNet.Migration.Transforms
                     var fullIncludeSet = includeContext.IncludePatterns
                                          .Concat(includeContext.BuiltInsInclude);
 
-                    return FormatPatterns(fullIncludeSet);
+                    return FormatPatterns(fullIncludeSet, includeContext.SourceBasePath);
                 },
                 includeContext =>
                 {
                     var fullExcludeSet = includeContext.ExcludePatterns
                                          .Concat(includeContext.BuiltInsExclude)
                                          .Concat(includeContext.ExcludeFiles);
-                    return FormatPatterns(fullExcludeSet);
+                    return FormatPatterns(fullExcludeSet, includeContext.SourceBasePath);
                 },
                 includeContext => true);
 
@@ -75,7 +78,7 @@ namespace Microsoft.DotNet.Migration.Transforms
             };
         }
 
-        private string FormatPatterns(IEnumerable<string> patterns)
+        private string FormatPatterns(IEnumerable<string> patterns, string projectDirectory)
         {
             List<string> mutatedPatterns = new List<string>(patterns.Count());
 
@@ -84,10 +87,36 @@ namespace Microsoft.DotNet.Migration.Transforms
                 // Do not use forward slashes
                 // https://github.com/Microsoft/msbuild/issues/724
                 var mutatedPattern = pattern.Replace('/', '\\');
+
+                // MSBuild cannot copy directories
+                mutatedPattern = ReplaceDirectoriesWithGlobs(mutatedPattern, projectDirectory);
+
                 mutatedPatterns.Add(mutatedPattern);
             }
 
             return string.Join(";", mutatedPatterns);
+        }
+
+        private string ReplaceDirectoriesWithGlobs(string pattern, string projectDirectory)
+        {
+            if (PatternIsDirectory(pattern, projectDirectory))
+            {
+                return $"{pattern.TrimEnd(new char[] { '\\' })}\\**\\*";
+            }
+        }
+
+        private bool PatternIsDirectory(string pattern, string projectDirectory)
+        {
+            // TODO: what about /some/path/**/somedir?
+            // Should this even be migrated?
+            var path = pattern;
+
+            if (!Path.IsPathRooted(path))
+            {
+                path = Path.Combine(projectDirectory, path);
+            }
+
+            return Directory.Exists(path);
         }
     }
 }
