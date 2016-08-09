@@ -15,34 +15,28 @@ namespace Microsoft.DotNet.Migration
 {
     public class ProjectMigrator
     {
-        // TODO: Migrate P2Ps
+        // TODO: Test ProjectDependencyMigration
         // TODO: Migrate AssemblyInfo
         // TODO: Migrate PackOptions
         // TODO: Migrate Scripts
-        // TODO: Migrate Configurations
+        // TODO: Test Configuration Migration
         // TODO: Support Mappings in IncludeContext Transformations
         // TODO: Support Removal of default items/properties from template when appropriate
         // TODO: Specify ordering of generated property/item groups (append at end of file in most cases)
         // TODO: 
 
-        public int Migrate(string projectDirectory, string outputDirectory)
+        public int Migrate(MigrationSettings settings)
         {
+            var outputDirectory = settings.OutputDirectory;
+            var projectDirectory = settings.ProjectDirectory;
+
             if (!Directory.Exists(outputDirectory))
             {
                 Directory.CreateDirectory(outputDirectory);
             }
 
             var projectContexts = ProjectContext.CreateContextForEachTarget(projectDirectory);
-
-            if (projectContexts.Count() > 1)
-            {
-                throw new Exception("MultiTFM projects currently not supported.");
-            }
-
-            if (projectContexts.Count() == 0)
-            {
-                throw new Exception("No projects found");
-            }
+            VerifyProject(projectContexts);
 
             var projectContext = projectContexts.First();
 
@@ -56,6 +50,29 @@ namespace Microsoft.DotNet.Migration
             csproj.Save(Path.Combine(outputDirectory, projectContext.ProjectFile.Name + ".csproj"));
 
             return 1;
+        }
+
+        private void VerifyProject(IEnumerable<ProjectContext> projectContexts)
+        {
+            if (projectContexts.Count() > 1)
+            {
+                throw new Exception("MultiTFM projects currently not supported.");
+            }
+
+            if (projectContexts.Count() == 0)
+            {
+                throw new Exception("No projects found");
+            }
+
+            if (projectContexts.First().RuntimeIdentifier != null)
+            {
+                throw new Exception("Projects using runtimes node currently not supported.");
+            }
+
+            if (projectContexts.First().LockFile == null)
+            {
+                throw new Exception("Restore must be run prior to project migration.");
+            }
         }
 
         private ProjectRootElement GetDefaultMSBuildProject()

@@ -18,11 +18,33 @@ namespace Microsoft.DotNet.Migration.Rules
 {
     public class MigrateBuildOptionsRule : IMigrationRule
     {
-        
+        private bool _insideConfiguration;
+
+        private ProjectPropertyGroupElement _configurationPropertyGroup;
+        private ProjectItemGroupElement _configurationItemGroup;
+
+        public MigrateBuildOptionsRule()
+        {
+            _insideConfiguration = false;
+        }
+
+        public MigrateBuildOptionsRule(ProjectPropertyGroupElement configurationPropertyGroup, ProjectItemGroupElement configurationItemGroup)
+        {
+            _insideConfiguration = true;
+            _configurationPropertyGroup = configurationPropertyGroup;
+            _configurationItemGroup = configurationItemGroup;
+        }
+
         public void Apply(ProjectContext projectContext, ProjectRootElement csproj, string outputDirectory)
         {
+            // Clean Existing properties from Template, if we're not inside a configuration
+            if (!_insideConfiguration)
+            {
+                CleanExistingElements(csproj);
+            }
+
             // Map Properties
-            var propertyGroup = csproj.AddPropertyGroup();
+            var propertyGroup = _configurationPropertyGroup ?? csproj.AddPropertyGroup();
             var compilerOptions = projectContext.ProjectFile.GetCompilerOptions(null, null);
 
             EmitEntryPointTransform.Execute(compilerOptions.EmitEntryPoint ?? false, csproj, propertyGroup);
@@ -42,11 +64,37 @@ namespace Microsoft.DotNet.Migration.Rules
             PreserveCompilationContextTransform.Execute(compilerOptions.PreserveCompilationContext ?? false, csproj, propertyGroup);
 
             // Map Compile, Embed, CopyToOutput
-            var itemGroup = csproj.AddItemGroup();
+            var itemGroup = _configurationItemGroup ?? csproj.AddItemGroup();
 
             CompileFilesTransform.Execute(compilerOptions.CompileInclude, csproj, itemGroup);
             EmbedFilesTransform.Execute(compilerOptions.EmbedInclude, csproj, itemGroup);
             CopyToOutputFilesTransform.Execute(compilerOptions.CopyToOutputInclude, csproj, itemGroup);
+        }
+
+        private void CleanExistingElements(ProjectRootElement csproj)
+        {
+            var existingPropertiesToRemove = new string[] { "OutputType", "TargetExt" };
+            var existingItemsToRemove = new string[] { "Compile" };
+
+            foreach (var propertyName in existingPropertiesToRemove)
+            {
+                var properties = csproj.Properties.Where(p => p.Name == propertyName);
+
+                foreach (var property in properties)
+                {
+                    property.Parent.RemoveChild(property);
+                }
+            }
+
+            foreach (var itemName in existingItemsToRemove)
+            {
+                var items = csproj.Items.Where(p => p.Name == itemName);
+
+                foreach (var item in items)
+                {
+                    item.Parent.RemoveChild(item);
+                }
+            }
         }
 
         private ITransform<bool> EmitEntryPointTransform => new AggregateTransform<bool>(

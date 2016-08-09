@@ -21,7 +21,8 @@ namespace Microsoft.DotNet.Migration
         {
             new MigrateBuildOptionsRule(),
             new MigrateRuntimeOptionsRule(),
-            new MigratePublishOptionsRule()
+            new MigratePublishOptionsRule(),
+            new MigrateP2PRule()
         };
 
         public void Apply(ProjectContext projectContext, ProjectRootElement csproj, string outputDirectory)
