@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.Cli
 {
     public class MSBuildForwardingApp
     {
-        private const string s_msbuildExeName = "MSBuild.dll";
+        private const string s_msbuildExeName = "MSBuild.exe";
         private readonly ForwardingApp _forwardingApp;
 
         public MSBuildForwardingApp(string[] argsToForward)
