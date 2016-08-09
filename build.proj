@@ -57,10 +57,6 @@
 
     <ItemGroup>
       <DotnetSdkDirectories Include="$([System.IO.Directory]::GetDirectories(&quot;$(Stage0Directory)/sdk&quot;))" />
-      <DependenciesToCopy Include="$(DotnetCliBuildDirectory)/bin/Microsoft.Build.Utilities.Core.dll">
-        <Source>%(Identity)</Source>
-        <Destination>%(DotnetSdkDirectories.FullPath)/Microsoft.Build.Utilities.Core.dll</Destination>
-      </DependenciesToCopy>
       <DependenciesToCopy Include="$(DotnetCliBuildDirectory)/bin/Microsoft.WindowsAzure.Storage.dll">
         <Source>%(Identity)</Source>
         <Destination>%(DotnetSdkDirectories.FullPath)/Microsoft.WindowsAzure.Storage.dll</Destination>
