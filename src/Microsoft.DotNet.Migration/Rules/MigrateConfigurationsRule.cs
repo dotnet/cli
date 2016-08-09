@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 
 namespace Microsoft.DotNet.Migration.Rules
 {
-    public class MigrateProjectDependenciesRule : IMigrationRule
+    public class MigrateConfigurationsRule : IMigrationRule
     {
         public void Apply(ProjectContext projectContext, ProjectRootElement csproj, string outputDirectory)
         {
@@ -44,11 +44,5 @@ namespace Microsoft.DotNet.Migration.Rules
             var migrateBuildOptionsInConfigurationRule = new MigrateBuildOptionsRule(propertyGroup, itemGroup);
             migrateBuildOptionsInConfigurationRule.Apply(projectContext, csproj, outputDirectory);
         }
-
-        private ITransform<LibraryExport> ProjectDependencyTransform = new AddItemTransform<LibraryExport>(
-            "ProjectReference", 
-            export => ((ProjectDescription)export.Library).Project.ProjectFilePath,
-            export => "",
-            export => true);
     }
 }
