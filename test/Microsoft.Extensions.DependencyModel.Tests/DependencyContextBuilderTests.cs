@@ -19,6 +19,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
         private NuGetFramework _defaultFramework;
         private string _defaultName = "Library.Name";
         private string _defaultHash = "Hash";
+        private string _defaultPath = "the/Package/PATH";
         private NuGetVersion _defaultVersion = new NuGetVersion(1, 2, 3, new []{"dev"}, string.Empty);
 
         public DependencyContext Build(CommonCompilerOptions compilerOptions = null,
@@ -136,7 +137,8 @@ namespace Microsoft.Extensions.DependencyModel.Tests
                                 new VersionRange(new NuGetVersion(2, 1, 2)),
                                 LibraryType.ReferenceAssembly,
                                 LibraryDependencyType.Default)
-                        }),
+                        },
+                        path: "path/TO/package"),
                     resourceAssemblies: new[]
                     {
                         new LibraryResourceAssembly(
@@ -175,6 +177,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             lib.Version.Should().Be("1.2.3");
             lib.Dependencies.Should().OnlyContain(l => l.Name == "System.Collections" && l.Version == "3.3.3");
             lib.ResourceAssemblies.Should().OnlyContain(l => l.Path == "en-US/Pack.Age.resources.dll" && l.Locale == "en-US");
+            lib.Path.Should().Be("path/TO/package");
 
             lib.RuntimeAssemblyGroups.GetDefaultAssets().Should().OnlyContain(l => l == "lib/Pack.Age.dll");
             lib.RuntimeAssemblyGroups.GetRuntimeAssets("win8-x64").Should().OnlyContain(l => l == "win8-x64/Pack.Age.dll");
@@ -186,6 +189,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             asm.Hash.Should().BeEmpty();
             asm.Dependencies.Should().BeEmpty();
             asm.RuntimeAssemblyGroups.GetDefaultAssets().Should().OnlyContain(l => l == "System.Collections.dll");
+            asm.Path.Should().BeNull();
         }
 
         [Fact]
@@ -232,7 +236,8 @@ namespace Microsoft.Extensions.DependencyModel.Tests
                             new VersionRange(new NuGetVersion(2, 1, 2)),
                             LibraryType.ReferenceAssembly,
                             LibraryDependencyType.Default)
-                    }),
+                    },
+                    path: "path/TO/package"),
                     compilationAssemblies: new[]
                     {
                         new LibraryAsset("Dll", "lib/Pack.Age.dll", ""),
@@ -255,6 +260,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             lib.Version.Should().Be("1.2.3");
             lib.Dependencies.Should().OnlyContain(l => l.Name == "System.Collections" && l.Version == "3.3.3");
             lib.Assemblies.Should().OnlyContain(a => a == "lib/Pack.Age.dll");
+            lib.Path.Should().Be("path/TO/package");
 
             var asm = context.CompileLibraries.Should().Contain(l => l.Name == "System.Collections").Subject;
             asm.Type.Should().Be("referenceassembly");
@@ -262,6 +268,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             asm.Hash.Should().BeEmpty();
             asm.Dependencies.Should().BeEmpty();
             asm.Assemblies.Should().OnlyContain(a => a == "System.Collections.dll");
+            asm.Path.Should().BeNull();
         }
 
         [Fact]
@@ -354,7 +361,8 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             NuGetVersion version = null,
             string hash = null,
             IEnumerable<LibraryRange> dependencies = null,
-            bool? servicable = null)
+            bool? servicable = null,
+            string path = null)
         {
             return new PackageDescription(
                 "PATH",
@@ -364,7 +372,8 @@ namespace Microsoft.Extensions.DependencyModel.Tests
                     IsServiceable = servicable ?? false,
                     Name = name ?? _defaultName,
                     Version = version ?? _defaultVersion,
-                    Sha512 = hash ?? _defaultHash
+                    Sha512 = hash ?? _defaultHash,
+                    Path = path ?? _defaultPath
                 },
                 new LockFileTargetLibrary(),
                 dependencies ?? Enumerable.Empty<LibraryRange>(),
@@ -404,7 +413,8 @@ namespace Microsoft.Extensions.DependencyModel.Tests
                 Enumerable.Empty<LibraryRange>(),
                 _defaultFramework,
                 true,
-                true);
+                true,
+                packagesDirectoryPath: null);
         }
 
 

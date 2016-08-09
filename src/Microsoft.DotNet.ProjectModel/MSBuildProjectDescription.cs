@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.DotNet.ProjectModel.Graph;
 
 namespace Microsoft.DotNet.ProjectModel
@@ -33,7 +32,8 @@ namespace Microsoft.DotNet.ProjectModel
                   dependencies,
                   resolved: resolved,
                   compatible: compatible,
-                  framework: null)
+                  framework: null,
+                  packagesDirectoryPath: null)
         {
             MSBuildProjectPath = msbuildProjectPath;
             ProjectFile = projectFile;

@@ -9,7 +9,7 @@ namespace Microsoft.Extensions.DependencyModel
 {
     public class Library
     {
-        public Library(string type, string name, string version, string hash, IEnumerable<Dependency> dependencies, bool serviceable)
+        public Library(string type, string name, string version, string hash, IEnumerable<Dependency> dependencies, bool serviceable, string path)
         {
             if (string.IsNullOrEmpty(type))
             {
@@ -33,6 +33,7 @@ namespace Microsoft.Extensions.DependencyModel
             Hash = hash;
             Dependencies = dependencies.ToArray();
             Serviceable = serviceable;
+            Path = path;
         }
 
         public string Type { get; }
@@ -46,5 +47,7 @@ namespace Microsoft.Extensions.DependencyModel
         public IReadOnlyList<Dependency> Dependencies { get; }
 
         public bool Serviceable { get; }
+
+        public string Path { get; }
     }
 }

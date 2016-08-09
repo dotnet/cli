@@ -16,8 +16,9 @@ namespace Microsoft.Extensions.DependencyModel
             string hash,
             IEnumerable<string> assemblies,
             IEnumerable<Dependency> dependencies,
-            bool serviceable)
-            : base(type, name, version, hash,  dependencies, serviceable)
+            bool serviceable,
+            string path)
+            : base(type, name, version, hash,  dependencies, serviceable, path)
         {
             if (assemblies == null)
             {
