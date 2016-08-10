@@ -14,7 +14,6 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
 {
     public class GivenThatIWantToMigrateScripts : TestBase
     {
-
         [Theory]
         [InlineData("compile:FullTargetFramework", "$(TargetFrameworkIdentifier)=$(TargetFrameworkVersion)")]
         [InlineData("compile:Configuration", "$(Configuration)")]
