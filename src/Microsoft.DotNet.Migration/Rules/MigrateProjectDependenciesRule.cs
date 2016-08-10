@@ -11,11 +11,10 @@ using Microsoft.DotNet.Cli;
 using System.Linq;
 using System.IO;
 using Newtonsoft.Json;
-using Microsoft.DotNet.ProjectJsonMigration.Transforms;
 using Microsoft.DotNet.ProjectModel.Compilation;
 using Microsoft.DotNet.ProjectModel.Graph;
 
-namespace Microsoft.DotNet.ProjectJsonMigration.Rules
+namespace Microsoft.DotNet.ProjectJsonMigration
 {
     public class MigrateProjectDependenciesRule : IMigrationRule
     {

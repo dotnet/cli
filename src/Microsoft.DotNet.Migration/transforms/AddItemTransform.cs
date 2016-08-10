@@ -11,9 +11,8 @@ using Microsoft.DotNet.Cli;
 using System.Linq;
 using System.IO;
 using Newtonsoft.Json;
-using Microsoft.DotNet.ProjectJsonMigration.Models;
 
-namespace Microsoft.DotNet.ProjectJsonMigration.Transforms
+namespace Microsoft.DotNet.ProjectJsonMigration
 {
     public class AddItemTransform<T> : ConditionalTransform<T>
     {

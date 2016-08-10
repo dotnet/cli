@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             var testProjectPath = Path.Combine(RepoRoot, "TestAssets", "TestProjects", "PortableTests", "PortableApp");
             var output = Path.Combine(AppContext.BaseDirectory, "out");
 
-            migrator.Migrate(testProjectPath, output).Should().Be(0);
+            migrator.Migrate(new MigrationSettings(testProjectPath, output)).Should().Be(0);
         }
     }
 }

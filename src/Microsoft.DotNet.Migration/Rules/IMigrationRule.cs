@@ -12,7 +12,7 @@ using System.Linq;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace Microsoft.DotNet.ProjectJsonMigration.Rules
+namespace Microsoft.DotNet.ProjectJsonMigration
 {
     public interface IMigrationRule
     {

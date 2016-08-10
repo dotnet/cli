@@ -5,9 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Build.Construction;
-using Microsoft.DotNet.ProjectJsonMigration.Models;
 
-namespace Microsoft.DotNet.ProjectJsonMigration.Transforms
+namespace Microsoft.DotNet.ProjectJsonMigration
 {
     public class IncludeContextTransform : AggregateTransform<IncludeContext>
     {
@@ -102,6 +101,10 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Transforms
             if (PatternIsDirectory(pattern, projectDirectory))
             {
                 return $"{pattern.TrimEnd(new char[] { '\\' })}\\**\\*";
+            }
+            else
+            {
+                return pattern;
             }
         }
 

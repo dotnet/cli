@@ -11,10 +11,9 @@ using Microsoft.DotNet.Cli;
 using System.Linq;
 using System.IO;
 using Newtonsoft.Json;
-using Microsoft.DotNet.ProjectJsonMigration.Transforms;
 using Microsoft.DotNet.ProjectModel.Files;
 
-namespace Microsoft.DotNet.ProjectJsonMigration.Rules
+namespace Microsoft.DotNet.ProjectJsonMigration
 {
     public class MigratePublishOptionsRule : IMigrationRule
     {

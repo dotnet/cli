@@ -10,10 +10,9 @@ using Microsoft.DotNet.Cli;
 using System.Linq;
 using System.IO;
 using Newtonsoft.Json;
-using Microsoft.DotNet.ProjectJsonMigration.Transforms;
 using Microsoft.DotNet.ProjectModel.Files;
 
-namespace Microsoft.DotNet.ProjectJsonMigration.Rules
+namespace Microsoft.DotNet.ProjectJsonMigration
 {
     public class MigrateScriptsRule : IMigrationRule
     {
@@ -29,16 +28,18 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
             }
         }
 
-        private void MigrateScriptSet(ProjectRootElement csproj, IEnumerable<string> scriptCommands, string scriptSetName)
+        public ProjectTargetElement MigrateScriptSet(ProjectRootElement csproj, IEnumerable<string> scriptCommands, string scriptSetName)
         {
             var target = CreateTarget(csproj, scriptSetName);
             foreach (var scriptCommand in scriptCommands)
             {
                 AddExec(target, FormatScriptCommand(scriptCommand));
             }
+
+            return target;
         }
 
-        private string FormatScriptCommand(string command)
+        public string FormatScriptCommand(string command)
         {
             foreach (var scriptVariableEntry in ScriptVariableToMSBuildMap)
             {
@@ -61,10 +62,10 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
 
         private ProjectTargetElement CreateTarget(ProjectRootElement csproj, string scriptSetName)
         {
-            var targetName = $"{scriptSetName[0].ToString().ToUpper()}{scriptSetName.Skip(1).ToString()}Script";
+            var targetName = $"{scriptSetName[0].ToString().ToUpper()}{string.Concat(scriptSetName.Skip(1))}Script";
             var targetHookInfo = ScriptSetToMSBuildHookTargetMap[scriptSetName];
 
-            var target = csproj.CreateTargetElement(targetName);
+            var target = csproj.AddTarget(targetName);
             if (targetHookInfo.IsRunBefore)
             {
                 target.BeforeTargets = targetHookInfo.TargetName;
@@ -79,7 +80,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
 
         private void AddExec(ProjectTargetElement target, string command)
         {
-            target.AddTask("Exec").SetParameter("Command", command);
+            var task = target.AddTask("Exec");
+            task.SetParameter("Command", command);
         }
 
         // ProjectJson Script Set Name to 
