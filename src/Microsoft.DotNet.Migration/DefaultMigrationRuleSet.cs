@@ -22,7 +22,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             new MigrateRuntimeOptionsRule(),
             new MigratePublishOptionsRule(),
             new MigrateProjectDependenciesRule(),
-            new MigrateConfigurationsRule()
+            new MigrateConfigurationsRule(),
+            new MigrateRootOptionsRule(),
+            new MigrateScriptsRule()
         };
 
         public void Apply(ProjectContext projectContext, ProjectRootElement csproj, string outputDirectory)

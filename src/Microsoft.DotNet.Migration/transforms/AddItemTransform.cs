@@ -115,23 +115,23 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Transforms
             string includeValue = _includeValue ?? _includeValueFunc(source);
             string excludeValue = _excludeValue ?? _excludeValueFunc(source);
 
-            var item = FindExistingItem(destinationProject, includeValue);
-            if (item != default(ProjectItemElement) && !_mergeExisting)
+            var existingItem = FindExistingItem(destinationProject, includeValue);
+            if (existingItem != default(ProjectItemElement) && !_mergeExisting)
             {
                 throw new Exception("Existing item found, expected no item. Set mergeExisting to merge new metadata with existing items.");
             }
 
             // There is an existing item, merge exclude + metadata, with non-existing metadata being preferred in case of conflict
-            if (item != default(ProjectItemElement))
+            if (existingItem != default(ProjectItemElement))
             {
-                excludeValue += item.Exclude;
+                excludeValue += existingItem.Exclude;
                 
-                foreach (var existingMetadata in item.Metadata)
+                foreach (var existingMetadata in existingItem.Metadata)
                 {
                     _metadata.Insert(0, new ItemMetadataValue<T>(existingMetadata.Name, existingMetadata.Value));
                 }
 
-                item.Parent.RemoveChild(item);
+                existingItem.Parent.RemoveChild(existingItem);
             }
 
             ProjectItemGroupElement itemGroup = (ProjectItemGroupElement)destinationElement

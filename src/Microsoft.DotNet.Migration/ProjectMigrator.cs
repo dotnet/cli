@@ -13,17 +13,13 @@ using System.IO;
 namespace Microsoft.DotNet.ProjectJsonMigration
 {
     public class ProjectMigrator
-    {
-        // TODO: Test ProjectDependencyMigration
-        // TODO: Migrate AssemblyInfo
+    { 
         // TODO: Migrate PackOptions
-        // TODO: Migrate Scripts
-        // TODO: Test Configuration Migration
         // TODO: Support Mappings in IncludeContext Transformations
-        // TODO: Support Removal of default items/properties from template when appropriate
         // TODO: Specify ordering of generated property/item groups (append at end of file in most cases)
         // TODO: Migrate Multi-TFM projects
         // TODO: Migrate RID projects
+        // TODO: Tests
 
         public int Migrate(MigrationSettings settings)
         {
