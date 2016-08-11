@@ -25,7 +25,8 @@ namespace Microsoft.DotNet.ProjectModel
                   dependencies,
                   resolved: resolved,
                   compatible: compatible,
-                  framework: null)
+                  framework: null,
+                  packagesDirectoryPath: package.Path)
         {
             PackageLibrary = package;
         }

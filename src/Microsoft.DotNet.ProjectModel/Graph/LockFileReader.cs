@@ -143,6 +143,9 @@ namespace Microsoft.DotNet.ProjectModel.Graph
 
                 var type = _symbols.GetString(value.Value<string>("type"));
 
+                var pathValue = value["path"];
+                var path = pathValue == null ? null : ReadString(pathValue);
+
                 if (type == null || string.Equals(type, "package", StringComparison.OrdinalIgnoreCase))
                 {
                     lockFile.PackageLibraries.Add(new LockFilePackageLibrary
@@ -151,7 +154,8 @@ namespace Microsoft.DotNet.ProjectModel.Graph
                         Version = version,
                         IsServiceable = ReadBool(value, "serviceable", defaultValue: false),
                         Sha512 = ReadString(value["sha512"]),
-                        Files = ReadPathArray(value["files"], ReadString)
+                        Files = ReadPathArray(value["files"], ReadString),
+                        Path = path
                     });
                 }
                 else if (type == "project")
@@ -161,9 +165,8 @@ namespace Microsoft.DotNet.ProjectModel.Graph
                         Name = name,
                         Version = version
                     };
-
-                    var pathValue = value["path"];
-                    projectLibrary.Path = pathValue == null ? null : ReadString(pathValue);
+                    
+                    projectLibrary.Path = path;
 
                     var buildTimeDependencyValue = value["msbuildProject"];
                     projectLibrary.MSBuildProject = buildTimeDependencyValue == null ? null : ReadString(buildTimeDependencyValue);

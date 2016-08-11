@@ -17,6 +17,7 @@ namespace Microsoft.DotNet.ProjectModel
             IEnumerable<LibraryRange> dependencies,
             bool compatible,
             bool resolved,
+            string packagesDirectoryPath,
             NuGetFramework framework = null)
             : base(
                   libraryIdentity,
@@ -25,7 +26,8 @@ namespace Microsoft.DotNet.ProjectModel
                   dependencies: dependencies,
                   framework: null,
                   resolved: resolved,
-                  compatible: compatible)
+                  compatible: compatible,
+                  packagesDirectoryPath: packagesDirectoryPath)
         {
             TargetLibrary = lockFileLibrary;
         }

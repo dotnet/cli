@@ -45,7 +45,8 @@ namespace Microsoft.DotNet.ProjectModel.Resolution
                 Enumerable.Empty<LibraryRange>(),
                 targetFramework,
                 resolved: true,
-                compatible: true);
+                compatible: true,
+                packagesDirectoryPath: null);
         }
     }
 }
