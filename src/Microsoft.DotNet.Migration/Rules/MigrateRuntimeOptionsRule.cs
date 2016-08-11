@@ -20,7 +20,10 @@ namespace Microsoft.DotNet.ProjectJsonMigration
         {
             var raw = projectContext.ProjectFile.RawRuntimeOptions;
 
-            File.WriteAllText(Path.Combine(outputDirectory, "runtimeconfig.template.json"), raw);
+            if (!string.IsNullOrEmpty(raw))
+            {
+                File.WriteAllText(Path.Combine(outputDirectory, "runtimeconfig.template.json"), raw);
+            }
         }   
     }
 }
