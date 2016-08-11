@@ -26,6 +26,8 @@
     }
   },
   "dependencies": {
+    "NuGet.Commandline.XPlat": "3.6.0-beta.1.msbuild.1",
+    "NuGet.Build.Tasks": "3.6.0-beta.1.msbuild.1",
     "Newtonsoft.Json": "9.0.1",
     "System.Text.Encoding.CodePages": "4.0.1",
     "System.Diagnostics.FileVersionInfo": "4.0.0",
@@ -60,8 +62,8 @@
       "exclude": "compile"
     },
 
-    "Microsoft.Build": "0.1.0-preview-00029-160805", 
-    "Microsoft.Build.Framework": "0.1.0-preview-00029-160805", 
+    "Microsoft.Build": "0.1.0-preview-00029-160805",
+    "Microsoft.Build.Framework": "0.1.0-preview-00029-160805",
 
     "Microsoft.DotNet.PlatformAbstractions": "1.0.1-beta-000914"
   },
