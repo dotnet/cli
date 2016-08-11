@@ -198,7 +198,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             builder.AddRuntimeAssemblyGroup(new LibraryAssetGroup(PopulateAssets(library, library.RuntimeAssemblies)));
             builder.WithResourceAssemblies(PopulateResources(library, library.ResourceAssemblies));
             builder.WithCompilationAssemblies(PopulateAssets(library, library.CompileTimeAssemblies));
-
+            builder.WithResourceAssemblies(PopulateResourceAssemblies(library, library.ResourceAssemblies));
             if (library.Identity.Type.Equals(LibraryType.Package))
             {
                 builder.WithSourceReferences(GetSharedSources((PackageDescription) library));
@@ -496,6 +496,15 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             foreach (var assemblyPath in section.Where(a => !PackageDependencyProvider.IsPlaceholderFile(a.Path)))
             {
                 yield return LibraryAsset.CreateFromRelativePath(library.Path, assemblyPath.Path);
+            }
+        }
+        private IEnumerable<LibraryResourceAssembly> PopulateResourceAssemblies(TargetLibraryWithAssets library, IEnumerable<LockFileItem> section)
+        {
+            foreach (var assemblyPath in section)
+            {
+                string locale;
+                assemblyPath.Properties.TryGetValue("locale", out locale);
+                yield return new LibraryResourceAssembly(LibraryAsset.CreateFromRelativePath(library.Path, assemblyPath.Path), locale);
             }
         }
 
