@@ -64,11 +64,11 @@ namespace Microsoft.DotNet.Cli.Utils
 
                     if (onOutputLineCallCount == 1)
                     {
-                        Assert.Equal($"firstsecond", line);
+                        Assert.Equal($"firstsecond" + Environment.NewLine, line);
                     }
                     else
                     {
-                        Assert.Equal($"third", line);
+                        Assert.Equal($"third" + Environment.NewLine, line);
                     }
                 })
                 .OnErrorLine(line =>
@@ -77,11 +77,11 @@ namespace Microsoft.DotNet.Cli.Utils
 
                     if (onErrorLineCallCount == 1)
                     {
-                        Assert.Equal($"fourth", line);
+                        Assert.Equal($"fourth" + Environment.NewLine, line);
                     }
                     else
                     {
-                        Assert.Equal($"fifth", line);
+                        Assert.Equal($"fifth" + Environment.NewLine, line);
                     }
                 })
                 .Execute();

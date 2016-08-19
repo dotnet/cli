@@ -9,14 +9,14 @@ using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
 
-namespace StreamForwarderTests
+namespace Microsoft.DotNet.Cli.Utils.Tests
 {
     public class StreamForwarderTests : TestBase
     {
         private static readonly string s_rid = RuntimeEnvironmentRidExtensions.GetLegacyRestoreRuntimeIdentifier();
         private static readonly string s_testProjectRoot = Path.Combine(AppContext.BaseDirectory, "TestAssets", "TestProjects");
 
-        private TempDirectory _root;
+        private readonly TempDirectory _root;
 
         public static void Main()
         {
@@ -34,17 +34,21 @@ namespace StreamForwarderTests
             {
                 return new[]
                 {
+                    new object[] { "\n\n\n", new string[]{"\n", "\n", "\n"} },
+                    new object[] { "\r\n\r\n\r\n", new string[]{"\r\n", "\r\n", "\r\n"} },
                     new object[] { "123", new string[]{"123"} },
-                    new object[] { "123\n", new string[] {"123"} },
-                    new object[] { "123\r\n", new string[] {"123"} },
-                    new object[] { "1234\n5678", new string[] {"1234", "5678"} },
-                    new object[] { "1234\r\n5678", new string[] {"1234", "5678"} },
-                    new object[] { "1234\n5678\n", new string[] {"1234", "5678"} },
-                    new object[] { "1234\r\n5678\r\n", new string[] {"1234", "5678"} },
-                    new object[] { "1234\n5678\nabcdefghijklmnopqrstuvwxyz", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz"} },
-                    new object[] { "1234\r\n5678\r\nabcdefghijklmnopqrstuvwxyz", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz"} },
-                    new object[] { "1234\n5678\nabcdefghijklmnopqrstuvwxyz\n", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz"} },
-                    new object[] { "1234\r\n5678\r\nabcdefghijklmnopqrstuvwxyz\r\n", new string[] {"1234", "5678", "abcdefghijklmnopqrstuvwxyz"} }
+                    new object[] { "123\n", new string[] {"123\n"} },
+                    new object[] { "123\r\n", new string[] {"123\r\n"} },
+                    new object[] { "1234\n5678", new string[] {"1234\n", "5678"} },
+                    new object[] { "1234\r\n5678", new string[] {"1234\r\n", "5678"} },
+                    new object[] { "1234\n\n5678", new string[] {"1234\n", "\n", "5678"} },
+                    new object[] { "1234\r\n\r\n5678", new string[] {"1234\r\n", "\r\n", "5678"} },
+                    new object[] { "1234\n5678\n", new string[] {"1234\n", "5678\n"} },
+                    new object[] { "1234\r\n5678\r\n", new string[] {"1234\r\n", "5678\r\n"} },
+                    new object[] { "1234\n5678\nabcdefghijklmnopqrstuvwxyz", new string[] {"1234\n", "5678\n", "abcdefghijklmnopqrstuvwxyz"} },
+                    new object[] { "1234\r\n5678\r\nabcdefghijklmnopqrstuvwxyz", new string[] {"1234\r\n", "5678\r\n", "abcdefghijklmnopqrstuvwxyz"} },
+                    new object[] { "1234\n5678\nabcdefghijklmnopqrstuvwxyz\n", new string[] {"1234\n", "5678\n", "abcdefghijklmnopqrstuvwxyz\n"} },
+                    new object[] { "1234\r\n5678\r\nabcdefghijklmnopqrstuvwxyz\r\n", new string[] {"1234\r\n", "5678\r\n", "abcdefghijklmnopqrstuvwxyz\r\n"} }
                 };
             }
         }
@@ -61,23 +65,13 @@ namespace StreamForwarderTests
         [MemberData("ForwardingTheoryVariations")]
         public void TestForwardingOnly(string inputStr, string[] expectedWrites)
         {
-            for (int i = 0; i < expectedWrites.Length; ++i)
-            {
-                expectedWrites[i] += Environment.NewLine;
-            }
-
-            TestCapturingAndForwardingHelper(ForwardOptions.WriteLine, inputStr, null, expectedWrites);
+            TestCapturingAndForwardingHelper(ForwardOptions.Write, inputStr, null, expectedWrites);
         }
 
         [Theory]
         [MemberData("ForwardingTheoryVariations")]
         public void TestCaptureOnly(string inputStr, string[] expectedWrites)
         {
-            for (int i = 0; i < expectedWrites.Length; ++i)
-            {
-                expectedWrites[i] += Environment.NewLine;
-            }
-
             var expectedCaptured = string.Join("", expectedWrites);
 
             TestCapturingAndForwardingHelper(ForwardOptions.Capture, inputStr, expectedCaptured, new string[0]);
@@ -87,21 +81,17 @@ namespace StreamForwarderTests
         [MemberData("ForwardingTheoryVariations")]
         public void TestCaptureAndForwardingTogether(string inputStr, string[] expectedWrites)
         {
-            for (int i = 0; i < expectedWrites.Length; ++i)
-            {
-                expectedWrites[i] += Environment.NewLine;
-            }
-
             var expectedCaptured = string.Join("", expectedWrites);
 
-            TestCapturingAndForwardingHelper(ForwardOptions.WriteLine | ForwardOptions.Capture, inputStr, expectedCaptured, expectedWrites);
+            TestCapturingAndForwardingHelper(ForwardOptions.Write | ForwardOptions.Capture, inputStr, expectedCaptured, expectedWrites);
         }
 
+        [Flags]
         private enum ForwardOptions
         {
             None = 0x0,
             Capture = 0x1,
-            WriteLine = 0x02,
+            Write = 0x02,
         }
 
         private void TestCapturingAndForwardingHelper(ForwardOptions options, string str, string expectedCaptured, string[] expectedWrites)
@@ -109,9 +99,9 @@ namespace StreamForwarderTests
             var forwarder = new StreamForwarder();
             var writes = new List<string>();
 
-            if ((options & ForwardOptions.WriteLine) != 0)
+            if ((options & ForwardOptions.Write) != 0)
             {
-                forwarder.ForwardTo(writeLine: s => writes.Add(s + Environment.NewLine));
+                forwarder.ForwardTo(write: s => writes.Add(s));
             }
             if ((options & ForwardOptions.Capture) != 0)
             {
