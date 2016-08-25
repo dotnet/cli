@@ -2,28 +2,48 @@ Obtaining .NET CLI
 ==================
 
 ## Contents
-* [Overview](#overview)
-* [General principles](#general-principles)
-* [Components that can be installed](#components-that-can-be-installed)
-* [Installation process](#installation-process)
-* [Removal process](#removal-process)
-* [Upgrading the CLI](#upgrading-the-cli)
-* [Layout on disk](#layout-on-disk)
-* [Native dependencies](#native-dependencies)
-* [Channels](#channels)
-* [Funnels and discovery mechanisms for CLI bits](#funnels-and-discovery-mechanisms-for-cli-bits)
-  * [Getting Started page](#getting-started-page)
-  * [Repo landing page](#repo-landing-page)
-* [Acquisition modes](#acquisition-modes)
-  * [Native installers](#native-installers)
-  * [Installation script](#installation-script)
-    * [Windows one-liner](#windows-command)
-    * [OSX/Linux one-liner](#osxlinux-shell-command)
-  * [Complete manual installation](#complete-manual-installation)
-  * [Docker](#docker)
-  * [NuGet Packages](#nuget-packages)
-* [Acquiring through other products](#acquiring-through-other-products)
-  * [IDEs and editors](#ides-and-editors)
+<!-- TOC -->
+
+- [Contents](#contents)
+- [Overview](#overview)
+- [General principles](#general-principles)
+- [Components that can be installed](#components-that-can-be-installed)
+- [Installation process](#installation-process)
+- [Removal process](#removal-process)
+- [Upgrading the CLI](#upgrading-the-cli)
+- [Layout on disk](#layout-on-disk)
+- [Native dependencies](#native-dependencies)
+- [Channels](#channels)
+- [Funnels and discovery mechanisms for CLI bits](#funnels-and-discovery-mechanisms-for-cli-bits)
+    - [Getting Started page](#getting-started-page)
+    - [Repo landing page](#repo-landing-page)
+- [Acquisition modes](#acquisition-modes)
+    - [Native installers](#native-installers)
+    - [Installation script](#installation-script)
+        - [Installation script features](#installation-script-features)
+            - [Install the latest Future CLI](#install-the-latest-future-cli)
+            - [Install the latest preview to specified location](#install-the-latest-preview-to-specified-location)
+        - [Windows obtain one-liner example](#windows-obtain-one-liner-example)
+        - [OSX/Linux obtain one-liner](#osxlinux-obtain-one-liner)
+    - [Docker](#docker)
+    - [NuGet packages](#nuget-packages)
+- [Acquiring through other products](#acquiring-through-other-products)
+    - [IDEs and editors](#ides-and-editors)
+    - [Visual Studio](#visual-studio)
+- [Detecting dotnet/cli installation](#detecting-dotnetcli-installation)
+	- [Windows](#windows)
+		- [Requirements for CLI SDK and shared framework installer](#requirements-for-cli-sdk-and-shared-framework-installer)
+			- [Scenarios](#scenarios)
+			- [Registry keys and values](#registry-keys-and-values)
+		- [Requirements for shared host installer](#requirements-for-shared-host-installer)
+			- [Scenarios](#scenarios)
+				- [Example](#example)
+		- [Other Examples](#other-examples)
+			- [Scenario 1](#scenario-1)
+			- [Scenario 2](#scenario-2)
+			- [Scenario 3](#scenario-3)
+
+<!-- /TOC -->
   
 
 ## Overview
@@ -242,8 +262,16 @@ OSX/Linux:
 
 #### Windows obtain one-liner example 
 
+CMD:
+
 ```
-@powershell -NoProfile -ExecutionPolicy unrestricted -Command "&{iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.ps1'))}"
+@powershell -NoProfile -ExecutionPolicy unrestricted -Command "&{iwr https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.ps1 | iex}"
+```
+
+PowerShell:
+
+```
+iwr https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.ps1 | iex
 ```
 
 #### OSX/Linux obtain one-liner
