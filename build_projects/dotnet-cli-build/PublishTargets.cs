@@ -168,7 +168,7 @@ namespace Microsoft.DotNet.Cli.Build
 
         [Target(
             nameof(PublishSdkDebToDebianRepo))]
-        [BuildPlatforms(BuildPlatform.Ubuntu)]
+        [BuildPlatforms(BuildPlatform.Ubuntu, BuildPlatform.Debian)]
         public static BuildTargetResult PublishDebFilesToDebianRepo(BuildTargetContext c)
         {
             return c.Success();
@@ -184,7 +184,7 @@ namespace Microsoft.DotNet.Cli.Build
         }
 
         [Target]
-        [BuildPlatforms(BuildPlatform.Ubuntu)]
+        [BuildPlatforms(BuildPlatform.Ubuntu, BuildPlatform.Debian)]
         public static BuildTargetResult PublishSdkInstallerFileToAzure(BuildTargetContext c)
         {
             var installerFile = c.BuildContext.Get<string>("SdkInstallerFile");
@@ -232,7 +232,7 @@ namespace Microsoft.DotNet.Cli.Build
         }
 
         [Target]
-        [BuildPlatforms(BuildPlatform.Ubuntu)]
+        [BuildPlatforms(BuildPlatform.Ubuntu, BuildPlatform.Debian)]
         public static BuildTargetResult PublishSdkDebToDebianRepo(BuildTargetContext c)
         {
             var version = CliNuGetVersion;

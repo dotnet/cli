@@ -13,14 +13,14 @@ namespace Microsoft.DotNet.Cli.Build
     public class DebTargets
     {
         [Target(nameof(GenerateSdkDeb))]
-        [BuildPlatforms(BuildPlatform.Ubuntu)]
+        [BuildPlatforms(BuildPlatform.Ubuntu, BuildPlatform.Debian)]
         public static BuildTargetResult GenerateDebs(BuildTargetContext c)
         {
             return c.Success();
         }
 
         [Target(nameof(InstallSharedFramework))]
-        [BuildPlatforms(BuildPlatform.Ubuntu)]
+        [BuildPlatforms(BuildPlatform.Ubuntu, BuildPlatform.Debian)]
         public static BuildTargetResult GenerateSdkDeb(BuildTargetContext c)
         {
             // Ubuntu 16.04 Jenkins Machines don't have docker or debian package build tools
@@ -73,7 +73,7 @@ namespace Microsoft.DotNet.Cli.Build
         [Target(nameof(InstallSDK),
                 nameof(RunE2ETest),
                 nameof(RemovePackages))]
-        [BuildPlatforms(BuildPlatform.Ubuntu)]
+        [BuildPlatforms(BuildPlatform.Ubuntu, BuildPlatform.Debian)]
         public static BuildTargetResult TestDebInstaller(BuildTargetContext c)
         {
             return c.Success();
@@ -148,7 +148,7 @@ namespace Microsoft.DotNet.Cli.Build
         }
         
         [Target]
-        [BuildPlatforms(BuildPlatform.Ubuntu)]
+        [BuildPlatforms(BuildPlatform.Ubuntu, BuildPlatform.Debian)]
         public static BuildTargetResult RunE2ETest(BuildTargetContext c)
         {
             // Ubuntu 16.04 Jenkins Machines don't have docker or debian package build tools
@@ -176,7 +176,7 @@ namespace Microsoft.DotNet.Cli.Build
         }
         
         [Target]
-        [BuildPlatforms(BuildPlatform.Ubuntu)]
+        [BuildPlatforms(BuildPlatform.Ubuntu, BuildPlatform.Debian)]
         public static BuildTargetResult RemovePackages(BuildTargetContext c)
         {
             // Ubuntu 16.04 Jenkins Machines don't have docker or debian package build tools

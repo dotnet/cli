@@ -206,7 +206,7 @@ namespace Microsoft.DotNet.Cli.Build
         }
 
         [Target]
-        [BuildPlatforms(BuildPlatform.Windows, BuildPlatform.OSX, BuildPlatform.Ubuntu)]
+        [BuildPlatforms(BuildPlatform.Windows, BuildPlatform.OSX, BuildPlatform.Ubuntu, BuildPlatform.Debian)]
         public static BuildTargetResult DownloadHostAndSharedFxInstallers(BuildTargetContext c)
         {
             var sharedFrameworkVersion = CliDependencyVersions.SharedFrameworkVersion;
@@ -538,6 +538,7 @@ cmake is required to build the native host 'corehost'";
                     installer = productName + ".pkg";
                     break;
                 case BuildPlatform.Ubuntu:
+                case BuildPlatform.Debian:
                     installer = productName + ".deb";
                     break;
                 default:
