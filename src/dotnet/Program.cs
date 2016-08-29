@@ -20,6 +20,7 @@ using Microsoft.DotNet.Tools.Restore;
 using Microsoft.DotNet.Tools.Restore3;
 using Microsoft.DotNet.Tools.Run;
 using Microsoft.DotNet.Tools.Test;
+using Microsoft.DotNet.Tools.VSTest;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Cli
@@ -40,6 +41,7 @@ namespace Microsoft.DotNet.Cli
             ["build3"] = Build3Command.Run,
             ["run3"] = Run3Command.Run,
             ["restore3"] = Restore3Command.Run,
+            ["vstest"] = VSTestCommand.Run,
         };
 
         public static int Main(string[] args)
