@@ -8,7 +8,7 @@
       "type": "platform",
       "version": "1.0.0"
     },
-    "Microsoft.TestPlatform": "15.0.0-preview-*"
+    "Microsoft.TestPlatform": "15.0.0-preview-20160829-02"
   },
   "frameworks": {
     "netcoreapp1.0": {
