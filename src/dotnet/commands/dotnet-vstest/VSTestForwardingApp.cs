@@ -10,29 +10,19 @@ namespace Microsoft.DotNet.Cli
 {
     public class VSTestForwardingApp
     {
-        private const string vstestExename = "vstest.console.dll";
+        private const string VstestAppName = "vstest.console.dll";
         private readonly ForwardingApp _forwardingApp;
 
         public VSTestForwardingApp(IEnumerable<string> argsToForward)
         {
             _forwardingApp = new ForwardingApp(
                 GetVSTestExePath(),
-                argsToForward,
-                environmentVariables: GetEnvironmentVariables()
-                );
+                argsToForward);
         }
 
         public int Execute()
         {
             return _forwardingApp.Execute();
-        }
-
-        private Dictionary<string, string> GetEnvironmentVariables()
-        {
-            return new Dictionary<string, string>
-            {
-                { "DotnetHostPath", GetHostPath() },
-            };
         }
 
         private string GetHostPath()
@@ -42,7 +32,7 @@ namespace Microsoft.DotNet.Cli
 
         private string GetVSTestExePath()
         {
-            return Path.Combine(AppContext.BaseDirectory, vstestExename);
+            return Path.Combine(AppContext.BaseDirectory, VstestAppName);
         }
     }
 }
