@@ -1,18 +1,14 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Xunit;
 using FluentAssertions;
+using System.IO;
 
 namespace Microsoft.DotNet.Tests
 {
+    [Collection("'dotnet test' collection")]
     public class GivenThatIWantANewCSxUnitProject : TestBase
     {
         
@@ -20,12 +16,10 @@ namespace Microsoft.DotNet.Tests
         public void When_xUnit_project_created_Then_project_restores()
         {
             var rootPath = Temp.CreateDirectory().Path;
-            var projectJsonFile = Path.Combine(rootPath, "project.json");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .Execute("new --type xunittest")
-                .Should()
-                .Pass();
+                .Should().Pass();
             
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .Execute("restore")
@@ -56,7 +50,5 @@ namespace Microsoft.DotNet.Tests
                 .And
                 .NotHaveStdErr();
         }
-
-
     }
 }

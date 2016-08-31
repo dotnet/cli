@@ -15,6 +15,7 @@ using Microsoft.DotNet.Tools.Compiler;
 using Microsoft.DotNet.Tools.Compiler.Csc;
 using Microsoft.DotNet.Tools.Help;
 using Microsoft.DotNet.Tools.New;
+using Microsoft.DotNet.Tools.NuGet;
 using Microsoft.DotNet.Tools.Pack3;
 using Microsoft.DotNet.Tools.Publish;
 using Microsoft.DotNet.Tools.Restore;
@@ -22,6 +23,7 @@ using Microsoft.DotNet.Tools.Restore3;
 using Microsoft.DotNet.Tools.Run;
 using Microsoft.DotNet.Tools.Test;
 using Microsoft.DotNet.Tools.VSTest;
+using Microsoft.DotNet.Tools.Migrate;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Cli
@@ -34,6 +36,7 @@ namespace Microsoft.DotNet.Cli
             ["compile-csc"] = CompileCscCommand.Run,
             ["help"] = HelpCommand.Run,
             ["new"] = NewCommand.Run,
+            ["nuget"] = NuGetCommand.Run,
             ["pack"] = PackCommand.Run,
             ["publish"] = PublishCommand.Run,
             ["restore"] = RestoreCommand.Run,
@@ -44,6 +47,7 @@ namespace Microsoft.DotNet.Cli
             ["restore3"] = Restore3Command.Run,
             ["vstest"] = VSTestCommand.Run,
             ["pack3"] = Pack3Command.Run,
+            ["migrate"] = MigrateCommand.Run
         };
 
         public static int Main(string[] args)

@@ -9,6 +9,7 @@
         "commands/dotnet-new/CSharp_MSBuild.zip",
         "commands/dotnet-new/CSharp_xunittest.zip",
         "commands/dotnet-new/CSharp_Web.zip",
+        "commands/dotnet-new/CSharp_nunittest.zip",
         "commands/dotnet-new/FSharp_Console.zip",
         "commands/dotnet-new/FSharp_Lib.zip"
       ]
@@ -21,7 +22,8 @@
         "commands/dotnet-new/CSharp_Lib/**",
         "commands/dotnet-new/CSharp_MSBuild/**",
         "commands/dotnet-new/FSharp_Lib/**",
-        "commands/dotnet-new/CSharp_xunittest/**"
+        "commands/dotnet-new/CSharp_xunittest/**",
+        "commands/dotnet-new/CSharp_nunittest/**"
       ]
     }
   },
@@ -45,6 +47,12 @@
     "Microsoft.DotNet.Configurer": {
       "target": "project"
     },
+    "Microsoft.DotNet.ProjectJsonMigration": {
+      "target": "project"
+    },
+    "Microsoft.DotNet.Tools.Test": {
+      "target": "project"
+    },
     "Microsoft.NETCore.App": {
       "type": "platform",
       "version": "1.0.0"
@@ -60,8 +68,8 @@
       "exclude": "compile"
     },
 
-    "Microsoft.Build": "0.1.0-preview-00032-160824",
-    "Microsoft.Build.Framework": "0.1.0-preview-00032-160824",
+    "Microsoft.Build": "0.1.0-preview-00033-160829",
+    "Microsoft.Build.Framework": "0.1.0-preview-00033-160829",
 
     "Microsoft.DotNet.PlatformAbstractions": "1.0.1-beta-000919"
   },
