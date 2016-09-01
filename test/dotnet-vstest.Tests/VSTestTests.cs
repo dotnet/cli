@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.Cli.VSTest.Tests
     public class VSTestTests: TestBase
     {
         [Fact]
-        public void RunTestsFromGivenContainer()
+        public void TestsFromAGivenContainerShouldRunWithExpectedOutput()
         {
             // Copy DotNetCoreTestProject project in output directory of project dotnet-vstest.Tests
             string testAppName = "DotNetCoreTestProject";

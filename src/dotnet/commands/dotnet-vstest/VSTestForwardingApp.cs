@@ -25,11 +25,6 @@ namespace Microsoft.DotNet.Cli
             return _forwardingApp.Execute();
         }
 
-        private string GetHostPath()
-        {
-            return new Muxer().MuxerPath;
-        }
-
         private string GetVSTestExePath()
         {
             return Path.Combine(AppContext.BaseDirectory, VstestAppName);
