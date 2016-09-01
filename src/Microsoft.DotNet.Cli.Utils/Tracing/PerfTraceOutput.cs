@@ -50,7 +50,8 @@ namespace Microsoft.DotNet.Cli.Utils
                 AppendTime(builder, e.Duration.TotalSeconds / root.Duration.TotalSeconds, 0.2);
             }
             AppendTime(builder, e.Duration.TotalSeconds / parent?.Duration.TotalSeconds, 0.5);
-            builder.Append($"{e.Duration.ToString("ss\\.fff\\s").Blue()}]");
+            builder.Append($"{(int)e.Duration.TotalSeconds}.{e.Duration.Milliseconds:000}s".Blue());
+            builder.Append("]");
         }
 
         private static void AppendTime(StringBuilder builder, double? percent, double treshold)

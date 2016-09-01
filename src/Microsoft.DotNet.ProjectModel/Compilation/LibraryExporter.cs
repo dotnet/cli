@@ -25,6 +25,8 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         private readonly string _buildBasePath;
         private readonly string _solutionRootPath;
 
+        private List<LibraryExport> _cachedExports;
+
         public LibraryExporter(ProjectDescription rootProject,
             LibraryManager manager,
             string configuration,
@@ -84,62 +86,112 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         /// </summary>
         private IEnumerable<LibraryExport> ExportLibraries(Func<LibraryDescription, bool> condition)
         {
+            // Project Exports cannot be cached because the binding redirect file
+            // for desktop apps is not added to runtimeassets of the project
+            // until after the project is built.
+            var cache = GetCacheWithRefreshedProjectExports();
+
+            foreach (var export in cache)
+            {
+                if (!condition(export.Library))
+                {
+                    continue;
+                }
+                yield return export;
+            }
+        }
+
+        private IEnumerable<LibraryExport> GetCacheWithRefreshedProjectExports()
+        {
+            if (_cachedExports == null)
+            {
+                _cachedExports = CalculateAllExports().ToList();
+            }
+
+            var seenMetadataReferences = new HashSet<string>();
+            var refreshedCache = new LibraryExport[_cachedExports.Count()];
+
+            int index = 0;
+            foreach (var export in _cachedExports)
+            {
+                if (Equals(export.Library.Identity.Type, LibraryType.Project))
+                {
+                    refreshedCache[index++] = GenerateExportFromLibrary(seenMetadataReferences, export.Library);
+                }
+                else
+                {
+                    refreshedCache[index++] = export;
+                }
+
+                foreach (var reference in export.CompilationAssemblies)
+                {
+                    seenMetadataReferences.Add(reference.Name);
+                }
+            }
+
+            return refreshedCache;
+        }
+
+        private IEnumerable<LibraryExport> CalculateAllExports()
+        {
             var seenMetadataReferences = new HashSet<string>();
 
             // Iterate over libraries in the library manager
             foreach (var library in LibraryManager.GetLibraries())
             {
-                if (!condition(library))
-                {
-                    continue;
-                }
-
-                var compilationAssemblies = new List<LibraryAsset>();
-                var sourceReferences = new List<LibraryAsset>();
-                var analyzerReferences = new List<AnalyzerReference>();
-                var libraryExport = GetExport(library);
-
-                // We need to filter out source references from non-root libraries,
-                // so we rebuild the library export
-                foreach (var reference in libraryExport.CompilationAssemblies)
-                {
-                    if (seenMetadataReferences.Add(reference.Name))
-                    {
-                        compilationAssemblies.Add(reference);
-                    }
-                }
-
-                // Source and analyzer references are not transitive
-                if (library.Parents.Contains(_rootProject))
-                {
-                    sourceReferences.AddRange(libraryExport.SourceReferences);
-                    analyzerReferences.AddRange(libraryExport.AnalyzerReferences);
-                }
-
-                var builder = LibraryExportBuilder.Create(library);
-                if (_runtime != null && _runtimeFallbacks != null)
-                {
-                    // For portable apps that are built with runtime trimming we replace RuntimeAssemblyGroups and NativeLibraryGroups
-                    // with single default group that contains asset specific to runtime we are trimming for
-                    // based on runtime fallback list
-                    builder.WithRuntimeAssemblyGroups(TrimAssetGroups(libraryExport.RuntimeAssemblyGroups, _runtimeFallbacks));
-                    builder.WithNativeLibraryGroups(TrimAssetGroups(libraryExport.NativeLibraryGroups, _runtimeFallbacks));
-                }
-                else
-                {
-                    builder.WithRuntimeAssemblyGroups(libraryExport.RuntimeAssemblyGroups);
-                    builder.WithNativeLibraryGroups(libraryExport.NativeLibraryGroups);
-                }
-
-                yield return builder
-                    .WithCompilationAssemblies(compilationAssemblies)
-                    .WithSourceReferences(sourceReferences)
-                    .WithRuntimeAssets(libraryExport.RuntimeAssets)
-                    .WithEmbedddedResources(libraryExport.EmbeddedResources)
-                    .WithAnalyzerReference(analyzerReferences)
-                    .WithResourceAssemblies(libraryExport.ResourceAssemblies)
-                    .Build();
+                yield return GenerateExportFromLibrary(seenMetadataReferences, library);
             }
+        }
+
+        private LibraryExport GenerateExportFromLibrary(
+            HashSet<string> seenMetadataReferences, 
+            LibraryDescription library)
+        {
+            var compilationAssemblies = new List<LibraryAsset>();
+            var sourceReferences = new List<LibraryAsset>();
+            var analyzerReferences = new List<AnalyzerReference>();
+            var libraryExport = GetExport(library);
+
+            // We need to filter out source references from non-root libraries,
+            // so we rebuild the library export
+            foreach (var reference in libraryExport.CompilationAssemblies)
+            {
+                if (seenMetadataReferences.Add(reference.Name))
+                {
+                    compilationAssemblies.Add(reference);
+                }
+            }
+
+            // Source and analyzer references are not transitive
+            if (library.Parents.Contains(_rootProject))
+            {
+                sourceReferences.AddRange(libraryExport.SourceReferences);
+                analyzerReferences.AddRange(libraryExport.AnalyzerReferences);
+            }
+
+            var builder = LibraryExportBuilder.Create(library);
+            if (_runtime != null && _runtimeFallbacks != null)
+            {
+                // For portable apps that are built with runtime trimming we replace RuntimeAssemblyGroups and NativeLibraryGroups
+                // with single default group that contains asset specific to runtime we are trimming for
+                // based on runtime fallback list
+                builder.WithRuntimeAssemblyGroups(TrimAssetGroups(libraryExport.RuntimeAssemblyGroups, _runtimeFallbacks));
+                builder.WithNativeLibraryGroups(TrimAssetGroups(libraryExport.NativeLibraryGroups, _runtimeFallbacks));
+            }
+            else
+            {
+                builder.WithRuntimeAssemblyGroups(libraryExport.RuntimeAssemblyGroups);
+                builder.WithNativeLibraryGroups(libraryExport.NativeLibraryGroups);
+            }
+
+            return builder
+                .WithCompilationAssemblies(compilationAssemblies)
+                .WithSourceReferences(sourceReferences)
+                .WithRuntimeAssets(libraryExport.RuntimeAssets)
+                .WithEmbedddedResources(libraryExport.EmbeddedResources)
+                .WithAnalyzerReference(analyzerReferences)
+                .WithResourceAssemblies(libraryExport.ResourceAssemblies)
+                .Build();
         }
 
         private IEnumerable<LibraryAssetGroup> TrimAssetGroups(IEnumerable<LibraryAssetGroup> runtimeAssemblyGroups,

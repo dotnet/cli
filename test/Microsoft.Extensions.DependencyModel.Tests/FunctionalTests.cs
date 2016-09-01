@@ -30,6 +30,8 @@ namespace Microsoft.Extensions.DependencyModel
             var testProjectPath = Path.Combine(RepoRoot, "TestAssets", "TestProjects", "DependencyContextValidator", appname);
             var testProject = Path.Combine(testProjectPath, "project.json");
 
+            CleanBinObj(testProjectPath);
+
             var runCommand = new RunCommand(testProject);
             var result = runCommand.ExecuteWithCapturedOutput();
             result.Should().Pass();
@@ -50,6 +52,8 @@ namespace Microsoft.Extensions.DependencyModel
             var testProjectPath = Path.Combine(RepoRoot, "TestAssets", "TestProjects", "DependencyContextValidator", appname);
             var testProject = Path.Combine(testProjectPath, "project.json");
 
+            CleanBinObj(testProjectPath);
+
             var publishCommand = new PublishCommand(testProject);
             publishCommand.Execute().Should().Pass();
 
@@ -69,6 +73,8 @@ namespace Microsoft.Extensions.DependencyModel
             var testProjectPath = Path.Combine(RepoRoot, "TestAssets", "TestProjects", "DependencyContextValidator", "TestAppFullClr");
             var testProject = Path.Combine(testProjectPath, "project.json");
 
+            CleanBinObj(testProjectPath);
+
             var runCommand = new RunCommand(testProject);
             var result = runCommand.ExecuteWithCapturedOutput();
             result.Should().Pass();
@@ -82,12 +88,27 @@ namespace Microsoft.Extensions.DependencyModel
             var testProjectPath = Path.Combine(RepoRoot, "TestAssets", "TestProjects", "DependencyContextValidator", "TestAppFullClr");
             var testProject = Path.Combine(testProjectPath, "project.json");
 
+            CleanBinObj(testProjectPath);
+
             var publishCommand = new PublishCommand(testProject);
             publishCommand.Execute().Should().Pass();
 
             var result = TestExecutable(publishCommand.GetOutputDirectory().FullName, publishCommand.GetOutputExecutable(), string.Empty);
             ValidateRuntimeLibrariesFullClr(result, "TestAppFullClr");
             ValidateCompilationLibrariesFullClr(result, "TestAppFullClr");
+        }
+
+        private void CleanBinObj(string rootPath)
+        {
+            var dirs = new string[] {"bin", "obj"};
+
+            foreach (var dir in dirs)
+            {
+                if (Directory.Exists(Path.Combine(rootPath, dir)))
+                {
+                    Directory.Delete(Path.Combine(rootPath, dir), true);
+                }
+            }
         }
 
         private void ValidateRuntimeLibrariesFullClr(CommandResult result, string appname)

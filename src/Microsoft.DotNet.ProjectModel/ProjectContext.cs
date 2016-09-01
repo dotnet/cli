@@ -14,6 +14,9 @@ namespace Microsoft.DotNet.ProjectModel
 {
     public class ProjectContext
     {
+        private readonly Dictionary<Tuple<string, string, string>, LibraryExporter> _cachedExporters = 
+            new Dictionary<Tuple<string, string, string>, LibraryExporter>();
+        
         private string[] _runtimeFallbacks;
 
         public ProjectContextIdentity Identity { get; }
@@ -71,18 +74,34 @@ namespace Microsoft.DotNet.ProjectModel
 
         public LibraryExporter CreateExporter(string configuration, string buildBasePath = null)
         {
+            LibraryExporter exporter;
+            var libraryExporterCacheKey = Tuple.Create(
+                configuration ?? "", 
+                buildBasePath ?? "",
+                RootDirectory);
+
+            if (_cachedExporters.TryGetValue(libraryExporterCacheKey, out exporter))
+            {
+                return exporter;
+            }
+
             if (IsPortable && RuntimeIdentifier != null && _runtimeFallbacks == null)
             {
                 var graph = RuntimeGraphCollector.Collect(LibraryManager.GetLibraries());
                 _runtimeFallbacks = graph.ExpandRuntime(RuntimeIdentifier).ToArray();
             }
-            return new LibraryExporter(RootProject,
+
+            exporter = new LibraryExporter(RootProject,
                 LibraryManager,
                 configuration,
                 RuntimeIdentifier,
                 _runtimeFallbacks,
                 buildBasePath,
                 RootDirectory);
+
+            _cachedExporters[libraryExporterCacheKey] = exporter;
+
+            return exporter;
         }
 
         /// <summary>

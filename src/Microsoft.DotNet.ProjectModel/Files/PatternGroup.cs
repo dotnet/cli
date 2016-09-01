@@ -8,10 +8,15 @@ using System.Linq;
 using Microsoft.DotNet.ProjectModel.FileSystemGlobbing;
 using Newtonsoft.Json.Linq;
 
+using FourStringTuple = System.Tuple<string, string, string, string>;
+
 namespace Microsoft.DotNet.ProjectModel.Files
 {
     public class PatternGroup
     {
+        private static readonly Dictionary<FourStringTuple, IEnumerable<string>> s_resolvedFilesCache = 
+            new Dictionary<FourStringTuple, IEnumerable<string>>();
+        
         private readonly List<PatternGroup> _excludeGroups = new List<PatternGroup>();
         private readonly Matcher _matcher = new Matcher();
 
@@ -80,15 +85,47 @@ namespace Microsoft.DotNet.ProjectModel.Files
             return this;
         }
 
-        public IEnumerable<string> SearchFiles(string rootPath)
+        public IEnumerable<string> SearchFiles(string rootDirectory)
         {
+            var patternUnionKey = new FourStringTuple(rootDirectory, 
+                (IncludePatterns.Any() ? string.Join(", ", IncludePatterns): ""),
+                (IncludeLiterals.Any() ? string.Join(", ", IncludeLiterals) : ""),
+                (ExcludePatterns.Any() ? string.Join(", ", ExcludePatterns) : ""));
+
+            IEnumerable<string> resolvedFiles;
+            lock (s_resolvedFilesCache)
+            {
+                if (s_resolvedFilesCache.TryGetValue(patternUnionKey, out resolvedFiles))
+                {
+                    return resolvedFiles;
+                }
+            }
+
+            resolvedFiles = ResolveFilesFromPatterns(rootDirectory, IncludePatterns, IncludeLiterals, ExcludePatterns);
+
+            lock (s_resolvedFilesCache)
+            {
+                s_resolvedFilesCache.Add(patternUnionKey, resolvedFiles);
+            }
+
+            return resolvedFiles;
+        }
+
+        private IEnumerable<string> ResolveFilesFromPatterns(
+            string rootDirectory, 
+            IEnumerable<string> includePatterns,
+            IEnumerable<string> includeLiterals,
+            IEnumerable<string> excludePatterns)
+        {
+            IEnumerable<string> resolvedFiles;
+
             // literal included files are added at the last, but the search happens early
             // so as to make the process fail early in case there is missing file. fail early
             // helps to avoid unnecessary globing for performance optimization
             var literalIncludedFiles = new List<string>();
             foreach (var literalRelativePath in IncludeLiterals)
             {
-                var fullPath = Path.GetFullPath(Path.Combine(rootPath, literalRelativePath));
+                var fullPath = Path.GetFullPath(Path.Combine(rootDirectory, literalRelativePath));
 
                 if (!File.Exists(fullPath))
                 {
@@ -100,7 +137,7 @@ namespace Microsoft.DotNet.ProjectModel.Files
             }
 
             // globing files
-            var globbingResults = _matcher.GetResultsInFullPath(rootPath);
+            var globbingResults = _matcher.GetResultsInFullPath(rootDirectory);
 
             // if there is no results generated in globing, skip excluding other groups 
             // for performance optimization.
@@ -108,16 +145,25 @@ namespace Microsoft.DotNet.ProjectModel.Files
             {
                 foreach (var group in _excludeGroups)
                 {
-                    globbingResults = globbingResults.Except(group.SearchFiles(rootPath));
+                    globbingResults = globbingResults.Except(group.SearchFiles(rootDirectory));
                 }
             }
 
-            return globbingResults.Concat(literalIncludedFiles).Distinct();
+            resolvedFiles =  globbingResults.Concat(literalIncludedFiles).Distinct();
+            return resolvedFiles;
         }
 
         public override string ToString()
         {
             return string.Format("Pattern group: Literals [{0}] Includes [{1}] Excludes [{2}]", string.Join(", ", IncludeLiterals), string.Join(", ", IncludePatterns), string.Join(", ", ExcludePatterns));
+        }
+
+        public static void ClearCache()
+        {
+            if (s_resolvedFilesCache != null)
+            {
+                s_resolvedFilesCache.Clear();
+            }
         }
     }
 }

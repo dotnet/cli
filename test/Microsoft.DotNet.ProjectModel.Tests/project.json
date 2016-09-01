@@ -21,7 +21,8 @@
       "target": "project"
     },
     "xunit": "2.1.0",
-    "dotnet-test-xunit": "1.0.0-rc2-192208-24"
+    "dotnet-test-xunit": "1.0.0-rc2-192208-24",
+    "NuGet.Frameworks": "3.5.0-beta2-1484"
   },
   "frameworks": {
     "netcoreapp1.0": {
