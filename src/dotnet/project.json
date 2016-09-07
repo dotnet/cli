@@ -55,7 +55,7 @@
     },
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.0"
+      "version": "1.0.1"
     },
     "System.Diagnostics.TraceSource": "4.0.0",
     "System.Diagnostics.TextWriterTraceListener": "4.0.0",
@@ -71,7 +71,7 @@
     "Microsoft.Build": "0.1.0-preview-00033-160829",
     "Microsoft.Build.Framework": "0.1.0-preview-00033-160829",
 
-    "Microsoft.DotNet.PlatformAbstractions": "1.0.1-beta-000919"
+    "Microsoft.DotNet.PlatformAbstractions": "1.0.1-beta-000933"
   },
   "frameworks": {
     "netcoreapp1.0": {

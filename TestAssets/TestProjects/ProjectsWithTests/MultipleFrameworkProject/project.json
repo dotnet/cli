@@ -1,7 +1,7 @@
 {
   "version": "1.0.0-*",
   "dependencies": {
-    "dotnet-test-xunit": "1.0.0-rc2-330423-54",
+    "dotnet-test-xunit": "1.0.0-rc2-350904-49",
     "xunit": "2.2.0-beta3-build3330"
   },
   "frameworks": {
@@ -14,7 +14,7 @@
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.0.0"
+          "version": "1.0.1"
         },
         "System.Linq.Expressions": "4.1.0",
         "System.Runtime.Serialization.Primitives": "4.1.1"

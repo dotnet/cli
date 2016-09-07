@@ -6,9 +6,9 @@
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.0"
+      "version": "1.0.1"
     },
-    "Microsoft.Extensions.DependencyModel": "1.0.1-beta-000919"
+    "Microsoft.Extensions.DependencyModel": "1.0.1-beta-000933"
   },
   "frameworks": {
     "netcoreapp1.0": {
