@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.Cli.VSTest.Tests
             string argsForVstest = string.Concat("\"", outputDll, "\"", " --TestAdapterPath:", "\"", testAdapterPath, "\"", " --Platform:x64");
 
             // Call vstest
-            CommandResult result = new VSTestCommand().ExecuteWithCapturedOutput(argsForVstest);
+            CommandResult result = new VSTestCommand().Execute(argsForVstest);//.ExecuteWithCapturedOutput(argsForVstest);
 
             // Verify
             result.StdOut.Should().Contain("Total tests: 2. Passed: 1. Failed: 1. Skipped: 0.");
