@@ -10,6 +10,7 @@ using System.Text;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Configurer;
 using Microsoft.DotNet.PlatformAbstractions;
+using Microsoft.DotNet.ProjectModel.Server;
 using Microsoft.DotNet.Tools.Build;
 using Microsoft.DotNet.Tools.Compiler;
 using Microsoft.DotNet.Tools.Compiler.Csc;
@@ -47,7 +48,8 @@ namespace Microsoft.DotNet.Cli
             ["restore3"] = Restore3Command.Run,
             ["vstest"] = VSTestCommand.Run,
             ["pack3"] = Pack3Command.Run,
-            ["migrate"] = MigrateCommand.Run
+            ["migrate"] = MigrateCommand.Run,
+            ["projectmodel-server"] = ProjectModelServerCommand.Run,
         };
 
         public static int Main(string[] args)
@@ -74,6 +76,22 @@ namespace Microsoft.DotNet.Cli
             {
                 Reporter.Error.WriteLine(CommandContext.IsVerbose() ? e.ToString().Red().Bold() : e.Message.Red().Bold());
 
+                return 1;
+            }
+            catch (Exception ex)
+            {
+#if DEBUG
+                Reporter.Error.WriteLine(ex.ToString());
+#else
+                if (Reporter.IsVerbose)
+                {
+                    Reporter.Error.WriteLine(ex.ToString());
+                }
+                else
+                {
+                    Reporter.Error.WriteLine(ex.Message);
+                }
+#endif
                 return 1;
             }
             finally
