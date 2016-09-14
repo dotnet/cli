@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.Cli.VSTest.Tests
                 .Pass();
 
             // Prepare args to send vstest
-            string configuration = Environment.GetEnvironmentVariable("CONFIGURATION") ?? "debug";
+            string configuration = Environment.GetEnvironmentVariable("CONFIGURATION") ?? "Debug";
             string testAdapterPath = Path.Combine(testProjectDirectory, "bin", configuration, "netcoreapp1.0");
             string outputDll = Path.Combine(testAdapterPath, $"{testAppName}.dll");
             string argsForVstest = string.Concat("\"", outputDll, "\"", " --TestAdapterPath:", "\"", testAdapterPath, "\"", " --Platform:x64");
