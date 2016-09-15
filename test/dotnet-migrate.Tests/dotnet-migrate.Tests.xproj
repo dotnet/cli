@@ -6,7 +6,7 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>a62edfbd-9e6d-458f-983e-1a86da52ae1e</ProjectGuid>
+    <ProjectGuid>e93cbb48-22be-45e1-9c53-b0fdd761117f</ProjectGuid>
     <RootNamespace>Microsoft.DotNet.ProjectJsonMigration.Tests</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
