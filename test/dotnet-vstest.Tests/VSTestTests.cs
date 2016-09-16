@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.Cli.VSTest.Tests
         public void TestsFromAGivenContainerShouldRunWithExpectedOutput()
         {
             // Copy DotNetCoreTestProject project in output directory of project dotnet-vstest.Tests
-            string testAppName = "DotNetCoreTestProject";
+            string testAppName = "VSTestDotNetCoreProject";
             TestInstance testInstance = TestAssetsManager.CreateTestInstance(testAppName).WithLockFiles();
 
             string testProjectDirectory = testInstance.TestRoot;
