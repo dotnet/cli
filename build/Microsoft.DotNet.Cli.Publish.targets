@@ -2,6 +2,7 @@
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildThisFileDirectory)/publish/PublishContent.targets" />
   <Import Project="$(MSBuildThisFileDirectory)/publish/Microsoft.DotNet.Cli.Badge.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)/publish/Microsoft.DotNet.Cli.Checksum.targets" />
 
   <!-- PUBLISH_TO_AZURE_BLOB env variable set by CI -->
   <Target Name="Publish"
@@ -16,7 +17,9 @@
           DependsOnTargets="SetupAzureBlobInformation;
                             GenerateVersionBadge;
                             GatherItemsForPattern;
-                            UploadToAzure;
+                            GenerateChecksums;
+                            UploadArtifactsToAzure;
+                            UploadChecksumsToAzure;
                             PublishDebFilesToDebianRepo;
                             PublishCliVersionBadge" />
 
@@ -36,6 +39,9 @@
       <CloudDropAccessToken>$(STORAGE_KEY)</CloudDropAccessToken>
       <CloudDropAccountName>$(STORAGE_ACCOUNT)</CloudDropAccountName>
       <DotnetBlobRootUrl>https://$(CloudDropAccountName).blob.core.windows.net/$(ContainerName)</DotnetBlobRootUrl>
+      <ChecksumContainerName>$(CHECKSUM_STORAGE_CONTAINER)</ChecksumContainerName>
+      <ChecksumCloudDropAccessToken>$(CHECKSUM_STORAGE_KEY)</ChecksumCloudDropAccessToken>
+      <ChecksumCloudDropAccountName>$(CHECKSUM_STORAGE_ACCOUNT)</ChecksumCloudDropAccountName>
     </PropertyGroup>
   </Target>
 
