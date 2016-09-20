@@ -2,20 +2,20 @@
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Target Name="GenerateChecksums"
           DependsOnTargets="Init;
-                            SetupGenerateChecksumsInputs;"
-          Inputs="@(GenerateChecksumsInputs)"
-          Outputs="%(GenerateChecksumsInputs.DestinationPath)">
-    <GenerateChecksums Items="@(GenerateChecksumsInputs)" />
+                            InitializeChecksumItemGroup;"
+          Inputs="@(ArtifactsForGeneratingChecksums)"
+          Outputs="%(ArtifactsForGeneratingChecksums.DestinationPath)">
+    <GenerateChecksums Items="@(ArtifactsForGeneratingChecksums)" />
   </Target>
 
-  <Target Name="SetupGenerateChecksumsInputs"
+  <Target Name="InitializeChecksumItemGroup"
           DependsOnTargets="Init;
                             GatherItemsForPattern">
     <ItemGroup>
-      <GenerateChecksumsInputs Include="@(ForPublishing)">
+      <ArtifactsForGeneratingChecksums Include="@(ForPublishing)">
         <DestinationPath>%(ForPublishing.FullPath).sha</DestinationPath>
         <RelativeBlobPath>%(ForPublishing.RelativeBlobPath).sha</RelativeBlobPath>
-      </GenerateChecksumsInputs>
+      </ArtifactsForGeneratingChecksums>
     </ItemGroup>
   </Target>
 </Project>

@@ -36,7 +36,11 @@ namespace Microsoft.DotNet.Build.Tasks
                         throw new Exception($"The file '{item.ItemSpec}' does not exist.");
                     }
 
-                    Log.LogMessage(MessageImportance.High, "Generating checksum for '{0}' into '{1}'...", item.ItemSpec, destinationPath);
+                    Log.LogMessage(
+                        MessageImportance.High,
+                        "Generating checksum for '{0}' into '{1}'...",
+                        item.ItemSpec,
+                        destinationPath);
 
                     using (FileStream stream = File.OpenRead(item.ItemSpec))
                     {
@@ -48,7 +52,8 @@ namespace Microsoft.DotNet.Build.Tasks
                 }
                 catch (Exception e)
                 {
-                    // We have 2 log calls because we want a nice error message but we also want to capture the callstack in the log.
+                    // We have 2 log calls because we want a nice error message but we also want to capture the
+                    // callstack in the log.
                     Log.LogError("An exception occurred while trying to generate a checksum for '{0}'.", item.ItemSpec);
                     Log.LogMessage(MessageImportance.Low, e.ToString());
                     return false;

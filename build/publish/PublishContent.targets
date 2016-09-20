@@ -21,19 +21,19 @@
 
   <!-- publishes artifacts to blob storage in Azure -->
   <Target Name="UploadArtifactsToAzure" DependsOnTargets="GatherItemsForPattern">
-    <Error Condition="'$(ContainerName)' == ''" Text="Missing property ContainerName." />
-    <Error Condition="'$(CloudDropAccountName)' == ''" Text="Missing property CloudDropAccountName." />
-    <Error Condition="'$(CloudDropAccessToken)' == ''" Text="Missing property CloudDropAccessToken." />
+    <Error Condition="'$(ArtifactContainerName)' == ''" Text="Missing property ArtifactContainerName." />
+    <Error Condition="'$(ArtifactCloudDropAccountName)' == ''" Text="Missing property ArtifactCloudDropAccountName." />
+    <Error Condition="'$(ArtifactCloudDropAccessToken)' == ''" Text="Missing property ArtifactCloudDropAccessToken." />
     <!-- create the container if it doesn't exist -->
     <CreateAzureContainer
-      AccountKey="$(CloudDropAccessToken)"
-      AccountName="$(CloudDropAccountName)"
-      ContainerName="$(ContainerName)" />
+      AccountKey="$(ArtifactCloudDropAccessToken)"
+      AccountName="$(ArtifactCloudDropAccountName)"
+      ContainerName="$(ArtifactContainerName)" />
     <!-- now upload the items -->
     <UploadToAzure
-      AccountKey="$(CloudDropAccessToken)"
-      AccountName="$(CloudDropAccountName)"
-      ContainerName="$(ContainerName)"
+      AccountKey="$(ArtifactCloudDropAccessToken)"
+      AccountName="$(ArtifactCloudDropAccountName)"
+      ContainerName="$(ArtifactContainerName)"
       Items="@(ForPublishing)"
       Overwrite="$(OverwriteOnPublish)" />
   </Target>
@@ -53,7 +53,7 @@
       AccountKey="$(ChecksumCloudDropAccessToken)"
       AccountName="$(ChecksumCloudDropAccountName)"
       ContainerName="$(ChecksumContainerName)"
-      Items="@(GenerateChecksumsInputs->'%(DestinationPath)')"
+      Items="@(ArtifactsForGeneratingChecksums->'%(DestinationPath)')"
       Overwrite="$(OverwriteOnPublish)" />
   </Target>
 
