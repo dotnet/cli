@@ -365,7 +365,7 @@ ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]
 ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.3-123456=1
 ```
 
-Installing 1.0.4-234567 (RTM) on top of that
+Installing 1.1.0-preview1-24528-02-234567 (RTM) on top of that
 
 ```
 RF+ HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.0-rc1=1
@@ -381,10 +381,10 @@ RF+ HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]
 RF+ HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.3-rc2=1
 RF+ HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.3=1
 NOP HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.3-123456=1
-ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.4-rc1=1
-ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.4-rc2=1
-ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.4=1
-ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.4-234567=1
+ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.1.0-preview1-24528-02-rc1=1
+ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.1.0-preview1-24528-02-rc2=1
+ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.1.0-preview1-24528-02=1
+ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.1.0-preview1-24528-02-234567=1
 ```
 
 Removing 1.0.3-123456
@@ -403,10 +403,10 @@ RF- HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]
 RF- HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.3-rc2=1
 RF- HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.3=1
 DEL HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.3-123456=1
-NOP HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.4-rc1=1
-NOP HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.4-rc2=1
-NOP HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.4=1
-NOP HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.4-234567=1
+NOP HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.1.0-preview1-24528-02-rc1=1
+NOP HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.1.0-preview1-24528-02-rc2=1
+NOP HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.1.0-preview1-24528-02=1
+NOP HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.1.0-preview1-24528-02-234567=1
 ```
 
 #### Scenario 2
@@ -432,9 +432,9 @@ NOP HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]
 ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.3-rc1=1 (first back-incompatible version)
 ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.3-rc2=1
 ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.3=1
-ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.4-rc1=1
-ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.4-rc2=1
-ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.4=1
+ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.1.0-preview1-24528-02-rc1=1
+ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.1.0-preview1-24528-02-rc2=1
+ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.1.0-preview1-24528-02=1
 ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.1.0-rc1=1
 ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.1.0-rc2=1
 ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.1.0=1

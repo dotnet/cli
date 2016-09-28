@@ -16,9 +16,9 @@ namespace Microsoft.DotNet.Cli.Build
 
         // Version constants without suffix
         public override int Major => 1;
-        public override int Minor => 0;
-        public override int Patch => 1;
-        public override string ReleaseSuffix => "rc3";
+        public override int Minor => 1;
+        public override int Patch => 0;
+        public override string ReleaseSuffix => "preview1";
         public string LatestHostVersionNoSuffix => $"{Major}.{Minor}.{Patch}";
         public string LatestHostFxrVersionNoSuffix => $"{Major}.{Minor}.{Patch}";
         public string LatestHostPolicyVersionNoSuffix => $"{Major}.{Minor}.{Patch}";

@@ -2,7 +2,6 @@
   "version": "1.0.0-preview2-*",
   "buildOptions": {
     "emitEntryPoint": true,
-    "keyFile": "../../tools/Key.snk",
     "embed": {
       "include": [
         "commands/dotnet-new/CSharp_Console.zip",
@@ -51,7 +50,7 @@
     },
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.2-servicing-004528-00"
+      "version": "1.1.0-preview1-001024"
     },
     "System.Diagnostics.TraceSource": "4.0.0",
     "System.Diagnostics.TextWriterTraceListener": "4.0.0",
