@@ -7,7 +7,7 @@
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.1.0-preview1-001024"
+          "version": "1.1.0-preview1-001073-00"
         },
         "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-*",
         "Libuv": "1.9.0-rc2-20896"

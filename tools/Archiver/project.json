@@ -12,7 +12,7 @@
     "Microsoft.DotNet.Archive": {
       "target": "project"
     },
-    "Microsoft.NETCore.App": "1.1.0-preview1-001024"
+    "Microsoft.NETCore.App": "1.1.0-preview1-001073-00"
   },
   "frameworks": {
     "netcoreapp1.0": {}

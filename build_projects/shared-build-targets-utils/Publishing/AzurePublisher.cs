@@ -187,7 +187,7 @@ namespace Microsoft.DotNet.Cli.Build
         public static async Task DownloadFile(string blobFilePath, string localDownloadPath)
         {
             var blobUrl = $"{s_dotnetBlobRootUrl}{blobFilePath}";
-
+            Console.WriteLine($"Downloading {blobUrl} to {localDownloadPath}.");
             using (var client = new HttpClient())
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, blobUrl);
