@@ -6,7 +6,7 @@
   "dependencies": {
     "L11": "1.0.0-*",
     "L12": "1.0.0-*",
-    "Microsoft.NETCore.App": "1.1.0-preview1-001073-00"
+    "Microsoft.NETCore.App": "1.1.0-preview1-001086-00"
   },
   "frameworks": {
     "netcoreapp1.0": {}

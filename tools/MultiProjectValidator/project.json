@@ -5,7 +5,7 @@
     "emitEntryPoint": true
   },
   "dependencies": {
-    "Microsoft.NETCore.App": "1.1.0-preview1-001073-00",
+    "Microsoft.NETCore.App": "1.1.0-preview1-001086-00",
     "Microsoft.DotNet.ProjectModel": {
       "target": "project"
     },

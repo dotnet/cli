@@ -18,7 +18,7 @@
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.1.0-preview1-001073-00"
+          "version": "1.1.0-preview1-001086-00"
         }
       },
       "imports": [

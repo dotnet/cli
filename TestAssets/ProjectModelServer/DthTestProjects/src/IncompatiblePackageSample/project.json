@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "Microsoft.NETCore.App": "1.1.0-preview1-001073-00",
+    "Microsoft.NETCore.App": "1.1.0-preview1-001086-00",
     "Microsoft.Web.Administration": "7.0.0"
   },
   "frameworks": {
