@@ -116,7 +116,7 @@ namespace Microsoft.Extensions.DependencyModel
             // project dependency
             result.Should().HaveStdOutContaining("Runtime DependencyContextValidator:DependencyContextValidator");
             // system assembly
-            result.Should().HaveStdOutContaining("Runtime System.Linq:System.Linq");
+            result.StdOut.Should().ContainEquivalentOf("Runtime system.linq:System.Linq");
         }
 
         private void ValidateCompilationLibraries(CommandResult result, string appname)
