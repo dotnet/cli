@@ -14,6 +14,7 @@ using Microsoft.DotNet.Tools.Build;
 using Microsoft.DotNet.Tools.Build3;
 using Microsoft.DotNet.Tools.Compiler;
 using Microsoft.DotNet.Tools.Compiler.Csc;
+using Microsoft.DotNet.Tools.CrossGen;
 using Microsoft.DotNet.Tools.Help;
 using Microsoft.DotNet.Tools.Migrate;
 using Microsoft.DotNet.Tools.MSBuild;
@@ -37,6 +38,7 @@ namespace Microsoft.DotNet.Cli
         {
             ["build"] = BuildCommand.Run,
             ["compile-csc"] = CompileCscCommand.Run,
+            ["crossgen"] = CrossGenCommand.Run,
             ["help"] = HelpCommand.Run,
             ["new"] = NewCommand.Run,
             ["nuget"] = NuGetCommand.Run,
