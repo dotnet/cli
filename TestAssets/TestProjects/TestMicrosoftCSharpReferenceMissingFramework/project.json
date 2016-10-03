@@ -5,7 +5,7 @@
     "netcoreapp1.0": {
       "imports": "dnxcore50",
       "dependencies": {
-        "Microsoft.NETCore.App": "1.0.1"
+        "Microsoft.NETCore.App": "1.0.2-servicing-004530-00"
       }
     },
     "netcore50": {

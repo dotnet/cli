@@ -8,7 +8,7 @@
       "target": "package"
     },
     "Microsoft.NETCore.App": {
-      "version": "1.0.1",
+      "version": "1.0.2-servicing-004530-00",
       "type": "platform"
     }
   },
