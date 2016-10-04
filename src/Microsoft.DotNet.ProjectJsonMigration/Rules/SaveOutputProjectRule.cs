@@ -17,6 +17,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
 
             CleanEmptyPropertyAndItemGroups(migrationRuleInputs.OutputMSBuildProject);
 
+            // Temporarily Add ProjectLockFile
+            migrationRuleInputs.CommonPropertyGroup.AddProperty("ProjectLockFile", "$(MSBuildProjectDirectory)/$(MSBuildProjectName).project.lock.json");
+
             migrationRuleInputs.OutputMSBuildProject.Save(outputProject);
         }
 
