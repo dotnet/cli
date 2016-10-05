@@ -6,8 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Xml.XDocument;
 using Xunit;
 using FluentAssertions;
 
@@ -19,12 +18,12 @@ namespace Microsoft.DotNet.Tests
         public void When_NewtonsoftJson_dependency_added_Then_project_restores_and_runs()
         {
             var rootPath = Temp.CreateDirectory().Path;
-            var projectJsonFile = Path.Combine(rootPath, "project.json");
+            var projectFile = Path.Combine(rootPath, "project.json");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .Execute("new");
             
-            AddProjectJsonDependency(projectJsonFile, "Newtonsoft.Json", "7.0.1");
+            AddProjectJsonDependency(projectFile, "Newtonsoft.Json", "7.0.1");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .Execute("restore")
