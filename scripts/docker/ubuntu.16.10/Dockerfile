@@ -26,8 +26,9 @@ RUN apt-get update && \
         libssl1.0.0 \
         zlib1g \
         libuuid1 \
-        liblldb-3.5 && \
-    apt-get clean && \
+        liblldb-3.5 \
+        libcurl4-openssl-dev \
+    && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Build Prereqs
