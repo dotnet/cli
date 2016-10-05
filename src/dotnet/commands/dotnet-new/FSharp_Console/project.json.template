@@ -11,7 +11,7 @@
     }
   },
   "tools": {
-    "dotnet-compile-fsc": "1.0.0-preview2-*"
+    "dotnet-compile-fsc": "1.0.0-preview2.1-*"
   },
   "frameworks": {
     "netcoreapp1.0": {
