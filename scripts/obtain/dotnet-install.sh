@@ -64,34 +64,47 @@ get_current_os_name() {
         echo "osx"
         return 0
     else
-        # Detect Distro
-        if [ "$(cat /etc/*-release | grep -cim1 ubuntu)" -eq 1 ]; then
-            if [ "$(cat /etc/*-release | grep -cim1 16.04)" -eq 1 ]; then
-                echo "ubuntu.16.04"
-                return 0
-            fi
+        if [ -e /etc/os-release ]; then
+            . /etc/os-release
 
-            echo "ubuntu"
-            return 0
-        elif [ "$(cat /etc/*-release | grep -cim1 centos)" -eq 1 ]; then
-            echo "centos"
-            return 0
-        elif [ "$(cat /etc/*-release | grep -cim1 rhel)" -eq 1 ]; then
-            echo "rhel"
-            return 0
-        elif [ "$(cat /etc/*-release | grep -cim1 debian)" -eq 1 ]; then
-            echo "debian"
-            return 0
-        elif [ "$(cat /etc/*-release | grep -cim1 fedora)" -eq 1 ]; then
-            if [ "$(cat /etc/*-release | grep -cim1 23)" -eq 1 ]; then
-                echo "fedora.23"
-                return 0
-            fi
-        elif [ "$(cat /etc/*-release | grep -cim1 opensuse)" -eq 1 ]; then
-            if [ "$(cat /etc/*-release | grep -cim1 13.2)" -eq 1 ]; then
-                echo "opensuse.13.2"
-                return 0
-            fi
+            case "$ID.$VERSION_ID" in
+                "centos.7")
+                    echo "centos"
+                    return 0
+                    ;;
+                "debian.8")
+                    echo "debian"
+                    return 0
+                    ;;
+                "fedora.23")
+                    echo "fedora.23"
+                    return 0
+                    ;;
+                "opensuse.13.2")
+                    echo "opensuse.13.2"
+                    return 0
+                    ;;
+                "opensuse.42.1")
+                    echo "opensuse.42.1"
+                    return 0
+                    ;;
+                "rhel.7.0" | "rhel.7.1" | "rhel.7.2")
+                    echo "rhel"
+                    return 0
+                    ;;
+                "ubuntu.14.04")
+                    echo "ubuntu"
+                    return 0
+                    ;;
+                "ubuntu.16.04")
+                    echo "ubuntu.16.04"
+                    return 0
+                    ;;
+                "ubuntu.16.10")
+                    echo "ubuntu.16.10"
+                    return 0
+                    ;;
+            esac
         fi
     fi
     
@@ -284,12 +297,7 @@ get_latest_version_info() {
     
     local osname=$(get_current_os_name)
     
-    local version_file_url=null
-    if [ "$shared_runtime" = true ]; then
-        version_file_url="$azure_feed/$azure_channel/dnvm/latest.sharedfx.$osname.$normalized_architecture.version"
-    else
-        version_file_url="$azure_feed/$azure_channel/dnvm/latest.$osname.$normalized_architecture.version"
-    fi
+    local version_file_url="$azure_feed/$azure_channel/dnvm/latest.$osname.$normalized_architecture.version"
     say_verbose "get_latest_version_info: latest url: $version_file_url"
     
     download $version_file_url
@@ -370,13 +378,7 @@ construct_download_link() {
     
     local osname=$(get_current_os_name)
     
-    local download_link=null
-    if [ "$shared_runtime" = true ]; then
-        download_link="$azure_feed/$azure_channel/Binaries/$specific_version/dotnet-$osname-$normalized_architecture.$specific_version.tar.gz"
-    else
-        download_link="$azure_feed/$azure_channel/Binaries/$specific_version/dotnet-dev-$osname-$normalized_architecture.$specific_version.tar.gz"
-    fi
-    
+    local download_link="$azure_feed/$azure_channel/Binaries/$specific_version/dotnet-dev-$osname-$normalized_architecture.$specific_version.tar.gz"
     echo "$download_link"
     return 0
 }
@@ -566,7 +568,6 @@ dry_run=false
 no_path=false
 azure_feed="https://dotnetcli.blob.core.windows.net/dotnet"
 verbose=false
-shared_runtime=false
 
 while [ $# -ne 0 ]
 do
@@ -587,9 +588,6 @@ do
         --arch|--architecture|-[Aa]rch|-[Aa]rchitecture)
             shift
             architecture="$1"
-            ;;
-        --shared-runtime|-[Ss]hared[Rr]untime)
-            shared_runtime=true
             ;;
         --debug-symbols|-[Dd]ebug[Ss]ymbols)
             debug_symbols=true
@@ -624,8 +622,6 @@ do
             echo "      -InstallDir"
             echo "  --architecture <ARCHITECTURE>  Architecture of .NET Tools. Currently only x64 is supported."
             echo "      --arch,-Architecture,-Arch"
-            echo "  --shared-runtime               Installs just the shared runtime bits, not the entire SDK."
-            echo "      -SharedRuntime"
             echo "  --debug-symbols,-DebugSymbols  Specifies if symbols should be included in the installation."
             echo "  --dry-run,-DryRun              Do not perform installation. Display download link."
             echo "  --no-path, -NoPath             Do not set PATH for the current process."
@@ -668,4 +664,4 @@ else
     say "Binaries of dotnet can be found in $bin_path"
 fi
 
-say "Installation finished successfully."
+say "Installation finished successfuly."

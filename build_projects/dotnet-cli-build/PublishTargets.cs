@@ -91,12 +91,14 @@ namespace Microsoft.DotNet.Cli.Build
                         "win.x64.version",
                         "ubuntu.x64.version",
                         "ubuntu.16.04.x64.version",
+                        "ubuntu.16.10.x64.version",
                         "rhel.x64.version",
                         "osx.x64.version",
                         "debian.x64.version",
                         "centos.x64.version",
                         "fedora.23.x64.version",
-                        "opensuse.13.2.x64.version"
+                        "opensuse.13.2.x64.version",
+                        "opensuse.42.1.x64.version"
                     };
 
                     string cliVersion = Utils.GetCliVersionFileContent(c);
@@ -137,12 +139,14 @@ namespace Microsoft.DotNet.Cli.Build
                  { "Windows_x64", false },
                  { "Ubuntu_x64", false },
                  { "Ubuntu_16_04_x64", false },
+                 { "Ubuntu_16_10_x64", false },
                  { "RHEL_x64", false },
                  { "OSX_x64", false },
                  { "Debian_x64", false },
                  { "CentOS_x64", false },
                  { "Fedora_23_x64", false },
-                 { "openSUSE_13_2_x64", false }
+                 { "openSUSE_13_2_x64", false },
+                 { "openSUSE_42_1_x64", false }
              };
 
             List<string> blobs = new List<string>(AzurePublisherTool.ListBlobs($"{Channel}/Binaries/{CliNuGetVersion}/"));
