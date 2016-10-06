@@ -201,6 +201,7 @@ namespace Microsoft.DotNet.Cli.Build
             var compilersDeps = Path.Combine(sdkOutputDirectory, "compilers.deps.json");
             var compilersRuntimeConfig = Path.Combine(sdkOutputDirectory, "compilers.runtimeconfig.json");
 
+            RemoveAssetFromDepsPackages(compilersDeps, "runtime", "compilers.dll");
 
             var binaryToCorehostifyRelDir = Path.Combine("runtimes", "any", "native");
             var binaryToCorehostifyOutDir = Path.Combine(sdkOutputDirectory, binaryToCorehostifyRelDir);

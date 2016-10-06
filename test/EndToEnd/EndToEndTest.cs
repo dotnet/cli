@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 {
     public class EndToEndTest : TestBase
     {
-        private static readonly string NetCoreAppTfm = "netcoreapp1.0";
+        private static readonly string NetCoreAppTfm = "netcoreapp1.1";
         private static readonly string s_expectedOutput = "Hello World!" + Environment.NewLine;
         private static readonly string s_testdirName = "e2etestroot";
         private static readonly string s_outputdirName = "test space/bin";

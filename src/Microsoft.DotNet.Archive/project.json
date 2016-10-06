@@ -5,7 +5,7 @@
   },
   "description": "Archive and compression types.",
   "dependencies": {
-    "NETStandard.Library": "1.6.0",
+    "NETStandard.Library": "1.6.1-preview1-24528-02",
     "System.Linq.Parallel": "4.0.1"
   },
   "frameworks": {
