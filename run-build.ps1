@@ -79,12 +79,18 @@ if ((Test-Path $bootStrapperPath) -eq 0)
 }
 
 # now execute it
-& $bootStrapperPath (Get-Location) $toolsLocalPath $env:DOTNET_INSTALL_DIR $sharedFrameworkVersion | Out-File (Join-Path (Get-Location) "bootstrap.log")
+& $bootStrapperPath (Get-Location) $toolsLocalPath $env:DOTNET_INSTALL_DIR | Out-File (Join-Path (Get-Location) "bootstrap.log")
 if ($LastExitCode -ne 0)
 {
     Write-Output "Boot-strapping failed with exit code $LastExitCode, see bootstrap.log for more information."
     exit $LastExitCode
 }
+
+# create a junction to the shared FX version directory. this is
+# so we have a stable path to dotnet.exe regardless of version.
+$junctionTarget = Join-Path $env:DOTNET_INSTALL_DIR "shared\Microsoft.NETCore.App\$sharedFrameworkVersion"
+$junctionName = Join-Path $env:DOTNET_INSTALL_DIR "shared\Microsoft.NETCore.App\version"
+cmd.exe /c mklink /j $junctionName $junctionTarget | Out-Null
 
 # Put the stage0 on the path
 $env:PATH = "$env:DOTNET_INSTALL_DIR;$env:PATH"
