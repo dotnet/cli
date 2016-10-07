@@ -45,6 +45,7 @@ namespace Microsoft.DotNet.Migration.Tests
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
         }
 
+        [Fact]
         public void It_migrates_signed_apps(string projectName)
         {
             var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppWithSigning", callingMethod: "i").WithLockFiles().Path;
@@ -86,7 +87,7 @@ namespace Microsoft.DotNet.Migration.Tests
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
         }
 
-        [Fact()]
+        [Fact]
         public void It_migrates_dotnet_new_web_with_outputs_containing_project_json_outputs()
         {
             var projectDirectory = Temp.CreateDirectory().Path;
