@@ -86,7 +86,7 @@ namespace Microsoft.DotNet.Migration.Tests
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
         }
 
-        [Fact(Skip="https://github.com/dotnet/cli/issues/4299")]
+        [Fact()]
         public void It_migrates_dotnet_new_web_with_outputs_containing_project_json_outputs()
         {
             var projectDirectory = Temp.CreateDirectory().Path;
@@ -102,8 +102,7 @@ namespace Microsoft.DotNet.Migration.Tests
         }
 
         [Theory]
-        // TODO: Enable this when X-Targeting is in
-        // [InlineData("TestLibraryWithMultipleFrameworks")]
+        [InlineData("TestLibraryWithMultipleFrameworks")]
         public void It_migrates_projects_with_multiple_TFMs(string projectName)
         {
             var projectDirectory =
