@@ -46,13 +46,13 @@ namespace Microsoft.DotNet.Migration.Tests
         }
 
         [Fact]
-        public void It_migrates_signed_apps(string projectName)
+        public void It_migrates_signed_apps()
         {
             var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppWithSigning", callingMethod: "i").WithLockFiles().Path;
 
             CleanBinObj(projectDirectory);
 
-            var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, projectName);
+            var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, "TestAppWithSigning");
 
             var outputsIdentical =
                 outputComparisonData.ProjectJsonBuildOutputs.SetEquals(outputComparisonData.MSBuildBuildOutputs);
@@ -90,7 +90,13 @@ namespace Microsoft.DotNet.Migration.Tests
         [Fact]
         public void It_migrates_dotnet_new_web_with_outputs_containing_project_json_outputs()
         {
-            var projectDirectory = Temp.CreateDirectory().Path;
+            var projectDirectory = Path.Combine(AppContext.BaseDirectory, "newwebtest");
+            if (Directory.Exists(projectDirectory))
+            {
+                Directory.Delete(projectDirectory, true);
+            }
+            Directory.CreateDirectory(projectDirectory);
+            
             var outputComparisonData = GetDotnetNewComparisonData(projectDirectory, "web");
 
             var outputsIdentical =
