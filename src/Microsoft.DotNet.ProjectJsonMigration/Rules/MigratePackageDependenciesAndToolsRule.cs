@@ -83,7 +83,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
             }
             else
             {
-                MigrationTrace.Instance.WriteLine($"{nameof(MigratePackageDependenciesAndToolsRule)}: imports transform null for {string.Join(";", targetFramework.FrameworkName.GetShortFolderName())}");
+                MigrationTrace.Instance.WriteLine($"{nameof(MigratePackageDependenciesAndToolsRule)}: imports transform null for {targetFramework.FrameworkName.GetShortFolderName()}");
             }
         }
 
