@@ -30,7 +30,6 @@ if($Help)
 $env:CONFIGURATION = $Configuration;
 $RepoRoot = "$PSScriptRoot"
 $env:NUGET_PACKAGES = "$RepoRoot\.nuget\packages"
-$sharedFrameworkVersion = "1.0.1"
 
 if($NoPackage)
 {
@@ -85,12 +84,6 @@ if ($LastExitCode -ne 0)
     Write-Output "Boot-strapping failed with exit code $LastExitCode, see bootstrap.log for more information."
     exit $LastExitCode
 }
-
-# create a junction to the shared FX version directory. this is
-# so we have a stable path to dotnet.exe regardless of version.
-$junctionTarget = Join-Path $env:DOTNET_INSTALL_DIR "shared\Microsoft.NETCore.App\$sharedFrameworkVersion"
-$junctionName = Join-Path $env:DOTNET_INSTALL_DIR "shared\Microsoft.NETCore.App\version"
-cmd.exe /c mklink /j $junctionName $junctionTarget | Out-Null
 
 # Put the stage0 on the path
 $env:PATH = "$env:DOTNET_INSTALL_DIR;$env:PATH"
