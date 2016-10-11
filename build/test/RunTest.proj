@@ -3,7 +3,7 @@
 
   <!-- workaround for https://github.com/Microsoft/msbuild/issues/885 -->
   <PropertyGroup>
-    <CLIBuildDll Condition=" '!Exists($(CLIBuildDll))' ">$([MSBuild]::Unescape($(CLIBuildDll)))</CLIBuildDll>
+    <CLIBuildDll Condition="!Exists($(CLIBuildDll))">$([MSBuild]::Unescape($(CLIBuildDll)))</CLIBuildDll>
   </PropertyGroup>
 
 
