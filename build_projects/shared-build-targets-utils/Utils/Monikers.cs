@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.Cli.Build
         public const string SharedHostBrandName = "Microsoft .NET Core 1.0.0 - Host";
         public const string HostFxrBrandName = "Microsoft .NET Core 1.0.0 - Host FX Resolver";
 
-        private const string CLISdkBrandName = "Microsoft .NET Core 1.0.1 - SDK 1.0.0 Preview 2-{COMMIT_COUNT_STRING}";
+        private const string CLISdkBrandName = "Microsoft .NET Core 1.0.2 - SDK 1.0.0 Preview 2-{COMMIT_COUNT_STRING}";
 
         public static string GetCLISdkBrandName(BuildTargetContext c)
         {
