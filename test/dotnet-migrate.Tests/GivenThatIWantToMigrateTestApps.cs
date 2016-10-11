@@ -87,7 +87,7 @@ namespace Microsoft.DotNet.Migration.Tests
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
         }
 
-        [Fact]
+        // [Fact]
         public void It_migrates_dotnet_new_web_with_outputs_containing_project_json_outputs()
         {
             var projectDirectory = Path.Combine(AppContext.BaseDirectory, "newwebtest");

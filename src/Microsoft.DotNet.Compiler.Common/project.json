@@ -14,7 +14,7 @@
     "Microsoft.DotNet.Files": {
       "target": "project"
     },
-    "NuGet.ProjectModel": "3.6.0-rc-1976"
+    "NuGet.ProjectModel": "3.6.0-rc-1954"
   },
   "frameworks": {
     "net451": {
