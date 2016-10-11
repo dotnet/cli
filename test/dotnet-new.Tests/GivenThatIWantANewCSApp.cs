@@ -4,9 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using Microsoft.Build.Construction;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using System.Xml.XDocument;
 using Xunit;
 using FluentAssertions;
 
@@ -18,19 +17,20 @@ namespace Microsoft.DotNet.Tests
         public void When_NewtonsoftJson_dependency_added_Then_project_restores_and_runs()
         {
             var rootPath = Temp.CreateDirectory().Path;
-            var projectFile = Path.Combine(rootPath, "project.json");
+            var projectName = new FileInfo(rootPath).Directory.Name;
+            var projectFile = Path.Combine(rootPath, $"{projectName}.csproj");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .Execute("new");
             
-            AddProjectJsonDependency(projectFile, "Newtonsoft.Json", "7.0.1");
+            AddProjectDependency(projectFile, "Newtonsoft.Json", "7.0.1");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("restore")
+                .Execute("restore3")
                 .Should().Pass();
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("run")
+                .Execute("run3")
                 .Should().Pass();
         }
         
@@ -43,10 +43,10 @@ namespace Microsoft.DotNet.Tests
                 .Execute("new");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("restore");
+                .Execute("restore3");
 
             var buildResult = new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .ExecuteWithCapturedOutput("build");
+                .ExecuteWithCapturedOutput("build3");
             
             buildResult.Should().Pass();
             buildResult.Should().NotHaveStdErr();
@@ -73,36 +73,13 @@ namespace Microsoft.DotNet.Tests
             result.Should().HaveStdErr();
         }
         
-        private static void AddProjectJsonDependency(string projectJsonPath, string dependencyId, string dependencyVersion)
+        private static void AddProjectDependency(string projectFilePath, string dependencyId, string dependencyVersion)
         {
-            var projectJsonRoot = ReadProject(projectJsonPath);
+            var projectRootElement = ProjectRootElement.Create(projectFilePath);
 
-            var dependenciesNode = projectJsonRoot
-                .Descendants()
-                .OfType<JProperty>()
-                .First(p => p.Name == "dependencies");
+            projectRootElement.AddItem("PackageReference", "dependencyId", new Dictionary<string, string>{{"Version", dependencyVersion}});
 
-            ((JObject)dependenciesNode.Value).Add(new JProperty(dependencyId, dependencyVersion));
-
-            WriteProject(projectJsonRoot, projectJsonPath);
-        }
-
-        private static JObject ReadProject(string projectJsonPath)
-        {
-            using (TextReader projectFileReader = File.OpenText(projectJsonPath))
-            {
-                var projectJsonReader = new JsonTextReader(projectFileReader);
-
-                var serializer = new JsonSerializer();
-                return serializer.Deserialize<JObject>(projectJsonReader);
-            }
-        }
-
-        private static void WriteProject(JObject projectRoot, string projectJsonPath)
-        {
-            string projectJson = JsonConvert.SerializeObject(projectRoot, Formatting.Indented);
-
-            File.WriteAllText(projectJsonPath, projectJson + Environment.NewLine);
+            projectRootElement.Save();
         }
     }
 }
