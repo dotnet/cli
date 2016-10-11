@@ -59,8 +59,7 @@ param(
    [switch]$DryRun,
    [switch]$NoPath,
    [string]$AzureFeed="https://dotnetcli.azureedge.net/dotnet",
-   [string]$UncachedFeed="https://dotnetcli.blob.core.windows.net/dotnet",
-   [string]$RuntimeVersionFile
+   [string]$UncachedFeed="https://dotnetcli.blob.core.windows.net/dotnet"
 )
 
 Set-StrictMode -Version Latest
@@ -367,29 +366,6 @@ function DownloadFile([Uri]$Uri, [string]$OutPath) {
     }
 }
 
-function Get-Runtime-Version-From-Dotnet-Package([System.IO.Compression.ZipArchive]$Zip) {
-    Say-Invocation $MyInvocation
-    Load-Assembly -Assembly System.IO.Compression.FileSystem
-    Set-Variable -Name Zip
-    $Zip = [System.IO.Compression.ZipFile]::OpenRead($ZipPath)
-    try {
-        foreach ($entry in $Zip.Entries) {
-            $dir = Get-Path-Prefix-With-Version $entry.FullName
-            if ($dir -ne $null) {
-                if ($dir -match 'shared/Microsoft.NETCore.App/(?<version>(\d*\.?)+)')
-                {
-                    return $matches['version']
-                }
-            }
-        }
-    }
-    finally {
-        if ($Zip -ne $null) {
-            $Zip.Dispose()
-        }
-    }
-}
-
 $AzureChannel = Get-Azure-Channel-From-Channel -Channel $Channel
 $CLIArchitecture = Get-CLIArchitecture-From-Architecture $Architecture
 $SpecificVersion = Get-Specific-Version-From-Version -AzureFeed $AzureFeed -AzureChannel $AzureChannel -CLIArchitecture $CLIArchitecture -Version $Version
@@ -423,7 +399,6 @@ foreach ($DownloadLink in $DownloadLinks) {
 
     Say "Extracting zip from $DownloadLink"
     Extract-Dotnet-Package -ZipPath $ZipPath -OutPath $InstallRoot
-    $runtimeVersion = Get-Runtime-Version-From-Dotnet-Package -ZipPath $ZipPath
 
     Remove-Item $ZipPath
 }
@@ -435,11 +410,6 @@ if (-Not $NoPath) {
 }
 else {
     Say "Binaries of dotnet can be found in $BinPath"
-}
-
-if ($RuntimeVersionFile -ne "")
-{
-    $runtimeVersion | Out-File $RuntimeVersionFile -Force
 }
 
 Say "Installation finished"
