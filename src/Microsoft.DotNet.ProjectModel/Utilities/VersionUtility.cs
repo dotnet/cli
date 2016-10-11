@@ -33,6 +33,11 @@ namespace Microsoft.DotNet.ProjectModel.Utilities
                 return null;
             }
 
+            if (range.MinVersion == null)
+            {
+                return null;
+            }
+
             if (range.MinVersion == range.MaxVersion &&
                 (range.Float == null || range.Float.FloatBehavior == NuGetVersionFloatBehavior.None))
             {
