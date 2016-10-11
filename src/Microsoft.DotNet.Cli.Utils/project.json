@@ -9,10 +9,10 @@
       "target": "project"
     },
     "Microsoft.DotNet.PlatformAbstractions": "1.0.1-beta-000933",
-    "NuGet.Versioning": "3.6.0-rc-1973",
-    "NuGet.Packaging": "3.6.0-rc-1973",
-    "NuGet.Frameworks": "3.6.0-rc-1973",
-    "NuGet.ProjectModel": "3.6.0-rc-1973"
+    "NuGet.Versioning": "3.6.0-rc-1976",
+    "NuGet.Packaging": "3.6.0-rc-1976",
+    "NuGet.Frameworks": "3.6.0-rc-1976",
+    "NuGet.ProjectModel": "3.6.0-rc-1976"
   },
   "frameworks": {
     "net451": {
