@@ -45,14 +45,13 @@ namespace Microsoft.DotNet.Migration.Tests
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
         }
 
-        [Fact]
-        public void It_migrates_signed_apps()
+        public void It_migrates_signed_apps(string projectName)
         {
             var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppWithSigning", callingMethod: "i").WithLockFiles().Path;
 
             CleanBinObj(projectDirectory);
 
-            var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, "TestAppWithSigning");
+            var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, projectName);
 
             var outputsIdentical =
                 outputComparisonData.ProjectJsonBuildOutputs.SetEquals(outputComparisonData.MSBuildBuildOutputs);
@@ -87,16 +86,10 @@ namespace Microsoft.DotNet.Migration.Tests
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
         }
 
-        // [Fact]
+        [Fact(Skip="https://github.com/dotnet/cli/issues/4299")]
         public void It_migrates_dotnet_new_web_with_outputs_containing_project_json_outputs()
         {
-            var projectDirectory = Path.Combine(AppContext.BaseDirectory, "newwebtest");
-            if (Directory.Exists(projectDirectory))
-            {
-                Directory.Delete(projectDirectory, true);
-            }
-            Directory.CreateDirectory(projectDirectory);
-            
+            var projectDirectory = Temp.CreateDirectory().Path;
             var outputComparisonData = GetDotnetNewComparisonData(projectDirectory, "web");
 
             var outputsIdentical =
@@ -109,7 +102,8 @@ namespace Microsoft.DotNet.Migration.Tests
         }
 
         [Theory]
-        [InlineData("TestLibraryWithMultipleFrameworks")]
+        // TODO: Enable this when X-Targeting is in
+        // [InlineData("TestLibraryWithMultipleFrameworks")]
         public void It_migrates_projects_with_multiple_TFMs(string projectName)
         {
             var projectDirectory =
@@ -274,8 +268,54 @@ namespace Microsoft.DotNet.Migration.Tests
             outputsIdentical.Should().BeTrue();
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
          }
+        
+        [Theory]
+        // https://github.com/dotnet/cli/issues/4313
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Migration_outputs_error_when_no_projects_found(bool useGlobalJson)
+        {
+            var projectDirectory = TestAssetsManager.CreateTestDirectory("Migration_outputs_error_when_no_projects_found");
 
-         private void VerifyMigration(IEnumerable<string> expectedProjects, string rootDir)
+            string argstr = string.Empty;
+            string errorMessage = string.Empty;
+
+            if (useGlobalJson)
+            {
+                var globalJsonPath = Path.Combine(projectDirectory.Path, "global.json");
+                using (FileStream fs = File.Create(globalJsonPath))
+                {
+                    using (StreamWriter sw = new StreamWriter(fs))
+                    {
+                        sw.WriteLine("{");
+                        sw.WriteLine("\"projects\": [ \".\" ]");
+                        sw.WriteLine("}");
+                    }
+                }
+
+                argstr = globalJsonPath;
+                errorMessage = "Unable to find any projects in global.json";
+            }
+            else
+            {
+                argstr = projectDirectory.Path;
+                errorMessage = $"No project.json file found in '{projectDirectory.Path}'";
+            }
+
+            var result = new TestCommand("dotnet")
+                .WithWorkingDirectory(projectDirectory.Path)
+                .ExecuteWithCapturedOutput($"migrate {argstr}");
+
+            // Expecting an error exit code.
+            result.ExitCode.Should().Be(1);
+
+            // Verify the error messages. Note that debug builds also show the call stack, so we search
+            // for the error strings that should be present (rather than an exact match).
+            result.StdErr.Should().Contain(errorMessage);
+            result.StdErr.Should().Contain("Migration failed.");
+        }
+        
+        private void VerifyMigration(IEnumerable<string> expectedProjects, string rootDir)
          {
              var migratedProjects = Directory.EnumerateFiles(rootDir, "project.json", SearchOption.AllDirectories)
                                              .Where(s => Directory.EnumerateFiles(Path.GetDirectoryName(s), "*.csproj").Count() == 1)
