@@ -9,6 +9,11 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 {
     public class GivenDotNetUsesMSBuild : TestBase
     {
+        public static void Main() 
+        { 
+            Console.WriteLine("Dummy Entrypoint."); 
+        } 
+
         [Fact]
         public void ItCanNewRestoreBuildRunCleanMSBuildProject()
         {
@@ -18,7 +23,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 
                 new NewCommand()
                     .WithWorkingDirectory(projectDirectory)
-                    .Execute("-t msbuild")
+                    .Execute("")
                     .Should()
                     .Pass();
 
