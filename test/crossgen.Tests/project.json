@@ -3,7 +3,7 @@
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.2-servicing-004528-00"
+      "version": "1.0.2-servicing-004551-00"
     },
     "Microsoft.DotNet.Tools.Tests.Utilities": {
       "target": "project"
