@@ -10,8 +10,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
     public class GivenDotNetUsesMSBuild : TestBase
     {
         public static void Main() 
-        { 
-            Console.WriteLine("Dummy Entrypoint."); 
+        {
         } 
 
         [Fact]
