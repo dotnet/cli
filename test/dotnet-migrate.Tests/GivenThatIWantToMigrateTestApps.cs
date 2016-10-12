@@ -67,14 +67,12 @@ namespace Microsoft.DotNet.Migration.Tests
         [Fact]
         public void It_migrates_dotnet_new_console_with_identical_outputs()
         {
-            var projectDirectory = Path.Combine(AppContext.BaseDirectory, "newconsoletest");
-            if (Directory.Exists(projectDirectory))
-            {
-                Directory.Delete(projectDirectory, true);
-            }
-            Directory.CreateDirectory(projectDirectory);
+            var testInstance = TestAssetsManager
+                .CreateTestInstance("ProjectJsonConsoleTemplate");
+            
+            var projectDirectory = testInstance.Path;
 
-            var outputComparisonData = GetDotnetNewComparisonData(projectDirectory, "console");
+            var outputComparisonData = GetComparisonData(projectDirectory);
 
             var outputsIdentical =
                 outputComparisonData.ProjectJsonBuildOutputs.SetEquals(outputComparisonData.MSBuildBuildOutputs);
@@ -89,8 +87,12 @@ namespace Microsoft.DotNet.Migration.Tests
         [Fact(Skip="https://github.com/dotnet/cli/issues/4299")]
         public void It_migrates_dotnet_new_web_with_outputs_containing_project_json_outputs()
         {
-            var projectDirectory = Temp.CreateDirectory().Path;
-            var outputComparisonData = GetDotnetNewComparisonData(projectDirectory, "web");
+            var testInstance = TestAssetsManager
+                .CreateTestInstance("ProjectJsonWebTemplate");
+
+            var projectDirectory = testInstance.Path;
+
+            var outputComparisonData = GetComparisonData(projectDirectory);
 
             var outputsIdentical =
                 outputComparisonData.ProjectJsonBuildOutputs.SetEquals(outputComparisonData.MSBuildBuildOutputs);
@@ -324,10 +326,10 @@ namespace Microsoft.DotNet.Migration.Tests
              migratedProjects.Should().BeEquivalentTo(expectedProjects);
          }
 
-        private MigratedBuildComparisonData GetDotnetNewComparisonData(string projectDirectory, string dotnetNewType)
+        private MigratedBuildComparisonData GetComparisonData(string projectDirectory)
         {
-            DotnetNew(projectDirectory, dotnetNewType);
             File.Copy("NuGet.tempaspnetpatch.config", Path.Combine(projectDirectory, "NuGet.Config"));
+            
             Restore(projectDirectory);
 
             var outputComparisonData =
@@ -436,14 +438,6 @@ namespace Microsoft.DotNet.Migration.Tests
                 MigrateCommand.Run(migrateArgs);
 
             result.Should().Be(0);
-        }
-
-        private void DotnetNew(string projectDirectory, string dotnetNewType)
-        {
-            new NewCommand().WithWorkingDirectory(projectDirectory)
-                .ExecuteWithCapturedOutput($"-t {dotnetNewType}")
-                .Should()
-                .Pass();
         }
 
         private void Restore(string projectDirectory)
