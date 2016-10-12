@@ -103,7 +103,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
         {
             if (targetFramework != null)
             {
-                itemGroup.Condition = $" '$(TargetFrameworkIdentifier),Version=$(TargetFrameworkVersion)' == '{targetFramework.DotNetFrameworkName}' ";
+                itemGroup.Condition = targetFramework.GetMSBuildCondition();
             }
 
             foreach (var projectDependencyTransformResult in projectDependencyTransformResults)

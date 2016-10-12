@@ -358,9 +358,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
 
         private string FormatLanguageVersion(string langVersion)
         {
-            if (langVersion.StartsWith("csharp"))
+            if (langVersion.StartsWith("csharp", StringComparison.OrdinalIgnoreCase))
             {
-                return langVersion.Replace("csharp", "");
+                return langVersion.Substring("csharp".Length);
             }
 
             return langVersion;
