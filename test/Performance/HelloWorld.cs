@@ -11,13 +11,13 @@ namespace Microsoft.DotNet.Tests.Performance
     public class HelloWorld : TestBase
     {
         private static readonly string s_testdirName = "helloworldtestroot";
+        private static readonly string s_testProject = $"{s_testdirName}.csproj";
         private static readonly string s_outputdirName = "test space/bin";
 
         private static string AssetsRoot { get; set; }
         private static string RestoredTestProjectDirectory { get; set; }
 
         private string TestDirectory { get; set; }
-        private string TestProject { get; set; }
         private string OutputDirectory { get; set; }
 
         static HelloWorld()
@@ -38,11 +38,11 @@ namespace Microsoft.DotNet.Tests.Performance
                 TestInstanceSetup();
 
                 // Setup the build command.
-                var buildCommand = new BuildCommand(TestProject, output: OutputDirectory, framework: DefaultFramework);
+                var buildCommand = new Build3Command();
                 using (iter.StartMeasurement())
                 {
                     // Execute the build command.
-                    buildCommand.Execute();
+                    buildCommand.Execute($"{s_testProject} /p:OutputPath={OutputDirectory} /p:Framework={DefaultFramework}");
                 }
             }
         }
@@ -54,7 +54,6 @@ namespace Microsoft.DotNet.Tests.Performance
             var testInstanceDir = root.CopyDirectory(RestoredTestProjectDirectory);
 
             TestDirectory = testInstanceDir.Path;
-            TestProject = Path.Combine(TestDirectory, "project.json");
             OutputDirectory = Path.Combine(TestDirectory, s_outputdirName);
         }
 
@@ -79,7 +78,7 @@ namespace Microsoft.DotNet.Tests.Performance
             newCommand.WorkingDirectory = RestoredTestProjectDirectory;
             newCommand.Execute().Should().Pass();
 
-            var restoreCommand = new RestoreCommand();
+            var restoreCommand = new Restore3Command();
             restoreCommand.WorkingDirectory = RestoredTestProjectDirectory;
             restoreCommand.Execute().Should().Pass();
         }
