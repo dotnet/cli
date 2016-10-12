@@ -13,11 +13,11 @@ namespace Microsoft.DotNet.Tests
 {
     public class GivenThatIWantANewCSApp : TestBase
     {
-        [Fact]
+        [Fact(Skip="https://github.com/dotnet/cli/issues/4381")]
         public void When_NewtonsoftJson_dependency_added_Then_project_restores_and_runs()
         {
             var rootPath = Temp.CreateDirectory().Path;
-            var projectName = new FileInfo(rootPath).Directory.Name;
+            var projectName = new DirectoryInfo(rootPath).Name;
             var projectFile = Path.Combine(rootPath, $"{projectName}.csproj");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.Tests
             AddProjectDependency(projectFile, "Newtonsoft.Json", "7.0.1");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("restore3")
+                .Execute("restore3 -s https://dotnet.myget.org/F/cli-deps/api/v3/index.json")
                 .Should().Pass();
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
@@ -43,13 +43,13 @@ namespace Microsoft.DotNet.Tests
                 .Execute("new");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("restore3");
+                .Execute("restore3 -s https://dotnet.myget.org/F/cli-deps/api/v3/index.json");
 
             var buildResult = new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .ExecuteWithCapturedOutput("build3");
             
-            buildResult.Should().Pass();
-            buildResult.Should().NotHaveStdErr();
+            buildResult.Should().Pass()
+                .And.NotHaveStdErr();
         }
 
         [Fact]
@@ -69,15 +69,15 @@ namespace Microsoft.DotNet.Tests
 
             Assert.Equal(expectedState, actualState);
 
-            result.Should().Fail();
-            result.Should().HaveStdErr();
+            result.Should().Fail()
+                  .And.HaveStdErr();
         }
         
         private static void AddProjectDependency(string projectFilePath, string dependencyId, string dependencyVersion)
         {
-            var projectRootElement = ProjectRootElement.Create(projectFilePath);
+            var projectRootElement = ProjectRootElement.Open(projectFilePath);
 
-            projectRootElement.AddItem("PackageReference", "dependencyId", new Dictionary<string, string>{{"Version", dependencyVersion}});
+            projectRootElement.AddItem("PackageReference", dependencyId, new Dictionary<string, string>{{"Version", dependencyVersion}});
 
             projectRootElement.Save();
         }

@@ -69,10 +69,11 @@ namespace Microsoft.DotNet.Tools.New
 
                         archive.ExtractToDirectory(projectDirectory);
 
+                        ReplaceFileTemplateNames(projectDirectory);
+
                         if (!isMsBuild)
                         {
                             ReplaceProjectJsonTemplateValues(projectDirectory);
-                            ReplaceFileTemplateNames(projectDirectory);
                         }
                     }
                     catch (IOException ex)
