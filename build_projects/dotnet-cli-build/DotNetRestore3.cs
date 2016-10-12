@@ -12,12 +12,14 @@ namespace Microsoft.DotNet.Cli.Build
 
         protected override string Args
         {
-            get { return $"{GetVerbosity()} {GetFallbackSource()} {GetPackages()}"; }
+            get { return $"{GetVerbosity()} {GetFallbackSource()} {GetPackages()} {GetSkipInvalidConfigurations()}"; }
         }
 
         public string FallbackSource { get; set; }
 
         public string Packages { get; set; }
+
+        public bool SkipInvalidConfigurations { get; set; }
 
         public string Verbosity { get; set; }
 
@@ -46,6 +48,16 @@ namespace Microsoft.DotNet.Cli.Build
             if (!string.IsNullOrEmpty(Verbosity))
             {
                 return $"--verbosity {Verbosity}";
+            }
+
+            return null;
+        }
+
+        private string GetSkipInvalidConfigurations()
+        {
+            if (SkipInvalidConfigurations)
+            {
+                return "/p:SkipInvalidConfigurations=true";
             }
 
             return null;
