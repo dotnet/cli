@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.Migration.Tests
         // https://github.com/dotnet/sdk/issues/73 [InlineData("TestAppWithLibrary/TestApp", false)]
         [InlineData("TestAppWithRuntimeOptions")]
         [InlineData("TestAppWithContents")]
-        public void It_migrates_apps(string projectName)
+        public void It_migrates_apps_and_puts_newline_at_end_of_file(string projectName)
         {
             var projectDirectory = TestAssetsManager.CreateTestInstance(projectName, callingMethod: "i").WithLockFiles().Path;
 
@@ -43,6 +43,11 @@ namespace Microsoft.DotNet.Migration.Tests
             }
             outputsIdentical.Should().BeTrue();
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
+
+            var outputCsProj = Path.Combine(projectDirectory, projectName + ".csproj");
+            var csproj = File.ReadAllText(outputCsProj);
+            Console.WriteLine(csproj);
+            csproj.EndsWith(Environment.NewLine).Should().Be(true);
         }
 
         public void It_migrates_signed_apps(string projectName)
