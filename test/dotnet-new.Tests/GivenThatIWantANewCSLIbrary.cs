@@ -18,14 +18,14 @@ namespace Microsoft.DotNet.Tests
         [Fact]
         public void When_library_created_Then_project_restores()
         {
-            var rootPath = Temp.CreateDirectory().Path;
+            var rootPath = TestAssetsManager.CreateTestDirectory().Path;
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .Execute("new --type lib")
                 .Should().Pass();
             
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("restore3 -s https://dotnet.myget.org/F/cli-deps/api/v3/index.json /p:SkipInvalidConfigurations=true")
+                .Execute("restore3 /p:SkipInvalidConfigurations=true")
                 .Should().Pass();
             
         }
@@ -33,13 +33,13 @@ namespace Microsoft.DotNet.Tests
         [Fact]
         public void When_dotnet_build_is_invoked_Then_project_builds_without_warnings()
         {
-            var rootPath = Temp.CreateDirectory().Path;
+            var rootPath = TestAssetsManager.CreateTestDirectory().Path;
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .Execute("new --type lib");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("restore3 -s https://dotnet.myget.org/F/cli-deps/api/v3/index.json /p:SkipInvalidConfigurations=true");
+                .Execute("restore3 -/p:SkipInvalidConfigurations=true");
 
             var buildResult = new TestCommand("dotnet")
                 .WithWorkingDirectory(rootPath)

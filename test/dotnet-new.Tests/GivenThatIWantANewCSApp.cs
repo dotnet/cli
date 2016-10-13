@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.Tests
         [Fact(Skip="https://github.com/dotnet/cli/issues/4381")]
         public void When_NewtonsoftJson_dependency_added_Then_project_restores_and_runs()
         {
-            var rootPath = Temp.CreateDirectory().Path;
+            var rootPath = TestAssetsManager.CreateTestDirectory().Path;
             var projectName = new DirectoryInfo(rootPath).Name;
             var projectFile = Path.Combine(rootPath, $"{projectName}.csproj");
 
@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.Tests
             AddProjectDependency(projectFile, "Newtonsoft.Json", "7.0.1");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("restore3 -s https://dotnet.myget.org/F/cli-deps/api/v3/index.json /p:SkipInvalidConfigurations=true")
+                .Execute("restore3 /p:SkipInvalidConfigurations=true")
                 .Should().Pass();
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
@@ -37,13 +37,13 @@ namespace Microsoft.DotNet.Tests
         [Fact]
         public void When_dotnet_build_is_invoked_Then_project_builds_without_warnings()
         {
-            var rootPath = Temp.CreateDirectory().Path;
+            var rootPath = TestAssetsManager.CreateTestDirectory().Path;
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .Execute("new");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("restore3 -s https://dotnet.myget.org/F/cli-deps/api/v3/index.json /p:SkipInvalidConfigurations=true");
+                .Execute("restore3 /p:SkipInvalidConfigurations=true");
 
             var buildResult = new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .ExecuteWithCapturedOutput("build3");
@@ -55,7 +55,7 @@ namespace Microsoft.DotNet.Tests
         [Fact]
         public void When_dotnet_new_is_invoked_mupliple_times_it_should_fail()
         {
-            var rootPath = Temp.CreateDirectory().Path;
+            var rootPath = TestAssetsManager.CreateTestDirectory().Path;
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .Execute("new");

@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.Tests.Performance
 
         private void TestInstanceSetup()
         {
-            var root = Temp.CreateDirectory();
+            var root = Temp.CreateDirectory(); 
 
             var testInstanceDir = root.CopyDirectory(RestoredTestProjectDirectory);
 
