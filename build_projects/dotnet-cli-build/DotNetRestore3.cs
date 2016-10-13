@@ -12,22 +12,20 @@ namespace Microsoft.DotNet.Cli.Build
 
         protected override string Args
         {
-            get { return $"{GetVerbosity()} {GetFallbackSource()} {GetPackages()} {GetSkipInvalidConfigurations()}"; }
+            get { return $"{GetSource()} {GetPackages()} {GetSkipInvalidConfigurations()}"; }
         }
 
-        public string FallbackSource { get; set; }
+        public string Source { get; set; }
 
         public string Packages { get; set; }
 
         public bool SkipInvalidConfigurations { get; set; }
 
-        public string Verbosity { get; set; }
-
-        private string GetFallbackSource()
+        private string GetSource()
         {
-            if (!string.IsNullOrEmpty(FallbackSource))
+            if (!string.IsNullOrEmpty(Source))
             {
-                return $"--fallbacksource {FallbackSource}";
+                return $"--source {Source}";
             }
 
             return null;
@@ -38,16 +36,6 @@ namespace Microsoft.DotNet.Cli.Build
             if (!string.IsNullOrEmpty(Packages))
             {
                 return $"--packages {Packages}";
-            }
-
-            return null;
-        }
-
-        private string GetVerbosity()
-        {
-            if (!string.IsNullOrEmpty(Verbosity))
-            {
-                return $"--verbosity {Verbosity}";
             }
 
             return null;
