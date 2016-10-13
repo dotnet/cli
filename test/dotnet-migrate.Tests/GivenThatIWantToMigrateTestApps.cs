@@ -1,22 +1,16 @@
-﻿using Microsoft.Build.Construction;
-using Microsoft.DotNet.ProjectJsonMigration;
-using Microsoft.DotNet.ProjectModel;
-using Microsoft.DotNet.Tools.Test.Utilities;
-using NuGet.Frameworks;
+﻿using Microsoft.DotNet.Tools.Test.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
 using System.IO;
-using System.Runtime.InteropServices;
-using Microsoft.DotNet.Tools.Common;
-using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Tools.Migrate;
 using Build3Command = Microsoft.DotNet.Tools.Test.Utilities.Build3Command;
 using BuildCommand = Microsoft.DotNet.Tools.Test.Utilities.BuildCommand;
 using System.Runtime.Loader;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Microsoft.DotNet.Migration.Tests
 {
@@ -47,7 +41,9 @@ namespace Microsoft.DotNet.Migration.Tests
 
         public void It_migrates_signed_apps(string projectName)
         {
-            var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppWithSigning", callingMethod: "i").WithLockFiles().Path;
+            var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppWithSigning", callingMethod: "i")
+                .WithLockFiles()
+                .Path;
 
             CleanBinObj(projectDirectory);
 
@@ -86,11 +82,23 @@ namespace Microsoft.DotNet.Migration.Tests
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
         }
 
-        [Fact(Skip="https://github.com/dotnet/cli/issues/4299")]
-        public void It_migrates_dotnet_new_web_with_outputs_containing_project_json_outputs()
+        [Fact]
+        public void It_migrates_web_without_tools_with_outputs_containing_project_json_outputs()
         {
-            var projectDirectory = Temp.CreateDirectory().Path;
-            var outputComparisonData = GetDotnetNewComparisonData(projectDirectory, "web");
+            var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppWithSigning", callingMethod: "newwebtest");
+                .WithLockFiles()
+                .Path;
+            var globalDirectory = Path.Combine(projectDirectory, "..");
+            var projectJsonFile = Path.Combine(projectDirectory, "project.json");
+            
+            WriteGlobalJson(globalDirectory);
+
+            var projectJson = JObject.Parse(File.ReadAllText(projectJsonFile));
+            projectJson.Remove("tools");
+
+            File.WriteAllText(projectJsonFile, projectJson.ToString());
+
+            var outputComparisonData = GetDotnetNewComparisonData(projectDirectory);
 
             var outputsIdentical =
                 outputComparisonData.ProjectJsonBuildOutputs.SetEquals(outputComparisonData.MSBuildBuildOutputs);
@@ -99,6 +107,16 @@ namespace Microsoft.DotNet.Migration.Tests
                 OutputDiagnostics(outputComparisonData);
             }
             outputsIdentical.Should().BeTrue();
+        }
+
+        private void WriteGlobalJson(string globalDirectory)
+        {
+            var file = Path.Combine(globalDirectory, "global.json");
+
+            File.WriteAllText(file, @"
+            {
+                ""projects"": [ ]
+            }");
         }
 
         [Theory]
@@ -327,6 +345,11 @@ namespace Microsoft.DotNet.Migration.Tests
         private MigratedBuildComparisonData GetDotnetNewComparisonData(string projectDirectory, string dotnetNewType)
         {
             DotnetNew(projectDirectory, dotnetNewType);
+            return GetDotnetNewComparisonData(projectDirectory);
+        }
+
+        private MigratedBuildComparisonData GetDotnetNewComparisonData(string projectDirectory)
+        {
             File.Copy("NuGet.tempaspnetpatch.config", Path.Combine(projectDirectory, "NuGet.Config"));
             Restore(projectDirectory);
 

@@ -463,8 +463,6 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             var mockProj = RunBuildOptionsRuleOnPj(pj,
                 testDirectory: testDirectory);
 
-            Console.WriteLine(mockProj.RawXml);
-
             mockProj.Items.Count(i => i.ItemType.Equals(itemName, StringComparison.Ordinal)).Should().Be(1);
 
             var defaultIncludePatterns = GetDefaultIncludePatterns(group);
