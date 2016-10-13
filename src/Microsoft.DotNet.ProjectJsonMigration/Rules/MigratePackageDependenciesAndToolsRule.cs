@@ -36,9 +36,6 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
 
             var tfmDependencyMap = new Dictionary<string, IEnumerable<ProjectLibraryDependency>>();
             var targetFrameworks = project.GetTargetFrameworks();
-
-            var defaultProjectTargetFramework = migrationRuleInputs.DefaultProjectContext.TargetFramework;
-            List<ProjectLibraryDependency> allDependencies = new List<ProjectLibraryDependency>();
             
             // Inject Sdk dependency
             _transformApplicator.Execute(
@@ -57,11 +54,6 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                 null, 
                 project.Dependencies,
                 migrationRuleInputs.ProjectXproj);
-
-            if (defaultProjectTargetFramework.IsDesktop())
-            {
-                allDependencies.AddRange(project.Dependencies);
-            }
             
             MigrationTrace.Instance.WriteLine($"Migrating {targetFrameworks.Count()} target frameworks");
             foreach (var targetFramework in targetFrameworks)
@@ -76,54 +68,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                     targetFramework.FrameworkName, 
                     targetFramework.Dependencies,
                     migrationRuleInputs.ProjectXproj);
-
-                if (defaultProjectTargetFramework.IsDesktop())
-                {
-                    allDependencies.AddRange(targetFramework.Dependencies);
-                }
-            }
-
-            // Automatically add the same desktop references that the build for project.json does.
-            // This ensures if the project.json build succeeded then the migrated msbuild one 
-            // will succeed too. See src\Microsoft.DotNet.ProjectModel\Resolution for more details.
-            if (defaultProjectTargetFramework.IsDesktop())
-            {
-                List<ProjectLibraryDependency> autoAddDesktopDependencies = new List<ProjectLibraryDependency>();
-
-                // MSBuild targets automatically add a reference to mscorlib
-                // AddIfMissing(autoAddDesktopDependencies, allDependencies, "mscorlib");
-                AddIfMissing(autoAddDesktopDependencies, allDependencies, "System");
-
-                // MSBuild targets automatically add a reference to System.Core
-                //if (defaultProjectTargetFramework.Version >= new Version(3, 5))
-                //{
-                //    AddIfMissing(autoAddDesktopDependencies, allDependencies, "System.Core");
-                    if (defaultProjectTargetFramework.Version >= new Version(4, 0))
-                    {
-                        AddIfMissing(autoAddDesktopDependencies, allDependencies, "Microsoft.CSharp");
-                    }
-                //}
-
-                MigrateDependencies(
-                    project,
-                    migrationRuleInputs.OutputMSBuildProject,
-                    null,
-                    autoAddDesktopDependencies,
-                    migrationRuleInputs.ProjectXproj);
             }
 
             MigrateTools(project, migrationRuleInputs.OutputMSBuildProject);
-        }
-
-        private void AddIfMissing(List<ProjectLibraryDependency> results, List<ProjectLibraryDependency> existing, string dependencyName)
-        {
-            if (!existing.Any(dep => string.Equals(dep.Name, dependencyName, StringComparison.OrdinalIgnoreCase)))
-            {
-                results.Add(new ProjectLibraryDependency
-                {
-                    LibraryRange = new LibraryRange(dependencyName, LibraryDependencyTarget.Reference)
-                });
-            }
         }
 
         private void MigrateImports(ProjectPropertyGroupElement commonPropertyGroup, TargetFrameworkInformation targetFramework)
@@ -178,12 +125,14 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
             ProjectRootElement xproj)
         {
             var projectDependencies = new HashSet<string>(GetAllProjectReferenceNames(project, framework, xproj));
-            var packageDependencies = dependencies.Where(d => !projectDependencies.Contains(d.Name));
+            var packageDependencies = new List<ProjectLibraryDependency>(dependencies.Where(d => !projectDependencies.Contains(d.Name)));
 
             string condition = framework?.GetMSBuildCondition() ?? "";
             var itemGroup = output.ItemGroups.FirstOrDefault(i => i.Condition == condition) 
                 ?? output.AddItemGroup();
             itemGroup.Condition = condition;
+
+            AutoInjectAssemblyReferences(framework, packageDependencies);
 
             foreach (var packageDependency in packageDependencies)
             {
@@ -215,6 +164,32 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                 }
 
                 _transformApplicator.Execute(transform.Transform(packageDependency), itemGroup);
+            }
+        }
+
+        private void AutoInjectAssemblyReferences(NuGetFramework framework, List<ProjectLibraryDependency> packageDependencies)
+        {
+            // Mimic what the build for project.json does. This ensures if it built properly for project.json then the migrated
+            // project will also build properly. Note that System.Core and mscorlib are auto-referenced by MSBuild targets so 
+            // we don't need to auto-inject those.
+            if (framework?.IsDesktop() ?? false)
+            {
+                AutoInjectAssemblyReferenceIfNotPresent("System", packageDependencies);
+                if (framework.Version >= new Version(4, 0))
+                {
+                    AutoInjectAssemblyReferenceIfNotPresent("Microsoft.CSharp", packageDependencies);
+                }
+            }
+        }
+
+        private void AutoInjectAssemblyReferenceIfNotPresent(string dependencyName, List<ProjectLibraryDependency> packageDependencies)
+        {
+            if (!packageDependencies.Any(dep => string.Equals(dep.Name, dependencyName, StringComparison.OrdinalIgnoreCase)))
+            {
+                packageDependencies.Add(new ProjectLibraryDependency
+                {
+                    LibraryRange = new LibraryRange(dependencyName, LibraryDependencyTarget.Reference)
+                });
             }
         }
 

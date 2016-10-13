@@ -6,6 +6,6 @@
   },
   "dependencies": {},
   "frameworks": {
-    "net451": {}
+    "net4": {}
   }
 }
