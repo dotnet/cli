@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.Tests.Performance
                 using (iter.StartMeasurement())
                 {
                     // Execute the build command.
-                    buildCommand.Execute($"{s_testProject} /p:OutputPath={OutputDirectory} /p:Framework={DefaultFramework}");
+                    buildCommand.Execute($"{s_testProject} /p:OutputPath=\"{OutputDirectory}\" /p:Framework={DefaultFramework}");
                 }
             }
         }
@@ -80,7 +80,8 @@ namespace Microsoft.DotNet.Tests.Performance
 
             var restoreCommand = new Restore3Command();
             restoreCommand.WorkingDirectory = RestoredTestProjectDirectory;
-            restoreCommand.Execute().Should().Pass();
+            restoreCommand.Execute("/p:SkipInvalidConfigurations=true")
+                .Should().Pass();
         }
     }
 }

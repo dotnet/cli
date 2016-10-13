@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 
                 new Restore3Command()
                     .WithWorkingDirectory(projectDirectory)
-                    .Execute()
+                    .Execute("/p:SkipInvalidConfigurations=true")
                     .Should()
                     .Pass();
 

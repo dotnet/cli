@@ -26,22 +26,28 @@ namespace Microsoft.DotNet.Migration.Tests
         // TODO: Standalone apps [InlineData("TestAppSimple", false)]
         // https://github.com/dotnet/sdk/issues/73 [InlineData("TestAppWithLibrary/TestApp", false)]
         [InlineData("TestAppWithRuntimeOptions")]
-        [InlineData("TestAppWithContents")]
+        //[InlineData("TestAppWithContents")]
         public void It_migrates_apps(string projectName)
         {
-            var projectDirectory = TestAssetsManager.CreateTestInstance(projectName, callingMethod: "i").WithLockFiles().Path;
+Console.WriteLine($"Starting test {projectName}");
+            var projectDirectory = TestAssetsManager.CreateTestInstance(projectName, callingMethod: "i")
+                                                    .WithLockFiles()
+                                                    .Path;
 
             CleanBinObj(projectDirectory);
-
+Console.WriteLine("CleanedBinObj");
             var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, projectName);
-
+Console.WriteLine("Did the thing with the name");
             var outputsIdentical =
                 outputComparisonData.ProjectJsonBuildOutputs.SetEquals(outputComparisonData.MSBuildBuildOutputs);
+
             if (!outputsIdentical)
             {
                 OutputDiagnostics(outputComparisonData);
             }
+
             outputsIdentical.Should().BeTrue();
+
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
         }
 
@@ -76,11 +82,14 @@ namespace Microsoft.DotNet.Migration.Tests
 
             var outputsIdentical =
                 outputComparisonData.ProjectJsonBuildOutputs.SetEquals(outputComparisonData.MSBuildBuildOutputs);
+
             if (!outputsIdentical)
             {
                 OutputDiagnostics(outputComparisonData);
             }
+
             outputsIdentical.Should().BeTrue();
+
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
         }
 
@@ -331,9 +340,10 @@ namespace Microsoft.DotNet.Migration.Tests
             File.Copy("NuGet.tempaspnetpatch.config", Path.Combine(projectDirectory, "NuGet.Config"));
             
             Restore(projectDirectory);
-
+Console.WriteLine("Restored");
             var outputComparisonData =
                 BuildProjectJsonMigrateBuildMSBuild(projectDirectory, Path.GetFileNameWithoutExtension(projectDirectory));
+
             return outputComparisonData;
         }
 
@@ -377,6 +387,7 @@ namespace Microsoft.DotNet.Migration.Tests
                                                                                 string[] migrateArgs,
                                                                                 string[] restoreDirectories)
         {
+Console.WriteLine("Building PJ");
             BuildProjectJson(projectDirectory);
             var projectJsonBuildOutputs = new HashSet<string>(CollectBuildOutputs(projectDirectory));
             CleanBinObj(projectDirectory);
@@ -456,13 +467,13 @@ namespace Microsoft.DotNet.Migration.Tests
 
             if (projectName != null)
             {
-                command.Execute($"{projectName}.csproj")
+                command.Execute($"{projectName}.csproj /p:SkipInvalidConfigurations=true")
                     .Should()
                     .Pass();
             }
             else
             {
-                command.Execute()
+                command.Execute("/p:SkipInvalidConfigurations=true")
                     .Should()
                     .Pass(); 
             }
