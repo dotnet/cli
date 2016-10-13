@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.Tests
         }
 
         [Fact]
-        public void When_dotnet_build_is_invoked_Then_project_builds_without_warnings()
+        public void When_dotnet_build_is_invoked_Then_library_builds_without_warnings()
         {
             var rootPath = TestAssetsManager.CreateTestDirectory().Path;
 
@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.Tests
                 .Execute("new --type lib");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("restore3 -/p:SkipInvalidConfigurations=true");
+                .Execute("restore3 /p:SkipInvalidConfigurations=true");
 
             var buildResult = new TestCommand("dotnet")
                 .WithWorkingDirectory(rootPath)

@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.Tests
         }
         
         [Fact]
-        public void When_dotnet_build_is_invoked_Then_project_builds_without_warnings()
+        public void When_dotnet_build_is_invoked_Then_app_builds_without_warnings()
         {
             var rootPath = TestAssetsManager.CreateTestDirectory().Path;
 
