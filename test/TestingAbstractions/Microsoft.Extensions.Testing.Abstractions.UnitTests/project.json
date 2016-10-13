@@ -8,8 +8,8 @@
     "Microsoft.Extensions.Testing.Abstractions": {
       "target": "project"
     },
-    "System.Runtime.Serialization.Primitives": "4.1.1",
-    "System.Diagnostics.Process": "4.1.0",
+    "System.Runtime.Serialization.Primitives": "4.3.0-preview1-24530-04",
+    "System.Diagnostics.Process": "4.3.0-preview1-24530-04",
     "TestAppWithPortablePdbs": {
       "target": "project"
     },
