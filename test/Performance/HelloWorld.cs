@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.Tests.Performance
                 using (iter.StartMeasurement())
                 {
                     // Execute the build command.
-                    buildCommand.Execute($"{ProjectPath} /p:OutputPath=\"{OutputDirectory}\" /p:Framework={DefaultFramework}");
+                    buildCommand.Execute($"{ProjectPath} --output \"{OutputDirectory}\" --framework {DefaultFramework}");
                 }
             }
         }
