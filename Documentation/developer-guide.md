@@ -27,10 +27,11 @@ In order to build .NET Command Line Interface, you need the following installed 
 
 ## Building/Running
 
-1. Run `build.cmd` or `build.sh` from the root depending on your OS. If you don't want to execute tests, run `build.cmd /t:Compile` or `./build.sh /t:Compile`. 
-2. Use `artifacts/{RID}/stage2/dotnet` to try out the `dotnet` command. You can also add `artifacts/{os}-{arch}/stage2` to the PATH if you want to run `dotnet` from anywhere.
+1. Run `build.cmd` or `build.sh` from the root depending on your OS. If you don't want to execute tests, run `build.cmd /t:Compile` or `./build.sh /t:Compile`.
+2. Use `artifacts/{RID}/stage2/dotnet` to try out the `dotnet` command. You can also add `artifacts/{os}-{arch}/stage2` to the PATH if you want to use the build output when invoking `dotnet` from the current console.
 
 ## A simple test
+Using the `dotnet` built in the previous step:
 
 1. `cd {new directory}`
 2. `dotnet new`
@@ -40,7 +41,7 @@ In order to build .NET Command Line Interface, you need the following installed 
 ## Running tests
 
 1. To run all tests invoke `build.cmd` or `build.sh` which will build the product and run the tests.
-2. To run a specific test, cd into that test's directory and execute `dotnet test`
+2. To run a specific test, cd into that test's directory and execute `dotnet test`. If using this approach, make sure to add `artifacts/{RID}/stage2` to your `PATH` and set the `NUGET_PACKAGES` environment variable to point to the repo's `.nuget/packages` directory.
 
 ##Adding a Command
 
