@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.Tests
                 .ExecuteWithCapturedOutput("build3");
             
             buildResult.Should().Pass()
-                .And.NotHaveStdErr();
+                       .And.NotHaveStdErr();
         }
 
         [Fact]
