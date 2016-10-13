@@ -1,18 +1,11 @@
-﻿using Microsoft.Build.Construction;
-using Microsoft.DotNet.ProjectJsonMigration;
-using Microsoft.DotNet.ProjectModel;
+﻿using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using NuGet.Frameworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
 using System.IO;
-using System.Runtime.InteropServices;
-using Microsoft.DotNet.Tools.Common;
-using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Tools.Migrate;
 using Build3Command = Microsoft.DotNet.Tools.Test.Utilities.Build3Command;
 using BuildCommand = Microsoft.DotNet.Tools.Test.Utilities.BuildCommand;
@@ -314,7 +307,21 @@ namespace Microsoft.DotNet.Migration.Tests
             result.StdErr.Should().Contain(errorMessage);
             result.StdErr.Should().Contain("Migration failed.");
         }
-        
+
+        [Fact]
+        // https://github.com/dotnet/cli/issues/4351
+        public void It_auto_add_desktop_references_during_migrate()
+        {
+            var projectName = "AutoAddDesktopReferencesDuringMigrate";
+            var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "DesktopTestProjects"));
+            var projectDirectory = testAssetManager.CreateTestInstance(projectName, callingMethod: "i").WithLockFiles().Path;
+
+            CleanBinObj(projectDirectory);
+            MigrateProject(new string[] { projectDirectory });
+            BuildMSBuild(projectDirectory, projectName);
+            VerifyAllMSBuildOutputsRunnable(projectDirectory);
+        }
+
         private void VerifyMigration(IEnumerable<string> expectedProjects, string rootDir)
          {
              var migratedProjects = Directory.EnumerateFiles(rootDir, "project.json", SearchOption.AllDirectories)

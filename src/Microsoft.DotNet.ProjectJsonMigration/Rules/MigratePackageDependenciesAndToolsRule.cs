@@ -37,6 +37,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
             var tfmDependencyMap = new Dictionary<string, IEnumerable<ProjectLibraryDependency>>();
             var targetFrameworks = project.GetTargetFrameworks();
 
+            var defaultProjectTargetFramework = migrationRuleInputs.DefaultProjectContext.TargetFramework;
+            List<ProjectLibraryDependency> allDependencies = new List<ProjectLibraryDependency>();
+            
             // Inject Sdk dependency
             _transformApplicator.Execute(
                 PackageDependencyInfoTransform.Transform(
@@ -54,6 +57,11 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                 null, 
                 project.Dependencies,
                 migrationRuleInputs.ProjectXproj);
+
+            if (defaultProjectTargetFramework.IsDesktop())
+            {
+                allDependencies.AddRange(project.Dependencies);
+            }
             
             MigrationTrace.Instance.WriteLine($"Migrating {targetFrameworks.Count()} target frameworks");
             foreach (var targetFramework in targetFrameworks)
@@ -67,10 +75,55 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                     migrationRuleInputs.OutputMSBuildProject,
                     targetFramework.FrameworkName, 
                     targetFramework.Dependencies,
-                    migrationRuleInputs.ProjectXproj); 
+                    migrationRuleInputs.ProjectXproj);
+
+                if (defaultProjectTargetFramework.IsDesktop())
+                {
+                    allDependencies.AddRange(targetFramework.Dependencies);
+                }
+            }
+
+            // Automatically add the same desktop references that the build for project.json does.
+            // This ensures if the project.json build succeeded then the migrated msbuild one 
+            // will succeed too. See src\Microsoft.DotNet.ProjectModel\Resolution for more details.
+            if (defaultProjectTargetFramework.IsDesktop())
+            {
+                List<ProjectLibraryDependency> autoAddDesktopDependencies = new List<ProjectLibraryDependency>();
+
+                // MSBuild targets automatically add a reference to mscorlib
+                // AddIfMissing(autoAddDesktopDependencies, allDependencies, "mscorlib");
+                AddIfMissing(autoAddDesktopDependencies, allDependencies, "System");
+
+                // MSBuild targets automatically add a reference to System.Core
+                //if (defaultProjectTargetFramework.Version >= new Version(3, 5))
+                //{
+                //    AddIfMissing(autoAddDesktopDependencies, allDependencies, "System.Core");
+                    if (defaultProjectTargetFramework.Version >= new Version(4, 0))
+                    {
+                        AddIfMissing(autoAddDesktopDependencies, allDependencies, "Microsoft.CSharp");
+                    }
+                //}
+
+                MigrateDependencies(
+                    project,
+                    migrationRuleInputs.OutputMSBuildProject,
+                    null,
+                    autoAddDesktopDependencies,
+                    migrationRuleInputs.ProjectXproj);
             }
 
             MigrateTools(project, migrationRuleInputs.OutputMSBuildProject);
+        }
+
+        private void AddIfMissing(List<ProjectLibraryDependency> results, List<ProjectLibraryDependency> existing, string dependencyName)
+        {
+            if (!existing.Any(dep => string.Equals(dep.Name, dependencyName, StringComparison.OrdinalIgnoreCase)))
+            {
+                results.Add(new ProjectLibraryDependency
+                {
+                    LibraryRange = new LibraryRange(dependencyName, LibraryDependencyTarget.Reference)
+                });
+            }
         }
 
         private void MigrateImports(ProjectPropertyGroupElement commonPropertyGroup, TargetFrameworkInformation targetFramework)
