@@ -41,7 +41,9 @@ namespace Microsoft.DotNet.Migration.Tests
 
         public void It_migrates_signed_apps(string projectName)
         {
-            var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppWithSigning", callingMethod: "i").WithLockFiles().Path;
+            var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppWithSigning", callingMethod: "i")
+                .WithLockFiles()
+                .Path;
 
             CleanBinObj(projectDirectory);
 
@@ -81,26 +83,21 @@ namespace Microsoft.DotNet.Migration.Tests
         }
 
         [Fact]
-        public void It_migrates_dotnet_new_web_with_outputs_containing_project_json_outputs()
+        public void It_migrates_web_without_tools_with_outputs_containing_project_json_outputs()
         {
-            var globalDirectory = Path.Combine(AppContext.BaseDirectory, "newwebtest");
-            var projectDirectory = Path.Combine(globalDirectory, "project");
-            if (Directory.Exists(projectDirectory))
-            {
-                Directory.Delete(projectDirectory, true);
-            }
-            Directory.CreateDirectory(projectDirectory);
-
-            WriteGlobalJson(globalDirectory);
-            DotnetNew(projectDirectory, "web");
+            var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppWithSigning", callingMethod: "newwebtest");
+                .WithLockFiles()
+                .Path;
+            var globalDirectory = Path.Combine(projectDirectory, "..");
             var projectJsonFile = Path.Combine(projectDirectory, "project.json");
+            
+            WriteGlobalJson(globalDirectory);
 
             var projectJson = JObject.Parse(File.ReadAllText(projectJsonFile));
             projectJson.Remove("tools");
 
             File.WriteAllText(projectJsonFile, projectJson.ToString());
 
-            Directory.CreateDirectory(projectDirectory);
             var outputComparisonData = GetDotnetNewComparisonData(projectDirectory);
 
             var outputsIdentical =
