@@ -5,12 +5,12 @@
     "netcoreapp1.0": {
       "imports": "dnxcore50",
       "dependencies": {
-        "Microsoft.NETCore.App": "1.1.0-preview1-001086-00"
+        "Microsoft.NETCore.App": "1.1.0-preview1-001100-00"
       }
     },
     "net451": {
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1"
+        "Microsoft.CSharp": "4.3.0-preview1-24530-04"
       }
     }
   },

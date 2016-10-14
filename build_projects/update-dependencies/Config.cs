@@ -36,14 +36,14 @@ namespace Microsoft.DotNet.Scripts
         private Lazy<string> _email = new Lazy<string>(() => GetEnvironmentVariable("GITHUB_EMAIL"));
         private Lazy<string> _password = new Lazy<string>(() => GetEnvironmentVariable("GITHUB_PASSWORD"));
         
-        private Lazy<string> _coreFxVersionUrl = new Lazy<string>(() => GetEnvironmentVariable("COREFX_VERSION_URL", "https://raw.githubusercontent.com/dotnet/versions/master/build-info/dotnet/corefx/release/1.0.0/Latest_Packages.txt"));
-        private Lazy<string> _coreClrVersionUrl = new Lazy<string>(() => GetEnvironmentVariable("CORECLR_VERSION_URL", "https://raw.githubusercontent.com/dotnet/versions/master/build-info/dotnet/coreclr/release/1.0.0/Latest_Packages.txt"));
+        private Lazy<string> _coreFxVersionUrl = new Lazy<string>(() => GetEnvironmentVariable("COREFX_VERSION_URL", "https://raw.githubusercontent.com/dotnet/versions/master/build-info/dotnet/corefx/release/1.1.0/Latest_Packages.txt"));
+        private Lazy<string> _coreClrVersionUrl = new Lazy<string>(() => GetEnvironmentVariable("CORECLR_VERSION_URL", "https://raw.githubusercontent.com/dotnet/versions/master/build-info/dotnet/coreclr/release/1.1.0/Latest_Packages.txt"));
         private Lazy<string> _roslynVersionUrl = new Lazy<string>(() => GetEnvironmentVariable("ROSLYN_VERSION_URL", "https://raw.githubusercontent.com/dotnet/versions/master/build-info/dotnet/roslyn/netcore1.0/Latest_Packages.txt"));
-        private Lazy<string> _coreSetupVersionUrl = new Lazy<string>(() => GetEnvironmentVariable("CORESETUP_VERSION_URL", "https://raw.githubusercontent.com/dotnet/versions/master/build-info/dotnet/core-setup/release/1.0.0/Latest_Packages.txt"));
+        private Lazy<string> _coreSetupVersionUrl = new Lazy<string>(() => GetEnvironmentVariable("CORESETUP_VERSION_URL", "https://raw.githubusercontent.com/dotnet/versions/master/build-info/dotnet/core-setup/release/1.1.0/Latest_Packages.txt"));
         private Lazy<string> _gitHubOriginOwner;
         private Lazy<string> _gitHubUpstreamOwner = new Lazy<string>(() => GetEnvironmentVariable("GITHUB_UPSTREAM_OWNER", "dotnet"));
         private Lazy<string> _gitHubProject = new Lazy<string>(() => GetEnvironmentVariable("GITHUB_PROJECT", "cli"));
-        private Lazy<string> _gitHubUpstreamBranch = new Lazy<string>(() => GetEnvironmentVariable("GITHUB_UPSTREAM_BRANCH", "rel/1.0.0"));
+        private Lazy<string> _gitHubUpstreamBranch = new Lazy<string>(() => GetEnvironmentVariable("GITHUB_UPSTREAM_BRANCH", "rel/1.0.0-preview2.1"));
         private Lazy<string[]> _gitHubPullRequestNotifications = new Lazy<string[]>(() => 
                                                 GetEnvironmentVariable("GITHUB_PULL_REQUEST_NOTIFICATIONS", "")
                                                     .Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
