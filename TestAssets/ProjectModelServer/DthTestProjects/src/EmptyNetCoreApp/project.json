@@ -6,7 +6,7 @@
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.0.2-servicing-004528-00"
+          "version": "1.0.2"
         },
         "Newtonsoft.Json": "8.0.3"
       }
