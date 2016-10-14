@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
 
             var tfmDependencyMap = new Dictionary<string, IEnumerable<ProjectLibraryDependency>>();
             var targetFrameworks = project.GetTargetFrameworks();
-            
+
             // Inject Sdk dependency
             _transformApplicator.Execute(
                 PackageDependencyInfoTransform.Transform(
@@ -125,14 +125,15 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
             ProjectRootElement xproj)
         {
             var projectDependencies = new HashSet<string>(GetAllProjectReferenceNames(project, framework, xproj));
-            var packageDependencies = new List<ProjectLibraryDependency>(dependencies.Where(d => !projectDependencies.Contains(d.Name)));
+            var packageDependencies = new List<ProjectLibraryDependency>(
+                dependencies.Where(d => !projectDependencies.Contains(d.Name)));
 
             string condition = framework?.GetMSBuildCondition() ?? "";
             var itemGroup = output.ItemGroups.FirstOrDefault(i => i.Condition == condition) 
                 ?? output.AddItemGroup();
             itemGroup.Condition = condition;
 
-            AutoInjectAssemblyReferences(framework, packageDependencies);
+            AutoInjectImplicitProjectJsonAssemblyReferences(framework, packageDependencies);
 
             foreach (var packageDependency in packageDependencies)
             {
@@ -167,22 +168,19 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
             }
         }
 
-        private void AutoInjectAssemblyReferences(NuGetFramework framework, List<ProjectLibraryDependency> packageDependencies)
+        private void AutoInjectImplicitProjectJsonAssemblyReferences(NuGetFramework framework, List<ProjectLibraryDependency> packageDependencies)
         {
-            // Mimic what the build for project.json does. This ensures if it built properly for project.json then the migrated
-            // project will also build properly. Note that System.Core and mscorlib are auto-referenced by MSBuild targets so 
-            // we don't need to auto-inject those.
             if (framework?.IsDesktop() ?? false)
             {
-                AutoInjectAssemblyReferenceIfNotPresent("System", packageDependencies);
+                InjectAssemblyReferenceIfNotPresent("System", packageDependencies);
                 if (framework.Version >= new Version(4, 0))
                 {
-                    AutoInjectAssemblyReferenceIfNotPresent("Microsoft.CSharp", packageDependencies);
+                    InjectAssemblyReferenceIfNotPresent("Microsoft.CSharp", packageDependencies);
                 }
             }
         }
 
-        private void AutoInjectAssemblyReferenceIfNotPresent(string dependencyName, List<ProjectLibraryDependency> packageDependencies)
+        private void InjectAssemblyReferenceIfNotPresent(string dependencyName, List<ProjectLibraryDependency> packageDependencies)
         {
             if (!packageDependencies.Any(dep => string.Equals(dep.Name, dependencyName, StringComparison.OrdinalIgnoreCase)))
             {

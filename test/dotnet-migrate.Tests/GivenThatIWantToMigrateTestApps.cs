@@ -264,7 +264,6 @@ namespace Microsoft.DotNet.Migration.Tests
          }
         
         [Theory]
-        // https://github.com/dotnet/cli/issues/4313
         [InlineData(true)]
         [InlineData(false)]
         public void Migration_outputs_error_when_no_projects_found(bool useGlobalJson)
@@ -310,7 +309,6 @@ namespace Microsoft.DotNet.Migration.Tests
         }
 
         [Theory]
-        // https://github.com/dotnet/cli/issues/4351
         [InlineData("DesktopTestProjects", "AutoAddDesktopReferencesDuringMigrate", true)]
         [InlineData("TestProjects", "TestAppSimple", false)]
         public void It_auto_add_desktop_references_during_migrate(string testGroup, string projectName, bool isDesktopApp)

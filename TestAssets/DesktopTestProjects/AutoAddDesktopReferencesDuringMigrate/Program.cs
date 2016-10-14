@@ -9,10 +9,10 @@ namespace AutoAddDesktopReferencesDuringMigrate
     {
         static void Main(string[] args)
         {
-            var mscorlib_ref = new List<int>(new int[] { 4, 5, 6 });
-            var system_core_ref = mscorlib_ref.ToArray().Average();
-            Debug.Assert(system_core_ref == 5, "Test System assembly reference");
-            if (system_core_ref != 5)
+            var mscorlibRef = new List<int>(new int[] { 4, 5, 6 });
+            var systemCoreRef = mscorlibRef.ToArray().Average();
+            Debug.Assert(systemCoreRef == 5, "Test System assembly reference");
+            if (systemCoreRef != 5)
             {
                 throw new RuntimeBinderException("Test Microsoft.CSharp assembly reference");
             }
