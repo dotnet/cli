@@ -125,8 +125,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
             ProjectRootElement xproj)
         {
             var projectDependencies = new HashSet<string>(GetAllProjectReferenceNames(project, framework, xproj));
-            var packageDependencies = new List<ProjectLibraryDependency>(
-                dependencies.Where(d => !projectDependencies.Contains(d.Name)));
+            var packageDependencies = dependencies.Where(d => !projectDependencies.Contains(d.Name)).ToList();
 
             string condition = framework?.GetMSBuildCondition() ?? "";
             var itemGroup = output.ItemGroups.FirstOrDefault(i => i.Condition == condition) 
