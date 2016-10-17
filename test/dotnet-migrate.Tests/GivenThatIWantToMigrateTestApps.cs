@@ -337,7 +337,7 @@ namespace Microsoft.DotNet.Migration.Tests
             result.StdErr.Should().Contain("Migration failed.");
         }
 
-        [Theory]
+        [WindowsOnlyTheory]
         [InlineData("DesktopTestProjects", "AutoAddDesktopReferencesDuringMigrate", true)]
         [InlineData("TestProjects", "TestAppSimple", false)]
         public void It_auto_add_desktop_references_during_migrate(string testGroup, string projectName, bool isDesktopApp)
