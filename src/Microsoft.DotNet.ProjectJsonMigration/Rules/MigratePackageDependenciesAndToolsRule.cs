@@ -167,7 +167,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
             }
         }
 
-        private void AutoInjectImplicitProjectJsonAssemblyReferences(NuGetFramework framework, List<ProjectLibraryDependency> packageDependencies)
+        private void AutoInjectImplicitProjectJsonAssemblyReferences(NuGetFramework framework, 
+            IList<ProjectLibraryDependency> packageDependencies)
         {
             if (framework?.IsDesktop() ?? false)
             {
@@ -179,7 +180,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
             }
         }
 
-        private void InjectAssemblyReferenceIfNotPresent(string dependencyName, List<ProjectLibraryDependency> packageDependencies)
+        private void InjectAssemblyReferenceIfNotPresent(string dependencyName, 
+            IList<ProjectLibraryDependency> packageDependencies)
         {
             if (!packageDependencies.Any(dep => string.Equals(dep.Name, dependencyName, StringComparison.OrdinalIgnoreCase)))
             {
