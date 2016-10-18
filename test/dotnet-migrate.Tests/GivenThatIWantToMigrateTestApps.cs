@@ -8,7 +8,6 @@ using Xunit;
 using FluentAssertions;
 using System.IO;
 using Microsoft.DotNet.Tools.Migrate;
-using Build3Command = Microsoft.DotNet.Tools.Test.Utilities.Build3Command;
 using BuildCommand = Microsoft.DotNet.Tools.Test.Utilities.BuildCommand;
 using System.Runtime.Loader;
 
@@ -539,7 +538,7 @@ namespace Microsoft.DotNet.Migration.Tests
 
             DeleteXproj(projectDirectory);
 
-            var result = new Build3Command()
+            var result = new BuildCommand()
                 .WithWorkingDirectory(projectDirectory)
                 .ExecuteWithCapturedOutput($"{projectName} /p:Configuration={configuration}");
 

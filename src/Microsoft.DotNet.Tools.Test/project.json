@@ -17,9 +17,6 @@
     "Microsoft.DotNet.Cli.Utils": {
       "target": "project"
     },
-    "Microsoft.DotNet.ProjectModel": {
-      "target": "project"
-    },
     "Microsoft.Extensions.Testing.Abstractions": {
       "target": "project"
     },

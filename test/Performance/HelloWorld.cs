@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.Tests.Performance
                 TestInstanceSetup();
 
                 // Setup the build command.
-                var buildCommand = new Build3Command();
+                var buildCommand = new BuildCommand();
                 using (iter.StartMeasurement())
                 {
                     // Execute the build command.

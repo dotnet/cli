@@ -5,13 +5,7 @@
     "keyFile": "../../tools/Key.snk"
   },
   "dependencies": {
-    "Microsoft.DotNet.Compiler.Common": {
-      "target": "project"
-    },
     "Microsoft.DotNet.Cli.Utils": {
-      "target": "project"
-    },
-    "Microsoft.DotNet.ProjectModel": {
       "target": "project"
     },
     "Microsoft.Build": "15.1.316-preview5"

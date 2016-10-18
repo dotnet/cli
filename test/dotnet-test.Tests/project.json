@@ -12,9 +12,6 @@
     "Microsoft.DotNet.TestFramework": {
       "target": "project"
     },
-    "Microsoft.DotNet.ProjectModel": {
-      "target": "project"
-    },
     "Microsoft.DotNet.InternalAbstractions": {
       "target": "project"
     },

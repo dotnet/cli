@@ -49,12 +49,12 @@ namespace Microsoft.DotNet.Cli.MSBuild.Tests
         [InlineData("publish", false)]
         [InlineData("restore", false)]
         [InlineData("run", false)]
-        [InlineData("build3", true)]
-        [InlineData("clean3", true)]
-        [InlineData("pack3", true)]
-        [InlineData("publish3", true)]
-        [InlineData("restore3", true)]
-        [InlineData("run3", true)]
+        [InlineData("build", true)]
+        [InlineData("clean", true)]
+        [InlineData("pack", true)]
+        [InlineData("publish", true)]
+        [InlineData("restore", true)]
+        [InlineData("run", true)]
         public void ItMSBuildHelpText(string commandName, bool isMSBuildCommand)
         {
             const string MSBuildHelpText = "  Any extra options that should be passed to MSBuild. See 'dotnet msbuild -h' for available options.";

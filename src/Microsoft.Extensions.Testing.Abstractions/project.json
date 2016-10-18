@@ -8,9 +8,6 @@
   },
   "dependencies": {
     "Newtonsoft.Json": "9.0.1",
-    "Microsoft.DotNet.ProjectModel": {
-      "target": "project"
-    },
     "Microsoft.DiaSymReader": "1.0.8",
     "Microsoft.DiaSymReader.Native": "1.4.0-rc2",
     "System.Reflection.Metadata": "1.4.1-beta-24426-02"

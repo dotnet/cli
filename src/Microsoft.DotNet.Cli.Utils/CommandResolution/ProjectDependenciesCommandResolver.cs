@@ -135,8 +135,6 @@ namespace Microsoft.DotNet.Cli.Utils
             Reporter.Verbose.WriteLine($"projectdependenciescommandresolver: tool library found {toolLibraries?.Count() > 0}");
 
             return toolLibraries?.FirstOrDefault();
-        }
-
         private IEnumerable<string> GetAllowedCommandExtensionsFromEnvironment(IEnvironmentProvider environment)
         {
             var allowedCommandExtensions = new List<string>();

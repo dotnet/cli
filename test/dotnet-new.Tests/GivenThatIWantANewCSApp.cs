@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.Tests
                 .Execute("restore3 /p:SkipInvalidConfigurations=true");
 
             var buildResult = new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .ExecuteWithCapturedOutput("build3");
+                .ExecuteWithCapturedOutput("build");
             
             buildResult.Should().Pass()
                        .And.NotHaveStdErr();

@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.Cli.VSTest.Tests
                 .Pass();
 
             // Build project VSTestDotNetCoreProject
-            new Build3Command()
+            new BuildCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .Execute()
                 .Should()

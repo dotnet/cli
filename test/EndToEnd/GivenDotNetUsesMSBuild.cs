@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
                     .Should()
                     .Pass();
 
-                new Build3Command()
+                new BuildCommand()
                     .WithWorkingDirectory(projectDirectory)
                     .Execute()
                     .Should()

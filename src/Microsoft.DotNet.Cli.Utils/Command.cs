@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Microsoft.DotNet.ProjectModel;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Cli.Utils
@@ -112,27 +111,6 @@ namespace Microsoft.DotNet.Cli.Utils
         public static Command Create(CommandSpec commandSpec)
         {
             return new Command(commandSpec);
-        }
-
-        public static Command CreateForScript(
-            string commandName,
-            IEnumerable<string> args,
-            Project project,
-            string[] inferredExtensionList)
-        {
-            var commandSpec = CommandResolver.TryResolveScriptCommandSpec(commandName,
-                args,
-                project,
-                inferredExtensionList);
-
-            if (commandSpec == null)
-            {
-                throw new CommandUnknownException(commandName);
-            }
-
-            var command = new Command(commandSpec);
-
-            return command;
         }
 
         public CommandResult Execute()

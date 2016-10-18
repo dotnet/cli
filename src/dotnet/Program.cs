@@ -9,26 +9,17 @@ using System.Text;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Configurer;
 using Microsoft.DotNet.PlatformAbstractions;
-using Microsoft.DotNet.ProjectModel.Server;
 using Microsoft.DotNet.Tools.Build;
-using Microsoft.DotNet.Tools.Build3;
-using Microsoft.DotNet.Tools.Clean3;
-using Microsoft.DotNet.Tools.Compiler;
-using Microsoft.DotNet.Tools.Compiler.Csc;
 using Microsoft.DotNet.Tools.Help;
 using Microsoft.DotNet.Tools.Migrate;
 using Microsoft.DotNet.Tools.MSBuild;
 using Microsoft.DotNet.Tools.New;
 using Microsoft.DotNet.Tools.NuGet;
-using Microsoft.DotNet.Tools.Pack3;
 using Microsoft.DotNet.Tools.Publish;
-using Microsoft.DotNet.Tools.Publish3;
 using Microsoft.DotNet.Tools.Restore;
-using Microsoft.DotNet.Tools.Restore3;
 using Microsoft.DotNet.Tools.Run;
 using Microsoft.DotNet.Tools.Test;
 using Microsoft.DotNet.Tools.VSTest;
-using Microsoft.DotNet.Tools.Test3;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Cli
@@ -38,7 +29,6 @@ namespace Microsoft.DotNet.Cli
         private static Dictionary<string, Func<string[], int>> s_builtIns = new Dictionary<string, Func<string[], int>>
         {
             ["build"] = BuildCommand.Run,
-            ["compile-csc"] = CompileCscCommand.Run,
             ["help"] = HelpCommand.Run,
             ["new"] = NewCommand.Run,
             ["nuget"] = NuGetCommand.Run,
@@ -47,17 +37,10 @@ namespace Microsoft.DotNet.Cli
             ["restore"] = RestoreCommand.Run,
             ["run"] = RunCommand.Run,
             ["test"] = TestCommand.Run,
-            ["build3"] = Build3Command.Run,
-            ["clean3"] = Clean3Command.Run,
             ["msbuild"] = MSBuildCommand.Run,
-            ["run3"] = Run3Command.Run,
-            ["restore3"] = Restore3Command.Run,
-            ["publish3"] = Publish3Command.Run,
+            ["run"] = RunCommand.Run,
             ["vstest"] = VSTestCommand.Run,
-            ["test3"] = Test3Command.Run,
-            ["pack3"] = Pack3Command.Run,
             ["migrate"] = MigrateCommand.Run,
-            ["projectmodel-server"] = ProjectModelServerCommand.Run,
         };
 
         public static int Main(string[] args)

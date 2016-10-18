@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Microsoft.DotNet.InternalAbstractions;
-using Microsoft.DotNet.ProjectModel;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Cli.Utils
@@ -42,15 +41,6 @@ namespace Microsoft.DotNet.Cli.Utils
             string outputPath,
             string buildBasePath)
         {
-            var projectContext = GetProjectContextFromDirectory(
-                projectDirectory,
-                framework);
-
-            if (projectContext == null)
-            {
-                return null;
-            }
-
             var buildOutputPath =
                 projectContext.GetOutputPaths(configuration, buildBasePath, outputPath).RuntimeFiles.BasePath;
 
@@ -61,33 +51,6 @@ namespace Microsoft.DotNet.Cli.Utils
             }
 
             return _environment.GetCommandPathFromRootPath(buildOutputPath, commandName);
-        }
-
-        private ProjectContext GetProjectContextFromDirectory(string directory, NuGetFramework framework)
-        {
-            if (directory == null || framework == null)
-            {
-                return null;
-            }
-
-            var projectRootPath = directory;
-
-            if (!File.Exists(Path.Combine(projectRootPath, Project.FileName)))
-            {
-                return null;
-            }
-
-            var projectContext = ProjectContext.Create(
-                projectRootPath,
-                framework,
-                RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers());
-
-            if (projectContext.RuntimeIdentifier == null)
-            {
-                return null;
-            }
-
-            return projectContext;
         }
 
         internal override CommandResolutionStrategy GetCommandResolutionStrategy()

@@ -8,9 +8,6 @@
     "Microsoft.DotNet.Cli.Utils": {
       "target": "project"
     },
-    "Microsoft.DotNet.ProjectModel": {
-      "target": "project"
-    },
     "System.Linq.Expressions": "4.1.0"
   },
   "frameworks": {

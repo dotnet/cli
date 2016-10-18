@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.Tests
 
             var buildResult = new TestCommand("dotnet")
                 .WithWorkingDirectory(rootPath)
-                .ExecuteWithCapturedOutput("build3")
+                .ExecuteWithCapturedOutput("build")
                 .Should().Pass()
                 .And.NotHaveStdErr();
         }
