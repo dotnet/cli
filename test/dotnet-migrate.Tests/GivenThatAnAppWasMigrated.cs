@@ -13,7 +13,57 @@ namespace Microsoft.DotNet.Migration.Tests
         [Theory]
         [InlineData("TestAppSimple")]
         [InlineData("TestAppWithLibrary")]
-        public void When_the_app_has_a_single_project_Then_the_projectfiles_are_moved_to_backup(string testProjectName)
+        public void When_migration_succeeds_Then_project_json_artifacts_get_moved_to_backup(string testProjectName)
+        {
+            var testRoot = TestAssetsManager.CreateTestInstance(testProjectName, identifier: testProjectName).Path;
+
+            var backupRoot = Path.Combine(testRoot, ".backup");
+
+            var migratableArtifacts = GetProjectJsonArtifacts(testRoot);
+
+            new RestoreCommand()
+                .WithWorkingDirectory(testRoot)
+                .Execute();
+            
+            new MigrateCommand()
+                .WithWorkingDirectory(testRoot)
+                .Execute("--do-backup");
+
+            var backupArtifacts = GetProjectJsonArtifacts(backupRoot);
+
+            backupArtifacts.Should().Equal(migratableArtifacts, "Because all of and only these artifacts should have been moved");
+
+            new DirectoryInfo(testRoot).Should().NotHaveFiles(backupArtifacts.Keys);
+
+            new DirectoryInfo(backupRoot).Should().HaveTextFiles(backupArtifacts);
+        }
+
+        [Theory]
+        [InlineData("TestAppWithLibraryAndMissingP2P")]
+        public void When_migration_fails_Then_project_json_artifacts_do_not_get_moved_to_backup(string testProjectName)
+        {
+            var testRoot = TestAssetsManager.CreateTestInstance(testProjectName, identifier: testProjectName).Path;
+
+            var backupRoot = Path.Combine(testRoot, ".backup");
+
+            var migratableArtifacts = GetProjectJsonArtifacts(testRoot);
+
+            new RestoreCommand()
+                .WithWorkingDirectory(testRoot)
+                .Execute();
+            
+            new MigrateCommand()
+                .WithWorkingDirectory(testRoot)
+                .Execute("--do-backup");
+            
+            new DirectoryInfo(backupRoot).Should().NotExist("Because migration failed and therefore no backup is needed.");
+
+            new DirectoryInfo(testRoot).Should().HaveTextFiles(migratableArtifacts, "Because migration failed so nothing was moved to backup.");
+        }
+
+        [Theory]
+        [InlineData("TestAppSimple")]
+        public void When_dobackup_not_specified_Then_project_json_artifacts_do_not_get_moved_to_backup(string testProjectName)
         {
             var testRoot = TestAssetsManager.CreateTestInstance(testProjectName, identifier: testProjectName).Path;
 
@@ -28,14 +78,10 @@ namespace Microsoft.DotNet.Migration.Tests
             new MigrateCommand()
                 .WithWorkingDirectory(testRoot)
                 .Execute();
+            
+            new DirectoryInfo(backupRoot).Should().NotExist("Because --do-backup was not specified.");
 
-            var backupArtifacts = GetProjectJsonArtifacts(backupRoot);
-
-            backupArtifacts.Should().Equal(migratableArtifacts, "Because all of and only these artifacts should have been moved");
-
-            new DirectoryInfo(testRoot).Should().NotHaveFiles(backupArtifacts.Keys);
-
-            new DirectoryInfo(backupRoot).Should().HaveTextFiles(backupArtifacts);
+            new DirectoryInfo(testRoot).Should().HaveTextFiles(migratableArtifacts, "Because --do-backup was not specified.");
         }
 
         private Dictionary<string, string> GetProjectJsonArtifacts(string rootPath)

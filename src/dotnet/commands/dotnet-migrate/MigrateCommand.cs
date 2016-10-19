@@ -25,6 +25,7 @@ namespace Microsoft.DotNet.Tools.Migrate
         private readonly bool _skipProjectReferences;
         private readonly string _reportFile;
         private readonly bool _reportFormatJson;
+        private readonly bool _doBackup;
 
         private readonly TemporaryDotnetNewTemplateProject _temporaryDotnetNewProject;
 
@@ -35,7 +36,8 @@ namespace Microsoft.DotNet.Tools.Migrate
             string xprojFilePath, 
             string reportFile, 
             bool skipProjectReferences, 
-            bool reportFormatJson)
+            bool reportFormatJson,
+            bool doBackup)
         {            
             _templateFile = templateFile;
             _projectArg = projectArg ?? Directory.GetCurrentDirectory();
@@ -49,6 +51,7 @@ namespace Microsoft.DotNet.Tools.Migrate
             _temporaryDotnetNewProject = new TemporaryDotnetNewTemplateProject();
             _reportFile = reportFile;
             _reportFormatJson = reportFormatJson;
+            _doBackup = doBackup;
         }
 
         public int Execute()
@@ -83,13 +86,23 @@ namespace Microsoft.DotNet.Tools.Migrate
 
             WriteReport(migrationReport);
 
-            MoveProjectJsonArtifactsToBackup(migrationReport);
+            MoveProjectJsonArtifactsToBackup(_doBackup, migrationReport);
 
             return migrationReport.FailedProjectsCount;
         }
 
-        private void MoveProjectJsonArtifactsToBackup(MigrationReport migrationReport)
+        private void MoveProjectJsonArtifactsToBackup(bool doBackup, MigrationReport migrationReport)
         {
+            if (!doBackup)
+            {
+                return;
+            }
+            
+            if (migrationReport.FailedProjectsCount > 0)
+            {
+                return;
+            }
+            
             _backupDirectory.Create();
 
             var globalJson = Path.Combine(_workspaceDirectory.FullName, GlobalSettings.FileName);

@@ -142,5 +142,15 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
             return new AndConstraint<DirectoryInfoAssertions>(this);
         }
+
+        public AndConstraint<DirectoryInfoAssertions> NotExist(string because = "", params object[] reasonArgs)
+        {
+            Execute.Assertion
+                .ForCondition(_dirInfo.Exists == false)
+                .BecauseOf(because, reasonArgs)
+                .FailWith($"Expected directory {_dirInfo.FullName} to not exist, but it does.");
+
+            return new AndConstraint<DirectoryInfoAssertions>(this);
+        }
     }
 }
