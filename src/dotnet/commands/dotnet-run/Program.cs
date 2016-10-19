@@ -7,15 +7,15 @@ using Microsoft.DotNet.Cli.Utils;
 
 namespace Microsoft.DotNet.Tools.Run
 {
-    public partial class Run3Command
+    public partial class RunCommand
     {
         public static int Run(string[] args)
         {
             DebugHelper.HandleDebugSwitch(ref args);
 
             CommandLineApplication app = new CommandLineApplication(throwOnUnexpectedArg: false);
-            app.Name = "dotnet run3";
-            app.FullName = ".NET Run3 Command";
+            app.Name = "dotnet run";
+            app.FullName = ".NET Run Command";
             app.Description = "Command used to run .NET apps";
             app.HandleResponseFiles = true;
             app.AllowArgumentSeparator = true;
@@ -34,7 +34,7 @@ namespace Microsoft.DotNet.Tools.Run
 
             app.OnExecute(() =>
             {
-                Run3Command runCmd = new Run3Command();
+                RunCommand runCmd = new RunCommand();
 
                 runCmd.Configuration = configuration.Value();
                 runCmd.Framework = framework.Value();

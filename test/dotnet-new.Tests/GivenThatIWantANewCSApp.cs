@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.Tests
                 .Should().Pass();
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("run3")
+                .Execute("run")
                 .Should().Pass();
         }
         

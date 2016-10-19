@@ -11,7 +11,7 @@ using Microsoft.DotNet.Tools.MSBuild;
 
 namespace Microsoft.DotNet.Tools.Run
 {
-    public partial class Run3Command
+    public partial class RunCommand
     {
         public string Configuration { get; set; }
         public string Framework { get; set; }
@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.Tools.Run
 
         private List<string> _args;
 
-        public Run3Command()
+        public RunCommand()
         {
         }
 

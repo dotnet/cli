@@ -4,9 +4,9 @@
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
 
-namespace Microsoft.DotNet.Cli.Run3.Tests
+namespace Microsoft.DotNet.Cli.Run.Tests
 {
-    public class GivenDotnetRun3BuildsCsproj : TestBase
+    public class GivenDotnetRunBuildsCsproj : TestBase
     {
         [Fact]
         public void ItCanRunAMSBuildProject()
@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.Cli.Run3.Tests
                 .Pass();
 
             //TODO: https://github.com/dotnet/sdk/issues/187 - remove framework from below.
-            new Run3Command()
+            new RunCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .ExecuteWithCapturedOutput("--framework netcoreapp1.0")
                 .Should()
@@ -55,7 +55,7 @@ namespace Microsoft.DotNet.Cli.Run3.Tests
                 .Pass();
 
             //TODO: https://github.com/dotnet/sdk/issues/187 - remove framework from below.
-            new Run3Command()
+            new RunCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .ExecuteWithCapturedOutput("--framework netcoreapp1.0")
                 .Should()
@@ -79,7 +79,7 @@ namespace Microsoft.DotNet.Cli.Run3.Tests
                 .Should()
                 .Pass();
 
-            new Run3Command()
+            new RunCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .ExecuteWithCapturedOutput("--framework netcoreapp1.0")
                 .Should()
