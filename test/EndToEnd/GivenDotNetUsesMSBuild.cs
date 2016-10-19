@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
                     .Should()
                     .Pass();
 
-                new Restore3Command()
+                new RestoreCommand()
                     .WithWorkingDirectory(projectDirectory)
                     .Execute("/p:SkipInvalidConfigurations=true")
                     .Should()
@@ -70,7 +70,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 
             var testProjectDirectory = testInstance.TestRoot;
 
-            new Restore3Command()
+            new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .Execute()
                 .Should()
@@ -97,7 +97,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 
             var testProjectDirectory = testInstance.TestRoot;
 
-            new Restore3Command()
+            new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .Execute($"-s {repoDirectoriesProvider.TestPackages}")
                 .Should()

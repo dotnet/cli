@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
 
             var testProjectDirectory = testInstance.TestRoot;
 
-            new Restore3Command()
+            new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .Execute()
                 .Should()

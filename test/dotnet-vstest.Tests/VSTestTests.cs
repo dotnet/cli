@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.Cli.VSTest.Tests
             string testProjectDirectory = testInstance.TestRoot;
 
             // Restore project VSTestDotNetCoreProject
-            new Restore3Command()
+            new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .Execute()
                 .Should()

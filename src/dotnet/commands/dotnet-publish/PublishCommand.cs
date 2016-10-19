@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools.MSBuild;
-using Microsoft.DotNet.Tools.Restore3;
+using Microsoft.DotNet.Tools.Restore;
 
 namespace Microsoft.DotNet.Tools.Publish
 {
@@ -79,7 +79,7 @@ namespace Microsoft.DotNet.Tools.Publish
 
             if (!string.IsNullOrEmpty(Runtime))
             {
-                result = Restore3Command.Run(new[] { $"/p:RuntimeIdentifiers={Runtime}" });
+                result = RestoreCommand.Run(new[] { $"/p:RuntimeIdentifiers={Runtime}" });
             }
 
             return result;

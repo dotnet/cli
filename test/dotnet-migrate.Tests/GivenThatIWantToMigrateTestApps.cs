@@ -346,7 +346,7 @@ namespace Microsoft.DotNet.Migration.Tests
             
             CleanBinObj(projectDirectory);
             MigrateProject(new string[] { projectDirectory });
-            Restore3(projectDirectory);
+            Restore(projectDirectory);
             BuildMSBuild(projectDirectory, projectName);
             VerifyAutoInjectedDesktopReferences(projectDirectory, projectName, isDesktopApp);
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
@@ -385,7 +385,7 @@ namespace Microsoft.DotNet.Migration.Tests
         {
             File.Copy("NuGet.tempaspnetpatch.config", Path.Combine(projectDirectory, "NuGet.Config"));
             
-            Restore(projectDirectory);
+            RestoreProjectJson(projectDirectory);
 
             var outputComparisonData =
                 BuildProjectJsonMigrateBuildMSBuild(projectDirectory, Path.GetFileNameWithoutExtension(projectDirectory));
@@ -455,7 +455,7 @@ namespace Microsoft.DotNet.Migration.Tests
 
             foreach(var dir in restoreDirectories)
             {
-                Restore3(dir);
+                Restore(dir);
             }
 
             BuildMSBuild(projectDirectory, projectName);
@@ -504,17 +504,17 @@ namespace Microsoft.DotNet.Migration.Tests
             result.Should().Be(0);
         }
 
-        private void Restore(string projectDirectory)
+        private void RestoreProjectJson(string projectDirectory)
         {
             new TestCommand("dotnet")
                 .WithWorkingDirectory(projectDirectory)
-                .Execute("restore")
+                .Execute("restore-projectjson")
                 .Should().Pass();
         }
 
-        private void Restore3(string projectDirectory, string projectName=null)
+        private void Restore(string projectDirectory, string projectName=null)
         {
-            var command = new Restore3Command()
+            var command = new RestoreCommand()
                 .WithWorkingDirectory(projectDirectory);
 
             if (projectName != null)

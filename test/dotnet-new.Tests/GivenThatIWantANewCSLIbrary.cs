@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.Tests
                 .Should().Pass();
             
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("restore3 /p:SkipInvalidConfigurations=true")
+                .Execute("restore /p:SkipInvalidConfigurations=true")
                 .Should().Pass();
             
         }
@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.Tests
                 .Execute("new --type lib");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("restore3 /p:SkipInvalidConfigurations=true");
+                .Execute("restore /p:SkipInvalidConfigurations=true");
 
             var buildResult = new TestCommand("dotnet")
                 .WithWorkingDirectory(rootPath)

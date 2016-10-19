@@ -15,8 +15,10 @@ using Microsoft.DotNet.Tools.Migrate;
 using Microsoft.DotNet.Tools.MSBuild;
 using Microsoft.DotNet.Tools.New;
 using Microsoft.DotNet.Tools.NuGet;
+using Microsoft.DotNet.Tools.Pack;
 using Microsoft.DotNet.Tools.Publish;
 using Microsoft.DotNet.Tools.Restore;
+using Microsoft.DotNet.Tools.RestoreProjectJson;
 using Microsoft.DotNet.Tools.Run;
 using Microsoft.DotNet.Tools.Test;
 using Microsoft.DotNet.Tools.VSTest;
@@ -35,6 +37,7 @@ namespace Microsoft.DotNet.Cli
             ["pack"] = PackCommand.Run,
             ["publish"] = PublishCommand.Run,
             ["restore"] = RestoreCommand.Run,
+            ["restore-projectjson"] = RestoreProjectJsonCommand.Run,
             ["run"] = RunCommand.Run,
             ["test"] = TestCommand.Run,
             ["msbuild"] = MSBuildCommand.Run,

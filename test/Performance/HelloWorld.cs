@@ -80,7 +80,7 @@ namespace Microsoft.DotNet.Tests.Performance
             newCommand.WorkingDirectory = RestoredTestProjectDirectory;
             newCommand.Execute().Should().Pass();
 
-            var restoreCommand = new Restore3Command();
+            var restoreCommand = new RestoreCommand();
             restoreCommand.WorkingDirectory = RestoredTestProjectDirectory;
             restoreCommand.Execute("/p:SkipInvalidConfigurations=true")
                 .Should().Pass();

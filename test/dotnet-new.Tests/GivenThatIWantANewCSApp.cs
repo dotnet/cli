@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.Tests
             AddProjectDependency(projectFile, "Newtonsoft.Json", "7.0.1");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("restore3 /p:SkipInvalidConfigurations=true")
+                .Execute("restore /p:SkipInvalidConfigurations=true")
                 .Should().Pass();
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.Tests
                 .Execute("new");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("restore3 /p:SkipInvalidConfigurations=true");
+                .Execute("restore /p:SkipInvalidConfigurations=true");
 
             var buildResult = new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .ExecuteWithCapturedOutput("build");

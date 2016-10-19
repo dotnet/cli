@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             _repoDirectoriesProvider = new RepoDirectoriesProvider();
             _configuration = "Debug";
 
-            new Restore3Command()
+            new RestoreCommand()
                 .WithWorkingDirectory(MSBuildTestProjectInstance.Path)
                 .Execute($"-s {_repoDirectoriesProvider.TestPackages}")
                 .Should()
@@ -128,7 +128,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 OutputPath = outputDir
             };
 
-            new Restore3Command()
+            new RestoreCommand()
                 .WithWorkingDirectory(testInstance.Path)
                 .Execute($"-s {_repoDirectoriesProvider.TestPackages}")
                 .Should()

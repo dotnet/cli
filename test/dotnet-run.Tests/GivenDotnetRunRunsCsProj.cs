@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.Cli.Run.Tests
 
             var testProjectDirectory = testInstance.TestRoot;
 
-            new Restore3Command()
+            new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .Execute()
                 .Should()
@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.Cli.Run.Tests
 
             var testProjectDirectory = testInstance.TestRoot;
 
-            new Restore3Command()
+            new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .Execute()
                 .Should()
@@ -73,7 +73,7 @@ namespace Microsoft.DotNet.Cli.Run.Tests
 
             var testProjectDirectory = testInstance.TestRoot;
 
-            new Restore3Command()
+            new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .Execute()
                 .Should()

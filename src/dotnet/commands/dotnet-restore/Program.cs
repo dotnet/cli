@@ -6,9 +6,9 @@ using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools.MSBuild;
 
-namespace Microsoft.DotNet.Tools.Restore3
+namespace Microsoft.DotNet.Tools.Restore
 {
-    public class Restore3Command
+    public class RestoreCommand
     {
         public static int Run(string[] args)
         {
@@ -16,8 +16,8 @@ namespace Microsoft.DotNet.Tools.Restore3
 
             CommandLineApplication cmd = new CommandLineApplication(throwOnUnexpectedArg: false)
             {
-                Name = "restore3",
-                FullName = "restore3",
+                Name = "restore",
+                FullName = "restore",
                 Description = "restore for msbuild",
                 AllowArgumentSeparator = true,
                 ArgumentSeparatorHelpText = HelpMessageStrings.MSBuildAdditionalArgsHelpText

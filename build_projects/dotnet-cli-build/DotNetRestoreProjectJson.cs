@@ -3,29 +3,29 @@
 
 namespace Microsoft.DotNet.Cli.Build
 {
-    public class DotNetRestore3 : DotNetTool
+    public class DotNetRestoreProjectJson : DotNetTool
     {
         protected override string Command
         {
-            get { return "restore3"; }
+            get { return "restore-projectjson"; }
         }
 
         protected override string Args
         {
-            get { return $"{GetSource()} {GetPackages()} {GetSkipInvalidConfigurations()}"; }
+            get { return $"{GetVerbosity()} {GetFallbackSource()} {GetPackages()}"; }
         }
 
-        public string Source { get; set; }
+        public string FallbackSource { get; set; }
 
         public string Packages { get; set; }
 
-        public bool SkipInvalidConfigurations { get; set; }
+        public string Verbosity { get; set; }
 
-        private string GetSource()
+        private string GetFallbackSource()
         {
-            if (!string.IsNullOrEmpty(Source))
+            if (!string.IsNullOrEmpty(FallbackSource))
             {
-                return $"--source {Source}";
+                return $"--fallbacksource {FallbackSource}";
             }
 
             return null;
@@ -41,11 +41,11 @@ namespace Microsoft.DotNet.Cli.Build
             return null;
         }
 
-        private string GetSkipInvalidConfigurations()
+        private string GetVerbosity()
         {
-            if (SkipInvalidConfigurations)
+            if (!string.IsNullOrEmpty(Verbosity))
             {
-                return "/p:SkipInvalidConfigurations=true";
+                return $"--verbosity {Verbosity}";
             }
 
             return null;
