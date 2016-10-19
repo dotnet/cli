@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
                 var binDirectory = new DirectoryInfo(projectDirectory).Sub("bin");
                 binDirectory.Should().HaveFilesMatching("*.dll", SearchOption.AllDirectories);
 
-                new Clean3Command()
+                new CleanCommand()
                     .WithWorkingDirectory(projectDirectory)
                     .Execute()
                     .Should()

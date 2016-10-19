@@ -6,9 +6,9 @@ using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools.MSBuild;
 
-namespace Microsoft.DotNet.Tools.Clean3
+namespace Microsoft.DotNet.Tools.Clean
 {
-    public class Clean3Command
+    public class CleanCommand
     {
         public static int Run(string[] args)
         {
@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.Tools.Clean3
 
             CommandLineApplication app = new CommandLineApplication(throwOnUnexpectedArg: false)
             {
-                Name = "dotnet clean3",
+                Name = "dotnet clean",
                 FullName = ".NET Clean Command",
                 Description = "Command to clean previously generated build outputs.",
                 AllowArgumentSeparator = true,

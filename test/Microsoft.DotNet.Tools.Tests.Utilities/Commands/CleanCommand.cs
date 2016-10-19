@@ -8,22 +8,22 @@ using Microsoft.DotNet.ProjectModel;
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
 {
-    public sealed class Clean3Command : TestCommand
+    public sealed class CleanCommand : TestCommand
     {
-        public Clean3Command()
+        public CleanCommand()
             : base("dotnet")
         {
         }
 
         public override CommandResult Execute(string args = "")
         {
-            args = $"clean3 {args}";
+            args = $"clean {args}";
             return base.Execute(args);
         }
 
         public override CommandResult ExecuteWithCapturedOutput(string args = "")
         {
-            args = $"clean3 {args}";
+            args = $"clean {args}";
             return base.ExecuteWithCapturedOutput(args);
         }
     }
