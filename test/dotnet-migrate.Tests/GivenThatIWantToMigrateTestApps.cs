@@ -490,8 +490,8 @@ namespace Microsoft.DotNet.Migration.Tests
         {
             var projectFile = Path.Combine(projectDirectory, "project.json");
 
-            var result = new BuildCommand(projectPath: projectFile)
-                .ExecuteWithCapturedOutput();
+            var result = new BuildCommand()
+                .ExecuteWithCapturedOutput(projectFile);
 
             result.Should().Pass();
         }

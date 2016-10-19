@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.Cli.Run.Tests
                 .Should()
                 .Pass();
 
-            new Build3Command()
+            new BuildCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .Execute()
                 .Should()

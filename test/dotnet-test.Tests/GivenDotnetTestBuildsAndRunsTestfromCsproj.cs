@@ -28,7 +28,9 @@ namespace Microsoft.DotNet.Cli.test.Tests
                 .Pass();
 
             // Call test
-            CommandResult result = new testCommand().WithWorkingDirectory(testProjectDirectory).ExecuteWithCapturedOutput("/p:TargetFramework=netcoreapp1.0");
+            CommandResult result = new DotnetTestCommand()
+                                        .WithWorkingDirectory(testProjectDirectory)
+                                        .ExecuteWithCapturedOutput("/p:TargetFramework=netcoreapp1.0");
 
             // Verify
             result.StdOut.Should().Contain("Total tests: 2. Passed: 1. Failed: 1. Skipped: 0.");

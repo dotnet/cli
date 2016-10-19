@@ -72,7 +72,7 @@
           Outputs="%(TestProjects.BuildOutput)">
     <DotNetBuild  Configuration="$(Configuration)"
                   Framework="%(TestProjects.Framework)"
-                  ToolPath="$(DotnetUnderTest)"
+                  ToolPath="$(Stage0Directory)"
                   WorkingDirectory="%(TestProjects.RelativeDir)" />
   </Target>
 
@@ -126,7 +126,7 @@
 
     <DotNetBuild  Framework="netcoreapp1.0"
                   ProjectPath="$(RepoRoot)%(TestAssetProjects.ProjectPath)"
-                  ToolPath="$(DotnetUnderTest)"
+                  ToolPath="$(Stage0Directory)"
                   WorkingDirectory="%(TestAssetProjects.RelativeDir)" />
   </Target>
 
@@ -177,7 +177,7 @@
     <DotNetBuild  Configuration="$(Configuration)"
                   Framework="net46"
                   ProjectPath="%(BuildableDesktopTestAssetProjects.FullPath)"
-                  ToolPath="$(DotnetUnderTest)"
+                  ToolPath="$(Stage0Directory)"
                   WorkingDirectory="%(BuildableDesktopTestAssetProjects.RelativeDir)" />
   </Target>
 
@@ -209,7 +209,7 @@
                 NoBuild="True"
                 Output="$(TestPackagesDir)"
                 ProjectPath="%(TestPackageProject.FullPath)"
-                ToolPath="$(DotnetUnderTest)"
+                ToolPath="$(Stage0Directory)"
                 VersionSuffix="%(TestPackageProject.VersionSuffix)" />
   </Target>
 

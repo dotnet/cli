@@ -24,10 +24,8 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var testInstance = testAssetManager.CreateTestInstance("AppWithDirectDepDesktopAndPortable")
                 .WithLockFiles();
 
-            var buildCommand = new BuildCommand(
-                Path.Combine(testInstance.TestRoot, "project.json"),
-                configuration: configuration)
-                    .ExecuteWithCapturedOutput()
+            var buildCommand = new BuildCommand()
+                    .ExecuteWithCapturedOutput($"{Path.Combine(testInstance.TestRoot, \"project.json\")} --configuration {configuration}")
                     .Should()
                     .Pass();
 
@@ -42,8 +40,11 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
 
             var command = factory.Create("dotnet-desktop-and-portable", null);
 
-            command.CommandName.Should().Contain(Path.Combine(testInstance.TestRoot, "bin", configuration));
-            Path.GetFileName(command.CommandName).Should().Be("dotnet-desktop-and-portable.exe");
+            command.CommandName
+                .Should().Contain(Path.Combine(testInstance.TestRoot, "bin", configuration));
+
+            Path.GetFileName(command.CommandName)
+                .Should().Be("dotnet-desktop-and-portable.exe");
         }
 
         [WindowsOnlyFact]
@@ -55,10 +56,8 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var testInstance = testAssetManager.CreateTestInstance("AppWithDirectDepDesktopAndPortable")
                 .WithLockFiles();
 
-            var buildCommand = new BuildCommand(
-                Path.Combine(testInstance.TestRoot, "project.json"),
-                configuration: configuration)
-                    .ExecuteWithCapturedOutput()
+            var buildCommand = new BuildCommand()
+                    .ExecuteWithCapturedOutput($"{Path.Combine(testInstance.TestRoot, \"project.json\")} --configuration {configuration}")
                     .Should()
                     .Pass();
 
@@ -86,10 +85,8 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var testInstance = testAssetManager.CreateTestInstance("AppWithDirectDepDesktopAndPortable")
                 .WithLockFiles();
 
-            var buildCommand = new BuildCommand(
-                Path.Combine(testInstance.TestRoot, "project.json"),
-                configuration: configuration)
-                    .ExecuteWithCapturedOutput()
+            var buildCommand = new BuildCommand()
+                    .ExecuteWithCapturedOutput($"{Path.Combine(testInstance.TestRoot, \"project.json\")} --configuration {configuration}")
                     .Should()
                     .Pass();
 
@@ -117,10 +114,8 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var testInstance = testAssetManager.CreateTestInstance("AppWithDirectDepDesktopAndPortable")
                 .WithLockFiles();
 
-            var buildCommand = new BuildCommand(
-                Path.Combine(testInstance.TestRoot, "project.json"),
-                configuration: configuration)
-                    .ExecuteWithCapturedOutput()
+            var buildCommand = new BuildCommand()
+                    .ExecuteWithCapturedOutput($"{Path.Combine(testInstance.TestRoot, \"project.json\")} --configuration {configuration}")
                     .Should()
                     .Pass();
 
@@ -148,10 +143,8 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var testInstance = testAssetManager.CreateTestInstance("AppWithDirectDepWithOutputName")
                 .WithLockFiles();
 
-            var buildCommand = new BuildCommand(
-                Path.Combine(testInstance.TestRoot, "project.json"),
-                configuration: configuration)
-                    .ExecuteWithCapturedOutput()
+            var buildCommand = new BuildCommand()
+                    .ExecuteWithCapturedOutput($"{Path.Combine(testInstance.TestRoot, \"project.json\")} --configuration {configuration}")
                     .Should()
                     .Pass();
 

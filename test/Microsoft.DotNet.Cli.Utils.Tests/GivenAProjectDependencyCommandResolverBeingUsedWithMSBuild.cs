@@ -34,7 +34,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 .Should()
                 .Pass();
 
-            new Build3Command()
+            new BuildCommand()
                 .WithWorkingDirectory(MSBuildTestProjectInstance.Path)
                 .Execute($"-c {_configuration}")
                 .Should()
@@ -134,7 +134,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 .Should()
                 .Pass();
 
-            new Build3Command()
+            new BuildCommand()
                 .WithWorkingDirectory(testInstance.Path)
                 .Execute($"-c {_configuration} -o {outputDir}")
                 .Should()

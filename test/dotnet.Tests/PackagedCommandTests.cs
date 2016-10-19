@@ -57,8 +57,8 @@ namespace Microsoft.DotNet.Tests
 
             var appDirectory = testInstance.Path;
 
-            new BuildCommand(Path.Combine(appDirectory, "project.json"))
-                .Execute()
+            new BuildCommand()
+                .Execute(Path.Combine(appDirectory, "project.json"))
                 .Should()
                 .Pass();
 
@@ -79,8 +79,8 @@ namespace Microsoft.DotNet.Tests
 
             var appDirectory = testInstance.Path;
 
-            new BuildCommand(Path.Combine(appDirectory, "project.json"))
-                .Execute()
+            new BuildCommand()
+                .Execute(Path.Combine(appDirectory, "project.json"))
                 .Should()
                 .Pass();
 
@@ -103,8 +103,8 @@ namespace Microsoft.DotNet.Tests
             var appDirectory = testInstance.Path;
             const string framework = ".NETCoreApp,Version=v1.0";
 
-            new BuildCommand(Path.Combine(appDirectory, "project.json"))
-                .Execute()
+            new BuildCommand()
+                .Execute(Path.Combine(appDirectory, "project.json"))
                 .Should()
                 .Pass();
 
@@ -133,8 +133,8 @@ namespace Microsoft.DotNet.Tests
 
             var appDirectory = testInstance.Path;
 
-            new BuildCommand(Path.Combine(appDirectory, "project.json"))
-                .Execute()
+            new BuildCommand()
+                .Execute(Path.Combine(appDirectory, "project.json"))
                 .Should()
                 .Pass();
 
@@ -163,8 +163,8 @@ namespace Microsoft.DotNet.Tests
 
             var appDirectory = testInstance.Path;
 
-            new BuildCommand(Path.Combine(appDirectory, "project.json"))
-                .Execute()
+            new BuildCommand()
+                .Execute(Path.Combine(appDirectory, "project.json"))
                 .Should()
                 .Pass();
 
@@ -197,8 +197,8 @@ namespace Microsoft.DotNet.Tests
 
             var appDirectory = testInstance.Path;
 
-            new BuildCommand(Path.Combine(appDirectory, "project.json"))
-                .Execute()
+            new BuildCommand()
+                .Execute(Path.Combine(appDirectory, "project.json"))
                 .Should()
                 .Pass();
 

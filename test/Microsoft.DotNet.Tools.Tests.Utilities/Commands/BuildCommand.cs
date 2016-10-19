@@ -17,13 +17,13 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         public override CommandResult Execute(string args = "")
         {
-            args = $"build3 {args}";
+            args = $"build {args}";
             return base.Execute(args);
         }
 
         public override CommandResult ExecuteWithCapturedOutput(string args = "")
         {
-            args = $"build3 {args}";
+            args = $"build {args}";
             return base.ExecuteWithCapturedOutput(args);
         }
     }

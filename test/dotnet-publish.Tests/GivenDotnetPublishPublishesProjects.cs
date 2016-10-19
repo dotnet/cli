@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
                 .Should()
                 .Pass();
 
-            new Publish3Command()
+            new PublishCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .Execute("--framework netcoreapp1.0")
                 .Should()
@@ -55,7 +55,7 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
             var testProjectDirectory = testInstance.TestRoot;
             var rid = DotnetLegacyRuntimeIdentifiers.InferLegacyRestoreRuntimeIdentifier();
 
-            new Publish3Command()
+            new PublishCommand()
                 .WithFramework("netcoreapp1.0")
                 .WithRuntime(rid)
                 .WithWorkingDirectory(testProjectDirectory)
