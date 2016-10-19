@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using FluentAssertions;
 using Microsoft.DotNet.Cli.Utils;
-using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using NuGet.Frameworks;
@@ -80,7 +79,8 @@ namespace Microsoft.DotNet.Tests
         {
             var projectToolsCommandResolver = SetupProjectToolsCommandResolver();
 
-            var testInstance = TestAssetsManager.CreateTestInstance(TestProjectName)
+            var testInstance = TestAssetsManager
+                .CreateTestInstance(TestProjectName)
                 .WithLockFiles();
 
             var commandResolverArguments = new CommandResolverArguments()
@@ -150,7 +150,8 @@ namespace Microsoft.DotNet.Tests
         {
             var projectToolsCommandResolver = SetupProjectToolsCommandResolver();
 
-            var testInstance = TestAssetsManager.CreateTestInstance(TestProjectName)
+            var testInstance = TestAssetsManager
+                .CreateTestInstance(TestProjectName)
                 .WithLockFiles();
 
             var commandResolverArguments = new CommandResolverArguments()
@@ -160,9 +161,10 @@ namespace Microsoft.DotNet.Tests
                 ProjectDirectory = testInstance.Path
             };
 
-            var context = ProjectContext.Create(Path.Combine(testInstance.Path, "project.json"), s_toolPackageFramework);
+            var repoDirectoriesProvider = new RepoDirectoriesProvider();
 
-            var nugetPackagesRoot = context.PackagesDirectory;
+            var nugetPackagesRoot = repoDirectoriesProvider.NugetPackages;
+
             var toolPathCalculator = new ToolPathCalculator(nugetPackagesRoot);
 
             var lockFilePath = toolPathCalculator.GetLockFilePath(
@@ -198,9 +200,10 @@ namespace Microsoft.DotNet.Tests
             var testInstance = TestAssetsManager.CreateTestInstance(TestProjectName)
                 .WithLockFiles();
 
-            var context = ProjectContext.Create(Path.Combine(testInstance.Path, "project.json"), s_toolPackageFramework);
+            var repoDirectoriesProvider = new RepoDirectoriesProvider();
 
-            var nugetPackagesRoot = context.PackagesDirectory;
+            var nugetPackagesRoot = repoDirectoriesProvider.NugetPackages;
+
             var toolPathCalculator = new ToolPathCalculator(nugetPackagesRoot);
 
             var lockFilePath = toolPathCalculator.GetLockFilePath(

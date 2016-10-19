@@ -21,13 +21,16 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var configuration = "Debug";
 
             var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "DesktopTestProjects"));
-            var testInstance = testAssetManager.CreateTestInstance("AppWithDirectDepDesktopAndPortable")
+            var testInstance = testAssetManager
+                .CreateTestInstance("AppWithDirectDepDesktopAndPortable")
                 .WithLockFiles();
 
             var buildCommand = new BuildCommand()
-                    .ExecuteWithCapturedOutput($"{Path.Combine(testInstance.TestRoot, \"project.json\")} --configuration {configuration}")
-                    .Should()
-                    .Pass();
+                .WithProjectFile(new FileInfo(Path.Combine(testInstance.TestRoot, "project.json")))
+                .WithConfiguration(configuration)
+                .WithCapturedOutput()
+                .Execute()
+                .Should().Pass();
 
             var context = ProjectContext.Create(testInstance.TestRoot, s_desktopTestFramework);
 
@@ -40,11 +43,8 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
 
             var command = factory.Create("dotnet-desktop-and-portable", null);
 
-            command.CommandName
-                .Should().Contain(Path.Combine(testInstance.TestRoot, "bin", configuration));
-
-            Path.GetFileName(command.CommandName)
-                .Should().Be("dotnet-desktop-and-portable.exe");
+            command.CommandName.Should().Contain(Path.Combine(testInstance.TestRoot, "bin", configuration));
+            Path.GetFileName(command.CommandName).Should().Be("dotnet-desktop-and-portable.exe");
         }
 
         [WindowsOnlyFact]
@@ -53,13 +53,17 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var configuration = "Debug";
 
             var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "DesktopTestProjects"));
-            var testInstance = testAssetManager.CreateTestInstance("AppWithDirectDepDesktopAndPortable")
+
+            var testInstance = testAssetManager
+                .CreateTestInstance("AppWithDirectDepDesktopAndPortable")
                 .WithLockFiles();
 
             var buildCommand = new BuildCommand()
-                    .ExecuteWithCapturedOutput($"{Path.Combine(testInstance.TestRoot, \"project.json\")} --configuration {configuration}")
-                    .Should()
-                    .Pass();
+                .WithProjectFile(new FileInfo(Path.Combine(testInstance.TestRoot, "project.json")))
+                .WithConfiguration(configuration)
+                .WithCapturedOutput()
+                .Execute()
+                .Should().Pass();
 
             var context = ProjectContext.Create(testInstance.TestRoot, s_desktopTestFramework);
 
@@ -82,13 +86,16 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var configuration = "Release";
 
             var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "DesktopTestProjects"));
-            var testInstance = testAssetManager.CreateTestInstance("AppWithDirectDepDesktopAndPortable")
+            var testInstance = testAssetManager
+                .CreateTestInstance("AppWithDirectDepDesktopAndPortable")
                 .WithLockFiles();
 
             var buildCommand = new BuildCommand()
-                    .ExecuteWithCapturedOutput($"{Path.Combine(testInstance.TestRoot, \"project.json\")} --configuration {configuration}")
-                    .Should()
-                    .Pass();
+                .WithProjectFile(new FileInfo(Path.Combine(testInstance.TestRoot, "project.json")))
+                .WithConfiguration(configuration)
+                .WithCapturedOutput()
+                .Execute()
+                .Should().Pass();
 
             var context = ProjectContext.Create(testInstance.TestRoot, s_desktopTestFramework);
 
@@ -115,9 +122,11 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 .WithLockFiles();
 
             var buildCommand = new BuildCommand()
-                    .ExecuteWithCapturedOutput($"{Path.Combine(testInstance.TestRoot, \"project.json\")} --configuration {configuration}")
-                    .Should()
-                    .Pass();
+                .WithProjectFile(new FileInfo(Path.Combine(testInstance.TestRoot, "project.json")))
+                .WithConfiguration(configuration)
+                .WithCapturedOutput()
+                .Execute()
+                .Should().Pass();
 
             var context = ProjectContext.Create(testInstance.TestRoot, s_desktopTestFramework);
 
@@ -140,13 +149,16 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var configuration = "Debug";
 
             var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "TestProjects"));
-            var testInstance = testAssetManager.CreateTestInstance("AppWithDirectDepWithOutputName")
+            var testInstance = testAssetManager
+                .CreateTestInstance("AppWithDirectDepWithOutputName")
                 .WithLockFiles();
 
             var buildCommand = new BuildCommand()
-                    .ExecuteWithCapturedOutput($"{Path.Combine(testInstance.TestRoot, \"project.json\")} --configuration {configuration}")
-                    .Should()
-                    .Pass();
+                .WithProjectFile(new FileInfo(Path.Combine(testInstance.TestRoot, "project.json")))
+                .WithConfiguration(configuration)
+                .WithCapturedOutput()
+                .Execute()
+                .Should().Pass();
 
             var context = ProjectContext.Create(testInstance.TestRoot, FrameworkConstants.CommonFrameworks.NetCoreApp10);
 
