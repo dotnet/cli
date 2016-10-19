@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic; 
 using Microsoft.DotNet.PlatformAbstractions; 
  
-namespace Microsoft.DotNet.InternalAbstractions 
+namespace Microsoft.DotNet.Cli.Utils 
 { 
     // This is to support some legacy stuff. 
     // dnu restore (and thus dotnet restore) always uses win7-x64 as the Windows restore target, 
@@ -80,5 +80,5 @@ namespace Microsoft.DotNet.InternalAbstractions
  
             return result; 
         } 
-    } 
-} 
+    }
+}

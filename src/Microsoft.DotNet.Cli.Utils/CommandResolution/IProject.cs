@@ -14,6 +14,8 @@ namespace Microsoft.DotNet.Cli.Utils
 
         string DepsJsonPath { get; }
 
+        string OutputPath { get; }
+
         string RuntimeConfigJsonPath { get; }
 
         Dictionary<string, string> EnvironmentVariables { get; }

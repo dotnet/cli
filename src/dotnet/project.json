@@ -36,16 +36,10 @@
     "Microsoft.DotNet.Cli.Utils": {
       "target": "project"
     },
-    "Microsoft.Extensions.Testing.Abstractions": {
-      "target": "project"
-    },
     "Microsoft.DotNet.Configurer": {
       "target": "project"
     },
     "Microsoft.DotNet.ProjectJsonMigration": {
-      "target": "project"
-    },
-    "Microsoft.DotNet.Tools.Test": {
       "target": "project"
     },
     "Microsoft.NETCore.App": {

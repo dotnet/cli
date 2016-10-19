@@ -1,0 +1,39 @@
+{
+  "version": "1.0.0-rc-*",
+  "buildOptions": {
+    "emitEntryPoint": true,
+    "compile": {
+      "include": [
+        "**/*.cs",
+        "../../../src/dotnet/CommandLine/*.cs"
+      ]
+    }
+  },
+  "dependencies": {
+    "Microsoft.NETCore.App": {
+      "type": "platform",
+      "version": "1.0.1"
+    },
+    "Microsoft.DotNet.Cli.Utils": {
+      "target": "project"
+    },
+<<<<<<< e8b565158c0b1aa055683fc05e3f98fa2f682d53
+    "Microsoft.DotNet.ProjectModel": {
+      "target": "project"
+    },
+    "Microsoft.DotNet.Compiler.Common": {
+      "target": "project"
+    },
+    "NuGet.Frameworks": "3.6.0-rc-1984"
+=======
+>>>>>>> WiP
+  },
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": [
+        "portable-net45+win8",
+        "dnxcore50"
+      ]
+    }
+  }
+}

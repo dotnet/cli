@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Microsoft.DotNet.InternalAbstractions;
+using Microsoft.DotNet.Cli.Utils;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Cli.Utils
@@ -41,8 +41,15 @@ namespace Microsoft.DotNet.Cli.Utils
             string outputPath,
             string buildBasePath)
         {
-            var buildOutputPath =
-                projectContext.GetOutputPaths(configuration, buildBasePath, outputPath).RuntimeFiles.BasePath;
+            var projectFactory = new ProjectFactory(_environment);
+            
+            var projectContext = projectFactory.GetProject(projectDirectory, 
+                                                           framework,
+                                                           configuration,
+                                                           buildBasePath,
+                                                           outputPath); 
+
+            var buildOutputPath = projectContext.OutputPath;
 
             if (! Directory.Exists(buildOutputPath))
             {

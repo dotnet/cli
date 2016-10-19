@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.DotNet.Cli.Utils;
-using Microsoft.DotNet.InternalAbstractions;
-using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.Tools.Common;
 using NuGet.Frameworks;
 using NuGet.ProjectModel;
@@ -135,6 +133,8 @@ namespace Microsoft.DotNet.Cli.Utils
             Reporter.Verbose.WriteLine($"projectdependenciescommandresolver: tool library found {toolLibraries?.Count() > 0}");
 
             return toolLibraries?.FirstOrDefault();
+        }
+
         private IEnumerable<string> GetAllowedCommandExtensionsFromEnvironment(IEnvironmentProvider environment)
         {
             var allowedCommandExtensions = new List<string>();
