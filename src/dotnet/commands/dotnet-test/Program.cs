@@ -9,9 +9,9 @@ using Microsoft.DotNet.Tools.MSBuild;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace Microsoft.DotNet.Tools.Test3
+namespace Microsoft.DotNet.Tools.Test
 {
-    public class Test3Command
+    public class TestCommand
     {
         public static int Run(string[] args)
         {
@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.Tools.Test3
 
             var cmd = new CommandLineApplication(throwOnUnexpectedArg: false)
             {
-                Name = "dotnet test3",
+                Name = "dotnet test",
                 FullName = ".NET Test Driver",
                 Description = "Test Driver for the .NET Platform"
             };
