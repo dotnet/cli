@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.DotNet.ProjectJsonMigration;
 using Microsoft.DotNet.ProjectJsonMigration.Transforms;
-using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.Internal.ProjectModel;
 
 namespace Microsoft.DotNet.ProjectJsonMigration.Rules
 {
-    public class MigratePackOptionsRule : IMigrationRule
+    internal class MigratePackOptionsRule : IMigrationRule
     {
         private AddPropertyTransform<PackOptions> TagsTransform => new AddPropertyTransform<PackOptions>(
                     "PackageTags", 

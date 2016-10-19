@@ -9,7 +9,7 @@ using Microsoft.DotNet.ProjectJsonMigration;
 using System;
 using System.IO;
 using Microsoft.Build.Construction;
-using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.Internal.ProjectModel;
 using NuGet.Frameworks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
