@@ -4,16 +4,16 @@
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
 
-namespace Microsoft.DotNet.Tools.Publish3
+namespace Microsoft.DotNet.Tools.Publish
 {
-    public partial class Publish3Command
+    public partial class PublishCommand
     {
         public static int Run(string[] args)
         {
             DebugHelper.HandleDebugSwitch(ref args);
 
             CommandLineApplication app = new CommandLineApplication(throwOnUnexpectedArg: false);
-            app.Name = "dotnet publish3";
+            app.Name = "dotnet publish";
             app.FullName = ".NET Publisher";
             app.Description = "Publisher for the .NET Platform";
             app.AllowArgumentSeparator = true;
@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.Tools.Publish3
 
             app.OnExecute(() =>
             {
-                Publish3Command publish = new Publish3Command();
+                var publish = new PublishCommand();
 
                 publish.ProjectPath = projectArgument.Value;
                 publish.Framework = frameworkOption.Value();

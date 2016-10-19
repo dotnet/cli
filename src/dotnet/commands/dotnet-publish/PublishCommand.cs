@@ -6,9 +6,9 @@ using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools.MSBuild;
 using Microsoft.DotNet.Tools.Restore3;
 
-namespace Microsoft.DotNet.Tools.Publish3
+namespace Microsoft.DotNet.Tools.Publish
 {
-    public partial class Publish3Command
+    public partial class PublishCommand
     {
         public string ProjectPath { get; set; }
         public string Framework { get; set; }
@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.Tools.Publish3
 
         public List<string> ExtraMSBuildArguments { get; set; }
 
-        private Publish3Command()
+        private PublishCommand()
         {
         }
 

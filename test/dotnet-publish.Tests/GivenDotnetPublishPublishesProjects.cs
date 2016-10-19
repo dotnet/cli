@@ -9,9 +9,9 @@ using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
 
-namespace Microsoft.DotNet.Cli.Publish3.Tests
+namespace Microsoft.DotNet.Cli.Publish.Tests
 {
-    public class GivenDotnetPublish3PublishesProjects : TestBase
+    public class GivenDotnetPublishPublishesProjects : TestBase
     {
         [Fact]
         public void ItPublishesARunnablePortableApp()
