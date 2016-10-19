@@ -6,9 +6,9 @@ using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools.MSBuild;
 
-namespace Microsoft.DotNet.Tools.Pack3
+namespace Microsoft.DotNet.Tools.Pack
 {
-    public class Pack3Command
+    public class PackCommand
     {
         public static int Run(string[] args)
         {
@@ -16,8 +16,8 @@ namespace Microsoft.DotNet.Tools.Pack3
 
             CommandLineApplication cmd = new CommandLineApplication(throwOnUnexpectedArg: false)
             {
-                Name = "pack3",
-                FullName = "pack3",
+                Name = "pack",
+                FullName = "pack",
                 Description = "pack for msbuild",
                 AllowArgumentSeparator = true,
                 ArgumentSeparatorHelpText = HelpMessageStrings.MSBuildAdditionalArgsHelpText
