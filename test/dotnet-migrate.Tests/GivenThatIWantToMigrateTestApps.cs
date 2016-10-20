@@ -45,13 +45,13 @@ namespace Microsoft.DotNet.Migration.Tests
         }
 
         [Fact]
-        public void It_migrates_signed_apps(string projectName)
+        public void It_migrates_signed_apps()
         {
             var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppWithSigning", callingMethod: "i").WithLockFiles().Path;
 
             CleanBinObj(projectDirectory);
 
-            var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, projectName);
+            var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, "TestAppWithSigning");
 
             var outputsIdentical =
                 outputComparisonData.ProjectJsonBuildOutputs.SetEquals(outputComparisonData.MSBuildBuildOutputs);
