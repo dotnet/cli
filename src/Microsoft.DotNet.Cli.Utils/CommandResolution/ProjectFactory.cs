@@ -55,6 +55,7 @@ namespace Microsoft.DotNet.Cli.Utils
             catch (InvalidProjectFileException ex)
             {
                 Reporter.Verbose.WriteLine(ex.ToString().Red());
+                
                 return null;
             }
         }

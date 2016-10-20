@@ -52,12 +52,19 @@ namespace Microsoft.DotNet.Cli.Utils
         private CommandSpec ResolveFromProjectTools(CommandResolverArguments commandResolverArguments)
         {
             var projectFactory = new ProjectFactory(_environment);
+
             var project = projectFactory.GetProject(
                 commandResolverArguments.ProjectDirectory,
                 commandResolverArguments.Framework,
                 commandResolverArguments.Configuration,
                 commandResolverArguments.BuildBasePath,
                 commandResolverArguments.OutputPath);
+
+            if (project == null)
+            {
+                return null;
+            }
+            
             var tools = project.GetTools();
 
             return ResolveCommandSpecFromAllToolLibraries(

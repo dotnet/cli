@@ -55,6 +55,25 @@ namespace Microsoft.DotNet.Tests
         }
 
         [Fact]
+        public void It_returns_null_when_ProjectDirectory_does_not_contain_a_project_file()
+        {
+            var projectToolsCommandResolver = SetupProjectToolsCommandResolver();
+
+            var projectDirectory = TestAssetsManager.CreateTestDirectory();
+
+            var commandResolverArguments = new CommandResolverArguments()
+            {
+                CommandName = "command",
+                CommandArguments = new string[] { "" },
+                ProjectDirectory = projectDirectory
+            };
+
+            var result = projectToolsCommandResolver.Resolve(commandResolverArguments);
+
+            result.Should().BeNull();
+        }
+
+        [Fact]
         public void It_returns_null_when_CommandName_does_not_exist_in_ProjectTools()
         {
             var projectToolsCommandResolver = SetupProjectToolsCommandResolver();
