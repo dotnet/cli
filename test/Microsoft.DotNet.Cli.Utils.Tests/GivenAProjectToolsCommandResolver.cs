@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.Tests
             {
                 CommandName = "command",
                 CommandArguments = new string[] { "" },
-                ProjectDirectory = projectDirectory
+                ProjectDirectory = projectDirectory.Path
             };
 
             var result = projectToolsCommandResolver.Resolve(commandResolverArguments);

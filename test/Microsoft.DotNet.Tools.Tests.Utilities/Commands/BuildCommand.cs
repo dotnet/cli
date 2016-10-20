@@ -80,6 +80,13 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             return this;
         }
 
+        public BuildCommand WithProjectDirectory(DirectoryInfo projectDirectory)
+        {
+            _workingDirectory = projectDirectory;
+
+            return this;
+        }
+
         public BuildCommand WithProjectFile(FileInfo projectFile)
         {
             _projectFile = projectFile;
