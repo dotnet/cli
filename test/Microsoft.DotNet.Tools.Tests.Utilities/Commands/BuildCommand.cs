@@ -16,7 +16,11 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         private NuGetFramework _framework;
 
+        private bool _noDependencies;
+
         private DirectoryInfo _outputPath;
+
+        private DirectoryInfo _projectDirectory;
         
         private FileInfo _projectFile;
 
@@ -27,7 +31,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         public override CommandResult Execute(string args = "")
         {
-            args = $"build {GetProjectFile()} {GetOutputPath()} {GetConfiguration()} {GetFramework()} {args}";
+            args = $"build {GetNoDependencies()} {GetProjectFile()} {GetProjectDirectory()} {GetOutputPath()} {GetConfiguration()} {GetFramework()} {args}";
 
             if (_captureOutput)
             {
@@ -60,6 +64,13 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             return this;
         }
 
+        public BuildCommand WithNoDependencies()
+        {
+            _noDependencies = true;
+
+            return this;
+        }
+
         public BuildCommand WithOutputPath(DirectoryInfo outputPath)
         {
             _outputPath = outputPath;
@@ -70,6 +81,13 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         public BuildCommand WithProjectFile(FileInfo projectFile)
         {
             _projectFile = projectFile;
+
+            return this;
+        }
+
+        public BuildCommand WithProjectDirectory(DirectoryInfo projectDirectory)
+        {
+            _projectDirectory = projectDirectory;
 
             return this;
         }
@@ -94,6 +112,16 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             return _framework.ToString();
         }
 
+        private string GetNoDependencies()
+        {
+            if (!_noDependencies)
+            {
+                return null;
+            }
+
+            return "--no-dependencies";
+        }
+
         private string GetOutputPath()
         {
             if (_outputPath == null)
@@ -112,6 +140,16 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             }
 
             return $"\"{_projectFile.FullName}\"";
+        }
+
+        private string GetProjectDirectory()
+        {
+            if (_projectDirectory == null)
+            {
+                return null;
+            }
+
+            return $"\"{_projectDirectory.FullName}\"";
         }
     }
 }

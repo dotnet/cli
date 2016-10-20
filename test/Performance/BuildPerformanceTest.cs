@@ -51,10 +51,13 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         {
             foreach (var iteration in Benchmark.Iterations)
             {
-                var buildCommand = new BuildCommand(instance.TestRoot, buildProfile: false);
+                var buildCommand = new BuildCommand()
+                    .WithProjectDirectory(new DirectoryInfo(instance.TestRoot));
+
                 using (iteration.StartMeasurement())
                 {
-                    buildCommand.Execute().Should().Pass();
+                    buildCommand.Execute()
+                                .Should().Pass();
                 }
                 TouchSource(instance.TestRoot);
             }
@@ -62,28 +65,37 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
         [Benchmark]
         public void IncrementalSkipSingleProject_SingleTargetApp() => IncrementalSkipSingleProject(CreateTestInstance(SingleTargetApp));
+
         [Benchmark]
         public void IncrementalSkipSingleProject_TwoTargetApp() => IncrementalSkipSingleProject(CreateTestInstance(TwoTargetApp));
 
         public void IncrementalSkipSingleProject(TestInstance instance)
         {
-            new BuildCommand(instance.TestRoot, buildProfile: false)
-                   .Execute().Should().Pass();
+            new BuildCommand()
+                   .WithProjectDirectory(new DirectoryInfo(instance.TestRoot))
+                   .Execute()
+                   .Should().Pass();
 
             foreach (var iteration in Benchmark.Iterations)
             {
-                var buildCommand = new BuildCommand(instance.TestRoot, buildProfile: false);
+                var buildCommand = new BuildCommand()
+                                          .WithProjectDirectory(new DirectoryInfo(instance.TestRoot));
+
                 using (iteration.StartMeasurement())
                 {
-                    buildCommand.Execute().Should().Pass();
+                    buildCommand
+                        .Execute()
+                        .Should().Pass();
                 }
             }
         }
 
         [Benchmark]
         public void BuildAllInGraph_SingleTargetGraph() => BuildAllInGraph(CreateTestInstances(SingleTargetGraph));
+
         [Benchmark]
         public void BuildAllInGraph_TwoTargetGraph() => BuildAllInGraph(CreateTestInstances(TwoTargetGraph));
+
         [Benchmark]
         public void BuildAllInGraph_TwoTargetGraphLarge() => BuildAllInGraph(CreateTestInstances(TwoTargetGraphLarge));
 
@@ -93,11 +105,16 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
             foreach (var iteration in Benchmark.Iterations)
             {
-                var buildCommand = new BuildCommand(instance.TestRoot, buildProfile: false);
+                var buildCommand = new BuildCommand()
+                                          .WithProjectDirectory(new DirectoryInfo(instance.TestRoot));
+
                 using (iteration.StartMeasurement())
                 {
-                    buildCommand.Execute().Should().Pass();
+                    buildCommand
+                        .Execute()
+                        .Should().Pass();
                 }
+
                 foreach (var i in instances)
                 {
                     TouchSource(i.TestRoot);
@@ -120,15 +137,22 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         public void IncrementalSkipAllInGraph(TestInstance[] instances)
         {
             var instance = instances[0];
-            new BuildCommand(instance.TestRoot, buildProfile: false)
-                   .Execute().Should().Pass();
+
+            new BuildCommand()
+                   .WithProjectDirectory(new DirectoryInfo(instance.TestRoot))
+                   .Execute()
+                   .Should().Pass();
 
             foreach (var iteration in Benchmark.Iterations)
             {
-                var buildCommand = new BuildCommand(instance.TestRoot, buildProfile: false);
+                var buildCommand = new BuildCommand()
+                                          .WithProjectDirectory(new DirectoryInfo(instance.TestRoot));
+
                 using (iteration.StartMeasurement())
                 {
-                    buildCommand.Execute().Should().Pass();
+                    buildCommand
+                        .Execute()
+                        .Should().Pass();
                 }
             }
         }
@@ -148,16 +172,23 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         public void IncrementalRebuildWithRootChangedInGraph(TestInstance[] instances)
         {
             var instance = instances[0];
-            new BuildCommand(instance.TestRoot, buildProfile: false)
-                   .Execute().Should().Pass();
+            new BuildCommand()
+                   .WithProjectDirectory(new DirectoryInfo(instance.TestRoot))
+                   .Execute()
+                   .Should().Pass();
 
             foreach (var iteration in Benchmark.Iterations)
             {
-                var buildCommand = new BuildCommand(instance.TestRoot, buildProfile: false);
+                var buildCommand = new BuildCommand()
+                                          .WithProjectDirectory(new DirectoryInfo(instance.TestRoot));
+                                          
                 using (iteration.StartMeasurement())
                 {
-                    buildCommand.Execute().Should().Pass();
+                    buildCommand
+                        .Execute()
+                        .Should().Pass();
                 }
+
                 TouchSource(instance.TestRoot);
             }
         }
@@ -177,16 +208,24 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         public void IncrementalRebuildWithLastChangedInGraph(TestInstance[] instances)
         {
             var instance = instances[0];
-            new BuildCommand(instance.TestRoot, buildProfile: false)
-                   .Execute().Should().Pass();
+
+            new BuildCommand()
+                   .WithProjectDirectory(new DirectoryInfo(instance.TestRoot))
+                   .Execute()
+                   .Should().Pass();
 
             foreach (var iteration in Benchmark.Iterations)
             {
-                var buildCommand = new BuildCommand(instance.TestRoot, buildProfile: false);
+                var buildCommand = new BuildCommand()
+                                          .WithProjectDirectory(new DirectoryInfo(instance.TestRoot));
+
                 using (iteration.StartMeasurement())
                 {
-                    buildCommand.Execute().Should().Pass();
+                    buildCommand
+                        .Execute()
+                        .Should().Pass();
                 }
+
                 TouchSource(instances.Last().TestRoot);
             }
         }
@@ -207,24 +246,33 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         public void IncrementalSkipAllNoDependenciesInGraph(TestInstance[] instances)
         {
             var instance = instances[0];
-            new BuildCommand(instance.TestRoot, buildProfile: false)
-                   .Execute().Should().Pass();
+
+            new BuildCommand()
+                   .WithProjectDirectory(new DirectoryInfo(instance.TestRoot))
+                   .Execute()
+                   .Should().Pass();
 
             foreach (var iteration in Benchmark.Iterations)
             {
                 var commands = new List<BuildCommand>();
+
                 foreach (var i in instances.Reverse())
                 {
-                    commands.Add(new BuildCommand(i.TestRoot,
-                        framework: DefaultFramework,
-                        noDependencies: true,
-                        buildProfile: false));
+                    var buildCommand = new BuildCommand()
+                                              .WithProjectDirectory(new DirectoryInfo(instance.TestRoot))
+                                              .WithFramework(NuGet.Frameworks.FrameworkConstants.CommonFrameworks.NetCoreApp10)
+                                              .WithNoDependencies();
+
+                    commands.Add(buildCommand);
                 }
+
                 using (iteration.StartMeasurement())
                 {
                     foreach (var buildCommand in commands)
                     {
-                        buildCommand.Execute().Should().Pass();
+                        buildCommand
+                            .Execute()
+                            .Should().Pass();
                     }
                 }
             }
@@ -246,13 +294,17 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             foreach (var iteration in Benchmark.Iterations)
             {
                 var commands = new List<BuildCommand>();
+
                 foreach (var i in instances.Reverse())
                 {
-                    commands.Add(new BuildCommand(i.TestRoot,
-                        framework: DefaultFramework,
-                        noDependencies: true,
-                        buildProfile: false));
+                    var buildCommand = new BuildCommand()
+                                              .WithProjectDirectory(new DirectoryInfo(i.TestRoot))
+                                              .WithFramework(NuGet.Frameworks.FrameworkConstants.CommonFrameworks.NetCoreApp10)
+                                              .WithNoDependencies();
+                    
+                    commands.Add(buildCommand);
                 }
+
                 using (iteration.StartMeasurement())
                 {
                     foreach (var buildCommand in commands)
@@ -260,6 +312,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
                         buildCommand.Execute().Should().Pass();
                     }
                 }
+
                 foreach (var instance in instances)
                 {
                     TouchSource(instance.TestRoot);
@@ -270,10 +323,12 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
         protected void TouchSource(string project)
         {
             var sourceFile = Directory.GetFiles(project, "*.cs").FirstOrDefault();
+
             if (sourceFile == null)
             {
                 throw new InvalidOperationException($"'.cs' files not found in {project}");
             }
+
             File.SetLastWriteTime(sourceFile, DateTime.Now);
         }
 

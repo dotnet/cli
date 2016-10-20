@@ -39,7 +39,7 @@
           EnvironmentVariables=$(RunTestEnvironmentVariables);
           TestProjectName=%(TestProjects.OutputName);
           TestResultXmlDir=$(TestResultXmlDir);
-          ToolPath=$(Stage2Directory);
+          ToolPath=$(Stage0Directory);
           WorkingDirectory=%(TestProjects.ProjectDir)
         </Properties>
       </ProjectsToTest>

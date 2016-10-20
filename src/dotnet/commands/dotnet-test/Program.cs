@@ -62,7 +62,7 @@ namespace Microsoft.DotNet.Tools.Test
                 CommandOptionType.SingleValue);
 
             var configurationOption = cmd.Option(
-                "-c|--Configuration <Configuration>",
+                "-c|--configuration <configuration>",
                 @"Configuration under which to build, i.e. Debug/Release",
                 CommandOptionType.SingleValue);
 
