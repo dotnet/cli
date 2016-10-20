@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.TestFramework
                                   .Where(file =>
                                   {
                                       file = file.ToLower();
-                                      return !file.EndsWith("project.lock.json")
+                                      return !file.EndsWith("project.assets.json")
                                             && !file.Contains($"{System.IO.Path.DirectorySeparatorChar}bin{System.IO.Path.DirectorySeparatorChar}") 
                                             && !file.Contains($"{System.IO.Path.DirectorySeparatorChar}obj{System.IO.Path.DirectorySeparatorChar}");
                                   });
@@ -63,7 +63,7 @@ namespace Microsoft.DotNet.TestFramework
 
         public TestInstance WithLockFiles()
         {
-            foreach (string lockFile in Directory.GetFiles(_testAssetRoot, "project.lock.json", SearchOption.AllDirectories))
+            foreach (string lockFile in Directory.GetFiles(_testAssetRoot, "project.assets.json", SearchOption.AllDirectories))
             {
                 string destinationLockFile = lockFile.Replace(_testAssetRoot, Path);
                 Directory.CreateDirectory(System.IO.Path.GetDirectoryName(destinationLockFile));

@@ -55,7 +55,7 @@
           DependsOnTargets="Init">
     <PropertyGroup>
       <TestPackageBuildVersionSuffix>$(CommitCount)</TestPackageBuildVersionSuffix>
-      <TestOutputDir>$(BaseOutputDirectory)/tests/</TestOutputDir>
+      <TestOutputDir>$(RepoRoot)/artifacts/testpackages/</TestOutputDir>
       <TestPackagesBuildDir>$(TestOutputDir)/packagesBuild/</TestPackagesBuildDir>
       <TestPackagesDir>$(TestOutputDir)/packages/</TestPackagesDir>
       <TestArtifactsDir>$(TestOutputDir)/artifacts/</TestArtifactsDir>

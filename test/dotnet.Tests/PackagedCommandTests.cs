@@ -178,7 +178,8 @@ namespace Microsoft.DotNet.Tests
         [Fact]
         public void ToolsCanAccessDependencyContextProperly()
         {
-            var testInstance = TestAssetsManager.CreateTestInstance("DependencyContextFromTool").WithLockFiles();
+            var testInstance = TestAssetsManager.CreateTestInstance("DependencyContextFromTool")
+                                    .WithLockFiles();
 
             var appDirectory = testInstance.Path;
 
@@ -198,7 +199,9 @@ namespace Microsoft.DotNet.Tests
             var appDirectory = testInstance.Path;
 
             new BuildCommand()
-                .Execute(Path.Combine(appDirectory, "project.json"))
+                .WithWorkingDirectory(new DirectoryInfo(appDirectory))
+                .WithFramework(NuGet.Frameworks.FrameworkConstants.CommonFrameworks.NetCoreApp10)
+                .Execute()
                 .Should()
                 .Pass();
 

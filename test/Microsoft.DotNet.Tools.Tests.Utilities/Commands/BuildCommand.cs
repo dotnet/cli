@@ -19,10 +19,10 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         private bool _noDependencies;
 
         private DirectoryInfo _outputPath;
-
-        private DirectoryInfo _projectDirectory;
         
         private FileInfo _projectFile;
+
+        private DirectoryInfo _workingDirectory;
 
         public BuildCommand()
             : base("dotnet")
@@ -31,7 +31,9 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         public override CommandResult Execute(string args = "")
         {
-            args = $"build {GetNoDependencies()} {GetProjectFile()} {GetProjectDirectory()} {GetOutputPath()} {GetConfiguration()} {GetFramework()} {args}";
+            args = $"build {GetNoDependencies()} {GetProjectFile()} {GetOutputPath()} {GetConfiguration()} {GetFramework()} {args}";
+
+            base.WithWorkingDirectory(_workingDirectory.FullName);
 
             if (_captureOutput)
             {
@@ -85,9 +87,9 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             return this;
         }
 
-        public BuildCommand WithProjectDirectory(DirectoryInfo projectDirectory)
+        public BuildCommand WithWorkingDirectory(DirectoryInfo workingDirectory)
         {
-            _projectDirectory = projectDirectory;
+            _workingDirectory = workingDirectory;
 
             return this;
         }
@@ -109,7 +111,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
                 return null;
             }
 
-            return _framework.ToString();
+            return $"--framework {_framework.GetShortFolderName()}";
         }
 
         private string GetNoDependencies()
@@ -140,16 +142,6 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             }
 
             return $"\"{_projectFile.FullName}\"";
-        }
-
-        private string GetProjectDirectory()
-        {
-            if (_projectDirectory == null)
-            {
-                return null;
-            }
-
-            return $"\"{_projectDirectory.FullName}\"";
         }
     }
 }
