@@ -1,11 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
   <PropertyGroup>
     <VersionPrefix>1.0.0-preview3</VersionPrefix>
     <TargetFrameworks>netstandard1.5;net46</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
-    <KeyOriginatorFile>../../tools/Key.snk</KeyOriginatorFile>
+    <AssemblyOriginatorKeyFile Condition=" '$(OS)' == 'Windows_NT' ">../../tools/Key.snk</AssemblyOriginatorKeyFile>
+    <KeyOriginatorFile Condition=" '$(OS)' != 'Windows_NT' ">../../tools/Key.snk</KeyOriginatorFile>
     <SignAssembly Condition=" '$(OS)' == 'Windows_NT' ">true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.5' ">$(PackageTargetFallback);portable-net45+wp80+win8+wpa81+dnxcore50</PackageTargetFallback>
@@ -27,10 +27,10 @@
       <Version>3.6.0-rc-1984</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Build">
-      <Version>15.1.316-preview5</Version>
+      <Version>15.1.319-preview5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Build.Utilities.Core">
-      <Version>15.1.316-preview5</Version>
+      <Version>15.1.319-preview5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Sdk">
       <Version>1.0.0-alpha-20161019-1</Version>

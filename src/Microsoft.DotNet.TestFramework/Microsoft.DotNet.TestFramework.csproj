@@ -4,7 +4,8 @@
     <Description>Microsoft.DotNet.TestFramework Class Library</Description>
     <VersionPrefix>1.0.0-preview3</VersionPrefix>
     <TargetFrameworks>netstandard1.5;net46</TargetFrameworks>
-    <KeyOriginatorFile>../../tools/Key.snk</KeyOriginatorFile>
+    <AssemblyOriginatorKeyFile Condition=" '$(OS)' == 'Windows_NT' ">../../tools/Key.snk</AssemblyOriginatorKeyFile>
+    <KeyOriginatorFile Condition=" '$(OS)' != 'Windows_NT' ">../../tools/Key.snk</KeyOriginatorFile>
     <SignAssembly Condition=" '$(OS)' == 'Windows_NT' ">true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageTags />

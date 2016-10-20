@@ -4,7 +4,8 @@
     <Description>Abstraction to interact with the file system and file paths.</Description>
     <VersionPrefix>1.0.0-preview3</VersionPrefix>
     <TargetFramework>netstandard1.5</TargetFramework>
-    <KeyOriginatorFile>../../tools/Key.snk</KeyOriginatorFile>
+    <AssemblyOriginatorKeyFile Condition=" '$(OS)' == 'Windows_NT' ">../../tools/Key.snk</AssemblyOriginatorKeyFile>
+    <KeyOriginatorFile Condition=" '$(OS)' != 'Windows_NT' ">../../tools/Key.snk</KeyOriginatorFile>
     <SignAssembly Condition=" '$(OS)' == 'Windows_NT' ">true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.5' ">$(PackageTargetFallback);portable-net45+wp80+win8+wpa81+dnxcore50</PackageTargetFallback>

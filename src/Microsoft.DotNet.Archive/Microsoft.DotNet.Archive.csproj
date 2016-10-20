@@ -4,7 +4,8 @@
     <Description>Archive and compression types.</Description>
     <VersionPrefix>1.0.0-preview3</VersionPrefix>
     <TargetFramework>netstandard1.3</TargetFramework>
-    <KeyOriginatorFile>../../tools/Key.snk</KeyOriginatorFile>
+    <AssemblyOriginatorKeyFile Condition=" '$(OS)' == 'Windows_NT' ">../../tools/Key.snk</AssemblyOriginatorKeyFile>
+    <KeyOriginatorFile Condition=" '$(OS)' != 'Windows_NT' ">../../tools/Key.snk</KeyOriginatorFile>
     <SignAssembly Condition=" '$(OS)' == 'Windows_NT' ">true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
   </PropertyGroup>
