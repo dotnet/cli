@@ -47,8 +47,6 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Transforms
             {
                 // Don't duplicate items or includes
                 item = MergeWithExistingItemsWithSameCondition(item, destinationItemGroup);
-
-                // Item will be null when it's entire set of includes has been merged.
                 if (item == null)
                 {
                     MigrationTrace.Instance.WriteLine($"{nameof(ItemTransformApplicator)}: Item completely merged");
@@ -57,11 +55,16 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Transforms
 
                 // Handle duplicate includes between different conditioned items
                 item = MergeWithExistingItemsWithNoCondition(item, destinationItemGroup);
-
-                // Item will be null when it is equivalent to a conditionless item
                 if (item == null)
                 {
-                    MigrationTrace.Instance.WriteLine($"{nameof(ItemTransformApplicator)}: Item c");
+                    MigrationTrace.Instance.WriteLine($"{nameof(ItemTransformApplicator)}: Item completely merged");
+                    return;
+                }
+
+                item = MergeWithExistingItemsWithACondition(item, destinationItemGroup);
+                if (item == null)
+                {
+                    MigrationTrace.Instance.WriteLine($"{nameof(ItemTransformApplicator)}: Item completely merged");
                     return;
                 }
             }
@@ -87,6 +90,73 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Transforms
 
             itemGroup.AppendChild(outputItem);
             outputItem.AddMetadata(item.Metadata);
+        }
+
+        private ProjectItemElement MergeWithExistingItemsWithACondition(ProjectItemElement item, ProjectItemGroupElement destinationItemGroup)
+        {
+            // This logic only applies to conditionless items
+            if (item.ConditionChain().Any() || destinationItemGroup.ConditionChain().Any())
+            {
+                return item;
+            }
+
+            var existingItemsWithACondition =
+                    FindExistingItemsWithACondition(item, destinationItemGroup.ContainingProject, destinationItemGroup);
+
+            MigrationTrace.Instance.WriteLine($"{nameof(ItemTransformApplicator)}: Merging Item with {existingItemsWithACondition.Count()} existing items with a different condition chain.");
+
+            foreach (var existingItem in existingItemsWithACondition)
+            {
+                // If this item is encompassing items in a condition, remove the encompassed includes from the existing item
+                var encompassedIncludes = item.GetEncompassedIncludes(existingItem);
+                if (encompassedIncludes.Any())
+                {
+                    MigrationTrace.Instance.WriteLine($"{nameof(ItemTransformApplicator)}: encompassed includes {string.Join(", ", encompassedIncludes)}");
+                    existingItem.RemoveIncludes(encompassedIncludes);
+                }
+
+                // continue if the existing item is now empty
+                if (!existingItem.Includes().Any())
+                {
+                    MigrationTrace.Instance.WriteLine($"{nameof(ItemTransformApplicator)}: Removing Item {{ ItemType: {existingItem.ItemType}, Condition: {existingItem.Condition}, Include: {existingItem.Include}, Exclude: {existingItem.Exclude} }}");
+                    existingItem.Parent.RemoveChild(existingItem);
+                    continue;
+                }
+
+                // If we haven't continued, the existing item may have includes 
+                // that need to be removed before being redefined, to avoid duplicate includes
+                // Create or merge with existing remove
+                var remainingIntersectedIncludes = existingItem.IntersectIncludes(item);
+
+                if (remainingIntersectedIncludes.Any())
+                {
+                    var existingRemoveItem = destinationItemGroup.Items
+                        .Where(i =>
+                            string.IsNullOrEmpty(i.Include)
+                            && string.IsNullOrEmpty(i.Exclude)
+                            && !string.IsNullOrEmpty(i.Remove))
+                        .FirstOrDefault();
+
+                    if (existingRemoveItem != null)
+                    {
+                        var removes = new HashSet<string>(existingRemoveItem.Remove.Split(';'));
+                        foreach (var include in remainingIntersectedIncludes)
+                        {
+                            removes.Add(include);
+                        }
+                        existingRemoveItem.Remove = string.Join(";", removes);
+                    }
+                    else
+                    {
+                        var clearPreviousItem = _projectElementGenerator.CreateItemElement(item.ItemType);
+                        clearPreviousItem.Remove = string.Join(";", remainingIntersectedIncludes);
+
+                        AddItemToItemGroup(clearPreviousItem, existingItem.Parent as ProjectItemGroupElement);
+                    }
+                }
+            }
+
+            return item;
         }
 
         private ProjectItemElement MergeWithExistingItemsWithNoCondition(ProjectItemElement item, ProjectItemGroupElement destinationItemGroup)
@@ -122,8 +192,6 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Transforms
 
             // If we haven't returned, and there are existing items with a separate condition, we need to 
             // overwrite with those items inside the destinationItemGroup by using a Remove
-            // Unless this is a conditionless item, in which case this the conditioned items should be doing the
-            // overwriting.
             if (existingItemsWithNoCondition.Any())
             {
                 // Merge with the first remove if possible
@@ -240,6 +308,17 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Transforms
         {
             return project.Items
                 .Where(i => !i.ConditionChain().Any())
+                .Where(i => i.ItemType == item.ItemType)
+                .Where(i => i.IntersectIncludes(item).Any());
+        }
+
+        private IEnumerable<ProjectItemElement> FindExistingItemsWithACondition(
+            ProjectItemElement item,
+            ProjectRootElement project,
+            ProjectElementContainer destinationContainer)
+        {
+            return project.Items
+                .Where(i => i.ConditionChain().Any())
                 .Where(i => i.ItemType == item.ItemType)
                 .Where(i => i.IntersectIncludes(item).Any());
         }
