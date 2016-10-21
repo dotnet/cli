@@ -98,22 +98,24 @@ namespace Microsoft.DotNet.Tests
             var testInstance = TestAssetsManager
                 .CreateTestInstance("AppWithDirectDepWithOutputName")
                 .WithBuildArtifacts()
+                .WithNuGetMSBuildFiles()
                 .WithLockFiles();
 
             var appDirectory = testInstance.Path;
+            
             const string framework = ".NETCoreApp,Version=v1.0";
 
             new BuildCommand()
-                .Execute(Path.Combine(appDirectory, "project.json"))
+                .WithProjectDirectory(new DirectoryInfo(appDirectory))
+                .Execute()
                 .Should()
                 .Pass();
 
-            CommandResult result = new DependencyToolInvokerCommand { WorkingDirectory = appDirectory }
-                    .ExecuteWithCapturedOutput("tool-with-output-name", framework, string.Empty);
-
-            result.Should().HaveStdOutContaining("Tool with output name!");
-            result.Should().NotHaveStdErr();
-            result.Should().Pass();
+            new DependencyToolInvokerCommand { WorkingDirectory = appDirectory }
+                .ExecuteWithCapturedOutput("tool-with-output-name", framework, string.Empty)
+                .Should().HaveStdOutContaining("Tool with output name!")
+                    .And.NotHaveStdErr()
+                    .And.Pass();
         }
 
         // need conditional theories so we can skip on non-Windows
