@@ -53,21 +53,21 @@ namespace Microsoft.DotNet.Tests
         {
             var testInstance = TestAssetsManager
                 .CreateTestInstance(appName, identifier: appName)
+                .WithNuGetMSBuildFiles()
                 .WithLockFiles();
 
             var appDirectory = testInstance.Path;
 
             new BuildCommand()
-                .Execute(Path.Combine(appDirectory, "project.json"))
-                .Should()
-                .Pass();
+                .WithProjectDirectory(new DirectoryInfo(Path.Combine(appDirectory)))
+                .Execute()
+                .Should().Pass();
 
-            CommandResult result = new PortableCommand { WorkingDirectory = appDirectory }
-                .ExecuteWithCapturedOutput();
-
-            result.Should().HaveStdOutContaining("Hello Portable World!" + Environment.NewLine);
-            result.Should().NotHaveStdErr();
-            result.Should().Pass();
+            new PortableCommand { WorkingDirectory = appDirectory }
+                .ExecuteWithCapturedOutput()
+                .Should().HaveStdOutContaining("Hello Portable World!" + Environment.NewLine)
+                     .And.NotHaveStdErr()
+                     .And.Pass();
         }
 
         [Fact]
