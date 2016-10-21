@@ -33,8 +33,11 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         {
             args = $"build {GetNoDependencies()} {GetProjectFile()} {GetOutputPath()} {GetConfiguration()} {GetFramework()} {args}";
 
-            base.WithWorkingDirectory(_workingDirectory.FullName);
-
+            if (_workingDirectory != null)
+            {
+                base.WithWorkingDirectory(_workingDirectory.FullName);
+            }
+            
             if (_captureOutput)
             {
                 return base.ExecuteWithCapturedOutput(args);

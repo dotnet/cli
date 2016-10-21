@@ -15,47 +15,32 @@ using Xunit;
 
 namespace Microsoft.DotNet.Cli.Utils.Tests
 {
-    public class GivenAProjectDependencyCommandResolverBeingUsedWithMSBuild : TestBase
+    public class GivenAProjectDependencyCommandResolver : TestBase
     {
         private TestInstance MSBuildTestProjectInstance;
-        private RepoDirectoriesProvider _repoDirectoriesProvider;
-        private string _configuration;
 
-        public GivenAProjectDependencyCommandResolverBeingUsedWithMSBuild()
+        public GivenAProjectDependencyCommandResolver()
         {
-            MSBuildTestProjectInstance =
-                TestAssetsManager.CreateTestInstance("MSBuildTestAppWithToolInDependencies");
-            _repoDirectoriesProvider = new RepoDirectoriesProvider();
-            _configuration = "Debug";
-
-            new RestoreCommand()
-                .WithWorkingDirectory(MSBuildTestProjectInstance.Path)
-                .Execute($"-s {_repoDirectoriesProvider.TestPackages}")
-                .Should()
-                .Pass();
-
-            new BuildCommand()
-                .WithWorkingDirectory(MSBuildTestProjectInstance.Path)
-                .Execute($"-c {_configuration}")
-                .Should()
-                .Pass();            
-
             Environment.SetEnvironmentVariable(
                 Constants.MSBUILD_EXE_PATH,
-                Path.Combine(_repoDirectoriesProvider.Stage2Sdk, "MSBuild.dll"));
+                Path.Combine(new RepoDirectoriesProvider().Stage2Sdk, "MSBuild.dll"));
         }
 
         [Fact]
         public void ItReturnsACommandSpecWithDotnetAsFileNameAndCommandNameInArgsWhenCommandNameExistsInMSBuildProjectDependencies()
         {
+            MSBuildTestProjectInstance =
+                TestAssetsManager.CreateTestInstance("MSBuildTestAppWithToolInDependencies")
+                    .WithBuildArtifacts()
+                    .WithNuGetMSBuildFiles()
+                    .WithLockFiles();
+
             var projectDependenciesCommandResolver = SetupProjectDependenciesCommandResolver();
 
             var commandResolverArguments = new CommandResolverArguments()
             {
                 CommandName = "dotnet-portable",
-                CommandArguments = null,
                 ProjectDirectory = MSBuildTestProjectInstance.Path,
-                Configuration = _configuration,
                 Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10
             };
 
@@ -73,6 +58,11 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         [Fact]
         public void ItPassesDepsfileArgToHostWhenReturningACommandSpecForMSBuildProject()
         {
+            MSBuildTestProjectInstance =
+                TestAssetsManager.CreateTestInstance("MSBuildTestAppWithToolInDependencies")
+                    .WithNuGetMSBuildFiles()
+                    .WithLockFiles();
+
             var projectDependenciesCommandResolver = SetupProjectDependenciesCommandResolver();
 
             var commandResolverArguments = new CommandResolverArguments()
@@ -80,7 +70,6 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 CommandName = "dotnet-portable",
                 CommandArguments = null,
                 ProjectDirectory = MSBuildTestProjectInstance.Path,
-                Configuration = _configuration,
                 Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10
             };
 
@@ -93,6 +82,11 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         [Fact]
         public void ItReturnsNullWhenCommandNameDoesNotExistInProjectDependenciesForMSBuildProject()
         {
+            MSBuildTestProjectInstance =
+                TestAssetsManager.CreateTestInstance("MSBuildTestAppWithToolInDependencies")
+                    .WithNuGetMSBuildFiles()
+                    .WithLockFiles();
+
             var projectDependenciesCommandResolver = SetupProjectDependenciesCommandResolver();
 
             var commandResolverArguments = new CommandResolverArguments()
@@ -100,7 +94,6 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 CommandName = "nonexistent-command",
                 CommandArguments = null,
                 ProjectDirectory = MSBuildTestProjectInstance.Path,
-                Configuration = _configuration,
                 Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10
             };
 
@@ -112,6 +105,11 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         [Fact]
         public void ItSetsDepsfileToOutputInCommandspecForMSBuild()
         {
+            MSBuildTestProjectInstance =
+                TestAssetsManager.CreateTestInstance("MSBuildTestAppWithToolInDependencies")
+                    .WithNuGetMSBuildFiles()
+                    .WithLockFiles();
+
             var projectDependenciesCommandResolver = SetupProjectDependenciesCommandResolver();
 
             var testInstance = TestAssetsManager.CreateTestInstance("MSBuildTestAppWithToolInDependencies");
@@ -123,20 +121,13 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 CommandName = "dotnet-portable",
                 CommandArguments = null,
                 ProjectDirectory = testInstance.Path,
-                Configuration = _configuration,
                 Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10,
                 OutputPath = outputDir
             };
 
-            new RestoreCommand()
-                .WithWorkingDirectory(testInstance.Path)
-                .Execute($"-s {_repoDirectoriesProvider.TestPackages}")
-                .Should()
-                .Pass();
-
             new BuildCommand()
                 .WithWorkingDirectory(testInstance.Path)
-                .Execute($"-c {_configuration} -o {outputDir}")
+                .Execute($"-o {outputDir}")
                 .Should()
                 .Pass();
 
@@ -152,6 +143,10 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             IEnvironmentProvider environment = null,
             IPackagedCommandSpecFactory packagedCommandSpecFactory = null)
         {
+            Environment.SetEnvironmentVariable(
+                Constants.MSBUILD_EXE_PATH,
+                Path.Combine(new RepoDirectoriesProvider().Stage2Sdk, "MSBuild.dll"));
+
             environment = environment ?? new EnvironmentProvider();
             packagedCommandSpecFactory = packagedCommandSpecFactory ?? new PackagedCommandSpecFactory();
 

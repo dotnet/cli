@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
@@ -126,6 +127,7 @@ namespace Microsoft.DotNet.Tests
             var projectToolsCommandResolver = SetupProjectToolsCommandResolver();
 
             var testInstance = TestAssetsManager.CreateTestInstance(TestProjectName)
+                .WithNuGetMSBuildFiles()
                 .WithLockFiles();
 
             var commandResolverArguments = new CommandResolverArguments()
@@ -137,7 +139,7 @@ namespace Microsoft.DotNet.Tests
 
             var result = projectToolsCommandResolver.Resolve(commandResolverArguments);
 
-            result.Should().NotBeNull();
+            result.Should().NotBeNull("Because the command is a project tool dependency");
             result.Args.Should().Contain("\"arg with space\"");
         }
 
@@ -147,6 +149,7 @@ namespace Microsoft.DotNet.Tests
             var projectToolsCommandResolver = SetupProjectToolsCommandResolver();
 
             var testInstance = TestAssetsManager.CreateTestInstance(TestProjectName)
+                .WithNuGetMSBuildFiles() 
                 .WithLockFiles();
 
             var commandResolverArguments = new CommandResolverArguments()
@@ -171,6 +174,7 @@ namespace Microsoft.DotNet.Tests
 
             var testInstance = TestAssetsManager
                 .CreateTestInstance(TestProjectName)
+                .WithNuGetMSBuildFiles() 
                 .WithLockFiles();
 
             var commandResolverArguments = new CommandResolverArguments()
@@ -203,14 +207,11 @@ namespace Microsoft.DotNet.Tests
             }
 
             var result = projectToolsCommandResolver.Resolve(commandResolverArguments);
+            
             result.Should().NotBeNull();
 
-
-            depsJsonFile = Directory
-                .EnumerateFiles(directory)
-                .FirstOrDefault(p => Path.GetFileName(p).EndsWith(FileNameSuffixes.DepsJson));
-
-            depsJsonFile.Should().NotBeNull();
+            new DirectoryInfo(directory)
+                .Should().HaveFilesMatching("*.deps.json", SearchOption.TopDirectoryOnly);
         }
 
         [Fact]
@@ -255,6 +256,10 @@ namespace Microsoft.DotNet.Tests
         private ProjectToolsCommandResolver SetupProjectToolsCommandResolver(
             IPackagedCommandSpecFactory packagedCommandSpecFactory = null)
         {
+            Environment.SetEnvironmentVariable(
+                Constants.MSBUILD_EXE_PATH,
+                Path.Combine(new RepoDirectoriesProvider().Stage2Sdk, "MSBuild.dll"));
+
             packagedCommandSpecFactory = packagedCommandSpecFactory ?? new PackagedCommandSpecFactory();
 
             var projectToolsCommandResolver = new ProjectToolsCommandResolver(packagedCommandSpecFactory, new EnvironmentProvider());

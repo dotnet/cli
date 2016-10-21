@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.IO;
 using FluentAssertions;
 using Microsoft.DotNet.ProjectModel;
@@ -146,21 +147,25 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         [Fact]
         public void It_resolves_tools_whose_package_name_is_different_than_dll_name()
         {
+            Environment.SetEnvironmentVariable(
+                Constants.MSBUILD_EXE_PATH,
+                Path.Combine(new RepoDirectoriesProvider().Stage2Sdk, "MSBuild.dll"));
+
             var configuration = "Debug";
 
             var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "TestProjects"));
+
             var testInstance = testAssetManager
                 .CreateTestInstance("AppWithDirectDepWithOutputName")
+                .WithNuGetMSBuildFiles() 
                 .WithLockFiles();
 
             var buildCommand = new BuildCommand()
-                .WithProjectFile(new FileInfo(Path.Combine(testInstance.TestRoot, "project.json")))
+                .WithProjectDirectory(new DirectoryInfo(testInstance.TestRoot))
                 .WithConfiguration(configuration)
                 .WithCapturedOutput()
                 .Execute()
                 .Should().Pass();
-
-            var context = ProjectContext.Create(testInstance.TestRoot, FrameworkConstants.CommonFrameworks.NetCoreApp10);
 
             var factory = new ProjectDependenciesCommandFactory(
                 FrameworkConstants.CommonFrameworks.NetCoreApp10,
