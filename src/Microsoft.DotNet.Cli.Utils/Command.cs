@@ -14,7 +14,9 @@ namespace Microsoft.DotNet.Cli.Utils
     public class Command : ICommand
     {
         private readonly Process _process;
+
         private StreamForwarder _stdOut;
+        
         private StreamForwarder _stdErr;
 
         private bool _running = false;
@@ -119,12 +121,14 @@ namespace Microsoft.DotNet.Cli.Utils
             Reporter.Verbose.WriteLine($"Running {_process.StartInfo.FileName} {_process.StartInfo.Arguments}");
 
             ThrowIfRunning();
+
             _running = true;
 
             _process.EnableRaisingEvents = true;
 
 #if DEBUG
             var sw = Stopwatch.StartNew();
+            
             Reporter.Verbose.WriteLine($"> {FormatProcessInfo(_process.StartInfo)}".White());
 #endif
             using (PerfTrace.Current.CaptureTiming($"{Path.GetFileNameWithoutExtension(_process.StartInfo.FileName)} {_process.StartInfo.Arguments}"))

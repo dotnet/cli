@@ -61,6 +61,19 @@ namespace Microsoft.DotNet.TestFramework
             }
         }
 
+        public TestInstance WithNuGetMSBuildFiles()
+        {
+            foreach (string file in Directory.GetFiles(_testAssetRoot, "*.nuget.g.*", SearchOption.AllDirectories))
+            {
+                string destinationLockFile = file.Replace(_testAssetRoot, Path);
+                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(destinationLockFile));
+
+                File.Copy(file, destinationLockFile, true);
+            }
+
+            return this;
+        }
+
         public TestInstance WithLockFiles()
         {
             foreach (string lockFile in Directory.GetFiles(_testAssetRoot, "project.assets.json", SearchOption.AllDirectories))

@@ -194,6 +194,7 @@ namespace Microsoft.DotNet.Tests
         {
             var testInstance = TestAssetsManager
                 .CreateTestInstance("AppWithDirectDep")
+                .WithNuGetMSBuildFiles()
                 .WithLockFiles();
 
             var appDirectory = testInstance.Path;
