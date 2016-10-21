@@ -31,8 +31,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                     compilerOptions => !string.IsNullOrEmpty(compilerOptions.KeyFile)),
                 new AddPropertyTransform<CommonCompilerOptions>("SignAssembly",
                     "true",
-                    compilerOptions => !string.IsNullOrEmpty(compilerOptions.KeyFile))
-                    .WithMSBuildCondition(" '$(OS)' == 'Windows_NT' "),
+                    compilerOptions => !string.IsNullOrEmpty(compilerOptions.KeyFile)),
                 new AddPropertyTransform<CommonCompilerOptions>("PublicSign", 
                     "true",
                     compilerOptions => !string.IsNullOrEmpty(compilerOptions.KeyFile) && (compilerOptions.PublicSign == null))
