@@ -75,7 +75,7 @@
       <ItemGroup>
         <BinObj Remove="*" />
         <BinObj Include="$(SrcDirectory)/**/bin/**/*" />
-        <BinObj Include="$(SrcDirectory)/**/obj/**/*" />
+        <BinObj Include="$(SrcDirectory)/**/obj/**/*" Exclude="$(SrcDirectory)/**/obj/project.assets.json;$(SrcDirectory)/**/obj/*.csproj.nuget.g.props;$(SrcDirectory)/**/obj/*.csproj.nuget.g.targets;" />
 
         <SharedFramework Remove="*" />
         <SharedFramework Include="$(SharedFrameworkPublishDirectory)/**/*" />
