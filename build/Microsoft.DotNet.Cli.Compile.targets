@@ -29,7 +29,7 @@
 
     <ItemGroup>
       <CompileStageInputs Include="$(SrcDirectory)/**/*.cs" Exclude="$(SrcDirectory)/**/obj/**/*.cs" />
-      <CompileStageInputs Include="$(SrcDirectory)/**/project.json;$(SrcDirectory)/**/project.lock.json" />
+      <CompileStageInputs Include="$(SrcDirectory)/**/project.assets.json;" />
 
       <Stage Include="Stage1">
         <Inputs>@(CompileStageInputs)</Inputs>
@@ -96,12 +96,11 @@
             DestinationFiles="@(SharedFramework->'$(StageDirectory)/%(RecursiveDir)%(Filename)%(Extension)')" />
 
       <!-- Publish DotNet -->
-      <DotNetPublish ToolPath="%(Stage.DotnetDir)"
-                     NativeSubdirectory="True"
+      <DotNetPublish3 ToolPath="%(Stage.DotnetDir)"
                      Output="$(SdkOutputDirectory)"
                      Configuration="$(Configuration)"
                      VersionSuffix="$(CommitCount)"
-                     ProjectPath="$(SrcDirectory)/redist" />
+                     ProjectPath="$(SrcDirectory)/redist/redist.csproj" />
 
       <!-- Corehostify Binaries -->
       <ItemGroup Condition=" '$(OSName)' != 'win' ">

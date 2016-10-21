@@ -25,7 +25,7 @@
 
       <Message Text="Publishing Archiver" />
 
-      <DotNetPublish ToolPath="$(Stage2Directory)"
+      <DotNetPublish3 ToolPath="$(Stage2Directory)"
                      WorkingDirectory="$(RepoRoot)/tools/Archiver"
                      Output="$(ToolsOutputDirectory)"
                      Configuration="$(Configuration)" />

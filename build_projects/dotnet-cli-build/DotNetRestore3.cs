@@ -12,8 +12,10 @@ namespace Microsoft.DotNet.Cli.Build
 
         protected override string Args
         {
-            get { return $"{GetSource()} {GetPackages()} {GetSkipInvalidConfigurations()}"; }
+            get { return $"{Root} {GetSource()} {GetPackages()} {GetSkipInvalidConfigurations()}"; }
         }
+
+        public string Root { get; set; }
 
         public string Source { get; set; }
 
