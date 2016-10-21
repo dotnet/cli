@@ -75,21 +75,21 @@ namespace Microsoft.DotNet.Tests
         {
             var testInstance = TestAssetsManager
                 .CreateTestInstance("AppWithDepOnToolWithOutputName")
+                .WithNuGetMSBuildFiles()
                 .WithLockFiles();
 
             var appDirectory = testInstance.Path;
 
             new BuildCommand()
-                .Execute(Path.Combine(appDirectory, "project.json"))
-                .Should()
-                .Pass();
+                .WithProjectDirectory(new DirectoryInfo(appDirectory))
+                .Execute()
+                .Should().Pass();
 
-            CommandResult result = new GenericCommand("tool-with-output-name") { WorkingDirectory = appDirectory }
-                .ExecuteWithCapturedOutput();
-
-            result.Should().HaveStdOutContaining("Tool with output name!");
-            result.Should().NotHaveStdErr();
-            result.Should().Pass();
+            var result = new GenericCommand("tool-with-output-name") { WorkingDirectory = appDirectory }
+                .ExecuteWithCapturedOutput()
+                .Should().HaveStdOutContaining("Tool with output name!")
+                     .And.NotHaveStdErr()
+                     .And.Pass();
         }
 
         [Fact]
