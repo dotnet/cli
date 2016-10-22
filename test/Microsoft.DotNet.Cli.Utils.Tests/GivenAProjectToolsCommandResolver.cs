@@ -79,7 +79,9 @@ namespace Microsoft.DotNet.Tests
         {
             var projectToolsCommandResolver = SetupProjectToolsCommandResolver();
 
-            var testInstance = TestAssetsManager.CreateTestInstance(TestProjectName)
+            var testInstance = TestAssetsManager
+                .CreateTestInstance(TestProjectName)
+                .WithNuGetMSBuildFiles()
                 .WithLockFiles();
 
             var commandResolverArguments = new CommandResolverArguments()
@@ -101,6 +103,7 @@ namespace Microsoft.DotNet.Tests
 
             var testInstance = TestAssetsManager
                 .CreateTestInstance(TestProjectName)
+                .WithNuGetMSBuildFiles()
                 .WithLockFiles();
 
             var commandResolverArguments = new CommandResolverArguments()
@@ -207,7 +210,7 @@ namespace Microsoft.DotNet.Tests
             }
 
             var result = projectToolsCommandResolver.Resolve(commandResolverArguments);
-            
+
             result.Should().NotBeNull();
 
             new DirectoryInfo(directory)

@@ -41,6 +41,8 @@ namespace Microsoft.DotNet.Cli.Utils
                 || commandResolverArguments.Configuration == null
                 || commandResolverArguments.CommandName == null)
             {
+                Reporter.Verbose.WriteLine($"projectdependenciescommandresolver: invalid commandResolverArguments");
+
                 return null;
             }
 

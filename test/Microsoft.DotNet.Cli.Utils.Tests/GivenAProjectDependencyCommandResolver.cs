@@ -40,6 +40,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var commandResolverArguments = new CommandResolverArguments()
             {
                 CommandName = "dotnet-portable",
+                Configuration = "Debug",
                 ProjectDirectory = MSBuildTestProjectInstance.Path,
                 Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10
             };
@@ -60,6 +61,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         {
             MSBuildTestProjectInstance =
                 TestAssetsManager.CreateTestInstance("MSBuildTestAppWithToolInDependencies")
+                    .WithBuildArtifacts()
                     .WithNuGetMSBuildFiles()
                     .WithLockFiles();
 
@@ -68,7 +70,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var commandResolverArguments = new CommandResolverArguments()
             {
                 CommandName = "dotnet-portable",
-                CommandArguments = null,
+                Configuration = "Debug",
                 ProjectDirectory = MSBuildTestProjectInstance.Path,
                 Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10
             };
@@ -76,6 +78,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var result = projectDependenciesCommandResolver.Resolve(commandResolverArguments);
 
             result.Should().NotBeNull();
+
             result.Args.Should().Contain("--depsfile");
         }
 
@@ -105,21 +108,19 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         [Fact]
         public void ItSetsDepsfileToOutputInCommandspecForMSBuild()
         {
-            MSBuildTestProjectInstance =
-                TestAssetsManager.CreateTestInstance("MSBuildTestAppWithToolInDependencies")
+            var testInstance = TestAssetsManager
+                    .CreateTestInstance("MSBuildTestAppWithToolInDependencies")
                     .WithNuGetMSBuildFiles()
                     .WithLockFiles();
 
             var projectDependenciesCommandResolver = SetupProjectDependenciesCommandResolver();
-
-            var testInstance = TestAssetsManager.CreateTestInstance("MSBuildTestAppWithToolInDependencies");
 
             var outputDir = Path.Combine(testInstance.Path, "out");
 
             var commandResolverArguments = new CommandResolverArguments()
             {
                 CommandName = "dotnet-portable",
-                CommandArguments = null,
+                Configuration = "Debug",
                 ProjectDirectory = testInstance.Path,
                 Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10,
                 OutputPath = outputDir
