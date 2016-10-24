@@ -10,6 +10,7 @@ using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Configurer;
 using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.DotNet.Tools.Build;
+using Microsoft.DotNet.Tools.Clean;
 using Microsoft.DotNet.Tools.Help;
 using Microsoft.DotNet.Tools.Migrate;
 using Microsoft.DotNet.Tools.MSBuild;
@@ -31,7 +32,10 @@ namespace Microsoft.DotNet.Cli
         private static Dictionary<string, Func<string[], int>> s_builtIns = new Dictionary<string, Func<string[], int>>
         {
             ["build"] = BuildCommand.Run,
+            ["clean"] = CleanCommand.Run,
             ["help"] = HelpCommand.Run,
+            ["migrate"] = MigrateCommand.Run,
+            ["msbuild"] = MSBuildCommand.Run,
             ["new"] = NewCommand.Run,
             ["nuget"] = NuGetCommand.Run,
             ["pack"] = PackCommand.Run,
@@ -40,10 +44,7 @@ namespace Microsoft.DotNet.Cli
             ["restore-projectjson"] = RestoreProjectJsonCommand.Run,
             ["run"] = RunCommand.Run,
             ["test"] = TestCommand.Run,
-            ["msbuild"] = MSBuildCommand.Run,
-            ["run"] = RunCommand.Run,
             ["vstest"] = VSTestCommand.Run,
-            ["migrate"] = MigrateCommand.Run,
         };
 
         public static int Main(string[] args)

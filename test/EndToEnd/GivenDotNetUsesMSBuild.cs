@@ -24,29 +24,24 @@ namespace Microsoft.DotNet.Tests.EndToEnd
                 new NewCommand()
                     .WithWorkingDirectory(projectDirectory)
                     .Execute("")
-                    .Should()
-                    .Pass();
+                    .Should().Pass();
 
                 new RestoreCommand()
                     .WithWorkingDirectory(projectDirectory)
                     .Execute("/p:SkipInvalidConfigurations=true")
-                    .Should()
-                    .Pass();
+                    .Should().Pass();
 
                 new BuildCommand()
                     .WithWorkingDirectory(projectDirectory)
                     .Execute()
-                    .Should()
-                    .Pass();
+                    .Should().Pass();
 
                 //TODO: https://github.com/dotnet/sdk/issues/187 - remove framework from below.
                 new RunCommand()
                     .WithWorkingDirectory(projectDirectory)
                     .ExecuteWithCapturedOutput("--framework netcoreapp1.0")
-                    .Should()
-                    .Pass()
-                    .And
-                    .HaveStdOutContaining("Hello World!");
+                    .Should().Pass()
+                         .And.HaveStdOutContaining("Hello World!");
 
                 var binDirectory = new DirectoryInfo(projectDirectory).Sub("bin");
                 binDirectory.Should().HaveFilesMatching("*.dll", SearchOption.AllDirectories);
@@ -54,8 +49,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
                 new CleanCommand()
                     .WithWorkingDirectory(projectDirectory)
                     .Execute()
-                    .Should()
-                    .Pass();
+                    .Should().Pass();
 
                 binDirectory.Should().NotHaveFilesMatching("*.dll", SearchOption.AllDirectories);
             }
@@ -91,21 +85,17 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             var repoDirectoriesProvider = new RepoDirectoriesProvider();
             var testAppName = "MSBuildTestAppWithToolInDependencies";
             var testInstance = TestAssetsManager
-                .CreateTestInstance(testAppName);
+                .CreateTestInstance(testAppName)
+                .WithNuGetMSBuildFiles()
+                .WithLockFiles();
 
             var configuration = "Debug";
 
             var testProjectDirectory = testInstance.TestRoot;
 
-            new RestoreCommand()
-                .WithWorkingDirectory(testProjectDirectory)
-                .Execute($"-s {repoDirectoriesProvider.TestPackages}")
-                .Should()
-                .Pass();
-
             new BuildCommand()
                 .WithWorkingDirectory(testProjectDirectory)
-                .Execute($"-c {configuration}")
+                .Execute($"-c {configuration} ")
                 .Should()
                 .Pass();
 
