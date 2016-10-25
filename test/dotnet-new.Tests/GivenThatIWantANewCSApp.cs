@@ -9,7 +9,7 @@ using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
 using FluentAssertions;
 
-namespace Microsoft.DotNet.Tests
+namespace Microsoft.DotNet.New.Tests
 {
     public class GivenThatIWantANewCSApp : TestBase
     {

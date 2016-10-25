@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 using Xunit;
 using FluentAssertions;
 
-namespace Microsoft.DotNet.Tests
+namespace Microsoft.DotNet.New.Tests
 {
     public class GivenThatIWantANewCSLibrary : TestBase
     {
