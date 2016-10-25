@@ -12,9 +12,9 @@ namespace Microsoft.DotNet.TestFramework
             return target.FullName.StartsWith(subject.FullName);
         }
 
-        public static DirectoryInfo GetDirectory(this DirectoryInfo subject, string directoryName)
+        public static DirectoryInfo GetDirectory(this DirectoryInfo subject, params string [] directoryNames)
         {
-            return new DirectoryInfo(Path.Combine(subject.FullName, directoryName));
+            return new DirectoryInfo(Path.Combine(subject.FullName, Path.Combine(directoryNames)));
         }
 
         public static FileInfo GetFile(this DirectoryInfo subject, string fileName)
