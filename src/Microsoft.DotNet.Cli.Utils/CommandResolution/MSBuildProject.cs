@@ -41,13 +41,13 @@ namespace Microsoft.DotNet.Cli.Utils
             }
         }
 
-        public string OutputPath
+        public string FullOutputPath
         {
             get
             {
                 return _project
                     .AllEvaluatedProperties
-                    .FirstOrDefault(p => p.Name.Equals("OutputPath"))
+                    .FirstOrDefault(p => p.Name.Equals("TargetDir"))
                     .EvaluatedValue;
             }
         }

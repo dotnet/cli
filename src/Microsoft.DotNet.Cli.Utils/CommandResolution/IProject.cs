@@ -14,11 +14,11 @@ namespace Microsoft.DotNet.Cli.Utils
 
         string DepsJsonPath { get; }
 
-        string OutputPath { get; }
-
         string ProjectRoot { get; }
 
         string RuntimeConfigJsonPath { get; }
+
+        string FullOutputPath { get; }
 
         Dictionary<string, string> EnvironmentVariables { get; }
     }

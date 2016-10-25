@@ -69,7 +69,9 @@ namespace Microsoft.DotNet.Tools.Restore
             {
                 var msbuildArgs = new List<string>()
                 {
-                     "/t:Restore"
+                     "/NoLogo", 
+                     "/t:Restore", 
+                     "/ConsoleLoggerParameters:Verbosity=Minimal" 
                 };
 
                 if (sourceOption.HasValue())

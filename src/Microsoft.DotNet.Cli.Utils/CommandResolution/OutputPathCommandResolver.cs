@@ -42,16 +42,22 @@ namespace Microsoft.DotNet.Cli.Utils
             string buildBasePath)
         {
             var projectFactory = new ProjectFactory(_environment);
-            
-            var projectContext = projectFactory.GetProject(projectDirectory, 
-                                                           framework,
-                                                           configuration,
-                                                           buildBasePath,
-                                                           outputPath); 
+			
+            var project = projectFactory.GetProject(
+                projectDirectory,
+                framework,
+                configuration,
+                buildBasePath,
+                outputPath);
 
-            var buildOutputPath = projectContext.OutputPath;
+            if (project == null)
+            {
+                return null;
+            }
 
-            if (! Directory.Exists(buildOutputPath))
+            var buildOutputPath = project.FullOutputPath;
+
+            if (!Directory.Exists(buildOutputPath))
             {
                 Reporter.Verbose.WriteLine($"outputpathresolver: {buildOutputPath} does not exist");
                 return null;
@@ -59,7 +65,7 @@ namespace Microsoft.DotNet.Cli.Utils
 
             return _environment.GetCommandPathFromRootPath(buildOutputPath, commandName);
         }
-
+        
         internal override CommandResolutionStrategy GetCommandResolutionStrategy()
         {
             return CommandResolutionStrategy.OutputPath;
