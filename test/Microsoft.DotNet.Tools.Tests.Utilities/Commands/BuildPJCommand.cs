@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         private DirectoryInfo _workingDirectory;
 
         public BuildPJCommand()
-            : base("/Users/piotrp/code/github/piotrpMSFT/cli/.dotnet_stage0/x64/dotnet")
+            : base(new RepoDirectoriesProvider().PjDotnet)
         {
         }
 
