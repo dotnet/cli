@@ -76,7 +76,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         }
 
         public PackCommand(
-            string projectPath,
+            string projectPath = "",
             string output = "",
             string buildBasePath = "",
             string tempOutput="", 

@@ -13,11 +13,56 @@ namespace Microsoft.DotNet.TestFramework
 {
     public class TestAssetInventoryFiles
     {
-        public FileInfo Source { get; private set; }
+        private FileInfo _source;
 
-        public FileInfo Restore { get; private set; }
+        private FileInfo _restore;
 
-        public FileInfo Build { get; private set; }
+        private FileInfo _build;
+
+        public FileInfo Source 
+        { 
+            get
+            {
+                _source.Refresh();
+
+                return _source;
+            } 
+            
+            private set
+            {
+                _source = value;
+            }
+        }
+
+        public FileInfo Restore 
+        { 
+            get
+            {
+                _restore.Refresh();
+
+                return _restore;
+            } 
+            
+            private set
+            {
+                _restore = value;
+            }
+        }
+
+        public FileInfo Build
+        { 
+            get
+            {
+                _build.Refresh();
+
+                return _build;
+            } 
+            
+            private set
+            {
+                _build = value;
+            }
+        }
 
         public TestAssetInventoryFiles(DirectoryInfo inventoryFileDirectory)
         {

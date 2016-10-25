@@ -74,7 +74,7 @@ namespace Microsoft.DotNet.TestFramework
                 var relativePath = file.FullName.Substring(_testAssetInfo.Root.FullName.Length + 1);
 
                 var newPath = Path.Combine(Root.FullName, relativePath);
-                
+
                 var newFile = new FileInfo(newPath);
 
                 PathUtility.EnsureDirectory(newFile.Directory.FullName);

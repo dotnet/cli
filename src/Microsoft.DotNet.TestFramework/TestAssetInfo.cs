@@ -16,6 +16,10 @@ namespace Microsoft.DotNet.TestFramework
     {
         private const string DataDirectoryName = ".tam";
 
+        private readonly string [] FilesToExclude = { ".DS_Store", ".noautobuild" };
+
+        private readonly DirectoryInfo [] _directoriesToExclude;
+
         private readonly string _assetName;
 
         private readonly DirectoryInfo _dataDirectory;
@@ -46,6 +50,11 @@ namespace Microsoft.DotNet.TestFramework
             _dataDirectory = new DirectoryInfo(Path.Combine(_root.FullName, DataDirectoryName));
 
             _inventoryFiles = new TestAssetInventoryFiles(_dataDirectory);
+
+            _directoriesToExclude = new []
+            {
+                _dataDirectory
+            };
 
             if (!_dataDirectory.Exists)
             {
@@ -116,12 +125,13 @@ namespace Microsoft.DotNet.TestFramework
         private IEnumerable<FileInfo> GetFileList()
         {
             return _root.GetFiles("*.*", SearchOption.AllDirectories)
-                        .Where(f => !f.Name.StartsWith(DataDirectoryName));
+                        .Where(f => !_directoriesToExclude.Any(d => d.Contains(f)))
+                        .Where(f => !FilesToExclude.Contains(f.Name));    
         }
 
         internal IEnumerable<FileInfo> GetSourceFiles()
         {
-            return GetInventory(_inventoryFiles.Source, () => new List<FileInfo>(), () => {});
+            return GetInventory(_inventoryFiles.Source, null, () => {});
         }
 
         internal IEnumerable<FileInfo> GetRestoreFiles()
@@ -134,16 +144,27 @@ namespace Microsoft.DotNet.TestFramework
             return GetInventory(_inventoryFiles.Build, GetRestoreFiles, DoBuild);
         }
 
-        private IEnumerable<FileInfo> GetInventory(FileInfo file, Func<IEnumerable<FileInfo>> getPreInventory, Action create)
+        private IEnumerable<FileInfo> GetInventory(FileInfo file, Func<IEnumerable<FileInfo>> beforeAction, Action action)
         {
             if (file.Exists)
             {
                 return LoadInventory(file);
             }
 
-            var preInventory = getPreInventory();
+            IEnumerable<FileInfo> preInventory;
 
-            create();
+            if (beforeAction == null)
+            {
+                preInventory = new List<FileInfo>();
+            }
+            else
+            {
+                beforeAction();
+
+                preInventory = GetFileList();
+            }
+
+            action();
 
             var inventory = GetFileList().Where(i => !preInventory.Select(p => p.FullName).Contains(i.FullName));
 
@@ -154,24 +175,31 @@ namespace Microsoft.DotNet.TestFramework
 
         private void DoRestore()
         {
-            string[] restoreArgs = new string[] { "restore" };
-
             Console.WriteLine($"TestAsset Restore '{_assetName}'");
 
-            var commandResult = Command.Create(new PathCommandResolverPolicy(), "dotnet", restoreArgs)
-                                       .WorkingDirectory(_root.FullName)
+            var projFiles = _root.GetFiles("*.csproj", SearchOption.AllDirectories);
+
+            foreach (var projFile in projFiles)
+            {
+                var restoreArgs = new string[] { "restore", projFile.FullName };
+
+                var commandResult = Command.Create(new PathCommandResolverPolicy(), "dotnet", restoreArgs)
                                        .CaptureStdOut()
                                        .CaptureStdErr()
                                        .Execute();
 
-            int exitCode = commandResult.ExitCode;
+                int exitCode = commandResult.ExitCode;
 
-            if (exitCode != 0)
-            {
-                Console.WriteLine(commandResult.StdOut);
-                Console.WriteLine(commandResult.StdErr);
-                string message = string.Format($"TestAsset Restore '{_assetName}' Failed with {exitCode}");
-                throw new Exception(message);
+                if (exitCode != 0)
+                {
+                    Console.WriteLine(commandResult.StdOut);
+
+                    Console.WriteLine(commandResult.StdErr);
+
+                    string message = string.Format($"TestAsset Restore '{_assetName}'@'{projFile.FullName}' Failed with {exitCode}");
+
+                    throw new Exception(message);
+                }
             }
         }
 

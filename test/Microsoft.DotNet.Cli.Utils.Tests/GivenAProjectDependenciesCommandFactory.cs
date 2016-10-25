@@ -69,12 +69,12 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
 
             var projectFile = Path.Combine(testInstance.TestRoot, "MSBuildAppWithMultipleFrameworksAndTools.csproj");
 
-            new Restore3Command()
+            new RestoreCommand()
                 .ExecuteWithCapturedOutput($"{projectFile} -s {_repoDirectoriesProvider.TestPackages}")
                 .Should()
                 .Pass();
 
-            new Build3Command()
+            new BuildCommand()
                 .Execute($"{projectFile} --configuration {configuration}")
                 .Should()
                 .Pass();
