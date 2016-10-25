@@ -18,8 +18,10 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         [Fact]
         public void It_copies_ProjectDirectory_contents_to_OutputDirectory_when_the_directories_are_different()
         {
-            var testProjectDirectory = TestAssetsManager.CreateTestInstance("TestAppSimple", callingMethod: "z")
+            var testProjectDirectory = TestAssetsManager
+                .CreateTestInstance("PJTestAppSimple", callingMethod: "z")
                 .Path;
+
             var outputDirectory = Temp.CreateDirectory().Path;
 
             var projectDirectoryRelativeFilePaths = EnumerateFilesWithRelativePath(testProjectDirectory);

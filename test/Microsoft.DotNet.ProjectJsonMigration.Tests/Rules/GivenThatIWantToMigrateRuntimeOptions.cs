@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         [Fact]
         public void Migrating_ProjectJson_with_no_RuntimeOptions_produces_no_runtimeconfig_template_json_file()
         {
-            var testInstance = TestAssetsManager.CreateTestInstance("TestAppSimple");
+            var testInstance = TestAssetsManager.CreateTestInstance("PJTestAppSimple");
             var projectDir = testInstance.Path;
 
             var projectContext = ProjectContext.Create(projectDir, FrameworkConstants.CommonFrameworks.NetCoreApp10);
