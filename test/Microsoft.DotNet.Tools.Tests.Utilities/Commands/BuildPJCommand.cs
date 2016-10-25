@@ -7,7 +7,7 @@ using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
 {
-    public sealed class BuildCommand : TestCommand
+    public sealed class BuildPJCommand : TestCommand
     {
 
         private bool _captureOutput;
@@ -24,8 +24,8 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         private DirectoryInfo _workingDirectory;
 
-        public BuildCommand()
-            : base("dotnet")
+        public BuildPJCommand()
+            : base("/Users/piotrp/code/github/piotrpMSFT/cli/.dotnet_stage0/x64/dotnet")
         {
         }
 
@@ -55,56 +55,56 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             return Execute(args);
         }
 
-        public BuildCommand WithCapturedOutput()
+        public BuildPJCommand WithCapturedOutput()
         {
             _captureOutput = true;
 
             return this;
         }
 
-        public BuildCommand WithConfiguration(string configuration)
+        public BuildPJCommand WithConfiguration(string configuration)
         {
             _configuration = configuration;
 
             return this;
         }
 
-        public BuildCommand WithFramework(NuGetFramework framework)
+        public BuildPJCommand WithFramework(NuGetFramework framework)
         {
             _framework = framework;
 
             return this;
         }
 
-        public BuildCommand WithNoDependencies()
+        public BuildPJCommand WithNoDependencies()
         {
             _noDependencies = true;
 
             return this;
         }
 
-        public BuildCommand WithOutputPath(DirectoryInfo outputPath)
+        public BuildPJCommand WithOutputPath(DirectoryInfo outputPath)
         {
             _outputPath = outputPath;
 
             return this;
         }
 
-        public BuildCommand WithProjectDirectory(DirectoryInfo projectDirectory)
+        public BuildPJCommand WithProjectDirectory(DirectoryInfo projectDirectory)
         {
             _workingDirectory = projectDirectory;
 
             return this;
         }
 
-        public BuildCommand WithProjectFile(FileInfo projectFile)
+        public BuildPJCommand WithProjectFile(FileInfo projectFile)
         {
             _projectFile = projectFile;
 
             return this;
         }
 
-        public BuildCommand WithWorkingDirectory(DirectoryInfo workingDirectory)
+        public BuildPJCommand WithWorkingDirectory(DirectoryInfo workingDirectory)
         {
             _workingDirectory = workingDirectory;
 

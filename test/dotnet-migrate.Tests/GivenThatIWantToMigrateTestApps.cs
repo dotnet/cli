@@ -143,7 +143,7 @@ namespace Microsoft.DotNet.Migration.Tests
         [Theory]
         [InlineData("TestAppWithLibrary/TestLibrary")]
         [InlineData("TestLibraryWithAnalyzer")]
-        [InlineData("TestLibraryWithConfiguration")]
+        [InlineData("PJTestLibraryWithConfiguration")]
         public void It_migrates_a_library(string projectName)
         {
             var projectDirectory =
@@ -293,6 +293,7 @@ namespace Microsoft.DotNet.Migration.Tests
             }
 
             outputsIdentical.Should().BeTrue();
+            
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
          }
         
@@ -497,10 +498,11 @@ namespace Microsoft.DotNet.Migration.Tests
 
         private void BuildProjectJson(string projectDirectory)
         {
-            var projectFile = Path.Combine(projectDirectory, "project.json");
+            var projectFile = "\"" + Path.Combine(projectDirectory, "project.json\"");
 
-            var result = new BuildCommand()
-                .ExecuteWithCapturedOutput(projectFile);
+            var result = new BuildPJCommand()
+                .WithCapturedOutput()
+                .Execute(projectFile);
 
             result.Should().Pass();
         }
