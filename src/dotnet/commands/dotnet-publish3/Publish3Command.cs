@@ -77,10 +77,10 @@ namespace Microsoft.DotNet.Tools.Publish3
         {
             int result = 0;
 
-            if (!string.IsNullOrEmpty(Runtime))
-            {
-                result = Restore3Command.Run(new[] { $"/p:RuntimeIdentifiers={Runtime}" });
-            }
+            //if (!string.IsNullOrEmpty(Runtime))
+            //{
+            //    result = Restore3Command.Run(new[] { $"/p:RuntimeIdentifiers={Runtime}" });
+            //}
 
             return result;
         }

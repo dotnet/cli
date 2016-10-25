@@ -28,7 +28,8 @@
       <DotNetPublish3 ToolPath="$(Stage2Directory)"
                      WorkingDirectory="$(RepoRoot)/tools/Archiver"
                      Output="$(ToolsOutputDirectory)"
-                     Configuration="$(Configuration)" />
+                     Configuration="$(Configuration)"
+                     Runtime="$(Rid)"/>
 
       <Exec Command="$(ArchiverExe) -a $(IntermediateArchive) $(NuGetPackagesArchiveFolder)" />
 

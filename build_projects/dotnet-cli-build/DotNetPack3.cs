@@ -3,31 +3,27 @@
 
 namespace Microsoft.DotNet.Cli.Build
 {
-    public class DotNetPublish3 : DotNetTool
+    public class DotNetPack3 : DotNetTool
     {
         protected override string Command
         {
-            get { return "publish3"; }
+            get { return "pack3"; }
         }
 
         protected override string Args
         {
-            get { return $"{GetProjectPath()} {GetRuntime()} {GetConfiguration()} {GetFramework()} {GetOutput()} {GetVersionSuffix()} {MSBuildArgs}"; }
+            get { return $"{GetProjectPath()} {GetConfiguration()} {GetNoBuild()} {GetOutput()} {GetVersionSuffix()}"; }
         }
 
         public string Configuration { get; set; }
 
-        public string Framework { get; set; }
+        public bool NoBuild { get; set; }
         
         public string Output { get; set; }
 
         public string ProjectPath { get; set; }
 
-        public string Runtime { get; set; }
-
         public string VersionSuffix { get; set; }
-
-        public string MSBuildArgs { get; set; }
 
         private string GetConfiguration()
         {
@@ -39,26 +35,16 @@ namespace Microsoft.DotNet.Cli.Build
             return null;
         }
 
-        private string GetFramework()
+        private string GetNoBuild()
         {
-            if (!string.IsNullOrEmpty(Framework))
+            if (NoBuild)
             {
-                return $"--framework {Framework}";
+                return $"--no-build";
             }
 
             return null;
         }
-
-        private string GetRuntime()
-        {
-            if (!string.IsNullOrEmpty(Runtime))
-            {
-                return $"--runtime {Runtime}";
-            }
-
-            return null;
-        }
-
+        
         private string GetOutput()
         {
             if (!string.IsNullOrEmpty(Output))

@@ -3,31 +3,23 @@
 
 namespace Microsoft.DotNet.Cli.Build
 {
-    public class DotNetPublish3 : DotNetTool
+    public class DotNetBuild3 : DotNetTool
     {
         protected override string Command
         {
-            get { return "publish3"; }
+            get { return "build3"; }
         }
 
         protected override string Args
         {
-            get { return $"{GetProjectPath()} {GetRuntime()} {GetConfiguration()} {GetFramework()} {GetOutput()} {GetVersionSuffix()} {MSBuildArgs}"; }
+            get { return $"{GetProjectPath()} {GetConfiguration()} {GetFramework()}"; }
         }
-
+        
         public string Configuration { get; set; }
 
         public string Framework { get; set; }
-        
-        public string Output { get; set; }
 
         public string ProjectPath { get; set; }
-
-        public string Runtime { get; set; }
-
-        public string VersionSuffix { get; set; }
-
-        public string MSBuildArgs { get; set; }
 
         private string GetConfiguration()
         {
@@ -49,41 +41,11 @@ namespace Microsoft.DotNet.Cli.Build
             return null;
         }
 
-        private string GetRuntime()
-        {
-            if (!string.IsNullOrEmpty(Runtime))
-            {
-                return $"--runtime {Runtime}";
-            }
-
-            return null;
-        }
-
-        private string GetOutput()
-        {
-            if (!string.IsNullOrEmpty(Output))
-            {
-                return $"--output {Output}";
-            }
-
-            return null;
-        }
-
         private string GetProjectPath()
         {
             if (!string.IsNullOrEmpty(ProjectPath))
             {
                 return $"{ProjectPath}";
-            }
-
-            return null;
-        }
-
-        private string GetVersionSuffix()
-        {
-            if (!string.IsNullOrEmpty(VersionSuffix))
-            {
-                return $"--version-suffix {VersionSuffix}";
             }
 
             return null;

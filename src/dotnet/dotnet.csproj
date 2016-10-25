@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" Exclude="commands\dotnet-new\CSharp_Console\**;commands\dotnet-new\FSharp_Console\**;commands\dotnet-new\CSharp_Web\**;commands\dotnet-new\CSharp_Lib\**;commands\dotnet-new\CSharp_MSBuild\**;commands\dotnet-new\FSharp_Lib\**;commands\dotnet-new\CSharp_xunittest\**;commands\dotnet-new\CSharp_nunittest\**;" />
+    <EmbeddedResource Include="commands\dotnet-new\CSharp_Console.zip;commands\dotnet-new\CSharp_Lib.zip;commands\dotnet-new\CSharp_xunittest.zip;commands\dotnet-new\CSharp_Web.zip;commands\dotnet-new\CSharp_nunittest.zip;commands\dotnet-new\FSharp_Console.zip;commands\dotnet-new\FSharp_Lib.zip;" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
     <ProjectReference Include="..\Microsoft.DotNet.Archive\Microsoft.DotNet.Archive.csproj" />
