@@ -100,7 +100,8 @@
                      Output="$(SdkOutputDirectory)"
                      Configuration="$(Configuration)"
                      VersionSuffix="$(CommitCount)"
-                     ProjectPath="$(SrcDirectory)/redist/redist.csproj" />
+                     ProjectPath="$(SrcDirectory)/redist/redist.csproj" 
+                     MSBuildArgs="/p:GenerateRuntimeConfigurationFiles=true"/>
 
       <!-- Corehostify Binaries -->
       <ItemGroup Condition=" '$(OSName)' != 'win' ">
