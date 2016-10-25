@@ -129,15 +129,16 @@ namespace Microsoft.DotNet.Tests
         {
             var projectToolsCommandResolver = SetupProjectToolsCommandResolver();
 
-            var testInstance = TestAssetsManager.CreateTestInstance(TestProjectName)
-                .WithNuGetMSBuildFiles()
-                .WithLockFiles();
+            var testInstance = TestAssets.Get(TestProjectName)
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
 
             var commandResolverArguments = new CommandResolverArguments()
             {
                 CommandName = "dotnet-portable",
                 CommandArguments = new[] { "arg with space" },
-                ProjectDirectory = testInstance.Path
+                ProjectDirectory = testInstance.Root.FullName
             };
 
             var result = projectToolsCommandResolver.Resolve(commandResolverArguments);
@@ -151,15 +152,16 @@ namespace Microsoft.DotNet.Tests
         {
             var projectToolsCommandResolver = SetupProjectToolsCommandResolver();
 
-            var testInstance = TestAssetsManager.CreateTestInstance(TestProjectName)
-                .WithNuGetMSBuildFiles() 
-                .WithLockFiles();
+            var testInstance = TestAssets.Get(TestProjectName)
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
 
             var commandResolverArguments = new CommandResolverArguments()
             {
                 CommandName = "dotnet-portable",
                 CommandArguments = null,
-                ProjectDirectory = testInstance.Path
+                ProjectDirectory = testInstance.Root.FullName
             };
 
             var result = projectToolsCommandResolver.Resolve(commandResolverArguments);
@@ -175,16 +177,16 @@ namespace Microsoft.DotNet.Tests
         {
             var projectToolsCommandResolver = SetupProjectToolsCommandResolver();
 
-            var testInstance = TestAssetsManager
-                .CreateTestInstance(TestProjectName)
-                .WithNuGetMSBuildFiles() 
-                .WithLockFiles();
+            var testInstance = TestAssets.Get(TestProjectName)
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
 
             var commandResolverArguments = new CommandResolverArguments()
             {
                 CommandName = "dotnet-portable",
                 CommandArguments = null,
-                ProjectDirectory = testInstance.Path
+                ProjectDirectory = testInstance.Root.FullName
             };
 
             var repoDirectoriesProvider = new RepoDirectoriesProvider();
@@ -220,8 +222,10 @@ namespace Microsoft.DotNet.Tests
         [Fact]
         public void Generate_deps_json_method_doesnt_overwrite_when_deps_file_already_exists()
         {
-            var testInstance = TestAssetsManager.CreateTestInstance(TestProjectName)
-                .WithLockFiles();
+            var testInstance = TestAssets.Get(TestProjectName)
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
 
             var repoDirectoriesProvider = new RepoDirectoriesProvider();
 

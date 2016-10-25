@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
 {
     public class GivenAProjectDependencyCommandResolver : TestBase
     {
-        private TestInstance MSBuildTestProjectInstance;
+        private TestAssetInstance MSBuildTestProjectInstance;
 
         public GivenAProjectDependencyCommandResolver()
         {
@@ -30,10 +30,11 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         public void ItReturnsACommandSpecWithDotnetAsFileNameAndCommandNameInArgsWhenCommandNameExistsInMSBuildProjectDependencies()
         {
             MSBuildTestProjectInstance =
-                TestAssetsManager.CreateTestInstance("MSBuildTestAppWithToolInDependencies")
-                    .WithBuildArtifacts()
-                    .WithNuGetMSBuildFiles()
-                    .WithLockFiles();
+                TestAssets.Get("MSBuildTestAppWithToolInDependencies")
+                    .CreateInstance()
+                    .WithSourceFiles()
+                    .WithRestoreFiles()
+                    .WithBuildFiles();
 
             var projectDependenciesCommandResolver = SetupProjectDependenciesCommandResolver();
 
@@ -41,7 +42,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             {
                 CommandName = "dotnet-portable",
                 Configuration = "Debug",
-                ProjectDirectory = MSBuildTestProjectInstance.Path,
+                ProjectDirectory = MSBuildTestProjectInstance.Root.FullName,
                 Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10
             };
 
@@ -60,10 +61,11 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         public void ItPassesDepsfileArgToHostWhenReturningACommandSpecForMSBuildProject()
         {
             MSBuildTestProjectInstance =
-                TestAssetsManager.CreateTestInstance("MSBuildTestAppWithToolInDependencies")
-                    .WithBuildArtifacts()
-                    .WithNuGetMSBuildFiles()
-                    .WithLockFiles();
+                TestAssets.Get("MSBuildTestAppWithToolInDependencies")
+                    .CreateInstance()
+                    .WithSourceFiles()
+                    .WithRestoreFiles()
+                    .WithBuildFiles();
 
             var projectDependenciesCommandResolver = SetupProjectDependenciesCommandResolver();
 
@@ -71,7 +73,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             {
                 CommandName = "dotnet-portable",
                 Configuration = "Debug",
-                ProjectDirectory = MSBuildTestProjectInstance.Path,
+                ProjectDirectory = MSBuildTestProjectInstance.Root.FullName,
                 Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10
             };
 
@@ -86,9 +88,10 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         public void ItReturnsNullWhenCommandNameDoesNotExistInProjectDependenciesForMSBuildProject()
         {
             MSBuildTestProjectInstance =
-                TestAssetsManager.CreateTestInstance("MSBuildTestAppWithToolInDependencies")
-                    .WithNuGetMSBuildFiles()
-                    .WithLockFiles();
+                TestAssets.Get("MSBuildTestAppWithToolInDependencies")
+                    .CreateInstance()
+                    .WithSourceFiles()
+                    .WithRestoreFiles();
 
             var projectDependenciesCommandResolver = SetupProjectDependenciesCommandResolver();
 
@@ -96,7 +99,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             {
                 CommandName = "nonexistent-command",
                 CommandArguments = null,
-                ProjectDirectory = MSBuildTestProjectInstance.Path,
+                ProjectDirectory = MSBuildTestProjectInstance.Root.FullName,
                 Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10
             };
 
@@ -108,36 +111,37 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         [Fact]
         public void ItSetsDepsfileToOutputInCommandspecForMSBuild()
         {
-            var testInstance = TestAssetsManager
-                    .CreateTestInstance("MSBuildTestAppWithToolInDependencies")
-                    .WithNuGetMSBuildFiles()
-                    .WithLockFiles();
+            var testInstance = TestAssets
+                    .Get("MSBuildTestAppWithToolInDependencies")
+                    .CreateInstance()
+                    .WithSourceFiles()
+                    .WithRestoreFiles();
 
             var projectDependenciesCommandResolver = SetupProjectDependenciesCommandResolver();
 
-            var outputDir = Path.Combine(testInstance.Path, "out");
+            var outputDir = testInstance.Root.GetDirectory("out");
 
             var commandResolverArguments = new CommandResolverArguments()
             {
                 CommandName = "dotnet-portable",
                 Configuration = "Debug",
-                ProjectDirectory = testInstance.Path,
+                ProjectDirectory = testInstance.Root.FullName,
                 Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10,
-                OutputPath = outputDir
+                OutputPath = outputDir.FullName
             };
 
             new BuildCommand()
-                .WithWorkingDirectory(testInstance.Path)
-                .Execute($"-o {outputDir}")
+                .WithWorkingDirectory(testInstance.Root)
+                .Execute($"-o {outputDir.FullName}")
                 .Should()
                 .Pass();
 
             var result = projectDependenciesCommandResolver.Resolve(commandResolverArguments);
 
-            var depsFilePath = Path.Combine(outputDir, "MSBuildTestAppWithToolInDependencies.deps.json");
+            var depsFilePath = outputDir.GetFile("MSBuildTestAppWithToolInDependencies.deps.json");
 
             result.Should().NotBeNull();
-            result.Args.Should().Contain($"--depsfile {depsFilePath}");
+            result.Args.Should().Contain($"--depsfile {depsFilePath.FullName}");
         }
 
         private ProjectDependenciesCommandResolver SetupProjectDependenciesCommandResolver(

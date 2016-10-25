@@ -13,6 +13,8 @@ namespace Microsoft.DotNet.TestFramework
 {
     public class TestAssetKinds
     {
+        public static string DesktopTestProjects = "DesktopTestProjects";
+        
         public static string TestProjects = "TestProjects";
     }
 }

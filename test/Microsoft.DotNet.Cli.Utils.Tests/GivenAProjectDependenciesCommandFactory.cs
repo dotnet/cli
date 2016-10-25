@@ -31,30 +31,31 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         {
             var configuration = "Debug";
 
-            var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "DesktopTestProjects"));
-            var testInstance = testAssetManager
-                .CreateTestInstance("AppWithDirectDepDesktopAndPortable")
-                .WithLockFiles();
+            var testInstance = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "AppWithDirectDepDesktopAndPortable")
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
 
             var buildCommand = new BuildCommand()
-                .WithProjectFile(new FileInfo(Path.Combine(testInstance.TestRoot, "project.json")))
+                .WithProjectFile(testInstance.Root.GetFile("project.json"))
                 .WithConfiguration(configuration)
                 .WithCapturedOutput()
                 .Execute()
                 .Should().Pass();
 
-            var context = ProjectContext.Create(testInstance.TestRoot, s_desktopTestFramework);
+            var context = ProjectContext.Create(testInstance.Root.FullName, s_desktopTestFramework);
 
             var factory = new ProjectDependenciesCommandFactory(
                 s_desktopTestFramework,
                 null,
                 null,
                 null,
-                testInstance.TestRoot);
+                testInstance.Root.FullName);
 
             var command = factory.Create("dotnet-desktop-and-portable", null);
 
-            command.CommandName.Should().Contain(Path.Combine(testInstance.TestRoot, "bin", configuration));
+            command.CommandName.Should().Contain(testInstance.Root.GetDirectory("bin", configuration).FullName);
+
             Path.GetFileName(command.CommandName).Should().Be("dotnet-desktop-and-portable.exe");
         }
 
@@ -63,11 +64,12 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         {
             var configuration = "Debug";
 
-            var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "TestProjects"));
-            var testInstance = testAssetManager.CreateTestInstance("MSBuildAppWithMultipleFrameworksAndTools", "i")
-                .WithLockFiles();
+            var testInstance = TestAssets.Get("MSBuildAppWithMultipleFrameworksAndTools")
+                .CreateInstance("i")
+                .WithSourceFiles()
+                .WithRestoreFiles();
 
-            var projectFile = Path.Combine(testInstance.TestRoot, "MSBuildAppWithMultipleFrameworksAndTools.csproj");
+            var projectFile = testInstance.Root.GetFile("MSBuildAppWithMultipleFrameworksAndTools.csproj");
 
             new RestoreCommand()
                 .ExecuteWithCapturedOutput($"{projectFile} -s {_repoDirectoriesProvider.TestPackages}")
@@ -84,11 +86,12 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 null,
                 null,
                 null,
-                testInstance.TestRoot);
+                testInstance.Root.FullName);
 
             var command = factory.Create("dotnet-desktop-and-portable", null);
 
-            command.CommandName.Should().Contain(Path.Combine(testInstance.TestRoot, "bin", configuration));
+            command.CommandName.Should().Contain(testInstance.Root.GetDirectory("bin", configuration).FullName);
+
             Path.GetFileName(command.CommandName).Should().Be("dotnet-desktop-and-portable.exe");
         }
 
@@ -97,31 +100,30 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         {
             var configuration = "Debug";
 
-            var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "DesktopTestProjects"));
-
-            var testInstance = testAssetManager
-                .CreateTestInstance("AppWithDirectDepDesktopAndPortable")
-                .WithLockFiles();
+            var testInstance = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "AppWithDirectDepDesktopAndPortable")
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
 
             var buildCommand = new BuildCommand()
-                .WithProjectFile(new FileInfo(Path.Combine(testInstance.TestRoot, "project.json")))
+                .WithProjectFile(testInstance.Root.GetFile("project.json"))
                 .WithConfiguration(configuration)
                 .WithCapturedOutput()
                 .Execute()
                 .Should().Pass();
 
-            var context = ProjectContext.Create(testInstance.TestRoot, s_desktopTestFramework);
+            var context = ProjectContext.Create(testInstance.Root.FullName, s_desktopTestFramework);
 
             var factory = new ProjectDependenciesCommandFactory(
                 s_desktopTestFramework,
                 configuration,
                 null,
                 null,
-                testInstance.TestRoot);
+                testInstance.Root.FullName);
 
             var command = factory.Create("dotnet-desktop-and-portable", null);
 
-            command.CommandName.Should().Contain(Path.Combine(testInstance.TestRoot, "bin", configuration));
+            command.CommandName.Should().Contain(testInstance.Root.GetDirectory("bin", configuration).FullName);
             Path.GetFileName(command.CommandName).Should().Be("dotnet-desktop-and-portable.exe");
         }
 
@@ -130,30 +132,31 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         {
             var configuration = "Release";
 
-            var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "DesktopTestProjects"));
-            var testInstance = testAssetManager
-                .CreateTestInstance("AppWithDirectDepDesktopAndPortable")
-                .WithLockFiles();
+            var testInstance = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "AppWithDirectDepDesktopAndPortable")
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
 
             var buildCommand = new BuildCommand()
-                .WithProjectFile(new FileInfo(Path.Combine(testInstance.TestRoot, "project.json")))
+                .WithProjectFile(testInstance.Root.GetFile("project.json"))
                 .WithConfiguration(configuration)
                 .WithCapturedOutput()
                 .Execute()
                 .Should().Pass();
 
-            var context = ProjectContext.Create(testInstance.TestRoot, s_desktopTestFramework);
+            var context = ProjectContext.Create(testInstance.Root.FullName, s_desktopTestFramework);
 
             var factory = new ProjectDependenciesCommandFactory(
                 s_desktopTestFramework,
                 configuration,
                 null,
                 null,
-                testInstance.TestRoot);
+                testInstance.Root.FullName);
 
             var command = factory.Create("dotnet-desktop-and-portable", null);
 
-            command.CommandName.Should().Contain(Path.Combine(testInstance.TestRoot, "bin", configuration));
+            command.CommandName.Should().Contain(testInstance.Root.GetDirectory("bin", configuration).FullName);
+
             Path.GetFileName(command.CommandName).Should().Be("dotnet-desktop-and-portable.exe");
         }
 
@@ -162,29 +165,31 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         {
             var configuration = "Release";
 
-            var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "DesktopTestProjects"));
-            var testInstance = testAssetManager.CreateTestInstance("AppWithDirectDepDesktopAndPortable")
-                .WithLockFiles();
+            var testInstance = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "AppWithDirectDepDesktopAndPortable")
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
 
             var buildCommand = new BuildCommand()
-                .WithProjectFile(new FileInfo(Path.Combine(testInstance.TestRoot, "project.json")))
+                .WithProjectFile(testInstance.Root.GetFile("project.json"))
                 .WithConfiguration(configuration)
                 .WithCapturedOutput()
                 .Execute()
                 .Should().Pass();
 
-            var context = ProjectContext.Create(testInstance.TestRoot, s_desktopTestFramework);
+            var context = ProjectContext.Create(testInstance.Root.FullName, s_desktopTestFramework);
 
             var factory = new ProjectDependenciesCommandFactory(
                 s_desktopTestFramework,
                 "Debug",
                 null,
                 null,
-                testInstance.TestRoot);
+                testInstance.Root.FullName);
 
             var command = factory.Create("dotnet-desktop-and-portable", null, configuration: configuration);
 
-            command.CommandName.Should().Contain(Path.Combine(testInstance.TestRoot, "bin", configuration));
+            command.CommandName.Should().Contain(testInstance.Root.GetDirectory("bin", configuration).FullName);
+
             Path.GetFileName(command.CommandName).Should().Be("dotnet-desktop-and-portable.exe");
         }
 
@@ -197,15 +202,13 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
 
             var configuration = "Debug";
 
-            var testAssetManager = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "TestProjects"));
-
-            var testInstance = testAssetManager
-                .CreateTestInstance("AppWithDirectDepWithOutputName")
-                .WithNuGetMSBuildFiles() 
-                .WithLockFiles();
+            var testInstance = TestAssets.Get("AppWithDirectDepWithOutputName")
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
 
             var buildCommand = new BuildCommand()
-                .WithProjectDirectory(new DirectoryInfo(testInstance.TestRoot))
+                .WithProjectDirectory(testInstance.Root)
                 .WithConfiguration(configuration)
                 .WithCapturedOutput()
                 .Execute()
@@ -216,7 +219,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 configuration,
                 null,
                 null,
-                testInstance.TestRoot);
+                testInstance.Root.FullName);
 
             var command = factory.Create("dotnet-tool-with-output-name", null);
 
