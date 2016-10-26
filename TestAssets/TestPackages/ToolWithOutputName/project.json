@@ -9,7 +9,7 @@
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.0.2"
+          "version": "1.0.3-servicing-004563-00"
         }
       }
     }
