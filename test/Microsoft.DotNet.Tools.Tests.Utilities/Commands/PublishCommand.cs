@@ -36,13 +36,13 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         public override CommandResult Execute(string args = "")
         {
-            args = $"publish {args} {BuildArgs()}";
+            args = $"publish {BuildArgs()} {args}";
             return base.Execute(args);
         }
 
         public override CommandResult ExecuteWithCapturedOutput(string args = "")
         {
-            args = $"publish {args} {BuildArgs()}";
+            args = $"publish {BuildArgs()} {args}";
             return base.ExecuteWithCapturedOutput(args);
         }
 

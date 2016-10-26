@@ -49,29 +49,35 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
         public void ItPublishesARunnableSelfContainedApp()
         {
             var testAppName = "MSBuildTestApp";
-            var testInstance = TestAssetsManager
-                .CreateTestInstance(testAppName);
 
-            var testProjectDirectory = testInstance.TestRoot;
+            var testInstance = TestAssets.Get(testAppName)
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
+
+            var testProjectDirectory = testInstance.Root;
+
             var rid = DotnetLegacyRuntimeIdentifiers.InferLegacyRestoreRuntimeIdentifier();
 
             new PublishCommand()
                 .WithFramework("netcoreapp1.0")
                 .WithRuntime(rid)
                 .WithWorkingDirectory(testProjectDirectory)
-                .Execute()
-                .Should()
-                .Pass();
+                //Workaround for https://github.com/dotnet/cli/issues/4501
+                .WithEnvironmentVariable("SkipInvalidConfigurations", "true")
+                .Execute("/p:SkipInvalidConfigurations=true")
+                .Should().Pass();
 
             var configuration = Environment.GetEnvironmentVariable("CONFIGURATION") ?? "Debug";
-            var outputProgram = Path.Combine(testProjectDirectory, "bin", configuration, "netcoreapp1.0", rid, "publish", $"{testAppName}{Constants.ExeSuffix}");
+
+            var outputProgram = testProjectDirectory
+                .GetDirectory("bin", configuration, "netcoreapp1.0", rid, "publish", $"{testAppName}{Constants.ExeSuffix}")
+                .FullName;
 
             new TestCommand(outputProgram)
                 .ExecuteWithCapturedOutput()
-                .Should()
-                .Pass()
-                .And
-                .HaveStdOutContaining("Hello World");
+                .Should().Pass()
+                     .And.HaveStdOutContaining("Hello World");
         }
     }
 }
