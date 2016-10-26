@@ -9,6 +9,12 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
 {
     public class MigrateRuntimesRule : IMigrationRule
     {
+        AddPropertyTransform<IList<string>> RuntimeIdentifiersTransform =>
+            new AddPropertyTransform<IList<string>>(
+                "RuntimeIdentifiers",
+                l => String.Join(";", l),
+                l => l.Count > 0);
+
         private readonly ITransformApplicator _transformApplicator;
 
         public MigrateRuntimesRule(ITransformApplicator transformApplicator = null)
@@ -20,15 +26,10 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
         {
             var propertyGroup = migrationRuleInputs.CommonPropertyGroup;
 
-            var propertyTransform = new AddPropertyTransform<IList<string>>(
-                "RuntimeIdentifiers",
-                l => String.Join(";", l),
-                l => l.Count > 0
-            );
-
-            _transformApplicator.Execute(propertyTransform.Transform(
-                migrationRuleInputs.DefaultProjectContext.ProjectFile.Runtimes), 
-                propertyGroup, mergeExisting: true);
+            _transformApplicator.Execute(
+                RuntimeIdentifiersTransform.Transform(migrationRuleInputs.DefaultProjectContext.ProjectFile.Runtimes),
+                propertyGroup,
+                mergeExisting: true);
         }
     }
 }

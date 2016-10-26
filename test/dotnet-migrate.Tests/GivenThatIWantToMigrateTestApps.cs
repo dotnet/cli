@@ -347,7 +347,7 @@ namespace Microsoft.DotNet.Migration.Tests
         }
 
         [Fact]
-        public void It_migrates_runtimes_into_csproj()
+        public void It_migrates_and_publishes_projects_with_runtimes()
         {
             var projectName = "TestAppSimple";
             var projectDirectory = TestAssetsManager.CreateTestInstance(projectName, callingMethod: "i")

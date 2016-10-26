@@ -36,11 +36,31 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
                 }, projectJson, testDirectory);
 
             migratedProj.Properties.Count(p => p.Name == "RuntimeIdentifiers").Should().Be(1);
-            migratedProj.Properties.First(p => p.Name == "RuntimeIdentifiers").Value.Should().Be("win7-x64;win7-x86;osx.10.10-x64");
+            migratedProj.Properties.First(p => p.Name == "RuntimeIdentifiers").Value
+                .Should().Be("win7-x64;win7-x86;osx.10.10-x64");
         }
 
         [Fact]
-        public void It_no_runtimes_to_migrate()
+        public void It_has_an_empty_runtime_node_to_migrate()
+        {
+            var projectJson = @"
+                {
+                    ""runtimes"": {
+                    }
+                }
+            ";
+
+            var testDirectory = Temp.CreateDirectory().Path;
+            var migratedProj = TemporaryProjectFileRuleRunner.RunRules(new IMigrationRule[]
+                {
+                    new MigrateRuntimesRule()
+                }, projectJson, testDirectory);
+
+            migratedProj.Properties.Count(p => p.Name == "RuntimeIdentifiers").Should().Be(0);
+        }
+
+        [Fact]
+        public void It_has_no_runtimes_to_migrate()
         {
             var projectJson = @"
                 {
