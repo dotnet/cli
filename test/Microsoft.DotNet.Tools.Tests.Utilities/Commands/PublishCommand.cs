@@ -8,6 +8,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
     public sealed class PublishCommand : TestCommand
     {
         private string _framework;
+        private string _output;
         private string _runtime;
 
         public PublishCommand()
@@ -18,6 +19,12 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         public PublishCommand WithFramework(string framework)
         {
             _framework = framework;
+            return this;
+        }
+
+        public PublishCommand WithOutput(string output)
+        {
+            _output = output;
             return this;
         }
 
@@ -43,10 +50,14 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         {
             return string.Join(" ", 
                 FrameworkOption,
+                OutputOption,
                 RuntimeOption);
         }
 
         private string FrameworkOption => string.IsNullOrEmpty(_framework) ? "" : $"-f {_framework}";
+
+        private string OutputOption => string.IsNullOrEmpty(_output) ? "" : $"-o {_output}";
+
         private string RuntimeOption => string.IsNullOrEmpty(_runtime) ? "" : $"-r {_runtime}";
     }
 }

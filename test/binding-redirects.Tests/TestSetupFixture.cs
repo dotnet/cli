@@ -55,11 +55,20 @@ namespace Microsoft.DotNet.Tests
             buildDir = Path.Combine(projectDir, _buildRelativePath);
             publishDir = Path.Combine(projectDir, "publish");
 
-            var buildCommand = new BuildCommand(projectDir, framework: Framework, runtime: _Runtime);
-            buildCommand.Execute().Should().Pass();
+            var buildCommand = new BuildCommand()
+                .WithWorkingDirectory(projectDir)
+                .WithFramework(Framework)
+                .WithRuntime(_Runtime)
+                .Execute()
+                .Should().Pass();
 
-            var publishCommand = new PublishCommand(projectDir, output: publishDir, framework: Framework, runtime: _Runtime);
-            publishCommand.Execute().Should().Pass();
+            new PublishCommand()
+                .WithWorkingDirectory(projectDir)
+                .WithOutput(publishDir)
+                .WithFramework(Framework)
+                .WithRuntime(_Runtime)
+                .Execute()
+                .Should().Pass();
         }
     }
 }
