@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.Tests
 
             new RestoreCommand()
                 .WithWorkingDirectory(testInstance.TestRoot)
-                .ExecuteWithCapturedOutput()
+                .ExecuteWithCapturedOutput("/p:SkipInvalidConfigurations=true")
                 .Should()
                 .Fail();
 

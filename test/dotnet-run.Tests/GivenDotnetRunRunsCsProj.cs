@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.Cli.Run.Tests
 
             new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
-                .Execute()
+                .Execute("/p:SkipInvalidConfigurations=true")
                 .Should()
                 .Pass();
 
@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.Cli.Run.Tests
 
             new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
-                .Execute()
+                .Execute("/p:SkipInvalidConfigurations=true")
                 .Should()
                 .Pass();
 
@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.Cli.Run.Tests
 
             new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
-                .Execute()
+                .Execute("/p:SkipInvalidConfigurations=true")
                 .Should()
                 .Pass();
 

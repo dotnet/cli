@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
 
             new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
-                .Execute()
+                .Execute("/p:SkipInvalidConfigurations=true")
                 .Should()
                 .Pass();
 

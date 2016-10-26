@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.Cli.Build.Tests
 
             new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
-                .Execute()
+                .Execute("/p:SkipInvalidConfigurations=true")
                 .Should()
                 .Pass();
 
