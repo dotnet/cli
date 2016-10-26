@@ -37,14 +37,12 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 .WithRestoreFiles();
 
             var buildCommand = new BuildCommand()
-                .WithProjectFile(testInstance.Root.GetFile("project.json"))
+                .WithWorkingDirectory(testInstance.Root)
                 .WithConfiguration(configuration)
                 .WithCapturedOutput()
                 .Execute()
                 .Should().Pass();
-
-            var context = ProjectContext.Create(testInstance.Root.FullName, s_desktopTestFramework);
-
+                
             var factory = new ProjectDependenciesCommandFactory(
                 s_desktopTestFramework,
                 null,
@@ -73,13 +71,11 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
 
             new RestoreCommand()
                 .ExecuteWithCapturedOutput($"{projectFile} -s {_repoDirectoriesProvider.TestPackages}")
-                .Should()
-                .Pass();
+                .Should().Pass();
 
             new BuildCommand()
                 .Execute($"{projectFile} --configuration {configuration}")
-                .Should()
-                .Pass();
+                .Should().Pass();
 
             var factory = new ProjectDependenciesCommandFactory(
                 s_desktopTestFramework,
@@ -106,13 +102,10 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 .WithRestoreFiles();
 
             var buildCommand = new BuildCommand()
-                .WithProjectFile(testInstance.Root.GetFile("project.json"))
+                .WithWorkingDirectory(testInstance.Root)
                 .WithConfiguration(configuration)
-                .WithCapturedOutput()
                 .Execute()
                 .Should().Pass();
-
-            var context = ProjectContext.Create(testInstance.Root.FullName, s_desktopTestFramework);
 
             var factory = new ProjectDependenciesCommandFactory(
                 s_desktopTestFramework,
@@ -138,13 +131,11 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 .WithRestoreFiles();
 
             var buildCommand = new BuildCommand()
-                .WithProjectFile(testInstance.Root.GetFile("project.json"))
+                .WithWorkingDirectory(testInstance.Root)
                 .WithConfiguration(configuration)
                 .WithCapturedOutput()
                 .Execute()
                 .Should().Pass();
-
-            var context = ProjectContext.Create(testInstance.Root.FullName, s_desktopTestFramework);
 
             var factory = new ProjectDependenciesCommandFactory(
                 s_desktopTestFramework,
@@ -171,13 +162,11 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 .WithRestoreFiles();
 
             var buildCommand = new BuildCommand()
-                .WithProjectFile(testInstance.Root.GetFile("project.json"))
+                .WithWorkingDirectory(testInstance.Root)
                 .WithConfiguration(configuration)
                 .WithCapturedOutput()
                 .Execute()
                 .Should().Pass();
-
-            var context = ProjectContext.Create(testInstance.Root.FullName, s_desktopTestFramework);
 
             var factory = new ProjectDependenciesCommandFactory(
                 s_desktopTestFramework,

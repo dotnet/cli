@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Microsoft.DotNet.Cli.Utils;
+using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
 {
@@ -20,6 +21,11 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         {
             _framework = framework;
             return this;
+        }
+
+        public PublishCommand WithFramework(NuGetFramework framework)
+        {
+            return WithFramework(framework.GetShortFolderName());
         }
 
         public PublishCommand WithOutput(string output)

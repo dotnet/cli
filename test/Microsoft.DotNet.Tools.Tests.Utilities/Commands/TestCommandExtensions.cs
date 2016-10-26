@@ -27,5 +27,12 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             
             return subject;
         }
+        
+        public static TCommand WithEnvironmentVariable<TCommand>(this TCommand subject, string name, string value) where TCommand : TestCommand
+        {
+            subject.Environment.Add(name, value);
+            
+            return subject;
+        }
     }
 }
