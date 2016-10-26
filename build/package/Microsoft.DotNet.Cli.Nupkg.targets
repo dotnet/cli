@@ -71,7 +71,7 @@
                 NoBuild="True"
                 Output="$(NupkgOutputDirectory)"
                 ProjectPath="%(ProjectsToPack.Identity)"
-                ToolPath="$(Stage2Directory)"
+                ToolPath="$(Stage0Directory)"
                 VersionSuffix="$(NupkgVersionSuffix)"
                 Configuration="$(Configuration)" />
   </Target>
@@ -82,7 +82,7 @@
             Condition=" '$(OS)' == 'Windows_NT' ">
         <MakeDir Directories="$(PackagingBuildBasePath)" />
 
-        <DotNetBuild ToolPath="$(Stage2Directory)"
+        <DotNetBuild ToolPath="$(Stage0Directory)"
                      BuildBasePath="$(PackagingBuildBasePath)"
                      Configuration="$(Configuration)"
                      ProjectPath="%(ProjectsToPack.Identity)" />
