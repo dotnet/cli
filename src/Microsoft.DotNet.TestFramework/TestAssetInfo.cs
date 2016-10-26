@@ -181,7 +181,7 @@ namespace Microsoft.DotNet.TestFramework
 
             foreach (var projFile in projFiles)
             {
-                var restoreArgs = new string[] { "restore", projFile.FullName };
+                var restoreArgs = new string[] { "restore", projFile.FullName, "/p:SkipInvalidConfigurations=true" };
 
                 var commandResult = Command.Create(new PathCommandResolverPolicy(), "dotnet", restoreArgs)
                                        .CaptureStdOut()
