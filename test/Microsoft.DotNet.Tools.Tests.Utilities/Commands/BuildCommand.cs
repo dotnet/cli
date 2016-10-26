@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
             if (_workingDirectory != null)
             {
-                base.WithWorkingDirectory(_workingDirectory.FullName);
+                this.WithWorkingDirectory(_workingDirectory.FullName);
             }
             
             if (_captureOutput)

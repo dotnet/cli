@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.Cli.Utils
             if (commandResolverArguments.CommandName == null
                 || commandResolverArguments.ProjectDirectory == null)
             {
-                Reporter.Verbose.WriteLine("projecttoolscommandresolver: Invalid CommandResolverArguments");
+                Reporter.Verbose.WriteLine($"projecttoolscommandresolver: Invalid CommandResolverArguments");
 
                 return null;
             }
@@ -126,6 +126,8 @@ namespace Microsoft.DotNet.Cli.Utils
 
             var toolLockFile = GetToolLockFile(toolLibraryRange, nugetPackagesRoot);
 
+            Reporter.Verbose.WriteLine($"projecttoolscommandresolver: found tool lockfile at : {toolLockFile.Path}");
+
             var toolLibrary = toolLockFile.Targets
                 .FirstOrDefault(
                     t => t.TargetFramework.GetShortFolderName().Equals(s_toolPackageFramework.GetShortFolderName()))
@@ -144,6 +146,8 @@ namespace Microsoft.DotNet.Cli.Utils
 
             var normalizedNugetPackagesRoot = PathUtility.EnsureNoTrailingDirectorySeparator(nugetPackagesRoot);
 
+            Reporter.Verbose.WriteLine($"projecttoolscommandresolver: attempting to create commandspec");
+
             var commandSpec = _packagedCommandSpecFactory.CreateCommandSpecFromLibrary(
                     toolLibrary,
                     commandName,
@@ -153,6 +157,11 @@ namespace Microsoft.DotNet.Cli.Utils
                     s_commandResolutionStrategy,
                     depsFilePath,
                     null);
+
+            if (commandSpec == null)
+            {
+                Reporter.Verbose.WriteLine($"projecttoolscommandresolver: commandSpec is null.");
+            }
 
             commandSpec?.AddEnvironmentVariablesFromProject(project);
 
@@ -205,7 +214,7 @@ namespace Microsoft.DotNet.Cli.Utils
                 depsPathRoot,
                 toolLibrary.Name + FileNameSuffixes.DepsJson);
 
-            Reporter.Verbose.WriteLine($"expect deps.json at: {depsJsonPath}");
+            Reporter.Verbose.WriteLine($"projecttoolscommandresolver: expect deps.json at: {depsJsonPath}");
 
             EnsureToolJsonDepsFileExists(toolLockFile, depsJsonPath, toolLibrary);
 

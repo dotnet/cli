@@ -20,12 +20,15 @@ namespace Microsoft.DotNet.Cli.Utils
             string depsFilePath,
             string runtimeConfigPath)
         {
+            Reporter.Verbose.WriteLine($"packagedcommandspecfactory: attempting to find command {commandName} in {toolLibrary.Name}");
 
             var toolAssembly = toolLibrary?.RuntimeAssemblies
                     .FirstOrDefault(r => Path.GetFileNameWithoutExtension(r.Path) == commandName);
 
             if (toolAssembly == null)
             {
+                Reporter.Verbose.WriteLine($"packagedcommandspecfactory: failed to find toolAssembly for {commandName}");
+
                 return null;
             }
             
@@ -33,6 +36,8 @@ namespace Microsoft.DotNet.Cli.Utils
 
             if (!File.Exists(commandPath))
             {
+                Reporter.Verbose.WriteLine($"packagedcommandspecfactory: failed to find commandPath {commandPath}");
+
                 return null;
             }
 

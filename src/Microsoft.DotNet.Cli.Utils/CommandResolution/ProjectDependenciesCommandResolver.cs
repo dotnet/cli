@@ -36,6 +36,8 @@ namespace Microsoft.DotNet.Cli.Utils
 
         public CommandSpec Resolve(CommandResolverArguments commandResolverArguments)
         {
+            Reporter.Verbose.WriteLine($"projectdependenciescommandresolver: attempting to resolve {commandResolverArguments.CommandName}");
+
             if (commandResolverArguments.Framework == null
                 || commandResolverArguments.ProjectDirectory == null
                 || commandResolverArguments.Configuration == null
