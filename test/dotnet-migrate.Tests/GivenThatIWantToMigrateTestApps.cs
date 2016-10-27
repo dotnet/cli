@@ -10,17 +10,18 @@ using System.IO;
 using Microsoft.DotNet.Tools.Migrate;
 using Build3Command = Microsoft.DotNet.Tools.Test.Utilities.Build3Command;
 using BuildCommand = Microsoft.DotNet.Tools.Test.Utilities.BuildCommand;
+using Publish3Command = Microsoft.DotNet.Tools.Test.Utilities.Publish3Command;
 using System.Runtime.Loader;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.DotNet.Migration.Tests
 {
     public class GivenThatIWantToMigrateTestApps : TestBase
     {
         [Theory]
-        // TODO: Standalone apps [InlineData("TestAppSimple", false)]
-        // https://github.com/dotnet/sdk/issues/73 [InlineData("TestAppWithLibrary/TestApp", false)]
         [InlineData("TestAppWithRuntimeOptions")]
         [InlineData("TestAppWithContents")]
+        [InlineData("AppWithAssemblyInfo")]
         public void It_migrates_apps(string projectName)
         {
             var projectDirectory = TestAssetsManager.CreateTestInstance(projectName, callingMethod: "i")
@@ -44,13 +45,14 @@ namespace Microsoft.DotNet.Migration.Tests
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
         }
 
-        public void It_migrates_signed_apps(string projectName)
+        [Fact]
+        public void It_migrates_signed_apps()
         {
             var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppWithSigning", callingMethod: "i").WithLockFiles().Path;
 
             CleanBinObj(projectDirectory);
 
-            var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, projectName);
+            var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, "TestAppWithSigning");
 
             var outputsIdentical =
                 outputComparisonData.ProjectJsonBuildOutputs.SetEquals(outputComparisonData.MSBuildBuildOutputs);
@@ -90,13 +92,22 @@ namespace Microsoft.DotNet.Migration.Tests
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
         }
 
-        [Fact(Skip="https://github.com/dotnet/cli/issues/4299")]
-        public void It_migrates_dotnet_new_web_with_outputs_containing_project_json_outputs()
+        [Fact]
+        public void It_migrates_old_dotnet_new_web_without_tools_with_outputs_containing_project_json_outputs()
         {
             var testInstance = TestAssetsManager
-                .CreateTestInstance("ProjectJsonWebTemplate");
+                .CreateTestInstance("ProjectJsonWebTemplate")
+                .WithLockFiles();
 
             var projectDirectory = testInstance.Path;
+
+            var globalDirectory = Path.Combine(projectDirectory, "..");  
+            var projectJsonFile = Path.Combine(projectDirectory, "project.json");  
+              
+            WriteGlobalJson(globalDirectory);  
+            var projectJson = JObject.Parse(File.ReadAllText(projectJsonFile));  
+            projectJson.Remove("tools");  
+            File.WriteAllText(projectJsonFile, projectJson.ToString());  
 
             var outputComparisonData = GetComparisonData(projectDirectory);
 
@@ -112,8 +123,7 @@ namespace Microsoft.DotNet.Migration.Tests
         }
 
         [Theory]
-        // TODO: Enable this when X-Targeting is in
-        // [InlineData("TestLibraryWithMultipleFrameworks")]
+        [InlineData("TestLibraryWithTwoFrameworks")]
         public void It_migrates_projects_with_multiple_TFMs(string projectName)
         {
             var projectDirectory =
@@ -337,6 +347,19 @@ namespace Microsoft.DotNet.Migration.Tests
             result.StdErr.Should().Contain("Migration failed.");
         }
 
+        [Fact]
+        public void It_migrates_and_publishes_projects_with_runtimes()
+        {
+            var projectName = "TestAppSimple";
+            var projectDirectory = TestAssetsManager.CreateTestInstance(projectName, callingMethod: "i")
+                                                    .WithLockFiles()
+                                                    .Path;
+
+            CleanBinObj(projectDirectory);
+            BuildProjectJsonMigrateBuildMSBuild(projectDirectory, projectName);
+            PublishMSBuild(projectDirectory, projectName, "win7-x64");
+        }
+
         [WindowsOnlyTheory]
         [InlineData("DesktopTestProjects", "AutoAddDesktopReferencesDuringMigrate", true)]
         [InlineData("TestProjects", "TestAppSimple", false)]
@@ -520,12 +543,12 @@ namespace Microsoft.DotNet.Migration.Tests
 
             if (projectName != null)
             {
-                command.Execute($"{projectName}.csproj /p:SkipInvalidConfigurations=true")
+                command.Execute($"{projectName}.csproj /p:SkipInvalidConfigurations=true;_InvalidConfigurationWarning=false")
                     .Should().Pass();
             }
             else
             {
-                command.Execute("/p:SkipInvalidConfigurations=true")
+                command.Execute("/p:SkipInvalidConfigurations=true;_InvalidConfigurationWarning=false")
                     .Should().Pass(); 
             }
         }
@@ -545,6 +568,25 @@ namespace Microsoft.DotNet.Migration.Tests
 
             result
                 .Should().Pass();
+
+            return result.StdOut;
+        }
+
+        private string PublishMSBuild(string projectDirectory, string projectName, string runtime, string configuration = "Debug")
+        {
+            if (projectName != null)
+            {
+                projectName = projectName + ".csproj";
+            }
+
+            DeleteXproj(projectDirectory);
+
+            var result = new Publish3Command()
+                .WithRuntime(runtime)
+                .WithWorkingDirectory(projectDirectory)
+                .ExecuteWithCapturedOutput($"{projectName} /p:Configuration={configuration}");
+
+            result.Should().Pass();
 
             return result.StdOut;
         }
@@ -590,6 +632,15 @@ namespace Microsoft.DotNet.Migration.Tests
 
                 MSBuildBuildOutputs = msBuildBuildOutputs;
             }
+        }
+
+        private void WriteGlobalJson(string globalDirectory)  
+        {  
+            var file = Path.Combine(globalDirectory, "global.json");  
+            File.WriteAllText(file, @"  
+            {  
+                ""projects"": [ ]  
+            }");  
         }
     }
 }
