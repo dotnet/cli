@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.Tests
             get
             {
                 var rid = DotnetLegacyRuntimeIdentifiers.InferLegacyRestoreRuntimeIdentifier();
-                var projectOutputPath = $"AppWithDirectDepDesktopAndPortable\\bin\\Debug\\net451\\{rid}\\dotnet-desktop-and-portable.exe";
+                var projectOutputPath = $"AppWithProjTool2Fx\\bin\\Debug\\net451\\{rid}\\dotnet-desktop-and-portable.exe";
                 return new[]
                 {
                     new object[] { "CoreFX", ".NETCoreApp,Version=v1.0", "lib\\netcoreapp1.0\\dotnet-desktop-and-portable.dll", true },
@@ -135,7 +135,7 @@ namespace Microsoft.DotNet.Tests
                 return;
             }
 
-            var testInstance = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "AppWithDirectDepDesktopAndPortable")
+            var testInstance = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "AppWithProjTool2Fx")
                 .CreateInstance(identifier: identifier)
                 .WithSourceFiles()
                 .WithRestoreFiles();

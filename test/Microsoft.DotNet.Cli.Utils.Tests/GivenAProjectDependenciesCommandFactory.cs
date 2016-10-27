@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         {
             var configuration = "Debug";
 
-            var testInstance = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "AppWithDirectDepDesktopAndPortable")
+            var testInstance = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "AppWithProjTool2Fx")
                 .CreateInstance()
                 .WithSourceFiles()
                 .WithRestoreFiles();
@@ -91,7 +91,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         {
             var configuration = "Debug";
 
-            var testInstance = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "AppWithDirectDepDesktopAndPortable")
+            var testInstance = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "AppWithProjTool2Fx")
                 .CreateInstance()
                 .WithSourceFiles()
                 .WithRestoreFiles();
@@ -120,7 +120,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         {
             var configuration = "Release";
 
-            var testInstance = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "AppWithDirectDepDesktopAndPortable")
+            var testInstance = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "AppWithProjTool2Fx")
                 .CreateInstance()
                 .WithSourceFiles()
                 .WithRestoreFiles();
@@ -151,7 +151,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         {
             var configuration = "Release";
 
-            var testInstance = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "AppWithDirectDepDesktopAndPortable")
+            var testInstance = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "AppWithProjTool2Fx")
                 .CreateInstance()
                 .WithSourceFiles()
                 .WithRestoreFiles();
