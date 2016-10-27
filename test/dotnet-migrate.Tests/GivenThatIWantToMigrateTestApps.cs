@@ -9,7 +9,6 @@ using FluentAssertions;
 using System.IO;
 using Microsoft.DotNet.Tools.Migrate;
 using BuildCommand = Microsoft.DotNet.Tools.Test.Utilities.BuildCommand;
-using Publish3Command = Microsoft.DotNet.Tools.Test.Utilities.Publish3Command;
 using System.Runtime.Loader;
 using Newtonsoft.Json.Linq;
 
@@ -583,7 +582,7 @@ namespace Microsoft.DotNet.Migration.Tests
 
             DeleteXproj(projectDirectory);
 
-            var result = new Publish3Command()
+            var result = new PublishCommand()
                 .WithRuntime(runtime)
                 .WithWorkingDirectory(projectDirectory)
                 .ExecuteWithCapturedOutput($"{projectName} /p:Configuration={configuration}");

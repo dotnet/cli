@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         }
 
         [Fact]
-        public void ItReturnsACommandSpecWithDotnetAsFileNameAndCommandNameInArgsWhenCommandNameExistsInMSBuildProjectDependencies()
+        public void ItReturnsACommandSpecWhenToolIsInAProjectRef()
         {
             MSBuildTestProjectInstance =
                 TestAssets.Get("MSBuildTestAppWithToolInDependencies")

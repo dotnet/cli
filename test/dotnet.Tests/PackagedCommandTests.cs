@@ -179,8 +179,7 @@ namespace Microsoft.DotNet.Tests
             new DependencyToolInvokerCommand()
                 .WithWorkingDirectory(testInstance.Root)
                 .ExecuteWithCapturedOutput($"desktop-and-portable {framework} {identifier}")
-                .Should().HaveStdOutContaining("Command not found")
-                     .And.Fail();
+                .Should().Fail();
         }
 
         [Fact]
