@@ -62,19 +62,14 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         {
             var configuration = "Debug";
 
-            var testInstance = TestAssets.Get("MSBuildAppWithMultipleFrameworksAndTools")
-                .CreateInstance("i")
+            var testInstance = TestAssets.Get("AppWithMultipleFxAndTools")
+                .CreateInstance()
                 .WithSourceFiles()
                 .WithRestoreFiles();
 
-            var projectFile = testInstance.Root.GetFile("MSBuildAppWithMultipleFrameworksAndTools.csproj");
-
-            new RestoreCommand()
-                .ExecuteWithCapturedOutput($"{projectFile} -s {_repoDirectoriesProvider.TestPackages}")
-                .Should().Pass();
-
             new BuildCommand()
-                .Execute($"{projectFile} --configuration {configuration}")
+                .WithWorkingDirectory(testInstance.Root)
+                .Execute($"--configuration {configuration}")
                 .Should().Pass();
 
             var factory = new ProjectDependenciesCommandFactory(

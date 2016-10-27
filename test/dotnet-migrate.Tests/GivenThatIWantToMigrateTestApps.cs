@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.Migration.Tests
         [InlineData("TestAppWithContents")]
         public void It_migrates_apps(string projectName)
         {
-            var projectDirectory = TestAssetsManager.CreateTestInstance(projectName, callingMethod: "i")
+            var projectDirectory = TestAssetsManager.CreateTestInstance(projectName, identifier: projectName)
                                                     .WithLockFiles()
                                                     .Path;
 
@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.Migration.Tests
         [Fact]
         public void It_migrates_signed_apps()
         {
-            var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppWithSigning", callingMethod: "i").WithLockFiles().Path;
+            var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppWithSigning").WithLockFiles().Path;
 
             CleanBinObj(projectDirectory);
 
@@ -125,7 +125,7 @@ namespace Microsoft.DotNet.Migration.Tests
         public void It_migrates_projects_with_multiple_TFMs(string projectName)
         {
             var projectDirectory =
-                TestAssetsManager.CreateTestInstance(projectName, callingMethod: "i").WithLockFiles().Path;
+                TestAssetsManager.CreateTestInstance(projectName, identifier: projectName).WithLockFiles().Path;
 
             var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, projectName);
 
@@ -147,7 +147,7 @@ namespace Microsoft.DotNet.Migration.Tests
         public void It_migrates_a_library(string projectName)
         {
             var projectDirectory =
-                TestAssetsManager.CreateTestInstance(projectName, callingMethod: "i").WithLockFiles().Path;
+                TestAssetsManager.CreateTestInstance(projectName, identifier: projectName).WithLockFiles().Path;
 
             var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, Path.GetFileNameWithoutExtension(projectName));
 
@@ -348,11 +348,11 @@ namespace Microsoft.DotNet.Migration.Tests
 
         [WindowsOnlyTheory]
         [InlineData("DesktopTestProjects", "AutoAddDesktopReferencesDuringMigrate", true)]
-        [InlineData("TestProjects", "TestAppSimple", false)]
+        [InlineData("TestProjects", "PJTestAppSimple", false)]
         public void It_auto_add_desktop_references_during_migrate(string testGroup, string projectName, bool isDesktopApp)
         {
             var testAssetManager = GetTestGroupTestAssetsManager(testGroup);
-            var projectDirectory = testAssetManager.CreateTestInstance(projectName, callingMethod: "i").WithLockFiles().Path;
+            var projectDirectory = testAssetManager.CreateTestInstance(projectName).WithLockFiles().Path;
             
             CleanBinObj(projectDirectory);
             MigrateProject(new string[] { projectDirectory });
@@ -498,7 +498,8 @@ namespace Microsoft.DotNet.Migration.Tests
 
         private void BuildProjectJson(string projectDirectory)
         {
-            var projectFile = "\"" + Path.Combine(projectDirectory, "project.json\"");
+            Console.WriteLine(projectDirectory);
+            var projectFile = "\"" + Path.Combine(projectDirectory, "project.json") + "\"";
 
             var result = new BuildPJCommand()
                 .WithCapturedOutput()
