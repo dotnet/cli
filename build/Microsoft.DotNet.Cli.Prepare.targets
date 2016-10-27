@@ -4,7 +4,7 @@
   <Import Project="prepare/CheckPrereqs.targets" />
 
   <Target Name="Prepare"
-          DependsOnTargets="Init;DownloadHostAndSharedFxArtifacts;RestoreCrossgen;RestorePackagesSrc;RestorePackagesTools;ZipTemplates" />
+          DependsOnTargets="Init;DownloadHostAndSharedFxArtifacts;RestorePackagesSrc;RestorePackagesTools;ZipTemplates" />
 
   <Target Name="Init"
           DependsOnTargets="InitializeCommonProps;
@@ -182,15 +182,6 @@
                                OverwriteDestination="True" />
   </Target>
 
-  <Target Name="RestoreCrossgen"
-          DependsOnTargets="SetupRestoreCrossgenPackage;Init"
-          Inputs="@(RestoreCrossgenPackage)"
-          Outputs="@(RestoreCrossgenPackage->'%(RelativeDir)/obj/project.assets.json')">
-
-    <CallTarget Targets="CleanCrossgenLockFiles" />
-    <DotNetRestore3 WorkingDirectory="$(RepoRoot)/crossgen" ToolPath="$(DotNetPath)" Root="&quot;%(RestoreCrossgenPackage.FullPath)&quot;" MSBuildArgs="/p:RuntimeIdentifiers=$(Rid)" />
-  </Target>
-
   <Target Name="RestorePackagesSrc"
           DependsOnTargets="SetupRestorePackagesInputsOutputsSrc;Init"
           Inputs="@(RestorePackagesInputSrc)"
@@ -209,13 +200,6 @@
     <DotNetRestore3 WorkingDirectory="$(RepoRoot)/tools" ToolPath="$(DotNetPath)" Root="&quot;%(RestorePackagesInputTools.FullPath)&quot;" />
   </Target>
 
-  <Target Name="CleanCrossgenLockFiles" >
-    <ItemGroup>
-      <CrossgenLockFiles Include="$(RepoRoot)/crossgen/**/project.assets.json" />
-    </ItemGroup>
-    <Delete Files="@(CrossgenLockFiles)" />
-  </Target>
-
   <Target Name="CleanSrcLockFiles" >
     <ItemGroup>
       <SrcLockFiles Include="$(RepoRoot)/src/**/project.assets.json" />
@@ -230,12 +214,6 @@
     <Delete Files="@(ToolsLockFiles)" />
   </Target>
 
-  <Target Name="SetupRestoreCrossgenPackage">
-    <ItemGroup>
-      <RestoreCrossgenPackage Include="$(RepoRoot)/crossgen/**/*.csproj" />
-    </ItemGroup>
-  </Target>
-
   <Target Name="SetupRestorePackagesInputsOutputsSrc">
     <ItemGroup>
       <RestorePackagesInputSrc Include="$(RepoRoot)/src/**/*.csproj" Exclude="$(RepoRoot)/src/**/%24projectName%24.csproj" />
@@ -245,12 +223,6 @@
   <Target Name="SetupRestorePackagesInputsOutputsTools">
     <ItemGroup>
       <RestorePackagesInputTools Include="$(RepoRoot)/tools/**/*.csproj" />
-    </ItemGroup>
-  </Target>
-
-  <Target Name="SetupRestoreCrossgenPackage">
-    <ItemGroup>
-      <RestoreCrossgenPackage Include="$(RepoRoot)/crossgen/**/*.csproj" />
     </ItemGroup>
   </Target>
 
