@@ -106,6 +106,7 @@ namespace Microsoft.DotNet.Tests
 
             new DependencyToolInvokerCommand()
                 .WithWorkingDirectory(testInstance.Root)
+                .WithEnvironmentVariable(CommandContext.Variables.Verbose, "true")
                 .ExecuteWithCapturedOutput($"tool-with-output-name", framework, "")
                 .Should().HaveStdOutContaining("Tool with output name!")
                      .And.NotHaveStdErr()
