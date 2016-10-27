@@ -23,6 +23,8 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         public Dictionary<string, string> Environment { get; } = new Dictionary<string, string>();
 
+        private List<Action<string>> _writeLines = new List<Action<string>>();
+
         public TestCommand(string command)
         {
             _command = command;
@@ -43,8 +45,10 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             var stdOut = new StreamForwarder();
             var stdErr = new StreamForwarder();
 
-            stdOut.ForwardTo(writeLine: Reporter.Output.WriteLine);
-            stdErr.ForwardTo(writeLine: Reporter.Output.WriteLine);
+            AddWriteLine(Reporter.Output.WriteLine);
+
+            stdOut.ForwardTo(writeLine: WriteLine);
+            stdErr.ForwardTo(writeLine: WriteLine);
 
             return RunProcess(commandPath, args, stdOut, stdErr);
         }
@@ -59,8 +63,10 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             var stdOut = new StreamForwarder();
             var stdErr = new StreamForwarder();
 
-            stdOut.ForwardTo(writeLine: Reporter.Output.WriteLine);
-            stdErr.ForwardTo(writeLine: Reporter.Output.WriteLine);
+            AddWriteLine(Reporter.Output.WriteLine);
+
+            stdOut.ForwardTo(writeLine: WriteLine);
+            stdErr.ForwardTo(writeLine: WriteLine);
 
             return RunProcessAsync(commandPath, args, stdOut, stdErr);
         }
@@ -77,6 +83,9 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             var stdOut = new StreamForwarder();
             var stdErr = new StreamForwarder();
 
+            stdOut.ForwardTo(writeLine: WriteLine);
+            stdErr.ForwardTo(writeLine: WriteLine);
+
             stdOut.Capture();
             stdErr.Capture();
 
@@ -91,6 +100,11 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             }
 
             CurrentProcess.KillTree();
+        }
+
+        public void AddWriteLine(Action<string> writeLine)
+        {
+            _writeLines.Add(writeLine);
         }
 
         private void ResolveCommand(ref string executable, ref string args)
@@ -186,6 +200,14 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             process.EnableRaisingEvents = true;
             process.Start();
             return process;
+        }
+
+        private void WriteLine(string line)
+        {
+            foreach (var writeLine in _writeLines)
+            {
+                writeLine(line);
+            }
         }
     }
 }

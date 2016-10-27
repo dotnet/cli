@@ -11,11 +11,19 @@ using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Microsoft.DotNet.InternalAbstractions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Microsoft.DotNet.Tests
 {
     public class PackagedCommandTests : TestBase
     {
+        private readonly ITestOutputHelper _output;
+
+        public PackagedCommandTests(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
         public static IEnumerable<object[]> DependencyToolArguments
         {
             get
@@ -100,12 +108,14 @@ namespace Microsoft.DotNet.Tests
 
             new BuildCommand()
                 .WithProjectDirectory(testInstance.Root)
+                .WithWriteLine(_output.WriteLine)
                 .Execute()
                 .Should().Pass();
 
             new DependencyToolInvokerCommand()
                 .WithWorkingDirectory(testInstance.Root)
                 .WithEnvironmentVariable(CommandContext.Variables.Verbose, "true")
+                .WithWriteLine(_output.WriteLine)
                 .ExecuteWithCapturedOutput($"tool-with-output-name", framework, "")
                 .Should().HaveStdOutContaining("Tool with output name!")
                      .And.NotHaveStdErr()

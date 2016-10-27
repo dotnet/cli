@@ -34,5 +34,12 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             
             return subject;
         }
+        
+        public static TCommand WithWriteLine<TCommand>(this TCommand subject, Action<string> writeLine) where TCommand : TestCommand
+        {
+            subject.AddWriteLine(writeLine);
+            
+            return subject;
+        }
     }
 }
