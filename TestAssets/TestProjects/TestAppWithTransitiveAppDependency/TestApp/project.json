@@ -9,10 +9,10 @@
       "target": "project",
       "version": "1.0.0-*"
     },
-    "Microsoft.NETCore.App": "1.1.0-preview1-001100-00"
+    "Microsoft.NETCore.App": "1.1.0-preview1-001153-00"
   },
   "frameworks": {
-    "netcoreapp1.0": {}
+    "netcoreapp1.1": {}
   },
   "runtimes": {
     "win7-x64": {},
@@ -26,6 +26,7 @@
     "rhel.7.2-x64": {},
     "debian.8-x64": {},
     "fedora.23-x64": {},
+    "fedora.24-x64": {},
     "opensuse.13.2-x64": {},
     "opensuse.42.1-x64": {}
   },

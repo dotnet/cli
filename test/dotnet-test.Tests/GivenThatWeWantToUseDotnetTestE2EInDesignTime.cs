@@ -31,7 +31,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
             // unless we re-restore
             new RestoreCommand() { WorkingDirectory = testInstance.TestRoot }.Execute().Should().Pass();
 
-            _outputPath = Path.Combine(testInstance.TestRoot, "bin", "Debug", "netcoreapp1.0");
+            _outputPath = Path.Combine(testInstance.TestRoot, "bin", "Debug", "netcoreapp1.1");
             var buildCommand = new BuildCommand(_projectFilePath);
             var result = buildCommand.Execute();
 

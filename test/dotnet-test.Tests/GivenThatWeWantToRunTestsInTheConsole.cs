@@ -33,7 +33,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
             // unless we re-restore
             new RestoreCommand() { WorkingDirectory = testInstance.TestRoot }.Execute().Should().Pass();
 
-            _defaultOutputPath = Path.Combine(testInstance.TestRoot, "bin", "Debug", "netcoreapp1.0");
+            _defaultOutputPath = Path.Combine(testInstance.TestRoot, "bin", "Debug", "netcoreapp1.1");
         }
 
         //ISSUE https://github.com/dotnet/cli/issues/1935
@@ -72,7 +72,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
         {
             var testCommand = new DotnetTestCommand();
             var result = testCommand.Execute(
-                $"{_projectFilePath} -o {Path.Combine(AppContext.BaseDirectory, "output")} -f netcoreapp1.0");
+                $"{_projectFilePath} -o {Path.Combine(AppContext.BaseDirectory, "output")} -f netcoreapp1.1");
             result.Should().Pass();
         }
 

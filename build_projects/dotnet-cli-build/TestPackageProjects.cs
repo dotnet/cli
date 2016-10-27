@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.Cli.Build
                 IsApplicable = true,
                 VersionSuffix = s_testPackageBuildVersionSuffix,
                 Clean = true,
-                Frameworks = new [] { "netcoreapp1.0" }
+                Frameworks = new [] { "netcoreapp1.1" }
             },
             new TestPackageProject()
             {
@@ -55,7 +55,7 @@ namespace Microsoft.DotNet.Cli.Build
                 IsApplicable = true,
                 VersionSuffix = s_testPackageBuildVersionSuffix,
                 Clean = true,
-                Frameworks = new [] { "netcoreapp1.0" }
+                Frameworks = new [] { "netcoreapp1.1" }
             },
             new TestPackageProject()
             {
@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.Cli.Build
                 IsApplicable = CurrentPlatform.IsWindows,
                 VersionSuffix = s_testPackageBuildVersionSuffix,
                 Clean = true,
-                Frameworks = new [] { "net451", "netcoreapp1.0" }
+                Frameworks = new [] { "net451", "netcoreapp1.1" }
             },
             new TestPackageProject()
             {
@@ -85,7 +85,7 @@ namespace Microsoft.DotNet.Cli.Build
                 IsApplicable =true,
                 VersionSuffix = string.Empty,
                 Clean = true,
-                Frameworks = new [] { "netcoreapp1.0" }
+                Frameworks = new [] { "netcoreapp1.1" }
             },
             new TestPackageProject()
             {
@@ -95,7 +95,7 @@ namespace Microsoft.DotNet.Cli.Build
                 IsApplicable = true,
                 VersionSuffix = string.Empty,
                 Clean = true,
-                Frameworks = new [] { "netcoreapp1.0" }
+                Frameworks = new [] { "netcoreapp1.1" }
             },
             new TestPackageProject()
             {
@@ -105,7 +105,7 @@ namespace Microsoft.DotNet.Cli.Build
                 IsApplicable = true,
                 VersionSuffix = string.Empty,
                 Clean = true,
-                Frameworks = new [] { "netcoreapp1.0" }
+                Frameworks = new [] { "netcoreapp1.1" }
             },
             new TestPackageProject()
             {
@@ -115,7 +115,7 @@ namespace Microsoft.DotNet.Cli.Build
                 IsApplicable = true,
                 VersionSuffix = string.Empty,
                 Clean = true,
-                Frameworks = new [] { "netcoreapp1.0" }
+                Frameworks = new [] { "netcoreapp1.1" }
             },
             new TestPackageProject()
             {
@@ -215,7 +215,7 @@ namespace Microsoft.DotNet.Cli.Build
                 IsApplicable = true,
                 VersionSuffix = s_testPackageBuildVersionSuffix,
                 Clean = true,
-                Frameworks = new [] { "netcoreapp1.0" }
+                Frameworks = new [] { "netcoreapp1.1" }
             }
         };
     }

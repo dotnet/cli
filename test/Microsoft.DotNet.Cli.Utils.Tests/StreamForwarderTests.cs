@@ -135,7 +135,7 @@ namespace StreamForwarderTests
             buildCommand.Execute();
 
             var buildOutputExe = "OutputStandardOutputAndError" + Constants.ExeSuffix;
-            var buildOutputPath = Path.Combine(binTestProjectPath, "bin/Debug/netcoreapp1.0", buildOutputExe);
+            var buildOutputPath = Path.Combine(binTestProjectPath, "bin/Debug/netcoreapp1.1", buildOutputExe);
 
             return buildOutputPath;
         }

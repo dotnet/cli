@@ -30,8 +30,8 @@ namespace Microsoft.DotNet.ProjectModel.Tests
             target.CompileTimeAssemblies.Add("lib/dotnet/_._");
             target.NativeLibraries.Add("runtimes/any/native/Microsoft.CSharp.CurrentVersion.targets");
 
-            var p1 = provider.GetDescription(NuGetFramework.Parse("netcoreapp1.0"), package, target);
-            var p2 = provider.GetDescription(NuGetFramework.Parse("netcoreapp1.0"), package, target);
+            var p1 = provider.GetDescription(NuGetFramework.Parse("netcoreapp1.1"), package, target);
+            var p2 = provider.GetDescription(NuGetFramework.Parse("netcoreapp1.1"), package, target);
 
             Assert.True(p1.Compatible);
             Assert.True(p2.Compatible);

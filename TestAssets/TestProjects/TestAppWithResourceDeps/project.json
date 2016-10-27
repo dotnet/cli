@@ -4,16 +4,16 @@
     "emitEntryPoint": true
   },
   "dependencies": {
-    "Microsoft.NETCore.App": "1.1.0-preview1-001100-00",
-    "Microsoft.CSharp": "4.3.0-preview1-24530-04",
-    "System.Dynamic.Runtime": "4.3.0-preview1-24530-04",
-    "System.Reflection.Metadata": "1.4.1-preview1-24530-04",
-    "System.Runtime.Serialization.Primitives": "4.3.0-preview1-24530-04",
-    "System.Xml.XmlSerializer": "4.3.0-preview1-24530-04",
+    "Microsoft.NETCore.App": "1.1.0-preview1-001153-00",
+    "Microsoft.CSharp": "4.3.0-preview1-24626-02",
+    "System.Dynamic.Runtime": "4.3.0-preview1-24626-02",
+    "System.Reflection.Metadata": "1.4.1-preview1-24626-02",
+    "System.Runtime.Serialization.Primitives": "4.3.0-preview1-24626-02",
+    "System.Xml.XmlSerializer": "4.3.0-preview1-24626-02",
     "WindowsAzure.Storage": "6.2.2-preview"
   },
   "frameworks": {
-    "netcoreapp1.0": {
+    "netcoreapp1.1": {
       "imports": [
         "dnxcore50",
         "portable-net45+win8"
@@ -32,6 +32,7 @@
     "rhel.7.2-x64": {},
     "debian.8-x64": {},
     "fedora.23-x64": {},
+    "fedora.24-x64": {},
     "opensuse.13.2-x64": {},
     "opensuse.42.1-x64": {}
   }

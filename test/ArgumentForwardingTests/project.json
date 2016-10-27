@@ -6,9 +6,9 @@
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.1.0-preview1-001100-00"
+      "version": "1.1.0-preview1-001153-00"
     },
-    "System.Runtime.Serialization.Primitives": "4.3.0-preview1-24530-04",
+    "System.Runtime.Serialization.Primitives": "4.3.0-preview1-24626-02",
     "Microsoft.DotNet.ProjectModel": {
       "target": "project"
     },
@@ -22,7 +22,7 @@
     "dotnet-test-xunit": "1.0.0-rc2-192208-24"
   },
   "frameworks": {
-    "netcoreapp1.0": {
+    "netcoreapp1.1": {
       "imports": [
         "dotnet5.4",
         "portable-net451+win8"
@@ -31,6 +31,6 @@
   },
   "testRunner": "xunit",
   "scripts": {
-    "precompile": "dotnet publish ../ArgumentsReflector/project.json --framework netcoreapp1.0 --runtime %compile:RuntimeIdentifier% --output %compile:RuntimeOutputDir%"
+    "precompile": "dotnet publish ../ArgumentsReflector/project.json --framework netcoreapp1.1 --runtime %compile:RuntimeIdentifier% --output %compile:RuntimeOutputDir%"
   }
 }

@@ -238,7 +238,7 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var testAssetsRoot = Path.Combine(c.BuildContext.BuildDirectory, "TestAssets", "TestProjects");
             var dotnet = DotNetCli.Stage2;
-            var framework = "netcoreapp1.0";
+            var framework = "netcoreapp1.1";
 
             return BuildTestAssets(c, testAssetsRoot, dotnet, framework);
         }

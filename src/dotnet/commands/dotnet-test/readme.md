@@ -41,7 +41,7 @@ The following sample project.json shows the properties needed:
     "testRunner": "xunit",
 
     "frameworks": {
-        "netcoreapp1.0": {
+        "netcoreapp1.1": {
                 "imports": [
                     "dnxcore50",
                     "portable-net45+win8"

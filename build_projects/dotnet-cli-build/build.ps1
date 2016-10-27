@@ -93,7 +93,7 @@ popd
 
 # Publish the builder
 Write-Host "Compiling Build Scripts..."
-dotnet publish "$PSScriptRoot" -o "$PSScriptRoot\bin" --framework netcoreapp1.0
+dotnet publish "$PSScriptRoot" -o "$PSScriptRoot\bin" --framework netcoreapp1.1
 if($LASTEXITCODE -ne 0) { throw "Failed to compile build scripts" }
 
 # Run the builder

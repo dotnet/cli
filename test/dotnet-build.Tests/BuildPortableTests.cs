@@ -93,7 +93,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
             var outputBase = new DirectoryInfo(Path.Combine(testInstance.TestRoot, "PortableApp", "bin", "Debug"));
 
-            return outputBase.Sub("netcoreapp1.0");
+            return outputBase.Sub("netcoreapp1.1");
         }
     }
 }

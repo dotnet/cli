@@ -250,7 +250,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
             buildResult.StdErr.Should().Contain("The dependency ThisIsNotARealDependencyAndIfSomeoneGoesAndAddsAProjectWithThisNameIWillFindThemAndPunishThem could not be resolved.");
 
-            var outputDir = new DirectoryInfo(Path.Combine(testInstance.TestRoot, "bin", "Debug", "netcoreapp1.0"));
+            var outputDir = new DirectoryInfo(Path.Combine(testInstance.TestRoot, "bin", "Debug", "netcoreapp1.1"));
             outputDir.GetFiles().Length.Should().Be(0);
         }
 
@@ -266,7 +266,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             var result = cmd.Execute();
             result.Should().Pass();
 
-            var outputDir = new DirectoryInfo(Path.Combine(projectRoot, "bin", "Debug", "netcoreapp1.0"));
+            var outputDir = new DirectoryInfo(Path.Combine(projectRoot, "bin", "Debug", "netcoreapp1.1"));
 
             outputDir.Should().HaveFile("TestLibraryWithResources.dll");
             outputDir.Sub("fr").Should().HaveFile("TestLibraryWithResources.resources.dll");
@@ -275,7 +275,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
             foreach (var library in new[] { Tuple.Create("Microsoft.Data.OData", "5.6.4"), Tuple.Create("TestLibraryWithResources", "1.0.0") })
             {
-                var resources = depsJson["targets"][".NETCoreApp,Version=v1.0"][library.Item1 + "/" + library.Item2]["resources"];
+                var resources = depsJson["targets"][".NETCoreApp,Version=v1.1"][library.Item1 + "/" + library.Item2]["resources"];
 
                 resources.Should().NotBeNull();
 
@@ -347,7 +347,7 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
 
             buildResult.Should().Fail();
 
-            buildResult.StdErr.Should().Contain("Can not find runtime target for framework '.NETCoreApp,Version=v1.0' compatible with one of the target runtimes");
+            buildResult.StdErr.Should().Contain("Can not find runtime target for framework '.NETCoreApp,Version=v1.1' compatible with one of the target runtimes");
             buildResult.StdErr.Should().Contain("The project has not been restored or restore failed - run `dotnet restore`");
         }
 

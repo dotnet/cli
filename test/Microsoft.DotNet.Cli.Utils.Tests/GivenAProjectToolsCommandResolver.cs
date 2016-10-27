@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
 {
     public class GivenAProjectToolsCommandResolver
     {
-        private static readonly NuGetFramework s_toolPackageFramework = FrameworkConstants.CommonFrameworks.NetCoreApp10;
+        private static readonly NuGetFramework s_toolPackageFramework = FrameworkConstants.CommonFrameworks.NetCoreApp11;
 
         private static readonly string s_liveProjectDirectory =
             Path.Combine(AppContext.BaseDirectory, "TestAssets/TestProjects/AppWithToolDependency");

@@ -8,10 +8,10 @@
       "target": "project",
       "version": "1.0.0-*"
     },
-    "NETStandard.Library": "1.6.1-preview1-24530-04"
+    "NETStandard.Library": "1.6.1-preview1-24626-02"
   },
   "frameworks": {
-    "netcoreapp1.0": {}
+    "netcoreapp1.1": {}
   },
   "runtimes": {
     "win7-x64": {},
@@ -25,6 +25,7 @@
     "rhel.7.2-x64": {},
     "debian.8-x64": {},
     "fedora.23-x64": {},
+    "fedora.24-x64": {},
     "opensuse.13.2-x64": {},
     "opensuse.42.1-x64": {}
   }

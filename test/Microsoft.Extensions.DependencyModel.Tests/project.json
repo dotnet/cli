@@ -7,9 +7,9 @@
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.1.0-preview1-001100-00"
+      "version": "1.1.0-preview1-001153-00"
     },
-    "System.Diagnostics.TraceSource": "4.3.0-preview1-24530-04",
+    "System.Diagnostics.TraceSource": "4.3.0-preview1-24626-02",
     "Microsoft.DotNet.Tools.Tests.Utilities": {
       "target": "project"
     },
@@ -22,7 +22,7 @@
     "dotnet-test-xunit": "1.0.0-rc2-192208-24"
   },
   "frameworks": {
-    "netcoreapp1.0": {
+    "netcoreapp1.1": {
       "imports": [
         "dotnet5.4",
         "portable-net451+win8"

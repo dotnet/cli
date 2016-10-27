@@ -35,7 +35,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
             // unless we re-restore
             new RestoreCommand() { WorkingDirectory = testInstance.TestRoot }.Execute().Should().Pass();
 
-            _defaultNetCoreAppOutputPath = Path.Combine(testInstance.TestRoot, "bin", "Debug", "netcoreapp1.0");
+            _defaultNetCoreAppOutputPath = Path.Combine(testInstance.TestRoot, "bin", "Debug", "netcoreapp1.1");
             _defaultNet451OutputPath = Path.Combine(testInstance.TestRoot, "bin", "Debug", "net451", RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers().First());
         }
 
@@ -47,7 +47,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
                 .ExecuteWithCapturedOutput($"{_projectFilePath}");
             result.Should().Pass();
             result.StdOut.Should().Contain("Skipped for NET451");
-            result.StdOut.Should().Contain("Skipped for NETCOREAPP1.0");
+            result.StdOut.Should().Contain("Skipped for NETCOREAPP1.1");
         }
 
         [WindowsOnlyFact]
@@ -58,17 +58,17 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
                 .ExecuteWithCapturedOutput($"{_projectFilePath} -f net451");
             result.Should().Pass();
             result.StdOut.Should().Contain($"Skipped for NET451");
-            result.StdOut.Should().NotContain($"Skipped for NETCOREAPP1.0");
+            result.StdOut.Should().NotContain($"Skipped for NETCOREAPP1.1");
         }
 
         [Fact]
-        public void It_builds_and_runs_tests_for_netcoreapp10()
+        public void It_builds_and_runs_tests_for_netcoreapp11()
         {
             var testCommand = new DotnetTestCommand();
             var result = testCommand
-                .ExecuteWithCapturedOutput($"{_projectFilePath} -f netcoreapp1.0");
+                .ExecuteWithCapturedOutput($"{_projectFilePath} -f netcoreapp1.1");
             result.Should().Pass();
-            result.StdOut.Should().Contain($"Skipped for NETCOREAPP1.0");
+            result.StdOut.Should().Contain($"Skipped for netcoreapp1.1");
             result.StdOut.Should().NotContain($"Skipped for NET451");
         }
 
@@ -77,7 +77,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
         {
             var testCommand = new DotnetTestCommand();
             var result = testCommand.Execute(
-                $"{_projectFilePath} -o {Path.Combine(AppContext.BaseDirectory, "output")} -f netcoreapp1.0");
+                $"{_projectFilePath} -o {Path.Combine(AppContext.BaseDirectory, "output")} -f netcoreapp1.1");
             result.Should().Pass();
         }
 
@@ -94,7 +94,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
         public void It_skips_build_when_the_no_build_flag_is_passed_for_netcoreapp10()
         {
             var buildCommand = new BuildCommand(_projectFilePath);
-            var result = buildCommand.Execute($"-f netcoreapp1.0 -o {_defaultNetCoreAppOutputPath}");
+            var result = buildCommand.Execute($"-f netcoreapp1.1 -o {_defaultNetCoreAppOutputPath}");
             result.Should().Pass();
 
             var testCommand = new DotnetTestCommand();
@@ -143,7 +143,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
 
             result.Should().Fail();
             result.StdOut.Should().Contain("Failing in NET451");
-            result.StdOut.Should().Contain("Failing in NETCOREAPP1.0");
+            result.StdOut.Should().Contain("Failing in NETCOREAPP1.1");
         }
 
         private string GetNotSoLongBuildBasePath()

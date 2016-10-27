@@ -197,7 +197,7 @@ namespace Microsoft.DotNet.Cli.Build
                     "--output",
                     sdkOutputDirectory,
                     "--framework",
-                    "netcoreapp1.0")
+                    "netcoreapp1.1")
                     .Execute()
                     .EnsureSuccessful();
 

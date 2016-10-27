@@ -3,7 +3,7 @@
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.1.0-preview1-001100-00"
+      "version": "1.1.0-preview1-001153-00"
     },
     "Microsoft.DotNet.Tools.Tests.Utilities": {
       "target": "project"
@@ -16,7 +16,7 @@
     "dotnet-test-xunit": "1.0.0-rc2-192208-24"
   },
   "frameworks": {
-    "netcoreapp1.0": {
+    "netcoreapp1.1": {
       "imports": [
         "dnxcore50",
         "portable-net45+win8"
