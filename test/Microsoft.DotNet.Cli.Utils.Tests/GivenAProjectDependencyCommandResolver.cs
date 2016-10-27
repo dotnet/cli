@@ -67,7 +67,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                     .WithRestoreFiles();
             
             new BuildCommand()
-                .WithProjectDirectory(testInstance.Root)
+                .WithProjectDirectory(MSBuildTestProjectInstance.Root)
                 .Execute()
                 .Should().Pass();
 

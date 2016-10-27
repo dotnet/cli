@@ -11,7 +11,7 @@ using FluentAssertions;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
 
-namespace Microsoft.DotNet.Tests
+namespace Microsoft.DotNet.BindingRedirects.Tests
 {
     public class GivenAnAppWithRedirectsAndExecutableDependency : TestBase, IClassFixture<TestSetupFixture>
     {
@@ -134,13 +134,19 @@ namespace Microsoft.DotNet.Tests
         private IEnumerable<XElement> GetRedirects(string exePath)
         {
             var configFile = exePath + ".config";
+
             File.Exists(configFile).Should().BeTrue($"Config file not found - {configFile}");
+
             var config = ConfigurationManager.OpenExeConfiguration(exePath);
+
             var runtimeSectionXml = config.Sections["runtime"].SectionInformation.GetRawXml();
+
             var runtimeSectionElement = XElement.Parse(runtimeSectionXml);
+
             var redirects = runtimeSectionElement.Elements()
                                 .Where(e => e.Name.LocalName == "assemblyBinding").Elements()
                                 .Where(e => e.Name.LocalName == "dependentAssembly");
+                                
             return redirects;
         }
 
