@@ -94,7 +94,7 @@
       <!-- Run E2E -->
       <DotNetTest WorkingDirectory="$(EndToEndTestDirectory)"
                   EnvironmentVariables="@(TestSdkDebTaskEnvironmentVariables)"
-                  ToolPath="$(DebianInstalledDirectory)"
+                  ToolPath="$(Stage0Directory)"
                   Xml="$(DebianTestResultsXmlFile)" />
 
       <!-- Clean up Packages -->
