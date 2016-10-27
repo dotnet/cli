@@ -64,8 +64,12 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 TestAssets.Get("MSBuildTestAppWithToolInDependencies")
                     .CreateInstance()
                     .WithSourceFiles()
-                    .WithRestoreFiles()
-                    .WithBuildFiles();
+                    .WithRestoreFiles();
+            
+            new BuildCommand()
+                .WithProjectDirectory(testInstance.Root)
+                .Execute()
+                .Should().Pass();
 
             var projectDependenciesCommandResolver = SetupProjectDependenciesCommandResolver();
 

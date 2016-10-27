@@ -94,8 +94,7 @@ namespace Microsoft.DotNet.Tests
             var testInstance = TestAssets.Get("AppWithDirectDepWithOutputName")
                 .CreateInstance()
                 .WithSourceFiles()
-                .WithRestoreFiles()
-                .WithBuildFiles();
+                .WithRestoreFiles();
             
             const string framework = ".NETCoreApp,Version=v1.0";
 
