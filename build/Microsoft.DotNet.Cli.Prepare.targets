@@ -4,7 +4,7 @@
   <Import Project="prepare/CheckPrereqs.targets" />
 
   <Target Name="Prepare"
-          DependsOnTargets="Init;DownloadHostAndSharedFxArtifacts;RestorePackages;ZipTemplates" />
+          DependsOnTargets="Init;DownloadHostAndSharedFxArtifacts;RestorePackagesSrc;RestorePackagesTools;ZipTemplates" />
 
   <Target Name="Init"
           DependsOnTargets="InitializeCommonProps;
@@ -182,28 +182,49 @@
                                OverwriteDestination="True" />
   </Target>
 
-  <Target Name="RestorePackages"
-          DependsOnTargets="SetupRestorePackagesInputsOutputs;Init"
-          Inputs="@(RestorePackagesInput)"
-          Outputs="@(RestorePackagesInput->'%(RelativeDir)/project.lock.json')">
+  <Target Name="RestorePackagesSrc"
+          DependsOnTargets="SetupRestorePackagesInputsOutputsSrc;Init"
+          Inputs="@(RestorePackagesInputSrc)"
+          Outputs="@(RestorePackagesInputSrc->'%(RelativeDir)/obj/project.assets.json');@(RestorePackagesInputSrc->'%(RelativeDir)/obj/%(Filename).csproj.nuget.g.props')">
 
-    <CallTarget Targets="CleanSrcToolsLockFiles" />
+    <CallTarget Targets="CleanSrcLockFiles" />
     <DotNetRestore WorkingDirectory="$(RepoRoot)/src" ToolPath="$(DotNetPath)" />
+    <DotNetRestore3 WorkingDirectory="$(RepoRoot)/src" ToolPath="$(DotNetPath)" Root="&quot;%(RestorePackagesInputSrc.FullPath)&quot;" />
+  </Target>
+
+  <Target Name="RestorePackagesTools"
+          DependsOnTargets="SetupRestorePackagesInputsOutputsTools;Init"
+          Inputs="@(RestorePackagesInputTools)"
+          Outputs="@(RestorePackagesInputTools->'%(RelativeDir)/obj/project.assets.json')">
+
+    <CallTarget Targets="CleanToolsLockFiles" />
     <DotNetRestore WorkingDirectory="$(RepoRoot)/tools" ToolPath="$(DotNetPath)" />
-
+    <DotNetRestore3 WorkingDirectory="$(RepoRoot)/tools" ToolPath="$(DotNetPath)" Root="&quot;%(RestorePackagesInputTools.FullPath)&quot;" />
   </Target>
 
-  <Target Name="CleanSrcToolsLockFiles" >
+  <Target Name="CleanSrcLockFiles" >
     <ItemGroup>
-      <SrcToolsLockFiles Include="$(RepoRoot)/src/**/project.lock.json;$(RepoRoot)/tools/**/project.lock.json" />
+      <SrcLockFiles Include="$(RepoRoot)/src/**/project.assets.json" />
     </ItemGroup>
-    <Delete Files="@(SrcToolsLockFiles)" />
+    <Delete Files="@(SrcLockFiles)" />
   </Target>
 
-  <Target Name="SetupRestorePackagesInputsOutputs">
+  <Target Name="CleanToolsLockFiles" >
     <ItemGroup>
-      <RestorePackagesInput Include="$(RepoRoot)/src/**/project.json" />
-      <RestorePackagesInput Include="$(RepoRoot)/tools/**/project.json" />
+      <ToolsLockFiles Include="$(RepoRoot)/tools/**/project.assets.json" />
+    </ItemGroup>
+    <Delete Files="@(ToolsLockFiles)" />
+  </Target>
+
+  <Target Name="SetupRestorePackagesInputsOutputsSrc">
+    <ItemGroup>
+      <RestorePackagesInputSrc Include="$(RepoRoot)/src/**/*.csproj" Exclude="$(RepoRoot)/src/**/%24projectName%24.csproj" />
+    </ItemGroup>
+  </Target>
+  
+  <Target Name="SetupRestorePackagesInputsOutputsTools">
+    <ItemGroup>
+      <RestorePackagesInputTools Include="$(RepoRoot)/tools/**/*.csproj" />
     </ItemGroup>
   </Target>
 

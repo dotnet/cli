@@ -1,0 +1,34 @@
+﻿<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
+  <PropertyGroup>
+    <VersionPrefix>1.0.0-preview3</VersionPrefix>
+    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <WarningsAsErrors>true</WarningsAsErrors>
+    <AssemblyOriginatorKeyFile Condition=" '$(OS)' == 'Windows_NT' ">../../tools/Key.snk</AssemblyOriginatorKeyFile>
+    <KeyOriginatorFile Condition=" '$(OS)' != 'Windows_NT' ">../../tools/Key.snk</KeyOriginatorFile>
+    <SignAssembly Condition=" '$(OS)' == 'Windows_NT' ">true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build">
+      <Version>15.1.319-preview5</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Sdk">
+      <Version>1.0.0-alpha-20161019-1</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="**\*.cs" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
+    <ProjectReference Include="..\Microsoft.DotNet.Cli.Utils\Microsoft.DotNet.Cli.Utils.csproj" />
+    <ProjectReference Include="..\Microsoft.DotNet.Compiler.Common\Microsoft.DotNet.Compiler.Common.csproj" />
+    <ProjectReference Include="..\Microsoft.DotNet.Files\Microsoft.DotNet.Files.csproj" />
+    <ProjectReference Include="..\Microsoft.DotNet.ProjectModel\Microsoft.DotNet.ProjectModel.csproj" />
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
+    <DefineConstants>$(DefineConstants);NETCOREAPP1_0</DefineConstants>
+  </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

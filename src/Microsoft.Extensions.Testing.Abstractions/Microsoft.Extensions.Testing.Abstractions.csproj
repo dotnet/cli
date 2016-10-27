@@ -1,0 +1,51 @@
+﻿<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
+  <PropertyGroup>
+    <Description>Abstractions for test runners to communicate to a tool, such as Visual Studio.</Description>
+    <VersionPrefix>1.0.1-featmsbuild</VersionPrefix>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <WarningsAsErrors>true</WarningsAsErrors>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyOriginatorKeyFile Condition=" '$(OS)' == 'Windows_NT' ">../../tools/Key.snk</AssemblyOriginatorKeyFile>
+    <KeyOriginatorFile Condition=" '$(OS)' != 'Windows_NT' ">../../tools/Key.snk</KeyOriginatorFile>
+    <SignAssembly Condition=" '$(OS)' == 'Windows_NT' ">true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>git://github.com/dotnet/cli</RepositoryUrl>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.3' ">$(PackageTargetFallback);portable-net45+wp80+win8+wpa81+dnxcore50;portable-net45+win8</PackageTargetFallback>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>9.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.DiaSymReader">
+      <Version>1.0.8</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.DiaSymReader.Native">
+      <Version>1.4.0-rc2</Version>
+    </PackageReference>
+    <PackageReference Include="System.Reflection.Metadata">
+      <Version>1.4.1-beta-24426-02</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Sdk">
+      <Version>1.0.0-alpha-20161019-1</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="**\*.cs" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+    <ProjectReference Include="..\Microsoft.DotNet.ProjectModel\Microsoft.DotNet.ProjectModel.csproj" />
+    <PackageReference Include="System.Resources.ResourceManager">
+      <Version>4.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="System.Reflection.TypeExtensions">
+      <Version>4.1.0</Version>
+    </PackageReference>
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+    <DefineConstants>$(DefineConstants);NETSTANDARD1_3</DefineConstants>
+  </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
