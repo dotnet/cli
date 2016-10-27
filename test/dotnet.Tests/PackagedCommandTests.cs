@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.Tests
             {
                 var rid = DotnetLegacyRuntimeIdentifiers.InferLegacyRestoreRuntimeIdentifier();
 
-                var projectOutputPath = $"LibraryWithDirectDependencyDesktopAndPortable\\bin\\Debug\\net451\\dotnet-desktop-and-portable.exe";
+                var projectOutputPath = $"LibWithProjTool2Fx\\bin\\Debug\\net451\\dotnet-desktop-and-portable.exe";
 
                 return new[]
                 {
@@ -165,7 +165,7 @@ namespace Microsoft.DotNet.Tests
                 return;
             }
 
-            var testInstance = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "LibraryWithDirectDependencyDesktopAndPortable")
+            var testInstance = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "LibWithProjTool2Fx")
                 .CreateInstance(identifier: identifier)
                 .WithSourceFiles()
                 .WithRestoreFiles();
