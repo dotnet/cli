@@ -185,9 +185,10 @@
   <Target Name="RestorePackagesSrc"
           DependsOnTargets="SetupRestorePackagesInputsOutputsSrc;Init"
           Inputs="@(RestorePackagesInputSrc)"
-          Outputs="@(RestorePackagesInputSrc->'%(RelativeDir)/obj/project.assets.json')">
+          Outputs="@(RestorePackagesInputSrc->'%(RelativeDir)/obj/project.assets.json');@(RestorePackagesInputSrc->'%(RelativeDir)/obj/%(Filename).csproj.nuget.g.props')">
 
     <CallTarget Targets="CleanSrcLockFiles" />
+    <DotNetRestore WorkingDirectory="$(RepoRoot)/src" ToolPath="$(DotNetPath)" />
     <DotNetRestore3 WorkingDirectory="$(RepoRoot)/src" ToolPath="$(DotNetPath)" Root="&quot;%(RestorePackagesInputSrc.FullPath)&quot;" />
   </Target>
 
@@ -197,6 +198,7 @@
           Outputs="@(RestorePackagesInputTools->'%(RelativeDir)/obj/project.assets.json')">
 
     <CallTarget Targets="CleanToolsLockFiles" />
+    <DotNetRestore WorkingDirectory="$(RepoRoot)/tools" ToolPath="$(DotNetPath)" />
     <DotNetRestore3 WorkingDirectory="$(RepoRoot)/tools" ToolPath="$(DotNetPath)" Root="&quot;%(RestorePackagesInputTools.FullPath)&quot;" />
   </Target>
 

@@ -27,8 +27,8 @@ namespace Microsoft.DotNet.Cli.Utils
             string buildBasePath,
             string outputPath)
         {
-            return GetMSBuildProj(projectDirectory, framework, configuration, outputPath) ??
-                GetProjectJsonProject(projectDirectory, framework, configuration, buildBasePath, outputPath);
+            return GetProjectJsonProject(projectDirectory, framework, configuration, buildBasePath, outputPath) ??
+                GetMSBuildProj(projectDirectory, framework, configuration, outputPath);
         }
 
         private IProject GetMSBuildProj(string projectDirectory, NuGetFramework framework, string configuration, string outputPath)
