@@ -152,9 +152,10 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 Constants.MSBUILD_EXE_PATH,
                 Path.Combine(new RepoDirectoriesProvider().Stage2Sdk, "MSBuild.dll"));
 
-            Environment.SetEnvironmentVariable(CommandContext.Variables.Verbose, "true");
+            CommandContext.SetVerbose(true);
 
             environment = environment ?? new EnvironmentProvider();
+
             packagedCommandSpecFactory = packagedCommandSpecFactory ?? new PackagedCommandSpecFactory();
 
             var projectDependenciesCommandResolver = new ProjectDependenciesCommandResolver(environment, packagedCommandSpecFactory);
