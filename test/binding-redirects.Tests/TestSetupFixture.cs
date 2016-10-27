@@ -7,7 +7,7 @@ using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using NuGet.Frameworks;
 
-namespace Microsoft.DotNet.Tests
+namespace Microsoft.DotNet.BindingRedirects.Tests
 {
     public class TestSetupFixture : TestBase
     {
