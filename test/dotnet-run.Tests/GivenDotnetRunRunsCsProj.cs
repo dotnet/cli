@@ -85,7 +85,7 @@ namespace Microsoft.DotNet.Cli.Run.Tests
                 .CreateInstance()
                 .WithSourceFiles(); 
  
-            var testProjectDirectory = testInstance.TestRoot; 
+            var testProjectDirectory = testInstance.Root; 
  
             new RestoreCommand() 
                 .WithWorkingDirectory(testProjectDirectory) 

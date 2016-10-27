@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Microsoft.DotNet.InternalAbstractions;
+using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.DotNet.Internal.ProjectModel.Graph;
 using Microsoft.DotNet.Internal.ProjectModel.Resolution;
