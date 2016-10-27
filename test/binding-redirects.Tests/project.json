@@ -6,6 +6,9 @@
     "Microsoft.NETCore.Platforms": "1.0.1",
     "Microsoft.DotNet.Tools.Tests.Utilities": {
       "target": "project"
+    },
+    "Microsoft.DotNet.InternalAbstractions": {
+      "target": "project"
     }
   },
   "frameworks": {
