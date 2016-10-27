@@ -52,11 +52,6 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
                 .WithRestoreFiles();
 
             var testProjectDirectory = testInstance.Root;
-            
-            new RestoreCommand() 
-                .WithWorkingDirectory(testProjectDirectory) 
-                .Execute() 
-                .Should().Pass(); 
 
             var rid = DotnetLegacyRuntimeIdentifiers.InferLegacyRestoreRuntimeIdentifier();
 
