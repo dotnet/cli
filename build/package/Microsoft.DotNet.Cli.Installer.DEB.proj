@@ -135,9 +135,9 @@
   <Target Name="PrepareDotnetDebTool"
           DependsOnTargets="WriteDotnetDebToolProjectJson;">
 
-    <DotNetRestore  FallbackSource="$(DotnetDebToolPackageSource)"
-                    ToolPath="$(Stage2Directory)"
-                    WorkingDirectory="$(DotnetDebToolDir)" />
+    <DotNetRestoreProjectJson  FallbackSource="$(DotnetDebToolPackageSource)"
+                               ToolPath="$(Stage2Directory)"
+                               WorkingDirectory="$(DotnetDebToolDir)" />
   </Target>
 
   <Target Name="WriteDotnetDebToolProjectJson"
