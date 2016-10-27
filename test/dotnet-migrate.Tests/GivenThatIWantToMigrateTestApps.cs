@@ -349,7 +349,7 @@ namespace Microsoft.DotNet.Migration.Tests
         [Fact]
         public void It_migrates_and_publishes_projects_with_runtimes()
         {
-            var projectName = "TestAppSimple";
+            var projectName = "PJTestAppSimple";
             var projectDirectory = TestAssetsManager.CreateTestInstance(projectName, callingMethod: "i")
                                                     .WithLockFiles()
                                                     .Path;

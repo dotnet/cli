@@ -81,8 +81,9 @@ namespace Microsoft.DotNet.Cli.Run.Tests
         public void It_runs_portable_apps_from_a_different_path_after_building() 
         { 
             var testAppName = "MSBuildTestApp"; 
-            var testInstance = TestAssetsManager 
-                .CreateTestInstance(testAppName); 
+            var testInstance = TestAssets.Get(testAppName)
+                .CreateInstance()
+                .WithSourceFiles(); 
  
             var testProjectDirectory = testInstance.TestRoot; 
  
