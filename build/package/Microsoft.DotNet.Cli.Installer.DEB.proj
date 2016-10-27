@@ -49,7 +49,7 @@
         ReplacementStrings="@(DebianConfigTokenValues -> '%(ReplacementString)')" />
 
       <!-- Build SDK Deb package -->
-      <DotNetDebTool ToolPath="$(Stage2Directory)"
+      <DotNetDebTool ToolPath="$(Stage0Directory)"
                      InputDirectory="$(LayoutDirectory)"
                      OutputDirectory="$(DotNetDebToolOutputDirectory)"
                      PackageName="$(SdkDebianPackageName)"
