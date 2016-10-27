@@ -78,7 +78,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
         {
             var repoDirectoriesProvider = new RepoDirectoriesProvider();
 
-            var testInstance = TestAssets.Get("MSBuildTestAppWithToolInDependencies")
+            var testInstance = TestAssets.Get("TestAppWithProjDepTool")
                                          .CreateInstance()
                                          .WithSourceFiles()
                                          .WithRestoreFiles();

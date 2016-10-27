@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         public void ItReturnsACommandSpecWhenToolIsInAProjectRef()
         {
             MSBuildTestProjectInstance =
-                TestAssets.Get("MSBuildTestAppWithToolInDependencies")
+                TestAssets.Get("TestAppWithProjDepTool")
                     .CreateInstance()
                     .WithSourceFiles()
                     .WithRestoreFiles();
@@ -66,7 +66,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         public void ItPassesDepsfileArgToHostWhenReturningACommandSpecForMSBuildProject()
         {
             MSBuildTestProjectInstance =
-                TestAssets.Get("MSBuildTestAppWithToolInDependencies")
+                TestAssets.Get("TestAppWithProjDepTool")
                     .CreateInstance()
                     .WithSourceFiles()
                     .WithRestoreFiles();
@@ -98,7 +98,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         public void ItReturnsNullWhenCommandNameDoesNotExistInProjectDependenciesForMSBuildProject()
         {
             MSBuildTestProjectInstance =
-                TestAssets.Get("MSBuildTestAppWithToolInDependencies")
+                TestAssets.Get("TestAppWithProjDepTool")
                     .CreateInstance()
                     .WithSourceFiles()
                     .WithRestoreFiles();
@@ -122,7 +122,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         public void ItSetsDepsfileToOutputInCommandspecForMSBuild()
         {
             var testInstance = TestAssets
-                    .Get("MSBuildTestAppWithToolInDependencies")
+                    .Get("TestAppWithProjDepTool")
                     .CreateInstance()
                     .WithSourceFiles()
                     .WithRestoreFiles();
@@ -148,7 +148,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
 
             var result = projectDependenciesCommandResolver.Resolve(commandResolverArguments);
 
-            var depsFilePath = outputDir.GetFile("MSBuildTestAppWithToolInDependencies.deps.json");
+            var depsFilePath = outputDir.GetFile("TestAppWithProjDepTool.deps.json");
 
             result.Should().NotBeNull();
             result.Args.Should().Contain($"--depsfile {depsFilePath.FullName}");
