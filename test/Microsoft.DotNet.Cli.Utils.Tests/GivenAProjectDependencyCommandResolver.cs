@@ -68,6 +68,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             
             new BuildCommand()
                 .WithProjectDirectory(MSBuildTestProjectInstance.Root)
+                .WithConfiguration("Debug")
                 .Execute()
                 .Should().Pass();
 

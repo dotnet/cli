@@ -108,6 +108,7 @@ namespace Microsoft.DotNet.Tests
 
             new BuildCommand()
                 .WithProjectDirectory(testInstance.Root)
+                .WithConfiguration("Debug")
                 .WithWriteLine(_output.WriteLine)
                 .Execute()
                 .Should().Pass();
