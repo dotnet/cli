@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             var commandPath = _command;
             ResolveCommand(ref commandPath, ref args);
 
-            Console.WriteLine($"Executing - {commandPath} {args}");
+            Console.WriteLine($"Executing - {commandPath} {args} - {WorkingDirectoryInfo()}");
 
             var stdOut = new StreamForwarder();
             var stdErr = new StreamForwarder();
@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             var commandPath = _command;
             ResolveCommand(ref commandPath, ref args);
 
-            Console.WriteLine($"Executing - {commandPath} {args}");
+            Console.WriteLine($"Executing - {commandPath} {args} - {WorkingDirectoryInfo()}");
 
             var stdOut = new StreamForwarder();
             var stdErr = new StreamForwarder();
@@ -78,7 +78,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             var commandPath = Env.GetCommandPath(command, ".exe", ".cmd", "") ??
                 Env.GetCommandPathFromRootPath(_baseDirectory, command, ".exe", ".cmd", "");
 
-            Console.WriteLine($"Executing (Captured Output) - {commandPath} {args}");
+            Console.WriteLine($"Executing (Captured Output) - {commandPath} {args} - {WorkingDirectoryInfo()}");
 
             var stdOut = new StreamForwarder();
             var stdErr = new StreamForwarder();
@@ -208,6 +208,16 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             {
                 writeLine(line);
             }
+        }
+
+        private string WorkingDirectoryInfo()
+        {
+            if (WorkingDirectory == null)
+            { 
+                return "";
+            }
+
+            return $" in pwd {WorkingDirectory}";
         }
     }
 }

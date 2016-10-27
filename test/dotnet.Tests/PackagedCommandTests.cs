@@ -43,7 +43,9 @@ namespace Microsoft.DotNet.Tests
             get
             {
                 var rid = DotnetLegacyRuntimeIdentifiers.InferLegacyRestoreRuntimeIdentifier();
+
                 var projectOutputPath = $"LibraryWithDirectDependencyDesktopAndPortable\\bin\\Debug\\net451\\dotnet-desktop-and-portable.exe";
+
                 return new[]
                 {
                     new object[] { "CoreFX", ".NETStandard,Version=v1.6", "lib\\netstandard1.6\\dotnet-desktop-and-portable.dll", true },
@@ -136,14 +138,13 @@ namespace Microsoft.DotNet.Tests
             var testInstance = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "AppWithDirectDepDesktopAndPortable")
                 .CreateInstance(identifier: identifier)
                 .WithSourceFiles()
-                .WithRestoreFiles()
-                .WithBuildFiles();
+                .WithRestoreFiles();
 
             new BuildCommand()
                 .WithWorkingDirectory(testInstance.Root)
+                .WithConfiguration("Debug")
                 .Execute()
-                .Should()
-                .Pass();
+                .Should().Pass();
 
             new DependencyToolInvokerCommand()
                 .WithWorkingDirectory(testInstance.Root)
@@ -171,6 +172,7 @@ namespace Microsoft.DotNet.Tests
 
             new BuildCommand()
                 .WithWorkingDirectory(testInstance.Root)
+                .WithConfiguration("Debug")
                 .Execute()
                 .Should().Pass();
 
