@@ -33,8 +33,13 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 TestAssets.Get("MSBuildTestAppWithToolInDependencies")
                     .CreateInstance()
                     .WithSourceFiles()
-                    .WithRestoreFiles()
-                    .WithBuildFiles();
+                    .WithRestoreFiles();
+            
+            new BuildCommand()
+                .WithProjectDirectory(MSBuildTestProjectInstance.Root)
+                .WithConfiguration("Debug")
+                .Execute()
+                .Should().Pass();
 
             var projectDependenciesCommandResolver = SetupProjectDependenciesCommandResolver();
 
