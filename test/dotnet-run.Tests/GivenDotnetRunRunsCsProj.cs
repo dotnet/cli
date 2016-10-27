@@ -79,29 +79,20 @@ namespace Microsoft.DotNet.Cli.Run.Tests
  
         [Fact] 
         public void It_runs_portable_apps_from_a_different_path_after_building() 
-        { 
-            var testAppName = "MSBuildTestApp"; 
-            var testInstance = TestAssets.Get(testAppName)
+        {
+            var testInstance = TestAssets.Get("MSBuildTestApp")
                 .CreateInstance()
-                .WithSourceFiles(); 
- 
-            var testProjectDirectory = testInstance.Root; 
- 
-            new RestoreCommand() 
-                .WithWorkingDirectory(testProjectDirectory) 
-                .Execute() 
-                .Should().Pass(); 
+                .WithSourceFiles()
+                .WithRestoreFiles();
  
             new BuildCommand() 
-                .WithWorkingDirectory(testProjectDirectory) 
+                .WithWorkingDirectory(testInstance.Root) 
                 .Execute() 
                 .Should().Pass(); 
- 
-            string workingDirectory = Directory.GetParent(testProjectDirectory).FullName;
 
             new RunCommand() 
-                .WithWorkingDirectory(workingDirectory) 
-                .ExecuteWithCapturedOutput($"--no-build --project {Path.Combine(testProjectDirectory, testAppName)}.csproj") 
+                .WithWorkingDirectory(testInstance.Root) 
+                .ExecuteWithCapturedOutput($"--no-build") 
                 .Should().Pass() 
                          .And.HaveStdOutContaining("Hello World!"); 
         } 
@@ -110,20 +101,16 @@ namespace Microsoft.DotNet.Cli.Run.Tests
         public void It_runs_portable_apps_from_a_different_path_without_building() 
         { 
             var testAppName = "MSBuildTestApp"; 
-            var testInstance = TestAssetsManager 
-                .CreateTestInstance(testAppName); 
- 
-            var testProjectDirectory = testInstance.TestRoot; 
- 
-            new RestoreCommand() 
-                .WithWorkingDirectory(testProjectDirectory) 
-                .Execute() 
-                .Should().Pass(); 
- 
-            string workingDirectory = Directory.GetParent(testProjectDirectory).FullName; 
+            var testInstance = TestAssets.Get(testAppName)
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
+
+            var projectFile = testInstance.Root.GetFile(testAppName + ".csproj"); 
+
             new RunCommand() 
-                .WithWorkingDirectory(workingDirectory) 
-                .ExecuteWithCapturedOutput($"--project {Path.Combine(testProjectDirectory, testAppName)}.csproj") 
+                .WithWorkingDirectory(testInstance.Root.Parent) 
+                .ExecuteWithCapturedOutput($"--project {projectFile.FullName}") 
                 .Should().Pass() 
                          .And.HaveStdOutContaining("Hello World!"); 
         } 
