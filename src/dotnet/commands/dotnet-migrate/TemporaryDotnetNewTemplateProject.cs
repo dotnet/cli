@@ -15,9 +15,9 @@ namespace Microsoft.DotNet.Tools.Migrate
 
         public ProjectRootElement MSBuildProject { get; }
 
-        public TemporaryDotnetNewTemplateProject()
+        public TemporaryDotnetNewTemplateProject(string projectType)
         {
-            _projectDirectory = CreateDotnetNewMSBuild(c_temporaryDotnetNewMSBuildProjectName);
+            _projectDirectory = CreateDotnetNewMSBuild(c_temporaryDotnetNewMSBuildProjectName, projectType);
             MSBuildProject = GetMSBuildProject(_projectDirectory);
 
             Clean();
@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.Tools.Migrate
             Directory.Delete(Path.Combine(_projectDirectory, ".."), true);
         }
 
-        private string CreateDotnetNewMSBuild(string projectName)
+        private string CreateDotnetNewMSBuild(string projectName, string projectType)
         {
             var tempDir = Path.Combine(
                 Path.GetTempPath(),
@@ -42,7 +42,19 @@ namespace Microsoft.DotNet.Tools.Migrate
             }
             Directory.CreateDirectory(tempDir);
 
-            RunCommand("new", new string[] {}, tempDir);
+            string[] args;
+
+            switch (projectType?.ToUpperInvariant())
+            {
+                case "WEB":
+                    args = new[] { "-t", "web" };
+                    break;
+                default:
+                    args = new string[] { };
+                    break;
+            }
+
+            RunCommand("new", args, tempDir);
 
             return tempDir;
         }

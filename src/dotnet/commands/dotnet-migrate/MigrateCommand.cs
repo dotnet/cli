@@ -24,6 +24,7 @@ namespace Microsoft.DotNet.Tools.Migrate
         private readonly bool _reportFormatJson;
 
         private readonly TemporaryDotnetNewTemplateProject _temporaryDotnetNewProject;
+        private Dictionary<string, TemporaryDotnetNewTemplateProject> _temporaryDotnetNewProjectsByType;
 
         public MigrateCommand(
             string templateFile, 
@@ -39,7 +40,7 @@ namespace Microsoft.DotNet.Tools.Migrate
             _sdkVersion = sdkVersion;
             _xprojFilePath = xprojFilePath;
             _skipProjectReferences = skipProjectReferences;
-            _temporaryDotnetNewProject = new TemporaryDotnetNewTemplateProject();
+            _temporaryDotnetNewProject = new TemporaryDotnetNewTemplateProject(null);
             _reportFile = reportFile;
             _reportFormatJson = reportFormatJson;
         }
@@ -49,8 +50,8 @@ namespace Microsoft.DotNet.Tools.Migrate
             var projectsToMigrate = GetProjectsToMigrate(_projectArg);
 
             var msBuildTemplate = _templateFile != null ?
-                ProjectRootElement.TryOpen(_templateFile) : _temporaryDotnetNewProject.MSBuildProject;
-            
+                ProjectRootElement.TryOpen(_templateFile) : null;
+
             var sdkVersion = _sdkVersion ?? _temporaryDotnetNewProject.MSBuildProject.GetSdkVersion();
 
             EnsureNotNull(sdkVersion, "Null Sdk Version");
@@ -61,7 +62,21 @@ namespace Microsoft.DotNet.Tools.Migrate
             {
                 var projectDirectory = Path.GetDirectoryName(project);
                 var outputDirectory = projectDirectory;
-                var migrationSettings = new MigrationSettings(projectDirectory, outputDirectory, sdkVersion, msBuildTemplate, _xprojFilePath);
+
+                ProjectRootElement template;
+                string projectType;
+                if (msBuildTemplate == null
+                    && new ProjectTypeDetector().TryDetectProjectType(null, project, out projectType))
+                {
+                    var templateForProjectType = DemandMSBuildTemplateForProjectType(projectType);
+                    template = (templateForProjectType ?? _temporaryDotnetNewProject).MSBuildProject;
+                }
+                else
+                {
+                    template = msBuildTemplate ?? _temporaryDotnetNewProject.MSBuildProject;
+                }
+
+                var migrationSettings = new MigrationSettings(projectDirectory, outputDirectory, sdkVersion, template, _xprojFilePath);
                 var projectMigrationReport = new ProjectMigrator().Migrate(migrationSettings, _skipProjectReferences);
 
                 if (migrationReport == null)
@@ -77,6 +92,28 @@ namespace Microsoft.DotNet.Tools.Migrate
             WriteReport(migrationReport);
 
             return migrationReport.FailedProjectsCount;
+        }
+
+        private TemporaryDotnetNewTemplateProject DemandMSBuildTemplateForProjectType(string type)
+        {
+            if (type == null)
+            {
+                return null;
+            }
+
+            if (_temporaryDotnetNewProjectsByType == null)
+            {
+                _temporaryDotnetNewProjectsByType = new Dictionary<string, TemporaryDotnetNewTemplateProject>(StringComparer.OrdinalIgnoreCase);
+            }
+
+            TemporaryDotnetNewTemplateProject temporaryProject;
+            if(!_temporaryDotnetNewProjectsByType.TryGetValue(type, out temporaryProject))
+            {
+                temporaryProject = new TemporaryDotnetNewTemplateProject(type);
+                _temporaryDotnetNewProjectsByType[type] = temporaryProject;
+            }
+
+            return temporaryProject;
         }
 
         private void WriteReport(MigrationReport migrationReport)
