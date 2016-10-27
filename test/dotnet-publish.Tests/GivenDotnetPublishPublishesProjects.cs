@@ -25,24 +25,20 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
             new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .Execute("/p:SkipInvalidConfigurations=true")
-                .Should()
-                .Pass();
+                .Should().Pass();
 
             new PublishCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .Execute("--framework netcoreapp1.0")
-                .Should()
-                .Pass();
+                .Should().Pass();
 
             var configuration = Environment.GetEnvironmentVariable("CONFIGURATION") ?? "Debug";
             var outputDll = Path.Combine(testProjectDirectory, "bin", configuration, "netcoreapp1.0", "publish", $"{testAppName}.dll");
 
             new TestCommand("dotnet")
                 .ExecuteWithCapturedOutput(outputDll)
-                .Should()
-                .Pass()
-                .And
-                .HaveStdOutContaining("Hello World");
+                .Should().Pass()
+                         .And.HaveStdOutContaining("Hello World");
         }
 
         [Fact]
@@ -56,6 +52,11 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
                 .WithRestoreFiles();
 
             var testProjectDirectory = testInstance.Root;
+            
+            new RestoreCommand() 
+                .WithWorkingDirectory(testProjectDirectory) 
+                .Execute() 
+                .Should().Pass(); 
 
             var rid = DotnetLegacyRuntimeIdentifiers.InferLegacyRestoreRuntimeIdentifier();
 

@@ -25,12 +25,6 @@ namespace Microsoft.DotNet.Tools.Publish
 
         public int Execute()
         {
-            int restoreResult = EnsureRestored();
-            if (restoreResult != 0)
-            {
-                throw new GracefulException("Restore failed.  Please fix the errors and try publishing again.");
-            }
-
             List<string> msbuildArgs = new List<string>();
 
             if (!string.IsNullOrEmpty(ProjectPath))
@@ -68,21 +62,6 @@ namespace Microsoft.DotNet.Tools.Publish
             msbuildArgs.AddRange(ExtraMSBuildArguments);
 
             return new MSBuildForwardingApp(msbuildArgs).Execute();
-        }
-
-        /// <summary>
-        /// Ensures that the project has been restored for the specified runtime.
-        /// </summary>
-        private int EnsureRestored()
-        {
-            int result = 0;
-
-            if (!string.IsNullOrEmpty(Runtime))
-            {
-                result = RestoreCommand.Run(new[] { $"/p:RuntimeIdentifiers={Runtime}" });
-            }
-
-            return result;
         }
     }
 }

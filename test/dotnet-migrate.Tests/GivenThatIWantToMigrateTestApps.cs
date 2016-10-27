@@ -9,8 +9,8 @@ using FluentAssertions;
 using System.IO;
 using Microsoft.DotNet.Tools.Migrate;
 using BuildCommand = Microsoft.DotNet.Tools.Test.Utilities.BuildCommand;
+using Publish3Command = Microsoft.DotNet.Tools.Test.Utilities.Publish3Command;
 using System.Runtime.Loader;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.DotNet.Migration.Tests
@@ -20,6 +20,7 @@ namespace Microsoft.DotNet.Migration.Tests
         [Theory]
         [InlineData("TestAppWithRuntimeOptions")]
         [InlineData("TestAppWithContents")]
+        [InlineData("AppWithAssemblyInfo")]
         public void It_migrates_apps(string projectName)
         {
             var projectDirectory = TestAssetsManager.CreateTestInstance(projectName, identifier: projectName)
@@ -346,6 +347,19 @@ namespace Microsoft.DotNet.Migration.Tests
             result.StdErr.Should().Contain("Migration failed.");
         }
 
+        [Fact]
+        public void It_migrates_and_publishes_projects_with_runtimes()
+        {
+            var projectName = "TestAppSimple";
+            var projectDirectory = TestAssetsManager.CreateTestInstance(projectName, callingMethod: "i")
+                                                    .WithLockFiles()
+                                                    .Path;
+
+            CleanBinObj(projectDirectory);
+            BuildProjectJsonMigrateBuildMSBuild(projectDirectory, projectName);
+            PublishMSBuild(projectDirectory, projectName, "win7-x64");
+        }
+
         [WindowsOnlyTheory]
         [InlineData("DesktopTestProjects", "AutoAddDesktopReferencesDuringMigrate", true)]
         [InlineData("TestProjects", "PJTestAppSimple", false)]
@@ -556,6 +570,25 @@ namespace Microsoft.DotNet.Migration.Tests
 
             result
                 .Should().Pass();
+
+            return result.StdOut;
+        }
+
+        private string PublishMSBuild(string projectDirectory, string projectName, string runtime, string configuration = "Debug")
+        {
+            if (projectName != null)
+            {
+                projectName = projectName + ".csproj";
+            }
+
+            DeleteXproj(projectDirectory);
+
+            var result = new Publish3Command()
+                .WithRuntime(runtime)
+                .WithWorkingDirectory(projectDirectory)
+                .ExecuteWithCapturedOutput($"{projectName} /p:Configuration={configuration}");
+
+            result.Should().Pass();
 
             return result.StdOut;
         }

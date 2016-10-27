@@ -36,10 +36,9 @@ namespace Microsoft.DotNet.Tests.EndToEnd
                     .Execute()
                     .Should().Pass();
 
-                //TODO: https://github.com/dotnet/sdk/issues/187 - remove framework from below.
                 new RunCommand()
                     .WithWorkingDirectory(projectDirectory)
-                    .ExecuteWithCapturedOutput("--framework netcoreapp1.0")
+                    .ExecuteWithCapturedOutput()
                     .Should().Pass()
                          .And.HaveStdOutContaining("Hello World!");
 

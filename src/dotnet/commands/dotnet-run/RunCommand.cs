@@ -40,7 +40,9 @@ namespace Microsoft.DotNet.Tools.Run
         private void EnsureProjectIsBuilt()
         {
             List<string> buildArgs = new List<string>();
-
+ 
+            buildArgs.Add(Project); 
+ 
             buildArgs.Add("/nologo");
             buildArgs.Add("/verbosity:quiet");
 
