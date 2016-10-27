@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.Cli.Utils
 
         public static void SetVerbose(bool value)
         {
-            _verbose = value;
+            _verbose = new Lazy<bool>(() => value);
         }
     }
 }
