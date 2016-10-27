@@ -58,35 +58,6 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         }
 
         [WindowsOnlyFact]
-        public void It_resolves_desktop_apps_with_MSBuild_defaulting_to_Debug_Configuration()
-        {
-            var configuration = "Debug";
-
-            var testInstance = TestAssets.Get("AppWithMultipleFxAndTools")
-                .CreateInstance()
-                .WithSourceFiles()
-                .WithRestoreFiles();
-
-            new BuildCommand()
-                .WithWorkingDirectory(testInstance.Root)
-                .Execute($"--configuration {configuration}")
-                .Should().Pass();
-
-            var factory = new ProjectDependenciesCommandFactory(
-                s_desktopTestFramework,
-                null,
-                null,
-                null,
-                testInstance.Root.FullName);
-
-            var command = factory.Create("dotnet-desktop-and-portable", null);
-
-            command.CommandName.Should().Contain(testInstance.Root.GetDirectory("bin", configuration).FullName);
-
-            Path.GetFileName(command.CommandName).Should().Be("dotnet-desktop-and-portable.exe");
-        }
-
-        [WindowsOnlyFact]
         public void It_resolves_desktop_apps_when_configuration_is_Debug()
         {
             var configuration = "Debug";

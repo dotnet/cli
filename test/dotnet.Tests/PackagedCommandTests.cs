@@ -126,8 +126,8 @@ namespace Microsoft.DotNet.Tests
         }
 
         // need conditional theories so we can skip on non-Windows
-        [Theory]
-        [MemberData("DependencyToolArguments")]
+        //[Theory(Skip="https://github.com/dotnet/cli/issues/4514")]
+        //[MemberData("DependencyToolArguments")]
         public void TestFrameworkSpecificDependencyToolsCanBeInvoked(string identifier, string framework, string expectedDependencyToolPath, bool windowsOnly)
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && windowsOnly)
