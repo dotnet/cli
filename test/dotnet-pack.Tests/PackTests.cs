@@ -77,6 +77,7 @@ namespace Microsoft.DotNet.Tools.Pack.Tests
 
             new PackCommand(versionSuffix: "85")
                 .WithWorkingDirectory(testInstance.Root.FullName)
+                .WithConfiguration("Debug")
                 .Execute()
                 .Should().Pass();
 
