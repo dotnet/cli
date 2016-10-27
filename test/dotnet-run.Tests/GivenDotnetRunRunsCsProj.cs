@@ -98,7 +98,7 @@ namespace Microsoft.DotNet.Cli.Run.Tests
  
             string workingDirectory = Directory.GetParent(testProjectDirectory).FullName;
 
-            new Run3Command() 
+            new RunCommand() 
                 .WithWorkingDirectory(workingDirectory) 
                 .ExecuteWithCapturedOutput($"--no-build --project {Path.Combine(testProjectDirectory, testAppName)}.csproj") 
                 .Should().Pass() 
