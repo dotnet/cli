@@ -25,14 +25,14 @@ namespace Microsoft.DotNet.Cli.VSTest.Tests
             // Restore project VSTestDotNetCoreProject
             new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
-                .Execute()
+                .Execute("/p:SkipInvalidConfigurations=true")
                 .Should()
                 .Pass();
 
             // Build project VSTestDotNetCoreProject
             new BuildCommand()
                 .WithWorkingDirectory(testProjectDirectory)
-                .Execute("/p:SkipInvalidConfigurations=true")
+                .Execute()
                 .Should()
                 .Pass();
 
