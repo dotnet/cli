@@ -22,6 +22,7 @@ namespace Microsoft.DotNet.Tools.Publish
     public partial class PublishCommand
     {
         private const string PublishSubfolderName = "publish";
+        private static string LibraryPathPrefix = PathUtility.GetPathWithDirectorySeparator("lib/");
 
         public string ProjectPath { get; set; }
         public string Configuration { get; set; }
@@ -166,7 +167,7 @@ namespace Microsoft.DotNet.Tools.Publish
             {
                 if (options.PreserveCompilationContext.GetValueOrDefault())
                 {
-                    PublishRefs(export, outputPath);
+                    PublishRefs(export, outputPath, platformExclusionList);
                 }
             }
 
@@ -267,7 +268,7 @@ namespace Microsoft.DotNet.Tools.Publish
             return result == 0;
         }
 
-        private static void PublishRefs(LibraryExport export, string outputPath)
+        private static void PublishRefs(LibraryExport export, string outputPath, HashSet<string> platformExclusionList)
         {
             var refsPath = Path.Combine(outputPath, "refs");
             if (!Directory.Exists(refsPath))
@@ -280,6 +281,14 @@ namespace Microsoft.DotNet.Tools.Publish
             foreach (var compilationAssembly in export.CompilationAssemblies)
             {
                 if (runtimeAssemblies.Contains(compilationAssembly))
+                {
+                    continue;
+                }
+
+                // do not copy lib compilation assemblies to refs folder because they would end
+                // up in shared runtime folder
+                if (platformExclusionList.Contains(export.Library.Identity.Name)
+                     && compilationAssembly.RelativePath.StartsWith(LibraryPathPrefix))
                 {
                     continue;
                 }

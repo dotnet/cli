@@ -96,8 +96,10 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             publishCommand.GetOutputDirectory(true).Should().HaveFile("PortableAppCompilationContext.dll");
 
             var refsDirectory = new DirectoryInfo(Path.Combine(publishCommand.GetOutputDirectory(true).FullName, "refs"));
-            // Microsoft.CodeAnalysis.CSharp is IL only
+            // Microsoft.CodeAnalysis.CSharp is IL only direct reference
             refsDirectory.Should().NotHaveFile("Microsoft.CodeAnalysis.CSharp.dll");
+            // System.Diagnostics.DiagnosticSource is IL only shared framework dependency
+            refsDirectory.Should().NotHaveFile("System.Diagnostics.DiagnosticSource.dll");
             // System.IO has facede
             refsDirectory.Should().HaveFile("System.IO.dll");
             // Libraries in which lib==ref should be deduped
