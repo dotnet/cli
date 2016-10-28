@@ -9,7 +9,7 @@ using System.Text;
 using Microsoft.Build.Construction;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectJsonMigration;
-using Microsoft.DotNet.ProjectModel;
+using Microsoft.DotNet.Internal.ProjectModel;
 
 namespace Microsoft.DotNet.Tools.Migrate
 {
@@ -22,6 +22,8 @@ namespace Microsoft.DotNet.Tools.Migrate
         private readonly bool _skipProjectReferences;
         private readonly string _reportFile;
         private readonly bool _reportFormatJson;
+
+        private readonly TemporaryDotnetNewTemplateProject _temporaryDotnetNewProject;
 
         public MigrateCommand(
             string templateFile, 
@@ -37,6 +39,7 @@ namespace Microsoft.DotNet.Tools.Migrate
             _sdkVersion = sdkVersion;
             _xprojFilePath = xprojFilePath;
             _skipProjectReferences = skipProjectReferences;
+            _temporaryDotnetNewProject = TemporaryDotnetNewTemplateProject.DefaultTemplate;
             _reportFile = reportFile;
             _reportFormatJson = reportFormatJson;
         }
@@ -46,9 +49,9 @@ namespace Microsoft.DotNet.Tools.Migrate
             var projectsToMigrate = GetProjectsToMigrate(_projectArg);
 
             var msBuildTemplate = _templateFile != null ?
-                ProjectRootElement.TryOpen(_templateFile) : null;
+                ProjectRootElement.TryOpen(_templateFile) : _temporaryDotnetNewProject.MSBuildProject;
 
-            var sdkVersion = _sdkVersion ?? TemporaryDotnetNewTemplateProject.DefaultTemplate.MSBuildProject.GetSdkVersion();
+            var sdkVersion = _sdkVersion ?? _temporaryDotnetNewProject.MSBuildProject.GetSdkVersion();
 
             EnsureNotNull(sdkVersion, "Null Sdk Version");
 
