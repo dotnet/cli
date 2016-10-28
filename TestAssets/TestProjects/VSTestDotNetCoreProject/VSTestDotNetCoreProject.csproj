@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp1.0</TargetFrameworks>
+    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <RuntimeIdentifiers>win7-x64;win7-x86;osx.10.10-x64;osx.10.11-x64;ubuntu.14.04-x64;ubuntu.16.04-x64;centos.7-x64;rhel.7.2-x64;debian.8-x64;fedora.23-x64;opensuse.13.2-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,5 +29,12 @@
       <Version>15.0.0-preview-20161028-03</Version>
     </PackageReference>
   </ItemGroup>
+
+  <ItemGroup>
+    <DotNetCliToolReference Include="dotnet-portable">
+      <Version>1.0.0</Version>
+    </DotNetCliToolReference>
+  </ItemGroup>
+
   <Import Project="$(MSBuildExtensionsPath)\Microsoft.CSharp.targets" />
 </Project>
