@@ -137,7 +137,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
 
     public class ScriptVariablesFixture
     {
-        public readonly NuGetFramework TestAssetFramework = FrameworkConstants.CommonFrameworks.NetCoreApp11;
+        public readonly NuGetFramework TestAssetFramework = new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.NetCoreApp, new System.Version(1, 1, 0, 0));
         public const string ConfigValue = "Debug";
 
         public static string TestAssetPath = Path.Combine(

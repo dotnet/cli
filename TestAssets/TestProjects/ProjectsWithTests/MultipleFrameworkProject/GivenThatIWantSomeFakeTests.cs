@@ -27,7 +27,7 @@ namespace FakeTests
             Assert.True(true);
         }
 
-        [Fact(Skip="Skipped for NETCOREAPP1.0")]
+        [Fact(Skip="Skipped for NETCOREAPP1.1")]
         public void SkippedTest()
         {
 
@@ -48,7 +48,7 @@ namespace FakeTests
 #if NET451
             Assert.True(shouldFail, "Failing in NET451");
 #else
-            Assert.True(shouldFail, "Failing in NETCOREAPP1.0");
+            Assert.True(shouldFail, "Failing in NETCOREAPP1.1");
 #endif
         }
     }

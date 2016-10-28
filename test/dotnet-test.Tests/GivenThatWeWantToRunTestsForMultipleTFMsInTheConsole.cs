@@ -68,7 +68,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
             var result = testCommand
                 .ExecuteWithCapturedOutput($"{_projectFilePath} -f netcoreapp1.1");
             result.Should().Pass();
-            result.StdOut.Should().Contain($"Skipped for netcoreapp1.1");
+            result.StdOut.Should().Contain($"Skipped for NETCOREAPP1.1");
             result.StdOut.Should().NotContain($"Skipped for NET451");
         }
 
@@ -91,14 +91,14 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
         }
 
         [Fact]
-        public void It_skips_build_when_the_no_build_flag_is_passed_for_netcoreapp10()
+        public void It_skips_build_when_the_no_build_flag_is_passed_for_netcoreapp11()
         {
             var buildCommand = new BuildCommand(_projectFilePath);
             var result = buildCommand.Execute($"-f netcoreapp1.1 -o {_defaultNetCoreAppOutputPath}");
             result.Should().Pass();
 
             var testCommand = new DotnetTestCommand();
-            result = testCommand.Execute($"{_projectFilePath} -f netcoreapp10 -o {_defaultNetCoreAppOutputPath} --no-build");
+            result = testCommand.Execute($"{_projectFilePath} -f netcoreapp1.1 -o {_defaultNetCoreAppOutputPath} --no-build");
             result.Should().Pass();
         }
 
