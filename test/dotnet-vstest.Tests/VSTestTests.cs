@@ -32,7 +32,7 @@ namespace Microsoft.DotNet.Cli.VSTest.Tests
             // Build project VSTestDotNetCoreProject
             new BuildCommand()
                 .WithWorkingDirectory(testProjectDirectory)
-                .Execute()
+                .Execute("/p:SkipInvalidConfigurations=true")
                 .Should()
                 .Pass();
 
