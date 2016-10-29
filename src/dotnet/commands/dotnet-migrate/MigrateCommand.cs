@@ -11,7 +11,7 @@ using Microsoft.Build.Evaluation;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectJsonMigration;
 using Microsoft.DotNet.Internal.ProjectModel;
-using ProjectModel = Microsoft.DotNet.Internal.ProjectModel.Project;
+using Project = Microsoft.DotNet.Internal.ProjectModel.Project;
 using Microsoft.DotNet.Tools.Common;
 
 namespace Microsoft.DotNet.Tools.Migrate
@@ -265,7 +265,7 @@ namespace Microsoft.DotNet.Tools.Migrate
         {
             IEnumerable<string> projects = null;
 
-            if (projectArg.EndsWith(ProjectModel.FileName, StringComparison.OrdinalIgnoreCase))
+            if (projectArg.EndsWith(Project.FileName, StringComparison.OrdinalIgnoreCase))
             {
                 projects = Enumerable.Repeat(projectArg, 1);
             }
