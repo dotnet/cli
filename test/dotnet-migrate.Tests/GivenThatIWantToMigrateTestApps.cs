@@ -43,6 +43,10 @@ namespace Microsoft.DotNet.Migration.Tests
             outputsIdentical.Should().BeTrue();
 
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
+
+            var outputCsProj = Path.Combine(projectDirectory, projectName + ".csproj");
+            var csproj = File.ReadAllText(outputCsProj);
+            csproj.EndsWith("\n").Should().Be(true);
         }
 
         [Fact]
@@ -393,6 +397,31 @@ namespace Microsoft.DotNet.Migration.Tests
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
         }
 
+        [Fact]
+        public void It_migrates_project_with_output_name()
+        {
+            string projectName = "AppWithOutputAssemblyName";
+            string expectedOutputName = "MyApp";
+
+            var projectDirectory = TestAssetsManager.CreateTestInstance(projectName, callingMethod: $"It_migrates_{projectName}")
+                .WithLockFiles()
+                .Path;
+            
+            string expectedCsprojPath = Path.Combine(projectDirectory, $"{projectName}.csproj");
+            if (File.Exists(expectedCsprojPath))
+            {
+                File.Delete(expectedCsprojPath);
+            }
+
+            CleanBinObj(projectDirectory);
+            MigrateProject(projectDirectory);
+            File.Exists(expectedCsprojPath).Should().BeTrue();
+            Restore(projectDirectory, projectName);
+            BuildMSBuild(projectDirectory, projectName);
+            Directory.EnumerateFiles(Path.Combine(projectDirectory, "bin"), $"{expectedOutputName}.pdb", SearchOption.AllDirectories)
+                .Count().Should().Be(1);
+        }
+
         private void VerifyAutoInjectedDesktopReferences(string projectDirectory, string projectName, bool shouldBePresent)
         {
             if (projectName != null)
@@ -539,7 +568,7 @@ namespace Microsoft.DotNet.Migration.Tests
             result.Should().Pass();
         }
 
-        private void MigrateProject(string[] migrateArgs)
+        private void MigrateProject(params string[] migrateArgs)
         {
             var result =
                 MigrateCommand.Run(migrateArgs);
