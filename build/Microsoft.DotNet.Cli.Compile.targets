@@ -178,7 +178,10 @@
       <!-- Crossgen the Shared Framework -->
       <ItemGroup>
         <SdkFiles Remove="*" />
-        <SdkFiles Include="$(SdkOutputDirectory)/**/*" />
+
+        <!-- Removing Full CLR built TestHost assemblies from getting Crossgen as it is throwing error -->
+        <SdkFilesExclude Include="$(SdkOutputDirectory)/TestHost*/**/*" />
+        <SdkFiles Include="$(SdkOutputDirectory)/**/*" Exclude="@(SdkFilesExclude)" />
         <SdkFilesWithPEMarker Remove="*" />
       </ItemGroup>
 
@@ -222,8 +225,6 @@
 
       <Copy SourceFiles="@(MSBuildTargetsToCopy)"
             DestinationFiles="@(MSBuildTargetsToCopy->'$(SdkOutputDirectory)/%(RecursiveDir)%(Filename)%(Extension)')" />
-
-      <RemoveDir Directories="$(SdkOutputDirectory)/Extensions" />
 
       <ItemGroup>
         <FilesToClean Include="$(StageDirectory)/sdk/**/vbc.exe" />
