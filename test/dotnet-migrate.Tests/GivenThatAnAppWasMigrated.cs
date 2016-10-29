@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Common;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using System;
@@ -44,8 +45,8 @@ namespace Microsoft.DotNet.Migration.Tests
         [InlineData("TestAppWithLibraryAndMissingP2P")]
         public void When_migration_fails_Then_project_json_artifacts_do_not_get_moved_to_backup(string testProjectName)
         {
-            var testRoot = TestAssetsManager
-                .CreateTestInstance("NonRestoredTestProjects", testProjectName, identifier: testProjectName)
+            var testRoot = new TestAssetsManager(Path.Combine(RepoRoot, "TestAssets", "NonRestoredTestProjects"))
+                .CreateTestInstance(testProjectName, identifier: testProjectName)
                 .Path;
 
             var backupRoot = Path.Combine(testRoot, "backup");
