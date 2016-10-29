@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.Migration.Tests
             new MigrateCommand()
                 .WithWorkingDirectory(testRoot)
                 .Execute()
-                .Should().Pass();
+                .Should().Fail();
             
             new DirectoryInfo(backupRoot).Should().NotExist("Because migration failed and therefore no backup is needed.");
 
