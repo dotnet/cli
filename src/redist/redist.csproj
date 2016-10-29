@@ -30,7 +30,7 @@
       <Version>4.1.1</Version>
     </PackageReference>
     <PackageReference Include="NuGet.Build.Tasks">
-      <Version>3.6.0-rc-1984</Version>
+      <Version>4.0.0-rc-2037</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.TestPlatform.CLI">
       <Version>15.0.0-preview-20161005-01</Version>

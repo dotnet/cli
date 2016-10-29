@@ -24,16 +24,16 @@
       <Version>1.0.1-beta-000933</Version>
     </PackageReference>
     <PackageReference Include="NuGet.Versioning">
-      <Version>3.6.0-rc-1984</Version>
+      <Version>4.0.0-rc-2037</Version>
     </PackageReference>
     <PackageReference Include="NuGet.Packaging">
-      <Version>3.6.0-rc-1984</Version>
+      <Version>4.0.0-rc-2037</Version>
     </PackageReference>
     <PackageReference Include="NuGet.Frameworks">
-      <Version>3.6.0-rc-1984</Version>
+      <Version>4.0.0-rc-2037</Version>
     </PackageReference>
     <PackageReference Include="NuGet.ProjectModel">
-      <Version>3.6.0-rc-1984</Version>
+      <Version>4.0.0-rc-2037</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Build">
       <Version>15.1.319-preview5</Version>
