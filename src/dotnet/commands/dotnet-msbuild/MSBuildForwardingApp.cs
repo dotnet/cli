@@ -12,28 +12,30 @@ namespace Microsoft.DotNet.Tools.MSBuild
     public class MSBuildForwardingApp
     {
         private const string s_msbuildExeName = "MSBuild.dll";
+
         private readonly ForwardingApp _forwardingApp;
+
+        private readonly Dictionary<string, string> _msbuildRequiredEnvironmentVariables =
+            new Dictionary<string, string>
+            {
+                { "MSBuildExtensionsPath", AppContext.BaseDirectory },
+                { "CscToolExe", GetRunCscPath() }
+            };
+        
+        private readonly IEnumerable<string> _msbuildRequiredParameters = 
+            new List<string> { "/m" };
 
         public MSBuildForwardingApp(IEnumerable<string> argsToForward)
         {
             _forwardingApp = new ForwardingApp(
                 GetMSBuildExePath(),
-                argsToForward,
-                environmentVariables: GetEnvironmentVariables());
+                _msbuildRequiredParameters.Concat(argsToForward),
+                environmentVariables: _msbuildRequiredEnvironmentVariables);
         }
 
         public int Execute()
         {
             return _forwardingApp.Execute();
-        }
-
-        private static Dictionary<string, string> GetEnvironmentVariables()
-        {
-            return new Dictionary<string, string>
-            {
-                { "MSBuildExtensionsPath", AppContext.BaseDirectory },
-                { "CscToolExe", GetRunCscPath() }
-            };
         }
 
         private static string GetMSBuildExePath()
