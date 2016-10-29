@@ -352,9 +352,10 @@ namespace Microsoft.DotNet.Migration.Tests
         public void It_migrates_and_publishes_projects_with_runtimes()
         {
             var projectName = "PJTestAppSimple";
-            var projectDirectory = TestAssetsManager.CreateTestInstance(projectName, callingMethod: "i")
-                                                    .WithLockFiles()
-                                                    .Path;
+            var projectDirectory = TestAssetsManager
+                .CreateTestInstance(projectName)
+                .WithLockFiles()
+                .Path;
 
             CleanBinObj(projectDirectory);
             BuildProjectJsonMigrateBuildMSBuild(projectDirectory, projectName);
