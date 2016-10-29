@@ -11,17 +11,19 @@ namespace Microsoft.DotNet.Migration.Tests
     public class GivenThatAnAppWasMigrated : TestBase
     {
         [Theory]
-        [InlineData("TestAppSimple")]
+        [InlineData("PJTestAppSimple")]
         [InlineData("TestAppWithLibrary")]
         public void When_migration_succeeds_Then_project_json_artifacts_get_moved_to_backup(string testProjectName)
         {
-            var testRoot = TestAssetsManager.CreateTestInstance(testProjectName, identifier: testProjectName).Path;
+            var testRoot = TestAssetsManager
+                .CreateTestInstance(testProjectName, identifier: testProjectName)
+                .Path;
 
-            var backupRoot = Path.Combine(testRoot, ".backup");
+            var backupRoot = Path.Combine(testRoot, "backup");
 
             var migratableArtifacts = GetProjectJsonArtifacts(testRoot);
 
-            new RestoreCommand()
+            new RestoreProjectJsonCommand()
                 .WithWorkingDirectory(testRoot)
                 .Execute();
             
@@ -44,7 +46,7 @@ namespace Microsoft.DotNet.Migration.Tests
         {
             var testRoot = TestAssetsManager.CreateTestInstance(testProjectName, identifier: testProjectName).Path;
 
-            var backupRoot = Path.Combine(testRoot, ".backup");
+            var backupRoot = Path.Combine(testRoot, "backup");
 
             var migratableArtifacts = GetProjectJsonArtifacts(testRoot);
 
@@ -67,7 +69,7 @@ namespace Microsoft.DotNet.Migration.Tests
         {
             var testRoot = TestAssetsManager.CreateTestInstance(testProjectName, identifier: testProjectName).Path;
 
-            var backupRoot = Path.Combine(testRoot, ".backup");
+            var backupRoot = Path.Combine(testRoot, "backup");
 
             var migratableArtifacts = GetProjectJsonArtifacts(testRoot);
 

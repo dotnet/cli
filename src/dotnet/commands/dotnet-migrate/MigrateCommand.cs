@@ -10,7 +10,7 @@ using Microsoft.Build.Construction;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectJsonMigration;
 using Microsoft.DotNet.Internal.ProjectModel;
-using Microsoft.DotNet.Internal.Tools.Common;
+using Microsoft.DotNet.Tools.Common;
 
 namespace Microsoft.DotNet.Tools.Migrate
 {
@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.Tools.Migrate
             _workspaceDirectory = File.Exists(_projectArg)
                 ? new FileInfo(_projectArg).Directory
                 : new DirectoryInfo(_projectArg);
-            _backupDirectory = new DirectoryInfo(Path.Combine(_workspaceDirectory.FullName, ".backup"));
+            _backupDirectory = new DirectoryInfo(Path.Combine(_workspaceDirectory.FullName, "backup"));
             _sdkVersion = sdkVersion;
             _xprojFilePath = xprojFilePath;
             _skipProjectReferences = skipProjectReferences;
