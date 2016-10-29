@@ -15,11 +15,8 @@
           DependsOnTargets="Validate" />
   <Target Name="Restore"
           DependsOnTargets="Validate" />
-
-  <Target Name="Run"
-          DependsOnTargets="Validate" />
   
-  <Target Name="Test"
+  <Target Name="VSTest"
           DependsOnTargets="Validate" />
 
   <Target Name="Validate">  
