@@ -26,7 +26,7 @@
         "portable-net45+wp80+win8+wpa81+dnxcore50"
       ],
       "dependencies": {
-        "System.Diagnostics.Process": "4.3.0-preview1-24530-04"
+        "System.Diagnostics.Process": "4.3.0-preview1-24626-02"
       }
     }
   }

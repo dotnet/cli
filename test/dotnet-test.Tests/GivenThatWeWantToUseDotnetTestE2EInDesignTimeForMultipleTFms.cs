@@ -34,9 +34,9 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
             // unless we re-restore
             new RestoreCommand() { WorkingDirectory = testInstance.TestRoot }.Execute().Should().Pass();
 
-            _netCoreAppOutputPath = Path.Combine(testInstance.TestRoot, "bin", "Debug", "netcoreapp1.0");
+            _netCoreAppOutputPath = Path.Combine(testInstance.TestRoot, "bin", "Debug", "netcoreapp1.1");
             var buildCommand = new BuildCommand(_projectFilePath);
-            var result = buildCommand.Execute($"-f netcoreapp1.0 -o {_netCoreAppOutputPath}");
+            var result = buildCommand.Execute($"-f netcoreapp1.1 -o {_netCoreAppOutputPath}");
 
             result.Should().Pass();
 
@@ -59,7 +59,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
                 adapter.Listen();
 
                 var testCommand = new DotnetTestCommand();
-                var result = testCommand.Execute($"{_projectFilePath} -f netcoreapp1.0 -o {_netCoreAppOutputPath} --port {adapter.Port} --no-build");
+                var result = testCommand.Execute($"{_projectFilePath} -f netcoreapp1.1 -o {_netCoreAppOutputPath} --port {adapter.Port} --no-build");
                 result.Should().Pass();
 
                 adapter.Messages["TestSession.Connected"].Count.Should().Be(1);
@@ -98,7 +98,7 @@ namespace Microsoft.Dotnet.Tools.Test.Tests
                 adapter.Listen();
 
                 var testCommand = new DotnetTestCommand();
-                var result = testCommand.Execute($"{_projectFilePath} -f netcoreapp1.0 -o {_netCoreAppOutputPath} --port {adapter.Port} --no-build");
+                var result = testCommand.Execute($"{_projectFilePath} -f netcoreapp1.1 -o {_netCoreAppOutputPath} --port {adapter.Port} --no-build");
                 result.Should().Pass();
 
                 adapter.Messages["TestSession.Connected"].Count.Should().Be(1);

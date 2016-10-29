@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Tests
             _workspace = new BuildWorkspace(ProjectReaderSettings.ReadFromEnvironment());
             _contexts = new List<ProjectContext>
             {
-                _workspace.GetProjectContext(_projectJson, NuGetFramework.Parse("netcoreapp1.0"))
+                _workspace.GetProjectContext(_projectJson, NuGetFramework.Parse("netcoreapp1.1"))
             };
 
             _args = new BuildCommandApp("dotnet compile", ".NET Compiler", "Compiler for the .NET Platform", _workspace);

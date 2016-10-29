@@ -16,14 +16,14 @@ namespace Microsoft.DotNet.Tools.Builder.Tests
             var result = command.ExecuteWithCapturedOutput();
 
             // Verify the result
-            result.Should().HaveCompiledProject("TestSimpleIncrementalApp", ".NETCoreApp,Version=v1.0");
+            result.Should().HaveCompiledProject("TestSimpleIncrementalApp", ".NETCoreApp,Version=v1.1");
 
             // Build with Version Suffix 2
             command = new BuildCommand(testInstance.TestRoot, versionSuffix: "2");
             result = command.ExecuteWithCapturedOutput();
 
             // Verify the result
-            result.Should().HaveCompiledProject("TestSimpleIncrementalApp", ".NETCoreApp,Version=v1.0");
+            result.Should().HaveCompiledProject("TestSimpleIncrementalApp", ".NETCoreApp,Version=v1.1");
         }
     }
 }

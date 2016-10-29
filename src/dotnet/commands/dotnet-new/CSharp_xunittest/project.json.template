@@ -4,7 +4,7 @@
     "debugType": "portable"
   },
   "dependencies": {
-    "System.Runtime.Serialization.Primitives": "4.3.0-preview1-24530-04",
+    "System.Runtime.Serialization.Primitives": "4.3.0-preview1-24626-02",
     "xunit": "2.1.0",
     "dotnet-test-xunit": "1.0.0-rc2-192208-24"
   },
@@ -14,7 +14,7 @@
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.1.0-preview1-001100-00"
+          "version": "1.1.0-preview1-001153-00"
         }
       },
       "imports": [

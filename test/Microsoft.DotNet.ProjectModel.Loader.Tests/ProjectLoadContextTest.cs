@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.ProjectModel.Loader.Tests
 
             var runtimeIdentifier = DependencyContext.Default.Target.Runtime;
 
-            var context = ProjectContext.Create(testInstance.TestRoot, NuGetFramework.Parse("netcoreapp1.0"), new[] { runtimeIdentifier });
+            var context = ProjectContext.Create(testInstance.TestRoot, NuGetFramework.Parse("netcoreapp1.1"), new[] { runtimeIdentifier });
             var loadContext = context.CreateLoadContext(runtimeIdentifier, Constants.DefaultConfiguration);
 
             // Load the project assembly

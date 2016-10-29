@@ -26,14 +26,14 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             var context = Read(
 @"{
     ""runtimeTarget"": {
-        ""name"":"".NETCoreApp,Version=v1.0/osx.10.10-x64""
+        ""name"":"".NETCoreApp,Version=v1.1/osx.10.10-x64""
     },
     ""targets"": {
-        "".NETCoreApp,Version=v1.0/osx.10.10-x64"": {},
+        "".NETCoreApp,Version=v1.1/osx.10.10-x64"": {},
     }
 }");
             context.Target.IsPortable.Should().BeFalse();
-            context.Target.Framework.Should().Be(".NETCoreApp,Version=v1.0");
+            context.Target.Framework.Should().Be(".NETCoreApp,Version=v1.1");
             context.Target.Runtime.Should().Be("osx.10.10-x64");
         }
 
@@ -78,7 +78,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             var context = Read(
 @"{
     ""targets"": {
-        "".NETCoreApp,Version=v1.0"": {}
+        "".NETCoreApp,Version=v1.1"": {}
     }
 }");
             context.Target.IsPortable.Should().BeTrue();
@@ -90,10 +90,10 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             var context = Read(
 @"{
     ""runtimeTarget"": {
-        ""name"": "".NETCoreApp,Version=v1.0/osx.10.10-x64""
+        ""name"": "".NETCoreApp,Version=v1.1/osx.10.10-x64""
     },
     ""targets"": {
-        "".NETCoreApp,Version=v1.0/osx.10.10-x64"": {}
+        "".NETCoreApp,Version=v1.1/osx.10.10-x64"": {}
     }
 }");
             context.Target.IsPortable.Should().BeFalse();
@@ -105,10 +105,10 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             var context = Read(
 @"{
     ""targets"": {
-        "".NETCoreApp,Version=v1.0"": {}
+        "".NETCoreApp,Version=v1.1"": {}
     }
 }");
-            context.Target.Framework.Should().Be(".NETCoreApp,Version=v1.0");
+            context.Target.Framework.Should().Be(".NETCoreApp,Version=v1.1");
         }
 
         [Fact]
@@ -117,7 +117,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             var context = Read(
 @"{
     ""targets"": {
-        "".NETCoreApp,Version=v1.0/osx.10.10-x64"": {},
+        "".NETCoreApp,Version=v1.1/osx.10.10-x64"": {},
     },
     ""runtimes"": {
         ""osx.10.10-x64"": [ ],
@@ -141,7 +141,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             var context = Read(
 @"{
     ""targets"": {
-        "".NETCoreApp,Version=v1.0"": {
+        "".NETCoreApp,Version=v1.1"": {
             ""MyApp/1.0.1"": {
                 ""dependencies"": {
                     ""AspNet.Mvc"": ""1.0.0""
@@ -191,7 +191,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             var context = Read(
 @"{
     ""targets"": {
-        "".NETCoreApp,Version=v1.0"": {
+        "".NETCoreApp,Version=v1.1"": {
             ""MyApp/1.0.1"": {
                 ""dependencies"": {
                     ""AspNet.Mvc"": ""1.0.0""
@@ -234,10 +234,10 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             var context = Read(
 @"{
     ""runtimeTarget"": {
-        ""name"": "".NETCoreApp,Version=v1.0""
+        ""name"": "".NETCoreApp,Version=v1.1""
     },
     ""targets"": {
-        "".NETCoreApp,Version=v1.0"": {
+        "".NETCoreApp,Version=v1.1"": {
             ""MyApp/1.0.1"": {
                 ""dependencies"": {
                     ""AspNet.Mvc"": ""1.0.0""
@@ -299,9 +299,9 @@ namespace Microsoft.Extensions.DependencyModel.Tests
         {
             var context = Read(
 @"{
-    ""runtimeTarget"": "".NETCoreApp,Version=v1.0"",
+    ""runtimeTarget"": "".NETCoreApp,Version=v1.1"",
     ""targets"": {
-        "".NETCoreApp,Version=v1.0"": {
+        "".NETCoreApp,Version=v1.1"": {
             ""System.Banana/1.0.0"": {
                 ""runtimeTargets"": {
                     ""runtime/win7-x64/lib/_._"": { ""assetType"": ""runtime"", ""rid"": ""win7-x64""},
@@ -347,7 +347,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
         ""optimize"": true
     },
     ""targets"": {
-        "".NETCoreApp,Version=v1.0/osx.10.10-x64"": {},
+        "".NETCoreApp,Version=v1.1/osx.10.10-x64"": {},
     }
 }");
             context.CompilationOptions.AllowUnsafe.Should().Be(true);

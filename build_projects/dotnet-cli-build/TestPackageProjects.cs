@@ -85,7 +85,7 @@ namespace Microsoft.DotNet.Cli.Build
                 IsApplicable =true,
                 VersionSuffix = string.Empty,
                 Clean = true,
-                Frameworks = new [] { "netcoreapp1.0" }
+                Frameworks = new [] { "netcoreapp1.1" }
             },
             new TestPackageProject()
             {
@@ -95,7 +95,7 @@ namespace Microsoft.DotNet.Cli.Build
                 IsApplicable = true,
                 VersionSuffix = string.Empty,
                 Clean = true,
-                Frameworks = new [] { "netcoreapp1.0" }
+                Frameworks = new [] { "netcoreapp1.1" }
             },
             new TestPackageProject()
             {

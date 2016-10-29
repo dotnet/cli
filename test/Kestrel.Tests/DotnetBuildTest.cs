@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.Kestrel.Tests
 
             var outputBase = new DirectoryInfo(Path.Combine(testRoot, "bin", "Debug"));
 
-            var netcoreAppOutput = outputBase.Sub("netcoreapp1.0");
+            var netcoreAppOutput = outputBase.Sub("netcoreapp1.1");
 
             netcoreAppOutput.Should()
                 .Exist().And

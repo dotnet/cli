@@ -52,6 +52,7 @@ namespace Microsoft.DotNet.Cli.Build
             { "rhel.7.2-x64", "rhel.7-x64" },
             { "debian.8-x64", "debian.8-x64" },
             { "fedora.23-x64", "fedora.23-x64" },
+            { "fedora.24-x64", "fedora.24-x64" },
             { "opensuse.13.2-x64", "opensuse.13.2-x64" },
             { "opensuse.42.1-x64", "opensuse.42.1-x64" }
         };
@@ -196,7 +197,7 @@ namespace Microsoft.DotNet.Cli.Build
                     "--output",
                     sdkOutputDirectory,
                     "--framework",
-                    "netcoreapp1.0")
+                    "netcoreapp1.1")
                     .Execute()
                     .EnsureSuccessful();
 

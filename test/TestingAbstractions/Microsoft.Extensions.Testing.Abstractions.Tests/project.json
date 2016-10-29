@@ -3,12 +3,12 @@
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.1.0-preview1-001100-00"
+      "version": "1.1.0-preview1-001153-00"
     },
     "Microsoft.Extensions.Testing.Abstractions": {
       "target": "project"
     },
-    "System.Runtime.Serialization.Primitives": "4.3.0-preview1-24530-04",
+    "System.Runtime.Serialization.Primitives": "4.3.0-preview1-24626-02",
     "Microsoft.DotNet.Tools.Tests.Utilities": {
       "target": "project"
     },
@@ -23,7 +23,7 @@
     "FluentAssertions": "4.2.2"
   },
   "frameworks": {
-    "netcoreapp1.0": {
+    "netcoreapp1.1": {
       "imports": [
         "dotnet5.4",
         "portable-net451+win8"

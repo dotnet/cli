@@ -155,10 +155,10 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                     .Should()
                     .Pass();
 
-            var context = ProjectContext.Create(testInstance.TestRoot, FrameworkConstants.CommonFrameworks.NetCoreApp10);
+            var context = ProjectContext.Create(testInstance.TestRoot, new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.NetCoreApp, new System.Version(1, 1, 0, 0)));
 
             var factory = new ProjectDependenciesCommandFactory(
-                FrameworkConstants.CommonFrameworks.NetCoreApp10,
+                new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.NetCoreApp, new System.Version(1, 1, 0, 0)),
                 configuration,
                 null,
                 null,

@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                                                             .AssertJArrayCount(2)
                                                             .Select(f => f["ShortName"].Value<string>());
 
-                Assert.Contains("netcoreapp1.0", frameworkShortNames);
+                Assert.Contains("netcoreapp1.1", frameworkShortNames);
                 Assert.Contains("dnx451", frameworkShortNames);
             }
         }
@@ -540,7 +540,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                 var projectJson = JsonConvert.DeserializeObject<JObject>(File.ReadAllText(projectFilePath));
 
                 // Remove newtonsoft.json dependency
-                var dependencies = projectJson["frameworks"]["netcoreapp1.0"]["dependencies"] as JObject;
+                var dependencies = projectJson["frameworks"]["netcoreapp1.1"]["dependencies"] as JObject;
                 dependencies.Remove("Newtonsoft.Json");
 
                 File.WriteAllText(projectFilePath, JsonConvert.SerializeObject(projectJson));

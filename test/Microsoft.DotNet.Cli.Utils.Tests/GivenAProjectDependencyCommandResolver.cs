@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 CommandArguments = new string[] { "" },
                 ProjectDirectory = "/some/directory",
                 Configuration = "Debug",
-                Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10
+                Framework = new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.NetCoreApp, new System.Version(1, 1, 0, 0))
             };
 
             var result = projectDependenciesCommandResolver.Resolve(commandResolverArguments);
@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 CommandArguments = new string[] { "" },
                 ProjectDirectory = null,
                 Configuration = "Debug",
-                Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10
+                Framework = new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.NetCoreApp, new System.Version(1, 1, 0, 0))
             };
 
             var result = projectDependenciesCommandResolver.Resolve(commandResolverArguments);
@@ -86,7 +86,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 CommandArguments = new string[] { "" },
                 ProjectDirectory = s_liveProjectDirectory,
                 Configuration = null,
-                Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10
+                Framework = new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.NetCoreApp, new System.Version(1, 1, 0, 0))
             };
 
             var result = projectDependenciesCommandResolver.Resolve(commandResolverArguments);
@@ -105,7 +105,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 CommandArguments = null,
                 ProjectDirectory = s_liveProjectDirectory,
                 Configuration = "Debug",
-                Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10
+                Framework = new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.NetCoreApp, new System.Version(1, 1, 0, 0))
             };
 
             var result = projectDependenciesCommandResolver.Resolve(commandResolverArguments);
@@ -124,7 +124,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 CommandArguments = null,
                 ProjectDirectory = s_liveProjectDirectory,
                 Configuration = "Debug",
-                Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10
+                Framework = new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.NetCoreApp, new System.Version(1, 1, 0, 0))
             };
 
             var result = projectDependenciesCommandResolver.Resolve(commandResolverArguments);
@@ -149,7 +149,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 CommandArguments = new[] { "arg with space" },
                 ProjectDirectory = s_liveProjectDirectory,
                 Configuration = "Debug",
-                Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10
+                Framework = new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.NetCoreApp, new System.Version(1, 1, 0, 0))
             };
 
             var result = projectDependenciesCommandResolver.Resolve(commandResolverArguments);
@@ -169,7 +169,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 CommandArguments = null,
                 ProjectDirectory = s_liveProjectDirectory,
                 Configuration = "Debug",
-                Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10
+                Framework = new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.NetCoreApp, new System.Version(1, 1, 0, 0))
             };
 
             var result = projectDependenciesCommandResolver.Resolve(commandResolverArguments);
@@ -190,19 +190,19 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 CommandArguments = null,
                 ProjectDirectory = s_liveProjectDirectory,
                 Configuration = "Debug",
-                Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10,
+                Framework = new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.NetCoreApp, new System.Version(1, 1, 0, 0)),
                 OutputPath = outputDir
             };
 
             var buildCommand = new BuildCommand(
                 Path.Combine(s_liveProjectDirectory, "project.json"),
                 output: outputDir,
-                framework: FrameworkConstants.CommonFrameworks.NetCoreApp10.ToString())
+                framework: new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.NetCoreApp, new System.Version(1, 1, 0, 0)).ToString())
                 .Execute().Should().Pass();
 
             var projectContext = ProjectContext.Create(
                 s_liveProjectDirectory,
-                FrameworkConstants.CommonFrameworks.NetCoreApp10,
+                new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.NetCoreApp, new System.Version(1, 1, 0, 0)),
                 RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers());
 
             var depsFilePath =
@@ -226,19 +226,19 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 CommandArguments = null,
                 ProjectDirectory = s_liveProjectDirectory,
                 Configuration = "Debug",
-                Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10,
+                Framework = new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.NetCoreApp, new System.Version(1, 1, 0, 0)),
                 BuildBasePath = buildBasePath
             };
 
             var buildCommand = new BuildCommand(
                 Path.Combine(s_liveProjectDirectory, "project.json"),
                 buildBasePath: buildBasePath,
-                framework: FrameworkConstants.CommonFrameworks.NetCoreApp10.ToString())
+                framework: new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.NetCoreApp, new System.Version(1, 1, 0, 0)).ToString())
                 .Execute().Should().Pass();
 
             var projectContext = ProjectContext.Create(
                 s_liveProjectDirectory,
-                FrameworkConstants.CommonFrameworks.NetCoreApp10,
+                new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.NetCoreApp, new System.Version(1, 1, 0, 0)),
                 RuntimeEnvironmentRidExtensions.GetAllCandidateRuntimeIdentifiers());
 
             var depsFilePath =
@@ -261,7 +261,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 CommandArguments = null,
                 ProjectDirectory = s_liveProjectDirectory,
                 Configuration = "Debug",
-                Framework = FrameworkConstants.CommonFrameworks.NetCoreApp10
+                Framework = new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.NetCoreApp, new System.Version(1, 1, 0, 0))
             };
 
             var result = projectDependenciesCommandResolver.Resolve(commandResolverArguments);

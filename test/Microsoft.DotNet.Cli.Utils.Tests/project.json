@@ -16,10 +16,10 @@
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.1.0-preview1-001100-00"
+      "version": "1.1.0-preview1-001153-00"
     },
-    "System.Diagnostics.TraceSource": "4.3.0-preview1-24530-04",
-    "System.Runtime.Serialization.Primitives": "4.3.0-preview1-24530-04",
+    "System.Diagnostics.TraceSource": "4.3.0-preview1-24626-02",
+    "System.Runtime.Serialization.Primitives": "4.3.0-preview1-24626-02",
     "NuGet.Versioning": "3.5.0-beta2-1484",
     "NuGet.Packaging": "3.5.0-beta2-1484",
     "NuGet.Frameworks": "3.5.0-beta2-1484",
@@ -38,7 +38,7 @@
     "dotnet-test-xunit": "1.0.0-rc2-192208-24"
   },
   "frameworks": {
-    "netcoreapp1.0": {
+    "netcoreapp1.1": {
       "imports": [
         "netstandardapp1.5",
         "dotnet5.4",
