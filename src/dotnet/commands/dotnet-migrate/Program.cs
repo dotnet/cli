@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.Tools.Migrate
             
             CommandOption reportFile = app.Option("-r|--report-file", "Output migration report to a file in addition to the console.", CommandOptionType.SingleValue);
             CommandOption structuredReportOutput = app.Option("--format-report-file-json", "Output migration report file as json rather than user messages", CommandOptionType.BoolValue);
-            CommandOption doBackup = app.Option("--do-backup", "Move project.json, global.json, and *.xproj to a `backup` directory after successful migration.", CommandOptionType.BoolValue); 
+            CommandOption skipBackup = app.Option("--skip-backup", "Skip moving project.json, global.json, and *.xproj to a `backup` directory after successful migration.", CommandOptionType.BoolValue); 
 
             app.OnExecute(() =>
             {
@@ -55,7 +55,7 @@ namespace Microsoft.DotNet.Tools.Migrate
                     reportFile.Value(),
                     skipProjectReferences.BoolValue.HasValue ? skipProjectReferences.BoolValue.Value : false,
                     structuredReportOutput.BoolValue.HasValue ? structuredReportOutput.BoolValue.Value : false,
-                    doBackup.BoolValue.HasValue ? doBackup.BoolValue.Value : false);
+                    skipBackup.BoolValue.HasValue ? skipBackup.BoolValue.Value : false);
 
                 return migrateCommand.Execute();
             });

@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.Tools.Migrate
         private readonly bool _skipProjectReferences;
         private readonly string _reportFile;
         private readonly bool _reportFormatJson;
-        private readonly bool _doBackup;
+        private readonly bool _skipBackup;
 
         public MigrateCommand(
             string templateFile, 
@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.Tools.Migrate
             string reportFile, 
             bool skipProjectReferences, 
             bool reportFormatJson,
-            bool doBackup)
+            bool skipBackup)
         {            
             _templateFile = templateFile;
             _projectArg = projectArg ?? Directory.GetCurrentDirectory();
@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.Tools.Migrate
             _skipProjectReferences = skipProjectReferences;
             _reportFile = reportFile;
             _reportFormatJson = reportFormatJson;
-            _doBackup = doBackup;
+            _skipBackup = skipBackup;
         }
 
         public int Execute()
@@ -92,14 +92,14 @@ namespace Microsoft.DotNet.Tools.Migrate
 
             temporaryDotnetNewProject.Clean();
 
-            MoveProjectJsonArtifactsToBackup(_doBackup, migrationReport);
+            MoveProjectJsonArtifactsToBackup(migrationReport);
 
             return migrationReport.FailedProjectsCount;
         }
 
-        private void MoveProjectJsonArtifactsToBackup(bool doBackup, MigrationReport migrationReport)
+        private void MoveProjectJsonArtifactsToBackup(MigrationReport migrationReport)
         {
-            if (!doBackup)
+            if (_skipBackup)
             {
                 return;
             }

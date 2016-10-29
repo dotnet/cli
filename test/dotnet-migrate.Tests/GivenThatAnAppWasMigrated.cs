@@ -23,14 +23,11 @@ namespace Microsoft.DotNet.Migration.Tests
             var backupRoot = Path.Combine(testRoot, "backup");
 
             var migratableArtifacts = GetProjectJsonArtifacts(testRoot);
-
-            new RestoreProjectJsonCommand()
-                .WithWorkingDirectory(testRoot)
-                .Execute();
             
             new MigrateCommand()
                 .WithWorkingDirectory(testRoot)
-                .Execute("--do-backup");
+                .Execute()
+                .Should().Pass();
 
             var backupArtifacts = GetProjectJsonArtifacts(backupRoot);
 
@@ -53,13 +50,10 @@ namespace Microsoft.DotNet.Migration.Tests
 
             var migratableArtifacts = GetProjectJsonArtifacts(testRoot);
 
-            new RestoreCommand()
-                .WithWorkingDirectory(testRoot)
-                .Execute();
-            
             new MigrateCommand()
                 .WithWorkingDirectory(testRoot)
-                .Execute("--do-backup");
+                .Execute()
+                .Should().Pass();
             
             new DirectoryInfo(backupRoot).Should().NotExist("Because migration failed and therefore no backup is needed.");
 
@@ -67,8 +61,8 @@ namespace Microsoft.DotNet.Migration.Tests
         }
 
         [Theory]
-        [InlineData("TestAppSimple")]
-        public void When_dobackup_not_specified_Then_project_json_artifacts_do_not_get_moved_to_backup(string testProjectName)
+        [InlineData("PJTestAppSimple")]
+        public void When_skipbackup_specified_Then_project_json_artifacts_do_not_get_moved_to_backup(string testProjectName)
         {
             var testRoot = TestAssetsManager.CreateTestInstance(testProjectName, identifier: testProjectName).Path;
 
@@ -76,17 +70,14 @@ namespace Microsoft.DotNet.Migration.Tests
 
             var migratableArtifacts = GetProjectJsonArtifacts(testRoot);
 
-            new RestoreCommand()
-                .WithWorkingDirectory(testRoot)
-                .Execute();
-            
             new MigrateCommand()
                 .WithWorkingDirectory(testRoot)
-                .Execute();
+                .Execute("--skip-backup")
+                .Should().Pass();
             
-            new DirectoryInfo(backupRoot).Should().NotExist("Because --do-backup was not specified.");
+            new DirectoryInfo(backupRoot).Should().NotExist("Because --skip-backup was specified.");
 
-            new DirectoryInfo(testRoot).Should().HaveTextFiles(migratableArtifacts, "Because --do-backup was not specified.");
+            new DirectoryInfo(testRoot).Should().HaveTextFiles(migratableArtifacts, "Because --skip-backup was specified.");
         }
 
         private Dictionary<string, string> GetProjectJsonArtifacts(string rootPath)
