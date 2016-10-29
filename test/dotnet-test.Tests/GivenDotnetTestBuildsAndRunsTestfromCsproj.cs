@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.Cli.Test.Tests
             // Restore project VSTestDotNetCoreProject
             new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
-                .Execute()
+                .Execute("/p:SkipInvalidConfigurations=true")
                 .Should()
                 .Pass();
 
