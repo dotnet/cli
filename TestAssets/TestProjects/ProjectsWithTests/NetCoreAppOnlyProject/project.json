@@ -3,10 +3,10 @@
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.1.0-preview1-001153-00"
+      "version": "1.1.0"
     },
-    "System.Linq.Expressions": "4.3.0-preview1-24626-02",
-    "System.Runtime.Serialization.Primitives": "4.3.0-preview1-24626-02",
+    "System.Linq.Expressions": "4.3.0",
+    "System.Runtime.Serialization.Primitives": "4.3.0",
     "xunit": "2.1.0",
     "dotnet-test-xunit": "1.0.0-rc2-192208-24"
   },
