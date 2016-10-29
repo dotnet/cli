@@ -103,6 +103,14 @@ namespace Microsoft.DotNet.Tools.Migrate
                 return;
             }
             
+            BackupGlobalJson();
+
+            BackupProjects(migrationReport);
+            
+        }
+
+        private void BackupGlobalJson()
+        {   
             _backupDirectory.Create();
 
             var globalJson = Path.Combine(_workspaceDirectory.FullName, GlobalSettings.FileName);
@@ -111,27 +119,35 @@ namespace Microsoft.DotNet.Tools.Migrate
             {
                 File.Move(globalJson, Path.Combine(_backupDirectory.FullName, GlobalSettings.FileName));
             }
-            
+        }
+        
+        private void BackupProjects(MigrationReport migrationReport)
+        {
             foreach (var report in migrationReport.ProjectMigrationReports)
             {
-                var projectDirectory = PathUtility.EnsureTrailingSlash(report.ProjectDirectory);
-                
-                var relativeDirectory = PathUtility.GetRelativePath(PathUtility.EnsureTrailingSlash(_workspaceDirectory.FullName), projectDirectory);
+                MigrateProject(report);
+            }
+        }
 
-                var targetDirectory = String.IsNullOrEmpty(relativeDirectory)
-                    ? _backupDirectory.FullName
-                    :  Path.Combine(_backupDirectory.FullName, relativeDirectory);
+        private void MigrateProject(ProjectMigrationReport report)
+        {
+            var projectDirectory = PathUtility.EnsureTrailingSlash(report.ProjectDirectory);
+            
+            var relativeDirectory = PathUtility.GetRelativePath(PathUtility.EnsureTrailingSlash(_workspaceDirectory.FullName), projectDirectory);
 
-                PathUtility.EnsureDirectory(PathUtility.EnsureTrailingSlash(targetDirectory));
+            var targetDirectory = String.IsNullOrEmpty(relativeDirectory)
+                ? _backupDirectory.FullName
+                :  Path.Combine(_backupDirectory.FullName, relativeDirectory);
 
-                var movableFiles = new DirectoryInfo(projectDirectory)
-                    .EnumerateFiles()
-                    .Where(f => f.Name == Project.FileName || f.Extension == ".xproj");
-                
-                foreach (var movableFile in movableFiles)
-                {
-                    movableFile.MoveTo(Path.Combine(targetDirectory, movableFile.Name));
-                }
+            PathUtility.EnsureDirectory(PathUtility.EnsureTrailingSlash(targetDirectory));
+
+            var movableFiles = new DirectoryInfo(projectDirectory)
+                .EnumerateFiles()
+                .Where(f => f.Name == Project.FileName || f.Extension == ".xproj");
+            
+            foreach (var movableFile in movableFiles)
+            {
+                movableFile.MoveTo(Path.Combine(targetDirectory, movableFile.Name));
             }
         }
 
