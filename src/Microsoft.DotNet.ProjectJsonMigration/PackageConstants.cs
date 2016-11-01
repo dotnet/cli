@@ -19,6 +19,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration
         public const string TestSdkPackageName = "Microsoft.NET.Test.Sdk";
         public const string XUnitPackageName = "xunit";
         public const string XUnitRunnerPackageName = "xunit.runner.visualstudio";
+        public const string MstestTestAdapterName = "MSTest.TestAdapter";
+        public const string MstestTestFrameworkName = "MSTest.TestFramework";
 
         public static readonly IDictionary<string, PackageDependencyInfo> ProjectDependencyPackages = 
             new Dictionary<string, PackageDependencyInfo> {
@@ -44,6 +46,12 @@ namespace Microsoft.DotNet.ProjectJsonMigration
                 { XUnitRunnerPackageName, new PackageDependencyInfo {
                     Name = XUnitRunnerPackageName,
                     Version = ConstantPackageVersions.XUnitRunnerPackageVersion } },
+                { MstestTestAdapterName, new PackageDependencyInfo {
+                    Name = MstestTestAdapterName,
+                    Version = ConstantPackageVersions.MstestTestAdapterVersion } },
+                { MstestTestFrameworkName, new PackageDependencyInfo {
+                    Name = MstestTestFrameworkName,
+                    Version = ConstantPackageVersions.MstestTestFrameworkVersion } },
         };
 
         public static readonly IDictionary<string, PackageDependencyInfo> ProjectToolPackages = 
