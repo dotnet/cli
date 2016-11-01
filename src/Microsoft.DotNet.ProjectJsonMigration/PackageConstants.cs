@@ -16,11 +16,18 @@ namespace Microsoft.DotNet.ProjectJsonMigration
         public const string XUnitRunnerPackageName = "xunit.runner.visualstudio";
         public const string XUnitRunnerPackageVersion = "2.2.0-beta4-build1188";
 
+        public static readonly IDictionary<string, string> TestProjectDependencyPackages = new Dictionary<string, string>
+        {
+            { TestSdkPackageName, TestSdkPackageVersion },
+            { XUnitPackageName, XUnitPackageVersion },
+            { XUnitRunnerPackageName, XUnitRunnerPackageVersion }
+        };
+
         public static readonly IDictionary<string, string> AspProjectDependencyToolsPackages = new Dictionary<string, string> {
             {"Microsoft.EntityFrameworkCore.Tools", "Microsoft.EntityFrameworkCore.Tools"},
             {"Microsoft.AspNetCore.Razor.Tools", "Microsoft.AspNetCore.Razor.Design"},
             {"Microsoft.AspNetCore.Razor.Design", "Microsoft.AspNetCore.Razor.Design"},
-            {"Microsoft.VisualStudio.Web.CodeGenerators.Mvc", "Microsoft.VisualStudio.Web.CodGeneration.Design"},
+            {"Microsoft.VisualStudio.Web.CodeGenerators.Mvc", "Microsoft.VisualStudio.Web.CodeGeneration.Design"},
             {"Microsoft.VisualStudio.Web.CodeGeneration.Tools", ""},
         };
 

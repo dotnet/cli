@@ -29,6 +29,92 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Fact]
+        public void It_migrates_asp_project_dependency_tools_packages()
+        {
+            var mockProj = RunPackageDependenciesRuleOnPj(@"                
+                {
+                    ""dependencies"": {
+                        ""Microsoft.EntityFrameworkCore.Tools"" : ""1.0.0-preview"",
+                        ""Microsoft.AspNetCore.Razor.Tools"" : ""1.0.0"",
+                        ""Microsoft.AspNetCore.Razor.Design"" : ""1.0.0"",
+                        ""Microsoft.VisualStudio.Web.CodeGenerators.Mvc"" : ""1.0.0"",
+                        ""Microsoft.VisualStudio.Web.CodeGeneration.Tools"" : ""1.0.0"",
+                    }
+                }");
+
+            mockProj.Items.Should().ContainSingle(
+                i => (i.Include == "Microsoft.EntityFrameworkCore.Tools" &&
+                      i.ItemType == "PackageReference" &&
+                      i.GetMetadataWithName("Version").Value == "1.0.0-rc1-final"));
+
+            mockProj.Items.Should().ContainSingle(
+                i => (i.Include == "Microsoft.AspNetCore.Razor.Design" &&
+                      i.ItemType == "PackageReference" &&
+                      i.GetMetadataWithName("Version").Value == "1.0.0-rc1-final"));
+
+            mockProj.Items.Should().ContainSingle(
+                i => (i.Include == "Microsoft.VisualStudio.Web.CodeGeneration.Design" &&
+                      i.ItemType == "PackageReference" &&
+                      i.GetMetadataWithName("Version").Value == "1.0.0-rc1-final"));
+
+            mockProj.Items.Should().NotContain(
+                i => (i.Include == "Microsoft.AspNetCore.Razor.Tools" && i.ItemType == "PackageReference"));
+
+            mockProj.Items.Should().NotContain(
+                i => (i.Include == "Microsoft.VisualStudio.Web.CodeGenerators.Mvc" && i.ItemType == "PackageReference"));
+
+            mockProj.Items.Should().NotContain(
+                i => (i.Include == "Microsoft.VisualStudio.Web.CodeGeneration.Tools" && i.ItemType == "PackageReference"));
+        }
+
+        [Fact]
+        public void It_migrates_asp_project_tools_packages()
+        {
+            var mockProj = RunPackageDependenciesRuleOnPj(@"                
+                {
+                    ""tools"": {
+                        ""Microsoft.EntityFrameworkCore.Tools"" : { ""version"": ""1.0.0-preview"" },
+                        ""Microsoft.AspNetCore.Razor.Tools"" : { ""version"": ""1.0.0-preview"" },
+                        ""Microsoft.VisualStudio.Web.CodeGeneration.Tools"" : { ""version"": ""1.0.0-preview"" },
+                        ""Microsoft.DotNet.Watcher.Tools"" : { ""version"": ""1.0.0-preview"" },
+                        ""Microsoft.Extensions.SecretManager.Tools"" : { ""version"": ""1.0.0"" },
+                        ""Microsoft.AspNetCore.Server.IISIntegration.Tools"" : { ""version"": ""1.0.0-preview"" }
+                    }
+                }");
+
+            mockProj.Items.Should().ContainSingle(
+                i => (i.Include == "Microsoft.EntityFrameworkCore.Tools.DotNet" &&
+                      i.ItemType == "DotNetCliToolReference" &&
+                      i.GetMetadataWithName("Version").Value == "1.0.0-rc1-final"));
+
+            mockProj.Items.Should().ContainSingle(
+                i => (i.Include == "Microsoft.AspNetCore.Razor.Tools" &&
+                      i.ItemType == "DotNetCliToolReference" &&
+                      i.GetMetadataWithName("Version").Value == "1.0.0-rc1-final"));
+
+            mockProj.Items.Should().ContainSingle(
+                i => (i.Include == "Microsoft.VisualStudio.Web.CodeGeneration.Tools" &&
+                      i.ItemType == "DotNetCliToolReference" &&
+                      i.GetMetadataWithName("Version").Value == "1.0.0-rc1-final"));
+
+            mockProj.Items.Should().ContainSingle(
+                i => (i.Include == "Microsoft.DotNet.Watcher.Tools" &&
+                      i.ItemType == "DotNetCliToolReference" &&
+                      i.GetMetadataWithName("Version").Value == "1.0.0-rc1-final"));
+
+            mockProj.Items.Should().ContainSingle(
+                i => (i.Include == "Microsoft.Extensions.SecretManager.Tools" &&
+                      i.ItemType == "DotNetCliToolReference" &&
+                      i.GetMetadataWithName("Version").Value == "1.0.0-rc1-final"));
+                
+            mockProj.Items.Should().NotContain(
+                i => (i.Include == "Microsoft.EntityFrameworkCore.Tools" && i.ItemType == "DotNetCliToolReference"));
+
+            mockProj.Items.Should().NotContain(
+                i => (i.Include == "Microsoft.AspNetCore.Server.IISIntegration.Tools" && i.ItemType == "DotNetCliToolReference"));
+        }
+
+        [Fact]
         public void It_migrates_type_build_to_PrivateAssets()
         {
             var mockProj = RunPackageDependenciesRuleOnPj(@"                
@@ -273,7 +359,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
                 }");
 
             mockProj.Items.Should().ContainSingle(
-                i => (i.Include == "Microsoft.NET.Test.Sdk" && i.ItemType == "PackageReference"));
+                i => (i.Include == "Microsoft.NET.Test.Sdk" &&
+                      i.ItemType == "PackageReference" &&
+                      i.GetMetadataWithName("Version").Value == "15.0.0-preview-20161024-02"));
 
             mockProj.Items.Should().NotContain(
                 i => (i.Include == "xunit" && i.ItemType == "PackageReference"));
@@ -297,13 +385,52 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
                 }");
 
             mockProj.Items.Should().ContainSingle(
-                i => (i.Include == "Microsoft.NET.Test.Sdk" && i.ItemType == "PackageReference"));
+                i => (i.Include == "Microsoft.NET.Test.Sdk" && 
+                      i.ItemType == "PackageReference" &&
+                      i.GetMetadataWithName("Version").Value == "15.0.0-preview-20161024-02"));
 
             mockProj.Items.Should().ContainSingle(
-                i => (i.Include == "xunit" && i.ItemType == "PackageReference"));
+                i => (i.Include == "xunit" && 
+                      i.ItemType == "PackageReference" &&
+                      i.GetMetadataWithName("Version").Value == "2.2.0-beta3-build3402"));
 
             mockProj.Items.Should().ContainSingle(
-                i => (i.Include == "xunit.runner.visualstudio" && i.ItemType == "PackageReference"));
+                i => (i.Include == "xunit.runner.visualstudio" && 
+                      i.ItemType == "PackageReference" &&
+                      i.GetMetadataWithName("Version").Value == "2.2.0-beta4-build1188"));
+        }
+
+        [Fact]
+        public void It_migrates_test_projects_to_have_test_sdk_and_xunit_packagedependencies_overwrite_existing_packagedependencies()
+        {
+            var mockProj = RunPackageDependenciesRuleOnPj(@"
+                {
+                    ""buildOptions"": {
+                        ""emitEntryPoint"": true
+                    },
+                    ""dependencies"": {
+                        ""xunit"": ""2.2.0-beta3-build3330""
+                    },
+                    ""frameworks"": {
+                        ""netcoreapp1.0"": {}
+                    },
+                    ""testRunner"": ""xunit""
+                }");
+
+            mockProj.Items.Should().ContainSingle(
+                i => (i.Include == "Microsoft.NET.Test.Sdk" &&
+                      i.ItemType == "PackageReference" &&
+                      i.GetMetadataWithName("Version").Value == "15.0.0-preview-20161024-02"));
+
+            mockProj.Items.Should().ContainSingle(
+                i => (i.Include == "xunit" &&
+                      i.ItemType == "PackageReference" &&
+                      i.GetMetadataWithName("Version").Value == "2.2.0-beta3-build3402"));
+
+            mockProj.Items.Should().ContainSingle(
+                i => (i.Include == "xunit.runner.visualstudio" &&
+                      i.ItemType == "PackageReference" &&
+                      i.GetMetadataWithName("Version").Value == "2.2.0-beta4-build1188"));
         }
 
         private void EmitsPackageReferences(ProjectRootElement mockProj, params Tuple<string, string, string>[] packageSpecs)

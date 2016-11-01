@@ -243,7 +243,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                 _transformApplicator.Execute(
                     transform.Transform(ToPackageDependencyInfo(
                         packageDependency,
-                        PackageConstants.AspProjectDependencyToolsPackages)),
+                        PackageConstants.AspProjectDependencyToolsPackages,
+                        PackageConstants.TestProjectDependencyPackages)),
                     itemGroup,
                     mergeExisting: true);
             }
@@ -251,7 +252,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
 
         private PackageDependencyInfo ToPackageDependencyInfo(
             ProjectLibraryDependency dependency,
-            IDictionary<string, string> toolsDictionary)
+            IDictionary<string, string> toolsDictionary,
+            IDictionary<string, string> dependencyToVersionMap = null)
         {
             var name = dependency.Name;
             var version = dependency.LibraryRange?.VersionRange?.OriginalString;
@@ -267,13 +269,18 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                 }
             }
 
+            if (dependencyToVersionMap != null && dependencyToVersionMap.ContainsKey(name))
+            {
+                version = dependencyToVersionMap[name];
+            }
+
             return new PackageDependencyInfo
             {
                 Name = name,
                 Version = version
             };
         }
-
+        
         private void AutoInjectImplicitProjectJsonAssemblyReferences(NuGetFramework framework, 
             IList<ProjectLibraryDependency> packageDependencies)
         {
