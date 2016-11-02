@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.New.Tests
             string projectType,
             bool useNuGetConfigForAspNet)
         {
-            var rootPath = TestAssetsManager.CreateTestDirectory().Path;
+            var rootPath = TestAssetsManager.CreateTestDirectory(callingMethod: "i").Path;
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .Execute($"new --type {projectType}")
