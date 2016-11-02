@@ -15,29 +15,10 @@
         <ProjectName>Microsoft.DotNet.Cli.Utils</ProjectName>
         <Version>$(SdkNugetVersion)</Version>
       </ProjectsToPack>
-      <ProjectsToPack Include="$(ProjectsSrcDirectory)/Microsoft.DotNet.InternalAbstractions">
-        <ProjectName>Microsoft.DotNet.InternalAbstractions</ProjectName>
-        <Version>$(DependencyModelAndInternalAbstractionsNugetVersion)</Version>
-      </ProjectsToPack>
-      <ProjectsToPack Include="$(ProjectsSrcDirectory)/Microsoft.DotNet.ProjectJsonMigration">
-        <ProjectName>Microsoft.DotNet.ProjectJsonMigration</ProjectName>
-        <Version>$(SdkNugetVersion)</Version>
-      </ProjectsToPack>
     </ItemGroup>
   </Target>
 
-  <Target Name="SetupGenerateNugetPackagesInputsOutputs"
-          DependsOnTargets="SetupProjectsToPack">
-    <ItemGroup>
-      <ProjectPackTargetInputs Include="$(PackagingBuildBasePath)/src/%(ProjectsToPack.ProjectName)/**/netstandard*/%(ProjectsToPack.ProjectName).dll" />
-      <ProjectPackTargetOutputs Include="$(NupkgOutputDirectory)/%(ProjectsToPack.ProjectName).%(ProjectsToPack.Version).nupkg" />
-    </ItemGroup>
-  </Target>
-
-  <Target Name="GenerateNugetPackages"
-          DependsOnTargets="SetupGenerateNugetPackagesInputsOutputs"
-          Inputs="@(ProjectPackTargetInputs -> '%(Identity)')"
-          Outputs="@(ProjectPackTargetOutputs -> '%(Identity)')">
+  <Target Name="GenerateNugetPackages">
 
     <DotNetPack NoBuild="True"
                 Output="$(NupkgOutputDirectory)"
