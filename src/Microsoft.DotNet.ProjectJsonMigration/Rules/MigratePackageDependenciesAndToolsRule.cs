@@ -311,7 +311,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                 Version = version
             };
         }
-        
+
         private void AutoInjectImplicitProjectJsonAssemblyReferences(NuGetFramework framework, 
             IList<ProjectLibraryDependency> packageDependencies)
         {
