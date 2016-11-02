@@ -21,6 +21,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration
         public const string XUnitRunnerPackageName = "xunit.runner.visualstudio";
         public const string MstestTestAdapterName = "MSTest.TestAdapter";
         public const string MstestTestFrameworkName = "MSTest.TestFramework";
+        public const string NetStandardPackageName = "NETStandard.Library";
+        public const string NetStandardPackageVersion = "1.6.0";
 
         public static readonly IDictionary<string, PackageDependencyInfo> ProjectDependencyPackages = 
             new Dictionary<string, PackageDependencyInfo> {
