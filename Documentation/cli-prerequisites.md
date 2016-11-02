@@ -1,5 +1,5 @@
 CLI native prerequisites
-=========================
+========================
 
 This document outlines the dependencies needed to run .NET Core CLI tools. Most of these dependencies are also .NET Core's general dependencies, so installing them will make sure that you can run applications written for .NET Core in general.
 
