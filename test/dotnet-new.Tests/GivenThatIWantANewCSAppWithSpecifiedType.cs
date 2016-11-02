@@ -16,13 +16,14 @@ namespace Microsoft.DotNet.New.Tests
     public class GivenThatIWantANewCSAppWithSpecifiedType : TestBase
     {
         [Theory]
-        [InlineData("Console")]
-        [InlineData("Lib")]
-        [InlineData("Web", Skip="Skip until Microsoft.Net.Sdk.Web is uploaded to nuget.org")]
-        [InlineData("Mstest")]
-        [InlineData("XUnittest")]
+        [InlineData("Console", "")]
+        [InlineData("Lib", "")]
+        [InlineData("Web", "-s https://dotnet.myget.org/F/dotnet-web/api/v3/index.json")]
+        [InlineData("Mstest", "")]
+        [InlineData("XUnittest", "")]
         public void When_dotnet_build_is_invoked_then_project_restores_and_builds_without_warnings(
-            string projectType)
+            string projectType,
+            string restoreArgs)
         {
             var rootPath = TestAssetsManager.CreateTestDirectory().Path;
 
@@ -31,7 +32,7 @@ namespace Microsoft.DotNet.New.Tests
                 .Should().Pass();
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("restore /p:SkipInvalidConfigurations=true")
+                .Execute($"restore {restoreArgs} -- /p:SkipInvalidConfigurations=true")
                 .Should().Pass();
 
             var buildResult = new TestCommand("dotnet")
