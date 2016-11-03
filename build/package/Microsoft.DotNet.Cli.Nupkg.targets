@@ -39,12 +39,12 @@
           Inputs="@(ProjectPackTargetInputs -> '%(Identity)')"
           Outputs="@(ProjectPackTargetOutputs -> '%(Identity)')">
 
-    <DotNetPackMsbuildLegacy NoBuild="True"
-                             Output="$(NupkgOutputDirectory)"
-                             ProjectPath="%(ProjectsToPack.Identity)/%(ProjectsToPack.ProjectName).csproj"
-                             ToolPath="$(Stage0Directory)"
-                             VersionSuffix="$(NupkgVersionSuffix)"
-                             Configuration="$(Configuration)" />
+    <DotNetPack NoBuild="True"
+                Output="$(NupkgOutputDirectory)"
+                ProjectPath="%(ProjectsToPack.Identity)/%(ProjectsToPack.ProjectName).csproj"
+                ToolPath="$(Stage0Directory)"
+                VersionSuffix="$(NupkgVersionSuffix)"
+                Configuration="$(Configuration)" />
   </Target>
 
   <Target Name="BuildProjectsForNuGetPackages"
