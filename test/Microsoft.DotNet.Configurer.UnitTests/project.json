@@ -6,7 +6,7 @@
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.2"
+      "version": "1.0.3-servicing-004573-00"
     },
     "System.Diagnostics.TraceSource": "4.0.0",
     "Microsoft.DotNet.Configurer": {
