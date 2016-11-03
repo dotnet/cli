@@ -142,6 +142,7 @@ export __INIT_TOOLS_RESTORE_ARGS="$__INIT_TOOLS_RESTORE_ARGS --disable-parallel"
 DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 toolsLocalPath="$REPOROOT/build_tools"
 bootStrapperPath="$toolsLocalPath/bootstrap.sh"
+dotnetInstallPath="$toolsLocalPath/dotnet-install.sh"
 if [ ! -f $bootStrapperPath ]; then
     if [ ! -d $toolsLocalPath ]; then
         mkdir $toolsLocalPath
@@ -158,8 +159,8 @@ if [ $? != 0 ]; then
 fi
 
 # now execute the script
-say_verbose "installing CLI: $dotnetInstallPath --version \"latest\" --install-dir $DOTNET_INSTALL_DIR --architecture \"$architecture\""
-$dotnetInstallPath --version "latest" --install-dir $DOTNET_INSTALL_DIR --architecture "$architecture"
+echo "installing CLI: $dotnetInstallPath --version \"latest\" --install-dir $DOTNET_INSTALL_DIR --architecture \"$ARCHITECTURE\""
+$dotnetInstallPath --version "latest" --install-dir $DOTNET_INSTALL_DIR --architecture "$ARCHITECTURE"
 if [ $? != 0 ]; then
     echo "run-build: Error: Boot-strapping post-PJ stage0 with exit code $?." >&2
     exit $?
