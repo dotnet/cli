@@ -3,7 +3,7 @@
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.2"
+      "version": "1.0.3-servicing-004577-00"
     },
     "System.Linq.Expressions": "4.1.0",
     "System.Runtime.Serialization.Primitives": "4.1.1",
