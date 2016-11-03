@@ -48,13 +48,13 @@
   </Target>
 
   <Target Name="BuildProjectsForNuGetPackages"
-            DependsOnTargets="Init;
-                              SetupProjectsToPack"
-            Condition=" '$(OS)' == 'Windows_NT' ">
-        <MakeDir Directories="$(PackagingBuildBasePath)" />
+          DependsOnTargets="Init; SetupProjectsToPack"
+          Condition=" '$(OS)' == 'Windows_NT' ">
 
-    <DotNetBuildMsbuildLegacy ToolPath="$(Stage0Directory)"
-                              Configuration="$(Configuration)"
-                              ProjectPath="%(ProjectsToPack.Identity)/%(ProjectsToPack.ProjectName).csproj" />
+    <MakeDir Directories="$(PackagingBuildBasePath)" />
+
+    <DotNetBuild ToolPath="$(Stage0Directory)"
+                 Configuration="$(Configuration)"
+                 ProjectPath="%(ProjectsToPack.Identity)/%(ProjectsToPack.ProjectName).csproj" />
   </Target>
 </Project>
