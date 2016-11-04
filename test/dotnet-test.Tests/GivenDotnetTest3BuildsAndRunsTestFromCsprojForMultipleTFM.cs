@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.Cli.Test.Tests
 {
     public class GivenDotnetTest3BuildsAndRunsTestFromCsprojForMultipleTFM : TestBase
     {
-        [WindowsOnlyFact]
+        [WindowsOnlyFact(Skip="https://github.com/dotnet/cli/issues/4616")]
         public void MStestMultiTFM()
         {
             var testProjectDirectory = TestAssets.Get("VSTestDesktopAndNetCore")
