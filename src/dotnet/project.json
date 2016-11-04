@@ -18,8 +18,8 @@
         "commands/dotnet-new/CSharp_Lib/**",
         "commands/dotnet-new/CSharp_Mstest/**",
         "commands/dotnet-new/CSharp_Web/**",
-        "commands/dotnet-new/FSharp_Lib/**",
         "commands/dotnet-new/CSharp_Xunittest/**"
+
       ]
     }
   },
