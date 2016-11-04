@@ -51,7 +51,7 @@
     },
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.2"
+      "version": "1.0.3-servicing-004582-00"
     },
     "System.Diagnostics.TraceSource": "4.0.0",
     "System.Diagnostics.TextWriterTraceListener": "4.0.0",
