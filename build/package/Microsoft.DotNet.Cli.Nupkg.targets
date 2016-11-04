@@ -18,7 +18,9 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="GenerateNugetPackages">
+  <Target Name="GenerateNugetPackages"
+          DependsOnTargets="Init; SetupProjectsToPack"
+          Condition=" '$(OS)' == 'Windows_NT' ">
 
     <DotNetPack NoBuild="True"
                 Output="$(NupkgOutputDirectory)"
