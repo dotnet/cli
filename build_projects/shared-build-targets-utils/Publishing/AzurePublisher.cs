@@ -188,6 +188,8 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var blobUrl = $"{s_dotnetBlobRootUrl}{blobFilePath}";
 
+            Console.WriteLine($"Downloading {blobUrl}");
+
             using (var client = new HttpClient())
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, blobUrl);

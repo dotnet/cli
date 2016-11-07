@@ -7,7 +7,7 @@ namespace Microsoft.DotNet.Cli.Build
 {
     public class CliDependencyVersions
     {
-        public static readonly string SharedFrameworkVersion = "1.0.2";
+        public static readonly string SharedFrameworkVersion = "1.0.3-servicing-004584-00";
         public static readonly string SharedHostVersion = "1.0.1";
         public static readonly string HostFxrVersion = "1.0.1";
 
