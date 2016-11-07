@@ -1,5 +1,5 @@
 dotnet-test communication protocol
-===================================
+==================================
 
 ## Introduction
 Anytime you pass a port to dotnet test, the command will run in design time. That means that dotnet test will connect to that port
