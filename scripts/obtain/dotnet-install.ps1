@@ -311,7 +311,7 @@ function Get-List-Of-Directories-And-Versions-To-Unpack-From-Dotnet-Package([Sys
     
     $ret = $ret | Sort-Object | Get-Unique
     
-   $values = ($ret | foreach { "$_" }) -join ";"
+    $values = ($ret | foreach { "$_" }) -join ";"
     Say-Verbose "Directories to unpack: $values"
     
     return $ret
