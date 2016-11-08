@@ -396,7 +396,7 @@ if ($DryRun) {
 $InstallRoot = Resolve-Installation-Path $InstallDir
 Say-Verbose "InstallRoot: $InstallRoot"
 
-$free = Get-CimInstance -Class win32_logicaldisk | where deviceid -eq c:| select Freespace # as install path is 99% $env:LocalAppData\Microsoft\dotnet" c-drive should be fine
+$free = Get-CimInstance -Class win32_logicaldisk | where Deviceid -eq "$((Get-Item $InstallRoot).PSDrive.Name):"
 if ($free.Freespace / 1MB -le 250 ) {
     Say "there is not enough disk space on drive c:"
     exit 0
