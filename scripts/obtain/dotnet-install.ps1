@@ -356,7 +356,8 @@ function Extract-Dotnet-Package([string]$ZipPath, [string]$OutPath) {
     finally {
         if ($Zip -ne $null) {
             $Zip.Dispose()
-        }
+
+}
     }
 }
 
@@ -365,7 +366,8 @@ function DownloadFile([Uri]$Uri, [string]$OutPath) {
 
     try {
         $Response = GetHTTPResponse -Uri $Uri
-        $Stream = $Response.Content.ReadAsStreamAsync().Result
+
+$Stream = $Response.Content.ReadAsStreamAsync().Result
         $File = [System.IO.File]::Create($OutPath)
         $Stream.CopyTo($File)
         $File.Close()
@@ -393,6 +395,12 @@ if ($DryRun) {
 
 $InstallRoot = Resolve-Installation-Path $InstallDir
 Say-Verbose "InstallRoot: $InstallRoot"
+
+$free = Get-CimInstance -Class win32_logicaldisk | where deviceid -eq c:| select Freespace # as install path is 99% $env:LocalAppData\Microsoft\dotnet" c-drive should be fine
+if ($free.Freespace / 1MB -le 250 ) {
+    Say "there is not enough disk space on drive c:"
+    exit 0
+}
 
 $IsSdkInstalled = Is-Dotnet-Package-Installed -InstallRoot $InstallRoot -RelativePathToPackage "sdk" -SpecificVersion $SpecificVersion
 Say-Verbose ".NET SDK installed? $IsSdkInstalled"
