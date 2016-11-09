@@ -61,7 +61,7 @@
   </PropertyGroup>
 
   <Target Name="PrecompileScript" BeforeTargets="Build" Condition=" '$(IsCrossTargetingBuild)' != 'true' ">
-    <Exec Command="dotnet publish ../ArgumentsReflector/ArgumentsReflector.csproj" />
+    <Exec Command="dotnet publish ../ArgumentsReflector/ArgumentsReflector.csproj --output $(MSBuildThisFileDirectory)/$(OutputPath)" />
   </Target>
   
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

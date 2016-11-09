@@ -20,7 +20,8 @@
       <Link>.version</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\TestAssets\TestProjects\OutputStandardOutputAndError\*;..\..\TestAssets\TestProjects\TestAppWithArgs\*;..\..\TestAssets\TestProjects\AppWithDirectAndToolDependency\**\*;..\..\TestAssets\TestProjects\AppWithDirectDependency\**\*;..\..\TestAssets\TestProjects\AppWithToolDependency\**\*">
+    <Content Include="..\..\TestAssets\TestProjects\AppWithToolDependency\**\*">
+      <Link>TestAssets/TestProjects/AppWithToolDependency/%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>

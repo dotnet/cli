@@ -9,7 +9,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Xunit;
 using Microsoft.DotNet.Cli.Utils;
-using Microsoft.DotNet.ProjectModel;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using System.Diagnostics;
 using FluentAssertions;
@@ -26,6 +25,10 @@ namespace Microsoft.DotNet.Tests.ArgumentForwarding
 
         public ArgumentForwardingTests()
         {
+            Environment.SetEnvironmentVariable(
+                Constants.MSBUILD_EXE_PATH,
+                Path.Combine(new RepoDirectoriesProvider().Stage2Sdk, "MSBuild.dll"));
+
             // This test has a dependency on an argument reflector
             // Make sure it's been binplaced properly
             FindAndEnsureReflectorPresent();
