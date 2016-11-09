@@ -24,11 +24,6 @@ namespace Microsoft.DotNet.Tests.ArgumentForwarding
         private string ReflectorPath { get; set; }
         private string ReflectorCmdPath { get; set; }
 
-        public static void Main()
-        {
-            Console.WriteLine("Dummy Entrypoint.");
-        }
-
         public ArgumentForwardingTests()
         {
             // This test has a dependency on an argument reflector

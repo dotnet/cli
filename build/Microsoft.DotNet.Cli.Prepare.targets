@@ -190,8 +190,8 @@
 
     <CallTarget Targets="CleanSrcLockFiles" />
 
-    <DotNetRestore ToolPath="$(DotNetPath)" 
-                   Root="&quot;%(RestoreSrcPackagesInput.FullPath)&quot;" />
+    <DotNetRestore ToolPath="$(DotNetPath)"
+                   ProjectPath="&quot;%(RestoreSrcPackagesInput.FullPath)&quot;" />
 
   </Target>
 
@@ -216,7 +216,7 @@
     <CallTarget Targets="CleanToolsLockFiles" />
 
     <DotNetRestore ToolPath="$(DotNetPath)" 
-                   Root="&quot;%(RestoreToolsPackagesInput.FullPath)&quot;" />
+                   ProjectPath="&quot;%(RestoreToolsPackagesInput.FullPath)&quot;" />
 
   </Target>
 
@@ -232,7 +232,7 @@
       <RestoreToolsPackagesInput Include="$(RepoRoot)/tools/**/*.csproj" />
     </ItemGroup>
   </Target>
-
+  
   <Target Name="RestoreProjectJsonPackages"
           DependsOnTargets="SetupRestoreProjectJsonPackagesInputsOutputs;Init"
           Inputs="@(RestoreProjectJsonPackagesInput)"
