@@ -31,10 +31,6 @@ namespace Microsoft.DotNet.Cli.Utils
                 {
                     return func();
                 }
-                catch (DirectoryNotFoundException)
-                {
-                    throw;
-                }
                 catch (UnauthorizedAccessException)
                 {
                     // This can occur when the file is being deleted

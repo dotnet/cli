@@ -222,7 +222,7 @@ namespace Microsoft.DotNet.Tests
         }
 
         [Fact]
-        public void When_assets_file_in_use_Then_the_tool_retries_for_more_than_one_second()
+        public void When_assets_file_is_in_use_Then_CLI_retries_launching_the_command_for_at_least_one_second()
         {
             var testInstance = TestAssets.Get("AppWithToolDependency")
                 .CreateInstance()
@@ -244,7 +244,7 @@ namespace Microsoft.DotNet.Tests
         }
 
         [Fact]
-        public void When_assets_file_locked_by_NuGet_Then_the_tool_retries_for_more_than_one_second()
+        public void When_assets_file_is_locked_by_NuGet_Then_CLI_retries_launching_the_command_for_at_least_one_second()
         {
             var testInstance = TestAssets.Get("AppWithToolDependency")
                 .CreateInstance()
