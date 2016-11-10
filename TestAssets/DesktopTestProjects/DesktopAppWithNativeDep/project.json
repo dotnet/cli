@@ -2,7 +2,7 @@
   "version": "1.0.0-*",
   "dependencies": {
     "PackageWithFakeNativeDep": "1.0.0-*",
-    "Microsoft.NETCore.Platforms": "1.0.2-servicing-24703-01"
+    "Microsoft.NETCore.Platforms": "1.0.2"
   },
   "buildOptions": {
     "emitEntryPoint": true
