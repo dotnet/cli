@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.Cli.Build
 
         private string GetXml()
         {
-            if (!string.IsNullOrEmpty(ProjectPath))
+            if (!string.IsNullOrEmpty(Xml))
             {
                 return $"-xml {Xml}";
             }
