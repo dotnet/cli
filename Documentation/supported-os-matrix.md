@@ -26,8 +26,11 @@ The following versions of Linux are supported:
 
 - Debian 8.2
 - Ubuntu 14.04 LTS
+- Ubuntu 16.04 LTS
 - CentOS 7.1
 - Red Hat Enterprise Linux 7.2
+- Fedora 23
+- OpenSUSE 13.2
 
 ## OS X (x64 only)
 The following versions of OS X are supported:
