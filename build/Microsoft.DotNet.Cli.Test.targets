@@ -220,7 +220,8 @@
   <Target Name="CreateTestAssetPackageNuPkgsFromMsbuildProjects"
           DependsOnTargets="RestoreTestAssetPackageMsbuildProjects;
                             SetupTestPackageProjectData;">
-    <DotNetPack Output="$(TestPackagesDir)"
+    <DotNetPack Condition="'@(TestPackageCsProj)' != ''"
+                Output="$(TestPackagesDir)"
                 Runtime="%(TestPackageCsProj.Runtime)"
                 ToolPath="$(Stage2Directory)"
                 VersionSuffix="%(TestPackageCsProj.VersionSuffix)"
@@ -262,9 +263,10 @@
 
   <Target Name="RestoreTestAssetPackageMsbuildProjects"
           DependsOnTargets="PrepareTestAssetPackageMsbuildProjects">
-    <DotNetRestore  ToolPath="$(Stage2Directory)"
-                    Runtime="%(TestPackageCsProj.Runtime)"
-                    WorkingDirectory="%(TestPackageCsProj.WorkingDirectory)" />
+    <DotNetRestore Condition="'@(TestPackageCsProj)' != ''"
+                   ToolPath="$(Stage2Directory)"
+                   Runtime="%(TestPackageCsProj.Runtime)"
+                   WorkingDirectory="%(TestPackageCsProj.WorkingDirectory)" />
   </Target>
 
   <Target Name="SetupRestoreTestAssetPackageProjectsInputs"
