@@ -93,6 +93,9 @@
 
       <!-- Run E2E -->
       <DotNetRestorePJ ToolPath="$(Stage0PjDirectory)"
+                       WorkingDirectory="$(TestUtilitiesDirectory)" />
+
+      <DotNetRestorePJ ToolPath="$(Stage0PjDirectory)"
                        WorkingDirectory="$(EndToEndTestDirectory)" />
 
       <DotNetTestPJ WorkingDirectory="$(EndToEndTestDirectory)"

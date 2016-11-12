@@ -48,6 +48,7 @@
     <PropertyGroup>
       <ManpagesDirectory>$(RepoRoot)/Documentation/manpages</ManpagesDirectory>
       <EndToEndTestDirectory>$(RepoRoot)/test/EndToEnd</EndToEndTestDirectory>
+      <TestUtilitiesDirectory>$(RepoRoot)/test/Microsoft.DotNet.Tools.Tests.Utilities</TestUtilitiesDirectory>
       <CLISdkRoot>$(Stage2Directory)/sdk</CLISdkRoot>
     </PropertyGroup>
 

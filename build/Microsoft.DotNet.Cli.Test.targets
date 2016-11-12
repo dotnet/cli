@@ -75,7 +75,6 @@
     <DotNetBuild  Configuration="$(Configuration)"
                   Framework="%(TestProjects.Framework)"
                   ToolPath="$(Stage0Directory)"
-                  WorkingDirectory="%(TestProjects.RelativeDir)" 
                   ProjectPath="%(TestProjects.ProjectPath)" />
   </Target>
 
@@ -88,7 +87,6 @@
     <CallTarget Targets="CleanTestProjectsLockFiles"/>
 
     <DotNetRestore ToolPath="$(Stage0Directory)"
-                   WorkingDirectory="%(RestoreTestsInputs.RootDir)%(RestoreTestsInputs.Directory)"
                    ProjectPath="&quot;%(RestoreTestsInputs.FullPath)&quot;" />
   </Target>
 
@@ -127,8 +125,7 @@
 
     <DotNetBuildPj  Framework="netcoreapp1.0"
                     ProjectPath="$(RepoRoot)%(TestAssetProjects.ProjectPath)"
-                    ToolPath="$(Stage0PjDirectory)"
-                    WorkingDirectory="%(TestAssetProjects.RelativeDir)" />
+                    ToolPath="$(Stage0PjDirectory)" />
   </Target>
 
   <Target Name="RestoreTestAssetProjects"
@@ -178,8 +175,7 @@
     <DotNetBuild  Configuration="$(Configuration)"
                   Framework="net46"
                   ProjectPath="%(BuildableDesktopTestAssetProjects.FullPath)"
-                  ToolPath="$(Stage0PjDirectory)"
-                  WorkingDirectory="%(BuildableDesktopTestAssetProjects.RelativeDir)" />
+                  ToolPath="$(Stage0PjDirectory)" />
   </Target>
 
   <Target Name="RestoreDesktopTestAssetProjects"
@@ -223,8 +219,7 @@
     <DotNetBuildPj  BuildBasePath="$(TestPackagesBuildDir)"
                     Framework="%(TestPackageProject.Framework)"
                     ProjectPath="%(TestPackageProject.FullPath)"
-                    ToolPath="$(Stage0PjDirectory)"
-                    WorkingDirectory="%(BuildableTestAssetProjects.RelativeDir)" />
+                    ToolPath="$(Stage0PjDirectory)" />
   </Target>
 
   <Target Name="RestoreTestAssetPackageProjects"
