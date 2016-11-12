@@ -232,7 +232,7 @@
       <RestoreToolsPackagesInput Include="$(RepoRoot)/tools/**/*.csproj" />
     </ItemGroup>
   </Target>
-  
+
   <Target Name="RestoreProjectJsonPackages"
           DependsOnTargets="SetupRestoreProjectJsonPackagesInputsOutputs;Init"
           Inputs="@(RestoreProjectJsonPackagesInput)"
