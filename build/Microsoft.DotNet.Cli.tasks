@@ -17,7 +17,6 @@
   <UsingTask TaskName="DotNetRestore" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="DotNetRestorePJ" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="DotNetTest" AssemblyFile="$(CLIBuildDll)" />
-  <UsingTask TaskName="DotNetTestPJ" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="DownloadFile" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="GenerateBuildVersionInfo" AssemblyFile="$(CLIBuildDll)" />
   <UsingTask TaskName="GenerateChecksums" AssemblyFile="$(CLIBuildDll)" />

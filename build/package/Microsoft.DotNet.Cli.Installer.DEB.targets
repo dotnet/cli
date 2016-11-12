@@ -47,8 +47,7 @@
     <!-- Inputs -->
     <PropertyGroup>
       <ManpagesDirectory>$(RepoRoot)/Documentation/manpages</ManpagesDirectory>
-      <EndToEndTestDirectory>$(RepoRoot)/test/EndToEnd</EndToEndTestDirectory>
-      <TestUtilitiesDirectory>$(RepoRoot)/test/Microsoft.DotNet.Tools.Tests.Utilities</TestUtilitiesDirectory>
+      <EndToEndTestProject>$(RepoRoot)/test/EndToEnd/EndToEnd.csproj</EndToEndTestProject>
       <CLISdkRoot>$(Stage2Directory)/sdk</CLISdkRoot>
     </PropertyGroup>
 
