@@ -6,7 +6,7 @@
     <TargetFramework>net451</TargetFramework>
     <AssemblyName>dotnet-desktop-binding-redirects</AssemblyName>
     <OutputType>Exe</OutputType>
-    <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+    <RuntimeIdentifiers>win7-x86;win7-x64</RuntimeIdentifiers>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
