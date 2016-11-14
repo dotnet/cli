@@ -440,7 +440,7 @@ namespace Microsoft.DotNet.Migration.Tests
         public void It_fails_gracefully_when_migrating_app_with_missing_dependency()
         {
             string projectName = "MigrateAppWithMissingDep";
-            var projectDirectory = Path.Combine(TestAssetsManager.CreateTestInstance(projectName).Path, "MyApp");
+            var projectDirectory = Path.Combine(GetTestGroupTestAssetsManager("NonRestoredTestProjects").CreateTestInstance(projectName).Path, "MyApp");
 
             string migrationOutputFile = Path.Combine(projectDirectory, "migration-output.json");
             File.Exists(migrationOutputFile).Should().BeFalse();
