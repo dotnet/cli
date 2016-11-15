@@ -204,16 +204,17 @@
           Outputs="%(TestPackageProject.PackOutputs)">
 
     <PropertyGroup>
-      <DotNetPackRuntime />
-      <DotNetPackRuntime Condition=" '%(TestPackageProject.PackRuntime)' != '' ">/p:RuntimeIdentifier=%(TestPackageProject.PackRuntime)</DotNetPackRuntime>
-    </PropertyGroup>
+      <DotNetPackMsbuildArgs />
+      <DotNetPackMsbuildArgs Condition=" '$(IsDesktopAvailable)' == 'True' And '%(TestPackageProject.PackRuntime)' != '' ">/p:RuntimeIdentifier=%(TestPackageProject.PackRuntime)</DotNetPackMsbuildArgs>
+      <DotNetPackMsbuildArgs Condition=" '$(IsDesktopAvailable)' == 'False' And '%(TestPackageProject.PackRuntime)' != '' ">/p:TargetFramework=%(TestPackageProject.Framework)</DotNetPackMsbuildArgs>
+  </PropertyGroup>
     
     <DotNetPack NoBuild="True"
                 Output="$(TestPackagesDir)"
                 ProjectPath="%(TestPackageProject.ProjectPath)"
                 ToolPath="$(Stage0Directory)"
                 VersionSuffix="%(TestPackageProject.VersionSuffix)"
-                MsbuildArgs="$(DotNetPackRuntime)" />
+                MsbuildArgs="$(DotNetPackMsbuildArgs)" />
   </Target>
 
   <Target Name="BuildTestAssetPackageProjects"
