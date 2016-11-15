@@ -204,9 +204,8 @@
           Outputs="%(TestPackageProject.PackOutputs)">
 
     <PropertyGroup>
-      <DotNetPackMsbuildArgs />
+      <DotNetPackMsbuildArgs>/p:TargetFramework=%(TestPackageProject.Framework)</DotNetPackMsbuildArgs>
       <DotNetPackMsbuildArgs Condition=" '$(IsDesktopAvailable)' == 'True' And '%(TestPackageProject.PackRuntime)' != '' ">/p:TargetFramework=%(TestPackageProject.Framework) /p:RuntimeIdentifier=%(TestPackageProject.PackRuntime)</DotNetPackMsbuildArgs>
-      <DotNetPackMsbuildArgs Condition=" '$(IsDesktopAvailable)' == 'False' And '%(TestPackageProject.PackRuntime)' != '' ">/p:TargetFramework=%(TestPackageProject.Framework)</DotNetPackMsbuildArgs>
     </PropertyGroup>
     
     <DotNetPack NoBuild="True"
