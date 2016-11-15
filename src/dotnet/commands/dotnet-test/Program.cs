@@ -96,7 +96,6 @@ namespace Microsoft.DotNet.Tools.Test
                     "/t:VSTest"
                 };
 
-                msbuildArgs.Add("/verbosity:quiet");
                 msbuildArgs.Add("/nologo");
 
                 if (settingOption.HasValue())
@@ -152,6 +151,10 @@ namespace Microsoft.DotNet.Tools.Test
                 if (verbosityOption.HasValue())
                 {
                     msbuildArgs.Add($"/verbosity:{verbosityOption.Value()}");
+                }
+                else
+                {
+                    msbuildArgs.Add("/verbosity:quiet");
                 }
 
                 string defaultproject = GetSingleTestProjectToRunTestIfNotProvided(argRoot.Value, cmd.RemainingArguments);

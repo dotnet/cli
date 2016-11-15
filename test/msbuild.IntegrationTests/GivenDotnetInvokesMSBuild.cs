@@ -35,10 +35,8 @@ namespace Microsoft.DotNet.Cli.MSBuild.IntegrationTests
         [Theory]
         [InlineData("build")]
         [InlineData("clean")]
-        [InlineData("msbuild")]
         [InlineData("pack")]
         [InlineData("publish")]
-        [InlineData("test")]
         public void When_dotnet_command_invokes_msbuild_with_no_args_verbosity_is_set_to_minimum(string command)
         {
             var testInstance = TestAssets.Get("MSBuildIntegration")
@@ -57,7 +55,6 @@ namespace Microsoft.DotNet.Cli.MSBuild.IntegrationTests
         [Theory]
         [InlineData("build")]
         [InlineData("clean")]
-        [InlineData("msbuild")]
         [InlineData("pack")]
         [InlineData("publish")]
         [InlineData("test")]
@@ -72,6 +69,35 @@ namespace Microsoft.DotNet.Cli.MSBuild.IntegrationTests
                 .ExecuteWithCapturedOutput($"{command} -v diag");
             cmd.Should().Pass();
             cmd.StdOut.Should().Contain("Message with low importance");
+        }
+
+        [Fact]
+        public void When_dotnet_test_invokes_msbuild_with_no_args_verbosity_is_set_to_quiet()
+        {
+            string command = "test";
+            var testInstance = TestAssets.Get("MSBuildIntegration")
+                .CreateInstance(identifier: command)
+                .WithSourceFiles();
+
+            var cmd = new DotnetCommand()
+                .WithWorkingDirectory(testInstance.Root)
+                .ExecuteWithCapturedOutput(command);
+            cmd.Should().Pass();
+            cmd.StdOut.Should().NotContain("Message with high importance");
+        }
+
+        [Fact]
+        public void When_dotnet_msbuild_command_is_invoked_with_non_msbuild_switch_Then_it_fails()
+        {
+            string command = "msbuild";
+            var testInstance = TestAssets.Get("MSBuildIntegration")
+                .CreateInstance(identifier: command)
+                .WithSourceFiles();
+
+            var cmd = new DotnetCommand()
+                .WithWorkingDirectory(testInstance.Root)
+                .ExecuteWithCapturedOutput($"{command} -v diag");
+            cmd.ExitCode.Should().NotBe(0);
         }
     }
 }
