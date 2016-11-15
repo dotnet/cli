@@ -16,7 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="$(OutputPath)\$(AssemblyName).runtimeconfig.json">
+    <Content Condition="'$(TargetFramework)' == ''" Include="$(OutputPath)\netcoreapp1.0\$(AssemblyName).runtimeconfig.json">
+      <Pack>true</Pack>
+      <PackagePath>lib\netcoreapp1.0</PackagePath>
+    </Content>
+    <Content Condition="'$(TargetFramework)' != ''" Include="$(OutputPath)\$(AssemblyName).runtimeconfig.json">
       <Pack>true</Pack>
       <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
