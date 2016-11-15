@@ -205,9 +205,9 @@
 
     <PropertyGroup>
       <DotNetPackMsbuildArgs />
-      <DotNetPackMsbuildArgs Condition=" '$(IsDesktopAvailable)' == 'True' And '%(TestPackageProject.PackRuntime)' != '' ">/p:RuntimeIdentifier=%(TestPackageProject.PackRuntime)</DotNetPackMsbuildArgs>
+      <DotNetPackMsbuildArgs Condition=" '$(IsDesktopAvailable)' == 'True' And '%(TestPackageProject.PackRuntime)' != '' ">/p:TargetFramework=%(TestPackageProject.Framework) /p:RuntimeIdentifier=%(TestPackageProject.PackRuntime)</DotNetPackMsbuildArgs>
       <DotNetPackMsbuildArgs Condition=" '$(IsDesktopAvailable)' == 'False' And '%(TestPackageProject.PackRuntime)' != '' ">/p:TargetFramework=%(TestPackageProject.Framework)</DotNetPackMsbuildArgs>
-  </PropertyGroup>
+    </PropertyGroup>
     
     <DotNetPack NoBuild="True"
                 Output="$(TestPackagesDir)"

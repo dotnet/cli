@@ -16,9 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="$(OutputPath)\netcoreapp1.0\$(AssemblyName).runtimeconfig.json">
+    <Content Include="$(OutputPath)\$(AssemblyName).runtimeconfig.json">
       <Pack>true</Pack>
-      <PackagePath>lib\netcoreapp1.0\$(TargetFramework)</PackagePath>
+      <PackagePath>lib\$(TargetFramework)</PackagePath>
     </Content>
   </ItemGroup>
 
