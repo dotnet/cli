@@ -14,7 +14,7 @@
           DependsOnTargets="PrepareTests;
                             BuildTestAssets;
                             BuildTests;">
-                            
+
     <PropertyGroup>
       <PathListSeparator>:</PathListSeparator>
       <PathListSeparator Condition=" '$(OSName)' == 'win' ">%3b</PathListSeparator>
