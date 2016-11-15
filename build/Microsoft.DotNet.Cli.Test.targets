@@ -205,7 +205,7 @@
 
     <PropertyGroup>
       <DotNetPackRuntime />
-      <DotNetPackRuntime Condition=" '$(IsDesktopAvailable)' == 'True' And '%(TestPackageProject.PackRuntime)' != '' ">/p:RuntimeIdentifier=%(TestPackageProject.PackRuntime)</DotNetPackRuntime>
+      <DotNetPackRuntime Condition=" '%(TestPackageProject.PackRuntime)' != '' ">/p:RuntimeIdentifier=%(TestPackageProject.PackRuntime)</DotNetPackRuntime>
     </PropertyGroup>
     
     <DotNetPack NoBuild="True"
