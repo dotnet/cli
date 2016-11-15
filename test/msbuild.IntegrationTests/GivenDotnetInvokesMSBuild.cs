@@ -31,5 +31,47 @@ namespace Microsoft.DotNet.Cli.MSBuild.IntegrationTests
                 .Execute(command)
                 .Should().Pass();
         }
+
+        [Theory]
+        [InlineData("build")]
+        [InlineData("clean")]
+        [InlineData("msbuild")]
+        [InlineData("pack")]
+        [InlineData("publish")]
+        [InlineData("test")]
+        public void When_dotnet_command_invokes_msbuild_with_no_args_verbosity_is_set_to_minimum(string command)
+        {
+            var testInstance = TestAssets.Get("MSBuildIntegration")
+                .CreateInstance(identifier: command)
+                .WithSourceFiles();
+
+            var cmd = new DotnetCommand()
+                .WithWorkingDirectory(testInstance.Root)
+                .ExecuteWithCapturedOutput(command);
+            cmd.Should().Pass();
+            cmd.StdOut.Should().NotContain("Message with normal importance");
+            // sanity check
+            cmd.StdOut.Should().Contain("Message with high importance");
+        }
+
+        [Theory]
+        [InlineData("build")]
+        [InlineData("clean")]
+        [InlineData("msbuild")]
+        [InlineData("pack")]
+        [InlineData("publish")]
+        [InlineData("test")]
+        public void When_dotnet_command_invokes_msbuild_with_diag_verbosity_Then_arg_is_passed(string command)
+        {
+            var testInstance = TestAssets.Get("MSBuildIntegration")
+                .CreateInstance(identifier: command)
+                .WithSourceFiles();
+
+            var cmd = new DotnetCommand()
+                .WithWorkingDirectory(testInstance.Root)
+                .ExecuteWithCapturedOutput($"{command} -v diag");
+            cmd.Should().Pass();
+            cmd.StdOut.Should().Contain("Message with low importance");
+        }
     }
 }
