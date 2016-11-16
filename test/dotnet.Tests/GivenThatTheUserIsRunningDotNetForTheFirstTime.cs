@@ -71,8 +71,8 @@ A command is running to initially populate your local package cache, to improve 
 
             // normalizing line endings as git is occasionally replacing line endings in this file causing this test to fail
             NormalizeLineEndings(_firstDotnetVerbUseCommandResult.StdOut)
-                .Should()
-                .StartWith(NormalizeLineEndings(firstTimeUseWelcomeMessage));
+                .Should().StartWith(firstTimeUseWelcomeMessage);
+                     .And.NotContain("Restore completed in");
         }
 
     	[Fact]
