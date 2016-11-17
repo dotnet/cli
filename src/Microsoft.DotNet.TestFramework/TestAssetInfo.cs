@@ -136,7 +136,15 @@ namespace Microsoft.DotNet.TestFramework
 
         internal IEnumerable<FileInfo> GetRestoreFiles()
         {
-            return GetInventory(_inventoryFiles.Restore, GetSourceFiles, DoRestore);
+            var inventory = GetInventory(_inventoryFiles.Restore, GetSourceFiles, DoRestore);
+
+            if (!inventory.Any())
+            {
+                _inventoryFiles.Restore.Delete();
+                inventory = GetInventory(_inventoryFiles.Restore, GetSourceFiles, DoRestore);
+            }
+
+            return inventory;
         }
 
         internal IEnumerable<FileInfo> GetBuildFiles()
@@ -144,10 +152,14 @@ namespace Microsoft.DotNet.TestFramework
             return GetInventory(_inventoryFiles.Build, GetRestoreFiles, DoBuild);
         }
 
-        private IEnumerable<FileInfo> GetInventory(FileInfo file, Func<IEnumerable<FileInfo>> beforeAction, Action action)
+        private IEnumerable<FileInfo> GetInventory(
+            FileInfo file,
+            Func<IEnumerable<FileInfo>> beforeAction,
+            Action action)
         {
             if (file.Exists)
             {
+                Console.WriteLine($"File exists: {file.FullName}");
                 return LoadInventory(file);
             }
 
