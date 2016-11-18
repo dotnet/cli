@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.PlatformAbstractions;
+using NuGet.Common;
 
 namespace Microsoft.DotNet.TestFramework
 {
@@ -102,24 +103,22 @@ namespace Microsoft.DotNet.TestFramework
 
         private void SaveInventory(FileInfo file, IEnumerable<FileInfo> inventory)
         {
-            StreamWriter writer;
-
-            if (file.Exists)
-            {
-                writer = file.AppendText();
-            }
-            else
-            {
-                writer = file.CreateText();
-            }
-
-            using(writer)
-            {
-                foreach (var path in inventory.Select(i => i.FullName))
+            FileUtility.ReplaceWithLock(
+                filePath =>
                 {
-                    writer.WriteLine(path);
-                }
-            }
+                    using (var stream =
+                        new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                    {
+                        using (var writer = new StreamWriter(stream))
+                        {
+                            foreach (var path in inventory.Select(i => i.FullName))
+                            {
+                                writer.WriteLine(path);
+                            }
+                        }
+                    }
+                },
+                file.FullName);
         }
 
         private IEnumerable<FileInfo> GetFileList()
