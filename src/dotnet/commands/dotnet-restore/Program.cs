@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.Tools.Restore
 
             var configFileOption = cmd.Option(
                     "--configfile <{LocalizableStrings.CmdConfigFileOption}>",
-                    LocalizableString.CmdConfigFileOptionDescription,
+                    LocalizableStrings.CmdConfigFileOptionDescription,
                     CommandOptionType.SingleValue);
 
             var noCacheOption = cmd.Option(
