@@ -90,8 +90,8 @@ namespace Microsoft.DotNet.Tools.Run
                 string outputType = projectInstance.GetPropertyValue(LocalizableStrings.RunCommandOutputType);
 
                 throw new GracefulException(string.Join(Environment.NewLine,
-                    LocalizableString.RunCommandExceptionUnableToRun1,
-                    LocalizableString.RunCommandExceptionUnableToRun2,
+                    LocalizableStrings.RunCommandExceptionUnableToRun1,
+                    LocalizableStrings.RunCommandExceptionUnableToRun2,
                     $"{LocalizableStrings.RunCommandExceptionUnableToRun3} '{outputType}'."));
             }
 
