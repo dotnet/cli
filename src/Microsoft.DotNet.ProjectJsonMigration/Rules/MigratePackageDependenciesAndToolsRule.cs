@@ -317,7 +317,6 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
         {
             if (framework?.IsDesktop() ?? false)
             {
-                InjectAssemblyReferenceIfNotPresent("System", packageDependencies);
                 if (framework.Version >= new Version(4, 0))
                 {
                     InjectAssemblyReferenceIfNotPresent("Microsoft.CSharp", packageDependencies);

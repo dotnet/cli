@@ -239,23 +239,19 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
 
             var itemGroup = mockProj.ItemGroups.Where(i => i.Condition == " '$(TargetFramework)' == 'net451' ");
             itemGroup.Should().HaveCount(1);
-            itemGroup.First().Items.Should().HaveCount(2);
+            itemGroup.First().Items.Should().HaveCount(1);
             var items = itemGroup.First().Items.ToArray();
-            items[0].Include.Should().Be("System");
-            items[1].Include.Should().Be("Microsoft.CSharp");
+            items[0].Include.Should().Be("Microsoft.CSharp");
 
             itemGroup = mockProj.ItemGroups.Where(i => i.Condition == " '$(TargetFramework)' == 'net40' ");
             itemGroup.Should().HaveCount(1);
-            itemGroup.First().Items.Should().HaveCount(2);
+            itemGroup.First().Items.Should().HaveCount(1);
             items = itemGroup.First().Items.ToArray();
-            items[0].Include.Should().Be("System");
-            items[1].Include.Should().Be("Microsoft.CSharp");
+            items[0].Include.Should().Be("Microsoft.CSharp");
 
             itemGroup = mockProj.ItemGroups.Where(i => i.Condition == " '$(TargetFramework)' == 'net35' ");
             itemGroup.Should().HaveCount(1);
-            itemGroup.First().Items.Should().HaveCount(1);
-            items = itemGroup.First().Items.ToArray();
-            items[0].Include.Should().Be("System");
+            itemGroup.First().Items.Should().HaveCount(0);
         }
 
         [Fact]
