@@ -136,20 +136,20 @@ namespace Microsoft.DotNet.TestFramework
 
         internal IEnumerable<FileInfo> GetRestoreFiles()
         {
-            var inventory = GetInventory(_inventoryFiles.Restore, GetSourceFiles, DoRestore);
-
-            if (!inventory.Any())
-            {
-                _inventoryFiles.Restore.Delete();
-                inventory = GetInventory(_inventoryFiles.Restore, GetSourceFiles, DoRestore);
-            }
-
-            return inventory;
+            return GetInventory(_inventoryFiles.Restore, GetSourceFiles, DoRestore);
         }
 
         internal IEnumerable<FileInfo> GetBuildFiles()
         {
-            return GetInventory(_inventoryFiles.Build, GetRestoreFiles, DoBuild);
+            return GetInventory(
+                _inventoryFiles.Build,
+                () =>
+                {
+                    var preInventory = new List<FileInfo>(GetRestoreFiles());
+                    preInventory.AddRange(GetSourceFiles());
+                    return preInventory;
+                },
+                DoBuild);
         }
 
         private IEnumerable<FileInfo> GetInventory(
@@ -157,10 +157,15 @@ namespace Microsoft.DotNet.TestFramework
             Func<IEnumerable<FileInfo>> beforeAction,
             Action action)
         {
+            var inventory = Enumerable.Empty<FileInfo>();
             if (file.Exists)
             {
-                Console.WriteLine($"File exists: {file.FullName}");
-                return LoadInventory(file);
+                inventory = LoadInventory(file);
+            }
+
+            if(inventory.Any())
+            {
+                return inventory;
             }
 
             IEnumerable<FileInfo> preInventory;
@@ -171,14 +176,12 @@ namespace Microsoft.DotNet.TestFramework
             }
             else
             {
-                beforeAction();
-
-                preInventory = GetFileList();
+                preInventory = beforeAction();
             }
 
             action();
 
-            var inventory = GetFileList().Where(i => !preInventory.Select(p => p.FullName).Contains(i.FullName));
+            inventory = GetFileList().Where(i => !preInventory.Select(p => p.FullName).Contains(i.FullName));
 
             SaveInventory(file, inventory);
 
