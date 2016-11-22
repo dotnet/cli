@@ -103,8 +103,8 @@ namespace Microsoft.DotNet.Configurer
 
         private bool RunCommand(string commandToExecute, IEnumerable<string> args, string workingDirectory)
         {
-            var command = Command
-                .CreateDotNet(commandToExecute, args)
+            var command = _commandFactory 
+                .Create(commandToExecute, args) 
                 .WorkingDirectory(workingDirectory)
                 .CaptureStdOut()
                 .CaptureStdErr();
