@@ -40,7 +40,8 @@ Copyright (c) .NET Foundation. All rights reserved.
     <MSBuild Projects="$(MSBuildProjectFile)"
              Condition="'$(TargetFrameworks)' != '' "
              Targets="$(InnerVSTestTargets)"
-             Properties="TargetFramework=%(_TargetFramework.Identity);VSTestNoBuild=true">
+             Properties="TargetFramework=%(_TargetFramework.Identity);VSTestNoBuild=true"
+             ContinueOnError="true">
       <Output ItemName="InnerOutput" TaskParameter="TargetOutputs" />
     </MSBuild>
   </Target>
