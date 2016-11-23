@@ -41,7 +41,7 @@ namespace Microsoft.DotNet.Tools.Publish
                 CommandOptionType.SingleValue);
 
             CommandOption versionSuffixOption = app.Option(
-               $ "--version-suffix <{LocalizableStrings.VersionSuffixOption}>", LocalizableStrings.VersionSuffixOptionDescription,
+               $"--version-suffix <{LocalizableStrings.VersionSuffixOption}>", LocalizableStrings.VersionSuffixOptionDescription,
                 CommandOptionType.SingleValue);
             CommandOption verbosityOption = MSBuildForwardingApp.AddVerbosityOption(app);
 
