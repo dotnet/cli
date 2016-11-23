@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.New.Tests
         }
         
         [Fact]
-        public void When_dotnet_build_is_invoked_Then_app_builds_without_warnings()
+        public void When_dotnet_build_is_invoked_Then_app_builds_without_warnings_fs()
         {
             var rootPath = TestAssetsManager.CreateTestDirectory().Path;
 
@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.New.Tests
         }
 
         [Fact]
-        public void When_dotnet_new_is_invoked_mupliple_times_it_should_fail()
+        public void When_dotnet_new_is_invoked_mupliple_times_it_should_fail_fs()
         {
             var rootPath = TestAssetsManager.CreateTestDirectory().Path;
 
