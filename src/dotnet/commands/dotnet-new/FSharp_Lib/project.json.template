@@ -12,6 +12,7 @@
   "tools": {
     "dotnet-compile-fsc":"1.0.0-preview2-*"
   },
+  "dependencies": {},
   "frameworks": {
     "netstandard1.6": {
       "dependencies": {
