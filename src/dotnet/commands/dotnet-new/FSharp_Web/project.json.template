@@ -84,12 +84,12 @@
   "buildOptions": {
     "debugType": "portable",
     "emitEntryPoint": true,
-    "preserveCompilationContext": true
+    "preserveCompilationContext": true,
     "compilerName": "fsc",
     "compile": {
       "includeFiles": [
-        "Controllers/HomeController.fs"
-        "Startup.fs"
+        "Controllers/HomeController.fs",
+        "Startup.fs",
         "Program.fs"
       ]
     }
