@@ -11,7 +11,7 @@ using FluentAssertions;
 
 namespace Microsoft.DotNet.New.Tests
 {
-    public class GivenThatIWantANewCSApp : TestBase
+    public class GivenThatIWantANewFSApp : TestBase
     {
         [Fact(Skip="https://github.com/dotnet/cli/issues/4381")]
         public void When_NewtonsoftJson_dependency_added_Then_project_restores_and_runs()
@@ -21,9 +21,9 @@ namespace Microsoft.DotNet.New.Tests
             var projectFile = Path.Combine(rootPath, $"{projectName}.csproj");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("new");
+                .Execute("new --lang f#");
             
-            AddProjectDependency(projectFile, "Newtonsoft.Json", "7.0.1");
+            GivenThatIWantANewCSApp.AddProjectDependency(projectFile, "Newtonsoft.Json", "7.0.1");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .Execute("restore /p:SkipInvalidConfigurations=true")
@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.New.Tests
             var rootPath = TestAssetsManager.CreateTestDirectory().Path;
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("new");
+                .Execute("new --lang f#");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .Execute("restore /p:SkipInvalidConfigurations=true");
@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.New.Tests
             var rootPath = TestAssetsManager.CreateTestDirectory().Path;
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("new");
+                .Execute("new --lang f#");
 
             DateTime expectedState = Directory.GetLastWriteTime(rootPath);
 
@@ -71,15 +71,6 @@ namespace Microsoft.DotNet.New.Tests
 
             result.Should().Fail()
                   .And.HaveStdErr();
-        }
-        
-        internal static void AddProjectDependency(string projectFilePath, string dependencyId, string dependencyVersion)
-        {
-            var projectRootElement = ProjectRootElement.Open(projectFilePath);
-
-            projectRootElement.AddItem("PackageReference", dependencyId, new Dictionary<string, string>{{"Version", dependencyVersion}});
-
-            projectRootElement.Save();
         }
     }
 }
