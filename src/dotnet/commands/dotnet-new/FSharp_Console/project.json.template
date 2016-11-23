@@ -13,6 +13,7 @@
   "tools": {
     "dotnet-compile-fsc": "1.0.0-preview2.1-*"
   },
+  "dependencies": {},
   "frameworks": {
     "netcoreapp1.1": {
       "dependencies": {
@@ -21,7 +22,8 @@
           "version": "1.1.0"
         },
         "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-160629"
-      }
+      },
+      "imports": "dnxcore50"
     }
   }
 }
