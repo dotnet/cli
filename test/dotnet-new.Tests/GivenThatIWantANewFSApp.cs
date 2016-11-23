@@ -63,7 +63,7 @@ namespace Microsoft.DotNet.New.Tests
             DateTime expectedState = Directory.GetLastWriteTime(rootPath);
 
             var result = new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .ExecuteWithCapturedOutput("new");
+                .ExecuteWithCapturedOutput("new --lang f#");
 
             DateTime actualState = Directory.GetLastWriteTime(rootPath);
 
