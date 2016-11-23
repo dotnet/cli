@@ -13,6 +13,8 @@
 
   <ItemGroup>
     <Compile Include="**\*.cs" Exclude="$(GlobalExclude)" />
+    <Content Include="Views\**\*" Exclude="$(GlobalExclude)" />
+    <Content Include="wwwroot\**\*" Exclude="$(GlobalExclude)" />
     <EmbeddedResource Include="**\*.resx" Exclude="$(GlobalExclude)" />
   </ItemGroup>
 
