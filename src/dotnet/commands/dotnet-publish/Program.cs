@@ -21,27 +21,27 @@ namespace Microsoft.DotNet.Tools.Publish
             app.ArgumentSeparatorHelpText = HelpMessageStrings.MSBuildAdditionalArgsHelpText;
             app.HelpOption("-h|--help");
 
-            CommandArgument projectArgument = app.Argument("<{LocalizableStrings.ProjectArgument}>",
+            CommandArgument projectArgument = app.Argument($"<{LocalizableStrings.ProjectArgument}>",
                 LocalizableStrings.ProjectArgDescription);
 
             CommandOption frameworkOption = app.Option(
-                "-f|--framework <{LocalizableStrings.FrameworkOption}>", LocalizableStrings.FrameworkOptionDescription,
+                $"-f|--framework <{LocalizableStrings.FrameworkOption}>", LocalizableStrings.FrameworkOptionDescription,
                 CommandOptionType.SingleValue);
 
             CommandOption runtimeOption = app.Option(
-                "-r|--runtime <{LocalizableStrings.RuntimeOption}>", LocalizableStrings.RuntimeOptionDescription,
+                $"-r|--runtime <{LocalizableStrings.RuntimeOption}>", LocalizableStrings.RuntimeOptionDescription,
                 CommandOptionType.SingleValue);
 
             CommandOption outputOption = app.Option(
-                "-o|--output <{LocalizableStrings.OutputOption}>", LocalizableStrings.OutputOptionDescription,
+                $"-o|--output <{LocalizableStrings.OutputOption}>", LocalizableStrings.OutputOptionDescription,
                 CommandOptionType.SingleValue);
 
             CommandOption configurationOption = app.Option(
-                "-c|--configuration <{LocalizableStrings.ConfigurationOption}>", LocalizableStrings.ConfigurationOptionDescription,
+                $"-c|--configuration <{LocalizableStrings.ConfigurationOption}>", LocalizableStrings.ConfigurationOptionDescription,
                 CommandOptionType.SingleValue);
 
             CommandOption versionSuffixOption = app.Option(
-                "--version-suffix <{LocalizableStrings.VersionSuffixOption}>", LocalizableStrings.VersionSuffixOptionDescription,
+               $ "--version-suffix <{LocalizableStrings.VersionSuffixOption}>", LocalizableStrings.VersionSuffixOptionDescription,
                 CommandOptionType.SingleValue);
             CommandOption verbosityOption = MSBuildForwardingApp.AddVerbosityOption(app);
 
