@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.Tests
     public class GivenThatIWantANewFSLibrary : TestBase
     {
         
-        [Fact]
+        [Fact(Skip="https://github.com/dotnet/netcorecli-fsc/issues/42")]
         public void When_library_created_Then_project_restores()
         {
             var rootPath = Temp.CreateDirectory().Path;
@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.Tests
             
         }
 
-        [Fact]
+        [Fact(Skip="https://github.com/dotnet/netcorecli-fsc/issues/42")]
         public void When_dotnet_build_is_invoked_Then_project_builds_without_warnings()
         {
             var rootPath = Temp.CreateDirectory().Path;

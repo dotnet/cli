@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.Tests
     public class GivenThatIWantANewFSxUnitProject : TestBase
     {
         
-        [Fact]
+        [Fact(Skip="https://github.com/dotnet/netcorecli-fsc/issues/42")]
         public void When_xUnit_project_created_Then_project_restores()
         {
             var rootPath = Temp.CreateDirectory().Path;
@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.Tests
             
         }
 
-        [Fact]
+        [Fact(Skip="https://github.com/dotnet/netcorecli-fsc/issues/42")]
         public void When_dotnet_test_is_invoked_Then_tests_run_without_errors()
         {
             var rootPath = Temp.CreateDirectory().Path;

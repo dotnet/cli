@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.Tests
 {
     public class GivenThatIWantANewFSApp : TestBase
     {
-        [Fact]
+        [Fact(Skip="https://github.com/dotnet/netcorecli-fsc/issues/42")]
         public void When_NewtonsoftJson_dependency_added_Then_project_restores_and_runs()
         {
             var rootPath = Temp.CreateDirectory().Path;
@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.Tests
                 .Should().Pass();
         }
         
-        [Fact]
+        [Fact(Skip="https://github.com/dotnet/netcorecli-fsc/issues/42")]
         public void When_dotnet_build_is_invoked_Then_project_builds_without_warnings()
         {
             var rootPath = Temp.CreateDirectory().Path;
@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.Tests
             buildResult.Should().NotHaveStdErr();
         }
 
-        [Fact]
+        [Fact(Skip="https://github.com/dotnet/netcorecli-fsc/issues/42")]
         public void When_dotnet_new_is_invoked_mupliple_times_it_should_fail()
         {
             var rootPath = Temp.CreateDirectory().Path;
