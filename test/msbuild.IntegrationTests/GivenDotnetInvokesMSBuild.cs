@@ -51,14 +51,13 @@ namespace Microsoft.DotNet.Cli.MSBuild.IntegrationTests
             cmd.Should().Pass();
 
             cmd.StdOut
-                .Should().NotContain("Message with normal importance", "Because verbosity is set to minimum");
+                .Should().NotContain("Message with normal importance", "Because verbosity is set to minimum")
                      .And.Contain("Message with high importance", "Because high importance messages are shown on minimum verbosity");
         }
 
         [Theory]
         [InlineData("build")]
         [InlineData("clean")]
-        [InlineData("msbuild")]
         [InlineData("pack")]
         [InlineData("publish")]
         public void When_dotnet_command_invokes_msbuild_with_diag_verbosity_Then_arg_is_passed(string command)
@@ -101,7 +100,7 @@ namespace Microsoft.DotNet.Cli.MSBuild.IntegrationTests
             var cmd = new DotnetCommand()
                 .WithWorkingDirectory(testInstance.Root)
                 .ExecuteWithCapturedOutput($"msbuild -v diag");
-                
+
             cmd.ExitCode.Should().NotBe(0);
         }
     }
