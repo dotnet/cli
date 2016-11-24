@@ -57,7 +57,7 @@ namespace Microsoft.DotNet.Tests
         [Fact]
         public void It_shows_the_appropriate_message_to_the_user()
         {
-            const string firstTimeUseWelcomeMessage = NormalizeLineEndings(@"Welcome to .NET Core!
+            string firstTimeUseWelcomeMessage = NormalizeLineEndings(@"Welcome to .NET Core!
 ---------------------
 Learn more about .NET Core @ https://aka.ms/dotnet-docs. Use dotnet --help to see available commands or go to https://aka.ms/dotnet-cli-docs.
 Telemetry
