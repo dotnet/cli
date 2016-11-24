@@ -73,7 +73,7 @@ namespace Microsoft.DotNet.New.Tests
                   .And.HaveStdErr();
         }
         
-        private static void AddProjectDependency(string projectFilePath, string dependencyId, string dependencyVersion)
+        internal static void AddProjectDependency(string projectFilePath, string dependencyId, string dependencyVersion)
         {
             var projectRootElement = ProjectRootElement.Open(projectFilePath);
 
