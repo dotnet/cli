@@ -20,7 +20,7 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk">
-      <Version>15.0.0-preview-20161122-02</Version>
+      <Version>15.0.0-preview-20161123-03</Version>
     </PackageReference>
     <PackageReference Include="MSTest.TestAdapter">
       <Version>1.1.5-preview</Version>
