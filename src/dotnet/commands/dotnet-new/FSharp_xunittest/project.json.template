@@ -2,18 +2,22 @@
   "version": "1.0.0-*",
   "buildOptions": {
     "debugType": "portable",
-    "emitEntryPoint": true,
     "compilerName": "fsc",
     "compile": {
       "includeFiles": [
-        "Program.fs"
+        "Tests.fs"
       ]
     }
   },
   "tools": {
-    "dotnet-compile-fsc": "1.0.0-preview2-*"
+    "dotnet-compile-fsc":"1.0.0-preview2-*"
   },
-  "dependencies": {},
+  "dependencies": {
+    "System.Runtime.Serialization.Primitives": "4.1.1",
+    "xunit": "2.1.0",
+    "dotnet-test-xunit": "1.0.0-rc2-192208-24"
+  },
+  "testRunner": "xunit",
   "frameworks": {
     "netcoreapp1.0": {
       "dependencies": {
@@ -23,7 +27,10 @@
         },
         "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-160629"
       },
-      "imports": "dnxcore50"
+      "imports": [
+        "dotnet5.4",
+        "portable-net451+win8"
+      ]
     }
   }
 }
