@@ -379,9 +379,9 @@ function DownloadFile([Uri]$Uri, [string]$OutPath) {
     }
 }
 
-function Append-Sdk-InstallRoot-To-Path([string]$InstallRoot, [string]$BinFolderRelativePath) {
+function Prepend-Sdk-InstallRoot-To-Path([string]$InstallRoot, [string]$BinFolderRelativePath) {
     $BinPath = Get-Absolute-Path $(Join-Path -Path $InstallRoot -ChildPath $BinFolderRelativePath)
-    if (-Not $NoPath -And -Not $env:Path.split(";").Contains($BinPath)) {
+    if (-Not $NoPath) {
         Say "Adding to current process PATH: `"$BinPath`". Note: This change will not be visible if PowerShell was run as a child process."
         $env:path = "$BinPath;" + $env:path
     }
@@ -411,7 +411,7 @@ $IsSdkInstalled = Is-Dotnet-Package-Installed -InstallRoot $InstallRoot -Relativ
 Say-Verbose ".NET SDK installed? $IsSdkInstalled"
 if ($IsSdkInstalled) {
     Say ".NET SDK version $SpecificVersion is already installed."
-    Append-Sdk-InstallRoot-To-Path -InstallRoot $InstallRoot -BinFolderRelativePath $BinFolderRelativePath
+    Prepend-Sdk-InstallRoot-To-Path -InstallRoot $InstallRoot -BinFolderRelativePath $BinFolderRelativePath
     exit 0
 }
 
@@ -434,7 +434,7 @@ foreach ($DownloadLink in $DownloadLinks) {
     Remove-Item $ZipPath
 }
 
-Append-Sdk-InstallRoot-To-Path -InstallRoot $InstallRoot -BinFolderRelativePath $BinFolderRelativePath
+Prepend-Sdk-InstallRoot-To-Path -InstallRoot $InstallRoot -BinFolderRelativePath $BinFolderRelativePath
 
 Say "Installation finished"
 exit 0
