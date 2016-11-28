@@ -13,18 +13,18 @@ using FluentAssertions;
 
 namespace Microsoft.DotNet.Tests
 {
-    public class GivenThatIWantANewCSApp : TestBase
+    public class GivenThatIWantANewFSApp : TestBase
     {
-        [Fact]
+        [Fact(Skip="https://github.com/dotnet/netcorecli-fsc/issues/42")]
         public void When_NewtonsoftJson_dependency_added_Then_project_restores_and_runs()
         {
             var rootPath = Temp.CreateDirectory().Path;
             var projectJsonFile = Path.Combine(rootPath, "project.json");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("new");
+                .Execute("new --lang fsharp");
             
-            AddProjectJsonDependency(projectJsonFile, "Newtonsoft.Json", "7.0.1");
+            GivenThatIWantANewCSApp.AddProjectJsonDependency(projectJsonFile, "Newtonsoft.Json", "7.0.1");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .Execute("restore")
@@ -35,13 +35,13 @@ namespace Microsoft.DotNet.Tests
                 .Should().Pass();
         }
         
-        [Fact]
+        [Fact(Skip="https://github.com/dotnet/netcorecli-fsc/issues/42")]
         public void When_dotnet_build_is_invoked_Then_project_builds_without_warnings()
         {
             var rootPath = Temp.CreateDirectory().Path;
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("new");
+                .Execute("new --lang fsharp");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .Execute("restore");
@@ -53,13 +53,13 @@ namespace Microsoft.DotNet.Tests
             buildResult.Should().NotHaveStdErr();
         }
 
-        [Fact]
+        [Fact(Skip="https://github.com/dotnet/netcorecli-fsc/issues/42")]
         public void When_dotnet_new_is_invoked_mupliple_times_it_should_fail()
         {
             var rootPath = Temp.CreateDirectory().Path;
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("new");
+                .Execute("new --lang fsharp");
 
             DateTime expectedState = Directory.GetLastWriteTime(rootPath);
 
@@ -72,38 +72,6 @@ namespace Microsoft.DotNet.Tests
 
             result.Should().Fail();
             result.Should().HaveStdErr();
-        }
-        
-        internal static void AddProjectJsonDependency(string projectJsonPath, string dependencyId, string dependencyVersion)
-        {
-            var projectJsonRoot = ReadProject(projectJsonPath);
-
-            var dependenciesNode = projectJsonRoot
-                .Descendants()
-                .OfType<JProperty>()
-                .First(p => p.Name == "dependencies");
-
-            ((JObject)dependenciesNode.Value).Add(new JProperty(dependencyId, dependencyVersion));
-
-            WriteProject(projectJsonRoot, projectJsonPath);
-        }
-
-        private static JObject ReadProject(string projectJsonPath)
-        {
-            using (TextReader projectFileReader = File.OpenText(projectJsonPath))
-            {
-                var projectJsonReader = new JsonTextReader(projectFileReader);
-
-                var serializer = new JsonSerializer();
-                return serializer.Deserialize<JObject>(projectJsonReader);
-            }
-        }
-
-        private static void WriteProject(JObject projectRoot, string projectJsonPath)
-        {
-            string projectJson = JsonConvert.SerializeObject(projectRoot, Formatting.Indented);
-
-            File.WriteAllText(projectJsonPath, projectJson + Environment.NewLine);
         }
     }
 }
