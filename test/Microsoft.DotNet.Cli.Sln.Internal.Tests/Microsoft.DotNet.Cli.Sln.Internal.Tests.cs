@@ -3,7 +3,6 @@
 
 using System;
 using System.IO;
-//using System.Linq;
 using FluentAssertions;
 using Xunit;
 using Microsoft.DotNet.Cli.Sln.Internal;
