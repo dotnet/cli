@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "PJTestAppSimple", "PJTestAppSimple.xproj", "{0138CB8F-4AA9-4029-A21E-C07C30F425BA}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "TestAppWithSln", "TestAppWithSln.xproj", "{0138CB8F-4AA9-4029-A21E-C07C30F425BA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

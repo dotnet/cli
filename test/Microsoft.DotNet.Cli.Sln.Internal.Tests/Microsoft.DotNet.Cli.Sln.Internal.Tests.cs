@@ -18,9 +18,9 @@ namespace Microsoft.DotNet.Cli.Sln.Internal.Tests
         public void It_reads_an_sln_file()
         {
             var solutionDirectory =
-                TestAssetsManager.CreateTestInstance("PJTestAppSimple", callingMethod: "p").Path;
+                TestAssetsManager.CreateTestInstance("TestAppWithSln", callingMethod: "p").Path;
 
-            var solutionFullPath = Path.Combine(solutionDirectory, "PJTestAppSimple.sln");
+            var solutionFullPath = Path.Combine(solutionDirectory, "TestAppWithSln.sln");
 
             var slnFile = new SlnFile();
             slnFile.Read(solutionFullPath);
@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.Cli.Sln.Internal.Tests
             slnFile.VisualStudioVersion.Should().Be("14.0.25420.1");
             slnFile.MinimumVisualStudioVersion.Should().Be("10.0.40219.1");
             slnFile.BaseDirectory.Should().Be(solutionDirectory);
-            slnFile.FileName.FileName.Should().Be("PJTestAppSimple.sln");
+            slnFile.FileName.FileName.Should().Be("TestAppWithSln.sln");
 
             SlnFile.GetFileVersion(solutionFullPath).Should().Be("12.00");
 
@@ -38,29 +38,29 @@ namespace Microsoft.DotNet.Cli.Sln.Internal.Tests
             var project = slnFile.Projects[0];
             project.Id.Should().Be("{0138CB8F-4AA9-4029-A21E-C07C30F425BA}");
             project.TypeGuid.Should().Be("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}");
-            project.Name.Should().Be("PJTestAppSimple");
-            project.FilePath.Should().Be("PJTestAppSimple.xproj");
+            project.Name.Should().Be("TestAppWithSln");
+            project.FilePath.Should().Be("TestAppWithSln.xproj");
         }
 
         [Fact]
         public void It_writes_an_sln_file()
         {
             var solutionDirectory =
-                TestAssetsManager.CreateTestInstance("PJTestAppSimple", callingMethod: "p").Path;
+                TestAssetsManager.CreateTestInstance("TestAppWithSln", callingMethod: "p").Path;
 
-            var solutionFullPath = Path.Combine(solutionDirectory, "PJTestAppSimple.sln");
+            var solutionFullPath = Path.Combine(solutionDirectory, "TestAppWithSln.sln");
 
             var slnFile = new SlnFile();
             slnFile.Read(solutionFullPath);
 
             slnFile.Projects.Count.Should().Be(1);
             var project = slnFile.Projects[0];
-            project.Name.Should().Be("PJTestAppSimple");
+            project.Name.Should().Be("TestAppWithSln");
             project.Name = "New Project Name";
-            project.FilePath.Should().Be("PJTestAppSimple.xproj");
+            project.FilePath.Should().Be("TestAppWithSln.xproj");
             project.FilePath = "New File Path";
 
-            var newSolutionFullPath = Path.Combine(solutionDirectory, "PJTestAppSimple_modified.sln");
+            var newSolutionFullPath = Path.Combine(solutionDirectory, "TestAppWithSln_modified.sln");
             slnFile.Write(newSolutionFullPath);
 
             slnFile = new SlnFile();
@@ -70,7 +70,7 @@ namespace Microsoft.DotNet.Cli.Sln.Internal.Tests
             slnFile.VisualStudioVersion.Should().Be("14.0.25420.1");
             slnFile.MinimumVisualStudioVersion.Should().Be("10.0.40219.1");
             slnFile.BaseDirectory.Should().Be(solutionDirectory);
-            slnFile.FileName.FileName.Should().Be("PJTestAppSimple_modified.sln");
+            slnFile.FileName.FileName.Should().Be("TestAppWithSln_modified.sln");
             SlnFile.GetFileVersion(solutionFullPath).Should().Be("12.00");
             slnFile.Projects.Count.Should().Be(1);
             project = slnFile.Projects[0];
