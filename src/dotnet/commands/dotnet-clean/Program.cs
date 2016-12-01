@@ -24,7 +24,8 @@ namespace Microsoft.DotNet.Tools.Clean
             };
             app.HelpOption("-h|--help");
 
-            CommandArgument projectArgument = app.Argument($"<{LocalizableStrings.CmdArgProject}>",
+            CommandArgument projectArgument = app.Argument(
+                $"<{LocalizableStrings.CmdArgProject}>",
                 LocalizableStrings.CmdArgProjDescription);
 
             CommandOption outputOption = app.Option(
