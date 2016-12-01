@@ -25,7 +25,8 @@ namespace Microsoft.DotNet.Tools.Pack
 
             cmd.HelpOption("-h|--help");
 
-            var output = cmd.Option($"-o|--output <{LocalizableStrings.CmdOutputDir}>",
+            var output = cmd.Option(
+                $"-o|--output <{LocalizableStrings.CmdOutputDir}>",
                 LocalizableStrings.CmdOutputDirDescription,
                 CommandOptionType.SingleValue);
             var noBuild = cmd.Option("--no-build",
@@ -37,16 +38,19 @@ namespace Microsoft.DotNet.Tools.Pack
             var includeSource = cmd.Option("--include-source",
                 LocalizableStrings.CmdIncludeSourceDescription,
                 CommandOptionType.NoValue);
-            var configuration = cmd.Option($"-c|--configuration <{LocalizableStrings.CmdConfig}>",
+            var configuration = cmd.Option(
+                $"-c|--configuration <{LocalizableStrings.CmdConfig}>",
                 LocalizableStrings.CmdConfigDescription, 
                 CommandOptionType.SingleValue);
-            var versionSuffix = cmd.Option($"--version-suffix <{LocalizableStrings.CmdVersionSuffix}>",
+            var versionSuffix = cmd.Option(
+                $"--version-suffix <{LocalizableStrings.CmdVersionSuffix}>",
                 LocalizableStrings.CmdVersionSuffixDescription,
                 CommandOptionType.SingleValue);
             var serviceable = cmd.Option("-s|--serviceable",
                 LocalizableStrings.CmdServiceableDescription, 
                 CommandOptionType.NoValue);
-            var argRoot = cmd.Argument($"<{LocalizableStrings.CmdArgumentProject}>",
+            var argRoot = cmd.Argument(
+                $"<{LocalizableStrings.CmdArgumentProject}>",
                 LocalizableStrings.CmdArgumentDescription,
                 multipleValues:true);
             CommandOption verbosityOption = MSBuildForwardingApp.AddVerbosityOption(cmd);
