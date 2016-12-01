@@ -27,9 +27,18 @@ namespace Microsoft.DotNet.Tools.Clean
             CommandArgument projectArgument = app.Argument($"<{LocalizableStrings.CmdArgProject}>",
                 LocalizableStrings.CmdArgProjDescription);
 
-            CommandOption outputOption = app.Option($"-o|--output <{LocalizableStrings.CmdOutputDir}>", LocalizableStrings.CmdOutputDirDescription, CommandOptionType.SingleValue);
-            CommandOption frameworkOption = app.Option($"-f|--framework <{LocalizableStrings.CmdFramework}>", LocalizableStrings.CmdFrameworkDescription, CommandOptionType.SingleValue);
-            CommandOption configurationOption = app.Option($"-c|--configuration <{LocalizableStrings.CmdConfiguration}>", LocalizableStrings.CmdConfigurationDescription, CommandOptionType.SingleValue);
+            CommandOption outputOption = app.Option(
+                $"-o|--output <{LocalizableStrings.CmdOutputDir}>", 
+                LocalizableStrings.CmdOutputDirDescription, 
+                CommandOptionType.SingleValue);
+            CommandOption frameworkOption = app.Option(
+                $"-f|--framework <{LocalizableStrings.CmdFramework}>", 
+                LocalizableStrings.CmdFrameworkDescription, 
+                CommandOptionType.SingleValue);
+            CommandOption configurationOption = app.Option(
+                $"-c|--configuration <{LocalizableStrings.CmdConfiguration}>", 
+                LocalizableStrings.CmdConfigurationDescription, 
+                CommandOptionType.SingleValue);
             CommandOption verbosityOption = MSBuildForwardingApp.AddVerbosityOption(app);
 
             app.OnExecute(() =>
