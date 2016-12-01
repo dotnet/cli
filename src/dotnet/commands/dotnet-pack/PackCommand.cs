@@ -29,13 +29,16 @@ namespace Microsoft.DotNet.Tools.Pack
                 $"-o|--output <{LocalizableStrings.CmdOutputDir}>",
                 LocalizableStrings.CmdOutputDirDescription,
                 CommandOptionType.SingleValue);
-            var noBuild = cmd.Option("--no-build",
+            var noBuild = cmd.Option(
+                "--no-build",
                 LocalizableStrings.CmdNoBuildOptionDescription, 
                 CommandOptionType.NoValue);
-            var includeSymbols = cmd.Option("--include-symbols",
+            var includeSymbols = cmd.Option(
+                "--include-symbols",
                 LocalizableStrings.CmdIncludeSymbolsDescription,
                 CommandOptionType.NoValue);
-            var includeSource = cmd.Option("--include-source",
+            var includeSource = cmd.Option(
+                "--include-source",
                 LocalizableStrings.CmdIncludeSourceDescription,
                 CommandOptionType.NoValue);
             var configuration = cmd.Option(
@@ -46,7 +49,8 @@ namespace Microsoft.DotNet.Tools.Pack
                 $"--version-suffix <{LocalizableStrings.CmdVersionSuffix}>",
                 LocalizableStrings.CmdVersionSuffixDescription,
                 CommandOptionType.SingleValue);
-            var serviceable = cmd.Option("-s|--serviceable",
+            var serviceable = cmd.Option(
+                "-s|--serviceable",
                 LocalizableStrings.CmdServiceableDescription, 
                 CommandOptionType.NoValue);
             var argRoot = cmd.Argument(
