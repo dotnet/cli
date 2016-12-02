@@ -44,7 +44,7 @@
 
         public const string MigrateDefinition = "Migrates a project.json based project to a msbuild based project";
 
-        public const string ProjModificationCommands = "Project modification commands";
+        public const string ProjectModificationCommands = "Project modification commands";
 
         public const string AddDefinition = "Add items to the project";
 
