@@ -13,7 +13,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Sdk">
-      <Version>1.0.0-alpha-20161019-1</Version>
+      <Version>$(CLI_NETSDK_Version)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
   </ItemGroup>
