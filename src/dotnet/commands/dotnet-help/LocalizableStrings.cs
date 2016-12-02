@@ -47,6 +47,8 @@
         public const string ProjectModificationCommands = "Project modification commands";
 
         public const string AddDefinition = "Add items to the project";
+        
+        public const string RemoveDefinition = "Remove items from the project";
 
         public const string AdvancedCommands = "Advanced Commands";
 
