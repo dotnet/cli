@@ -13,7 +13,7 @@
                             EnsureSdkRestored;
                             GetSdkItemsToCopy"
           Inputs="@(SdkContent)"
-          Outputs="@(SdkContent->'$(oz)/$(SdkPackageName)/$(SdkPackageVersion)/%(RecursiveDir)%(FileName)%(Extension)')">
+          Outputs="@(SdkContent->'$(SdkLayoutDirectory)/%(RecursiveDir)%(FileName)%(Extension)')">
     <Copy SourceFiles="@(SdkContent)"
           DestinationFiles="@(SdkContent->'$(SdkLayoutDirectory)/%(RecursiveDir)%(FileName)%(Extension)')" />
   </Target>
@@ -29,10 +29,6 @@
 
   <Target Name="EnsureSdkRestored"
           Condition="!Exists('$(SdkNuPkgPath)/$(SdkPackageName.ToLower()).nuspec')">
-    
-    <Message Text="$(SdkNuPkgPath)/$(SdkPackageName.ToLower()).nuspec" 
-             Importance="High" />
-
     <DotNetRestore ToolPath="$(Stage0Directory)"
                    ProjectPath="$(MSBuildThisFileDirectory)/sdks/sdks.csproj"
                    AdditionalParameters="/p:SdkPackageName=$(SdkPackageName) /p:SdkPackageVersion=$(SdkPackageVersion)" />
