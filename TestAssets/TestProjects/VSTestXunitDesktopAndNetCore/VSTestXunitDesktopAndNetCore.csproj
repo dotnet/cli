@@ -23,7 +23,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Sdk">
-      <Version>$(CLI_NETSDK_Version)</Version>
+      <!-- Should be $(CLI_NETSDK_Version) but https://github.com/dotnet/cli/issues/4892 -->
+      <Version>1.0.0-alpha-20161026-2</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk">
