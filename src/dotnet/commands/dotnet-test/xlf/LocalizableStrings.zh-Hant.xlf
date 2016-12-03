@@ -34,8 +34,8 @@
         <note></note>
       </trans-unit>
       <trans-unit id="CmdListTestsDescription">
-        <source>@"Lists discovered tests</source>
-        <target state="new">@"Lists discovered tests</target>
+        <source>Lists discovered tests</source>
+        <target state="new">Lists discovered tests</target>
         <note></note>
       </trans-unit>
       <trans-unit id="CmdTestCaseFilterExpression">
@@ -44,20 +44,20 @@
         <note></note>
       </trans-unit>
       <trans-unit id="CmdTestCaseFilterDescription">
-        <source>@"Run tests that match the given expression.
+        <source>Run tests that match the given expression.
                                         Examples:
-                                        --testCaseFilter:""Priority = 1""
-                                        --testCaseFilter: ""(FullyQualifiedName~Nightly | Name = MyTestMethod)</source>
-        <target state="new">@"Run tests that match the given expression.
+                                        --testCaseFilter:"Priority = 1"
+                                        --testCaseFilter: "(FullyQualifiedName~Nightly | Name = MyTestMethod)"</source>
+        <target state="new">Run tests that match the given expression.
                                         Examples:
-                                        --testCaseFilter:""Priority = 1""
-                                        --testCaseFilter: ""(FullyQualifiedName~Nightly | Name = MyTestMethod)</target>
+                                        --testCaseFilter:"Priority = 1"
+                                        --testCaseFilter: "(FullyQualifiedName~Nightly | Name = MyTestMethod)"</target>
         <note></note>
       </trans-unit>
       <trans-unit id="CmdTestAdapterPathDescription">
-        <source>@"Use custom adapters from the given path in the test run.
+        <source>Use custom adapters from the given path in the test run.
                                         Example: --testAdapterPath:&lt;pathToCustomAdapters&gt;</source>
-        <target state="new">@"Use custom adapters from the given path in the test run.
+        <target state="new">Use custom adapters from the given path in the test run.
                                         Example: --testAdapterPath:&lt;pathToCustomAdapters&gt;</target>
         <note></note>
       </trans-unit>
@@ -67,9 +67,9 @@
         <note></note>
       </trans-unit>
       <trans-unit id="CmdLoggerDescription">
-        <source>@"Specify a logger for test results. 
+        <source>Specify a logger for test results. 
                                         Example: --logger:trx</source>
-        <target state="new">@"Specify a logger for test results. 
+        <target state="new">Specify a logger for test results. 
                                         Example: --logger:trx</target>
         <note></note>
       </trans-unit>
@@ -79,8 +79,8 @@
         <note></note>
       </trans-unit>
       <trans-unit id="CmdConfigDescription">
-        <source>@"Configuration under which to build, i.e. Debug/Release</source>
-        <target state="new">@"Configuration under which to build, i.e. Debug/Release</target>
+        <source>Configuration under which to build, i.e. Debug/Release</source>
+        <target state="new">Configuration under which to build, i.e. Debug/Release</target>
         <note></note>
       </trans-unit>
       <trans-unit id="CmdFramework">
@@ -89,8 +89,8 @@
         <note></note>
       </trans-unit>
       <trans-unit id="CmdFrameworkDescription">
-        <source>@"Looks for test binaries for a specific framework</source>
-        <target state="new">@"Looks for test binaries for a specific framework</target>
+        <source>Looks for test binaries for a specific framework</source>
+        <target state="new">Looks for test binaries for a specific framework</target>
         <note></note>
       </trans-unit>
       <trans-unit id="CmdOutputDir">
@@ -99,8 +99,8 @@
         <note></note>
       </trans-unit>
       <trans-unit id="CmdOutputDescription">
-        <source>@"Directory in which to find the binaries to be run</source>
-        <target state="new">@"Directory in which to find the binaries to be run</target>
+        <source>Directory in which to find the binaries to be run</source>
+        <target state="new">Directory in which to find the binaries to be run</target>
         <note></note>
       </trans-unit>
       <trans-unit id="CmdPathToLogFile">
@@ -109,15 +109,15 @@
         <note></note>
       </trans-unit>
       <trans-unit id="CmdPathTologFileDescription">
-        <source>@"Enable verbose logs for test platform.
+        <source>Enable verbose logs for test platform.
                                         Logs are written to the provided file.</source>
-        <target state="new">@"Enable verbose logs for test platform.
+        <target state="new">Enable verbose logs for test platform.
                                         Logs are written to the provided file.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="CmdNoBuildDescription">
-        <source>@"Do not build project before testing.</source>
-        <target state="new">@"Do not build project before testing.</target>
+        <source>Do not build project before testing.</source>
+        <target state="new">Do not build project before testing.</target>
         <note></note>
       </trans-unit>
     </body>

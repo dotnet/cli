@@ -599,13 +599,13 @@
         <note></note>
       </trans-unit>
       <trans-unit id="TemplateCreatedSuccessfully">
-        <source>The template {0} created successfully. Please run \"dotnet restore\" to get started!</source>
-        <target state="new">The template {0} created successfully. Please run \"dotnet restore\" to get started!</target>
+        <source>The template {0} created successfully. Please run "dotnet restore" to get started!</source>
+        <target state="new">The template {0} created successfully. Please run "dotnet restore" to get started!</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TemplateInstalledSuccesfully">
-        <source>The template {0} installed successfully. You can use \"dotnet new {0}\" to get started with the new template.</source>
-        <target state="new">The template {0} installed successfully. You can use \"dotnet new {0}\" to get started with the new template.</target>
+        <source>The template {0} installed successfully. You can use "dotnet new {0}" to get started with the new template.</source>
+        <target state="new">The template {0} installed successfully. You can use "dotnet new {0}" to get started with the new template.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TemplateCreateError">

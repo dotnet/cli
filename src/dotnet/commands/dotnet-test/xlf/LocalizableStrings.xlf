@@ -28,7 +28,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="CmdListTestsDescription">
-        <source>@"Lists discovered tests</source>
+        <source>Lists discovered tests</source>
         <note></note>
       </trans-unit>
       <trans-unit id="CmdTestCaseFilterExpression">
@@ -36,14 +36,14 @@
         <note></note>
       </trans-unit>
       <trans-unit id="CmdTestCaseFilterDescription">
-        <source>@"Run tests that match the given expression.
+        <source>Run tests that match the given expression.
                                         Examples:
-                                        --testCaseFilter:""Priority = 1""
-                                        --testCaseFilter: ""(FullyQualifiedName~Nightly | Name = MyTestMethod)</source>
+                                        --testCaseFilter:"Priority = 1"
+                                        --testCaseFilter: "(FullyQualifiedName~Nightly | Name = MyTestMethod)"</source>
         <note></note>
       </trans-unit>
       <trans-unit id="CmdTestAdapterPathDescription">
-        <source>@"Use custom adapters from the given path in the test run.
+        <source>Use custom adapters from the given path in the test run.
                                         Example: --testAdapterPath:&lt;pathToCustomAdapters&gt;</source>
         <note></note>
       </trans-unit>
@@ -52,7 +52,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="CmdLoggerDescription">
-        <source>@"Specify a logger for test results. 
+        <source>Specify a logger for test results. 
                                         Example: --logger:trx</source>
         <note></note>
       </trans-unit>
@@ -61,7 +61,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="CmdConfigDescription">
-        <source>@"Configuration under which to build, i.e. Debug/Release</source>
+        <source>Configuration under which to build, i.e. Debug/Release</source>
         <note></note>
       </trans-unit>
       <trans-unit id="CmdFramework">
@@ -69,7 +69,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="CmdFrameworkDescription">
-        <source>@"Looks for test binaries for a specific framework</source>
+        <source>Looks for test binaries for a specific framework</source>
         <note></note>
       </trans-unit>
       <trans-unit id="CmdOutputDir">
@@ -77,7 +77,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="CmdOutputDescription">
-        <source>@"Directory in which to find the binaries to be run</source>
+        <source>Directory in which to find the binaries to be run</source>
         <note></note>
       </trans-unit>
       <trans-unit id="CmdPathToLogFile">
@@ -85,12 +85,12 @@
         <note></note>
       </trans-unit>
       <trans-unit id="CmdPathTologFileDescription">
-        <source>@"Enable verbose logs for test platform.
+        <source>Enable verbose logs for test platform.
                                         Logs are written to the provided file.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="CmdNoBuildDescription">
-        <source>@"Do not build project before testing.</source>
+        <source>Do not build project before testing.</source>
         <note></note>
       </trans-unit>
     </body>
