@@ -131,11 +131,16 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         private CommandResult RunProcess(string executable, string args, StreamForwarder stdOut, StreamForwarder stdErr)
         {
-            CurrentProcess = StartProcess(executable, args);
+            CurrentProcess = CreateProcess(executable, args);
+
             var taskOut = stdOut.BeginRead(CurrentProcess.StandardOutput);
+
             var taskErr = stdErr.BeginRead(CurrentProcess.StandardError);
 
+            CurrentProcess.Start();
+
             CurrentProcess.WaitForExit();
+
             Task.WaitAll(taskOut, taskErr);
 
             var result = new CommandResult(
@@ -149,9 +154,13 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         private Task<CommandResult> RunProcessAsync(string executable, string args, StreamForwarder stdOut, StreamForwarder stdErr)
         {
-            CurrentProcess = StartProcess(executable, args);
+            CurrentProcess = CreateProcess(executable, args);
+
             var taskOut = stdOut.BeginRead(CurrentProcess.StandardOutput);
+
             var taskErr = stdErr.BeginRead(CurrentProcess.StandardError);
+
+            CurrentProcess.Start();
 
             var tcs = new TaskCompletionSource<CommandResult>();
             CurrentProcess.Exited += (sender, arg) =>
@@ -168,7 +177,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             return tcs.Task;
         }
 
-        private Process StartProcess(string executable, string args)
+        private Process CreateProcess(string executable, string args)
         {
             var psi = new ProcessStartInfo
             {
@@ -202,7 +211,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             };
 
             process.EnableRaisingEvents = true;
-            process.Start();
+
             return process;
         }
 
