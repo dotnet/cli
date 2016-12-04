@@ -3,9 +3,10 @@
 
 using Microsoft.DotNet.Cli.Utils;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
@@ -131,46 +132,127 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         private CommandResult RunProcess(string executable, string args, StreamForwarder stdOut, StreamForwarder stdErr)
         {
+            Task taskOut = null;
+
+            Task taskErr = null;
+         
             CurrentProcess = CreateProcess(executable, args);
-
-            var taskOut = stdOut.BeginRead(CurrentProcess.StandardOutput);
-
-            var taskErr = stdErr.BeginRead(CurrentProcess.StandardError);
 
             CurrentProcess.Start();
 
+            try
+            {
+                taskOut = stdOut.BeginRead(CurrentProcess.StandardOutput);
+            }
+            catch (System.InvalidOperationException e)
+            {
+                if (!e.Message.Equals("The collection has been marked as complete with regards to additions."))
+                {
+                    throw;
+                }
+            }
+
+            try
+            {
+                taskErr = stdErr.BeginRead(CurrentProcess.StandardError);
+            }
+            catch (System.InvalidOperationException e)
+            {
+                if (!e.Message.Equals("The collection has been marked as complete with regards to additions."))
+                {
+                    throw;
+                }
+            }
+
             CurrentProcess.WaitForExit();
 
-            Task.WaitAll(taskOut, taskErr);
+            var tasksToAwait = new List<Task>();
+
+            if (taskOut != null)
+            {
+                tasksToAwait.Add(taskOut);
+            }
+
+            if (taskErr != null)
+            {
+                tasksToAwait.Add(taskErr);
+            }
+
+            if (tasksToAwait.Any())
+            {
+                Task.WaitAll(tasksToAwait.ToArray());
+            }
 
             var result = new CommandResult(
                 CurrentProcess.StartInfo,
                 CurrentProcess.ExitCode,
-                stdOut.CapturedOutput,
-                stdErr.CapturedOutput);
+                stdOut?.CapturedOutput ?? CurrentProcess.StandardOutput.ReadToEnd(),
+                stdErr?.CapturedOutput ?? CurrentProcess.StandardError.ReadToEnd());
 
             return result;
         }
 
         private Task<CommandResult> RunProcessAsync(string executable, string args, StreamForwarder stdOut, StreamForwarder stdErr)
         {
+            Task taskOut = null;
+
+            Task taskErr = null;
+         
             CurrentProcess = CreateProcess(executable, args);
-
-            var taskOut = stdOut.BeginRead(CurrentProcess.StandardOutput);
-
-            var taskErr = stdErr.BeginRead(CurrentProcess.StandardError);
 
             CurrentProcess.Start();
 
+            try
+            {
+                taskOut = stdOut.BeginRead(CurrentProcess.StandardOutput);
+            }
+            catch (System.InvalidOperationException e)
+            {
+                if (!e.Message.Equals("The collection has been marked as complete with regards to additions."))
+                {
+                    throw;
+                }
+            }
+
+            try
+            {
+                taskErr = stdErr.BeginRead(CurrentProcess.StandardError);
+            }
+            catch (System.InvalidOperationException e)
+            {
+                if (!e.Message.Equals("The collection has been marked as complete with regards to additions."))
+                {
+                    throw;
+                }
+            }
+
             var tcs = new TaskCompletionSource<CommandResult>();
+
             CurrentProcess.Exited += (sender, arg) =>
             {
-                Task.WaitAll(taskOut, taskErr);
+                var tasksToAwait = new List<Task>();
+
+                if (taskOut != null)
+                {
+                    tasksToAwait.Add(taskOut);
+                }
+
+                if (taskErr != null)
+                {
+                    tasksToAwait.Add(taskErr);
+                }
+
+                if (tasksToAwait.Any())
+                {
+                    Task.WaitAll(tasksToAwait.ToArray());
+                }
+                
                 var result = new CommandResult(
                                     CurrentProcess.StartInfo,
                                     CurrentProcess.ExitCode,
-                                    stdOut.CapturedOutput,
-                                    stdErr.CapturedOutput);
+                                    stdOut?.CapturedOutput ?? CurrentProcess.StandardOutput.ReadToEnd(),
+                                    stdErr?.CapturedOutput ?? CurrentProcess.StandardError.ReadToEnd());
+
                 tcs.SetResult(result);
             };
 
