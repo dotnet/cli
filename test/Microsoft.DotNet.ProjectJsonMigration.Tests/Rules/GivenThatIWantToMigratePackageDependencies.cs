@@ -431,7 +431,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
                 i => (i.Include == "NETStandard.Library" && i.ItemType == "PackageReference"));
         }
 
-        private void EmitsPackageReferences(ProjectRootElement mockProj, params Tuple<string, string, string>[] packageSpecs)
+        new private void EmitsPackageReferences(ProjectRootElement mockProj, params Tuple<string, string, string>[] packageSpecs)
         {
             foreach (var packageSpec in packageSpecs)
             {
@@ -449,7 +449,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             }
         }
 
-        private void EmitsToolReferences(ProjectRootElement mockProj, params Tuple<string, string>[] toolSpecs)
+        new private void EmitsToolReferences(ProjectRootElement mockProj, params Tuple<string, string>[] toolSpecs)
         {
             foreach (var toolSpec in toolSpecs)
             {
@@ -465,7 +465,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             }
         }
 
-        private ProjectRootElement RunPackageDependenciesRuleOnPj(string s, string testDirectory = null)
+        new private ProjectRootElement RunPackageDependenciesRuleOnPj(string s, string testDirectory = null)
         {
             testDirectory = testDirectory ?? Temp.CreateDirectory().Path;
             return TemporaryProjectFileRuleRunner.RunRules(new IMigrationRule[]
