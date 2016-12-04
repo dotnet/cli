@@ -260,7 +260,7 @@
     </ItemGroup>
 
     <MSBuild
-      BuildInParallel="True"
+      BuildInParallel="False"
       Projects="@(SdksToBundle)">
     </MSBuild>
   </Target>
