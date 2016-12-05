@@ -39,15 +39,26 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         private string RunMigrateWebSdkRuleOnPj(string s, string testDirectory = null)
         {
             testDirectory = testDirectory ?? Temp.CreateDirectory().Path;
-            var csprojFilePath = Path.Combine(testDirectory, "migrateWebSdkRule.csproj");
-            var mockProj = TemporaryProjectFileRuleRunner.RunRules(new IMigrationRule[]
+            var csprojFilePath = Path.Combine(testDirectory, $"{GetContainingFolderName(testDirectory)}.csproj");
+
+            File.WriteAllText(csprojFilePath, @"
+                <Project Sdk=""Microsoft.NET.Sdk"" ToolsVersion=""15.0"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
+                  <PropertyGroup />
+                  <ItemGroup />
+                </Project>");
+
+            TemporaryProjectFileRuleRunner.RunRules(new IMigrationRule[]
             {
                 new MigrateWebSdkRule()
             }, s, testDirectory);
 
-            mockProj.Save(csprojFilePath);
-
             return csprojFilePath;
+        }
+
+        private static string GetContainingFolderName(string projectDirectory)
+        {
+            projectDirectory = projectDirectory.TrimEnd(new char[] { '/', '\\' });
+            return Path.GetFileName(projectDirectory);
         }
     }
 }
