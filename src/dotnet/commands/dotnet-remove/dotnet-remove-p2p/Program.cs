@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.Tools.Remove.ProjectToProjectReference
             app.OnExecute(() => {
                 if (string.IsNullOrEmpty(projectArgument.Value))
                 {
-                    throw new GracefulException(LocalizableStrings.RequiredArgumentNotPassed, $"<{LocalizableStrings.ProjectException}>");
+                    throw new GracefulException(CommonLocalizableStrings.RequiredArgumentNotPassed, $"<{LocalizableStrings.ProjectException}>");
                 }
 
                 var msbuildProj = MsbuildProject.FromFileOrDirectory(projectArgument.Value);

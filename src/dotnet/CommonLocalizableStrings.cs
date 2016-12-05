@@ -116,10 +116,9 @@
         public const string SolutionAlreadyContainsAProject = "Solution {0} already contains project {1}.";
 
         /// add p2p
-        public const string ReferenceDoesNotExist = "Reference {0} does not exist. If you still want to add it, please use --force option. Please note that this may have adverse effects on the project. ";
+        public const string ReferenceDoesNotExistForce = "Reference {0} does not exist. If you still want to add it, please use --force option. Please note that this may have adverse effects on the project. ";
         public const string ReferenceIsInvalid = "Reference `{0}` is invalid.";
         public const string SpecifyAtLeastOneReferenceToAdd = "You must specify at least one reference to add. Please run dotnet add --help for more information.";
-        public const string ReferenceAddedToTheProject = "Reference `{0}` added to the project.";
         public const string ProjectAlreadyHasAReference = "Project {0} already has a reference `{1}`.";
 
         /// add package
