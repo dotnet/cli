@@ -80,18 +80,6 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
             var type = project.GetProjectType();
             switch (type)
             {
-                case ProjectType.Web:
-                    _transformApplicator.Execute(
-                        SdkPackageDependencyTransform.Transform(
-                            new PackageDependencyInfo
-                            {
-                                Name = PackageConstants.WebSdkPackageName,
-                                Version = ConstantPackageVersions.WebSdkPackageVersion,
-                                PrivateAssets = "All"
-                            }),
-                        noFrameworkPackageReferenceItemGroup,
-                        mergeExisting: false);
-                    break;
                 case ProjectType.Test:
                     _transformApplicator.Execute(
                         PackageDependencyInfoTransform().Transform(
