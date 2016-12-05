@@ -8,7 +8,7 @@ namespace Microsoft.DotNet.Tools.Help
 {
     public class HelpCommand
     {
-        private const string UsageText = $@"{LocalizableStrings.Usage}: dotnet [host-options] [command] [arguments] [common-options]
+        private static readonly string UsageText = $@"{LocalizableStrings.Usage}: dotnet [host-options] [command] [arguments] [common-options]
 
 {LocalizableStrings.Arguments}:
   [command]             {LocalizableStrings.CommandDefinition}
