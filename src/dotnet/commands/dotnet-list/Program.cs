@@ -9,22 +9,22 @@ namespace Microsoft.DotNet.Tools.List
 {
     public class ListCommand : DispatchCommand
     {
-        protected override string HelpText => @".NET List Command
+        protected override string HelpText => $@"{LocalizableStrings.ListCommandDescription}
 
-Usage: dotnet list [options] <object> <command> [[--] <arg>...]]
+{LocalizableStrings.Usage}: dotnet list [options] <object> <command> [[--] <arg>...]]
 
 Options:
-  -h|--help  Show help information
+  -h|--help  {LocalizableStrings.HelpDefinition}
 
-Arguments:
-  <object>   The object of the operation. If a project file is not specified, it defaults to the current directory.
-  <command>  Command to be executed on <object>.
+{LocalizableStrings.Arguments}:
+  <object>   {LocalizableStrings.ObjectDefinition}
+  <command>  {LocalizableStrings.CommandDefinition}
 
-Args:
-  Any extra arguments passed to the command. Use `dotnet list <command> --help` to get help about these arguments.
+{LocalizableStrings.ExtraArgs}:
+  {LocalizableStrings.ExtraArgumentsDefinition}
 
-Commands:
-  p2ps       List project to project (p2p) references to a project";
+{LocalizableStrings.Commands}:
+  p2ps       {LocalizableStrings.P2PsDefinition}";
 
         protected override Dictionary<string, Func<string[], int>> BuiltInCommands => new Dictionary<string, Func<string[], int>>
         {

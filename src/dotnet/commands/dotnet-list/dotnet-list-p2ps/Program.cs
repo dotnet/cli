@@ -17,24 +17,18 @@ namespace Microsoft.DotNet.Tools.List.ProjectToProjectReferences
             CommandLineApplication app = new CommandLineApplication(throwOnUnexpectedArg: false)
             {
                 Name = "dotnet list p2ps",
-                FullName = ".NET Add Project to Project (p2p) reference Command",
-                Description = "Command to add project to project (p2p) reference",
-                AllowArgumentSeparator = true,
-                ArgumentSeparatorHelpText = "Project to project references to add"
+                FullName = LocalizableStrings.AppFullName,
+                Description = LocalizableStrings.AppDescription
             };
 
             app.HelpOption("-h|--help");
 
-            CommandArgument projectArgument = app.Argument(
-                "<PROJECT>",
-                "The project file to modify. If a project file is not specified," +
-                " it searches the current working directory for an MSBuild file that has" +
-                " a file extension that ends in `proj` and uses that file.");
+            CommandArgument projectArgument = app.Argument($"<{LocalizableStrings.ProjectArgumentValueName}>", LocalizableStrings.ProjectArgumentDescription);
 
             app.OnExecute(() => {
                 if (string.IsNullOrEmpty(projectArgument.Value))
                 {
-                    throw new GracefulException(CommonLocalizableStrings.RequiredArgumentNotPassed, "<Project>");
+                    throw new GracefulException(CommonLocalizableStrings.RequiredArgumentNotPassed, $"<{LocalizableStrings.ProjectArgumentValueName}>");
                 }
 
                 var msbuildProj = MsbuildProject.FromFileOrDirectory(projectArgument.Value);
