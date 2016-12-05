@@ -28,9 +28,12 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         private List<string> _cliGeneratedEnvironmentVariables = new List<string> { "MSBuildSDKsPath" };
 
+        private bool _showOutput = false;
+
         public TestCommand(string command)
         {
             _command = command;
+
 #if NET451            
             _baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 #else
@@ -40,59 +43,32 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         public virtual CommandResult Execute(string args = "")
         {
-            var commandPath = _command;
-            ResolveCommand(ref commandPath, ref args);
-
-            Console.WriteLine($"Executing - {commandPath} {args} - {WorkingDirectoryInfo()}");
-
-            var stdOut = new StreamForwarder();
-            var stdErr = new StreamForwarder();
-
-            AddWriteLine(Reporter.Output.WriteLine);
-
-            stdOut.ForwardTo(writeLine: WriteLine);
-            stdErr.ForwardTo(writeLine: WriteLine);
-
-            return RunProcess(commandPath, args, stdOut, stdErr);
+            return ExecuteAsync(args).Wait().Result;
         }
 
         public virtual Task<CommandResult> ExecuteAsync(string args = "")
         {
             var commandPath = _command;
+
             ResolveCommand(ref commandPath, ref args);
 
             Console.WriteLine($"Executing - {commandPath} {args} - {WorkingDirectoryInfo()}");
-
-            var stdOut = new StreamForwarder();
-            var stdErr = new StreamForwarder();
-
-            AddWriteLine(Reporter.Output.WriteLine);
-
-            stdOut.ForwardTo(writeLine: WriteLine);
-            stdErr.ForwardTo(writeLine: WriteLine);
-
-            return RunProcessAsync(commandPath, args, stdOut, stdErr);
+            
+            return ExecuteAsyncInternal(commandPath, args);
         }
 
         public virtual CommandResult ExecuteWithCapturedOutput(string args = "")
         {
             var command = _command;
+
             ResolveCommand(ref command, ref args);
+
             var commandPath = Env.GetCommandPath(command, ".exe", ".cmd", "") ??
                 Env.GetCommandPathFromRootPath(_baseDirectory, command, ".exe", ".cmd", "");
 
             Console.WriteLine($"Executing (Captured Output) - {commandPath} {args} - {WorkingDirectoryInfo()}");
 
-            var stdOut = new StreamForwarder();
-            var stdErr = new StreamForwarder();
-
-            stdOut.ForwardTo(writeLine: WriteLine);
-            stdErr.ForwardTo(writeLine: WriteLine);
-
-            stdOut.Capture();
-            stdErr.Capture();
-
-            return RunProcess(commandPath, args, stdOut, stdErr);
+            return ExecuteAsyncInternal(command, args);
         }
 
         public void KillTree()
@@ -103,6 +79,20 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             }
 
             CurrentProcess.KillTree();
+        }
+
+        private Task<CommandResult> ExecuteAsyncInternal(string executable, string args)
+        {
+            var stdOut = new StreamForwarder();
+            var stdErr = new StreamForwarder();
+
+            stdOut.ForwardTo(writeLine: WriteLine);
+            stdErr.ForwardTo(writeLine: WriteLine);
+
+            stdOut.Capture();
+            stdErr.Capture();
+
+            return RunProcess(commandPath, args, stdOut, stdErr);
         }
 
         public void AddWriteLine(Action<string> writeLine)
