@@ -36,11 +36,12 @@ namespace Microsoft.DotNet.Tools.List.ProjectToProjectReferences
                 var p2ps = msbuildProj.GetProjectToProjectReferences();
                 if (p2ps.Count() == 0)
                 {
-                    throw new GracefulException(LocalizableStrings.NoReferencesFound);
+                    Reporter.Output.WriteLine(string.Format(LocalizableStrings.NoReferencesFound, CommonLocalizableStrings.P2P, projectArgument.Value));
+                    return 0;
                 }
 
-                Reporter.Output.WriteLine($"{CommonLocalizableStrings.ProjectReference}");
-                Reporter.Output.WriteLine(new string('-', CommonLocalizableStrings.ProjectReference.Length));
+                Reporter.Output.WriteLine($"{CommonLocalizableStrings.ProjectReferenceOrMultiple}");
+                Reporter.Output.WriteLine(new string('-', CommonLocalizableStrings.ProjectReferenceOrMultiple.Length));
                 foreach (var p2p in p2ps)
                 {
                     Reporter.Output.WriteLine(p2p.Include);
