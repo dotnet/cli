@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
 {
@@ -109,6 +110,22 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             }
 
             return process.ExitCode;
+        }
+
+        public static Task WaitForExitAsync(this Process subject)
+        {
+            var taskCompletionSource = new TaskCompletionSource<object>();
+
+            subject.EnableRaisingEvents = true;
+            
+            subject.Exited += (s, a) => taskCompletionSource.TrySetResult(null);
+            
+            if (subject.HasExited)
+            {
+                return Task.CompletedTask;
+            }
+
+            return taskCompletionSource.Task;
         }
     }
 }

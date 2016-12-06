@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
@@ -20,7 +21,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         public string WorkingDirectory { get; set; }
 
-        public Process CurrentProcess { get; set; }
+        public Process CurrentProcess { get; private set; }
 
         public Dictionary<string, string> Environment { get; } = new Dictionary<string, string>();
 
@@ -28,7 +29,9 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         private List<string> _cliGeneratedEnvironmentVariables = new List<string> { "MSBuildSDKsPath" };
 
-        private bool _showOutput = false;
+        public event DataReceivedEventHandler ErrorDataReceived;
+
+        public event DataReceivedEventHandler OutputDataReceived;
 
         public TestCommand(string command)
         {
@@ -43,32 +46,32 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         public virtual CommandResult Execute(string args = "")
         {
-            return ExecuteAsync(args).Wait().Result;
+            return ExecuteAsync(args).Result;
         }
 
-        public virtual Task<CommandResult> ExecuteAsync(string args = "")
+        public async virtual Task<CommandResult> ExecuteAsync(string args = "")
         {
-            var commandPath = _command;
+            var resolvedCommand = _command;
 
-            ResolveCommand(ref commandPath, ref args);
+            ResolveCommand(ref resolvedCommand, ref args);
 
-            Console.WriteLine($"Executing - {commandPath} {args} - {WorkingDirectoryInfo()}");
+            Console.WriteLine($"Executing - {resolvedCommand} {args} - {WorkingDirectoryInfo()}");
             
-            return ExecuteAsyncInternal(commandPath, args);
+            return await ExecuteAsyncInternal(resolvedCommand, args);
         }
 
         public virtual CommandResult ExecuteWithCapturedOutput(string args = "")
         {
-            var command = _command;
+            var resolvedCommand = _command;
 
-            ResolveCommand(ref command, ref args);
+            ResolveCommand(ref resolvedCommand, ref args);
 
-            var commandPath = Env.GetCommandPath(command, ".exe", ".cmd", "") ??
-                Env.GetCommandPathFromRootPath(_baseDirectory, command, ".exe", ".cmd", "");
+            var commandPath = Env.GetCommandPath(resolvedCommand, ".exe", ".cmd", "") ??
+                Env.GetCommandPathFromRootPath(_baseDirectory, resolvedCommand, ".exe", ".cmd", "");
 
             Console.WriteLine($"Executing (Captured Output) - {commandPath} {args} - {WorkingDirectoryInfo()}");
 
-            return ExecuteAsyncInternal(command, args);
+            return ExecuteAsyncInternal(resolvedCommand, args).Result;
         }
 
         public void KillTree()
@@ -81,190 +84,77 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             CurrentProcess.KillTree();
         }
 
-        private Task<CommandResult> ExecuteAsyncInternal(string executable, string args)
-        {
-            var stdOut = new StreamForwarder();
-            var stdErr = new StreamForwarder();
-
-            stdOut.ForwardTo(writeLine: WriteLine);
-            stdErr.ForwardTo(writeLine: WriteLine);
-
-            stdOut.Capture();
-            stdErr.Capture();
-
-            return RunProcess(commandPath, args, stdOut, stdErr);
-        }
-
-        public void AddWriteLine(Action<string> writeLine)
-        {
-            _writeLines.Add(writeLine);
-        }
-
         private void ResolveCommand(ref string executable, ref string args)
         {
             if (executable.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
             {
                 var newArgs = ArgumentEscaper.EscapeSingleArg(executable);
+
                 if (!string.IsNullOrEmpty(args))
                 {
                     newArgs += " " + args;
                 }
+
                 args = newArgs;
+
                 executable = "dotnet";
             }
 
             if (!Path.IsPathRooted(executable))
             {
                 executable = Env.GetCommandPath(executable) ??
-                           Env.GetCommandPathFromRootPath(_baseDirectory, executable);
+                             Env.GetCommandPathFromRootPath(_baseDirectory, executable);
             }
         }
 
-        private CommandResult RunProcess(string executable, string args, StreamForwarder stdOut, StreamForwarder stdErr)
-        {
-            Task taskOut = null;
 
-            Task taskErr = null;
-         
-            CurrentProcess = CreateProcess(executable, args);
+        private async Task<CommandResult> ExecuteAsyncInternal(string executable, string args)
+        {
+            var stdOut = new StringBuilder();
+
+            var stdErr = new StringBuilder();
+
+            CurrentProcess = CreateProcess(executable, args); 
+
+            CurrentProcess.ErrorDataReceived += (s, e) =>
+            {
+                stdErr.Append(e.Data);
+
+                var handler = ErrorDataReceived;
+                
+                if (handler != null)
+                {
+                    handler(s, e);
+                }
+            };
+
+            CurrentProcess.OutputDataReceived += (s, e) =>
+            {
+                stdOut.Append(e.Data);
+
+                var handler = OutputDataReceived;
+                
+                if (handler != null)
+                {
+                    handler(s, e);
+                }
+            };
 
             CurrentProcess.Start();
 
-            try
-            {
-                taskOut = stdOut.BeginRead(CurrentProcess.StandardOutput);
-            }
-            catch (System.InvalidOperationException e)
-            {
-                if (!e.Message.Equals("The collection has been marked as complete with regards to additions."))
-                {
-                    throw;
-                }
-            }
+            CurrentProcess.BeginOutputReadLine();
 
-            try
-            {
-                taskErr = stdErr.BeginRead(CurrentProcess.StandardError);
-            }
-            catch (System.InvalidOperationException e)
-            {
-                if (!e.Message.Equals("The collection has been marked as complete with regards to additions."))
-                {
-                    throw;
-                }
-            }
+            CurrentProcess.BeginErrorReadLine();
+
+            await CurrentProcess.WaitForExitAsync();
 
             CurrentProcess.WaitForExit();
 
-            var tasksToAwait = new List<Task>();
-
-            if (taskOut != null)
-            {
-                tasksToAwait.Add(taskOut);
-            }
-
-            if (taskErr != null)
-            {
-                tasksToAwait.Add(taskErr);
-            }
-
-            if (tasksToAwait.Any())
-            {
-                try
-                {
-                    Task.WaitAll(tasksToAwait.ToArray());
-                }
-                catch (System.ObjectDisposedException e)
-                {
-                    taskErr = null;
-
-                    taskOut = null;
-                }
-            }
-
-            var result = new CommandResult(
+            return new CommandResult(
                 CurrentProcess.StartInfo,
                 CurrentProcess.ExitCode,
-                stdOut?.CapturedOutput ?? CurrentProcess.StandardOutput.ReadToEnd(),
-                stdErr?.CapturedOutput ?? CurrentProcess.StandardError.ReadToEnd());
-
-            return result;
-        }
-
-        private Task<CommandResult> RunProcessAsync(string executable, string args, StreamForwarder stdOut, StreamForwarder stdErr)
-        {
-            Task taskOut = null;
-
-            Task taskErr = null;
-         
-            CurrentProcess = CreateProcess(executable, args);
-
-            CurrentProcess.Start();
-
-            try
-            {
-                taskOut = stdOut.BeginRead(CurrentProcess.StandardOutput);
-            }
-            catch (System.InvalidOperationException e)
-            {
-                if (!e.Message.Equals("The collection has been marked as complete with regards to additions."))
-                {
-                    throw;
-                }
-            }
-
-            try
-            {
-                taskErr = stdErr.BeginRead(CurrentProcess.StandardError);
-            }
-            catch (System.InvalidOperationException e)
-            {
-                if (!e.Message.Equals("The collection has been marked as complete with regards to additions."))
-                {
-                    throw;
-                }
-            }
-
-            var tcs = new TaskCompletionSource<CommandResult>();
-
-            CurrentProcess.Exited += (sender, arg) =>
-            {
-                var tasksToAwait = new List<Task>();
-
-                if (taskOut != null)
-                {
-                    tasksToAwait.Add(taskOut);
-                }
-
-                if (taskErr != null)
-                {
-                    tasksToAwait.Add(taskErr);
-                }
-
-                if (tasksToAwait.Any())
-                {
-                    try
-                    {
-                        Task.WaitAll(tasksToAwait.ToArray());
-                    }
-                    catch (System.ObjectDisposedException e)
-                    {
-                        taskErr = null;
-
-                        taskOut = null;
-                    }
-                }
-                
-                var result = new CommandResult(
-                                    CurrentProcess.StartInfo,
-                                    CurrentProcess.ExitCode,
-                                    stdOut?.CapturedOutput ?? CurrentProcess.StandardOutput.ReadToEnd(),
-                                    stdErr?.CapturedOutput ?? CurrentProcess.StandardError.ReadToEnd());
-
-                tcs.SetResult(result);
-            };
-
-            return tcs.Task;
+                stdOut.ToString(),
+                stdErr.ToString());
         }
 
         private Process CreateProcess(string executable, string args)
@@ -303,14 +193,6 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             process.EnableRaisingEvents = true;
 
             return process;
-        }
-
-        private void WriteLine(string line)
-        {
-            foreach (var writeLine in _writeLines)
-            {
-                writeLine(line);
-            }
         }
 
         private string WorkingDirectoryInfo()

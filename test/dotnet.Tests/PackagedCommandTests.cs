@@ -111,14 +111,12 @@ namespace Microsoft.DotNet.Tests
             new BuildCommand()
                 .WithProjectDirectory(testInstance.Root)
                 .WithConfiguration("Debug")
-                .WithWriteLine(_output.WriteLine)
                 .Execute()
                 .Should().Pass();
 
             new DependencyToolInvokerCommand()
                 .WithWorkingDirectory(testInstance.Root)
                 .WithEnvironmentVariable(CommandContext.Variables.Verbose, "true")
-                .WithWriteLine(_output.WriteLine)
                 .ExecuteWithCapturedOutput($"tool-with-output-name", framework, "")
                 .Should().HaveStdOutContaining("Tool with output name!")
                      .And.NotHaveStdErr()
