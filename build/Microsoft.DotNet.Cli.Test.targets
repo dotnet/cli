@@ -48,10 +48,14 @@
       </ProjectsToTest>
     </ItemGroup>
 
+    <Message Text="Starting test execution" Importance="High" />
+  
     <MSBuild
       BuildInParallel="True"
       Projects="@(ProjectsToTest)">
     </MSBuild>
+
+    <Message Text="Finished test execution" Importance="High" />
   </Target>
 
   <Target Name="PrepareTests"
