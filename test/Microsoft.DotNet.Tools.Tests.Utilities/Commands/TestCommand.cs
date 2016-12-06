@@ -118,7 +118,10 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
             CurrentProcess.ErrorDataReceived += (s, e) =>
             {
-                stdErr.Append(e.Data);
+                if (e.Data != null)
+                {
+                    stdErr.Append(e.Data + System.Environment.NewLine);
+                }
 
                 var handler = ErrorDataReceived;
                 
@@ -130,7 +133,10 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
             CurrentProcess.OutputDataReceived += (s, e) =>
             {
-                stdOut.Append(e.Data);
+                if (e.Data != null)
+                {
+                    stdOut.Append(e.Data + System.Environment.NewLine);
+                }
 
                 var handler = OutputDataReceived;
                 
