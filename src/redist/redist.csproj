@@ -3,7 +3,7 @@
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\dir.props" />
   
   <PropertyGroup>
-    <VersionPrefix>1.0.0-preview4</VersionPrefix>
+    <VersionPrefix>1.0.0-preview5</VersionPrefix>
     <TargetFramework>netcoreapp1.0</TargetFramework>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dotnet5.4</PackageTargetFallback>
@@ -27,9 +27,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.Build.Tasks">
       <Version>2.0.0-beta6-60922-08</Version>
-    </PackageReference>
-    <PackageReference Include="System.Runtime.Serialization.Xml">
-      <Version>4.1.1</Version>
     </PackageReference>
     <PackageReference Include="NuGet.Build.Tasks">
       <Version>4.0.0-rc2</Version>
