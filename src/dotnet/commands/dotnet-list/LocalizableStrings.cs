@@ -20,6 +20,6 @@
 
         public const string ObjectDefinition = "The object of the operation. If a project file is not specified, it defaults to the current directory.";
 
-        public const string P2PsDefinition = "List project to project (p2p) references to a project";
+        public const string P2PsDefinition = "List project to project (p2p) references from a project";
     }
 }
