@@ -30,5 +30,11 @@ Options:
         {
             ["p2ps"] = ListProjectToProjectReferencesCommand.Run,
         };
+
+        public static int Run(string[] args)
+        {
+            var cmd = new ListCommand();
+            return cmd.Start(args);
+        }
     }
 }
