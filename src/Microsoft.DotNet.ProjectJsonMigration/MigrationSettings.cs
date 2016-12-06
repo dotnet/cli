@@ -40,10 +40,12 @@ namespace Microsoft.DotNet.ProjectJsonMigration
                 projectDirectory, outputDirectory, projectXprojFilePath, sdkDefaultsFilePath, solutionFile)
         {
             _msBuildProjectTemplatePath = msBuildProjectTemplatePath;
-            MSBuildProjectTemplate = ProjectRootElement.Open(
+            var rootElement = ProjectRootElement.Open(
                 _msBuildProjectTemplatePath,
                 new ProjectCollection(),
                 preserveFormatting: true);
+            var rootElementWithNamespaces = rootElement.DeepClone();
+            MSBuildProjectTemplate = rootElementWithNamespaces;
         }
 
         private MigrationSettings(
