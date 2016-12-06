@@ -9,6 +9,7 @@ using Microsoft.DotNet.Internal.ProjectModel.Graph;
 using Microsoft.DotNet.Cli;
 using System.Linq;
 using System.IO;
+using Microsoft.DotNet.Cli.Sln.Internal;
 using Microsoft.DotNet.ProjectJsonMigration.Rules;
 using Microsoft.DotNet.Tools.Common;
 
@@ -46,7 +47,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration
 
                 projectDependencies = ResolveTransitiveClosureProjectDependencies(
                     rootSettings.ProjectDirectory, 
-                    rootSettings.ProjectXProjFilePath);
+                    rootSettings.ProjectXProjFilePath,
+                    rootSettings.SolutionFile);
             }
             catch (MigrationException e)
             {
@@ -98,10 +100,11 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             }
         }
 
-        private IEnumerable<ProjectDependency> ResolveTransitiveClosureProjectDependencies(string rootProject, string xprojFile)
+        private IEnumerable<ProjectDependency> ResolveTransitiveClosureProjectDependencies(
+            string rootProject, string xprojFile, SlnFile solutionFile)
         {
             HashSet<ProjectDependency> projectsMap = new HashSet<ProjectDependency>(new ProjectDependencyComparer());
-            var projectDependencies = _projectDependencyFinder.ResolveProjectDependencies(rootProject, xprojFile);
+            var projectDependencies = _projectDependencyFinder.ResolveProjectDependencies(rootProject, xprojFile, solutionFile);
             Queue<ProjectDependency> projectsQueue = new Queue<ProjectDependency>(projectDependencies);
 
             while (projectsQueue.Count() != 0)
