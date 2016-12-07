@@ -465,7 +465,7 @@ namespace Microsoft.DotNet.Migration.Tests
 
             MigrateProject(slnPath);
             Restore(testAppProjectDirectory, "TestApp.sln");
-            BuildMSBuild(testAppProjectDirectory, "TestApp.sln");
+            BuildMSBuild(testAppProjectDirectory, "TestApp.sln", "Release");
         }
 
         private void VerifyAutoInjectedDesktopReferences(string projectDirectory, string projectName, bool shouldBePresent)
