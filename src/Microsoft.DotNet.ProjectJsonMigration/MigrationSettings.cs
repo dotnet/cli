@@ -23,9 +23,13 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             string msBuildProjectTemplatePath,
             string projectXprojFilePath=null,
             string sdkDefaultsFilePath=null,
-            SlnFile solutionFile=null) : this(
-                projectDirectory, outputDirectory, projectXprojFilePath, sdkDefaultsFilePath, solutionFile)
+            SlnFile solutionFile=null)
         {
+            ProjectDirectory = projectDirectory;
+            OutputDirectory = outputDirectory;
+            ProjectXProjFilePath = projectXprojFilePath;
+            SdkDefaultsFilePath = sdkDefaultsFilePath;
+            SolutionFile = solutionFile;
             MSBuildProjectTemplatePath = msBuildProjectTemplatePath;
             MSBuildProjectTemplate = ProjectRootElement.Open(
                 MSBuildProjectTemplatePath,
@@ -36,15 +40,29 @@ namespace Microsoft.DotNet.ProjectJsonMigration
         private MigrationSettings(
             string projectDirectory,
             string outputDirectory,
-            string projectXprojFilePath=null,
-            string sdkDefaultsFilePath=null,
-            SlnFile solutionFile=null)
+            ProjectRootElement msBuildProjectTemplate,
+            string projectXprojFilePath = null,
+            string sdkDefaultsFilePath = null) : this(
+                projectDirectory, outputDirectory, projectXprojFilePath, sdkDefaultsFilePath)
         {
-            ProjectDirectory = projectDirectory;
-            OutputDirectory = outputDirectory;
-            ProjectXProjFilePath = projectXprojFilePath;
-            SdkDefaultsFilePath = sdkDefaultsFilePath;
-            SolutionFile = solutionFile;
+            MSBuildProjectTemplate = msBuildProjectTemplate != null ? msBuildProjectTemplate.DeepClone() : null;
+        }
+
+        public static MigrationSettings CreateMigrationSettingsTestHook(
+            string projectDirectory,
+            string outputDirectory,
+            ProjectRootElement msBuildProjectTemplate,
+            string projectXprojFilePath = null,
+            string sdkDefaultsFilePath = null)
+        {
+            // Product code should not call this private constructor because we don't want to call DeepClone.
+            // Doing so means we lose formatting.
+            return new MigrationSettings(
+                projectDirectory,
+                outputDirectory,
+                msBuildProjectTemplate,
+                projectXprojFilePath,
+                sdkDefaultsFilePath);
         }
 
     }
