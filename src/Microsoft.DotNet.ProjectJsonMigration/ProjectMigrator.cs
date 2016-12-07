@@ -38,8 +38,6 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             MigrationRuleInputs rootInputs = ComputeMigrationRuleInputs(rootSettings);
             IEnumerable<ProjectDependency> projectDependencies = null;
 
-            var tempMSBuildProjectTemplate = rootSettings.CloneMSBuildProjectTemplate();
-
             try
             {
                 // Verify up front so we can prefer these errors over an unresolved project dependency
@@ -76,7 +74,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration
                 var projectDir = Path.GetDirectoryName(project.ProjectFilePath);
                 var settings = new MigrationSettings(projectDir,
                                                      projectDir,
-                                                     tempMSBuildProjectTemplate);
+                                                     rootSettings.MSBuildProjectTemplatePath);
                 MigrateProject(settings);
                 projectMigrationReports.Add(MigrateProject(settings));
             }

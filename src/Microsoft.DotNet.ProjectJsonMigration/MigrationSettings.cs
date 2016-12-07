@@ -9,26 +9,13 @@ namespace Microsoft.DotNet.ProjectJsonMigration
 {
     internal class MigrationSettings
     {
-        private string _msBuildProjectTemplatePath;
-
         public string ProjectXProjFilePath { get; }
         public string ProjectDirectory { get; }
         public string OutputDirectory { get; }
         public ProjectRootElement MSBuildProjectTemplate { get; }
+        public string MSBuildProjectTemplatePath { get; }
         public string SdkDefaultsFilePath { get; }
         public SlnFile SolutionFile { get; }
-
-        public MigrationSettings(
-            string projectDirectory,
-            string outputDirectory,
-            ProjectRootElement msBuildProjectTemplate,
-            string projectXprojFilePath=null,
-            string sdkDefaultsFilePath=null,
-            SlnFile solutionFile=null) : this(
-                projectDirectory, outputDirectory, projectXprojFilePath, sdkDefaultsFilePath, solutionFile)
-        {
-            MSBuildProjectTemplate = msBuildProjectTemplate != null ? msBuildProjectTemplate.DeepClone() : null;
-        }
 
         public MigrationSettings(
             string projectDirectory,
@@ -39,9 +26,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             SlnFile solutionFile=null) : this(
                 projectDirectory, outputDirectory, projectXprojFilePath, sdkDefaultsFilePath, solutionFile)
         {
-            _msBuildProjectTemplatePath = msBuildProjectTemplatePath;
+            MSBuildProjectTemplatePath = msBuildProjectTemplatePath;
             MSBuildProjectTemplate = ProjectRootElement.Open(
-                _msBuildProjectTemplatePath,
+                MSBuildProjectTemplatePath,
                 new ProjectCollection(),
                 preserveFormatting: true);
         }
@@ -60,22 +47,5 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             SolutionFile = solutionFile;
         }
 
-        public ProjectRootElement CloneMSBuildProjectTemplate()
-        {
-            ProjectRootElement msBuildProjectTemplateClone = null;
-            if(!string.IsNullOrEmpty(_msBuildProjectTemplatePath))
-            {
-                msBuildProjectTemplateClone = ProjectRootElement.Open(
-                    _msBuildProjectTemplatePath,
-                    new ProjectCollection(),
-                    preserveFormatting: true);
-            }
-            else if(MSBuildProjectTemplate != null)
-            {
-                msBuildProjectTemplateClone = MSBuildProjectTemplate.DeepClone();
-            }
-
-            return msBuildProjectTemplateClone;
-        }
     }
 }
