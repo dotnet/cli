@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
@@ -110,18 +109,15 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         private async Task<CommandResult> ExecuteAsyncInternal(string executable, string args)
         {
-            var stdOut = new StringBuilder();
+            var stdOut = new List<String>();
 
-            var stdErr = new StringBuilder();
+            var stdErr = new List<String>();
 
             CurrentProcess = CreateProcess(executable, args); 
 
             CurrentProcess.ErrorDataReceived += (s, e) =>
             {
-                if (e.Data != null)
-                {
-                    stdErr.Append(e.Data + System.Environment.NewLine);
-                }
+                stdErr.Add(e.Data);
 
                 var handler = ErrorDataReceived;
                 
@@ -133,10 +129,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
             CurrentProcess.OutputDataReceived += (s, e) =>
             {
-                if (e.Data != null)
-                {
-                    stdOut.Append(e.Data + System.Environment.NewLine);
-                }
+                stdOut.Add(e.Data);
 
                 var handler = OutputDataReceived;
                 
@@ -156,11 +149,15 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
             CurrentProcess.WaitForExit();
 
+            RemoveNullTerminator(stdOut);
+
+            RemoveNullTerminator(stdErr);
+
             return new CommandResult(
                 CurrentProcess.StartInfo,
                 CurrentProcess.ExitCode,
-                stdOut.ToString(),
-                stdErr.ToString());
+                String.Join(System.Environment.NewLine, stdOut),
+                String.Join(System.Environment.NewLine, stdErr));
         }
 
         private Process CreateProcess(string executable, string args)
@@ -220,6 +217,21 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 #else
                 psi.Environment.Remove(name);
 #endif
+            }
+        }
+
+        private void RemoveNullTerminator(List<string> strings)
+        {
+            var count = strings.Count;
+
+            if (count < 1)
+            {
+                return;
+            }
+
+            if (strings[count - 1] == null)
+            {
+                strings.RemoveAt(count - 1);
             }
         }
     }
