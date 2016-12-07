@@ -23,13 +23,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             string msBuildProjectTemplatePath,
             string projectXprojFilePath=null,
             string sdkDefaultsFilePath=null,
-            SlnFile solutionFile=null)
+            SlnFile solutionFile=null) : this(
+                projectDirectory, outputDirectory, projectXprojFilePath, sdkDefaultsFilePath, solutionFile)
         {
-            ProjectDirectory = projectDirectory;
-            OutputDirectory = outputDirectory;
-            ProjectXProjFilePath = projectXprojFilePath;
-            SdkDefaultsFilePath = sdkDefaultsFilePath;
-            SolutionFile = solutionFile;
             MSBuildProjectTemplatePath = msBuildProjectTemplatePath;
             MSBuildProjectTemplate = ProjectRootElement.Open(
                 MSBuildProjectTemplatePath,
@@ -43,9 +39,23 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             ProjectRootElement msBuildProjectTemplate,
             string projectXprojFilePath = null,
             string sdkDefaultsFilePath = null) : this(
-                projectDirectory, outputDirectory, projectXprojFilePath, sdkDefaultsFilePath)
+                projectDirectory, outputDirectory, projectXprojFilePath, sdkDefaultsFilePath, null)
         {
             MSBuildProjectTemplate = msBuildProjectTemplate != null ? msBuildProjectTemplate.DeepClone() : null;
+        }
+
+        private MigrationSettings(
+            string projectDirectory,
+            string outputDirectory,
+            string projectXprojFilePath,
+            string sdkDefaultsFilePath,
+            SlnFile solutionFile)
+        {
+            ProjectDirectory = projectDirectory;
+            OutputDirectory = outputDirectory;
+            ProjectXProjFilePath = projectXprojFilePath;
+            SdkDefaultsFilePath = sdkDefaultsFilePath;
+            SolutionFile = solutionFile;
         }
 
         public static MigrationSettings CreateMigrationSettingsTestHook(

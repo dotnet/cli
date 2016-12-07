@@ -464,7 +464,7 @@ namespace Microsoft.DotNet.Migration.Tests
             CleanBinObj(testLibProjectDirectory);
 
             MigrateProject(slnPath);
-            Restore(testAppProjectDirectory, "TestApp.sln");
+            Restore(testAppProjectDirectory, "TestApp.csproj");
             BuildMSBuild(testAppProjectDirectory, "TestApp.sln", "Release");
         }
 
