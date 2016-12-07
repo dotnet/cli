@@ -40,8 +40,8 @@ namespace Microsoft.DotNet.Tools.List.ProjectToProjectReferences
                     return 0;
                 }
 
-                Reporter.Output.WriteLine($"{CommonLocalizableStrings.ProjectReferenceOrMultiple}");
-                Reporter.Output.WriteLine(new string('-', CommonLocalizableStrings.ProjectReferenceOrMultiple.Length));
+                Reporter.Output.WriteLine($"{CommonLocalizableStrings.ProjectReferenceOneOrMore}");
+                Reporter.Output.WriteLine(new string('-', CommonLocalizableStrings.ProjectReferenceOneOrMore.Length));
                 foreach (var p2p in p2ps)
                 {
                     Reporter.Output.WriteLine(p2p.Include);
