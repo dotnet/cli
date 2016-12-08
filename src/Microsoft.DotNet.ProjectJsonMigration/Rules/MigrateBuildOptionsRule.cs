@@ -196,6 +196,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
 
             var compilerOptions = projectContext.ProjectFile.GetCompilerOptions(null, null);
 
+            var project = migrationRuleInputs.DefaultProjectContext.ProjectFile;
+            var projectType = project.GetProjectType();
+
             // If we're in a configuration, we need to be careful not to overwrite values from BuildOptions
             // without a configuration
             if (_configurationBuildOptions == null)
@@ -207,7 +210,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                     propertyGroup,
                     itemGroup,
                     _transformApplicator,
-                    migrationSettings.ProjectDirectory);
+                    migrationSettings.ProjectDirectory,
+                    projectType,
+                    csproj);
             }
             else
             {
@@ -217,7 +222,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                     propertyGroup,
                     itemGroup,
                     _transformApplicator,
-                    migrationSettings.ProjectDirectory);
+                    migrationSettings.ProjectDirectory,
+                    projectType,
+                    csproj);
             }
         }
 
@@ -227,7 +234,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
             ProjectPropertyGroupElement propertyGroup,
             ProjectItemGroupElement itemGroup,
             ITransformApplicator transformApplicator,
-            string projectDirectory)
+            string projectDirectory,
+            ProjectType projectType,
+            ProjectRootElement csproj)
         {
             foreach (var transform in _propertyTransforms)
             {
@@ -243,7 +252,13 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
             foreach (var includeContextTransformExecute in _includeContextTransformExecutes)
             {
                 var nonConfigurationOutput = includeContextTransformExecute(compilerOptions, projectDirectory);
-                var configurationOutput = includeContextTransformExecute(configurationCompilerOptions, projectDirectory);
+                var configurationOutput =
+                    includeContextTransformExecute(configurationCompilerOptions, projectDirectory);
+
+                configurationOutput = RemoveDefaultCompileAndEmbeddedResourceForWebProjects(
+                    configurationOutput,
+                    projectType,
+                    csproj);
 
                 transformApplicator.Execute(configurationOutput, itemGroup, mergeExisting: true);
             }
@@ -283,7 +298,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
             ProjectPropertyGroupElement propertyGroup, 
             ProjectItemGroupElement itemGroup,
             ITransformApplicator transformApplicator,
-            string projectDirectory)
+            string projectDirectory,
+            ProjectType projectType,
+            ProjectRootElement csproj)
         {
             foreach (var transform in _propertyTransforms)
             {
@@ -292,11 +309,36 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
 
             foreach (var includeContextTransformExecute in _includeContextTransformExecutes)
             {
+                var transform = includeContextTransformExecute(compilerOptions, projectDirectory);
+                
+                transform = RemoveDefaultCompileAndEmbeddedResourceForWebProjects(
+                    transform,
+                    projectType,
+                    csproj);
+
                 transformApplicator.Execute(
-                    includeContextTransformExecute(compilerOptions, projectDirectory),
+                    transform,
                     itemGroup,
                     mergeExisting: true);
             }
+        }
+
+        private IEnumerable<ProjectItemElement> RemoveDefaultCompileAndEmbeddedResourceForWebProjects(
+            IEnumerable<ProjectItemElement> transform,
+            ProjectType projectType,
+            ProjectRootElement csproj)
+        {
+            if(projectType == ProjectType.Web)
+            {
+                var itemsToRemove = transform.Where(p => 
+                    p != null && p.Include.Contains("**\\*")).Select(p => p.ItemType);
+
+                CleanExistingItems(csproj, itemsToRemove);
+
+                transform = transform.Where(p => p != null && !p.Include.Contains("**\\*"));
+            }
+
+            return transform;
         }
 
         private void CleanExistingProperties(ProjectRootElement csproj)
@@ -310,6 +352,19 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                 foreach (var property in properties)
                 {
                     property.Parent.RemoveChild(property);
+                }
+            }
+        }
+
+        private void CleanExistingItems(ProjectRootElement csproj, IEnumerable<string> itemsToRemove)
+        {
+            foreach (var itemName in itemsToRemove)
+            {
+                var items = csproj.Items.Where(i => i.ItemType == itemName);
+
+                foreach (var item in items)
+                {
+                    item.Parent.RemoveChild(item);
                 }
             }
         }
