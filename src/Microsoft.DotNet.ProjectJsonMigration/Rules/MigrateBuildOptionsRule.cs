@@ -331,11 +331,13 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
             if(projectType == ProjectType.Web)
             {
                 var itemsToRemove = transform.Where(p => 
-                    p != null && p.Include.Contains("**\\*")).Select(p => p.ItemType);
+                        p != null && 
+                        p.Include.Contains("**\\*") &&
+                        (p.ItemType == "Compile" || p.ItemType == "EmbeddedResource"));
 
-                CleanExistingItems(csproj, itemsToRemove);
+                CleanExistingItems(csproj, new [] {"Compile", "EmbeddedResource"});
 
-                transform = transform.Where(p => p != null && !p.Include.Contains("**\\*"));
+                transform = transform.Where(p => !itemsToRemove.Contains(p));
             }
 
             return transform;
