@@ -21,13 +21,14 @@ namespace Microsoft.DotNet.New.Tests
         [InlineData("Web", true)]
         [InlineData("Mstest", false)]
         [InlineData("XUnittest", false)]
-        public void ICanRestoreBuildAndPublishTheAppWithoutWarnings(
+        public void WhenDotnetBuildIsInvokedThenProjectRestoresAndBuildsWithoutWarnings(
             string projectType,
             bool useNuGetConfigForAspNet)
         {
-            var rootPath = TestAssetsManager.CreateTestDirectory(callingMethod: "i").Path;
+            var rootPath = TestAssetsManager.CreateTestDirectory(identifier: projectType).Path;
 
-            new TestCommand("dotnet") { WorkingDirectory = rootPath }
+            new TestCommand("dotnet") 
+                .WithWorkingDirectory(rootPath)
                 .Execute($"new --type {projectType}")
                 .Should().Pass();
 
@@ -36,9 +37,9 @@ namespace Microsoft.DotNet.New.Tests
                 File.Copy("NuGet.tempaspnetpatch.config", Path.Combine(rootPath, "NuGet.Config"));
             }
 
-            new RestoreCommand()
+            new TestCommand("dotnet")
                 .WithWorkingDirectory(rootPath)
-                .Execute("/p:SkipInvalidConfigurations=true")
+                .Execute($"restore")
                 .Should().Pass();
 
             new BuildCommand()

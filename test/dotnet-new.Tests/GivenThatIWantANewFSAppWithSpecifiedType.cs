@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.New.Tests
             string projectType,
             bool useNuGetConfigForAspNet)
         {
-            var rootPath = TestAssetsManager.CreateTestDirectory(callingMethod: "fs").Path;
+            var rootPath = TestAssetsManager.CreateTestDirectory(identifier: projectType).Path;
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .Execute($"new --lang fsharp --type {projectType}")

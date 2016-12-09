@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
@@ -145,7 +146,18 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
             CurrentProcess.BeginErrorReadLine();
 
-            await CurrentProcess.WaitForExitAsync();
+            var processWaitTask = CurrentProcess.WaitForExitAsync();
+
+            var processTimeoutCancellationTokenSource = new CancellationTokenSource();
+
+            if (await Task.WhenAny(processWaitTask, Task.Delay(120000, processTimeoutCancellationTokenSource.Token)) != processWaitTask)
+            {
+                KillTree();
+
+                throw new TimeoutException($"Timeout - {executable} {args} - {WorkingDirectoryInfo()}");
+            }
+
+            processTimeoutCancellationTokenSource.Cancel();
 
             CurrentProcess.WaitForExit();
 
