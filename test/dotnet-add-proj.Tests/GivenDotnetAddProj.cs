@@ -122,12 +122,13 @@ namespace Microsoft.DotNet.Cli.Add.Proj.Tests
             cmd.StdOut.Should().Contain("added to the solution");
             cmd.StdErr.Should().BeEmpty();
 
-            var slnFile = new SlnFile();
-            slnFile.Read(Path.Combine(slnDir, slnName));
-            VerifyProjectInSolution(slnFile, projectName, projectGuid);
-
+            //var slnFile = new SlnFile();
+            //slnFile.Read(Path.Combine(slnDir, slnName));
+            //VerifyProjectInSolution(slnFile, projectName, projectGuid);
+            var contentBefore = File.ReadAllText(Path.Combine(slnDir, slnName));
             Restore(Path.Combine(setup.TestRoot, "App"), "App.csproj");
             Build(slnDir, slnName);
+            contentBefore.Should().Be("I'm debugging");
         }
 
         [Fact]
