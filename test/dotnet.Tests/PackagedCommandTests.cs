@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using FluentAssertions;
@@ -220,14 +221,18 @@ namespace Microsoft.DotNet.Tests
         }
 
         [Fact]
-        public void WhenAssetsFileIsInUseThenCLIRetriesLaunchingTheCommandForAtLeastOneSecond()
+        public void WhenToolAssetsFileIsInUseThenCLIRetriesLaunchingTheCommandForAtLeastOneSecond()
         {
             var testInstance = TestAssets.Get("AppWithToolDependency")
                 .CreateInstance()
                 .WithSourceFiles()
                 .WithRestoreFiles();
 
-            var assetsFile = testInstance.Root.GetDirectory("obj").GetFile("project.assets.json");
+            var assetsFile = new DirectoryInfo(new RepoDirectoriesProvider().NugetPackages)
+                .GetDirectory(".tools", "dotnet-portable", "1.0.0", "netcoreapp1.0")
+                .GetFile("project.assets.json");
+
+            var stopWatch = Stopwatch.StartNew();
 
             using (assetsFile.Lock()
                              .DisposeAfter(TimeSpan.FromMilliseconds(1000)))
@@ -239,17 +244,25 @@ namespace Microsoft.DotNet.Tests
                         .And.NotHaveStdErr()
                         .And.Pass();
             }
+
+            stopWatch.Stop();
+
+            stopWatch.ElapsedMilliseconds.Should().BeGreaterThan(1000, "Because dotnet should respect the NuGet lock");
         }
 
         [Fact]
-        public void WhenAssetsFileIsLockedByNuGetThenCLIRetriesLaunchingTheCommandForAtLeastOneSecond()
+        public void WhenToolAssetsFileIsLockedByNuGetThenCLIRetriesLaunchingTheCommandForAtLeastOneSecond()
         {
             var testInstance = TestAssets.Get("AppWithToolDependency")
                 .CreateInstance()
                 .WithSourceFiles()
                 .WithRestoreFiles();
 
-            var assetsFile = testInstance.Root.GetDirectory("obj").GetFile("project.assets.json");
+            var assetsFile = new DirectoryInfo(new RepoDirectoriesProvider().NugetPackages)
+                .GetDirectory(".tools", "dotnet-portable", "1.0.0", "netcoreapp1.0")
+                .GetFile("project.assets.json");
+
+            var stopWatch = Stopwatch.StartNew();
 
             using (assetsFile.NuGetLock()
                              .DisposeAfter(TimeSpan.FromMilliseconds(1000)))
@@ -261,6 +274,10 @@ namespace Microsoft.DotNet.Tests
                         .And.NotHaveStdErr()
                         .And.Pass();
             }
+
+            stopWatch.Stop();
+
+            stopWatch.ElapsedMilliseconds.Should().BeGreaterThan(1000, "Because dotnet should respect the NuGet lock");
         }
 
         class HelloCommand : TestCommand

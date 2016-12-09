@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.Tests
         }
 
         [Fact]
-        public void WhenInfokedThenDotnetWritesOptimizationDataToTheProfileRoot()
+        public void WhenInvokedThenDotnetWritesOptimizationDataToTheProfileRoot()
         {
             var testDirectory = TestAssetsManager.CreateTestDirectory();
             var testStartTime = GetTruncatedDateTime();
