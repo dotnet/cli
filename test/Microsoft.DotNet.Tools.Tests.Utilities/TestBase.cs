@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.TestFramework;
@@ -66,6 +67,20 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             var testAssetsMgr = new TestAssetsManager(assetsRoot);
 
             return testAssetsMgr;
+        }
+
+        protected static TestSetup CreateTestSetup(
+            string testGroup,
+            string projectName,
+            [CallerMemberName] string callingMethod = nameof(CreateTestSetup),
+            string identifier = "")
+        {
+            return new TestSetup(
+                TestAssets.Get(testGroup, projectName)
+                    .CreateInstance(callingMethod: callingMethod, identifier: identifier)
+                    .WithSourceFiles()
+                    .Root
+                    .FullName);
         }
 
         protected TestBase()
@@ -178,5 +193,32 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             Console.WriteLine(runtimeConfig.Framework);
             return runtimeConfig.IsPortable;
         }
+
+        protected ProjDir NewDir([CallerMemberName] string callingMethod = nameof(NewDir), string identifier = "")
+        {
+            return new ProjDir(
+                TestAssetsManager.CreateTestDirectory(callingMethod: callingMethod, identifier: identifier).Path);
+        }
+
+        protected ProjDir NewLib([CallerMemberName] string callingMethod = nameof(NewDir), string identifier = "")
+        {
+            var dir = NewDir(callingMethod: callingMethod, identifier: identifier);
+
+            try
+            {
+                new NewCommand()
+                    .WithWorkingDirectory(dir.Path)
+                    .ExecuteWithCapturedOutput("-t Lib")
+                .Should().Pass();
+            }
+            catch (System.ComponentModel.Win32Exception e)
+            {
+                throw new Exception(
+                    $"Intermittent error in `dotnet new` occurred when running it in dir `{dir.Path}`\nException:\n{e}");
+            }
+
+            return dir;
+        }
+
     }
 }

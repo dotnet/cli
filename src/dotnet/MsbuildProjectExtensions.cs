@@ -100,7 +100,7 @@ namespace Microsoft.DotNet.Tools
 
         private static string NormalizeIncludeForComparison(string include)
         {
-            return MsbuildProject.NormalizeSlashes(include.ToLower());
+            return MsbuildUtilities.NormalizeSlashes(include.ToLower());
         }
     }
 }

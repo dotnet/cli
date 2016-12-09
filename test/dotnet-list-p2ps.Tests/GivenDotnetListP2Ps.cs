@@ -4,7 +4,6 @@
 using FluentAssertions;
 using Microsoft.Build.Construction;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using Msbuild.Tests.Utilities;
 using System;
 using System.IO;
 using Xunit;
@@ -13,6 +12,8 @@ namespace Microsoft.DotNet.Cli.List.P2P.Tests
 {
     public class GivenDotnetListP2Ps : TestBase
     {
+        const string TestGroup = "NonRestoredTestProjects";
+        const string ProjectName = "DotnetAddP2PProjects";
         const string FrameworkNet451Arg = "-f net451";
         const string ConditionFrameworkNet451 = "== 'net451'";
         const string FrameworkNetCoreApp10Arg = "-f netcoreapp1.0";
@@ -34,7 +35,7 @@ namespace Microsoft.DotNet.Cli.List.P2P.Tests
         [InlineData("ihave?inv@lid/char\\acters")]
         public void WhenNonExistingProjectIsPassedItPrintsErrorAndUsage(string projName)
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             var cmd = new ListP2PsCommand()
                     .WithWorkingDirectory(setup.TestRoot)
@@ -49,7 +50,7 @@ namespace Microsoft.DotNet.Cli.List.P2P.Tests
         public void WhenBrokenProjectIsPassedItPrintsErrorAndUsage()
         {
             string projName = "Broken/Broken.csproj";
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             var cmd = new ListP2PsCommand()
                     .WithWorkingDirectory(setup.TestRoot)
@@ -63,7 +64,7 @@ namespace Microsoft.DotNet.Cli.List.P2P.Tests
         [Fact]
         public void WhenMoreThanOneProjectExistsInTheDirectoryItPrintsErrorAndUsage()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             var cmd = new ListP2PsCommand()
                     .WithWorkingDirectory(Path.Combine(setup.TestRoot, "MoreThanOne"))
@@ -76,7 +77,7 @@ namespace Microsoft.DotNet.Cli.List.P2P.Tests
         [Fact]
         public void WhenNoProjectsExistsInTheDirectoryItPrintsErrorAndUsage()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             var cmd = new ListP2PsCommand()
                     .WithWorkingDirectory(setup.TestRoot)
@@ -133,40 +134,6 @@ namespace Microsoft.DotNet.Cli.List.P2P.Tests
             cmd.StdOut.Should().Contain(ref1);
             cmd.StdOut.Should().Contain(ref2);
             cmd.StdOut.Should().Contain(ref3);
-        }
-
-        private TestSetup Setup([System.Runtime.CompilerServices.CallerMemberName] string callingMethod = nameof(Setup), string identifier = "")
-        {
-            return new TestSetup(
-                TestAssets.Get(TestSetup.TestGroup, TestSetup.ProjectName)
-                    .CreateInstance(callingMethod: callingMethod, identifier: identifier)
-                    .WithSourceFiles()
-                    .Root
-                    .FullName);
-        }
-
-        private ProjDir NewDir([System.Runtime.CompilerServices.CallerMemberName] string callingMethod = nameof(NewDir), string identifier = "")
-        {
-            return new ProjDir(TestAssetsManager.CreateTestDirectory(callingMethod: callingMethod, identifier: identifier).Path);
-        }
-
-        private ProjDir NewLib([System.Runtime.CompilerServices.CallerMemberName] string callingMethod = nameof(NewDir), string identifier = "")
-        {
-            var dir = NewDir(callingMethod: callingMethod, identifier: identifier);
-
-            try
-            {
-                new NewCommand()
-                    .WithWorkingDirectory(dir.Path)
-                    .ExecuteWithCapturedOutput("-t Lib")
-                .Should().Pass();
-            }
-            catch (System.ComponentModel.Win32Exception e)
-            {
-                throw new Exception($"Intermittent error in `dotnet new` occurred when running it in dir `{dir.Path}`\nException:\n{e}");
-            }
-
-            return dir;
         }
 
         private void AddFakeRef(string path, ProjDir proj)

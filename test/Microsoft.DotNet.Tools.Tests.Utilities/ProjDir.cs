@@ -5,7 +5,7 @@ using System.IO;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
 
-namespace Msbuild.Tests.Utilities
+namespace Microsoft.DotNet.Tools.Test.Utilities
 {
     public class ProjDir
     {

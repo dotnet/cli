@@ -40,6 +40,8 @@ namespace Microsoft.DotNet.Cli.Sln.Internal
 {
     public class SlnFile
     {
+        public const string CSharpProjectTypeGuid = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
+
         SlnProjectCollection projects = new SlnProjectCollection();
         SlnSectionCollection sections = new SlnSectionCollection();
         SlnPropertySet metadata = new SlnPropertySet(true);
@@ -99,12 +101,22 @@ namespace Microsoft.DotNet.Cli.Sln.Internal
 
         static Regex slnVersionRegex = new Regex(@"Microsoft Visual Studio Solution File, Format Version (\d?\d.\d\d)");
 
+        public string FileName
+        {
+            get { return FilePath.FileName; }
+        }
+
+        public string FullPath
+        {
+            get { return FilePath.FullPath; }
+        }
+
         /// <summary>
         /// The directory to be used as base for converting absolute paths to relative
         /// </summary>
-        public FilePath BaseDirectory
+        public string BaseDirectory
         {
-            get { return FileName.ParentDirectory; }
+            get { return FilePath.ParentDirectory.FullPath; }
         }
 
         /// <summary>
@@ -135,11 +147,11 @@ namespace Microsoft.DotNet.Cli.Sln.Internal
             get { return projects; }
         }
 
-        public FilePath FileName { get; set; }
+        private FilePath FilePath { get; set; }
 
         public void Read(string file)
         {
-            FileName = file;
+            FilePath = file;
             format = FileUtil.GetTextFormatInfo(file);
 
             using (var sr = new StreamReader(new FileStream(file, FileMode.Open)))
@@ -213,12 +225,15 @@ namespace Microsoft.DotNet.Cli.Sln.Internal
                 throw new InvalidSolutionFormatException(curLineNum, "File header is missing");
         }
 
-        public void Write(string file)
+        public void Write(string file = null)
         {
-            FileName = file;
+            if (!string.IsNullOrEmpty(file))
+            {
+                FilePath = file;
+            }
             var sw = new StringWriter();
             Write(sw);
-            File.WriteAllText(file, sw.ToString());
+            File.WriteAllText(FullPath, sw.ToString());
         }
 
         public void Write(TextWriter writer)
