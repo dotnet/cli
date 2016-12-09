@@ -73,6 +73,10 @@ if (!(Test-Path $env:DOTNET_INSTALL_DIR))
 # Disable first run since we want to control all package sources
 $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 
+# Enable vs test console logging
+$env:VSTEST_BUILD_TRACE=1
+$env:VSTEST_TRACE_BUILD=1
+
 # set the base tools directory
 $toolsLocalPath = Join-Path $PSScriptRoot "build_tools"
 $bootStrapperPath = Join-Path $toolsLocalPath "bootstrap.ps1"
