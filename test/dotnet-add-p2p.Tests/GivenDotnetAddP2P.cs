@@ -4,7 +4,6 @@
 using FluentAssertions;
 using Microsoft.Build.Construction;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using Msbuild.Tests.Utilities;
 using System;
 using System.IO;
 using Xunit;
@@ -13,44 +12,12 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
 {
     public class GivenDotnetAddP2P : TestBase
     {
+        const string TestGroup = "NonRestoredTestProjects";
+        const string ProjectName = "DotnetAddP2PProjects";
         const string FrameworkNet451Arg = "-f net451";
         const string ConditionFrameworkNet451 = "== 'net451'";
         const string FrameworkNetCoreApp10Arg = "-f netcoreapp1.0";
         const string ConditionFrameworkNetCoreApp10 = "== 'netcoreapp1.0'";
-
-        private TestSetup Setup([System.Runtime.CompilerServices.CallerMemberName] string callingMethod = nameof(Setup), string identifier = "")
-        {
-            return new TestSetup(
-                TestAssets.Get(TestSetup.TestGroup, TestSetup.ProjectName)
-                    .CreateInstance(callingMethod: callingMethod, identifier: identifier)
-                    .WithSourceFiles()
-                    .Root
-                    .FullName);
-        }
-
-        private ProjDir NewDir([System.Runtime.CompilerServices.CallerMemberName] string callingMethod = nameof(NewDir), string identifier = "")
-        {
-            return new ProjDir(TestAssetsManager.CreateTestDirectory(callingMethod: callingMethod, identifier: identifier).Path);
-        }
-
-        private ProjDir NewLib([System.Runtime.CompilerServices.CallerMemberName] string callingMethod = nameof(NewDir), string identifier = "")
-        {
-            var dir = NewDir(callingMethod: callingMethod, identifier: identifier);
-
-            try
-            {
-                new NewCommand()
-                    .WithWorkingDirectory(dir.Path)
-                    .ExecuteWithCapturedOutput("-t Lib")
-                .Should().Pass();
-            }
-            catch (System.ComponentModel.Win32Exception e)
-            {
-                throw new Exception($"Intermittent error in `dotnet new` occurred when running it in dir `{dir.Path}`\nException:\n{e}");
-            }
-
-            return dir;
-        }
 
         [Theory]
         [InlineData("--help")]
@@ -67,7 +34,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         [InlineData("ihave?inv@lid/char\\acters")]
         public void WhenNonExistingProjectIsPassedItPrintsErrorAndUsage(string projName)
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             var cmd = new AddP2PCommand()
                     .WithWorkingDirectory(setup.TestRoot)
@@ -82,7 +49,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         public void WhenBrokenProjectIsPassedItPrintsErrorAndUsage()
         {
             string projName = "Broken/Broken.csproj";
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             var cmd = new AddP2PCommand()
                     .WithWorkingDirectory(setup.TestRoot)
@@ -96,7 +63,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         [Fact]
         public void WhenMoreThanOneProjectExistsInTheDirectoryItPrintsErrorAndUsage()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             var cmd = new AddP2PCommand()
                     .WithWorkingDirectory(Path.Combine(setup.TestRoot, "MoreThanOne"))
@@ -109,7 +76,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         [Fact]
         public void WhenNoProjectsExistsInTheDirectoryItPrintsErrorAndUsage()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             var cmd = new AddP2PCommand()
                     .WithWorkingDirectory(setup.TestRoot)
@@ -123,7 +90,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         public void ItAddsRefWithoutCondAndPrintsStatus()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             int noCondBefore = lib.CsProj().NumberOfItemGroupsWithoutCondition();
             var cmd = new AddP2PCommand()
@@ -142,7 +109,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         public void ItAddsRefWithCondAndPrintsStatus()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             int condBefore = lib.CsProj().NumberOfItemGroupsWithConditionContaining(ConditionFrameworkNet451);
             var cmd = new AddP2PCommand()
@@ -161,7 +128,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         public void WhenRefWithoutCondIsPresentItAddsDifferentRefWithoutCond()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             new AddP2PCommand()
                 .WithWorkingDirectory(setup.TestRoot)
@@ -185,7 +152,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         public void WhenRefWithCondIsPresentItAddsDifferentRefWithCond()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             new AddP2PCommand()
                 .WithWorkingDirectory(setup.TestRoot)
@@ -209,7 +176,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         public void WhenRefWithCondIsPresentItAddsRefWithDifferentCond()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             new AddP2PCommand()
                 .WithWorkingDirectory(setup.TestRoot)
@@ -233,7 +200,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         public void WhenRefWithConditionIsPresentItAddsDifferentRefWithoutCond()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             new AddP2PCommand()
                 .WithWorkingDirectory(setup.TestRoot)
@@ -257,7 +224,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         public void WhenRefWithNoCondAlreadyExistsItDoesntDuplicate()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             new AddP2PCommand()
                 .WithWorkingDirectory(setup.TestRoot)
@@ -281,7 +248,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         [Fact]
         public void WhenRefWithCondOnItemAlreadyExistsItDoesntDuplicate()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var proj = new ProjDir(Path.Combine(setup.TestRoot, "WithExistingRefCondOnItem"));
 
             string contentBefore = proj.CsProjContent();
@@ -298,7 +265,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         public void WhenRefWithCondOnItemGroupAlreadyExistsItDoesntDuplicate()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             new AddP2PCommand()
                 .WithWorkingDirectory(setup.TestRoot)
@@ -319,7 +286,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         [Fact]
         public void WhenRefWithCondWithWhitespaceOnItemGroupExistsItDoesntDuplicate()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var proj = new ProjDir(Path.Combine(setup.TestRoot, "WithExistingRefCondWhitespaces"));
 
             string contentBefore = proj.CsProjContent();
@@ -335,7 +302,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         [Fact]
         public void WhenRefWithoutCondAlreadyExistsInNonUniformItemGroupItDoesntDuplicate()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var proj = new ProjDir(Path.Combine(setup.TestRoot, "WithRefNoCondNonUniform"));
 
             string contentBefore = proj.CsProjContent();
@@ -351,7 +318,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         [Fact]
         public void WhenRefWithoutCondAlreadyExistsInNonUniformItemGroupItAddsDifferentRefInDifferentGroup()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var proj = new ProjDir(Path.Combine(setup.TestRoot, "WithRefNoCondNonUniform"));
 
             int noCondBefore = proj.CsProj().NumberOfItemGroupsWithoutCondition();
@@ -369,7 +336,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         [Fact]
         public void WhenRefWithCondAlreadyExistsInNonUniformItemGroupItDoesntDuplicate()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var proj = new ProjDir(Path.Combine(setup.TestRoot, "WithRefCondNonUniform"));
 
             string contentBefore = proj.CsProjContent();
@@ -385,7 +352,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         [Fact]
         public void WhenRefWithCondAlreadyExistsInNonUniformItemGroupItAddsDifferentRefInDifferentGroup()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var proj = new ProjDir(Path.Combine(setup.TestRoot, "WithRefCondNonUniform"));
 
             int condBefore = proj.CsProj().NumberOfItemGroupsWithConditionContaining(ConditionFrameworkNet451);
@@ -403,7 +370,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         [Fact]
         public void WhenEmptyItemGroupPresentItAddsRefInIt()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var proj = new ProjDir(Path.Combine(setup.TestRoot, "EmptyItemGroup"));
 
             int noCondBefore = proj.CsProj().NumberOfItemGroupsWithoutCondition();
@@ -422,7 +389,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         public void ItAddsMultipleRefsNoCondToTheSameItemGroup()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             int noCondBefore = lib.CsProj().NumberOfItemGroupsWithoutCondition();
             var cmd = new AddP2PCommand()
@@ -441,7 +408,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         public void ItAddsMultipleRefsWithCondToTheSameItemGroup()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             int noCondBefore = lib.CsProj().NumberOfItemGroupsWithConditionContaining(ConditionFrameworkNet451);
             var cmd = new AddP2PCommand()
@@ -460,7 +427,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         public void WhenProjectNameIsNotPassedItFindsItAndAddsReference()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             int noCondBefore = lib.CsProj().NumberOfItemGroupsWithoutCondition();
             var cmd = new AddP2PCommand()
@@ -478,7 +445,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         public void ItAddsRefBetweenImports()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             var cmd = new AddP2PCommand()
                 .WithWorkingDirectory(lib.Path)
@@ -538,7 +505,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         public void WhenPassedMultipleRefsAndOneOfthemDoesNotExistItCancelsWholeOperation()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             var contentBefore = lib.CsProjContent();
             var cmd = new AddP2PCommand()
@@ -574,7 +541,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         public void WhenPassedReferenceIsUsingSlashesItNormalizesItToBackslashes()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             int noCondBefore = lib.CsProj().NumberOfItemGroupsWithoutCondition();
             var cmd = new AddP2PCommand()
@@ -592,7 +559,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         [Fact]
         public void WhenReferenceIsRelativeAndProjectIsNotInCurrentDirectoryReferencePathIsFixed()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var proj = new ProjDir(setup.LibDir);
 
             int noCondBefore = proj.CsProj().NumberOfItemGroupsWithoutCondition();
@@ -611,7 +578,7 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         [Fact]
         public void WhenReferenceIsRelativeAndProjectIsNotInCurrentDirectoryAndForceSwitchIsPassedItDoesNotChangeIt()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var proj = new ProjDir(setup.LibDir);
 
             int noCondBefore = proj.CsProj().NumberOfItemGroupsWithoutCondition();

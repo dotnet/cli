@@ -6,7 +6,7 @@ using Microsoft.DotNet.ProjectJsonMigration;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Msbuild.Tests.Utilities
+namespace Microsoft.DotNet.Tools.Test.Utilities
 {
     public static class ProjectRootElementExtensions
     {

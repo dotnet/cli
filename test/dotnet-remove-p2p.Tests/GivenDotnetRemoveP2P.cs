@@ -4,7 +4,6 @@
 using FluentAssertions;
 using Microsoft.Build.Construction;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using Msbuild.Tests.Utilities;
 using System;
 using System.IO;
 using Xunit;
@@ -13,44 +12,12 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
 {
     public class GivenDotnetRemoveP2P : TestBase
     {
+        const string TestGroup = "NonRestoredTestProjects";
+        const string ProjectName = "DotnetAddP2PProjects";
         const string FrameworkNet451Arg = "-f net451";
         const string ConditionFrameworkNet451 = "== 'net451'";
         const string FrameworkNetCoreApp10Arg = "-f netcoreapp1.0";
         const string ConditionFrameworkNetCoreApp10 = "== 'netcoreapp1.0'";
-
-        private TestSetup Setup([System.Runtime.CompilerServices.CallerMemberName] string callingMethod = nameof(Setup), string identifier = "")
-        {
-            return new TestSetup(
-                TestAssets.Get(TestSetup.TestGroup, TestSetup.ProjectName)
-                    .CreateInstance(callingMethod: callingMethod, identifier: identifier)
-                    .WithSourceFiles()
-                    .Root
-                    .FullName);
-        }
-
-        private ProjDir NewDir([System.Runtime.CompilerServices.CallerMemberName] string callingMethod = nameof(NewDir), string identifier = "")
-        {
-            return new ProjDir(TestAssetsManager.CreateTestDirectory(callingMethod: callingMethod, identifier: identifier).Path);
-        }
-
-        private ProjDir NewLib([System.Runtime.CompilerServices.CallerMemberName] string callingMethod = nameof(NewDir), string identifier = "")
-        {
-            var dir = NewDir(callingMethod: callingMethod, identifier: identifier);
-
-            try
-            {
-                new NewCommand()
-                    .WithWorkingDirectory(dir.Path)
-                    .ExecuteWithCapturedOutput("-t Lib")
-                .Should().Pass();
-            }
-            catch (System.ComponentModel.Win32Exception e)
-            {
-                throw new Exception($"Intermittent error in `dotnet new` occurred when running it in dir `{dir.Path}`\nException:\n{e}");
-            }
-
-            return dir;
-        }
 
         private ProjDir GetLibRef(TestSetup setup)
         {
@@ -96,7 +63,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         [InlineData("ihave?inv@lid/char\\acters")]
         public void WhenNonExistingProjectIsPassedItPrintsErrorAndUsage(string projName)
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             var cmd = new RemoveP2PCommand()
                     .WithWorkingDirectory(setup.TestRoot)
@@ -111,7 +78,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         public void WhenBrokenProjectIsPassedItPrintsErrorAndUsage()
         {
             string projName = "Broken/Broken.csproj";
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             var cmd = new RemoveP2PCommand()
                     .WithWorkingDirectory(setup.TestRoot)
@@ -125,7 +92,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         [Fact]
         public void WhenMoreThanOneProjectExistsInTheDirectoryItPrintsErrorAndUsage()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             var cmd = new RemoveP2PCommand()
                     .WithWorkingDirectory(Path.Combine(setup.TestRoot, "MoreThanOne"))
@@ -138,7 +105,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         [Fact]
         public void WhenNoProjectsExistsInTheDirectoryItPrintsErrorAndUsage()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
 
             var cmd = new RemoveP2PCommand()
                     .WithWorkingDirectory(setup.TestRoot)
@@ -152,7 +119,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         public void ItRemovesRefWithoutCondAndPrintsStatus()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var libref = AddLibRef(setup, lib);
 
             int noCondBefore = lib.CsProj().NumberOfItemGroupsWithoutCondition();
@@ -171,7 +138,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         public void ItRemovesRefWithCondAndPrintsStatus()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var libref = AddLibRef(setup, lib, FrameworkNet451Arg);
 
             int condBefore = lib.CsProj().NumberOfItemGroupsWithConditionContaining(ConditionFrameworkNet451);
@@ -190,7 +157,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         public void WhenTwoDifferentRefsArePresentItDoesNotRemoveBoth()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var libref = AddLibRef(setup, lib);
             var validref = AddValidRef(setup, lib);
 
@@ -211,7 +178,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         public void WhenRefWithoutCondIsNotThereItPrintsMessage()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var libref = GetLibRef(setup);
 
             string csprojContetntBefore = lib.CsProjContent();
@@ -228,7 +195,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         public void WhenRefWithCondIsNotThereItPrintsMessage()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var libref = GetLibRef(setup);
 
             string csprojContetntBefore = lib.CsProjContent();
@@ -245,7 +212,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         public void WhenRefWithAndWithoutCondArePresentAndRemovingNoCondItDoesNotRemoveOther()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var librefCond = AddLibRef(setup, lib, FrameworkNet451Arg);
             var librefNoCond = AddLibRef(setup, lib);
 
@@ -270,7 +237,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         public void WhenRefWithAndWithoutCondArePresentAndRemovingCondItDoesNotRemoveOther()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var librefCond = AddLibRef(setup, lib, FrameworkNet451Arg);
             var librefNoCond = AddLibRef(setup, lib);
 
@@ -295,7 +262,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         public void WhenRefWithDifferentCondIsPresentItDoesNotRemoveIt()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var librefCondNet451 = AddLibRef(setup, lib, FrameworkNet451Arg);
             var librefCondNetCoreApp10 = AddLibRef(setup, lib, FrameworkNetCoreApp10Arg);
 
@@ -319,7 +286,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         [Fact]
         public void WhenDuplicateReferencesArePresentItRemovesThemAll()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var proj = new ProjDir(Path.Combine(setup.TestRoot, "WithDoubledRef"));
             var libref = GetLibRef(setup);
 
@@ -339,7 +306,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         [Fact]
         public void WhenPassingRefWithRelPathItRemovesRefWithAbsolutePath()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var lib = GetLibRef(setup);
             var libref = AddValidRef(setup, lib, "--force");
 
@@ -358,7 +325,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         [Fact]
         public void WhenPassingRefWithRelPathToProjectItRemovesRefWithPathRelToProject()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var lib = GetLibRef(setup);
             var libref = AddValidRef(setup, lib);
 
@@ -377,7 +344,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         [Fact]
         public void WhenPassingRefWithAbsolutePathItRemovesRefWithRelPath()
         {
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var lib = GetLibRef(setup);
             var libref = AddValidRef(setup, lib);
 
@@ -397,7 +364,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         public void WhenPassingMultipleReferencesItRemovesThemAll()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var libref = AddLibRef(setup, lib);
             var validref = AddValidRef(setup, lib);
 
@@ -418,7 +385,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         public void WhenPassingMultipleReferencesAndOneOfThemDoesNotExistItRemovesOne()
         {
             var lib = NewLib();
-            var setup = Setup();
+            var setup = CreateTestSetup(TestGroup, ProjectName);
             var libref = GetLibRef(setup);
             var validref = AddValidRef(setup, lib);
 

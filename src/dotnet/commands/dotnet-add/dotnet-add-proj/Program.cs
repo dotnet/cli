@@ -5,9 +5,9 @@ using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
 using System.Collections.Generic;
 
-namespace Microsoft.DotNet.Tools.Add.ProjectToProjectReference
+namespace Microsoft.DotNet.Tools.Add.ProjectToSolution
 {
-    public class AddProjectToProjectReferenceCommand
+    public class AddProjectToSolutionCommand
     {
         public static int Run(string[] args)
         {
@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.Tools.Add.ProjectToProjectReference
 
             CommandLineApplication app = new CommandLineApplication(throwOnUnexpectedArg: false)
             {
-                Name = "dotnet add p2p",
+                Name = "dotnet add proj",
                 FullName = LocalizableStrings.AppFullName,
                 Description = LocalizableStrings.AppDescription,
                 AllowArgumentSeparator = true,
@@ -24,47 +24,39 @@ namespace Microsoft.DotNet.Tools.Add.ProjectToProjectReference
 
             app.HelpOption("-h|--help");
 
-            CommandArgument projectArgument = app.Argument(
-                $"<{LocalizableStrings.CmdProject}>",
-                LocalizableStrings.CmdProjectDescription);
-
-            CommandOption frameworkOption = app.Option(
-                $"-f|--framework <{LocalizableStrings.CmdFramework}>",
-                LocalizableStrings.CmdFrameworkDescription,
-                CommandOptionType.SingleValue);
+            CommandArgument solutionArgument = app.Argument(
+                $"<{LocalizableStrings.CmdSolution}>",
+                LocalizableStrings.CmdSolutionDescription);
 
             CommandOption forceOption = app.Option(
-                "--force", 
+                "--force",
                 LocalizableStrings.CmdForceDescription,
                 CommandOptionType.NoValue);
 
             app.OnExecute(() => {
-                if (string.IsNullOrEmpty(projectArgument.Value))
+                if (string.IsNullOrEmpty(solutionArgument.Value))
                 {
-                    throw new GracefulException(CommonLocalizableStrings.RequiredArgumentNotPassed, $"<{LocalizableStrings.ProjectException}>");
+                    throw new GracefulException(CommonLocalizableStrings.RequiredArgumentNotPassed, $"<{LocalizableStrings.SolutionException}>");
                 }
 
-                var msbuildProj = MsbuildProject.FromFileOrDirectory(projectArgument.Value);
+                var solution = MsbuildSolution.FromFileOrDirectory(solutionArgument.Value);
 
                 if (app.RemainingArguments.Count == 0)
                 {
-                    throw new GracefulException(LocalizableStrings.SpecifyAtLeastOneReferenceToAdd);
+                    throw new GracefulException(CommonLocalizableStrings.SpecifyAtLeastOneProjectToAdd);
                 }
 
-                List<string> references = app.RemainingArguments;
+                List<string> projects = app.RemainingArguments;
                 if (!forceOption.HasValue())
                 {
-                    MsbuildUtilities.EnsureAllPathsExist(references, CommonLocalizableStrings.ReferenceDoesNotExist);
-                    MsbuildUtilities.ConvertPathsToRelative(msbuildProj.ProjectDirectory, ref references);
+                    MsbuildUtilities.EnsureAllPathsExist(projects, CommonLocalizableStrings.ProjectDoesNotExist);
+                    MsbuildUtilities.ConvertPathsToRelative(solution.SolutionFullPath, ref projects);
                 }
-                
-                int numberOfAddedReferences = msbuildProj.AddProjectToProjectReferences(
-                    frameworkOption.Value(),
-                    references);
 
-                if (numberOfAddedReferences != 0)
+                int numberOfAddedProjects = solution.AddProjectToSolution(projects);
+                if (numberOfAddedProjects != 0)
                 {
-                    msbuildProj.Project.Save();
+                    solution.Save();
                 }
 
                 return 0;

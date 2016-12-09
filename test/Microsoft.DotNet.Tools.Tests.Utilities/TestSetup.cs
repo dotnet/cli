@@ -1,15 +1,13 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.IO;
 
-namespace Msbuild.Tests.Utilities
+namespace Microsoft.DotNet.Tools.Test.Utilities
 {
     public class TestSetup
     {
-        public const string TestGroup = "NonRestoredTestProjects";
-        public const string ProjectName = "DotnetAddP2PProjects";
-
         public string TestRoot { get; private set; }
 
         private const string ValidRef = "ValidRef";
@@ -24,6 +22,20 @@ namespace Msbuild.Tests.Utilities
         public string LibCsprojName => $"{Lib}.csproj";
         public string LibCsprojPath => Path.Combine(TestRoot, Lib, LibCsprojName);
         public string LibCsprojRelPath => Path.Combine("..", Lib, LibCsprojName);
+
+        public string GetProjectFullPath(string projectDir, string projectName = null)
+        {
+            if (string.IsNullOrEmpty(projectName))
+            {
+                projectName = projectDir;
+            }
+
+            if (!Path.HasExtension(projectName))
+            {
+                projectName += ".csproj";
+            }
+            return Path.Combine(TestRoot, Path.Combine(projectDir, projectName));
+        }
 
         public TestSetup(string testRoot)
         {

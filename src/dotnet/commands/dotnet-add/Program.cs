@@ -10,6 +10,7 @@ using System.Linq;
 using Microsoft.Build.Construction;
 using Microsoft.DotNet.ProjectJsonMigration;
 using NuGet.Frameworks;
+using Microsoft.DotNet.Tools.Add.ProjectToSolution;
 using Microsoft.DotNet.Tools.Add.ProjectToProjectReference;
 
 namespace Microsoft.DotNet.Tools.Add
@@ -31,10 +32,12 @@ Args:
   {LocalizableStrings.ArgsDefinition}
 
 {LocalizableStrings.Commands}:
+  proj       {LocalizableStrings.CommandProjDefinition}
   p2p        {LocalizableStrings.CommandP2PDefinition}";
 
         protected override Dictionary<string, Func<string[], int>> BuiltInCommands => new Dictionary<string, Func<string[], int>>
         {
+            ["proj"] = AddProjectToSolutionCommand.Run,
             ["p2p"] = AddProjectToProjectReferenceCommand.Run,
         };
 

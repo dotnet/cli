@@ -21,5 +21,7 @@ namespace Microsoft.DotNet.Tools.Add
         public const string Commands = "Commands";
 
         public const string CommandP2PDefinition = "Add project to project (p2p) reference to a project";
+
+        public const string CommandProjDefinition = "Add project to a solution";
     }
 }
