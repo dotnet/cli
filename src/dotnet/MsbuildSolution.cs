@@ -102,10 +102,11 @@ namespace Microsoft.DotNet.Tools
         {
             int numberOfAddedProjects = 0;
 
-            foreach (var projectPath in projects.Select((p) => MsbuildUtilities.NormalizeSlashes(p)))
+            foreach (var projectPath in projects)
             {
+                var projectPathNormalized = MsbuildUtilities.NormalizeSlashes(projectPath);
                 if (_slnFile.Projects.Any((p) =>
-                     string.Equals(p.FilePath, projectPath, StringComparison.OrdinalIgnoreCase)))
+                     string.Equals(p.FilePath, projectPathNormalized, StringComparison.OrdinalIgnoreCase)))
                 {
                     Reporter.Output.WriteLine(string.Format(
                         CommonLocalizableStrings.SolutionAlreadyHasAProject,
@@ -140,7 +141,7 @@ namespace Microsoft.DotNet.Tools
                         Id = projectGuid.ToString("B").ToUpper(),
                         TypeGuid = SlnFile.CSharpProjectTypeGuid,
                         Name = Path.GetFileNameWithoutExtension(projectPath),
-                        FilePath = projectPath
+                        FilePath = projectPathNormalized
                     };
 
                     _slnFile.Projects.Add(slnProject);
