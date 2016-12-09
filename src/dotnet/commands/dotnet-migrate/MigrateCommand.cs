@@ -408,7 +408,7 @@ namespace Microsoft.DotNet.Tools.Migrate
             {
                 var projectFilePath = Path.Combine(
                     _slnFile.BaseDirectory,
-                    project.FilePath,
+                    Path.GetDirectoryName(project.FilePath),
                     Project.FileName);
 
                 if (File.Exists(projectFilePath))

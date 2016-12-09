@@ -111,7 +111,7 @@ namespace Microsoft.DotNet.Cli.Add.Proj.Tests
             string slnName = "App.sln";
 
             var projectToAdd = makeRelative
-                ? $"\"..\\{projectName}\\{projectName}.csproj\""
+                ? $"\"..{Path.DirectorySeparatorChar}{projectName}{Path.DirectorySeparatorChar}{projectName}.csproj\""
                 : $"\"{setup.GetProjectFullPath(projectName)}\"";
 
             var cmd = new AddProjCommand()
