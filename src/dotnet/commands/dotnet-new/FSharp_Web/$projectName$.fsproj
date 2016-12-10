@@ -10,20 +10,10 @@
     <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wp8+wpa81;</PackageTargetFallback>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <GlobalExclude>$(GlobalExclude);bin\**;obj\**;node_modules\**;jspm_packages\**;bower_components\**;**\*.user;**\*.*proj</GlobalExclude>
-  </PropertyGroup>
-
   <ItemGroup>
-    <None Include="**\*" />
     <Compile Include="Controllers\*.fs" />
     <Compile Include="Startup.fs" />
     <Compile Include="Program.fs" />
-    <EmbeddedResource Include="**\*.resx" />
-    <Content Include="wwwroot\**" CopyToPublishDirectory="PreserveNewest" />
-    <Content Include="**\*.cshtml" Exclude="wwwroot\**\*.cshtml" CopyToPublishDirectory="PreserveNewest" />
-    <Content Include="**\*.config" Exclude="wwwroot\**\*.config" CopyToPublishDirectory="PreserveNewest" />
-    <Content Include="**\*.json" Exclude="wwwroot\**\*.json" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
