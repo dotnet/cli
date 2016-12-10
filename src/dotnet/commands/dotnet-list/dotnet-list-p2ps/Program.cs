@@ -10,33 +10,35 @@ namespace Microsoft.DotNet.Tools.List.ProjectToProjectReferences
 {
     public class ListProjectToProjectReferencesCommand
     {
-        public static int Run(string[] args)
+        public static int Run(string projectOrDirectory, string[] args)
         {
             DebugHelper.HandleDebugSwitch(ref args);
 
             CommandLineApplication app = new CommandLineApplication(throwOnUnexpectedArg: false)
             {
-                Name = "dotnet list p2ps",
+                Name = "dotnet list <PROJECT> p2ps",
                 FullName = LocalizableStrings.AppFullName,
                 Description = LocalizableStrings.AppDescription
             };
 
+            app.ArgumentHandledByParentCommand(
+                "<PROJECT>",
+                LocalizableStrings.ProjectArgumentDescription);
+
             app.HelpOption("-h|--help");
 
-            CommandArgument projectArgument = app.Argument($"<{LocalizableStrings.ProjectArgumentValueName}>", LocalizableStrings.ProjectArgumentDescription);
-
             app.OnExecute(() => {
-                if (string.IsNullOrEmpty(projectArgument.Value))
+                if (string.IsNullOrEmpty(projectOrDirectory))
                 {
                     throw new GracefulException(CommonLocalizableStrings.RequiredArgumentNotPassed, $"<{LocalizableStrings.ProjectArgumentValueName}>");
                 }
 
-                var msbuildProj = MsbuildProject.FromFileOrDirectory(projectArgument.Value);
+                var msbuildProj = MsbuildProject.FromFileOrDirectory(projectOrDirectory);
 
                 var p2ps = msbuildProj.GetProjectToProjectReferences();
                 if (p2ps.Count() == 0)
                 {
-                    Reporter.Output.WriteLine(string.Format(LocalizableStrings.NoReferencesFound, CommonLocalizableStrings.P2P, projectArgument.Value));
+                    Reporter.Output.WriteLine(string.Format(LocalizableStrings.NoReferencesFound, CommonLocalizableStrings.P2P, projectOrDirectory));
                     return 0;
                 }
 

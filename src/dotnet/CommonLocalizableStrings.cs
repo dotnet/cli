@@ -7,13 +7,22 @@
         public const string ProjectAlreadyHasAreference = "Project already has a reference to `{0}`.";
         public const string ProjectReferenceCouldNotBeFound = "Project reference `{0}` could not be found.";
         public const string ProjectReferenceRemoved = "Project reference `{0}` removed.";
-        
-        // General purpose words
-        public const string RequiredArgument = "Required argument";
-        public const string Option = "Option";
-        public const string Argument = "Argument";
-        public const string Help = "Help";
 
+        // General purpose words
+        public const string Usage = "Usage";
+        public const string RequiredArgument = "Required argument";
+        public const string Options = "Options";
+        public const string Option = "Option";
+        public const string Arguments = "Arguments";
+        public const string Argument = "Argument";
+        public const string Commands = "Commands";
+        public const string Args = "Args";
+        public const string Help = "Help";
+        public const string HelpDefinition = "Show help information";
+        public const string ArgumentsObjectDefinition = "The object of the operation. If a project file is not specified, it defaults to the current directory.";
+        public const string ArgumentsCommandDefinition = "Command to be executed on <object>.";
+        public const string ArgsDefinition = "Any extra arguments passed to the command. Use `dotnet add <command> --help` to get help about these arguments.";
+        
         // Project related
         public const string Project = "Project";
         public const string ProjectFile = "Project file";

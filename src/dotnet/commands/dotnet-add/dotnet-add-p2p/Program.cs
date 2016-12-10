@@ -9,55 +9,47 @@ namespace Microsoft.DotNet.Tools.Add.ProjectToProjectReference
 {
     public class AddProjectToProjectReferenceCommand
     {
-        public static int Run(string[] args)
+        public static int Run(string projectOrDirectory, string[] args)
         {
             DebugHelper.HandleDebugSwitch(ref args);
 
             CommandLineApplication app = new CommandLineApplication(throwOnUnexpectedArg: false)
             {
-                Name = "dotnet add p2p",
+                Name = "dotnet add <PROJECT> p2p",
                 FullName = LocalizableStrings.AppFullName,
                 Description = LocalizableStrings.AppDescription,
-                AllowArgumentSeparator = true,
+                HandleRemainingArguments = true,
                 ArgumentSeparatorHelpText = LocalizableStrings.AppHelpText
             };
 
-            app.HelpOption("-h|--help");
-
-            CommandArgument projectArgument = app.Argument(
-                $"<{LocalizableStrings.CmdProject}>",
+            app.ArgumentHandledByParentCommand(
+                "<PROJECT>",
                 LocalizableStrings.CmdProjectDescription);
+
+            app.HelpOption("-h|--help");
 
             CommandOption frameworkOption = app.Option(
                 $"-f|--framework <{LocalizableStrings.CmdFramework}>",
                 LocalizableStrings.CmdFrameworkDescription,
                 CommandOptionType.SingleValue);
 
-            CommandOption forceOption = app.Option(
-                "--force", 
-                LocalizableStrings.CmdForceDescription,
-                CommandOptionType.NoValue);
-
             app.OnExecute(() => {
-                if (string.IsNullOrEmpty(projectArgument.Value))
+                if (string.IsNullOrEmpty(projectOrDirectory))
                 {
-                    throw new GracefulException(CommonLocalizableStrings.RequiredArgumentNotPassed, $"<{LocalizableStrings.ProjectException}>");
+                    throw new GracefulException(CommonLocalizableStrings.RequiredArgumentNotPassed, "<PROJECT>");
                 }
 
-                var msbuildProj = MsbuildProject.FromFileOrDirectory(projectArgument.Value);
+                var msbuildProj = MsbuildProject.FromFileOrDirectory(projectOrDirectory);
 
                 if (app.RemainingArguments.Count == 0)
                 {
-                    throw new GracefulException(LocalizableStrings.SpecifyAtLeastOneReferenceToAdd);
+                    throw new GracefulException(CommonLocalizableStrings.SpecifyAtLeastOneReferenceToAdd);
                 }
 
                 List<string> references = app.RemainingArguments;
-                if (!forceOption.HasValue())
-                {
-                    MsbuildProject.EnsureAllReferencesExist(references);
-                    msbuildProj.ConvertPathsToRelative(ref references);
-                }
-                
+                MsbuildProject.EnsureAllReferencesExist(references);
+                msbuildProj.ConvertPathsToRelative(ref references);
+
                 int numberOfAddedReferences = msbuildProj.AddProjectToProjectReferences(
                     frameworkOption.Value(),
                     references);

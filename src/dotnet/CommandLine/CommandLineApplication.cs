@@ -22,6 +22,7 @@ namespace Microsoft.DotNet.Cli.CommandLine
         {
             _throwOnUnexpectedArg = throwOnUnexpectedArg;
             Options = new List<CommandOption>();
+            ArgumentsHandledByParentCommands = new List<CommandArgument>();
             Arguments = new List<CommandArgument>();
             Commands = new List<CommandLineApplication>();
             RemainingArguments = new List<string>();
@@ -36,6 +37,7 @@ namespace Microsoft.DotNet.Cli.CommandLine
         public List<CommandOption> Options { get; private set; }
         public CommandOption OptionHelp { get; private set; }
         public CommandOption OptionVersion { get; private set; }
+        public List<CommandArgument> ArgumentsHandledByParentCommands { get; private set; }
         public List<CommandArgument> Arguments { get; private set; }
         public List<string> RemainingArguments { get; private set; }
         public bool IsShowingInformation { get; protected set; }  // Is showing help or version?
@@ -45,6 +47,7 @@ namespace Microsoft.DotNet.Cli.CommandLine
         public List<CommandLineApplication> Commands { get; private set; }
         public bool HandleResponseFiles { get; set; }
         public bool AllowArgumentSeparator { get; set; }
+        public bool HandleRemainingArguments { get; set; }
         public string ArgumentSeparatorHelpText { get; set; }
 
         public CommandLineApplication Command(string name, Action<CommandLineApplication> configuration,
@@ -67,6 +70,13 @@ namespace Microsoft.DotNet.Cli.CommandLine
             Options.Add(option);
             configuration(option);
             return option;
+        }
+
+        public CommandArgument ArgumentHandledByParentCommand(string name, string description)
+        {
+            var argument = new CommandArgument { Name = name, Description = description };
+            ArgumentsHandledByParentCommands.Add(argument);
+            return argument;
         }
 
         public CommandArgument Argument(string name, string description, bool multipleValues = false)
@@ -378,6 +388,18 @@ namespace Microsoft.DotNet.Cli.CommandLine
                     argumentsBuilder.AppendLine();
                 }
             }
+            else if (target.ArgumentsHandledByParentCommands.Any())
+            {
+                argumentsBuilder.AppendLine();
+                argumentsBuilder.AppendLine("Arguments:");
+                var maxArgLen = MaxArgumentLength(target.ArgumentsHandledByParentCommands);
+                var outputFormat = string.Format("  {{0, -{0}}}{{1}}", maxArgLen + 2);
+                foreach (var arg in target.ArgumentsHandledByParentCommands)
+                {
+                    argumentsBuilder.AppendFormat(outputFormat, arg.Name, arg.Description);
+                    argumentsBuilder.AppendLine();
+                }
+            }
 
             if (target.Options.Any())
             {
@@ -416,9 +438,17 @@ namespace Microsoft.DotNet.Cli.CommandLine
                 }
             }
 
-            if (target.AllowArgumentSeparator)
+            if (target.AllowArgumentSeparator || target.HandleRemainingArguments)
             {
-                headerBuilder.Append(" [[--] <arg>...]]");
+                if (target.AllowArgumentSeparator)
+                {
+                    headerBuilder.Append(" [[--] <arg>...]]");
+                }
+                else
+                {
+                    headerBuilder.Append(" [args]");
+                }
+
                 if (!string.IsNullOrEmpty(target.ArgumentSeparatorHelpText))
                 {
                     argumentSeparatorBuilder.AppendLine();

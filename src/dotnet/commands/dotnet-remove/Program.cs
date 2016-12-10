@@ -33,7 +33,8 @@ Args:
 {LocalizableStrings.Commands}:
   p2p        {LocalizableStrings.CommandP2PDefinition}";
 
-        protected override Dictionary<string, Func<string[], int>> BuiltInCommands => new Dictionary<string, Func<string[], int>>
+        protected override Dictionary<string, Func<string, string[], int>> BuiltInCommands =>
+            new Dictionary<string, Func<string, string[], int>>
         {
             ["p2p"] = RemoveProjectToProjectReferenceCommand.Run,
         };

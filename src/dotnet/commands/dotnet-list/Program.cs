@@ -26,7 +26,8 @@ Options:
 {LocalizableStrings.Commands}:
   p2ps       {LocalizableStrings.P2PsDefinition}";
 
-        protected override Dictionary<string, Func<string[], int>> BuiltInCommands => new Dictionary<string, Func<string[], int>>
+        protected override Dictionary<string, Func<string, string[], int>> BuiltInCommands =>
+            new Dictionary<string, Func<string, string[], int>>
         {
             ["p2ps"] = ListProjectToProjectReferencesCommand.Run,
         };

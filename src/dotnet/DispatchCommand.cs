@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.Tools
     public abstract class DispatchCommand
     {
         protected abstract string HelpText { get; }
-        protected abstract Dictionary<string, Func<string[], int>> BuiltInCommands { get; }
+        protected abstract Dictionary<string, Func<string, string[], int>> BuiltInCommands { get; }
 
         public int Start(string[] args)
         {
@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.Tools
             {
                 command = args[0];
                 commandObject = GetCurrentDirectoryWithDirSeparator();
-                args = args.Skip(1).Prepend(commandObject).ToArray();
+                args = args.Skip(1).ToArray();
             }
             else if (args.Length == 1)
             {
@@ -43,13 +43,13 @@ namespace Microsoft.DotNet.Tools
                 commandObject = args[0];
                 command = args[1];
 
-                args = args.Skip(2).Prepend(commandObject).ToArray();
+                args = args.Skip(2).ToArray();
             }
 
-            Func<string[], int> builtin;
+            Func<string, string[], int> builtin;
             if (BuiltInCommands.TryGetValue(command, out builtin))
             {
-                return builtin(args);
+                return builtin(commandObject, args);
             }
 
             Reporter.Error.WriteLine(string.Format(CommonLocalizableStrings.RequiredArgumentIsInvalid, "<command>").Red());

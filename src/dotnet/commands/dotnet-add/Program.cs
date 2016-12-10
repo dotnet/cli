@@ -18,22 +18,23 @@ namespace Microsoft.DotNet.Tools.Add
     {
         protected override string HelpText => $@"{LocalizableStrings.NetAddCommand}
 
-{LocalizableStrings.Usage}: dotnet add [options] <object> <command> [[--] <arg>...]]
+{CommonLocalizableStrings.Usage}: dotnet add [options] <object> <command> <args>
 
-{LocalizableStrings.Options}:
-  -h|--help  {LocalizableStrings.HelpDefinition}
+Options:
+  -h|--help  {CommonLocalizableStrings.HelpDefinition}
 
-{LocalizableStrings.Arguments}:
-  <object>   {LocalizableStrings.ArgumentsObjectDefinition}
-  <command>  {LocalizableStrings.ArgumentsCommandDefinition}
+Arguments:
+  <object>   {CommonLocalizableStrings.ArgumentsObjectDefinition}
+  <command>  {CommonLocalizableStrings.ArgumentsCommandDefinition}
 
 Args:
-  {LocalizableStrings.ArgsDefinition}
+  {CommonLocalizableStrings.ArgsDefinition}
 
-{LocalizableStrings.Commands}:
+Commands:
   p2p        {LocalizableStrings.CommandP2PDefinition}";
 
-        protected override Dictionary<string, Func<string[], int>> BuiltInCommands => new Dictionary<string, Func<string[], int>>
+        protected override Dictionary<string, Func<string, string[], int>> BuiltInCommands => 
+            new Dictionary<string, Func<string, string[], int>>
         {
             ["p2p"] = AddProjectToProjectReferenceCommand.Run,
         };

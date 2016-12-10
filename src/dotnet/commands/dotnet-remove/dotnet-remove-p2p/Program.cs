@@ -9,24 +9,24 @@ namespace Microsoft.DotNet.Tools.Remove.ProjectToProjectReference
 {
     public class RemoveProjectToProjectReferenceCommand
     {
-        public static int Run(string[] args)
+        public static int Run(string projectOrDirectory, string[] args)
         {
             DebugHelper.HandleDebugSwitch(ref args);
 
             CommandLineApplication app = new CommandLineApplication(throwOnUnexpectedArg: false)
             {
-                Name = "dotnet remove p2p",
+                Name = "dotnet remove <PROJECT> p2p",
                 FullName = LocalizableStrings.AppFullName,
                 Description = LocalizableStrings.AppDescription,
-                AllowArgumentSeparator = true,
+                HandleRemainingArguments = true,
                 ArgumentSeparatorHelpText = LocalizableStrings.AppArgumentSeparatorHelpText
             };
 
-            app.HelpOption("-h|--help");
-
-            CommandArgument projectArgument = app.Argument(
-                $"<{LocalizableStrings.CmdArgProject}>",
+            app.ArgumentHandledByParentCommand(
+                "<PROJECT>",
                 LocalizableStrings.CmdArgumentDescription);
+
+            app.HelpOption("-h|--help");
 
             CommandOption frameworkOption = app.Option(
                 $"-f|--framework <{LocalizableStrings.CmdFramework}>",
@@ -34,12 +34,12 @@ namespace Microsoft.DotNet.Tools.Remove.ProjectToProjectReference
                 CommandOptionType.SingleValue);
 
             app.OnExecute(() => {
-                if (string.IsNullOrEmpty(projectArgument.Value))
+                if (string.IsNullOrEmpty(projectOrDirectory))
                 {
                     throw new GracefulException(CommonLocalizableStrings.RequiredArgumentNotPassed, $"<{LocalizableStrings.ProjectException}>");
                 }
 
-                var msbuildProj = MsbuildProject.FromFileOrDirectory(projectArgument.Value);
+                var msbuildProj = MsbuildProject.FromFileOrDirectory(projectOrDirectory);
 
                 if (app.RemainingArguments.Count == 0)
                 {
