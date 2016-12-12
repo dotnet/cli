@@ -22,7 +22,6 @@ namespace Microsoft.DotNet.Cli.CommandLine
         {
             _throwOnUnexpectedArg = throwOnUnexpectedArg;
             Options = new List<CommandOption>();
-            ArgumentsHandledByParentCommands = new List<CommandArgument>();
             Arguments = new List<CommandArgument>();
             Commands = new List<CommandLineApplication>();
             RemainingArguments = new List<string>();
@@ -37,7 +36,6 @@ namespace Microsoft.DotNet.Cli.CommandLine
         public List<CommandOption> Options { get; private set; }
         public CommandOption OptionHelp { get; private set; }
         public CommandOption OptionVersion { get; private set; }
-        public List<CommandArgument> ArgumentsHandledByParentCommands { get; private set; }
         public List<CommandArgument> Arguments { get; private set; }
         public List<string> RemainingArguments { get; private set; }
         public bool IsShowingInformation { get; protected set; }  // Is showing help or version?
@@ -49,6 +47,11 @@ namespace Microsoft.DotNet.Cli.CommandLine
         public bool AllowArgumentSeparator { get; set; }
         public bool HandleRemainingArguments { get; set; }
         public string ArgumentSeparatorHelpText { get; set; }
+
+        public CommandLineApplication Command(string name, bool throwOnUnexpectedArg = true)
+        {
+            return Command(name, _ => { }, throwOnUnexpectedArg);
+        }
 
         public CommandLineApplication Command(string name, Action<CommandLineApplication> configuration,
             bool throwOnUnexpectedArg = true)
@@ -70,13 +73,6 @@ namespace Microsoft.DotNet.Cli.CommandLine
             Options.Add(option);
             configuration(option);
             return option;
-        }
-
-        public CommandArgument ArgumentHandledByParentCommand(string name, string description)
-        {
-            var argument = new CommandArgument { Name = name, Description = description };
-            ArgumentsHandledByParentCommands.Add(argument);
-            return argument;
         }
 
         public CommandArgument Argument(string name, string description, bool multipleValues = false)
@@ -243,7 +239,7 @@ namespace Microsoft.DotNet.Cli.CommandLine
                     option = null;
                 }
 
-                if (!processed && arguments == null)
+                if (!processed)
                 {
                     var currentCommand = command;
                     foreach (var subcommand in command.Commands)
@@ -344,7 +340,15 @@ namespace Microsoft.DotNet.Cli.CommandLine
             for (var cmd = this; cmd != null; cmd = cmd.Parent)
             {
                 cmd.IsShowingInformation = true;
-                headerBuilder.Insert(6, string.Format(" {0}", cmd.Name));
+                if (cmd != this && cmd.Arguments.Any())
+                {
+                    var args = string.Join(" ", cmd.Arguments.Select(arg => arg.Name));
+                    headerBuilder.Insert(6, string.Format(" {0} {1}", cmd.Name, args));
+                }
+                else
+                {
+                    headerBuilder.Insert(6, string.Format(" {0}", cmd.Name));
+                }
             }
 
             CommandLineApplication target;
@@ -374,30 +378,36 @@ namespace Microsoft.DotNet.Cli.CommandLine
             var argumentsBuilder = new StringBuilder();
             var argumentSeparatorBuilder = new StringBuilder();
 
-            if (target.Arguments.Any())
+            int maxArgLen = 0;
+            for (var cmd = target; cmd != null; cmd = cmd.Parent)
             {
-                headerBuilder.Append(" [arguments]");
-
-                argumentsBuilder.AppendLine();
-                argumentsBuilder.AppendLine("Arguments:");
-                var maxArgLen = MaxArgumentLength(target.Arguments);
-                var outputFormat = string.Format("  {{0, -{0}}}{{1}}", maxArgLen + 2);
-                foreach (var arg in target.Arguments)
+                if (cmd.Arguments.Any())
                 {
-                    argumentsBuilder.AppendFormat(outputFormat, arg.Name, arg.Description);
-                    argumentsBuilder.AppendLine();
+                    if (cmd == target)
+                    {
+                        headerBuilder.Append(" [arguments]");
+                    }
+
+                    if (argumentsBuilder.Length == 0)
+                    {
+                        argumentsBuilder.AppendLine();
+                        argumentsBuilder.AppendLine("Arguments:");
+                    }
+
+                    maxArgLen = Math.Max(maxArgLen, MaxArgumentLength(cmd.Arguments));
                 }
             }
-            else if (target.ArgumentsHandledByParentCommands.Any())
+
+            for (var cmd = target; cmd != null; cmd = cmd.Parent)
             {
-                argumentsBuilder.AppendLine();
-                argumentsBuilder.AppendLine("Arguments:");
-                var maxArgLen = MaxArgumentLength(target.ArgumentsHandledByParentCommands);
-                var outputFormat = string.Format("  {{0, -{0}}}{{1}}", maxArgLen + 2);
-                foreach (var arg in target.ArgumentsHandledByParentCommands)
+                if (cmd.Arguments.Any())
                 {
-                    argumentsBuilder.AppendFormat(outputFormat, arg.Name, arg.Description);
-                    argumentsBuilder.AppendLine();
+                    var outputFormat = string.Format("  {{0, -{0}}}{{1}}", maxArgLen + 2);
+                    foreach (var arg in cmd.Arguments)
+                    {
+                        argumentsBuilder.AppendFormat(outputFormat, arg.Name, arg.Description);
+                        argumentsBuilder.AppendLine();
+                    }
                 }
             }
 

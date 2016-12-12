@@ -14,35 +14,45 @@ using Microsoft.DotNet.Tools.Add.ProjectToProjectReference;
 
 namespace Microsoft.DotNet.Tools.Add
 {
-    public class AddCommand : DispatchCommand
+    public class AddCommand
     {
-        protected override string HelpText => $@"{LocalizableStrings.NetAddCommand}
-
-{CommonLocalizableStrings.Usage}: dotnet add [options] <object> <command> <args>
-
-Options:
-  -h|--help  {CommonLocalizableStrings.HelpDefinition}
-
-Arguments:
-  <object>   {CommonLocalizableStrings.ArgumentsObjectDefinition}
-  <command>  {CommonLocalizableStrings.ArgumentsCommandDefinition}
-
-Args:
-  {CommonLocalizableStrings.ArgsDefinition}
-
-Commands:
-  p2p        {LocalizableStrings.CommandP2PDefinition}";
-
-        protected override Dictionary<string, Func<string, string[], int>> BuiltInCommands => 
-            new Dictionary<string, Func<string, string[], int>>
+        private static List<Func<CommandLineApplication, CommandLineApplication>>
+            BuiltInCommands => new List<Func<CommandLineApplication, CommandLineApplication>>
         {
-            ["p2p"] = AddProjectToProjectReferenceCommand.Run,
+            AddProjectToProjectReferenceCommand.CreateApplication,
         };
 
         public static int Run(string[] args)
         {
-            var cmd = new AddCommand();
-            return cmd.Start(args);
+            DebugHelper.HandleDebugSwitch(ref args);
+
+            CommandLineApplication app = new CommandLineApplication(throwOnUnexpectedArg: false)
+            {
+                Name = "dotnet add",
+                FullName = LocalizableStrings.NetAddCommand,
+            };
+
+            app.HelpOption("-h|--help");
+
+            app.Argument(
+                Constants.ProjectOrSolutionArgumentName,
+                CommonLocalizableStrings.ArgumentsProjectOrSolutionDescription);
+
+            foreach (var subCommandCreator in BuiltInCommands)
+            {
+                subCommandCreator(app);
+            }
+
+            try
+            {
+                return app.Execute(args);
+            }
+            catch (GracefulException e)
+            {
+                Reporter.Error.WriteLine(e.Message.Red());
+                app.ShowHelp();
+                return 1;
+            }
         }
     }
 }

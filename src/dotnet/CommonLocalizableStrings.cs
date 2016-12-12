@@ -2,27 +2,10 @@
 {
     internal class CommonLocalizableStrings
     {
-        public const string CouldNotFindAnyProjectInDirectory = "Could not find any project in `{0}`.";
-        public const string MoreThanOneProjectInDirectory = "Found more than one project in `{0}`. Please specify which one to use.";
         public const string ProjectAlreadyHasAreference = "Project already has a reference to `{0}`.";
         public const string ProjectReferenceCouldNotBeFound = "Project reference `{0}` could not be found.";
         public const string ProjectReferenceRemoved = "Project reference `{0}` removed.";
 
-        // General purpose words
-        public const string Usage = "Usage";
-        public const string RequiredArgument = "Required argument";
-        public const string Options = "Options";
-        public const string Option = "Option";
-        public const string Arguments = "Arguments";
-        public const string Argument = "Argument";
-        public const string Commands = "Commands";
-        public const string Args = "Args";
-        public const string Help = "Help";
-        public const string HelpDefinition = "Show help information";
-        public const string ArgumentsObjectDefinition = "The object of the operation. If a project file is not specified, it defaults to the current directory.";
-        public const string ArgumentsCommandDefinition = "Command to be executed on <object>.";
-        public const string ArgsDefinition = "Any extra arguments passed to the command. Use `dotnet add <command> --help` to get help about these arguments.";
-        
         // Project related
         public const string Project = "Project";
         public const string ProjectFile = "Project file";
@@ -110,9 +93,9 @@
 
         // dotnet <verb>
         /// Project
-        public const string CouldNotFindProjectIn = "Could not find any project in `{0}`.";
+        public const string CouldNotFindAnyProjectInDirectory = "Could not find any project in `{0}`.";
         public const string CouldNotFindProjectOrDirectory = "Could not find project or directory `{0}`.";
-        public const string FoundMoreThanOneProjectIn = "Found more than one project in `{0}`. Please specify which one to use.";
+        public const string MoreThanOneProjectInDirectory = "Found more than one project in `{0}`. Please specify which one to use.";
         public const string FoundInvalidProject = "Found a project `{0}` but it is invalid.";
         public const string InvalidProject = "Invalid project `{0}`.";
 
@@ -170,6 +153,12 @@
         /// list
         public const string NoReferencesFound = "There are no {0} references in project {1}. ;; {0} is the type of the item being requested (project, package, p2p) and {1} is the object operated on (a project file or a solution file). ";
         public const string NoProjectsFound = "No projects found in the solution.";
+
+        /// arguments
+        public const string ArgumentsProjectOrSolutionDescription = "The project or solution to operation on. If a file is not specified, the current directory is searched.";
+
+        /// commands
+        public const string CmdFramework = "FRAMEWORK";
 
         /// update pkg
         public const string PleaseSpecifyNewVersion = "Please specify new version of the package.";

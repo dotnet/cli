@@ -14,35 +14,45 @@ using Microsoft.DotNet.Tools.Remove.ProjectToProjectReference;
 
 namespace Microsoft.DotNet.Tools.Remove
 {
-    public class RemoveCommand : DispatchCommand
+    public class RemoveCommand
     {
-        protected override string HelpText => $@"{LocalizableStrings.NetRemoveCommand};
-
-{LocalizableStrings.Usage}: dotnet remove [options] <object> <command> [[--] <arg>...]]
-
-{LocalizableStrings.Options}:
-  -h|--help  {LocalizableStrings.HelpDefinition}
-
-{LocalizableStrings.Arguments}:
-  <object>   {LocalizableStrings.ArgumentsObjectDefinition}
-  <command>  {LocalizableStrings.ArgumentsCommandDefinition}
-
-Args:
-  {LocalizableStrings.ArgsDefinition}
-
-{LocalizableStrings.Commands}:
-  p2p        {LocalizableStrings.CommandP2PDefinition}";
-
-        protected override Dictionary<string, Func<string, string[], int>> BuiltInCommands =>
-            new Dictionary<string, Func<string, string[], int>>
+        private static List<Func<CommandLineApplication, CommandLineApplication>>
+            BuiltInCommands => new List<Func<CommandLineApplication, CommandLineApplication>>
         {
-            ["p2p"] = RemoveProjectToProjectReferenceCommand.Run,
+            RemoveProjectToProjectReferenceCommand.CreateApplication,
         };
 
         public static int Run(string[] args)
         {
-            var cmd = new RemoveCommand();
-            return cmd.Start(args);
+            DebugHelper.HandleDebugSwitch(ref args);
+
+            CommandLineApplication app = new CommandLineApplication(throwOnUnexpectedArg: false)
+            {
+                Name = "dotnet remove",
+                FullName = LocalizableStrings.NetRemoveCommand,
+            };
+
+            app.HelpOption("-h|--help");
+
+            app.Argument(
+                Constants.ProjectOrSolutionArgumentName,
+                CommonLocalizableStrings.ArgumentsProjectOrSolutionDescription);
+
+            foreach (var subCommandCreator in BuiltInCommands)
+            {
+                subCommandCreator(app);
+            }
+
+            try
+            {
+                return app.Execute(args);
+            }
+            catch (GracefulException e)
+            {
+                Reporter.Error.WriteLine(e.Message.Red());
+                app.ShowHelp();
+                return 1;
+            }
         }
     }
 }

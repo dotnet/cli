@@ -3,39 +3,51 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Tools.List.ProjectToProjectReferences;
+using Microsoft.DotNet.Cli.Utils;
 
 namespace Microsoft.DotNet.Tools.List
 {
-    public class ListCommand : DispatchCommand
+    public class ListCommand
     {
-        protected override string HelpText => $@"{LocalizableStrings.ListCommandDescription}
-
-{LocalizableStrings.Usage}: dotnet list [options] <object> <command> [[--] <arg>...]]
-
-Options:
-  -h|--help  {LocalizableStrings.HelpDefinition}
-
-{LocalizableStrings.Arguments}:
-  <object>   {LocalizableStrings.ObjectDefinition}
-  <command>  {LocalizableStrings.CommandDefinition}
-
-{LocalizableStrings.ExtraArgs}:
-  {LocalizableStrings.ExtraArgumentsDefinition}
-
-{LocalizableStrings.Commands}:
-  p2ps       {LocalizableStrings.P2PsDefinition}";
-
-        protected override Dictionary<string, Func<string, string[], int>> BuiltInCommands =>
-            new Dictionary<string, Func<string, string[], int>>
+        private static List<Func<CommandLineApplication, CommandLineApplication>>
+            BuiltInCommands => new List<Func<CommandLineApplication, CommandLineApplication>>
         {
-            ["p2ps"] = ListProjectToProjectReferencesCommand.Run,
+            ListProjectToProjectReferencesCommand.CreateApplication,
         };
 
         public static int Run(string[] args)
         {
-            var cmd = new ListCommand();
-            return cmd.Start(args);
+            DebugHelper.HandleDebugSwitch(ref args);
+
+            CommandLineApplication app = new CommandLineApplication(throwOnUnexpectedArg: false)
+            {
+                Name = "dotnet list",
+                FullName = LocalizableStrings.NetListCommand,
+            };
+
+            app.HelpOption("-h|--help");
+
+            app.Argument(
+                Constants.ProjectOrSolutionArgumentName,
+                CommonLocalizableStrings.ArgumentsProjectOrSolutionDescription);
+
+            foreach (var subCommandCreator in BuiltInCommands)
+            {
+                subCommandCreator(app);
+            }
+
+            try
+            {
+                return app.Execute(args);
+            }
+            catch (GracefulException e)
+            {
+                Reporter.Error.WriteLine(e.Message.Red());
+                app.ShowHelp();
+                return 1;
+            }
         }
     }
 }

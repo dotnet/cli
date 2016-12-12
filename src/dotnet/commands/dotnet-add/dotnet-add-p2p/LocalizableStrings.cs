@@ -6,15 +6,8 @@ namespace Microsoft.DotNet.Tools.Add.ProjectToProjectReference
 
         public const string AppDescription = "Command to add project to project (p2p) reference";
 
-        public const string SpecifyAtLeastOneReferenceToAdd = "You must specify at least one reference to add. Please run dotnet add --help for more information.";
-
         public const string AppHelpText = "Project to project references to add";
 
-        public const string CmdProjectDescription = "The project file to modify. If a project file is not specified, it searches the current working directory for an MSBuild file that has a file extension that ends in `proj` and uses that file.";
-
-        public const string CmdFramework = "FRAMEWORK";
-
         public const string CmdFrameworkDescription = "Add reference only when targetting a specific framework";
-        
     }
 }

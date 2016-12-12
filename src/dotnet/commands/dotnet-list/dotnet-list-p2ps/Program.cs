@@ -4,6 +4,7 @@
 using Microsoft.Build.Evaluation;
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.Tools.Common;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,58 +12,55 @@ namespace Microsoft.DotNet.Tools.List.ProjectToProjectReferences
 {
     public class ListProjectToProjectReferencesCommand
     {
-        public static int Run(string projectOrDirectory, string[] args)
+        internal static CommandLineApplication CreateApplication(CommandLineApplication parentApp)
         {
-            DebugHelper.HandleDebugSwitch(ref args);
-
-            CommandLineApplication app = new CommandLineApplication(throwOnUnexpectedArg: false)
-            {
-                Name = "dotnet list <PROJECT> p2ps",
-                FullName = LocalizableStrings.AppFullName,
-                Description = LocalizableStrings.AppDescription
-            };
-
-            app.ArgumentHandledByParentCommand(
-                "<PROJECT>",
-                LocalizableStrings.ProjectArgumentDescription);
+            CommandLineApplication app = parentApp.Command("p2ps", throwOnUnexpectedArg: false);
+            app.FullName = LocalizableStrings.AppFullName;
+            app.Description = LocalizableStrings.AppDescription;
 
             app.HelpOption("-h|--help");
 
             app.OnExecute(() => {
-                if (string.IsNullOrEmpty(projectOrDirectory))
+                try
                 {
-                    throw new GracefulException(CommonLocalizableStrings.RequiredArgumentNotPassed, $"<{LocalizableStrings.ProjectArgumentValueName}>");
-                }
+                    if (!parentApp.Arguments.Any())
+                    {
+                        throw new GracefulException(CommonLocalizableStrings.RequiredArgumentNotPassed, Constants.ProjectOrSolutionArgumentName);
+                    }
 
-                var msbuildProj = MsbuildProject.FromFileOrDirectory(new ProjectCollection(), projectArgument.Value);
+                    var projectOrDirectory = parentApp.Arguments.First().Value;
+                    if (string.IsNullOrEmpty(projectOrDirectory))
+                    {
+                        projectOrDirectory = PathUtility.GetCurrentDirectoryWithDirSeparator();
+                    }
 
-                var p2ps = msbuildProj.GetProjectToProjectReferences();
-                if (p2ps.Count() == 0)
-                {
-                    Reporter.Output.WriteLine(string.Format(LocalizableStrings.NoReferencesFound, CommonLocalizableStrings.P2P, projectOrDirectory));
+                    var msbuildProj = MsbuildProject.FromFileOrDirectory(new ProjectCollection(), projectOrDirectory);
+
+                    var p2ps = msbuildProj.GetProjectToProjectReferences();
+                    if (p2ps.Count() == 0)
+                    {
+                        Reporter.Output.WriteLine(string.Format(LocalizableStrings.NoReferencesFound, CommonLocalizableStrings.P2P, projectOrDirectory));
+                        return 0;
+                    }
+
+                    Reporter.Output.WriteLine($"{CommonLocalizableStrings.ProjectReferenceOneOrMore}");
+                    Reporter.Output.WriteLine(new string('-', CommonLocalizableStrings.ProjectReferenceOneOrMore.Length));
+                    foreach (var p2p in p2ps)
+                    {
+                        Reporter.Output.WriteLine(p2p.Include);
+                    }
+
                     return 0;
                 }
-
-                Reporter.Output.WriteLine($"{CommonLocalizableStrings.ProjectReferenceOneOrMore}");
-                Reporter.Output.WriteLine(new string('-', CommonLocalizableStrings.ProjectReferenceOneOrMore.Length));
-                foreach (var p2p in p2ps)
+                catch (GracefulException e)
                 {
-                    Reporter.Output.WriteLine(p2p.Include);
+                    Reporter.Error.WriteLine(e.Message.Red());
+                    app.ShowHelp();
+                    return 1;
                 }
-
-                return 0;
             });
 
-            try
-            {
-                return app.Execute(args);
-            }
-            catch (GracefulException e)
-            {
-                Reporter.Error.WriteLine(e.Message.Red());
-                app.ShowHelp();
-                return 1;
-            }
+            return app;
         }
     }
 }

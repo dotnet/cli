@@ -257,5 +257,16 @@ namespace Microsoft.DotNet.Tools.Common
 
             return Path.GetFullPath(path);
         }
+
+        public static string GetCurrentDirectoryWithDirSeparator()
+        {
+            string ret = Directory.GetCurrentDirectory();
+            if (ret[ret.Length - 1] != Path.DirectorySeparatorChar)
+            {
+                ret += Path.DirectorySeparatorChar;
+            }
+
+            return ret;
+        }
     }
 }

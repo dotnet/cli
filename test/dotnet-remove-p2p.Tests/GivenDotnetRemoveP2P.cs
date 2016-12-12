@@ -356,7 +356,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
         {
             var setup = Setup();
             var lib = GetLibRef(setup);
-            var libref = AddValidRef(setup, lib, "--force");
+            var libref = AddValidRef(setup, lib);
 
             int noCondBefore = lib.CsProj().NumberOfItemGroupsWithoutCondition();
             var cmd = new RemoveP2PCommand()
