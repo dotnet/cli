@@ -112,18 +112,20 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             return process.ExitCode;
         }
 
-        public static Task WaitForExitAsync(this Process subject)
+        public static Task StartAndWaitForExitAsync(this Process subject)
         {
             var taskCompletionSource = new TaskCompletionSource<object>();
 
             subject.EnableRaisingEvents = true;
             
-            subject.Exited += (s, a) => taskCompletionSource.TrySetResult(null);
-            
-            if (subject.HasExited)
+            subject.Exited += (s, a) => 
             {
-                return Task.CompletedTask;
-            }
+                taskCompletionSource.SetResult(null);
+
+                subject.Dispose();
+            };
+
+            subject.Start();
 
             return taskCompletionSource.Task;
         }

@@ -19,16 +19,17 @@ namespace Microsoft.DotNet.New.Tests
             var rootPath = TestAssetsManager.CreateTestDirectory().Path;
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("new");
+                .Execute("new")
+                .Should().Pass();
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("restore /p:SkipInvalidConfigurations=true");
+                .Execute("restore")
+                .Should().Pass();
 
             var buildResult = new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .ExecuteWithCapturedOutput("build");
-            
-            buildResult.Should().Pass()
-                       .And.NotHaveStdErr();
+                .ExecuteWithCapturedOutput("build")
+                .Should().Pass()
+                     .And.NotHaveStdErr();
         }
 
         [Fact]

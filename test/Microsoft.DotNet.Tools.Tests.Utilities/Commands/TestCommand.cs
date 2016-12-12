@@ -118,6 +118,8 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
             CurrentProcess.ErrorDataReceived += (s, e) =>
             {
+Console.WriteLine(e.Data);
+
                 stdErr.Add(e.Data);
 
                 var handler = ErrorDataReceived;
@@ -130,6 +132,8 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
             CurrentProcess.OutputDataReceived += (s, e) =>
             {
+Console.WriteLine(e.Data);
+                
                 stdOut.Add(e.Data);
 
                 var handler = OutputDataReceived;
@@ -139,25 +143,15 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
                     handler(s, e);
                 }
             };
-
-            CurrentProcess.Start();
+Console.WriteLine("Starting Process");
+            var completionTask = CurrentProcess.StartAndWaitForExitAsync();
 
             CurrentProcess.BeginOutputReadLine();
 
             CurrentProcess.BeginErrorReadLine();
+Console.WriteLine("Getting Wait Task");
 
-            var processWaitTask = CurrentProcess.WaitForExitAsync();
-
-            var processTimeoutCancellationTokenSource = new CancellationTokenSource();
-
-            if (await Task.WhenAny(processWaitTask, Task.Delay(120000, processTimeoutCancellationTokenSource.Token)) != processWaitTask)
-            {
-                KillTree();
-
-                throw new TimeoutException($"Timeout - {executable} {args} - {WorkingDirectoryInfo()}");
-            }
-
-            processTimeoutCancellationTokenSource.Cancel();
+            //await completionTask;
 
             CurrentProcess.WaitForExit();
 

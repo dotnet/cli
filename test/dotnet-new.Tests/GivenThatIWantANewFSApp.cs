@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.New.Tests
                 .Execute("new --lang f#");
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("restore /p:SkipInvalidConfigurations=true");
+                .Execute("restore");
 
             var buildResult = new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .ExecuteWithCapturedOutput("build");
