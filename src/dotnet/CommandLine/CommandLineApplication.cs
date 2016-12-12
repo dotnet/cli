@@ -402,10 +402,13 @@ namespace Microsoft.DotNet.Cli.CommandLine
             {
                 if (cmd.Arguments.Any())
                 {
-                    var outputFormat = string.Format("  {{0, -{0}}}{{1}}", maxArgLen + 2);
+                    var outputFormat = "  {0}{1}";
                     foreach (var arg in cmd.Arguments)
                     {
-                        argumentsBuilder.AppendFormat(outputFormat, arg.Name, arg.Description);
+                        argumentsBuilder.AppendFormat(
+                            outputFormat, 
+                            arg.Name.PadRight(maxArgLen + 2), 
+                            arg.Description);
                         argumentsBuilder.AppendLine();
                     }
                 }

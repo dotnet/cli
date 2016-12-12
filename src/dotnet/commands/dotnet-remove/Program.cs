@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.Tools.Remove
         {
             DebugHelper.HandleDebugSwitch(ref args);
 
-            CommandLineApplication app = new CommandLineApplication(throwOnUnexpectedArg: false)
+            CommandLineApplication app = new CommandLineApplication(throwOnUnexpectedArg: true)
             {
                 Name = "dotnet remove",
                 FullName = LocalizableStrings.NetRemoveCommand,
@@ -51,6 +51,11 @@ namespace Microsoft.DotNet.Tools.Remove
             {
                 Reporter.Error.WriteLine(e.Message.Red());
                 app.ShowHelp();
+                return 1;
+            }
+            catch (CommandParsingException e)
+            {
+                Reporter.Error.WriteLine(e.Message.Red());
                 return 1;
             }
         }

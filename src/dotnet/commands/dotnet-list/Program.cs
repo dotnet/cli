@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.Tools.List
         {
             DebugHelper.HandleDebugSwitch(ref args);
 
-            CommandLineApplication app = new CommandLineApplication(throwOnUnexpectedArg: false)
+            CommandLineApplication app = new CommandLineApplication(throwOnUnexpectedArg: true)
             {
                 Name = "dotnet list",
                 FullName = LocalizableStrings.NetListCommand,
@@ -46,6 +46,11 @@ namespace Microsoft.DotNet.Tools.List
             {
                 Reporter.Error.WriteLine(e.Message.Red());
                 app.ShowHelp();
+                return 1;
+            }
+            catch (CommandParsingException e)
+            {
+                Reporter.Error.WriteLine(e.Message.Red());
                 return 1;
             }
         }

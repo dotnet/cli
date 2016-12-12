@@ -22,9 +22,7 @@
         public const string Library = "Library";
         public const string Program = "Program";
         public const string Application = "Application";
-        public const string ReferenceDoesNotExist = "Reference {0} does not exist. If you still want to add it, please use --force option. Please note that this may have adverse effects on the project. ";
         public const string ReferenceAddedToTheProject = "Reference `{0}` added to the project.";
-        
 
         // Verbs
         public const string Add = "Add";
@@ -109,15 +107,15 @@
         public const string SolutionAlreadyContainsAProject = "Solution {0} already contains project {1}.";
 
         /// add p2p
-        public const string ReferenceDoesNotExistForce = "Reference {0} does not exist. If you still want to add it, please use --force option. Please note that this may have adverse effects on the project. ";
+        public const string ReferenceDoesNotExist = "Reference {0} does not exist.";
         public const string ReferenceIsInvalid = "Reference `{0}` is invalid.";
-        public const string SpecifyAtLeastOneReferenceToAdd = "You must specify at least one reference to add. Please run dotnet add --help for more information.";
+        public const string SpecifyAtLeastOneReferenceToAdd = "You must specify at least one reference to add.";
         public const string ProjectAlreadyHasAReference = "Project {0} already has a reference `{1}`.";
 
         /// add package
         public const string PackageReferenceDoesNotExist = "Package reference `{0}` does not exist.";
         public const string PackageReferenceIsInvalid = "Package reference `{0}` is invalid.";
-        public const string SpecifyAtLeastOnePackageReferenceToAdd = "You must specify at least one reference to add. Please run dotnet add --help for more information.";
+        public const string SpecifyAtLeastOnePackageReferenceToAdd = "You must specify at least one package to add.";
         public const string PackageReferenceAddedToTheProject = "Package reference `{0}` added to the project.";
         public const string ProjectAlreadyHasAPackageReference = "Project {0} already has a reference `{1}`.";
         public const string PleaseSpecifyVersion = "Please specify a version of the package.";
@@ -125,7 +123,7 @@
         /// add sln
         public const string ProjectDoesNotExist = "Project `{0}` does not exist.";
         public const string ProjectIsInvalid = "Project `{0}` is invalid.";
-        public const string SpecifyAtLeastOneProjectToAdd = "You must specify at least one project to add. Please run dotnet add --help for more information.";
+        public const string SpecifyAtLeastOneProjectToAdd = "You must specify at least one project to add.";
         public const string ProjectAddedToTheSolution = "Project `{0}` added to the solution.";
         public const string SolutionAlreadyHasAProject = "Solution {0} already contains project {1}.";
 

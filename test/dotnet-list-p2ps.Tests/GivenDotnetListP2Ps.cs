@@ -29,6 +29,16 @@ namespace Microsoft.DotNet.Cli.List.P2P.Tests
             cmd.StdOut.Should().Contain("Usage");
         }
 
+        [Fact]
+        public void WhenTooManyArgumentsArePassedItPrintsError()
+        {
+            var cmd = new AddP2PCommand()
+                    .WithProject("one two three")
+                    .Execute("proj.csproj");
+            cmd.ExitCode.Should().NotBe(0);
+            cmd.StdErr.Should().Contain("Unrecognized command or argument");
+        }
+
         [Theory]
         [InlineData("idontexist.csproj")]
         [InlineData("ihave?inv@lid/char\\acters")]
