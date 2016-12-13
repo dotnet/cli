@@ -6,6 +6,7 @@ using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools.Common;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Microsoft.DotNet.Tools.List.ProjectToProjectReferences
@@ -31,7 +32,7 @@ namespace Microsoft.DotNet.Tools.List.ProjectToProjectReferences
                     var projectOrDirectory = parentApp.Arguments.First().Value;
                     if (string.IsNullOrEmpty(projectOrDirectory))
                     {
-                        projectOrDirectory = PathUtility.GetCurrentDirectoryWithDirSeparator();
+                        projectOrDirectory = PathUtility.EnsureTrailingSlash(Directory.GetCurrentDirectory());
                     }
 
                     var msbuildProj = MsbuildProject.FromFileOrDirectory(new ProjectCollection(), projectOrDirectory);

@@ -337,17 +337,18 @@ namespace Microsoft.DotNet.Cli.CommandLine
         public void ShowHelp(string commandName = null)
         {
             var headerBuilder = new StringBuilder("Usage:");
+            var usagePrefixLength = headerBuilder.Length;
             for (var cmd = this; cmd != null; cmd = cmd.Parent)
             {
                 cmd.IsShowingInformation = true;
                 if (cmd != this && cmd.Arguments.Any())
                 {
                     var args = string.Join(" ", cmd.Arguments.Select(arg => arg.Name));
-                    headerBuilder.Insert(6, string.Format(" {0} {1}", cmd.Name, args));
+                    headerBuilder.Insert(usagePrefixLength, string.Format(" {0} {1}", cmd.Name, args));
                 }
                 else
                 {
-                    headerBuilder.Insert(6, string.Format(" {0}", cmd.Name));
+                    headerBuilder.Insert(usagePrefixLength, string.Format(" {0}", cmd.Name));
                 }
             }
 

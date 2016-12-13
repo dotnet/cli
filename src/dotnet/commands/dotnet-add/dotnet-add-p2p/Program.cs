@@ -7,6 +7,7 @@ using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools.Common;
 using NuGet.Frameworks;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -41,7 +42,7 @@ namespace Microsoft.DotNet.Tools.Add.ProjectToProjectReference
                     var projectOrDirectory = parentApp.Arguments.First().Value;
                     if (string.IsNullOrEmpty(projectOrDirectory))
                     {
-                        projectOrDirectory = PathUtility.GetCurrentDirectoryWithDirSeparator();
+                        projectOrDirectory = PathUtility.EnsureTrailingSlash(Directory.GetCurrentDirectory());
                     }
 
                     var projects = new ProjectCollection();
