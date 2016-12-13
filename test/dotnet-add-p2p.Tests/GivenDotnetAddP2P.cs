@@ -580,6 +580,25 @@ namespace Microsoft.DotNet.Cli.Add.P2P.Tests
         }
 
         [Fact]
+        public void WhenPassedReferenceIsUsingSlashesItNormalizesItToBackslashes()
+        {
+            var lib = NewLibWithFrameworks();
+            var setup = Setup();
+
+            int noCondBefore = lib.CsProj().NumberOfItemGroupsWithoutCondition();
+            var cmd = new AddP2PCommand()
+                .WithWorkingDirectory(lib.Path)
+                .WithProject(lib.CsProjName)
+                .Execute($"\"{setup.ValidRefCsprojPath.Replace('\\', '/')}\"");
+            cmd.Should().Pass();
+            cmd.StdOut.Should().Contain("added to the project");
+            cmd.StdErr.Should().BeEmpty();
+            var csproj = lib.CsProj();
+            csproj.NumberOfItemGroupsWithoutCondition().Should().Be(noCondBefore + 1);
+            csproj.NumberOfProjectReferencesWithIncludeContaining(setup.ValidRefCsprojRelPath.Replace('/', '\\')).Should().Be(1);
+        }
+
+        [Fact]
         public void WhenReferenceIsRelativeAndProjectIsNotInCurrentDirectoryReferencePathIsFixed()
         {
             var setup = Setup();

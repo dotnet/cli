@@ -13,6 +13,14 @@ namespace Microsoft.DotNet.Cli.CommandLine
 {
     internal class CommandLineApplication
     {
+        private enum ParseOptionResult
+        {
+            Succeeded,
+            ShowHelp,
+            ShowVersion,
+            UnexpectedArgs,
+        }
+
         // Indicates whether the parser should throw an exception when it runs into an unexpected argument.
         // If this field is set to false, the parser will stop parsing when it sees an unexpected argument, and all
         // remaining arguments, including the first unexpected argument, will be stored in RemainingArguments property.
@@ -109,7 +117,6 @@ namespace Microsoft.DotNet.Cli.CommandLine
         public int Execute(params string[] args)
         {
             CommandLineApplication command = this;
-            CommandOption option = null;
             IEnumerator<CommandArgument> arguments = null;
 
             if (HandleResponseFiles)
@@ -120,170 +127,157 @@ namespace Microsoft.DotNet.Cli.CommandLine
             for (var index = 0; index < args.Length; index++)
             {
                 var arg = args[index];
-                var processed = false;
-                if (!processed && option == null)
+
+                bool isLongOption = arg.StartsWith("--");
+                if (isLongOption || arg.StartsWith("-"))
                 {
-                    string[] longOption = null;
-                    string[] shortOption = null;
-
-                    if (arg.StartsWith("--"))
+                    CommandOption option;
+                    var result = ParseOption(isLongOption, command, args, ref index, out option);
+                    if (result == ParseOptionResult.ShowHelp)
                     {
-                        longOption = arg.Substring(2).Split(new[] { ':', '=' }, 2);
+                        command.ShowHelp();
+                        return 0;
                     }
-                    else if (arg.StartsWith("-"))
+                    else if (result == ParseOptionResult.ShowVersion)
                     {
-                        shortOption = arg.Substring(1).Split(new[] { ':', '=' }, 2);
+                        command.ShowVersion();
+                        return 0;
                     }
-                    if (longOption != null)
+                    else if (result == ParseOptionResult.UnexpectedArgs)
                     {
-                        processed = true;
-                        string longOptionName = longOption[0];
-                        option = command.Options.SingleOrDefault(opt => string.Equals(opt.LongName, longOptionName, StringComparison.Ordinal));
-
-                        if (option == null)
-                        {
-                            if (string.IsNullOrEmpty(longOptionName) && !command._throwOnUnexpectedArg && AllowArgumentSeparator)
-                            {
-                                // a stand-alone "--" is the argument separator, so skip it and
-                                // handle the rest of the args as unexpected args
-                                index++;
-                            }
-
-                            HandleUnexpectedArg(command, args, index, argTypeName: "option");
-                            break;
-                        }
-
-                        // If we find a help/version option, show information and stop parsing
-                        if (command.OptionHelp == option)
-                        {
-                            command.ShowHelp();
-                            return 0;
-                        }
-                        else if (command.OptionVersion == option)
-                        {
-                            command.ShowVersion();
-                            return 0;
-                        }
-
-                        if (longOption.Length == 2)
-                        {
-                            if (!option.TryParse(longOption[1]))
-                            {
-                                command.ShowHint();
-                                throw new CommandParsingException(command, $"Unexpected value '{longOption[1]}' for option '{option.LongName}'");
-                            }
-                            option = null;
-                        }
-                        else if (option.OptionType == CommandOptionType.NoValue || option.OptionType == CommandOptionType.BoolValue)
-                        {
-                            // No value is needed for this option
-                            option.TryParse(null);
-                            option = null;
-                        }
-                    }
-                    if (shortOption != null)
-                    {
-                        processed = true;
-                        option = command.Options.SingleOrDefault(opt => string.Equals(opt.ShortName, shortOption[0], StringComparison.Ordinal));
-
-                        // If not a short option, try symbol option
-                        if (option == null)
-                        {
-                            option = command.Options.SingleOrDefault(opt => string.Equals(opt.SymbolName, shortOption[0], StringComparison.Ordinal));
-                        }
-
-                        if (option == null)
-                        {
-                            HandleUnexpectedArg(command, args, index, argTypeName: "option");
-                            break;
-                        }
-
-                        // If we find a help/version option, show information and stop parsing
-                        if (command.OptionHelp == option)
-                        {
-                            command.ShowHelp();
-                            return 0;
-                        }
-                        else if (command.OptionVersion == option)
-                        {
-                            command.ShowVersion();
-                            return 0;
-                        }
-
-                        if (shortOption.Length == 2)
-                        {
-                            if (!option.TryParse(shortOption[1]))
-                            {
-                                command.ShowHint();
-                                throw new CommandParsingException(command, $"Unexpected value '{shortOption[1]}' for option '{option.LongName}'");
-                            }
-                            option = null;
-                        }
-                        else if (option.OptionType == CommandOptionType.NoValue || option.OptionType == CommandOptionType.BoolValue)
-                        {
-                            // No value is needed for this option
-                            option.TryParse(null);
-                            option = null;
-                        }
+                        break;
                     }
                 }
-
-                if (!processed && option != null)
+                else
                 {
-                    processed = true;
-                    if (!option.TryParse(arg))
+                    var subcommand = ParseSubCommand(arg, command);
+                    if (subcommand != null)
                     {
-                        command.ShowHint();
-                        throw new CommandParsingException(command, $"Unexpected value '{arg}' for option '{option.LongName}'");
+                        command = subcommand;
                     }
-                    option = null;
-                }
-
-                if (!processed)
-                {
-                    var currentCommand = command;
-                    foreach (var subcommand in command.Commands)
+                    else
                     {
-                        if (string.Equals(subcommand.Name, arg, StringComparison.OrdinalIgnoreCase))
+                        if (arguments == null)
                         {
-                            processed = true;
-                            command = subcommand;
+                            arguments = new CommandArgumentEnumerator(command.Arguments.GetEnumerator());
+                        }
+
+                        if (arguments.MoveNext())
+                        {
+                            arguments.Current.Values.Add(arg);
+                        }
+                        else
+                        {
+                            HandleUnexpectedArg(command, args, index, argTypeName: "command or argument");
                             break;
                         }
                     }
-
-                    // If we detect a subcommand
-                    if (command != currentCommand)
-                    {
-                        processed = true;
-                    }
                 }
-                if (!processed)
-                {
-                    if (arguments == null)
-                    {
-                        arguments = new CommandArgumentEnumerator(command.Arguments.GetEnumerator());
-                    }
-                    if (arguments.MoveNext())
-                    {
-                        processed = true;
-                        arguments.Current.Values.Add(arg);
-                    }
-                }
-                if (!processed)
-                {
-                    HandleUnexpectedArg(command, args, index, argTypeName: "command or argument");
-                    break;
-                }
-            }
-
-            if (option != null)
-            {
-                command.ShowHint();
-                throw new CommandParsingException(command, $"Missing value for option '{option.LongName}'");
             }
 
             return command.Invoke();
+        }
+
+        private ParseOptionResult ParseOption(
+            bool isLongOption,
+            CommandLineApplication command, 
+            string[] args, 
+            ref int index,
+            out CommandOption option)
+        {
+            option = null;
+            ParseOptionResult result = ParseOptionResult.Succeeded;
+            var arg = args[index];
+
+            int optionPrefixLength = isLongOption ? 2 : 1;
+            string[] optionComponents = arg.Substring(optionPrefixLength).Split(new[] { ':', '=' }, 2);
+            string optionName = optionComponents[0];
+            
+            if (isLongOption)
+            {
+                option = command.Options.SingleOrDefault(
+                    opt => string.Equals(opt.LongName, optionName, StringComparison.Ordinal));
+            }
+            else
+            {
+                option = command.Options.SingleOrDefault(
+                    opt => string.Equals(opt.ShortName, optionName, StringComparison.Ordinal));
+
+                if (option == null)
+                {
+                    option = command.Options.SingleOrDefault(
+                        opt => string.Equals(opt.SymbolName, optionName, StringComparison.Ordinal));
+                }
+            }
+
+            if (option == null)
+            {
+                if (isLongOption && string.IsNullOrEmpty(optionName) &&
+                    !command._throwOnUnexpectedArg && AllowArgumentSeparator)
+                {
+                    // a stand-alone "--" is the argument separator, so skip it and
+                    // handle the rest of the args as unexpected args
+                    index++;
+                }
+
+                HandleUnexpectedArg(command, args, index, argTypeName: "option");
+                result = ParseOptionResult.UnexpectedArgs;
+            }
+            else if (command.OptionHelp == option)
+            {
+                result = ParseOptionResult.ShowHelp;
+            }
+            else if (command.OptionVersion == option)
+            {
+                result = ParseOptionResult.ShowVersion;
+            }
+            else
+            {
+                if (optionComponents.Length == 2)
+                {
+                    if (!option.TryParse(optionComponents[1]))
+                    {
+                        command.ShowHint();
+                        throw new CommandParsingException(command,
+                            $"Unexpected value '{optionComponents[1]}' for option '{optionName}'");
+                    }
+                }
+                else
+                {
+                    if (option.OptionType == CommandOptionType.NoValue ||
+                        option.OptionType == CommandOptionType.BoolValue)
+                    {
+                        // No value is needed for this option
+                        option.TryParse(null);
+                    }
+                    else
+                    {
+                        index++;
+                        arg = args[index];
+                        if (!option.TryParse(arg))
+                        {
+                            command.ShowHint();
+                            throw new CommandParsingException(command, $"Unexpected value '{arg}' for option '{optionName}'");
+
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private CommandLineApplication ParseSubCommand(string arg, CommandLineApplication command)
+        {
+            foreach (var subcommand in command.Commands)
+            {
+                if (string.Equals(subcommand.Name, arg, StringComparison.OrdinalIgnoreCase))
+                {
+                    return subcommand;
+                }
+            }
+
+            return null;
         }
 
         // Helper method that adds a help option

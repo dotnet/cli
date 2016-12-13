@@ -3,56 +3,26 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Tools.List.ProjectToProjectReferences;
-using Microsoft.DotNet.Cli.Utils;
 
 namespace Microsoft.DotNet.Tools.List
 {
-    public class ListCommand
+    public class ListCommand : DotNetTopLevelCommandBase
     {
-        private static List<Func<CommandLineApplication, CommandLineApplication>>
-            BuiltInCommands => new List<Func<CommandLineApplication, CommandLineApplication>>
-        {
-            ListProjectToProjectReferencesCommand.CreateApplication,
-        };
+        protected override string CommandName => "list";
+        protected override string FullCommandNameLocalized => LocalizableStrings.NetListCommand;
+        internal override List<Func<CommandLineApplication, CommandLineApplication>> SubCommands =>
+            new List<Func<CommandLineApplication, CommandLineApplication>>
+            {
+                ListProjectToProjectReferencesCommand.CreateApplication,
+            };
 
         public static int Run(string[] args)
         {
-            DebugHelper.HandleDebugSwitch(ref args);
-
-            CommandLineApplication app = new CommandLineApplication(throwOnUnexpectedArg: true)
-            {
-                Name = "dotnet list",
-                FullName = LocalizableStrings.NetListCommand,
-            };
-
-            app.HelpOption("-h|--help");
-
-            app.Argument(
-                Constants.ProjectOrSolutionArgumentName,
-                CommonLocalizableStrings.ArgumentsProjectOrSolutionDescription);
-
-            foreach (var subCommandCreator in BuiltInCommands)
-            {
-                subCommandCreator(app);
-            }
-
-            try
-            {
-                return app.Execute(args);
-            }
-            catch (GracefulException e)
-            {
-                Reporter.Error.WriteLine(e.Message.Red());
-                app.ShowHelp();
-                return 1;
-            }
-            catch (CommandParsingException e)
-            {
-                Reporter.Error.WriteLine(e.Message.Red());
-                return 1;
-            }
+            var command = new ListCommand();
+            return command.RunCommand(args);
         }
     }
 }
