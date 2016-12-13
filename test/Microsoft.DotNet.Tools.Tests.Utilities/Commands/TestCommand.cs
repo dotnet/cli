@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         public virtual CommandResult Execute(string args = "")
         {
-            return ExecuteAsync(args).Result;
+            return Task.Run(async () => await ExecuteAsync(args)).Result;
         }
 
         public async virtual Task<CommandResult> ExecuteAsync(string args = "")
@@ -71,7 +71,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
             Console.WriteLine($"Executing (Captured Output) - {commandPath} {args} - {WorkingDirectoryInfo()}");
 
-            return ExecuteAsyncInternal(resolvedCommand, args).Result;
+            return Task.Run(async () => await ExecuteAsyncInternal(resolvedCommand, args)).Result;
         }
 
         public void KillTree()
@@ -151,7 +151,7 @@ Console.WriteLine("Starting Process");
             CurrentProcess.BeginErrorReadLine();
 Console.WriteLine("Getting Wait Task");
 
-            //await completionTask;
+            await completionTask;
 
             CurrentProcess.WaitForExit();
 
