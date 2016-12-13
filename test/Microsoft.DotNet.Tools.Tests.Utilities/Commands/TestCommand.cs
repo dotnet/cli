@@ -25,8 +25,6 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         public Dictionary<string, string> Environment { get; } = new Dictionary<string, string>();
 
-        private List<Action<string>> _writeLines = new List<Action<string>>();
-
         private List<string> _cliGeneratedEnvironmentVariables = new List<string> { "MSBuildSDKsPath" };
 
         public event DataReceivedEventHandler ErrorDataReceived;
@@ -118,8 +116,6 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
             CurrentProcess.ErrorDataReceived += (s, e) =>
             {
-Console.WriteLine(e.Data);
-
                 stdErr.Add(e.Data);
 
                 var handler = ErrorDataReceived;
@@ -132,8 +128,6 @@ Console.WriteLine(e.Data);
 
             CurrentProcess.OutputDataReceived += (s, e) =>
             {
-Console.WriteLine(e.Data);
-                
                 stdOut.Add(e.Data);
 
                 var handler = OutputDataReceived;
@@ -143,13 +137,12 @@ Console.WriteLine(e.Data);
                     handler(s, e);
                 }
             };
-Console.WriteLine("Starting Process");
+            
             var completionTask = CurrentProcess.StartAndWaitForExitAsync();
 
             CurrentProcess.BeginOutputReadLine();
 
             CurrentProcess.BeginErrorReadLine();
-Console.WriteLine("Getting Wait Task");
 
             await completionTask;
 
