@@ -122,6 +122,6 @@ if ($NoBuild)
 }
 else
 {
-    dotnet msbuild build.proj /m /p:Architecture=$Architecture $ExtraParameters /v:diag
+    dotnet msbuild build.proj /m /v:diag /p:Architecture=$Architecture $ExtraParameters
     if($LASTEXITCODE -ne 0) { throw "Failed to build" } 
 }

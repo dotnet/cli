@@ -16,23 +16,25 @@ namespace Microsoft.DotNet.Cli.VSTest.Tests
         [Fact]
         public void TestsFromAGivenContainerShouldRunWithExpectedOutput()
         {
-            var testRoot = TestAssets.Get("VSTestDotNetCore")
+            var testAppName = "VSTestDotNetCore";
+            var testRoot = TestAssets.Get(testAppName)
                 .CreateInstance()
                 .WithRestoreFiles()
                 .WithBuildFiles()
                 .Root;
 
-            string configuration = Environment.GetEnvironmentVariable("CONFIGURATION") ?? "Debug";
+            var configuration = Environment.GetEnvironmentVariable("CONFIGURATION") ?? "Debug";
 
-            string outputDll = testRoot
+            var outputDll = testRoot
                 .GetDirectory("bin", configuration, "netcoreapp1.0")
                 .GetFile($"{testAppName}.dll");
 
-            string argsForVstest = $"\"{outputDll}\"";
+            var argsForVstest = $"\"{outputDll.FullName}\"";
 
             // Call vstest
             new VSTestCommand()
                 .ExecuteWithCapturedOutput(argsForVstest)
+                .StdOut
                 .Should().Contain("Total tests: 2. Passed: 1. Failed: 1. Skipped: 0.")
                      .And.Contain("Passed   TestNamespace.VSTestTests.VSTestPassTest")
                      .And.Contain("Failed   TestNamespace.VSTestTests.VSTestFailTest");

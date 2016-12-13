@@ -15,31 +15,37 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 {
     public class TestCommand
     {
-        protected string _command;
-
         private string _baseDirectory;
 
-        public string WorkingDirectory { get; set; }
+        private List<string> _cliGeneratedEnvironmentVariables = new List<string> { "MSBuildSDKsPath" };
+
+        protected string _command;
 
         public Process CurrentProcess { get; private set; }
 
         public Dictionary<string, string> Environment { get; } = new Dictionary<string, string>();
 
-        private List<string> _cliGeneratedEnvironmentVariables = new List<string> { "MSBuildSDKsPath" };
-
         public event DataReceivedEventHandler ErrorDataReceived;
 
         public event DataReceivedEventHandler OutputDataReceived;
+
+        public string WorkingDirectory { get; set; }
 
         public TestCommand(string command)
         {
             _command = command;
 
-#if NET451            
-            _baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-#else
-            _baseDirectory = AppContext.BaseDirectory;
-#endif 
+            _baseDirectory = GetBaseDirectory();
+        }
+
+        public void KillTree()
+        {
+            if (CurrentProcess == null)
+            {
+                throw new InvalidOperationException("No process is available to be killed");
+            }
+
+            CurrentProcess.KillTree();
         }
 
         public virtual CommandResult Execute(string args = "")
@@ -70,39 +76,6 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             Console.WriteLine($"Executing (Captured Output) - {commandPath} {args} - {WorkingDirectoryInfo()}");
 
             return Task.Run(async () => await ExecuteAsyncInternal(resolvedCommand, args)).Result;
-        }
-
-        public void KillTree()
-        {
-            if (CurrentProcess == null)
-            {
-                throw new InvalidOperationException("No process is available to be killed");
-            }
-
-            CurrentProcess.KillTree();
-        }
-
-        private void ResolveCommand(ref string executable, ref string args)
-        {
-            if (executable.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
-            {
-                var newArgs = ArgumentEscaper.EscapeSingleArg(executable);
-
-                if (!string.IsNullOrEmpty(args))
-                {
-                    newArgs += " " + args;
-                }
-
-                args = newArgs;
-
-                executable = "dotnet";
-            }
-
-            if (!Path.IsPathRooted(executable))
-            {
-                executable = Env.GetCommandPath(executable) ??
-                             Env.GetCommandPathFromRootPath(_baseDirectory, executable);
-            }
         }
 
 
@@ -171,21 +144,11 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
                 UseShellExecute = false
             };
 
-            RemoveCliGeneratedEnvironmentVariables(psi);
+            RemoveCliGeneratedEnvironmentVariablesFrom(psi);
 
-            foreach (var item in Environment)
-            {
-#if NET451
-                psi.EnvironmentVariables[item.Key] = item.Value;
-#else
-                psi.Environment[item.Key] = item.Value;
-#endif
-            }
+            AddEnvironmentVariablesTo(psi);
 
-            if (!string.IsNullOrWhiteSpace(WorkingDirectory))
-            {
-                psi.WorkingDirectory = WorkingDirectory;
-            }
+            AddWorkingDirectoryTo(psi);
 
             var process = new Process
             {
@@ -207,18 +170,6 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             return $" in pwd {WorkingDirectory}";
         }
 
-        private void RemoveCliGeneratedEnvironmentVariables(ProcessStartInfo psi)
-        {
-            foreach (var name in _cliGeneratedEnvironmentVariables)
-            {
-#if NET451
-                psi.EnvironmentVariables.Remove(name);
-#else
-                psi.Environment.Remove(name);
-#endif
-            }
-        }
-
         private void RemoveNullTerminator(List<string> strings)
         {
             var count = strings.Count;
@@ -231,6 +182,70 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             if (strings[count - 1] == null)
             {
                 strings.RemoveAt(count - 1);
+            }
+        }
+
+        private string GetBaseDirectory()
+        {
+#if NET451
+            return AppDomain.CurrentDomain.BaseDirectory;
+#else
+            return AppContext.BaseDirectory;
+#endif
+        }
+
+        private void ResolveCommand(ref string executable, ref string args)
+        {
+            if (executable.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+            {
+                var newArgs = ArgumentEscaper.EscapeSingleArg(executable);
+
+                if (!string.IsNullOrEmpty(args))
+                {
+                    newArgs += " " + args;
+                }
+
+                args = newArgs;
+
+                executable = "dotnet";
+            }
+
+            if (!Path.IsPathRooted(executable))
+            {
+                executable = Env.GetCommandPath(executable) ??
+                             Env.GetCommandPathFromRootPath(_baseDirectory, executable);
+            }
+        }
+
+        private void RemoveCliGeneratedEnvironmentVariablesFrom(ProcessStartInfo psi)
+        {
+            foreach (var name in _cliGeneratedEnvironmentVariables)
+            {
+#if NET451
+                psi.EnvironmentVariables.Remove(name);
+#else
+                psi.Environment.Remove(name);
+#endif
+            }
+        }
+
+        private void AddEnvironmentVariablesTo(ProcessStartInfo psi)
+        {
+            foreach (var item in Environment)
+            {
+#if NET451
+                psi.EnvironmentVariables[item.Key] = item.Value;
+#else
+                psi.Environment[item.Key] = item.Value;
+#endif
+            }
+        }
+
+        private void AddWorkingDirectoryTo(ProcessStartInfo psi)
+        {
+            if (!string.IsNullOrWhiteSpace(WorkingDirectory))
+            {
+                psi.WorkingDirectory = WorkingDirectory;
             }
         }
     }
