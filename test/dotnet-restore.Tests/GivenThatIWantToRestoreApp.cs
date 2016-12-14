@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.Restore.Tests
             string args = $"--packages \"{dir}\"";
             new RestoreCommand()
                  .WithWorkingDirectory(rootPath)
-                 .Execute(args)
+                 .ExecuteWithCapturedOutput(args)
                  .Should()
                  .Pass()
                  .And.NotHaveStdErr();
@@ -57,7 +57,7 @@ namespace Microsoft.DotNet.Restore.Tests
             string args = $"--packages \"{dir}\"";
             new RestoreCommand()
                  .WithWorkingDirectory(rootPath)
-                 .Execute(args)
+                 .ExecuteWithCapturedOutput(args)
                  .Should()
                  .Pass()
                  .And.NotHaveStdErr();
@@ -77,7 +77,7 @@ namespace Microsoft.DotNet.Restore.Tests
             string args = $"--packages \"{dir}\"";
             new RestoreCommand()
                  .WithWorkingDirectory(rootPath)
-                 .Execute(args)
+                 .ExecuteWithCapturedOutput(args)
                  .Should()
                  .Pass()
                  .And.NotHaveStdErr();
