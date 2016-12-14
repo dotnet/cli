@@ -50,13 +50,13 @@ namespace Microsoft.DotNet.Tools.Add.ProjectToSolution
 
                     List<string> projectPaths = app.RemainingArguments;
                     PathUtility.EnsureAllPathsExist(projectPaths, CommonLocalizableStrings.ProjectDoesNotExist);
-                    projectPaths = projectPaths.Select((p) =>
+                    var relativeProjectPaths = projectPaths.Select((p) =>
                         PathUtility.GetRelativePath(
                             PathUtility.EnsureTrailingSlash(slnFile.BaseDirectory),
                             Path.GetFullPath(p))).ToList();
 
                     int preAddProjectCount = slnFile.Projects.Count;
-                    foreach (var project in projectPaths)
+                    foreach (var project in relativeProjectPaths)
                     {
                         AddProject(slnFile, project);
                     }

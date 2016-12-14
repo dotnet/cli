@@ -72,7 +72,7 @@ namespace Microsoft.DotNet.Tools.Common
                     solutionDirectory);
             }
 
-            FileInfo solutionFile = files.First();
+            FileInfo solutionFile = files.Single();
             if (!solutionFile.Exists)
             {
                 throw new GracefulException(

@@ -27,7 +27,10 @@ namespace Microsoft.DotNet.Cli.Add.Proj.Tests
 
         [Theory]
         [InlineData("idontexist.sln")]
-        [InlineData("ihave?inv@lid/char\\acters")]
+        [InlineData("ihave?invalidcharacters")]
+        [InlineData("ihaveinv@lidcharacters")]
+        [InlineData("ihaveinvalid/characters")]
+        [InlineData("ihaveinvalidchar\\acters")]
         public void WhenNonExistingSolutionIsPassedItPrintsErrorAndUsage(string solutionName)
         {
             var cmd = new DotnetCommand()
@@ -116,17 +119,17 @@ namespace Microsoft.DotNet.Cli.Add.Proj.Tests
         }
 
         [Theory]
-        [InlineData("TestAppWithSlnAndCsprojFiles", "Lib\\Lib.csproj", "")]
-        [InlineData("TestAppWithSlnAndCsprojProjectGuidFiles", "Lib/Lib.csproj", "{84A45D44-B677-492D-A6DA-B3A71135AB8E}")]
+        [InlineData("TestAppWithSlnAndCsprojFiles", "")]
+        [InlineData("TestAppWithSlnAndCsprojProjectGuidFiles", "{84A45D44-B677-492D-A6DA-B3A71135AB8E}")]
         public void WhenValidProjectIsPassedItGetsNormalizedAndAddedAndSlnBuilds(
             string testAsset,
-            string projectToAdd,
             string projectGuid)
         {
             var projectDirectory = TestAssetsManager.CreateTestInstance(testAsset)
                                                     .WithLockFiles()
                                                     .Path;
 
+            var projectToAdd = "Lib/Lib.csproj";
             var normalizedProjectPath = @"Lib\Lib.csproj";
             var cmd = new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)
