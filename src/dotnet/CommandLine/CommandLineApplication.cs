@@ -8,6 +8,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.Tools;
 
 namespace Microsoft.DotNet.Cli.CommandLine
 {
@@ -173,6 +175,11 @@ namespace Microsoft.DotNet.Cli.CommandLine
                         }
                     }
                 }
+            }
+
+            if (Commands.Count > 0 && command == this)
+            {
+                throw new GracefulException(CommonLocalizableStrings.RequiredCommandNotPassed);
             }
 
             return command.Invoke();

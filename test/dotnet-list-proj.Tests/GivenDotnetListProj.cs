@@ -13,6 +13,16 @@ namespace Microsoft.DotNet.Cli.List.Proj.Tests
 {
     public class GivenDotnetListProj : TestBase
     {
+        private const string HelpText = @".NET Projects in Solution viewer
+
+Usage: dotnet list <PROJECT_OR_SOLUTION> projects [options]
+
+Arguments:
+  <PROJECT_OR_SOLUTION>  The project or solution to operation on. If a file is not specified, the current directory is searched.
+
+Options:
+  -h|--help  Show help information";
+
         [Theory]
         [InlineData("--help")]
         [InlineData("-h")]
@@ -21,7 +31,18 @@ namespace Microsoft.DotNet.Cli.List.Proj.Tests
             var cmd = new DotnetCommand()
                 .ExecuteWithCapturedOutput($"list projects {helpArg}");
             cmd.Should().Pass();
-            cmd.StdOut.Should().Contain("Usage");
+            cmd.StdOut.Should().Contain(HelpText);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("unknownCommandName")]
+        public void WhenNoCommandIsPassedItPrintsError(string commandName)
+        {
+            var cmd = new DotnetCommand()
+                .ExecuteWithCapturedOutput($"list {commandName}");
+            cmd.Should().Fail();
+            cmd.StdErr.Should().Contain("Required command was not provided.");
         }
 
         [Fact]
@@ -30,7 +51,7 @@ namespace Microsoft.DotNet.Cli.List.Proj.Tests
             var cmd = new DotnetCommand()
                 .ExecuteWithCapturedOutput("list one.sln two.sln three.sln projects");
             cmd.Should().Fail();
-            cmd.StdErr.Should().Contain("Unrecognized command or argument");
+            cmd.StdErr.Should().Contain("Unrecognized command or argument 'two.sln'");
         }
 
         [Theory]
@@ -44,76 +65,93 @@ namespace Microsoft.DotNet.Cli.List.Proj.Tests
             var cmd = new DotnetCommand()
                 .ExecuteWithCapturedOutput($"list {solutionName} projects");
             cmd.Should().Fail();
-            cmd.StdErr.Should().Contain("Could not find");
-            cmd.StdOut.Should().Contain("Usage:");
+            cmd.StdErr.Should().Contain($"Could not find solution or directory `{solutionName}`");
+            cmd.StdOut.Should().Contain(HelpText);
         }
 
         [Fact]
         public void WhenInvalidSolutionIsPassedItPrintsErrorAndUsage()
         {
-            var projectDirectory = TestAssetsManager.CreateTestInstance("InvalidSolution")
-                                                    .WithLockFiles()
-                                                    .Path;
-
+            var projectDirectory = TestAssets
+                .Get("InvalidSolution")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root
+                .FullName;
+            
             var cmd = new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)
                 .ExecuteWithCapturedOutput("list InvalidSolution.sln projects");
             cmd.Should().Fail();
-            cmd.StdErr.Should().Contain("Invalid solution ");
-            cmd.StdOut.Should().Contain("Usage:");
+            cmd.StdErr.Should().Contain("Invalid solution `InvalidSolution.sln`");
+            cmd.StdOut.Should().Contain(HelpText);
         }
 
         [Fact]
         public void WhenInvalidSolutionIsFoundItPrintsErrorAndUsage()
         {
-            var projectDirectory = TestAssetsManager.CreateTestInstance("InvalidSolution")
-                                                    .WithLockFiles()
-                                                    .Path;
+            var projectDirectory = TestAssets
+                .Get("InvalidSolution")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root
+                .FullName;
 
+            var solutionFullPath = Path.Combine(projectDirectory, "InvalidSolution.sln");
             var cmd = new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)
                 .ExecuteWithCapturedOutput("list projects");
             cmd.Should().Fail();
-            cmd.StdErr.Should().Contain("Invalid solution ");
-            cmd.StdOut.Should().Contain("Usage:");
+            cmd.StdErr.Should().Contain($"Invalid solution `{solutionFullPath}`");
+            cmd.StdOut.Should().Contain(HelpText);
         }
 
         [Fact]
         public void WhenNoSolutionExistsInTheDirectoryItPrintsErrorAndUsage()
         {
-            var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppWithSlnAndCsprojFiles")
-                                                    .WithLockFiles()
-                                                    .Path;
+            var projectDirectory = TestAssets
+                .Get("TestAppWithSlnAndCsprojFiles")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root
+                .FullName;
 
+            var solutionDir = Path.Combine(projectDirectory, "App");
             var cmd = new DotnetCommand()
-                .WithWorkingDirectory(Path.Combine(projectDirectory, "App"))
+                .WithWorkingDirectory(solutionDir)
                 .ExecuteWithCapturedOutput("list projects");
             cmd.Should().Fail();
-            cmd.StdErr.Should().Contain("does not exist");
-            cmd.StdOut.Should().Contain("Usage:");
+            cmd.StdErr.Should().Contain($"Specified solution file {solutionDir + Path.DirectorySeparatorChar} does not exist, or there is no solution file in the directory");
+            cmd.StdOut.Should().Contain(HelpText);
         }
 
         [Fact]
         public void WhenMoreThanOneSolutionExistsInTheDirectoryItPrintsErrorAndUsage()
         {
-            var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppWithMultipleSlnFiles")
-                                                    .WithLockFiles()
-                                                    .Path;
+            var projectDirectory = TestAssets
+                .Get("TestAppWithMultipleSlnFiles")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root
+                .FullName;
 
             var cmd = new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)
                 .ExecuteWithCapturedOutput("list projects");
             cmd.Should().Fail();
-            cmd.StdErr.Should().Contain("more than one");
-            cmd.StdOut.Should().Contain("Usage");
+            cmd.StdErr.Should().Contain($"Found more than one solution file in {projectDirectory + Path.DirectorySeparatorChar}. Please specify which one to use.");
+            cmd.StdOut.Should().Contain(HelpText);
         }
 
         [Fact]
-        public void WhenNoProjectReferencesArePresentInTheSolutionItPrintsError()
+        public void WhenNoProjectReferencesArePresentInTheSolutionItPrintsANoProjectMessage()
         {
-            var projectDirectory = TestAssetsManager.CreateTestInstance("SlnFileWithNoProjectReferences")
-                                                    .WithLockFiles()
-                                                    .Path;
+            var projectDirectory = TestAssets
+                .Get("SlnFileWithNoProjectReferences")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root
+                .FullName;
 
             var cmd = new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)
@@ -125,9 +163,12 @@ namespace Microsoft.DotNet.Cli.List.Proj.Tests
         [Fact]
         public void WhenProjectReferencesArePresentInTheSolutionItListsThem()
         {
-            var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppWithSlnAndExistingCsprojReferences")
-                                                    .WithLockFiles()
-                                                    .Path;
+            var projectDirectory = TestAssets
+                .Get("TestAppWithSlnAndExistingCsprojReferences")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root
+                .FullName;
 
             var cmd = new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)

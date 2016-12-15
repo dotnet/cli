@@ -91,6 +91,7 @@ namespace Microsoft.DotNet.Tools
         public const string OptionIsInvalid = "Option {0} is invalid.";
         public const string ArgumentIsInvalid = "Argument {0} is invalid.";
         public const string RequiredArgumentNotPassed = "Required argument {0} was not provided.";
+        public const string RequiredCommandNotPassed = "Required command was not provided.";
 
         // dotnet <verb>
         /// Project
