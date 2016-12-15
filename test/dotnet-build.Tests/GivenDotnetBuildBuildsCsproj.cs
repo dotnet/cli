@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.Cli.Build.Tests
         }
 
         [Fact]
-        public void ItBuildsARunnableOutputWhenRestoringToSpecificPackageDirectory()
+        public void ItRunsWhenRestoringToSpecificPackageDir()
         {
             var rootPath = TestAssetsManager.CreateTestDirectory().Path;
 
