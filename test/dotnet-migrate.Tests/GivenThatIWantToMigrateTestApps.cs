@@ -676,10 +676,10 @@ namespace Microsoft.DotNet.Migration.Tests
 
         private void MigrateProject(params string[] migrateArgs)
         {
-            var result =
-                MigrateCommand.Run(migrateArgs);
+            var result = new TestCommand("dotnet")
+                    .Execute($"migrate {string.Join(" ", migrateArgs)}");
 
-            result.Should().Be(0);
+            result.Should().Pass();
         }
 
         private void RestoreProjectJson(string projectDirectory)
