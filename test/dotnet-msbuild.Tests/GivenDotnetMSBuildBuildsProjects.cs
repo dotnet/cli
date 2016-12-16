@@ -20,34 +20,28 @@ namespace Microsoft.DotNet.Cli.MSBuild.Tests
         [Fact]
         public void ItRunsSpecifiedTargetsWithPropertiesCorrectly()
         {
-            var testInstance = TestAssetsManager
-                .CreateTestInstance("MSBuildBareBonesProject");
-
-            var testProjectDirectory = testInstance.TestRoot;
+            var testProjectDirectory = TestAssets.Get("MSBuildBareBonesProject")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root;
 
             new MSBuildCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .ExecuteWithCapturedOutput("/t:SayHello")
-                .Should()
-                .Pass()
-                .And
-                .HaveStdOutContaining("Hello, from MSBuild!");
+                .Should().Pass()
+                     .And.HaveStdOutContaining("Hello, from MSBuild!");
 
             new MSBuildCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .ExecuteWithCapturedOutput("/t:SayGoodbye")
-                .Should()
-                .Pass()
-                .And
-                .HaveStdOutContaining("Goodbye, from MSBuild. :'(");
+                .Should().Pass()
+                     .And.HaveStdOutContaining("Goodbye, from MSBuild. :'(");
 
             new MSBuildCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .ExecuteWithCapturedOutput("/t:SayThis /p:This=GreatScott")
-                .Should()
-                .Pass()
-                .And
-                .HaveStdOutContaining("You want me to say 'GreatScott'");
+                .Should().Pass()
+                     .And.HaveStdOutContaining("You want me to say 'GreatScott'");
         }
 
         [Theory]
@@ -60,12 +54,14 @@ namespace Microsoft.DotNet.Cli.MSBuild.Tests
         {
             const string MSBuildHelpText = " Any extra options that should be passed to MSBuild. See 'dotnet msbuild -h' for available options.";
 
-            var projectDirectory = TestAssetsManager.CreateTestDirectory("ItContainsMSBuildHelpText");
+            var projectDirectory = TestAssets.CreateTestDirectory();
+
             var result = new TestCommand("dotnet")
-                .WithWorkingDirectory(projectDirectory.Path)
+                .WithWorkingDirectory(projectDirectory)
                 .ExecuteWithCapturedOutput($"{commandName} --help");
 
             result.ExitCode.Should().Be(0);
+
             if (isMSBuildCommand)
             {
                 result.StdOut.Should().Contain(MSBuildHelpText);

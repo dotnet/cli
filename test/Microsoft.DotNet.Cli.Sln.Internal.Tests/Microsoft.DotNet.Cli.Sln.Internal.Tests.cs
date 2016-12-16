@@ -17,11 +17,15 @@ namespace Microsoft.DotNet.Cli.Sln.Internal.Tests
         public void WhenGivenAValidPathItReadsAnSlnFile()
         {
             var solutionDirectory =
-                TestAssetsManager.CreateTestInstance("TestAppWithSln", callingMethod: "p").Path;
+                TestAssets.Get("TestAppWithSln")
+                    .WithSourceFiles()
+                    .Root;
 
-            var solutionFullPath = Path.Combine(solutionDirectory, "TestAppWithSln.sln");
+            var solutionFullPath = solutionDirectory.GetFile("TestAppWithSln.sln");
 
             var slnFile = SlnFile.Read(solutionFullPath);
+
+            slnFile.Read(solutionFullPath.FullName);
 
             slnFile.FormatVersion.Should().Be("12.00");
             slnFile.ProductDescription.Should().Be("Visual Studio 14");
@@ -42,21 +46,22 @@ namespace Microsoft.DotNet.Cli.Sln.Internal.Tests
         public void WhenGivenAValidPathItReadsModifiesThenWritesAnSln()
         {
             var solutionDirectory =
-                TestAssetsManager.CreateTestInstance("TestAppWithSln", callingMethod: "p").Path;
+                TestAssets.Get("TestAppWithSln")
+                    .CreateInstance()
+                    .WithSourceFiles()
+                    .Root;
 
-            var solutionFullPath = Path.Combine(solutionDirectory, "TestAppWithSln.sln");
+            var solutionFullPath = solutionDirectory
+                .GetFile("TestAppWithSln.sln")
+                .FullName;
 
             var slnFile = SlnFile.Read(solutionFullPath);
             slnFile.FullPath.Should().Be(solutionFullPath);
 
-            slnFile.Projects.Count.Should().Be(1);
-            var project = slnFile.Projects[0];
-            project.Name.Should().Be("TestAppWithSln");
-            project.Name = "New Project Name";
-            project.FilePath.Should().Be("TestAppWithSln.xproj");
-            project.FilePath = "New File Path";
+            var newSolutionFullPath = solutionDirectory
+                .GetFile("TestAppWithSln_modified.sln")
+                .FullName;
 
-            var newSolutionFullPath = Path.Combine(solutionDirectory, "TestAppWithSln_modified.sln");
             slnFile.Write(newSolutionFullPath);
 
             slnFile = SlnFile.Read(newSolutionFullPath);

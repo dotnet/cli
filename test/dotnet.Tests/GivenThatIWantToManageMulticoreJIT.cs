@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.Tests
         [Fact]
         public void WhenInvokedThenDotnetWritesOptimizationDataToTheProfileRoot()
         {
-            var testDirectory = TestAssetsManager.CreateTestDirectory();
+            var testDirectory = TestAssets.CreateTestDirectory();
             var testStartTime = GetTruncatedDateTime();
                         
             new TestCommand("dotnet")
@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.Tests
         [Fact]
         public void WhenInvokedWithMulticoreJitDisabledThenDotnetDoesNotWriteOptimizationDataToTheProfileRoot()
         {
-            var testDirectory = TestAssetsManager.CreateTestDirectory();
+            var testDirectory = TestAssets.CreateTestDirectory();
             var testStartTime = GetTruncatedDateTime();
                         
             new TestCommand("dotnet")
@@ -62,7 +62,7 @@ namespace Microsoft.DotNet.Tests
         [Fact]
         public void WhenTheProfileRootIsUndefinedThenDotnetDoesNotCrash()
         {
-            var testDirectory = TestAssetsManager.CreateTestDirectory();
+            var testDirectory = TestAssets.CreateTestDirectory();
             var testStartTime = GetTruncatedDateTime();
             
             var optimizationProfileFilePath = GetOptimizationProfileFilePath(testDirectory.Path);

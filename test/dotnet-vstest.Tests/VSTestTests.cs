@@ -16,9 +16,9 @@ namespace Microsoft.DotNet.Cli.VSTest.Tests
         [Fact]
         public void TestsFromAGivenContainerShouldRunWithExpectedOutput()
         {
-            var testAppName = "VSTestDotNetCore";
-            var testRoot = TestAssets.Get(testAppName)
+            var testProjectDirectory = TestAssets.Get("VSTestDotNetCore")
                 .CreateInstance()
+                .WithSourceFiles()
                 .WithRestoreFiles()
                 .WithBuildFiles()
                 .Root;

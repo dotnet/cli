@@ -19,17 +19,17 @@ namespace Microsoft.DotNet.Migration.Tests
     public class GivenThatIWantToMigrateTestApps : TestBase
     {
         [Theory]
-        [InlineData("TestAppWithRuntimeOptions")]
-        [InlineData("TestAppWithContents")]
-        [InlineData("AppWithAssemblyInfo")]
-        [InlineData("TestAppWithEmbeddedResources")]
+        [InlineData("PJTestAppWithRuntimeOptions")]
+        [InlineData("PJTestAppWithContents")]
+        [InlineData("PJAppWithAssemblyInfo")]
+        [InlineData("PJTestAppWithEmbeddedResources")]
         public void ItMigratesApps(string projectName)
         {
-            var projectDirectory = TestAssetsManager.CreateTestInstance(projectName, identifier: projectName)
-                                                    .WithLockFiles()
-                                                    .Path;
-
-            CleanBinObj(projectDirectory);
+            var projectDirectory = TestAssets.GetPJ(projectName)
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles()
+                .Root;
 
             var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, projectName);
 
@@ -45,19 +45,22 @@ namespace Microsoft.DotNet.Migration.Tests
 
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
 
-            var outputCsProj = Path.Combine(projectDirectory, projectName + ".csproj");
-            var csproj = File.ReadAllText(outputCsProj);
+            var outputCsProj = projectDirectory.GetFile(projectName + ".csproj");
+            var csproj = outputCsProj.OpenText().ReadToEnd();
             csproj.EndsWith("\n").Should().Be(true);
         }
 
         [Fact]
         public void ItMigratesSignedApps()
         {
-            var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppWithSigning").WithLockFiles().Path;
+            var projectName = "PJTestAppWithSigning";
+            var projectDirectory = TestAssets.GetPJ(projectName)
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles()
+                .Root;
 
-            CleanBinObj(projectDirectory);
-
-            var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, "TestAppWithSigning");
+            var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, projectName);
 
             var outputsIdentical =
                 outputComparisonData.ProjectJsonBuildOutputs.SetEquals(outputComparisonData.MSBuildBuildOutputs);
@@ -77,10 +80,10 @@ namespace Microsoft.DotNet.Migration.Tests
         [Fact]
         public void ItMigratesDotnetNewConsoleWithIdenticalOutputs()
         {
-            var testInstance = TestAssetsManager
-                .CreateTestInstance("ProjectJsonConsoleTemplate");
-            
-            var projectDirectory = testInstance.Path;
+            var projectDirectory = TestAssets.GetPJ("PJConsoleTemplate")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root;
 
             var outputComparisonData = GetComparisonData(projectDirectory);
 
@@ -100,21 +103,23 @@ namespace Microsoft.DotNet.Migration.Tests
         [Fact]
         public void ItMigratesOldDotnetNewWebWithoutToolsWithOutputsContainingProjectJsonOutputs()
         {
-            var testInstance = TestAssetsManager
-                .CreateTestInstance("ProjectJsonWebTemplate")
-                .WithLockFiles();
+            var projectDirectory = TestAssets.GetPJ("PJWebTemplate")
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles()
+                .Root;
 
-            var projectDirectory = testInstance.Path;
+            var globalDirectory = projectDirectory.Parent;
 
-            var globalDirectory = Path.Combine(projectDirectory, "..");  
-            var projectJsonFile = Path.Combine(projectDirectory, "project.json");  
-              
+            var projectJsonFile = projectDirectory.GetFile("project.json");  
+
             WriteGlobalJson(globalDirectory);
 
             var outputComparisonData = GetComparisonData(projectDirectory);
 
-            var outputsIdentical =
-                outputComparisonData.ProjectJsonBuildOutputs.SetEquals(outputComparisonData.MSBuildBuildOutputs);
+            var outputsIdentical = outputComparisonData
+                .ProjectJsonBuildOutputs
+                .SetEquals(outputComparisonData.MSBuildBuildOutputs);
 
             if (!outputsIdentical)
             {
@@ -143,33 +148,37 @@ namespace Microsoft.DotNet.Migration.Tests
         [Fact]
         public void ItAddsMicrosoftNetWebSdkToTheSdkAttributeOfAWebApp()
         {
-            var testInstance = TestAssetsManager
-                .CreateTestInstance("ProjectJsonWebTemplate")
-                .WithLockFiles();
+            var projectDirectory = TestAssets.GetPJ("ProjectJsonWebTemplate")
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles()
+                .Root;
 
-            var projectDirectory = testInstance.Path;
-
-            var globalDirectory = Path.Combine(projectDirectory, "..");  
-            var projectJsonFile = Path.Combine(projectDirectory, "project.json");  
+            var globalDirectory = projectDirectory.Parent;  
+            var projectJsonFile = projectDirectory.GetFile("project.json");  
               
-            MigrateProject(new [] { projectDirectory });
+            MigrateProject(projectDirectory );
 
-            var csProj = Path.Combine(projectDirectory, $"{new DirectoryInfo(projectDirectory).Name}.csproj");
+            var csProj = projectDirectory.GetFile(projectDirectory.Name + ".csproj");
 
-            File.ReadAllText(csProj).Should().Contain(@"Sdk=""Microsoft.NET.Sdk.Web""");
+            csProj.ReadAllText().Should().Contain(@"Sdk=""Microsoft.NET.Sdk.Web""");
         }
 
         [Theory]
-        [InlineData("TestLibraryWithTwoFrameworks")]
+        [InlineData("PJTestLibraryWithTwoFrameworks")]
         public void ItMigratesProjectsWithMultipleTFMs(string projectName)
         {
-            var projectDirectory =
-                TestAssetsManager.CreateTestInstance(projectName, identifier: projectName).WithLockFiles().Path;
+            var projectDirectory = TestAssets.GetPJ(projectName)
+                .CreateInstance(identifier: projectName)
+                .WithSourceFiles()
+                .WithRestoreFiles()
+                .Root;
 
             var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, projectName);
 
-            var outputsIdentical =
-                outputComparisonData.ProjectJsonBuildOutputs.SetEquals(outputComparisonData.MSBuildBuildOutputs);
+            var outputsIdentical = outputComparisonData
+                .ProjectJsonBuildOutputs
+                .SetEquals(outputComparisonData.MSBuildBuildOutputs);
 
             if (!outputsIdentical)
             {
@@ -180,18 +189,24 @@ namespace Microsoft.DotNet.Migration.Tests
         }
 
         [Theory]
-        [InlineData("TestAppWithLibrary/TestLibrary")]
-        [InlineData("TestLibraryWithAnalyzer")]
+        [InlineData("PJTestAppWithLibrary/TestLibrary")]
+        [InlineData("PJTestLibraryWithAnalyzer")]
         [InlineData("PJTestLibraryWithConfiguration")]
         public void ItMigratesALibrary(string projectName)
         {
-            var projectDirectory =
-                TestAssetsManager.CreateTestInstance(projectName, identifier: projectName).WithLockFiles().Path;
+            var projectDirectory = TestAssets.GetPJ(projectName)
+                .CreateInstance(identifier: projectName)
+                .WithSourceFiles()
+                .WithRestoreFiles()
+                .Root;
 
-            var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, Path.GetFileNameWithoutExtension(projectName));
+            var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(
+                projectDirectory, 
+                Path.GetFileNameWithoutExtension(projectName));
 
-            var outputsIdentical =
-                outputComparisonData.ProjectJsonBuildOutputs.SetEquals(outputComparisonData.MSBuildBuildOutputs);
+            var outputsIdentical = outputComparisonData
+                .ProjectJsonBuildOutputs
+                .SetEquals(outputComparisonData.MSBuildBuildOutputs);
 
             if (!outputsIdentical)
             {
@@ -209,10 +224,12 @@ namespace Microsoft.DotNet.Migration.Tests
         [InlineData("ProjectE", "ProjectE")]
         public void ItMigratesRootProjectAndReferences(string projectName, string expectedProjects)
         {
-            var projectDirectory =
-                TestAssetsManager.CreateTestInstance("TestAppDependencyGraph", callingMethod: $"{projectName}.RefsTest").Path;
+            var projectDirectory = TestAssets.GetPJ("PJTestAppDependencyGraph")
+                .CreateInstance(identifier: $"{projectName}.RefsTest")
+                .WithSourceFiles()
+                .Root;
 
-            MigrateProject(new [] { Path.Combine(projectDirectory, projectName) });
+            MigrateProject(projectDirectory.GetDirectory(projectName));
 
             string[] migratedProjects = expectedProjects.Split(new char[] { ',' });
 
@@ -227,10 +244,12 @@ namespace Microsoft.DotNet.Migration.Tests
         [InlineData("ProjectE")]
         public void ItMigratesRootProjectAndSkipsReferences(string projectName)
         {
-            var projectDirectory =
-                TestAssetsManager.CreateTestInstance("TestAppDependencyGraph", callingMethod: $"{projectName}.SkipRefsTest").Path;
+            var projectDirectory = TestAssets.GetPJ("PJTestAppDependencyGraph")
+                .CreateInstance(identifier: $"{projectName}.SkipRefsTest")
+                .WithSourceFiles()
+                .Root;
 
-            MigrateProject(new [] { Path.Combine(projectDirectory, projectName), "--skip-project-references" });
+            MigrateProject(new [] { projectDirectory.GetFile(projectName).FullName, "--skip-project-references" });
 
             VerifyMigration(Enumerable.Repeat(projectName, 1), projectDirectory);
          }
@@ -240,15 +259,18 @@ namespace Microsoft.DotNet.Migration.Tests
          [InlineData(false)]
          public void ItMigratesAllProjectsInGivenDirectory(bool skipRefs)
          {
-            var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppDependencyGraph", callingMethod: $"MigrateDirectory.SkipRefs.{skipRefs}").Path;
+            var projectDirectory = TestAssets.GetPJ("PJTestAppDependencyGraph")
+                .CreateInstance(identifier: $"MigrateDirectory.SkipRefs.{skipRefs}")
+                .WithSourceFiles()
+                .Root;
 
             if (skipRefs)
             {
-                MigrateProject(new [] { projectDirectory, "--skip-project-references" });
+                MigrateProject(projectDirectory.FullName, "--skip-project-references" );
             }
             else
             {
-                MigrateProject(new [] { projectDirectory });
+                MigrateProject(projectDirectory);
             }
 
             string[] migratedProjects = new string[] { "ProjectA", "ProjectB", "ProjectC", "ProjectD", "ProjectE", "ProjectF", "ProjectG", "ProjectH", "ProjectI", "ProjectJ" };
@@ -259,11 +281,16 @@ namespace Microsoft.DotNet.Migration.Tests
          [Fact]
          public void ItMigratesGivenProjectJson()
          {
-            var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppDependencyGraph").Path;
+            var projectDirectory = TestAssets.GetPJ("PJTestAppDependencyGraph")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root;
 
-            var project = Path.Combine(projectDirectory, "ProjectA", "project.json");
+            var project = projectDirectory
+                .GetDirectory("ProjectA")
+                .GetFile("project.json");
 
-            MigrateProject(new [] { project });
+            MigrateProject(project);
 
             string[] migratedProjects = new string[] { "ProjectA", "ProjectB", "ProjectC", "ProjectD", "ProjectE" };
 
@@ -274,17 +301,21 @@ namespace Microsoft.DotNet.Migration.Tests
          // regression test for https://github.com/dotnet/cli/issues/4269
          public void ItMigratesAndBuildsP2PReferences()
          {
-            var assetsDir = TestAssetsManager.CreateTestInstance("TestAppDependencyGraph").WithLockFiles().Path;
+            var assetsDir = TestAssets.GetPJ("PJTestAppDependencyGraph")
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles()
+                .Root;
 
-            var projectDirectory = Path.Combine(assetsDir, "ProjectF");
+            var projectDirectory = assetsDir.GetDirectory("ProjectF");
 
-            var restoreDirectories = new string[]
+            var restoreDirectories = new DirectoryInfo[]
             {
                 projectDirectory, 
-                Path.Combine(assetsDir, "ProjectG")
+                assetsDir.GetDirectory("ProjectG")
             };
 
-            var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, "ProjectF", new [] { projectDirectory }, restoreDirectories);
+            var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, "ProjectF", new [] { projectDirectory.FullName }, restoreDirectories);
 
             var outputsIdentical = outputComparisonData.ProjectJsonBuildOutputs
                                                        .SetEquals(outputComparisonData.MSBuildBuildOutputs);
@@ -304,27 +335,32 @@ namespace Microsoft.DotNet.Migration.Tests
          [InlineData("src with spaces", "ProjectJ")]
          public void ItMigratesAndBuildsProjectsInGlobalJson(string path, string projectName)
          {
-            var assetsDir = TestAssetsManager.CreateTestInstance(Path.Combine("TestAppDependencyGraph", "ProjectsWithGlobalJson"), 
-                                                                 callingMethod: $"ProjectsWithGlobalJson.{projectName}")
-                                             .WithLockFiles().Path;
-            var globalJson = Path.Combine(assetsDir, "global.json");
+            var assetsDir = TestAssets.GetPJ(Path.Combine("PJTestAppDependencyGraph", "ProjectsWithGlobalJson"))
+                .CreateInstance(identifier: $"ProjectsWithGlobalJson.{projectName}")
+                .WithSourceFiles()
+                .WithRestoreFiles()
+                .Root;
 
-            var restoreDirectories = new string[]
+            var globalJson = assetsDir.GetFile("global.json");
+
+            var restoreDirectories = new DirectoryInfo[]
             {
-                Path.Combine(assetsDir, "src", "ProjectH"),
-                Path.Combine(assetsDir, "src", "ProjectI"),
-                Path.Combine(assetsDir, "src with spaces", "ProjectJ")
+                assetsDir.GetDirectory("src", "ProjectH"),
+                assetsDir.GetDirectory("src", "ProjectI"),
+                assetsDir.GetDirectory("src with spaces", "ProjectJ")
             };
 
-            var projectDirectory = Path.Combine(assetsDir, path, projectName);
+            var projectDirectory = assetsDir.GetDirectory(path, projectName);
 
-            var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(projectDirectory, 
-                                                                           projectName,
-                                                                           new [] { globalJson },
-                                                                           restoreDirectories);
+            var outputComparisonData = BuildProjectJsonMigrateBuildMSBuild(
+                projectDirectory, 
+                projectName,
+                new [] { globalJson.FullName },
+                restoreDirectories);
 
-            var outputsIdentical = outputComparisonData.ProjectJsonBuildOutputs
-                                                       .SetEquals(outputComparisonData.MSBuildBuildOutputs);
+            var outputsIdentical = outputComparisonData
+                .ProjectJsonBuildOutputs
+                .SetEquals(outputComparisonData.MSBuildBuildOutputs);
 
             if (!outputsIdentical)
             {
@@ -341,7 +377,8 @@ namespace Microsoft.DotNet.Migration.Tests
         [InlineData(false)]
         public void MigrationOutputsErrorWhenNoProjectsFound(bool useGlobalJson)
         {
-            var projectDirectory = TestAssetsManager.CreateTestDirectory("Migration_outputs_error_when_no_projects_found");
+            var projectDirectory = TestAssets
+                .CreateTestDirectory("Migration_outputs_error_when_no_projects_found");
 
             string argstr = string.Empty;
 
@@ -349,31 +386,31 @@ namespace Microsoft.DotNet.Migration.Tests
 
             if (useGlobalJson)
             {
-                var globalJsonPath = Path.Combine(projectDirectory.Path, "global.json");
+                var globalJson = projectDirectory.GetFile("global.json");
 
-                using (FileStream fs = File.Create(globalJsonPath))
+                using (var fileStream = globalJson.OpenWrite())
                 {
-                    using (StreamWriter sw = new StreamWriter(fs))
+                    using (var streamWriter = new StreamWriter(fileStream))
                     {
-                        sw.WriteLine("{");
-                        sw.WriteLine("\"projects\": [ \".\" ]");
-                        sw.WriteLine("}");
+                        streamWriter.WriteLine("{");
+                        streamWriter.WriteLine("\"projects\": [ \".\" ]");
+                        streamWriter.WriteLine("}");
                     }
                 }
 
-                argstr = globalJsonPath;
+                argstr = globalJson.FullName;
 
                 errorMessage = "Unable to find any projects in global.json";
             }
             else
             {
-                argstr = projectDirectory.Path;
+                argstr = projectDirectory.FullName;
 
-                errorMessage = $"No project.json file found in '{projectDirectory.Path}'";
+                errorMessage = $"No project.json file found in '{projectDirectory.FullName}'";
             }
 
             var result = new TestCommand("dotnet")
-                .WithWorkingDirectory(projectDirectory.Path)
+                .WithWorkingDirectory(projectDirectory)
                 .ExecuteWithCapturedOutput($"migrate {argstr}");
 
             // Expecting an error exit code.
@@ -381,18 +418,19 @@ namespace Microsoft.DotNet.Migration.Tests
 
             // Verify the error messages. Note that debug builds also show the call stack, so we search
             // for the error strings that should be present (rather than an exact match).
-            result.StdErr.Should().Contain(errorMessage);
-            result.StdErr.Should().Contain("Migration failed.");
+            result.StdErr.Should().Contain(errorMessage)
+                     .And.Contain("Migration failed.");
         }
 
         [Fact]
         public void ItMigratesAndPublishesProjectsWithRuntimes()
         {
             var projectName = "PJTestAppSimple";
-            var projectDirectory = TestAssetsManager
-                .CreateTestInstance(projectName)
-                .WithLockFiles()
-                .Path;
+            var projectDirectory = TestAssets.GetPJ(projectName)
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles()
+                .Root;
 
             CleanBinObj(projectDirectory);
             BuildProjectJsonMigrateBuildMSBuild(projectDirectory, projectName);
@@ -400,32 +438,44 @@ namespace Microsoft.DotNet.Migration.Tests
         }
 
         [WindowsOnlyTheory]
-        [InlineData("DesktopTestProjects", "AutoAddDesktopReferencesDuringMigrate", true)]
+        [InlineData("DesktopTestProjects", "PJAutoAddDesktopReferencesDuringMigrate", true)]
         [InlineData("TestProjects", "PJTestAppSimple", false)]
         public void ItAutoAddDesktopReferencesDuringMigrate(string testGroup, string projectName, bool isDesktopApp)
         {
             var runtime = DotnetLegacyRuntimeIdentifiers.InferLegacyRestoreRuntimeIdentifier();
-            var testAssetManager = GetTestGroupTestAssetsManager(testGroup);
-            var projectDirectory = testAssetManager.CreateTestInstance(projectName).WithLockFiles().Path;
+
+            var projectDirectory = TestAssets.GetPJ(testGroup, projectName)
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles()
+                .Root;
             
-            CleanBinObj(projectDirectory);
-            MigrateProject(new string[] { projectDirectory });
+            MigrateProject(projectDirectory);
+            
             Restore(projectDirectory, runtime: runtime);
+            
             BuildMSBuild(projectDirectory, projectName, runtime:runtime);
+            
             VerifyAutoInjectedDesktopReferences(projectDirectory, projectName, isDesktopApp);
+            
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
         }
 
         [Fact]
         public void ItBuildsAMigratedAppWithAnIndirectDependency()
         {
-            const string projectName = "ProjectA";
-            var solutionDirectory =
-                TestAssetsManager.CreateTestInstance("TestAppDependencyGraph", callingMethod: "p").Path;
-            var projectDirectory = Path.Combine(solutionDirectory, projectName);
+            var projectName = "ProjectA";
 
-            MigrateProject(new string[] { projectDirectory });
+            var projectDirectory = TestAssets.GetPJ("PJTestAppDependencyGraph")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root
+                .GetDirectory(projectName);
+
+            MigrateProject(projectDirectory);
+
             Restore(projectDirectory);
+
             BuildMSBuild(projectDirectory, projectName);
 
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
@@ -434,91 +484,107 @@ namespace Microsoft.DotNet.Migration.Tests
         [Fact]
         public void ItMigratesProjectWithOutputName()
         {
-            string projectName = "AppWithOutputAssemblyName";
-            string expectedOutputName = "MyApp";
+            var projectName = "PJAppWithOutputAssemblyName";
+            var expectedOutputName = "MyApp";
 
-            var projectDirectory = TestAssetsManager.CreateTestInstance(projectName, callingMethod: $"It_migrates_{projectName}")
-                .WithLockFiles()
-                .Path;
+            var projectDirectory = TestAssets.GetPJ("PJAppWithOutputAssemblyName")
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles()
+                .Root;
             
-            string expectedCsprojPath = Path.Combine(projectDirectory, $"{projectName}.csproj");
-            if (File.Exists(expectedCsprojPath))
-            {
-                File.Delete(expectedCsprojPath);
-            }
+            var expectedCsprojFile = projectDirectory.GetFile($"{projectName}.csproj");
 
-            CleanBinObj(projectDirectory);
             MigrateProject(projectDirectory);
-            File.Exists(expectedCsprojPath).Should().BeTrue();
-            Restore(projectDirectory, projectName);
-            BuildMSBuild(projectDirectory, projectName);
-            Directory.EnumerateFiles(
-                    Path.Combine(projectDirectory, "bin"),
-                    $"{expectedOutputName}.pdb",
-                    SearchOption.AllDirectories)
-                .Count().Should().Be(1);
 
+            expectedCsprojFile.Should().Exist();
+
+            Restore(projectDirectory, projectName);
+
+            BuildMSBuild(projectDirectory, projectName);
+
+            projectDirectory
+                .GetDirectory("bin", "Debug", "netcoreapp1.0")
+                .GetFile($"{expectedOutputName}.pdb")
+                .Should().Exist();
+            
             PackMSBuild(projectDirectory, projectName);
-            Directory.EnumerateFiles(
-                    Path.Combine(projectDirectory, "bin"),
-                    $"{projectName}.1.0.0.nupkg",
-                    SearchOption.AllDirectories)
-                .Count().Should().Be(1);
+            
+            projectDirectory
+                .GetDirectory("bin", "Debug")
+                .GetFile($"{projectName}.1.0.0.nupkg")
+                .Should().Exist();
         }
 
         [Theory]
-        [InlineData("LibraryWithoutNetStandardLibRef")]
-        [InlineData("LibraryWithNetStandardLibRef")]
+        [InlineData("PJLibraryWithoutNetStandardLibRef")]
+        [InlineData("PJLibraryWithNetStandardLibRef")]
         public void ItMigratesAndBuildsLibrary(string projectName)
         {
-            var projectDirectory = TestAssetsManager.CreateTestInstance(projectName,
-                callingMethod: $"{nameof(ItMigratesAndBuildsLibrary)}-projectName").Path;
+            var projectDirectory = TestAssets.GetPJ(projectName)
+                .CreateInstance(identifier: projectName)
+                .WithSourceFiles()
+                .Root;
 
             MigrateProject(projectDirectory);
+
             Restore(projectDirectory, projectName);
+
             BuildMSBuild(projectDirectory, projectName);
         }
 
         [Fact]
         public void ItFailsGracefullyWhenMigratingAppWithMissingDependency()
         {
-            string projectName = "MigrateAppWithMissingDep";
-            var projectDirectory = Path.Combine(GetTestGroupTestAssetsManager("NonRestoredTestProjects").CreateTestInstance(projectName).Path, "MyApp");
+            var projectDirectory = TestAssets.Get(TestAssetKinds.NonRestoredTestProjects, "PJMigrateAppWithMissingDep")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root
+                .GetDirectory("MyApp");
 
-            string migrationOutputFile = Path.Combine(projectDirectory, "migration-output.json");
-            File.Exists(migrationOutputFile).Should().BeFalse();
-            MigrateCommand.Run(new string[] { projectDirectory, "-r", migrationOutputFile, "--format-report-file-json" }).Should().NotBe(0);
-            File.Exists(migrationOutputFile).Should().BeTrue();
-            File.ReadAllText(migrationOutputFile).Should().Contain("MIGRATE1018");
+            var migrationOutputFile = projectDirectory.GetFile("migration-output.json");
+
+            MigrateCommand.Run(new string[] 
+            { 
+                projectDirectory.FullName, 
+                "-r", 
+                migrationOutputFile.FullName, 
+                "--format-report-file-json" 
+            }).Should().NotBe(0);
+
+            migrationOutputFile.Should().Exist();
+
+            migrationOutputFile.OpenText().ReadToEnd().Should().Contain("MIGRATE1018");
         }
 
         [Fact]
         public void ItMigratesSln()
         {
-            var rootDirectory = TestAssetsManager.CreateTestInstance(
-                "TestAppWithSlnAndMultipleProjects",
-                callingMethod: "a").Path;
+            var rootDirectory = TestAssets.Get("PJTestAppWithSlnAndMultipleProjects")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root;
 
-            var testAppProjectDirectory = Path.Combine(rootDirectory, "TestApp");
-            var testLibProjectDirectory = Path.Combine(rootDirectory, "TestLibrary");
-            string slnPath = Path.Combine(testAppProjectDirectory, "TestApp.sln");
-            
-            CleanBinObj(testAppProjectDirectory);
-            CleanBinObj(testLibProjectDirectory);
+            var testAppProjectDirectory = rootDirectory.GetDirectory("TestApp");
+            var testLibProjectDirectory = rootDirectory.GetDirectory("TestLibrary");
+            var slnPath = testAppProjectDirectory.GetFile("TestApp.sln");
 
             MigrateProject(slnPath);
+
             Restore(testAppProjectDirectory, "TestApp.csproj");
+
             BuildMSBuild(testAppProjectDirectory, "TestApp.sln", "Release");
         }
 
-        private void VerifyAutoInjectedDesktopReferences(string projectDirectory, string projectName, bool shouldBePresent)
+        private void VerifyAutoInjectedDesktopReferences(DirectoryInfo projectDirectory, string projectName, bool shouldBePresent)
         {
             if (projectName != null)
             {
                 projectName = projectName + ".csproj";
             }
 
-            var root = ProjectRootElement.Open(Path.Combine(projectDirectory, projectName));
+            var root = ProjectRootElement.Open(projectDirectory.GetFile(projectName).FullName);
+
             var autoInjectedReferences = root.Items.Where(i => i.ItemType == "Reference" && (i.Include == "System" || i.Include == "Microsoft.CSharp"));
             if (shouldBePresent)
             {
@@ -530,51 +596,56 @@ namespace Microsoft.DotNet.Migration.Tests
             }
         }
 
-        private void VerifyMigration(IEnumerable<string> expectedProjects, string rootDir)
+        private void VerifyMigration(IEnumerable<string> expectedProjects, DirectoryInfo rootDir)
          {
-             var migratedProjects = Directory.EnumerateFiles(rootDir, "*.csproj", SearchOption.AllDirectories)
-                                             .Where(s => Directory.EnumerateFiles(Path.GetDirectoryName(s), "*.csproj").Count() == 1)
-                                             .Where(s => Path.GetFileName(Path.GetDirectoryName(s)).Contains("Project"))
-                                             .Select(s => Path.GetFileName(Path.GetDirectoryName(s)));
+             var migratedProjects = rootDir
+                .EnumerateFiles("*.csproj", SearchOption.AllDirectories)
+                .Where(s => s.Directory.EnumerateFiles("*.csproj").Count() == 1)
+                .Where(s => s.Directory.Name.Contains("Project"))
+                .Select(s => s.Directory.Name);
 
              migratedProjects.Should().BeEquivalentTo(expectedProjects);
          }
 
-        private MigratedBuildComparisonData GetComparisonData(string projectDirectory)
+        private MigratedBuildComparisonData GetComparisonData(DirectoryInfo projectDirectory)
         {
-            File.Copy("NuGet.tempaspnetpatch.config", Path.Combine(projectDirectory, "NuGet.Config"));
+            File.Copy("NuGet.tempaspnetpatch.config", projectDirectory.GetFile("NuGet.Config").FullName);
             
             RestoreProjectJson(projectDirectory);
 
             var outputComparisonData =
-                BuildProjectJsonMigrateBuildMSBuild(projectDirectory, Path.GetFileNameWithoutExtension(projectDirectory));
+                BuildProjectJsonMigrateBuildMSBuild(projectDirectory, projectDirectory.Name);
 
             return outputComparisonData;
         }
 
-        private void VerifyAllMSBuildOutputsRunnable(string projectDirectory)
+        private void VerifyAllMSBuildOutputsRunnable(DirectoryInfo projectDirectory)
         {
-            var dllFileName = Path.GetFileName(projectDirectory) + ".dll";
+            var dllFileName = projectDirectory.Name + ".dll";
 
-            var runnableDlls = Directory.EnumerateFiles(Path.Combine(projectDirectory, "bin"), dllFileName,
-                SearchOption.AllDirectories);
+            var runnableDlls = projectDirectory
+                .GetDirectory("bin")
+                .EnumerateFiles(dllFileName, SearchOption.AllDirectories);
 
             foreach (var dll in runnableDlls)
             {
-                new TestCommand("dotnet").ExecuteWithCapturedOutput($"\"{dll}\"").Should().Pass();
+                new TestCommand("dotnet")
+                    .ExecuteWithCapturedOutput($"\"{dll.FullName}\"")
+                    .Should().Pass();
             }
         }
 
-        private void VerifyAllMSBuildOutputsAreSigned(string projectDirectory)
+        private void VerifyAllMSBuildOutputsAreSigned(DirectoryInfo projectDirectory)
         {
-            var dllFileName = Path.GetFileName(projectDirectory) + ".dll";
+            var dllFileName = projectDirectory.Name + ".dll";
 
-            var runnableDlls = Directory.EnumerateFiles(Path.Combine(projectDirectory, "bin"), dllFileName,
-                SearchOption.AllDirectories);
+            var runnableDlls = projectDirectory
+                .GetDirectory("bin")
+                .EnumerateFiles(dllFileName, SearchOption.AllDirectories);
 
             foreach (var dll in runnableDlls)
             {
-                var assemblyName = AssemblyLoadContext.GetAssemblyName(dll);
+                var assemblyName = AssemblyLoadContext.GetAssemblyName(dll.FullName);
 
                 var token = assemblyName.GetPublicKeyToken();
 
@@ -582,19 +653,19 @@ namespace Microsoft.DotNet.Migration.Tests
             }
         }
 
-        private MigratedBuildComparisonData BuildProjectJsonMigrateBuildMSBuild(string projectDirectory, 
+        private MigratedBuildComparisonData BuildProjectJsonMigrateBuildMSBuild(DirectoryInfo projectDirectory, 
                                                                                 string projectName)
         {
             return BuildProjectJsonMigrateBuildMSBuild(projectDirectory, 
                                                        projectName,
-                                                       new [] { projectDirectory }, 
+                                                       new [] { projectDirectory.FullName }, 
                                                        new [] { projectDirectory });
         }
 
-        private MigratedBuildComparisonData BuildProjectJsonMigrateBuildMSBuild(string projectDirectory, 
+        private MigratedBuildComparisonData BuildProjectJsonMigrateBuildMSBuild(DirectoryInfo projectDirectory, 
                                                                                 string projectName,
                                                                                 string[] migrateArgs,
-                                                                                string[] restoreDirectories)
+                                                                                DirectoryInfo[] restoreDirectories)
         {
             BuildProjectJson(projectDirectory);
 
@@ -605,7 +676,7 @@ namespace Microsoft.DotNet.Migration.Tests
             // Remove lock file for migration
             foreach(var dir in restoreDirectories)
             {
-                File.Delete(Path.Combine(dir, "project.lock.json"));
+                dir.GetFile("project.lock.json").Delete();
             }
 
             MigrateProject(migrateArgs);
@@ -624,12 +695,13 @@ namespace Microsoft.DotNet.Migration.Tests
             return new MigratedBuildComparisonData(projectJsonBuildOutputs, msbuildBuildOutputs);
         }
 
-        private IEnumerable<string> CollectBuildOutputs(string projectDirectory)
+        private IEnumerable<string> CollectBuildOutputs(DirectoryInfo projectDirectory)
         {
-            var fullBinPath = Path.GetFullPath(Path.Combine(projectDirectory, "bin"));
+            var fullBinPath = projectDirectory.GetDirectory("bin");
 
-            return Directory.EnumerateFiles(fullBinPath, "*", SearchOption.AllDirectories)
-                            .Select(p => Path.GetFullPath(p).Substring(fullBinPath.Length));
+            return fullBinPath
+                .EnumerateFiles("*", SearchOption.AllDirectories)
+                .Select(p => p.FullName.Substring(fullBinPath.FullName.Length));
         }
 
         private static void DeleteDirectory(string dir)
@@ -650,29 +722,37 @@ namespace Microsoft.DotNet.Migration.Tests
             }
         }
 
-        private void CleanBinObj(string projectDirectory)
+        private void CleanBinObj(DirectoryInfo projectDirectory)
         {
-            var dirs = new string[] { Path.Combine(projectDirectory, "bin"), Path.Combine(projectDirectory, "obj") };
+            var dirs = new DirectoryInfo[] 
+            { 
+                projectDirectory.GetDirectory("bin"), 
+                projectDirectory.GetDirectory("obj") 
+            };
 
             foreach (var dir in dirs)
             {
-                if(Directory.Exists(dir))
+                if(dir.Exists)
                 {
-                    DeleteDirectory(dir);
+                    dir.Delete(true);
                 }
             }
         }
 
-        private void BuildProjectJson(string projectDirectory)
+        private void BuildProjectJson(DirectoryInfo projectDirectory)
         {
-            Console.WriteLine(projectDirectory);
-            var projectFile = "\"" + Path.Combine(projectDirectory, "project.json") + "\"";
-
+            var projectFile = projectDirectory.GetFile("project.json");
+            
             var result = new BuildPJCommand()
                 .WithCapturedOutput()
-                .Execute(projectFile);
+                .Execute($"\"{projectFile.FullName}\"");
 
             result.Should().Pass();
+        }
+
+        private void MigrateProject(params FileSystemInfo[] args)
+        {
+            MigrateProject(args.Select(f => f.FullName).ToArray());
         }
 
         private void MigrateProject(params string[] migrateArgs)
@@ -683,7 +763,7 @@ namespace Microsoft.DotNet.Migration.Tests
             result.Should().Be(0);
         }
 
-        private void RestoreProjectJson(string projectDirectory)
+        private void RestoreProjectJson(DirectoryInfo projectDirectory)
         {
             new TestCommand("dotnet")
                 .WithWorkingDirectory(projectDirectory)
@@ -691,7 +771,7 @@ namespace Microsoft.DotNet.Migration.Tests
                 .Should().Pass();
         }
 
-        private void Restore(string projectDirectory, string projectName=null, string runtime=null)
+        private void Restore(DirectoryInfo projectDirectory, string projectName=null, string runtime=null)
         {
             var command = new RestoreCommand()
                 .WithWorkingDirectory(projectDirectory)
@@ -714,7 +794,7 @@ namespace Microsoft.DotNet.Migration.Tests
         }
 
         private string BuildMSBuild(
-            string projectDirectory,
+            DirectoryInfo projectDirectory,
             string projectName,
             string configuration="Debug",
             string runtime=null)
@@ -738,7 +818,7 @@ namespace Microsoft.DotNet.Migration.Tests
         }
 
         private string PublishMSBuild(
-            string projectDirectory,
+            DirectoryInfo projectDirectory,
             string projectName,
             string runtime = null,
             string configuration = "Debug")
@@ -760,7 +840,7 @@ namespace Microsoft.DotNet.Migration.Tests
             return result.StdOut;
         }
 
-        private string PackMSBuild(string projectDirectory, string projectName)
+        private string PackMSBuild(DirectoryInfo projectDirectory, string projectName)
         {
             if (projectName != null && !Path.HasExtension(projectName))
             {
@@ -776,13 +856,13 @@ namespace Microsoft.DotNet.Migration.Tests
             return result.StdOut;
         }
 
-        private void DeleteXproj(string projectDirectory)
+        private void DeleteXproj(DirectoryInfo projectDirectory)
         {
-            var xprojFiles = Directory.EnumerateFiles(projectDirectory, "*.xproj");
+            var xprojFiles = projectDirectory.EnumerateFiles("*.xproj");
 
             foreach (var xprojFile in xprojFiles)
             {
-                File.Delete(xprojFile);
+                xprojFile.Delete();
             }
         }
 
@@ -819,13 +899,19 @@ namespace Microsoft.DotNet.Migration.Tests
             }
         }
 
-        private void WriteGlobalJson(string globalDirectory)  
+        private void WriteGlobalJson(DirectoryInfo globalDirectory)  
         {  
-            var file = Path.Combine(globalDirectory, "global.json");  
-            File.WriteAllText(file, @"  
-            {  
-                ""projects"": [ ]  
-            }");  
+            var globalJson = globalDirectory.GetFile("global.json");
+            
+            using (var fileStream = globalJson.OpenWrite())
+            {
+                using (var streamWriter = new StreamWriter(fileStream))
+                {
+                    streamWriter.WriteLine("{");
+                    streamWriter.WriteLine("\"projects\": [ ]");
+                    streamWriter.WriteLine("}");
+                }
+            }
         }
     }
 }

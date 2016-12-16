@@ -22,8 +22,10 @@ namespace Microsoft.DotNet.Kestrel.Tests
         [Fact]
         public void ItRunsKestrelPortableAfterBuild()
         {
-            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelSampleBase)
-                                                     .WithLockFiles();
+            var instance = TestAssets.Get("KestrelSample")
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
 
             var url = NetworkHelper.GetLocalhostUrlWithFreePort();
             var args = $"{url} {Guid.NewGuid().ToString()}";
@@ -45,8 +47,10 @@ namespace Microsoft.DotNet.Kestrel.Tests
         [Fact]
         public void ItRunsKestrelStandaloneAfterBuild()
         {
-            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelSampleBase)
-                                                     .WithLockFiles();
+            TestAssets.Get("KestrelSample")
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
 
             var url = NetworkHelper.GetLocalhostUrlWithFreePort();
             var args = $"{url} {Guid.NewGuid().ToString()}";
@@ -68,9 +72,11 @@ namespace Microsoft.DotNet.Kestrel.Tests
         [Fact]
         public void ItRunsKestrelPortableAfterPublish()
         {
-            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelSampleBase)
-                                                     .WithLockFiles();
-
+            var instance = TestAssets.Get("KestrelSample")
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
+                
             var url = NetworkHelper.GetLocalhostUrlWithFreePort();
             var args = $"{url} {Guid.NewGuid().ToString()}";
             var dotnetCommand = new DotnetCommand();
@@ -91,9 +97,11 @@ namespace Microsoft.DotNet.Kestrel.Tests
         [Fact]
         public void ItRunsKestrelStandaloneAfterPublish()
         {
-            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelSampleBase)
-                                                     .WithLockFiles();
-
+            var instance = TestAssets.Get("KestrelSample")
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
+                
             var url = NetworkHelper.GetLocalhostUrlWithFreePort();
             var args = $"{url} {Guid.NewGuid().ToString()}";
             var output = Publish(Path.Combine(instance.TestRoot, KestrelStandalone), false);

@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.Tests
 
         static GivenThatTheUserIsRunningDotNetForTheFirstTime()
         {
-            var testDirectory = TestAssetsManager.CreateTestDirectory("Dotnet_first_time_experience_tests");
+            var testDirectory = TestAssets.CreateTestDirectory("Dotnet_first_time_experience_tests");
             var testNugetCache = Path.Combine(testDirectory.Path, "nuget_cache");
 
             var command = new DotnetCommand()

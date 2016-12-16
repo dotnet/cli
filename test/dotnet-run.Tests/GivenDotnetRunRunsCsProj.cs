@@ -12,11 +12,10 @@ namespace Microsoft.DotNet.Cli.Run.Tests
         [Fact]
         public void ItCanRunAMSBuildProject()
         {
-            var testAppName = "MSBuildTestApp";
-            var testInstance = TestAssetsManager
-                .CreateTestInstance(testAppName);
-
-            var testProjectDirectory = testInstance.TestRoot;
+            var testProjectDirectory = TestAssets.Get("MSBuildTestApp")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root;
 
             new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
@@ -32,17 +31,16 @@ namespace Microsoft.DotNet.Cli.Run.Tests
                 .WithWorkingDirectory(testProjectDirectory)
                 .ExecuteWithCapturedOutput()
                 .Should().Pass()
-                         .And.HaveStdOutContaining("Hello World!");
+                     .And.HaveStdOutContaining("Hello World!");
         }
 
         [Fact]
         public void ItBuildsTheProjectBeforeRunning()
         {
-            var testAppName = "MSBuildTestApp";
-            var testInstance = TestAssetsManager
-                .CreateTestInstance(testAppName);
-
-            var testProjectDirectory = testInstance.TestRoot;
+            var testProjectDirectory = TestAssets.Get("MSBuildTestApp")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root;
 
             new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
@@ -53,17 +51,16 @@ namespace Microsoft.DotNet.Cli.Run.Tests
                 .WithWorkingDirectory(testProjectDirectory)
                 .ExecuteWithCapturedOutput()
                 .Should().Pass()
-                         .And.HaveStdOutContaining("Hello World!");
+                     .And.HaveStdOutContaining("Hello World!");
         }
 
         [Fact]
         public void ItCanRunAMSBuildProjectWhenSpecifyingAFramework()
         {
-            var testAppName = "MSBuildTestApp";
-            var testInstance = TestAssetsManager
-                .CreateTestInstance(testAppName);
-
-            var testProjectDirectory = testInstance.TestRoot;
+            var testProjectDirectory = TestAssets.Get("MSBuildTestApp")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root;
 
             new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
@@ -74,7 +71,7 @@ namespace Microsoft.DotNet.Cli.Run.Tests
                 .WithWorkingDirectory(testProjectDirectory)
                 .ExecuteWithCapturedOutput("--framework netcoreapp1.0")
                 .Should().Pass()
-                         .And.HaveStdOutContaining("Hello World!");            
+                     .And.HaveStdOutContaining("Hello World!");            
         }
  
         [Fact] 
@@ -94,13 +91,14 @@ namespace Microsoft.DotNet.Cli.Run.Tests
                 .WithWorkingDirectory(testInstance.Root) 
                 .ExecuteWithCapturedOutput($"--no-build") 
                 .Should().Pass() 
-                         .And.HaveStdOutContaining("Hello World!"); 
+                     .And.HaveStdOutContaining("Hello World!"); 
         } 
  
         [Fact] 
         public void ItRunsPortableAppsFromADifferentPathWithoutBuilding() 
         { 
-            var testAppName = "MSBuildTestApp"; 
+            var testAppName = "MSBuildTestApp";
+
             var testInstance = TestAssets.Get(testAppName)
                 .CreateInstance()
                 .WithSourceFiles()
@@ -112,34 +110,7 @@ namespace Microsoft.DotNet.Cli.Run.Tests
                 .WithWorkingDirectory(testInstance.Root.Parent) 
                 .ExecuteWithCapturedOutput($"--project {projectFile.FullName}") 
                 .Should().Pass() 
-                         .And.HaveStdOutContaining("Hello World!"); 
-        }
-
-        [Fact]
-        public void ItRunsAppWhenRestoringToSpecificPackageDirectory()
-        {
-            var rootPath = TestAssetsManager.CreateTestDirectory().Path;
-
-            string dir = "pkgs";
-            string args = $"--packages {dir}";
-
-            new NewCommand()
-                .WithWorkingDirectory(rootPath)
-                .Execute()
-                .Should()
-                .Pass();
-
-            new RestoreCommand()
-                .WithWorkingDirectory(rootPath)
-                .Execute(args)
-                .Should()
-                .Pass();
-
-            new RunCommand()
-                .WithWorkingDirectory(rootPath)
-                .ExecuteWithCapturedOutput()
-                .Should().Pass()
-                         .And.HaveStdOutContaining("Hello World");
-        }
+                     .And.HaveStdOutContaining("Hello World!"); 
+        } 
     }
 }

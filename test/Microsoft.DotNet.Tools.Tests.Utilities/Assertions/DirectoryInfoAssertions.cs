@@ -58,10 +58,12 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             return new AndConstraint<DirectoryInfoAssertions>(this);
         }
 
-        public AndConstraint<DirectoryInfoAssertions> NotHaveFile(string expectedFile)
+        public AndConstraint<DirectoryInfoAssertions> NotHaveFile(string expectedFile, string because = "", params object [] reasonArgs)
         {
             var file = _dirInfo.EnumerateFiles(expectedFile, SearchOption.TopDirectoryOnly).SingleOrDefault();
-            Execute.Assertion.ForCondition(file == null)
+            Execute.Assertion
+                .ForCondition(file == null)
+                .BecauseOf(because, reasonArgs)
                 .FailWith("File {0} should not be found in directory {1}.", expectedFile, _dirInfo.FullName);
             return new AndConstraint<DirectoryInfoAssertions>(this);
         }
@@ -99,7 +101,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             return new AndConstraint<DirectoryInfoAssertions>(this);
         }
 
-        public AndConstraint<DirectoryInfoAssertions> NotHaveFiles(IEnumerable<string> expectedFiles)
+        public AndConstraint<DirectoryInfoAssertions> NotHaveFiles(IEnumerable<string> expectedFiles, string because, params object [] reasonArgs)
         {
             foreach (var expectedFile in expectedFiles)
             {

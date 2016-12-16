@@ -31,25 +31,25 @@ namespace Microsoft.DotNet.New.Tests
             string projectType,
             bool useNuGetConfigForAspNet)
         {
-            var rootPath = TestAssetsManager.CreateTestDirectory(identifier: $"{language}_{projectType}").Path;
+            var testDirectory = TestAssets.CreateTestDirectory(identifier: $"{language}_{projectType}");
 
             new TestCommand("dotnet") 
-                .WithWorkingDirectory(rootPath)
+                .WithWorkingDirectory(testDirectory)
                 .Execute($"new --type {projectType} --lang {language}")
                 .Should().Pass();
 
             if (useNuGetConfigForAspNet)
             {
-                File.Copy("NuGet.tempaspnetpatch.config", Path.Combine(rootPath, "NuGet.Config"));
+                File.Copy("NuGet.tempaspnetpatch.config", testDirectory.GetFile("NuGet.Config").FullName);
             }
 
             new TestCommand("dotnet")
-                .WithWorkingDirectory(rootPath)
+                .WithWorkingDirectory(testDirectory)
                 .Execute($"restore")
                 .Should().Pass();
 
             var buildResult = new TestCommand("dotnet")
-                .WithWorkingDirectory(rootPath)
+                .WithWorkingDirectory(testDirectory)
                 .ExecuteWithCapturedOutput("build")
                 .Should().Pass()
                 .And.NotHaveStdErr();

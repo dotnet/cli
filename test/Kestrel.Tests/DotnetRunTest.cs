@@ -14,19 +14,17 @@ namespace Microsoft.DotNet.Kestrel.Tests
 {
     public class DotnetRunTest : TestBase
     {
-        private const string KestrelSampleBase = "KestrelSample";
-        private const string KestrelPortable = "KestrelPortable";
-        private const string KestrelStandalone = "KestrelStandalone";
-
         [Fact]
         public void ItRunsKestrelPortableApp()
         {
-            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelSampleBase)
-                                                     .WithLockFiles();
+            var instance = TestAssets.Get("KestrelSample")
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
 
             var url = NetworkHelper.GetLocalhostUrlWithFreePort();
             var args = $"{url} {Guid.NewGuid().ToString()}";
-            var runCommand = new RunCommand(Path.Combine(instance.TestRoot, KestrelPortable));
+            var runCommand = new RunCommand(instance.Root.GetDirectory("KestrelPortable"));
 
             try
             {
@@ -43,12 +41,14 @@ namespace Microsoft.DotNet.Kestrel.Tests
         [Fact]
         public void ItRunsKestrelStandaloneApp()
         {
-            TestInstance instance = TestAssetsManager.CreateTestInstance(KestrelSampleBase)
-                                                     .WithLockFiles();
+            var instance = TestAssets.Get("KestrelSample")
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
 
             var url = NetworkHelper.GetLocalhostUrlWithFreePort();
             var args = $"{url} {Guid.NewGuid().ToString()}";
-            var runCommand = new RunCommand(Path.Combine(instance.TestRoot, KestrelStandalone));
+            var runCommand = new RunCommand(instance.Root.GetDirectory("KestrelStandalone"));
 
             try
             {

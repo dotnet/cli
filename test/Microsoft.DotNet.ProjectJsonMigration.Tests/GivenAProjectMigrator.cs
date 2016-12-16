@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         public void ItCopiesProjectDirectoryContentsToOutputDirectoryWhenTheDirectoriesAreDifferent()
         {
             var testProjectDirectory = TestAssetsManager
-                .CreateTestInstance("PJTestAppSimple", callingMethod: "z")
+                .CreateTestInstance("PJTestAppSimple")
                 .Path;
 
             var outputDirectory = Temp.CreateDirectory().Path;
@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         public void ItHasErrorWhenMigratingADeprecatedProjectJson()
         {
             var testProjectDirectory =
-                TestAssetsManager.CreateTestInstance("TestLibraryWithDeprecatedProjectFile", callingMethod: "z")
+                TestAssetsManager.CreateTestInstance("PJTestLibraryWithDeprecatedProjectFile")
                     .Path;
 
             var mockProj = ProjectRootElement.Create();
@@ -63,7 +63,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         public void ItHasErrorWhenMigratingANonCsharpApp()
         {
             var testProjectDirectory =
-                TestAssetsManager.CreateTestInstance("FSharpTestProjects/TestApp", callingMethod: "z")
+                TestAssetsManager.CreateTestInstance("PJFSharpTestProjects/TestApp")
                     .Path;
 
             var mockProj = ProjectRootElement.Create();
