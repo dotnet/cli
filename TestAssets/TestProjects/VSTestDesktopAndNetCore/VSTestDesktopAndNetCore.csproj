@@ -33,7 +33,7 @@
       <Version>1.1.5-preview</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk">
-      <Version>15.0.0-preview-20161123-03</Version>
+      <Version>15.0.0-preview-20161216-01</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft.CSharp.targets" />
