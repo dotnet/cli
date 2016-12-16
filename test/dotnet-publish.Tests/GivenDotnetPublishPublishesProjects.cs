@@ -92,10 +92,10 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
                 .Pass();
 
             new RestoreCommand()
-             .WithWorkingDirectory(rootPath)
-             .Execute(args)
-             .Should()
-             .Pass();
+                .WithWorkingDirectory(rootPath)
+                .Execute(args)
+                .Should()
+                .Pass();
 
             new PublishCommand()
                 .WithWorkingDirectory(rootPath)

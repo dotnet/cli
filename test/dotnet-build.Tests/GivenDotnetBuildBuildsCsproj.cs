@@ -53,11 +53,11 @@ namespace Microsoft.DotNet.Cli.Build.Tests
                 .Pass();
 
             new RestoreCommand()
-             .WithWorkingDirectory(rootPath)
-             .Execute(args)
-             .Should()
-             .Pass()
-             .And.NotHaveStdErr();
+                .WithWorkingDirectory(rootPath)
+                .Execute(args)
+                .Should()
+                .Pass()
+                .And.NotHaveStdErr();
 
             new BuildCommand()
                 .WithWorkingDirectory(rootPath)

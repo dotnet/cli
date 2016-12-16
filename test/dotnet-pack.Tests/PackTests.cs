@@ -223,10 +223,10 @@ namespace Microsoft.DotNet.Tools.Pack.Tests
                 .Pass();
 
             new RestoreCommand()
-             .WithWorkingDirectory(rootPath)
-             .Execute(args)
-             .Should()
-             .Pass();
+                .WithWorkingDirectory(rootPath)
+                .Execute(args)
+                .Should()
+                .Pass();
 
             new PackCommand()
                 .WithWorkingDirectory(rootPath)

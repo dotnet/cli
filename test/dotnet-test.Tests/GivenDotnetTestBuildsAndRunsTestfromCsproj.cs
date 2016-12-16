@@ -148,10 +148,10 @@ namespace Microsoft.DotNet.Cli.Test.Tests
 
             string args = $"--packages \"{dir}\"";
             new RestoreCommand()
-                 .WithWorkingDirectory(rootPath)
-                 .Execute(args)
-                 .Should()
-                 .Pass();
+                .WithWorkingDirectory(rootPath)
+                .Execute(args)
+                .Should()
+                .Pass();
 
             new BuildCommand()
                 .WithWorkingDirectory(rootPath)

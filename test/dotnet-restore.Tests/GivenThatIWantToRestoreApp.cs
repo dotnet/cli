@@ -56,11 +56,11 @@ namespace Microsoft.DotNet.Restore.Tests
 
             string args = $"--packages \"{dir}\"";
             new RestoreCommand()
-                 .WithWorkingDirectory(rootPath)
-                 .ExecuteWithCapturedOutput(args)
-                 .Should()
-                 .Pass()
-                 .And.NotHaveStdErr();
+                .WithWorkingDirectory(rootPath)
+                .ExecuteWithCapturedOutput(args)
+                .Should()
+                .Pass()
+                .And.NotHaveStdErr();
 
             Directory.Exists(fullPath).Should().BeTrue();
             Directory.EnumerateFiles(fullPath, "*.dll", SearchOption.AllDirectories).Count().Should().BeGreaterThan(0);
@@ -76,11 +76,11 @@ namespace Microsoft.DotNet.Restore.Tests
 
             string args = $"--packages \"{dir}\"";
             new RestoreCommand()
-                 .WithWorkingDirectory(rootPath)
-                 .ExecuteWithCapturedOutput(args)
-                 .Should()
-                 .Pass()
-                 .And.NotHaveStdErr();
+                .WithWorkingDirectory(rootPath)
+                .ExecuteWithCapturedOutput(args)
+                .Should()
+                .Pass()
+                .And.NotHaveStdErr();
 
             Directory.Exists(fullPath).Should().BeTrue();
             Directory.EnumerateFiles(fullPath, "*.dll", SearchOption.AllDirectories).Count().Should().BeGreaterThan(0);
