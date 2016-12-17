@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.Migration.Tests
         public void ItMigratesSln()
         {
             var projectDirectory = TestAssets
-                .Get("TestAppWithSlnAndMultipleProjects")
+                .Get("TestAppWithSlnAndExistingXprojReferences")
                 .CreateInstance()
                 .WithSourceFiles()
                 .Root
