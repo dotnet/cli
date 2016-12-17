@@ -137,9 +137,9 @@ namespace Microsoft.DotNet.Migration.Tests
                 .CreateInstance()
                 .WithSourceFiles();
 
-            var projectDirectory = testInstance.Root.FullName;
+            var projectDirectory = testInstance.Root;
 
-            MigrateProject(new [] { projectDirectory });
+            MigrateProject(new [] { projectDirectory.FullName });
 
             Restore(projectDirectory);
             PublishMSBuild(projectDirectory, projectName);
