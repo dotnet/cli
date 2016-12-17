@@ -31,12 +31,12 @@ namespace Microsoft.DotNet.Tests
             var testStartTime = GetTruncatedDateTime();
                         
             new TestCommand("dotnet")
-                .WithUserProfileRoot(testDirectory.Path)
+                .WithUserProfileRoot(testDirectory)
                 .ExecuteWithCapturedOutput("--help");
 
-            var optimizationProfileFilePath = GetOptimizationProfileFilePath(testDirectory.Path);
+            var optimizationProfileFile = GetOptimizationProfileFile(testDirectory);
 
-            new FileInfo(optimizationProfileFilePath)
+           optimizationProfileFile
                 .Should().Exist("Because dotnet CLI creates it after each run")
                      .And.HaveLastWriteTimeUtc()
                          .Which.Should().BeOnOrAfter(testStartTime, "Because dotnet CLI was executed after that time");
@@ -49,14 +49,14 @@ namespace Microsoft.DotNet.Tests
             var testStartTime = GetTruncatedDateTime();
                         
             new TestCommand("dotnet")
-                .WithUserProfileRoot(testDirectory.Path)
+                .WithUserProfileRoot(testDirectory)
                 .WithEnvironmentVariable("DOTNET_DISABLE_MULTICOREJIT", "1")
                 .ExecuteWithCapturedOutput("--help");
 
-            var optimizationProfileFilePath = GetOptimizationProfileFilePath(testDirectory.Path);
+            var optimizationProfileFile = GetOptimizationProfileFile(testDirectory);
 
-            File.Exists(optimizationProfileFilePath)
-                .Should().BeFalse("Because multicore JIT is disabled");
+            optimizationProfileFile
+                .Should().NotExist("Because multicore JIT is disabled");
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.Tests
             var testDirectory = TestAssets.CreateTestDirectory();
             var testStartTime = GetTruncatedDateTime();
             
-            var optimizationProfileFilePath = GetOptimizationProfileFilePath(testDirectory.Path);
+            var optimizationProfileFile = GetOptimizationProfileFile(testDirectory);
 
             new TestCommand("dotnet")
                 .WithUserProfileRoot("")
@@ -76,30 +76,32 @@ namespace Microsoft.DotNet.Tests
         [Fact]
         public void WhenCliRepoBuildsThenDotnetWritesOptimizationDataToTheDefaultProfileRoot()
         {
-            var optimizationProfileFilePath = GetOptimizationProfileFilePath();
+            var optimizationProfileFile = GetOptimizationProfileFile();
 
-            File.Exists(optimizationProfileFilePath)
-                .Should().BeTrue("Because the dotnet building dotnet writes to the default root");
+            optimizationProfileFile
+                .Should().Exist("Because the dotnet building dotnet writes to the default root");
         }
 
-        private static string GetOptimizationProfileFilePath(string userHomePath = null)
+        private static FileInfo GetOptimizationProfileFile(DirectoryInfo userHomeDirectory = null)
         {
-            return Path.Combine(
-                GetUserProfileRoot(userHomePath), 
+            return new FileInfo(Path.Combine(
+                GetUserProfileRoot(userHomeDirectory).FullName, 
                 GetOptimizationRootPath(GetDotnetVersion()),
-                OptimizationProfileFileName);
+                OptimizationProfileFileName));
         }
         
-        private static string GetUserProfileRoot(string overrideUserProfileRoot = null)
+        private static DirectoryInfo GetUserProfileRoot(DirectoryInfo overrideUserProfileRoot = null)
         {
             if (overrideUserProfileRoot != null)
             {
                 return overrideUserProfileRoot;
             }
-            
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+
+            var userProfileRootPath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? Environment.GetEnvironmentVariable("LocalAppData")
                 : Environment.GetEnvironmentVariable("HOME");
+            
+            return new DirectoryInfo(userProfileRootPath);
         }
 
         private static string GetOptimizationRootPath(string version)

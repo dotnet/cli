@@ -226,7 +226,7 @@ Additional Arguments:
             var projectToAdd = Path.Combine("Lib", "Lib.csproj");
             var cmd = new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)
-                .ExecuteWithCapturedOutput($"add App.sln project {projectToAdd.FullName}");
+                .ExecuteWithCapturedOutput($"add App.sln project {projectToAdd}");
             cmd.Should().Pass();
             cmd.StdOut.Should().Be($"Solution {solutionFile.FullName} already contains project {projectToAdd}.");
             cmd.StdErr.Should().BeEmpty();

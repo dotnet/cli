@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.Migration.Tests
         }
 
         [Theory]
-        [InlineData("TestAppWithLibraryAndMissingP2P")]
+        [InlineData("PJTestAppWithLibraryAndMissingP2P")]
         public void WhenMigrationFailsThenProjectJsonArtifactsDoNotGetMovedToBackup(string testProjectName)
         {
             var testRoot = TestAssets.Get(TestAssetKinds.NonRestoredTestProjects, testProjectName)

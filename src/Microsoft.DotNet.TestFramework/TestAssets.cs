@@ -81,7 +81,7 @@ namespace Microsoft.DotNet.TestFramework
 
         public DirectoryInfo CreateTestDirectory([CallerMemberName] string callingMethod = "", string identifier = "")
         {
-            var testDestination = GetTestDestinationDirectoryPath(string.Empty, callingMethod, identifier);
+            var testDestination = GetTestDestinationDirectoryPath("temp", callingMethod, identifier);
 
             var testDirectory = new DirectoryInfo(testDestination);
 

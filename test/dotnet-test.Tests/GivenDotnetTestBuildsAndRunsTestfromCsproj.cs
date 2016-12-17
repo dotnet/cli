@@ -69,16 +69,21 @@ namespace Microsoft.DotNet.Cli.Test.Tests
 
             var configuration = Environment.GetEnvironmentVariable("CONFIGURATION") ?? "Debug";
 
-            var buildArtifact = Path.Combine(testProjectDirectory, "bin",
-                                   configuration, "netcoreapp1.0", "VSTestDotNetCore.dll");
+            var buildArtifact = testProjectDirectory
+                .GetDirectory("bin", configuration, "netcoreapp1.0")
+                .GetFile("VSTestDotNetCore.dll");
+
+
+            var expectedError = $"The test source file \"{buildArtifact.FullName}\" provided was not found.";
 
             var result = new DotnetTestCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .ExecuteWithCapturedOutput("--no-build");
 
+            result.Should().Fail();
+
             result.StdOut
-                .Should().Pass()
-                     .And.Contain(expectedError); 
+                .Should().Contain(expectedError); 
         }
 
         [Fact]
@@ -92,11 +97,6 @@ namespace Microsoft.DotNet.Cli.Test.Tests
 
             var trxLoggerDirectory = testProjectDirectory.GetDirectory("TestResults");
 
-            if(trxLoggerDirectory.Exists)
-            {
-                trxLoggerDirectory.Delete(true);
-            }
-
             var result = new DotnetTestCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .ExecuteWithCapturedOutput("--logger:trx");
@@ -107,7 +107,7 @@ namespace Microsoft.DotNet.Cli.Test.Tests
             trxFiles.Length
                 .Should().Be(1, "Because a single trx file should have been produced");
 
-            result.StdOut.Should().Contain(trxFiles[0]);
+            result.StdOut.Should().Contain(trxFiles[0].FullName);
         }
 
         [Fact(Skip = "https://github.com/dotnet/cli/issues/5035")]

@@ -14,9 +14,10 @@ namespace Microsoft.DotNet.Tests
         [Fact]
         public void UnresolvedPlatformReferencesFailAsExpected()
         {
-            var testDirectory = testAssetsManager.Get("NonRestoredTestProjects", "TestProjectWithUnresolvedPlatformDependency")
+            var testDirectory = TestAssets.Get("NonRestoredTestProjects", "TestProjectWithUnresolvedPlatformDependency")
                 .CreateInstance()
-                .Root();
+                .WithSourceFiles()
+                .Root;
 
             new RestoreCommand()
                 .WithWorkingDirectory(testDirectory)

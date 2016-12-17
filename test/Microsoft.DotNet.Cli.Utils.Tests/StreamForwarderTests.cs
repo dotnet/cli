@@ -84,6 +84,13 @@ namespace StreamForwarderTests
             TestCapturingAndForwardingHelper(ForwardOptions.WriteLine | ForwardOptions.Capture, inputStr, expectedCaptured, expectedWrites);
         }
 
+        private enum ForwardOptions 
+        { 
+            None = 0x0, 
+            Capture = 0x1, 
+            WriteLine = 0x02, 
+        } 
+ 
         private void TestCapturingAndForwardingHelper(ForwardOptions options, string str, string expectedCaptured, string[] expectedWrites)
         {
             var forwarder = new StreamForwarder();

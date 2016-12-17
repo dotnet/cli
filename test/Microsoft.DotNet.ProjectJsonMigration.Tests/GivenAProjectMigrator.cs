@@ -18,11 +18,13 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         [Fact]
         public void ItCopiesProjectDirectoryContentsToOutputDirectoryWhenTheDirectoriesAreDifferent()
         {
-            var testProjectDirectory = TestAssetsManager
-                .CreateTestInstance("PJTestAppSimple")
-                .Path;
+            var testProjectDirectory = TestAssets
+                .Get("PJTestAppSimple")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root.FullName;
 
-            var outputDirectory = Temp.CreateDirectory().Path;
+            var outputDirectory = TestAssets.CreateTestDirectory().FullName;
 
             var projectDirectoryRelativeFilePaths = EnumerateFilesWithRelativePath(testProjectDirectory);
 
@@ -42,8 +44,10 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         public void ItHasErrorWhenMigratingADeprecatedProjectJson()
         {
             var testProjectDirectory =
-                TestAssetsManager.CreateTestInstance("PJTestLibraryWithDeprecatedProjectFile")
-                    .Path;
+                TestAssets.Get("PJTestLibraryWithDeprecatedProjectFile")
+                    .CreateInstance()
+                    .WithSourceFiles()
+                    .Root.FullName;
 
             var mockProj = ProjectRootElement.Create();
             var testSettings = MigrationSettings.CreateMigrationSettingsTestHook(testProjectDirectory, testProjectDirectory, mockProj);
@@ -63,8 +67,10 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         public void ItHasErrorWhenMigratingANonCsharpApp()
         {
             var testProjectDirectory =
-                TestAssetsManager.CreateTestInstance("PJFSharpTestProjects/TestApp")
-                    .Path;
+                TestAssets.Get("PJFSharpTestProjects/TestApp")
+                    .CreateInstance()
+                    .WithSourceFiles()
+                    .Root.FullName;
 
             var mockProj = ProjectRootElement.Create();
             var testSettings = MigrationSettings.CreateMigrationSettingsTestHook(testProjectDirectory, testProjectDirectory, mockProj);
@@ -80,13 +86,12 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         [Fact]
         public void ItHasErrorWhenMigratingAProjectJsonWithoutAFrameworks()
         {
-            var testInstance = TestAssets.Get(
+            var testProjectDirectory = TestAssets.Get(
                     "NonRestoredTestProjects", 
                     "TestLibraryWithProjectFileWithoutFrameworks")
                 .CreateInstance()
-                .WithSourceFiles();
-
-            var testProjectDirectory = testInstance.Root.FullName;
+                .WithSourceFiles()
+                .Root.FullName;
 
             var mockProj = ProjectRootElement.Create();
             var testSettings = MigrationSettings.CreateMigrationSettingsTestHook(

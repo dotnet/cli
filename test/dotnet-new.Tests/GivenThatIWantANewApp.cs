@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.New.Tests
     public class GivenThatIWantANewApp : TestBase
     {
         [Fact]
-        public void When_dotnet_new_is_invoked_mupliple_times_it_should_fail()
+        public void WhenDotnetNewIsInvokedMultipleTimesItShouldFail()
         {
             var testDirectory = TestAssets.CreateTestDirectory();
 
