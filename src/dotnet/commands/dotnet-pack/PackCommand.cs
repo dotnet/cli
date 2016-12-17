@@ -19,8 +19,8 @@ namespace Microsoft.DotNet.Tools.Pack
                 Name = "pack",
                 FullName = LocalizableStrings.AppFullName,
                 Description = LocalizableStrings.AppDescription,
-                AllowArgumentSeparator = true,
-                ArgumentSeparatorHelpText = HelpMessageStrings.MSBuildAdditionalArgsHelpText
+                HandleRemainingArguments = true,
+                ArgumentSeparatorHelpText = HelpMessageStrings.MSBuildAdditionalArgsHelpText                
             };
 
             cmd.HelpOption("-h|--help");

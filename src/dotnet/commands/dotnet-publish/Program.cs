@@ -17,8 +17,8 @@ namespace Microsoft.DotNet.Tools.Publish
             app.Name = "dotnet publish";
             app.FullName = LocalizableStrings.AppFullName;
             app.Description = LocalizableStrings.AppDescription;
-            app.AllowArgumentSeparator = true;
-            app.ArgumentSeparatorHelpText = HelpMessageStrings.MSBuildAdditionalArgsHelpText;
+            app.HandleRemainingArguments = true;
+            app.ArgumentSeparatorHelpText = HelpMessageStrings.MSBuildAdditionalArgsHelpText;            
             app.HelpOption("-h|--help");
 
             CommandArgument projectArgument = app.Argument($"<{LocalizableStrings.ProjectArgument}>",
