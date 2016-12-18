@@ -5,11 +5,10 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Edge.Settings;
 
 namespace Microsoft.DotNet.Tools.New3
 {
-    internal class ExtendedCommandParser
+    public class ExtendedCommandParser
     {
         private CommandLineApplication _app;
 
@@ -57,7 +56,7 @@ namespace Microsoft.DotNet.Tools.New3
             _helpDisplayer.ShowHelp();
         }
 
-        public void RemoveOption(CommandOption option)
+        internal void RemoveOption(CommandOption option)
         {
             _app.Options.Remove(option);
         }
@@ -86,11 +85,11 @@ namespace Microsoft.DotNet.Tools.New3
             get { return _app.RemainingArguments; }
         }
 
-        public CommandArgument Argument(string parameter, string description)
+        internal CommandArgument Argument(string parameter, string description)
         {
             if (IsParameterNameTaken(parameter))
             {
-                throw new Exception(string.Format(LocalizableStrings.ParameterReuseError, parameter));
+                throw new Exception($"Parameter name {parameter} cannot be used for multiple purposes");
             }
 
             _defaultCommandOptions.Add(parameter);
@@ -101,7 +100,7 @@ namespace Microsoft.DotNet.Tools.New3
             return _app.Argument(parameter, description);
         }
 
-        public void InternalOption(string parameterVariants, string canonical, string description, CommandOptionType optionType)
+        internal void InternalOption(string parameterVariants, string canonical, string description, CommandOptionType optionType)
         {
             _helpDisplayer.Option(parameterVariants, description, optionType);
             HiddenInternalOption(parameterVariants, canonical, optionType);
@@ -109,7 +108,7 @@ namespace Microsoft.DotNet.Tools.New3
 
         // NOTE: the exceptions here should never happen, this is strictly called by the program
         // Once testing is done, we can probably remove them.
-        public void HiddenInternalOption(string parameterVariants, string canonical, CommandOptionType optionType)
+        internal void HiddenInternalOption(string parameterVariants, string canonical, CommandOptionType optionType)
         {
             string[] parameters = parameterVariants.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -117,7 +116,7 @@ namespace Microsoft.DotNet.Tools.New3
             {
                 if (IsParameterNameTaken(parameters[i]))
                 {
-                    throw new Exception(string.Format(LocalizableStrings.ParameterReuseError, parameters[i]));
+                    throw new Exception($"Parameter name {parameters[i]} cannot be used for multiple purposes");
                 }
 
                 _hiddenCommandCanonicalMapping.Add(parameters[i], canonical);
@@ -193,7 +192,8 @@ namespace Microsoft.DotNet.Tools.New3
 
             foreach (KeyValuePair<string, IList<string>> param in allParameters)
             {
-                if (_hiddenCommandCanonicalMapping.TryGetValue(param.Key, out string canonicalName))
+                string canonicalName;
+                if (_hiddenCommandCanonicalMapping.TryGetValue(param.Key, out canonicalName))
                 {
                     CommandOptionType optionType = _hiddenCommandOptions[canonicalName];
 
@@ -205,14 +205,14 @@ namespace Microsoft.DotNet.Tools.New3
                     {
                         if (param.Value.Count != 1)
                         {
-                            throw new Exception(string.Format(LocalizableStrings.MultipleValuesSpecifiedForSingleValuedParameter, canonicalName));
+                            throw new Exception($"Multiple values specified for single value parameter: {canonicalName}");
                         }
                     }
                     else // NoValue
                     {
                         if (param.Value.Count != 1 || param.Value[0] != null)
                         {
-                            throw new Exception(string.Format(LocalizableStrings.ValueSpecifiedForValuelessParameter, canonicalName));
+                            throw new Exception($"Value specified for valueless parameter: {canonicalName}");
                         }
                     }
 
@@ -223,15 +223,15 @@ namespace Microsoft.DotNet.Tools.New3
                     if (_parsedTemplateParams.ContainsKey(canonicalName))
                     {
                         // error, the same param was specified twice
-                        throw new Exception(string.Format(LocalizableStrings.ParameterSpecifiedMultipleTimes, canonicalName, param.Key));
+                        throw new Exception($"Parameter [{canonicalName}] was specified multiple times, including with the flag [{param.Key}]");
                     }
                     else
                     {
                         if ((param.Value[0] == null) && (_templateParamDataTypeMapping[canonicalName] != "bool"))
                         {
-                            throw new Exception(string.Format(LocalizableStrings.ParameterMissingValue, param.Key, canonicalName));
+                            throw new Exception($"Parameter [{param.Key}] ({canonicalName}) must be given a value");
                         }
-                        
+
                         // TODO: allow for multi-valued params
                         _parsedTemplateParams[canonicalName] = param.Value[0];
                     }
@@ -257,7 +257,8 @@ namespace Microsoft.DotNet.Tools.New3
                     continue;
                 }
 
-                if (parameterNameMap == null || !parameterNameMap.TryGetValue(parameter.Name, out string flagFullText))
+                string flagFullText;
+                if (parameterNameMap == null || !parameterNameMap.TryGetValue(parameter.Name, out flagFullText))
                 {
                     flagFullText = parameter.Name;
                 }
@@ -282,7 +283,7 @@ namespace Microsoft.DotNet.Tools.New3
                 }
 
                 // always unless taken
-                string shortName = "-" + PosixNameToShortName(flagFullText);
+                string shortName = GetFreeShortName(flagFullText);
                 if (!IsParameterNameTaken(shortName))
                 {
                     MapTemplateParamToCanonical(shortName, parameter.Name);
@@ -290,26 +291,10 @@ namespace Microsoft.DotNet.Tools.New3
                 }
 
                 // only as fallback
-                string singleLetterName = "-" + flagFullText.Substring(0, 1);
-                if (!shortNameFound && !IsParameterNameTaken(singleLetterName))
-                {
-                    MapTemplateParamToCanonical(singleLetterName, parameter.Name);
-                    shortNameFound = true;
-                }
-
-                // only as fallback
-                string qualifiedShortName = "-p:" + PosixNameToShortName(flagFullText);
+                string qualifiedShortName = GetFreeShortName(flagFullText, "p:");
                 if (!shortNameFound && !IsParameterNameTaken(qualifiedShortName))
                 {
                     MapTemplateParamToCanonical(qualifiedShortName, parameter.Name);
-                    shortNameFound = true;
-                }
-
-                // only as fallback
-                string qualifiedSingleLetterName = "-p:" + flagFullText.Substring(0, 1);
-                if (!shortNameFound && !IsParameterNameTaken(qualifiedSingleLetterName))
-                {
-                    MapTemplateParamToCanonical(qualifiedSingleLetterName, parameter.Name);
                     shortNameFound = true;
                 }
 
@@ -326,34 +311,56 @@ namespace Microsoft.DotNet.Tools.New3
             if (invalidParams.Count > 0)
             {
                 string unusableDisplayList = string.Join(", ", invalidParams);
-                throw new Exception(string.Format(LocalizableStrings.TemplateMalformedDueToBadParameters, unusableDisplayList));
+                throw new Exception($"Template is malformed. The following parameter names are invalid: {unusableDisplayList}");
             }
+        }
+
+        private string GetFreeShortName(string name, string prefix = "")
+        {
+            string[] parts = name.Split(new[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] buckets = new string[parts.Length];
+
+            for (int i = 0; i < buckets.Length; ++i)
+            {
+                buckets[i] = parts[i].Substring(0, 1);
+            }
+
+            int lastBucket = parts.Length - 1;
+            while (IsParameterNameTaken("-" + prefix + string.Join("", buckets)))
+            {
+                //Find the next thing we can take a character from
+                bool first = true;
+                int end = (lastBucket + 1) % parts.Length;
+                int i = (lastBucket + 1) % parts.Length;
+                for (; first || i != end; first = false, i = (i + 1) % parts.Length)
+                {
+                    if (parts[i].Length > buckets[i].Length)
+                    {
+                        buckets[i] = parts[i].Substring(0, buckets[i].Length + 1);
+                        break;
+                    }
+                }
+
+                if (i == end)
+                {
+                    break;
+                }
+            }
+
+            return "-" + prefix + string.Join("", buckets);
         }
 
         private void MapTemplateParamToCanonical(string variant, string canonical)
         {
             if (_templateParamCanonicalMapping.TryGetValue(variant, out string existingCanonical))
             {
-                throw new Exception(string.Format(LocalizableStrings.OptionVariantAlreadyDefined, variant, canonical, existingCanonical));
+                throw new Exception($"Option variant {variant} for canonical {canonical} was already defined for canonical {existingCanonical}");
             }
 
             _templateParamCanonicalMapping[variant] = canonical;
         }
 
         // Concats the first letter of dash separated word.
-        private static string PosixNameToShortName(string name)
-        {
-            IList<string> wordsInName = name.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            IList<string> firstLetters = new List<string>();
-
-            foreach (string word in wordsInName)
-            {
-                firstLetters.Add(word.Substring(0, 1));
-            }
-
-            return string.Join("", firstLetters);
-        }
-
         private IDictionary<string, IList<string>> _canonicalToVariantsTemplateParamMap;
 
         public IDictionary<string, IList<string>> CanonicalToVariantsTemplateParamMap
@@ -368,7 +375,9 @@ namespace Microsoft.DotNet.Tools.New3
                     {
                         string variant = variantToCanonical.Key;
                         string canonical = variantToCanonical.Value;
-                        if (!_canonicalToVariantsTemplateParamMap.TryGetValue(canonical, out var variantList))
+
+                        IList<string> variantList;
+                        if (!_canonicalToVariantsTemplateParamMap.TryGetValue(canonical, out variantList))
                         {
                             variantList = new List<string>();
                             _canonicalToVariantsTemplateParamMap.Add(canonical, variantList);
