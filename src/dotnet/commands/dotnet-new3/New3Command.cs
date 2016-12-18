@@ -15,6 +15,9 @@ using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros;
 using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.DotNet.Tools.New3
@@ -44,24 +47,30 @@ namespace Microsoft.DotNet.Tools.New3
             appExt.HiddenInternalOption("-up|--update", "--update", CommandOptionType.MultipleValue);
             appExt.HiddenInternalOption("-u|--uninstall", "--uninstall", CommandOptionType.MultipleValue);
             appExt.HiddenInternalOption("--skip-update-check", "--skip-update-check", CommandOptionType.NoValue);
-
-            // Preserve these for now - they've got the help text, in case we want it back.
-            // (they'll need to get converted to extended option calls)
-            //
-            //CommandOption dirOption = app.Option("-d|--dir", LocalizableStrings.CreateDirectoryHelp, CommandOptionType.NoValue);
-            //CommandOption aliasOption = app.Option("-a|--alias", LocalizableStrings.CreateAliasHelp, CommandOptionType.SingleValue);
-            //CommandOption parametersFilesOption = app.Option("-x|--extra-args", LocalizableString.ExtraArgsFileHelp, CommandOptionType.MultipleValue);
-            //CommandOption localeOption = app.Option("--locale", LocalizableStrings.LocaleHelp, CommandOptionType.SingleValue);
-            //CommandOption quietOption = app.Option("--quiet", LocalizableStrings.QuietModeHelp, CommandOptionType.NoValue);
-            //CommandOption installOption = app.Option("-i|--install", LocalizableStrings.InstallHelp, CommandOptionType.MultipleValue);
-
-            //CommandOption update = app.Option("--update", LocalizableStrings.UpdateHelp, CommandOptionType.NoValue);
         }
 
         public static int Run(string[] args)
         {
+            Dictionary<Guid, Func<Type>> builtIns = new Dictionary<Guid, Func<Type>>
+            {
+                { new Guid("0C434DF7-E2CB-4DEE-B216-D7C58C8EB4B3"), () => typeof(RunnableProjectGenerator) },
+                { new Guid("3147965A-08E5-4523-B869-02C8E9A8AAA1"), () => typeof(BalancedNestingConfig) },
+                { new Guid("3E8BCBF0-D631-45BA-A12D-FBF1DE03AA38"), () => typeof(ConditionalConfig) },
+                { new Guid("A1E27A4B-9608-47F1-B3B8-F70DF62DC521"), () => typeof(FlagsConfig) },
+                { new Guid("3FAE1942-7257-4247-B44D-2DDE07CB4A4A"), () => typeof(IncludeConfig) },
+                { new Guid("3D33B3BF-F40E-43EB-A14D-F40516F880CD"), () => typeof(RegionConfig) },
+                { new Guid("62DB7F1F-A10E-46F0-953F-A28A03A81CD1"), () => typeof(ReplacementConfig) },
+                { new Guid("370996FE-2943-4AED-B2F6-EC03F0B75B4A"), () => typeof(ConstantMacro) },
+                { new Guid("BB625F71-6404-4550-98AF-B2E546F46C5F"), () => typeof(EvaluateMacro) },
+                { new Guid("10919008-4E13-4FA8-825C-3B4DA855578E"), () => typeof(GuidMacro) },
+                { new Guid("F2B423D7-3C23-4489-816A-41D8D2A98596"), () => typeof(NowMacro) },
+                { new Guid("011E8DC1-8544-4360-9B40-65FD916049B7"), () => typeof(RandomMacro) },
+                { new Guid("8A4D4937-E23F-426D-8398-3BDBD1873ADB"), () => typeof(RegexMacro) },
+                { new Guid("B57D64E0-9B4F-4ABE-9366-711170FD5294"), () => typeof(SwitchMacro) }
+            };
+
             // Initial host setup has the current locale. May need to be changed based on inputs.
-            Host = new DefaultTemplateEngineHost(HostIdentifier, HostVersion, CultureInfo.CurrentCulture.Name);
+            Host = new DefaultTemplateEngineHost(HostIdentifier, HostVersion, CultureInfo.CurrentCulture.Name, new Dictionary<string, string>(), builtIns.ToList());
             EngineEnvironmentSettings.Host = Host;
 
             ExtendedCommandParser app = new ExtendedCommandParser()
@@ -312,11 +321,6 @@ namespace Microsoft.DotNet.Tools.New3
                 return 0;
             }
 
-            //if (update.HasValue())
-            //{
-            //    return PerformUpdateAsync(templateName, quiet, source);
-            //}
-
             if (string.IsNullOrEmpty(templateName))
             {
                 ListTemplates(string.Empty);
@@ -339,91 +343,6 @@ namespace Microsoft.DotNet.Tools.New3
         {
             return _localeFormatRegex.IsMatch(localeToCheck);
         }
-
-        //private static async Task<int> PerformUpdateAsync(string name, bool quiet, CommandOption source)
-        //{
-        //    HashSet<IConfiguredTemplateSource> allSources = new HashSet<IConfiguredTemplateSource>();
-        //    HashSet<string> toInstall = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        //    foreach (ITemplate template in TemplateCreator.List(name, source))
-        //    {
-        //        allSources.Add(template.Source);
-        //    }
-
-        //    foreach (IConfiguredTemplateSource src in allSources)
-        //    {
-        //        if (!quiet)
-        //        {
-        //            Reporter.Output.WriteLine(string.Format(LocalizableStrings.CheckingForUpdates, src.Alias));
-        //        }
-
-        //        bool updatesReady;
-
-        //        if (src.ParentSource != null)
-        //        {
-        //            updatesReady = await src.Source.CheckForUpdatesAsync(src.ParentSource, src.Location);
-        //        }
-        //        else
-        //        {
-        //            updatesReady = await src.Source.CheckForUpdatesAsync(src.Location);
-        //        }
-
-        //        if (updatesReady)
-        //        {
-        //            if (!quiet)
-        //            {
-        //                Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateAvailable, src.Alias));
-        //            }
-
-        //            string packageId = src.ParentSource != null
-        //                ? src.Source.GetInstallPackageId(src.ParentSource, src.Location)
-        //                : src.Source.GetInstallPackageId(src.Location);
-
-        //            toInstall.Add(packageId);
-        //        }
-        //    }
-
-        //    if(toInstall.Count == 0)
-        //    {
-        //        if (!quiet)
-        //        {
-        //            Reporter.Output.WriteLine(LocalizableStrings.NoUpdates);
-        //        }
-
-        //        return 0;
-        //    }
-
-        //    if (!quiet)
-        //    {
-        //        Reporter.Output.WriteLine(LocalizableString.InstallingUpdates);
-        //    }
-
-        //    List<string> installCommands = new List<string>();
-        //    List<string> uninstallCommands = new List<string>();
-
-        //    foreach (string packageId in toInstall)
-        //    {
-        //        installCommands.Add("-i");
-        //        installCommands.Add(packageId);
-
-        //        uninstallCommands.Add("-i");
-        //        uninstallCommands.Add(packageId);
-        //    }
-
-        //    installCommands.Add("--quiet");
-        //    uninstallCommands.Add("--quiet");
-
-        //    Command.CreateDotNet("new", uninstallCommands).ForwardStdOut().ForwardStdErr().Execute();
-        //    Command.CreateDotNet("new", installCommands).ForwardStdOut().ForwardStdErr().Execute();
-        //    Broker.ComponentRegistry.ForceReinitialize();
-
-        //    if (!quiet)
-        //    {
-        //        Reporter.Output.WriteLine("Done.");
-        //    }
-
-        //    return 0;
-        //}
 
         private static void ConfigureEnvironment()
         {
@@ -635,80 +554,6 @@ namespace Microsoft.DotNet.Tools.New3
             {
                 Reporter.Output.WriteLine(LocalizableStrings.NoParameters);
             }
-        }
-    }
-
-    internal class TableFormatter
-    {
-        public static void Print<T>(IEnumerable<T> items, string noItemsMessage, string columnPad, char header, Dictionary<string, Func<T, object>> dictionary)
-        {
-            List<string>[] columns = new List<string>[dictionary.Count];
-
-            for (int i = 0; i < dictionary.Count; ++i)
-            {
-                columns[i] = new List<string>();
-            }
-
-            string[] headers = new string[dictionary.Count];
-            int[] columnWidths = new int[dictionary.Count];
-            int valueCount = 0;
-
-            foreach (T item in items)
-            {
-                int index = 0;
-                foreach (KeyValuePair<string, Func<T, object>> act in dictionary)
-                {
-                    headers[index] = act.Key;
-                    columns[index++].Add(act.Value(item)?.ToString() ?? "(null)");
-                }
-                ++valueCount;
-            }
-
-            if (valueCount > 0)
-            {
-                for (int i = 0; i < columns.Length; ++i)
-                {
-                    columnWidths[i] = Math.Max(columns[i].Max(x => x.Length), headers[i].Length);
-                }
-            }
-            else
-            {
-                int index = 0;
-                foreach (KeyValuePair<string, Func<T, object>> act in dictionary)
-                {
-                    headers[index] = act.Key;
-                    columnWidths[index++] = act.Key.Length;
-                }
-            }
-
-            int headerWidth = columnWidths.Sum() + columnPad.Length * (dictionary.Count - 1);
-
-            for (int i = 0; i < headers.Length - 1; ++i)
-            {
-                Reporter.Output.Write(headers[i].PadRight(columnWidths[i]));
-                Reporter.Output.Write(columnPad);
-            }
-
-            Reporter.Output.WriteLine(headers[headers.Length - 1]);
-            Reporter.Output.WriteLine("".PadRight(headerWidth, header));
-
-            for (int i = 0; i < valueCount; ++i)
-            {
-                for (int j = 0; j < columns.Length - 1; ++j)
-                {
-                    Reporter.Output.Write(columns[j][i].PadRight(columnWidths[j]));
-                    Reporter.Output.Write(columnPad);
-                }
-
-                Reporter.Output.WriteLine(columns[headers.Length - 1][i]);
-            }
-
-            if (valueCount == 0)
-            {
-                Reporter.Output.WriteLine(noItemsMessage);
-            }
-
-            Reporter.Output.WriteLine(" ");
         }
     }
 }
