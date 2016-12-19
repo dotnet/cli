@@ -38,6 +38,7 @@ namespace Microsoft.DotNet.Cli.Test.Tests
             result.StdOut.Should().Contain("Total tests: 2. Passed: 1. Failed: 1. Skipped: 0.");
             result.StdOut.Should().Contain("Passed   TestNamespace.VSTestTests.VSTestPassTest");
             result.StdOut.Should().Contain("Failed   TestNamespace.VSTestTests.VSTestFailTest");
+            result.ExitCode.Should().Be(1);
         }
 
         [Fact]
@@ -65,6 +66,7 @@ namespace Microsoft.DotNet.Cli.Test.Tests
             result.StdOut.Should().Contain("Total tests: 2. Passed: 1. Failed: 1. Skipped: 0.");
             result.StdOut.Should().Contain("Passed   TestNamespace.VSTestXunitTests.VSTestXunitPassTest");
             result.StdOut.Should().Contain("Failed   TestNamespace.VSTestXunitTests.VSTestXunitFailTest");
+            result.ExitCode.Should().Be(1);
         }
 
         [Fact]
@@ -136,6 +138,37 @@ namespace Microsoft.DotNet.Cli.Test.Tests
             {
                 Directory.Delete(trxLoggerDirectory, true);
             }
+        }
+
+        [Fact(Skip = "https://github.com/dotnet/cli/issues/5035")]
+        public void ItBuildsAndTestsAppWhenRestoringToSpecificDirectory()
+        {
+            var rootPath = TestAssets.Get("VSTestDotNetCore").CreateInstance().WithSourceFiles().Root.FullName;
+
+            string dir = "pkgs";
+            string fullPath = Path.GetFullPath(Path.Combine(rootPath, dir));
+
+            string args = $"--packages \"{dir}\"";
+            new RestoreCommand()
+                .WithWorkingDirectory(rootPath)
+                .Execute(args)
+                .Should()
+                .Pass();
+
+            new BuildCommand()
+                .WithWorkingDirectory(rootPath)
+                .ExecuteWithCapturedOutput()
+                .Should()
+                .Pass()
+                .And.NotHaveStdErr();
+
+            CommandResult result = new DotnetTestCommand()
+                                        .WithWorkingDirectory(rootPath)
+                                        .ExecuteWithCapturedOutput();
+
+            result.StdOut.Should().Contain("Total tests: 2. Passed: 1. Failed: 1. Skipped: 0.");
+            result.StdOut.Should().Contain("Passed   TestNamespace.VSTestTests.VSTestPassTest");
+            result.StdOut.Should().Contain("Failed   TestNamespace.VSTestTests.VSTestFailTest");
         }
     }
 }
