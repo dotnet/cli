@@ -213,7 +213,7 @@ Additional Arguments:
 
             slnFile = SlnFile.Read(solutionPath);
             slnFile.Projects.Count.Should().Be(1);
-            slnFile.Projects[0].FilePath.Should().Be(@"App\App.csproj");
+            slnFile.Projects[0].FilePath.Should().Be(Path.Combine("App", "App.csproj"));
         }
 
         [Fact]
@@ -243,7 +243,7 @@ Project reference `{projectToRemoveNormalized}` removed.";
 
             slnFile = SlnFile.Read(solutionPath);
             slnFile.Projects.Count.Should().Be(1);
-            slnFile.Projects[0].FilePath.Should().Be(@"App\App.csproj");
+            slnFile.Projects[0].FilePath.Should().Be(Path.Combine("App", "App.csproj"));
         }
 
         [Fact]
@@ -274,7 +274,7 @@ Project reference `idontexisteither.csproj` could not be found.";
 
             slnFile = SlnFile.Read(solutionPath);
             slnFile.Projects.Count.Should().Be(1);
-            slnFile.Projects[0].FilePath.Should().Be(@"App\App.csproj");
+            slnFile.Projects[0].FilePath.Should().Be(Path.Combine("App", "App.csproj"));
         }
     }
 }
