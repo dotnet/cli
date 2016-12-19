@@ -76,6 +76,20 @@ namespace Microsoft.DotNet.Cli.MSBuild.Tests
             }
         }
 
+        [Fact]
+        public void WhenDotnetRunHelpIsInvokedAppArgumentsTextIsIncludedInOutput()
+        {
+            const string AppArgumentsText = "Arguments passed to the application that is being run.";
+
+            var projectDirectory = TestAssetsManager.CreateTestDirectory("RunContainsAppArgumentsText");
+            var result = new TestCommand("dotnet")
+                .WithWorkingDirectory(projectDirectory.Path)
+                .ExecuteWithCapturedOutput("run --help");
+            
+            result.ExitCode.Should().Be(0);
+            result.StdOut.Should().Contain(AppArgumentsText);
+        }
+
 
         [Fact]
         public void WhenTelemetryIsEnabledTheLoggerIsAddedToTheCommandLine()
