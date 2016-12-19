@@ -90,7 +90,6 @@ namespace Microsoft.DotNet.Cli.MSBuild.Tests
             result.StdOut.Should().Contain(AppArgumentsText);
         }
 
-
         [Fact]
         public void WhenTelemetryIsEnabledTheLoggerIsAddedToTheCommandLine()
         {

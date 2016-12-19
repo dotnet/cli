@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.Tools.Publish
             app.FullName = LocalizableStrings.AppFullName;
             app.Description = LocalizableStrings.AppDescription;
             app.HandleRemainingArguments = true;
-            app.ArgumentSeparatorHelpText = HelpMessageStrings.MSBuildAdditionalArgsHelpText;            
+            app.ArgumentSeparatorHelpText = HelpMessageStrings.MSBuildAdditionalArgsHelpText;
             app.HelpOption("-h|--help");
 
             CommandArgument projectArgument = app.Argument($"<{LocalizableStrings.ProjectArgument}>",
