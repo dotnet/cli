@@ -15,16 +15,25 @@ namespace Microsoft.DotNet.Migration.Tests
         public void ItMigratesSln()
         {
             var projectDirectory = TestAssets
-                .Get("TestAppWithSlnAndExistingXprojReferences")
+                .Get("NonRestoredTestProjects", "PJTestAppWithSlnAndExistingXprojReferences")
                 .CreateInstance()
                 .WithSourceFiles()
-                .Root
-                .FullName;
+                .Root;
 
-            var cmd = new DotnetCommand()
+            new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)
-                .ExecuteWithCapturedOutput($"migrate \"{Path.Combine("TestApp", "TestApp.sln")}\"");
-            cmd.Should().Pass();
+                .Execute($"migrate \"{Path.Combine("TestApp", "TestApp.sln")}\"")
+                .Should().Pass();
+
+            new DotnetCommand()
+                .WithWorkingDirectory(projectDirectory)
+                .Execute($"restore \"{Path.Combine("TestApp", "TestApp.csproj")}\"")
+                .Should().Pass();
+
+            new DotnetCommand()
+                .WithWorkingDirectory(projectDirectory)
+                .Execute($"build \"{Path.Combine("TestApp", "TestApp.sln")}\"")
+                .Should().Pass();
         }
     }
 }
