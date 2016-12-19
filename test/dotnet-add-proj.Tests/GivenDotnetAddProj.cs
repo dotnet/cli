@@ -229,11 +229,12 @@ Additional Arguments:
 
             var solutionPath = Path.Combine(projectDirectory, "App.sln");
             var projectToAdd = Path.Combine("Lib", "Lib.csproj");
+            var projectToAddNormalized = @"Lib\Lib.csproj";
             var cmd = new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)
                 .ExecuteWithCapturedOutput($"add App.sln project {projectToAdd}");
             cmd.Should().Pass();
-            cmd.StdOut.Should().Be($"Solution {solutionPath} already contains project {projectToAdd}.");
+            cmd.StdOut.Should().Be($"Solution {solutionPath} already contains project {projectToAddNormalized}.");
             cmd.StdErr.Should().BeEmpty();
         }
 
