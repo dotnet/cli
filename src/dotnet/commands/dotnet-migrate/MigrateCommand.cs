@@ -112,17 +112,18 @@ namespace Microsoft.DotNet.Tools.Migrate
 
             foreach (var project in _slnFile.Projects)
             {
-                var projectDirectory = Path.Combine(
-                    _slnFile.BaseDirectory, 
-                    Path.GetDirectoryName(project.FilePath));
+                var projectDirectory = Path.GetFullPath(
+                    Path.Combine(_slnFile.BaseDirectory, Path.GetDirectoryName(project.FilePath)));
 
-                var csprojFiles = new DirectoryInfo(projectDirectory)
-                    .EnumerateFiles()
-                    .Where(f => f.Extension == ".csproj");
+                var reports = migrationReport.ProjectMigrationReports.Where((report)
+                    => report.ProjectDirectory == projectDirectory);
 
-                if (csprojFiles.Count() == 1)
+                if (reports.Count() == 1)
                 {
-                    project.FilePath = Path.Combine(Path.GetDirectoryName(project.FilePath), csprojFiles.First().Name);
+                    var projectMigrationReport = reports.Single();
+                    project.FilePath = Path.Combine(
+                        Path.GetDirectoryName(project.FilePath), 
+                        projectMigrationReport.ProjectName + ".csproj");
                     project.TypeGuid = ProjectTypeGuids.CSharpProjectTypeGuid;
                 }
             }
