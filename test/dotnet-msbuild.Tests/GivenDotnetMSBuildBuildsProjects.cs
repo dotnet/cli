@@ -77,9 +77,9 @@ namespace Microsoft.DotNet.Cli.MSBuild.Tests
         {
             const string AppArgumentsText = "Arguments passed to the application that is being run.";
 
-            var projectDirectory = TestAssetsManager.CreateTestDirectory("RunContainsAppArgumentsText");
+            var projectDirectory = TestAssets.CreateTestDirectory("RunContainsAppArgumentsText");
             var result = new TestCommand("dotnet")
-                .WithWorkingDirectory(projectDirectory.Path)
+                .WithWorkingDirectory(projectDirectory)
                 .ExecuteWithCapturedOutput("run --help");
             
             result.ExitCode.Should().Be(0);

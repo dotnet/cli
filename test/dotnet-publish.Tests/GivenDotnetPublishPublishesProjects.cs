@@ -83,8 +83,7 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
         [Fact]
         public void ItPublishesAppWhenRestoringToSpecificPackageDirectory()
         {
-            var rootPath = TestAssetsManager.CreateTestDirectory().Path;
-            var rootDir = new DirectoryInfo(rootPath);
+            var rootDir = TestAssets.CreateTestDirectory();
 
             string dir = "pkgs";
             string args = $"--packages {dir}";
