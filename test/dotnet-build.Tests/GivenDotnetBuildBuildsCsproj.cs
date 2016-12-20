@@ -64,11 +64,11 @@ namespace Microsoft.DotNet.Cli.Build.Tests
                 .Execute()
                 .Should().Pass();
 
-            var outputDll = Directory.EnumerateFiles(Path.Combine(rootPath, "bin"), "*.dll", SearchOption.AllDirectories).Single();
+            var outputDll = rootPath.GetDirectory("bin").EnumerateFiles("*.dll", SearchOption.AllDirectories).Single();
 
             var outputRunCommand = new TestCommand("dotnet");
 
-            outputRunCommand.ExecuteWithCapturedOutput(outputDll)
+            outputRunCommand.ExecuteWithCapturedOutput(outputDll.FullName)
                 .Should().Pass()
                      .And.HaveStdOutContaining("Hello World");
         }

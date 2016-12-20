@@ -96,7 +96,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         [Fact]
         public void MigrateTFMRuleDoesNotAddRuntimesWhenMigratingDesktopTFMsWithRuntimesAlready()
         {
-            var testDirectory = TestAssets.CreateDirectory();
+            var testDirectory = TestAssets.CreateTestDirectory().FullName;
             var testPJ = new ProjectJsonBuilder(TestAssets)
                 .FromTestAssetBase("TestAppWithMultipleFrameworksAndRuntimes")
                 .SaveToDisk(testDirectory);

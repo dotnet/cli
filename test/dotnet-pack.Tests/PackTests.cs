@@ -210,25 +210,25 @@ namespace Microsoft.DotNet.Tools.Pack.Tests
         [Fact]
         public void ItPacksAppWhenRestoringToSpecificPackageDirectory()
         {
-            var rootDir = TestAssets.CreateTestDirectory().Path;
+            var rootDir = TestAssets.CreateTestDirectory();
 
             string dir = "pkgs";
             string args = $"--packages {dir}";
 
             new NewCommand()
-                .WithWorkingDirectory(rootPath)
+                .WithWorkingDirectory(rootDir)
                 .Execute()
                 .Should()
                 .Pass();
 
             new RestoreCommand()
-                .WithWorkingDirectory(rootPath)
+                .WithWorkingDirectory(rootDir)
                 .Execute(args)
                 .Should()
                 .Pass();
 
             new PackCommand()
-                .WithWorkingDirectory(rootPath)
+                .WithWorkingDirectory(rootDir)
                 .ExecuteWithCapturedOutput()
                 .Should()
                 .Pass();

@@ -89,19 +89,19 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
             string args = $"--packages {dir}";
 
             new NewCommand()
-                .WithWorkingDirectory(rootPath)
+                .WithWorkingDirectory(rootDir)
                 .Execute()
                 .Should()
                 .Pass();
 
             new RestoreCommand()
-                .WithWorkingDirectory(rootPath)
+                .WithWorkingDirectory(rootDir)
                 .Execute(args)
                 .Should()
                 .Pass();
 
             new PublishCommand()
-                .WithWorkingDirectory(rootPath)
+                .WithWorkingDirectory(rootDir)
                 .ExecuteWithCapturedOutput()
                 .Should().Pass();
 
@@ -109,7 +109,8 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
             var configuration = Environment.GetEnvironmentVariable("CONFIGURATION") ?? "Debug";
 
             var outputProgram = rootDir
-                .GetDirectory("bin", configuration, "netcoreapp1.0", "publish", $"{rootDir.Name}.dll")
+                .GetDirectory("bin", configuration, "netcoreapp1.0", "publish")
+                .GetFile($"{rootDir.Name}.dll")
                 .FullName;
 
             new TestCommand(outputProgram)

@@ -19,25 +19,24 @@ namespace Microsoft.DotNet.Restore.Tests
         {
             var rootPath = TestAssets.CreateTestDirectory();
 
-            string dir = "pkgs";
-            string fullPath = Path.GetFullPath(Path.Combine(rootPath, dir));
+            var dir = "pkgs";
+            var packagesDirectory = rootPath.GetDirectory(dir);
 
             new NewCommand()
                 .WithWorkingDirectory(rootPath)
                 .Execute()
-                .Should()
-                .Pass();
+                .Should().Pass();
 
-            string args = $"--packages \"{dir}\"";
+            var args = $"--packages \"{dir}\"";
             new RestoreCommand()
                  .WithWorkingDirectory(rootPath)
                  .ExecuteWithCapturedOutput(args)
-                 .Should()
-                 .Pass()
+                 .Should().Pass()
                  .And.NotHaveStdErr();
 
-            Directory.Exists(fullPath).Should().BeTrue();
-            Directory.EnumerateFiles(fullPath, "*.dll", SearchOption.AllDirectories).Count().Should().BeGreaterThan(0);
+            packagesDirectory.Should().Exist();
+            packagesDirectory.EnumerateFiles("*.dll", SearchOption.AllDirectories).Count()
+                .Should().BeGreaterThan(0);
         }
 
         [Fact]
@@ -45,8 +44,8 @@ namespace Microsoft.DotNet.Restore.Tests
         {
             var rootPath = TestAssets.CreateTestDirectory();
 
-            string dir = "pkgs";
-            string fullPath = Path.GetFullPath(Path.Combine(rootPath, dir));
+            var dir = "pkgs";
+            var packagesDirectory = rootPath.GetDirectory(dir);
 
             new NewCommand()
                 .WithWorkingDirectory(rootPath)
@@ -54,7 +53,7 @@ namespace Microsoft.DotNet.Restore.Tests
                 .Should()
                 .Pass();
 
-            string args = $"--packages \"{dir}\"";
+            var args = $"--packages \"{dir}\"";
             new RestoreCommand()
                 .WithWorkingDirectory(rootPath)
                 .ExecuteWithCapturedOutput(args)
@@ -62,28 +61,32 @@ namespace Microsoft.DotNet.Restore.Tests
                 .Pass()
                 .And.NotHaveStdErr();
 
-            Directory.Exists(fullPath).Should().BeTrue();
-            Directory.EnumerateFiles(fullPath, "*.dll", SearchOption.AllDirectories).Count().Should().BeGreaterThan(0);
+            packagesDirectory.Should().Exist();
+            packagesDirectory.EnumerateFiles("*.dll", SearchOption.AllDirectories).Count()
+                .Should().BeGreaterThan(0);
         }
 
         [Fact]
         public void ItRestoresTestAppToSpecificDirectory()
         {
-            var rootPath = TestAssets.Get("VSTestDotNetCore").CreateInstance().WithSourceFiles().Root.FullName;
+            var rootPath = TestAssets.Get("VSTestDotNetCore")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root;
 
-            string dir = "pkgs";
-            string fullPath = Path.GetFullPath(Path.Combine(rootPath, dir));
+            var dir = "pkgs";
+            var packagesDirectory = rootPath.GetDirectory(dir);
 
-            string args = $"--packages \"{dir}\"";
+            var args = $"--packages \"{dir}\"";
             new RestoreCommand()
                 .WithWorkingDirectory(rootPath)
                 .ExecuteWithCapturedOutput(args)
-                .Should()
-                .Pass()
+                .Should().Pass()
                 .And.NotHaveStdErr();
 
-            Directory.Exists(fullPath).Should().BeTrue();
-            Directory.EnumerateFiles(fullPath, "*.dll", SearchOption.AllDirectories).Count().Should().BeGreaterThan(0);
+            packagesDirectory.Should().Exist();
+            packagesDirectory.EnumerateFiles("*.dll", SearchOption.AllDirectories).Count()
+                .Should().BeGreaterThan(0);
         }
     }
 }
