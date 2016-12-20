@@ -74,11 +74,11 @@ namespace Microsoft.DotNet.Migration.Tests
 
             slnProject = slnFile.Projects.Where((p) => p.Name == "TestLibrary").Single();
             slnProject.TypeGuid.Should().Be(ProjectTypeGuids.CSharpProjectTypeGuid);
-            slnProject.FilePath.Should().Be(@"..\TestLibrary\TestLibrary.csproj");
+            slnProject.FilePath.Should().Be(Path.Combine("..", "TestLibrary", "TestLibrary.csproj"));
 
             slnProject = slnFile.Projects.Where((p) => p.Name == "subdir").Single();
             slnProject.TypeGuid.Should().Be(subdirProjectTypeGuid);
-            slnProject.FilePath.Should().Be(@"src\subdir\subdir.csproj");
+            slnProject.FilePath.Should().Be(Path.Combine("src", "subdir", "subdir.csproj"));
         }
     }
 }
