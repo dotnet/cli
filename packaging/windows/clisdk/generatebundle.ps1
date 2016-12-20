@@ -13,7 +13,8 @@ param(
     [Parameter(Mandatory=$true)][string]$DotnetCLIDisplayVersion,
     [Parameter(Mandatory=$true)][string]$DotnetCLINugetVersion,
     [Parameter(Mandatory=$true)][string]$UpgradeCode,
-    [Parameter(Mandatory=$true)][string]$Architecture
+    [Parameter(Mandatory=$true)][string]$Architecture,
+    [Parameter(Mandatory=$true)][string]$LicenseType
 )
 
 . "$PSScriptRoot\..\..\..\scripts\common\_common.ps1"
@@ -29,7 +30,8 @@ function RunCandleForBundle
 
     .\candle.exe -nologo `
         -dDotnetSrc="$inputDir" `
-        -dMicrosoftEula="$RepoRoot\packaging\osx\clisdk\resources\en.lproj\eula.rtf" `
+        -dMicrosoftEula="$RepoRoot\packaging\osx\clisdk\resources\$LicenseType\en.lproj\eula.rtf" `
+        -dResourcesPath="$RepoRoot\packaging\osx\clisdk\resources\$LicenseType" `
         -dProductMoniker="$ProductMoniker" `
         -dBuildVersion="$DotnetMSIVersion" `
         -dDisplayVersion="$DotnetCLIDisplayVersion" `

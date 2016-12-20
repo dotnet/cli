@@ -93,7 +93,8 @@
                       '$(SimpleVersion)'
                       '$(NugetVersion)'
                       '$(SdkInstallerUpgradeCode)'
-                      '$(Architecture)'" />
+                      '$(Architecture)'
+                      '$(InstallerLicenseType)'" />
     </Target>
 
     <Target Name="GenerateSdkBundle"
@@ -118,7 +119,8 @@
                       '$(SimpleVersion)'
                       '$(NugetVersion)'
                       '$(CombinedFrameworkSDKHostInstallerUpgradeCode)'
-                      '$(Architecture)'" />
+                      '$(Architecture)'
+                      '$(InstallerLicenseType)'" />
     </Target>
 
     <Target Name="GenerateSdkNupkg"

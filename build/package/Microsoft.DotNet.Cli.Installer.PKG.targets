@@ -19,7 +19,7 @@
 
         <SdkPkgSourcesRootDirectory>$(RepoRoot)/packaging/osx/clisdk</SdkPkgSourcesRootDirectory>
         <SdkPkgScriptsDirectory>$(SdkPkgSourcesRootDirectory)/scripts</SdkPkgScriptsDirectory>
-        <SdkProductArchiveResourcesDirectory>$(SdkPkgSourcesRootDirectory)/resources</SdkProductArchiveResourcesDirectory>
+        <SdkProductArchiveResourcesDirectory>$(SdkPkgSourcesRootDirectory)/resources/$(InstallerLicenseType)</SdkProductArchiveResourcesDirectory>
 
         <SdkProductArchiveDistributionTemplateFile>$(SdkPkgSourcesRootDirectory)/Distribution-Template</SdkProductArchiveDistributionTemplateFile>
         <SdkProductArchiveDistributionFile>$(PkgIntermediateDirectory)/CLI-SDK-Formatted-Distribution-Template.xml</SdkProductArchiveDistributionFile>
