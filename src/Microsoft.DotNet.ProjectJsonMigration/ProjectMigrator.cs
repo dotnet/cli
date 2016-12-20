@@ -167,7 +167,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration
                 if (dependencies.Any())
                 {
                     csprojDependencies = dependencies
-                        .SelectMany(r => r.Includes())
+                        .SelectMany(r => r.Includes().Select(p => PathUtility.GetPathWithDirectorySeparator(p)))
                         .ToList();
                 }
                 else
