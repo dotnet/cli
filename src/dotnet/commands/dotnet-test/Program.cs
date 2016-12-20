@@ -21,11 +21,11 @@ namespace Microsoft.DotNet.Tools.Test
             {
                 Name = "dotnet test",
                 FullName = LocalizableStrings.AppFullName,
-                Description = LocalizableStrings.AppDescription
+                Description = LocalizableStrings.AppDescription,
+                HandleRemainingArguments = true,
+                ArgumentSeparatorHelpText = HelpMessageStrings.MSBuildAdditionalArgsHelpText                
             };
 
-            cmd.AllowArgumentSeparator = true;
-            cmd.ArgumentSeparatorHelpText = HelpMessageStrings.MSBuildAdditionalArgsHelpText;
             cmd.HelpOption("-h|--help");
 
             var argRoot = cmd.Argument(
@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.Tools.Test
                 CommandOptionType.NoValue);
 
             var testCaseFilterOption = cmd.Option(
-                $"--test-case-filter <{LocalizableStrings.CmdTestCaseFilterExpression}>",
+                $"--filter <{LocalizableStrings.CmdTestCaseFilterExpression}>",
                 LocalizableStrings.CmdTestCaseFilterDescription,
                 CommandOptionType.SingleValue);
 

@@ -4,74 +4,74 @@
     <body>
       <group id="src/dotnet/commands/dotnet-restore/LocalizableStrings.resx" />
       <trans-unit id="AppFullName">
-        <source>restore</source>
-        <target state="new">restore</target>
+        <source>.NET dependency restorer</source>
+        <target state="needs-review-translation">przywracanie</target>
         <note></note>
       </trans-unit>
       <trans-unit id="AppDescription">
         <source>restore for msbuild</source>
-        <target state="new">restore for msbuild</target>
-        <note></note>
+        <target state="translated">przywracanie dla programu MSBuild</target>
+        <note />
       </trans-unit>
       <trans-unit id="CmdArgument">
-        <source>root</source>
-        <target state="new">root</target>
+        <source>PROJECT</source>
+        <target state="needs-review-translation">główny</target>
         <note></note>
       </trans-unit>
       <trans-unit id="CmdArgumentDescription">
         <source>Optional path to a project file or MSBuild arguments.</source>
-        <target state="new">Optional path to a project file or MSBuild arguments.</target>
-        <note></note>
+        <target state="translated">Opcjonalna ścieżka do pliku projektu lub argumentów programu MSBuild.</target>
+        <note />
       </trans-unit>
       <trans-unit id="CmdSourceOption">
-        <source>source</source>
-        <target state="new">source</target>
+        <source>SOURCE</source>
+        <target state="needs-review-translation">źródło</target>
         <note></note>
       </trans-unit>
       <trans-unit id="CmdSourceOptionDescription">
         <source>Specifies a NuGet package source to use during the restore.</source>
-        <target state="new">Specifies a NuGet package source to use during the restore.</target>
-        <note></note>
+        <target state="translated">Określa źródło pakietów NuGet do użycia podczas przywracania.</target>
+        <note />
       </trans-unit>
       <trans-unit id="CmdPackagesOption">
-        <source>packagesDirectory</source>
-        <target state="new">packagesDirectory</target>
+        <source>PACKAGES_DIRECTORY</source>
+        <target state="needs-review-translation">katalogPakietów</target>
         <note></note>
       </trans-unit>
       <trans-unit id="CmdPackagesOptionDescription">
         <source>Directory to install packages in.</source>
-        <target state="new">Directory to install packages in.</target>
-        <note></note>
+        <target state="translated">Katalog, w którym mają zostać zainstalowane pakiety.</target>
+        <note />
       </trans-unit>
       <trans-unit id="CmdDisableParallelOptionDescription">
         <source>Disables restoring multiple projects in parallel.</source>
-        <target state="new">Disables restoring multiple projects in parallel.</target>
-        <note></note>
+        <target state="translated">Wyłącza równoległe przywracanie wielu projektów.</target>
+        <note />
       </trans-unit>
       <trans-unit id="CmdConfigFileOption">
-        <source>file</source>
-        <target state="new">file</target>
+        <source>FILE</source>
+        <target state="needs-review-translation">plik</target>
         <note></note>
       </trans-unit>
       <trans-unit id="CmdConfigFileOptionDescription">
         <source>The NuGet configuration file to use.</source>
-        <target state="new">The NuGet configuration file to use.</target>
-        <note></note>
+        <target state="translated">Plik konfiguracji programu NuGet do użycia.</target>
+        <note />
       </trans-unit>
       <trans-unit id="CmdNoCacheOptionDescription">
         <source>Do not cache packages and http requests.</source>
-        <target state="new">Do not cache packages and http requests.</target>
-        <note></note>
+        <target state="translated">Nie przechowuj w pamięci podręcznej pakietów ani żądań HTTP.</target>
+        <note />
       </trans-unit>
       <trans-unit id="CmdIgnoreFailedSourcesOptionDescription">
         <source>Treat package source failures as warnings.</source>
-        <target state="new">Treat package source failures as warnings.</target>
-        <note></note>
+        <target state="translated">Traktuj niepowodzenia źródła pakietów jako ostrzeżenia.</target>
+        <note />
       </trans-unit>
       <trans-unit id="CmdNoDependenciesOptionDescription">
         <source>Set this flag to ignore project to project references and only restore the root project</source>
-        <target state="new">Set this flag to ignore project to project references and only restore the root project</target>
-        <note></note>
+        <target state="translated">Ustaw tę flagę, aby ignorować odwołania między projektami i przywrócić tylko projekt główny</target>
+        <note />
       </trans-unit>
     </body>
   </file>
