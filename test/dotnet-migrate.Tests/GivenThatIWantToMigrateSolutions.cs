@@ -16,16 +16,31 @@ namespace Microsoft.DotNet.Migration.Tests
         [Fact]
         public void ItMigratesAndBuildsSln()
         {
-            MigrateAndBuild("NonRestoredTestProjects", "PJTestAppWithSlnAndExistingXprojReferences");
+            MigrateAndBuild(
+                "NonRestoredTestProjects",
+                "PJAppWithSlnAndXprojRefs",
+                ProjectTypeGuids.CSharpProjectTypeGuid);
         }
 
         [Fact]
         public void WhenDirectoryAlreadyContainsCsprojFileItMigratesAndBuildsSln()
         {
-            MigrateAndBuild("NonRestoredTestProjects", "PJTestAppWithSlnAndExistingXprojReferencesAndUnrelatedCsproj");
+            MigrateAndBuild(
+                "NonRestoredTestProjects",
+                "PJAppWithSlnAndXprojRefsAndUnrelatedCsproj",
+                ProjectTypeGuids.CSharpProjectTypeGuid);
         }
 
-        private void MigrateAndBuild(string groupName, string projectName)
+        [Fact]
+        public void WhenXprojReferencesCsprojAndSlnDoesNotItMigratesAndBuildsSln()
+        {
+            MigrateAndBuild(
+                "NonRestoredTestProjects",
+                "PJAppWithSlnAndXprojRefThatRefsCsprojWhereSlnDoesNotRefCsproj",
+                ProjectTypeGuids.CPSProjectTypeGuid);
+        }
+
+        private void MigrateAndBuild(string groupName, string projectName, string subdirProjectTypeGuid)
         {
             var projectDirectory = TestAssets
                 .Get(groupName, projectName)
@@ -54,18 +69,15 @@ namespace Microsoft.DotNet.Migration.Tests
             slnFile.Projects.Count.Should().Be(3);
 
             var slnProject = slnFile.Projects.Where((p) => p.Name == "TestApp").Single();
-            slnProject.Id.Should().Be("{0138CB8F-4AA9-4029-A21E-C07C30F425BA}");
-            slnProject.TypeGuid.Should().Be("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}");
+            slnProject.TypeGuid.Should().Be(ProjectTypeGuids.CSharpProjectTypeGuid);
             slnProject.FilePath.Should().Be("TestApp.csproj");
 
             slnProject = slnFile.Projects.Where((p) => p.Name == "TestLibrary").Single();
-            slnProject.Id.Should().Be("{DC0B35D0-8A36-4B52-8A11-B86739F055D2}");
-            slnProject.TypeGuid.Should().Be("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}");
+            slnProject.TypeGuid.Should().Be(ProjectTypeGuids.CSharpProjectTypeGuid);
             slnProject.FilePath.Should().Be(@"..\TestLibrary\TestLibrary.csproj");
 
             slnProject = slnFile.Projects.Where((p) => p.Name == "subdir").Single();
-            slnProject.Id.Should().Be("{F8F96F4A-F10C-4C54-867C-A9EFF55494C8}");
-            slnProject.TypeGuid.Should().Be("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}");
+            slnProject.TypeGuid.Should().Be(subdirProjectTypeGuid);
             slnProject.FilePath.Should().Be(@"src\subdir\subdir.csproj");
         }
     }
