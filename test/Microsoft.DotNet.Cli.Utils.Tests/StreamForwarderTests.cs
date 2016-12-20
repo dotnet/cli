@@ -84,13 +84,13 @@ namespace StreamForwarderTests
             TestCapturingAndForwardingHelper(ForwardOptions.WriteLine | ForwardOptions.Capture, inputStr, expectedCaptured, expectedWrites);
         }
 
-        private enum ForwardOptions
-        {
-            None = 0x0,
-            Capture = 0x1,
-            WriteLine = 0x02,
-        }
-
+        private enum ForwardOptions 
+        { 
+            None = 0x0, 
+            Capture = 0x1, 
+            WriteLine = 0x02, 
+        } 
+ 
         private void TestCapturingAndForwardingHelper(ForwardOptions options, string str, string expectedCaptured, string[] expectedWrites)
         {
             var forwarder = new StreamForwarder();
@@ -110,23 +110,6 @@ namespace StreamForwarderTests
 
             var captured = forwarder.CapturedOutput;
             Assert.Equal(expectedCaptured, captured);
-        }
-
-        private string SetupTestProject()
-        {
-
-            var testInstance = TestAssetsManager
-                .CreateTestInstance("OutputStandardOutputAndError")
-                .WithLockFiles();
-
-            var buildCommand = new BuildCommand()
-                .WithProjectFile(new FileInfo(Path.Combine(testInstance.Path, "project.json")))
-                .Execute();
-                
-            var buildOutputExe = "OutputStandardOutputAndError" + Constants.ExeSuffix;
-            var buildOutputPath = Path.Combine(testInstance.Path, "bin/Debug/netcoreapp1.0", buildOutputExe);
-
-            return buildOutputPath;
         }
     }
 }

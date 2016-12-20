@@ -14,24 +14,27 @@ namespace Microsoft.DotNet.New.Tests
     public class GivenThatIWantANewApp : TestBase
     {
         [Fact]
-        public void When_dotnet_new_is_invoked_mupliple_times_it_should_fail()
+        public void WhenDotnetNewIsInvokedMultipleTimesItShouldFail()
         {
-            var rootPath = TestAssetsManager.CreateTestDirectory().Path;
+            var testDirectory = TestAssets.CreateTestDirectory();
 
-            new TestCommand("dotnet") { WorkingDirectory = rootPath }
+            new TestCommand("dotnet")
+                .WithWorkingDirectory(testDirectory)
                 .Execute("new");
 
-            DateTime expectedState = Directory.GetLastWriteTime(rootPath);
+            var expectedState = testDirectory.LastWriteTime;
 
-            var result = new TestCommand("dotnet") { WorkingDirectory = rootPath }
+            var result = new TestCommand("dotnet")
+                .WithWorkingDirectory(testDirectory)
                 .ExecuteWithCapturedOutput("new");
 
-            DateTime actualState = Directory.GetLastWriteTime(rootPath);
+            var actualState = testDirectory.LastWriteTime;
 
             Assert.Equal(expectedState, actualState);
 
-            result.Should().Fail()
-                  .And.HaveStdErr();
+            result
+                .Should().Fail()
+                     .And.HaveStdErr();
         }
  
         [Fact] 
@@ -39,33 +42,37 @@ namespace Microsoft.DotNet.New.Tests
         { 
             var cSharpTemplates = new [] { "Console", "Lib", "Web", "Mstest", "XUnittest" }; 
  
-            var rootPath = TestAssetsManager.CreateTestDirectory().Path; 
-            var packagesDirectory = Path.Combine(rootPath, "packages"); 
+            var testDirectory = TestAssets.CreateTestDirectory();
+
+            var packagesDirectory = testDirectory.GetDirectory("packages");
  
-            foreach (var cSharpTemplate in cSharpTemplates) 
-            { 
-                var projectFolder = Path.Combine(rootPath, cSharpTemplate); 
-                Directory.CreateDirectory(projectFolder); 
-                CreateAndRestoreNewProject(cSharpTemplate, projectFolder, packagesDirectory); 
+            foreach (var cSharpTemplate in cSharpTemplates)
+            {
+                var projectDirectory = testDirectory.GetDirectory(cSharpTemplate);
+
+                projectDirectory.Create();
+
+                CreateAndRestoreNewProject(cSharpTemplate, projectDirectory, packagesDirectory); 
             } 
  
-            Directory.EnumerateFiles(packagesDirectory, $"*.nupkg", SearchOption.AllDirectories) 
-                .Should().NotContain(p => p.Contains("Microsoft.DotNet.Cli.Utils")); 
+            packagesDirectory
+                .Should().NotHaveFilesMatching($"Microsoft.DotNet.Cli.Utils.*.nupkg", SearchOption.AllDirectories); 
         } 
  
         private void CreateAndRestoreNewProject( 
             string projectType, 
-            string projectFolder, 
-            string packagesDirectory) 
+            DirectoryInfo projectDirectory, 
+            DirectoryInfo packagesDirectory) 
         { 
-            new TestCommand("dotnet") { WorkingDirectory = projectFolder } 
-                .Execute($"new --type {projectType}") 
-                .Should().Pass(); 
+            new TestCommand("dotnet")
+                .WithWorkingDirectory(projectDirectory)
+                .Execute($"new --type {projectType}")
+                .Should().Pass();
  
             new RestoreCommand() 
-                .WithWorkingDirectory(projectFolder) 
-                .Execute($"--packages {packagesDirectory} /p:SkipInvalidConfigurations=true") 
-                .Should().Pass(); 
+                .WithWorkingDirectory(projectDirectory)
+                .Execute($"--packages {packagesDirectory.FullName} /p:SkipInvalidConfigurations=true")
+                .Should().Pass();
         } 
     }
 }

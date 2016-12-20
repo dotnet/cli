@@ -78,14 +78,12 @@ Additional Arguments:
         [Fact]
         public void WhenInvalidSolutionIsPassedItPrintsErrorAndUsage()
         {
-            var projectDirectory = TestAssets
-                .Get("InvalidSolution")
+            var projectDirectory = TestAssets.Get("InvalidSolution")
                 .CreateInstance()
                 .WithSourceFiles()
-                .Root
-                .FullName;
+                .Root;
 
-            var projectToAdd = Path.Combine("Lib", "Lib.csproj");
+            var projectToAdd = projectDirectory.GetDirectory("Lib").GetFile("Lib.csproj");
             var cmd = new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)
                 .ExecuteWithCapturedOutput($"add InvalidSolution.sln project {projectToAdd}");
@@ -97,32 +95,31 @@ Additional Arguments:
         [Fact]
         public void WhenInvalidSolutionIsFoundItPrintsErrorAndUsage()
         {
-            var projectDirectory = TestAssets
-                .Get("InvalidSolution")
+            var projectDirectory = TestAssets.Get("InvalidSolution")
                 .CreateInstance()
                 .WithSourceFiles()
-                .Root
-                .FullName;
+                .WithRestoreFiles()
+                .Root;
 
-            var solutionPath = Path.Combine(projectDirectory, "InvalidSolution.sln");
-            var projectToAdd = Path.Combine("Lib", "Lib.csproj");
+			var solutionFile = projectDirectory.GetFile("InvalidSolution.sln");
+            var projectToAdd = projectDirectory.GetDirectory("Lib").GetFile("Lib.csproj");
+
             var cmd = new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)
                 .ExecuteWithCapturedOutput($"add project {projectToAdd}");
             cmd.Should().Fail();
-            cmd.StdErr.Should().Be($"Invalid solution `{solutionPath}`.");
+            cmd.StdErr.Should().Be($"Invalid solution `{solutionFile.FullName}`.");
             cmd.StdOut.Should().Be(HelpText);
         }
 
         [Fact]
         public void WhenNoProjectIsPassedItPrintsErrorAndUsage()
         {
-            var projectDirectory = TestAssets
-                .Get("TestAppWithSlnAndCsprojFiles")
+            var projectDirectory = TestAssets.Get("TestAppWithSlnAndCsprojFiles")
                 .CreateInstance()
                 .WithSourceFiles()
-                .Root
-                .FullName;
+                .WithRestoreFiles()
+                .Root;
 
             var cmd = new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)
@@ -135,38 +132,37 @@ Additional Arguments:
         [Fact]
         public void WhenNoSolutionExistsInTheDirectoryItPrintsErrorAndUsage()
         {
-            var projectDirectory = TestAssets
-                .Get("TestAppWithSlnAndCsprojFiles")
+            var projectDirectory = TestAssets.Get("TestAppWithSlnAndCsprojFiles")
                 .CreateInstance()
                 .WithSourceFiles()
-                .Root
-                .FullName;
+                .WithRestoreFiles()
+                .Root;
 
-            var solutionPath = Path.Combine(projectDirectory, "App");
+			var solutionDirectory = projectDirectory.GetDirectory("App");
+
             var cmd = new DotnetCommand()
-                .WithWorkingDirectory(solutionPath)
+                .WithWorkingDirectory(solutionDirectory)
                 .ExecuteWithCapturedOutput(@"add project App.csproj");
             cmd.Should().Fail();
-            cmd.StdErr.Should().Be($"Specified solution file {solutionPath + Path.DirectorySeparatorChar} does not exist, or there is no solution file in the directory.");
+            cmd.StdErr.Should().Be($"Specified solution file {solutionDirectory.FullName + Path.DirectorySeparatorChar} does not exist, or there is no solution file in the directory.");
             cmd.StdOut.Should().Be(HelpText);
         }
 
         [Fact]
         public void WhenMoreThanOneSolutionExistsInTheDirectoryItPrintsErrorAndUsage()
         {
-            var projectDirectory = TestAssets
-                .Get("TestAppWithMultipleSlnFiles")
+            var projectDirectory = TestAssets.Get("TestAppWithMultipleSlnFiles")
                 .CreateInstance()
                 .WithSourceFiles()
-                .Root
-                .FullName;
+                .WithRestoreFiles()
+                .Root;
 
-            var projectToAdd = Path.Combine("Lib", "Lib.csproj");
+            var projectToAdd = projectDirectory.GetDirectory("Lib").GetFile("Lib.csproj");
             var cmd = new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)
-                .ExecuteWithCapturedOutput($"add project {projectToAdd}");
+                .ExecuteWithCapturedOutput($"add project {projectToAdd.FullName}");
             cmd.Should().Fail();
-            cmd.StdErr.Should().Be($"Found more than one solution file in {projectDirectory + Path.DirectorySeparatorChar}. Please specify which one to use.");
+            cmd.StdErr.Should().Be($"Found more than one solution file in {projectDirectory.FullName + Path.DirectorySeparatorChar}. Please specify which one to use.");
             cmd.StdOut.Should().Be(HelpText);
         }
 
@@ -177,12 +173,11 @@ Additional Arguments:
             string testAsset,
             string projectGuid)
         {
-            var projectDirectory = TestAssets
-                .Get(testAsset)
+            var projectDirectory = TestAssets.Get(testAsset)
                 .CreateInstance()
                 .WithSourceFiles()
-                .Root
-                .FullName;
+                .WithRestoreFiles()
+                .Root;
 
             var projectToAdd = "Lib/Lib.csproj";
             var normalizedProjectPath = @"Lib\Lib.csproj";
@@ -193,7 +188,7 @@ Additional Arguments:
             cmd.StdOut.Should().Be($"Project `{Path.Combine("Lib", "Lib.csproj")}` added to the solution.");
             cmd.StdErr.Should().BeEmpty();
 
-            var slnFile = SlnFile.Read(Path.Combine(projectDirectory, "App.sln"));
+            var slnFile = SlnFile.Read(projectDirectory.GetFile("App.sln").FullName);
             var matchingProjects = slnFile.Projects
                 .Where((p) => p.Name == "Lib")
                 .ToList();
@@ -214,41 +209,40 @@ Additional Arguments:
             var buildCmd = new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)
                 .Execute("build App.sln");
+
             buildCmd.Should().Pass();
         }
 
         [Fact]
         public void WhenSolutionAlreadyContainsProjectItDoesntDuplicate()
         {
-            var projectDirectory = TestAssets
-                .Get("TestAppWithSlnAndExistingCsprojReferences")
+            var projectDirectory = TestAssets.Get("TestAppWithSlnAndExistingCsprojReferences")
                 .CreateInstance()
                 .WithSourceFiles()
-                .Root
-                .FullName;
-
-            var solutionPath = Path.Combine(projectDirectory, "App.sln");
+                .WithRestoreFiles()
+                .Root;
+				
+            var solutionFile = projectDirectory.GetFile("App.sln");
             var projectToAdd = Path.Combine("Lib", "Lib.csproj");
             var cmd = new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)
                 .ExecuteWithCapturedOutput($"add App.sln project {projectToAdd}");
             cmd.Should().Pass();
-            cmd.StdOut.Should().Be($"Solution {solutionPath} already contains project {projectToAdd}.");
+            cmd.StdOut.Should().Be($"Solution {solutionFile.FullName} already contains project {projectToAdd}.");
             cmd.StdErr.Should().BeEmpty();
         }
 
         [Fact]
         public void WhenPassedMultipleProjectsAndOneOfthemDoesNotExistItCancelsWholeOperation()
         {
-            var projectDirectory = TestAssets
-                .Get("TestAppWithSlnAndCsprojFiles")
+            var projectDirectory = TestAssets.Get("TestAppWithSlnAndCsprojFiles")
                 .CreateInstance()
                 .WithSourceFiles()
-                .Root
-                .FullName;
+                .WithRestoreFiles()
+                .Root;
 
-            var slnFullPath = Path.Combine(projectDirectory, "App.sln");
-            var contentBefore = File.ReadAllText(slnFullPath);
+            var slnFile = projectDirectory.GetFile("App.sln");
+            var contentBefore = slnFile.ReadAllText();
 
             var projectToAdd = Path.Combine("Lib", "Lib.csproj");
             var cmd = new DotnetCommand()
@@ -257,7 +251,7 @@ Additional Arguments:
             cmd.Should().Fail();
             cmd.StdErr.Should().Be("Project `idonotexist.csproj` does not exist.");
 
-            File.ReadAllText(slnFullPath)
+            slnFile.ReadAllText()
                 .Should().BeEquivalentTo(contentBefore);
         }
     }

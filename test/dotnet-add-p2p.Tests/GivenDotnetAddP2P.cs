@@ -49,7 +49,7 @@ Additional Arguments:
 
         private ProjDir NewDir([System.Runtime.CompilerServices.CallerMemberName] string callingMethod = nameof(NewDir), string identifier = "")
         {
-            return new ProjDir(TestAssetsManager.CreateTestDirectory(callingMethod: callingMethod, identifier: identifier).Path);
+            return new ProjDir(TestAssets.CreateTestDirectory(callingMethod: callingMethod, identifier: identifier).FullName);
         }
 
         private ProjDir NewLib([System.Runtime.CompilerServices.CallerMemberName] string callingMethod = nameof(NewDir), string identifier = "")

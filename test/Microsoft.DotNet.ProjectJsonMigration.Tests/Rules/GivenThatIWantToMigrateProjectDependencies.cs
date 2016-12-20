@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
@@ -21,7 +22,10 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         public void Project_dependencies_are_migrated_to_ProjectReference()
         {
             var solutionDirectory =
-                TestAssetsManager.CreateTestInstance("TestAppWithLibrary", callingMethod: "p").Path;
+                TestAssets.Get("PJTestAppWithLibrary")
+                    .CreateInstance()
+                    .WithSourceFiles()
+                    .Root.FullName;
 
             var appDirectory = Path.Combine(solutionDirectory, "TestApp");
 
@@ -43,9 +47,11 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         [Fact]
         public void It_does_not_migrate_a_dependency_with_target_package_that_has_a_matching_project_as_a_ProjectReference()
         {
-            var testAssetsManager = GetTestGroupTestAssetsManager("NonRestoredTestProjects");
             var solutionDirectory =
-                testAssetsManager.CreateTestInstance("AppWithProjectDependencyAsTarget", callingMethod: "p").Path;
+                TestAssets.Get("NonRestoredTestProjects", "AppWithProjectDependencyAsTarget")
+                    .CreateInstance()
+                    .WithSourceFiles()
+                    .Root.FullName;
 
             var appDirectory = Path.Combine(solutionDirectory, "TestApp");
 
@@ -64,8 +70,10 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         [Fact]
         public void TFM_specific_Project_dependencies_are_migrated_to_ProjectReference_under_condition_ItemGroup()
         {
-            var solutionDirectory =
-                TestAssetsManager.CreateTestInstance("TestAppWithLibraryUnderTFM", callingMethod: "p").Path;
+            var solutionDirectory = TestAssets.Get("PJTestAppWithLibraryUnderTFM")
+                    .CreateInstance()
+                    .WithSourceFiles()
+                    .Root.FullName;
 
             var appDirectory = Path.Combine(solutionDirectory, "TestApp");
 
@@ -89,7 +97,10 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         {
             // No Lock file => unresolved
             var solutionDirectory =
-                TestAssetsManager.CreateTestInstance("TestAppWithLibrary").Path;
+                TestAssets.Get("PJTestAppWithLibrary")
+                    .CreateInstance()
+                    .WithSourceFiles()
+                    .Root.FullName;
 
             var appDirectory = Path.Combine(solutionDirectory, "TestApp");
             var libraryDirectory = Path.Combine(solutionDirectory, "TestLibrary");
@@ -242,7 +253,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         [Fact]
         public void It_promotes_P2P_references_up_in_the_dependency_chain()
         {
-            var mockProj = MigrateProject("TestAppDependencyGraph", "ProjectA");
+            var mockProj = MigrateProject("PJTestAppDependencyGraph", "ProjectA");
 
             var projectReferences = mockProj.Items.Where(
                 item => item.ItemType.Equals("ProjectReference", StringComparison.Ordinal));
@@ -252,7 +263,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         [Fact]
         public void It_promotes_FrameworkAssemblies_from_P2P_references_up_in_the_dependency_chain()
         {
-            var solutionDirectory = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "TestAppWithFrameworkAssemblies")
+            var solutionDirectory = TestAssets.Get(TestAssetKinds.DesktopTestProjects, "PJTestAppWithFrameworkAssemblies")
                 .CreateInstance()
                 .WithSourceFiles().Root;
 
@@ -283,7 +294,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
                 Path.Combine("..", "CsprojLibrary3", "CsprojLibrary3.csproj")
             };
 
-            var mockProj = MigrateProject("TestAppDependencyGraph", "ProjectA");
+            var mockProj = MigrateProject("PJTestAppDependencyGraph", "ProjectA");
 
             var projectReferences = mockProj.Items
                 .Where(item =>
@@ -301,7 +312,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
                 Path.Combine("..", "ProjectC", "ProjectC.csproj")
             };
 
-            var mockProj = MigrateProject("TestAppDependencyGraph", "ProjectA");
+            var mockProj = MigrateProject("PJTestAppDependencyGraph", "ProjectA");
 
             var projectReferences = mockProj.Items
                 .Where(item =>
@@ -314,7 +325,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         [Fact]
         public void It_migrates_unqualified_dependencies_as_ProjectReference_when_a_matching_project_is_found()
         {
-            var mockProj = MigrateProject("TestAppWithUnqualifiedDependencies", "ProjectA");
+            var mockProj = MigrateProject("PJTestAppWithUnqualifiedDependencies", "ProjectA");
             var projectReferenceInclude = Path.Combine("..", "ProjectB", "ProjectB.csproj");            
 
             var projectReferences = mockProj.Items.Should().ContainSingle(
@@ -329,10 +340,15 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         private ProjectRootElement MigrateProject(
             string solution,
             string project,
-            NuGetFramework targetFramework)
+            NuGetFramework targetFramework,
+            [CallerMemberName] string callingMethod = "", 
+            string identifier = "")
         {
-            var solutionDirectory =
-                TestAssetsManager.CreateTestInstance(solution, callingMethod: "p").Path;
+            var solutionDirectory = TestAssets.Get(solution)
+                .CreateInstance(callingMethod, identifier)
+                .WithSourceFiles()
+                .WithRestoreFiles()
+                .Root.FullName;
 
             var appDirectory = Path.Combine(solutionDirectory, project);
 

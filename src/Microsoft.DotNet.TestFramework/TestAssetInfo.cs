@@ -29,6 +29,10 @@ namespace Microsoft.DotNet.TestFramework
 
         private readonly TestAssetInventoryFiles _inventoryFiles;
 
+        private readonly FileInfo _dotnetExeFile;
+
+        private readonly string _projectFilePattern;
+
         internal DirectoryInfo Root 
         {
             get
@@ -37,18 +41,37 @@ namespace Microsoft.DotNet.TestFramework
             }
         }
 
-        internal TestAssetInfo(DirectoryInfo root, string assetName)
+        internal TestAssetInfo(DirectoryInfo root, string assetName, FileInfo dotnetExeFile, string projectFilePattern)
         {
             if (!root.Exists)
             {
-                throw new DirectoryNotFoundException($"Directory not found at '{root}'");
+                throw new DirectoryNotFoundException($"Directory not found at '{root.FullName}'");
             }
 
-            _assetName = assetName;
+            if (string.IsNullOrWhiteSpace(assetName))
+            {
+                throw new ArgumentException("Argument cannot be null or whitespace", nameof(assetName));
+            }
+
+            if (!dotnetExeFile.Exists)
+            {
+                throw new FileNotFoundException($"File not found at '{dotnetExeFile.FullName}'");
+            }
+
+            if (string.IsNullOrWhiteSpace(projectFilePattern))
+            {
+                throw new ArgumentException("Argument cannot be null or whitespace", nameof(projectFilePattern));
+            }
 
             _root = root;
 
-            _dataDirectory = new DirectoryInfo(Path.Combine(_root.FullName, DataDirectoryName));
+            _assetName = assetName;
+
+            _dotnetExeFile = dotnetExeFile;
+
+            _projectFilePattern = projectFilePattern;
+
+            _dataDirectory = _root.GetDirectory(DataDirectoryName);
 
             _inventoryFiles = new TestAssetInventoryFiles(_dataDirectory);
 
@@ -56,6 +79,8 @@ namespace Microsoft.DotNet.TestFramework
             {
                 _dataDirectory
             };
+
+            RemoveDataDirectoryIfAssetChanged();
 
             if (!_dataDirectory.Exists)
             {
@@ -191,13 +216,13 @@ namespace Microsoft.DotNet.TestFramework
         {
             Console.WriteLine($"TestAsset Restore '{_assetName}'");
 
-            var projFiles = _root.GetFiles("*.csproj", SearchOption.AllDirectories);
+            var projFiles = _root.GetFiles(_projectFilePattern, SearchOption.AllDirectories);
 
             foreach (var projFile in projFiles)
             {
-                var restoreArgs = new string[] { "restore", projFile.FullName, "/p:SkipInvalidConfigurations=true" };
+                var restoreArgs = new string[] { "restore", projFile.FullName };
 
-                var commandResult = Command.Create(new PathCommandResolverPolicy(), "dotnet", restoreArgs)
+                var commandResult = Command.Create(_dotnetExeFile.FullName, restoreArgs)
                                        .CaptureStdOut()
                                        .CaptureStdErr()
                                        .Execute();
@@ -223,7 +248,7 @@ namespace Microsoft.DotNet.TestFramework
 
             Console.WriteLine($"TestAsset Build '{_assetName}'");
 
-            var commandResult = Command.Create(new PathCommandResolverPolicy(), "dotnet", args) 
+            var commandResult = Command.Create(_dotnetExeFile.FullName, args) 
                                        .WorkingDirectory(_root.FullName)
                                        .CaptureStdOut()
                                        .CaptureStdErr()
@@ -240,6 +265,43 @@ namespace Microsoft.DotNet.TestFramework
                 string message = string.Format($"TestAsset Build '{_assetName}' Failed with {exitCode}");
                 
                 throw new Exception(message);
+            }
+        }
+
+        private void RemoveDataDirectoryIfAssetChanged()
+        {
+            if (!_dataDirectory.Exists)
+            {
+                return;
+            }
+
+            var dataDirectoryFiles = _dataDirectory.GetFiles("*", SearchOption.AllDirectories);
+
+            if (!dataDirectoryFiles.Any())
+            {
+                return;
+            }
+
+            var earliestDataDirectoryTimestamp =
+                dataDirectoryFiles
+                    .OrderByDescending(f => f.LastWriteTime)
+                    .First()
+                    .LastWriteTime;
+
+            if (earliestDataDirectoryTimestamp == null)
+            {
+                return;
+            }
+
+            var latestAssetFileTimeStamp = _root.GetFiles("*", SearchOption.AllDirectories)
+                .Where(f => !_dataDirectory.Contains(f))
+                .OrderByDescending(f => f.LastWriteTime)
+                .First()
+                .LastWriteTime;
+
+            if (earliestDataDirectoryTimestamp <= latestAssetFileTimeStamp)
+            {
+                _dataDirectory.Delete(true);
             }
         }
     }

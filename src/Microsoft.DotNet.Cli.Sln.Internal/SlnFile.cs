@@ -104,18 +104,23 @@ namespace Microsoft.DotNet.Cli.Sln.Internal
             _sections.ParentFile = this;
         }
 
-        public static SlnFile Read(string file)
+        public static SlnFile Read(FileInfo file)
         {
             SlnFile slnFile = new SlnFile();
-            slnFile.FullPath = Path.GetFullPath(file);
-            slnFile._format = FileUtil.GetTextFormatInfo(file);
+            slnFile.FullPath = file.FullName;
+            slnFile._format = FileUtil.GetTextFormatInfo(file.FullName);
 
-            using (var sr = new StreamReader(new FileStream(file, FileMode.Open)))
+            using (var sr = new StreamReader(file.OpenRead()))
             {
                 slnFile.Read(sr);
             }
 
             return slnFile;
+        }
+
+        public static SlnFile Read(string file)
+        {
+            return Read(new FileInfo(file));
         }
 
         private void Read(TextReader reader)
@@ -195,15 +200,27 @@ namespace Microsoft.DotNet.Cli.Sln.Internal
             }
         }
 
-        public void Write(string file = null)
+        public void Write(string filePath)
         {
-            if (!string.IsNullOrEmpty(file))
+            var fileOverride = string.IsNullOrWhiteSpace(filePath)
+                ? null
+                : new FileInfo(filePath);
+
+            Write(fileOverride);
+        }
+
+        public void Write(FileInfo file = null)
+        {
+            if (file != null)
             {
-                FullPath = Path.GetFullPath(file);
+                FullPath = file.FullName;
             }
-            var sw = new StringWriter();
-            Write(sw);
-            File.WriteAllText(FullPath, sw.ToString());
+        
+            var stringWriter = new StringWriter();
+
+            Write(stringWriter);
+
+            File.WriteAllText(FullPath, stringWriter.ToString());
         }
 
         private void Write(TextWriter writer)

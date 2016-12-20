@@ -17,15 +17,17 @@ namespace Microsoft.DotNet.Cli.VSTest.Tests
         public void TestsFromAGivenContainerShouldRunWithExpectedOutput()
         {
             var testAppName = "VSTestDotNetCore";
-            var testRoot = TestAssets.Get(testAppName)
+            
+            var testProjectDirectory = TestAssets.Get(testAppName)
                 .CreateInstance()
+                .WithSourceFiles()
                 .WithRestoreFiles()
                 .WithBuildFiles()
                 .Root;
 
             var configuration = Environment.GetEnvironmentVariable("CONFIGURATION") ?? "Debug";
 
-            var outputDll = testRoot
+            var outputDll = testProjectDirectory
                 .GetDirectory("bin", configuration, "netcoreapp1.0")
                 .GetFile($"{testAppName}.dll");
 

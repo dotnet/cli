@@ -21,27 +21,26 @@ namespace Microsoft.DotNet.Tests
 
         static GivenThatTheUserIsRunningDotNetForTheFirstTime()
         {
-            var testDirectory = TestAssetsManager.CreateTestDirectory("Dotnet_first_time_experience_tests");
-            var testNugetCache = Path.Combine(testDirectory.Path, "nuget_cache");
+            var testDirectory = TestAssets.CreateTestDirectory("Dotnet_first_time_experience_tests");
+            var testNugetCache = testDirectory.GetDirectory("nuget_cache");
 
             var command = new DotnetCommand()
-                .WithWorkingDirectory(testDirectory.Path);
-            command.Environment["NUGET_PACKAGES"] = testNugetCache;
-            command.Environment["DOTNET_SKIP_FIRST_TIME_EXPERIENCE"] = "";
-            command.Environment["SkipInvalidConfigurations"] = "true";
+                .WithWorkingDirectory(testDirectory)
+                .WithEnvironmentVariable("NUGET_PACKAGES", testNugetCache.FullName)
+                .WithEnvironmentVariable("DOTNET_SKIP_FIRST_TIME_EXPERIENCE", "")
+                .WithEnvironmentVariable("SkipInvalidConfigurations", "true");
 
             _firstDotnetNonVerbUseCommandResult = command.ExecuteWithCapturedOutput("--info");
             _firstDotnetVerbUseCommandResult = command.ExecuteWithCapturedOutput("new");
 
-            _nugetCacheFolder = new DirectoryInfo(testNugetCache);
+            _nugetCacheFolder = testNugetCache;
         }        
 
         [Fact]
         public void UsingDotnetForTheFirstTimeSucceeds()
         {
             _firstDotnetVerbUseCommandResult
-                .Should()
-                .Pass();
+                .Should().Pass();
         }
 
         [Fact]
@@ -50,8 +49,7 @@ namespace Microsoft.DotNet.Tests
             const string firstTimeNonVerbUseMessage = @".NET Command Line Tools";
 
             _firstDotnetNonVerbUseCommandResult.StdOut
-                .Should()
-                .StartWith(firstTimeNonVerbUseMessage);
+                .Should().StartWith(firstTimeNonVerbUseMessage);
         }
 
         [Fact]
@@ -81,22 +79,21 @@ A command is running to initially populate your local package cache, to improve 
     	public void ItRestoresTheNuGetPackagesToTheNuGetCacheFolder()
     	{
             _nugetCacheFolder
-                .Should()
-                .HaveFile($"{GetDotnetVersion()}.dotnetSentinel");            
+                .Should().HaveFile($"{GetDotnetVersion()}.dotnetSentinel");            
     	}
 
         [Fact]
         public void ItCreatesASentinelFileUnderTheNuGetCacheFolder()
         {
             _nugetCacheFolder
-                .Should()
-                .HaveDirectory("microsoft.netcore.app");
+                .Should().HaveDirectory("microsoft.netcore.app");
         }
 
     	private string GetDotnetVersion()
     	{
-    		return new DotnetCommand().ExecuteWithCapturedOutput("--version").StdOut
-    			.TrimEnd(Environment.NewLine.ToCharArray());
+    		return new DotnetCommand()
+                .ExecuteWithCapturedOutput("--version")
+                .StdOut.TrimEnd(Environment.NewLine.ToCharArray());
     	}
 
         private static string NormalizeLineEndings(string s)

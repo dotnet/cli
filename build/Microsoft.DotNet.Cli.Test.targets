@@ -13,7 +13,6 @@
   <Target Name="Test"
           Condition=" '$(CLIBUILD_SKIP_TESTS)' != 'true' "
           DependsOnTargets="PrepareTests;
-                            BuildTestAssets;
                             BuildTests;">
 
     <PropertyGroup>
@@ -85,28 +84,11 @@
 
   <Target Name="RestoreTests"
           DependsOnTargets="CreateTestAssetPackageNuPkgs;
-                            CleanTestProjectsBinObj;
                             SetupRestoreTestsInputs;"
           Inputs="@(RestoreTestsInputs)"
           Outputs="@(RestoreTestsInputs->'%(RelativeDir)/obj/project.assets.json');@(RestoreTestsInputs->'%(RelativeDir)/obj/%(Filename).csproj.nuget.g.props');@(RestoreTestsInputs->'%(RelativeDir)/obj/%(Filename).csproj.nuget.g.targets')">
-    <CallTarget Targets="CleanTestProjectsLockFiles"/>
-
     <DotNetRestore ToolPath="$(Stage0Directory)"
                    ProjectPath="&quot;%(RestoreTestsInputs.FullPath)&quot;" />
-  </Target>
-
-  <Target Name="CleanTestProjectsBinObj"
-          DependsOnTargets="SetupRestoreTestsInputs;">
-    <ItemGroup>
-      <FilesToDelete Include="$(TestDirectory)**/bin/**/project.assets.json;$(TestDirectory)**/bin/**/*.csproj.nuget.g.props;$(TestDirectory)**/bin/**/*.csproj.nuget.g.targets" />
-      <FilesToDelete Include="$(TestDirectory)**/obj/**/project.assets.json;$(TestDirectory)**/obj/**/*.csproj.nuget.g.props;$(TestDirectory)**/obj/**/*.csproj.nuget.g.targets" />
-    </ItemGroup>
-
-    <Delete Files="@(FilesToDelete)" />
-
-    <ItemGroup>
-      <FilesToDelete Remove="*" />
-    </ItemGroup>
   </Target>
 
   <Target Name="SetupRestoreTestsInputs"
@@ -114,91 +96,6 @@
     <ItemGroup>
       <RestoreTestsInputs Include="$(TestDirectory)/**/*.csproj"
                           Exclude="$(TestDirectory)/**/bin/**/*.csproj" />
-    </ItemGroup>
-  </Target>
-
-  <Target Name="BuildTestAssets"
-          DependsOnTargets="BuildTestAssetProjects;
-                            BuildDesktopTestAssetProjects;">
-  </Target>
-
-  <Target Name="BuildTestAssetProjects"
-          DependsOnTargets="RestoreTestAssetProjects;
-                            SetupTestAssetProjectData;"
-          Inputs="%(TestAssetProjects.BuildInputs)"
-          Outputs="%(TestAssetProjects.BuildOutput)">
-
-    <DotNetBuildPj  Framework="netcoreapp1.0"
-                    ProjectPath="$(RepoRoot)%(TestAssetProjects.ProjectPath)"
-                    ToolPath="$(Stage0PjDirectory)" />
-  </Target>
-
-  <Target Name="RestoreTestAssetProjects"
-          DependsOnTargets="CreateTestAssetPackageNuPkgs;
-                            SetupRestoreTestAssetProjectsInputs;"
-          Inputs="@(RestoreTestAssetProjectsInputs)"
-          Outputs="@(RestoreTestAssetProjectsInputs->'%(RelativeDir)/project.lock.json')">
-
-    <DotNetRestorePj  FallbackSource="$(TestPackagesDir)"
-                      ToolPath="$(Stage0PjDirectory)"
-                      WorkingDirectory="$(RepoRoot)TestAssets/TestProjects/" />
-  </Target>
-
-  <Target Name="SetupRestoreTestAssetProjectsInputs" >
-    <ItemGroup>
-      <RestoreTestAssetProjectsInputs Include="$(RepoRoot)/TestAssets/TestProjects/**/project.json" />
-    </ItemGroup>
-  </Target>
-
-  <Target Name="CleanTestAssetProjectsLockFiles" >
-    <ItemGroup>
-      <TestAssetProjectsLockFiles Include="$(RepoRoot)/TestAssets/TestProjects/**/project.lock.json" />
-    </ItemGroup>
-    <Delete Files="@(TestAssetProjectsLockFiles)" />
-  </Target>
-
-  <Target Name="CleanTestProjectsLockFiles" >
-    <ItemGroup>
-      <TestProjectsLockFiles Include="$(RepoRoot)/test/**/project.assets.json;$(RepoRoot)/test/**/*.csproj.nuget.g.props;$(RepoRoot)/test/**/*.csproj.nuget.g.targets" />
-    </ItemGroup>
-    <Delete Files="@(TestProjectsLockFiles)" />
-  </Target>
-
-  <Target Name="BuildDesktopTestAssetProjects"
-          Condition=" '$(IsDesktopAvailable)' == 'True' "
-          DependsOnTargets="RestoreDesktopTestAssetProjects">
-    <ItemGroup>
-      <NoAutoBuildDesktopTestAssets Include="$(RepoRoot)TestAssets\DesktopTestProjects\**\.noautobuild" />
-      <NoAutoBuildDesktopTestAssetProjects Include="%(NoAutoBuildDesktopTestAssets.RelativeDir)project.json" />
-      <BuildableDesktopTestAssetProjects Include="$(RepoRoot)TestAssets\DesktopTestProjects\**\project.json"
-                                         Exclude="@(NoAutoBuildDesktopTestAssetProjects)" />
-    </ItemGroup>
-
-    <Message Text="Skipping projects with .noautobuild files:" />
-    <Message Text="%(NoAutoBuildDesktopTestAssetProjects.FullPath)" />
-
-    <DotNetBuild  Condition="'@(BuildableDesktopTestAssetProjects)' != ''"
-                  Configuration="$(Configuration)"
-                  Framework="net46"
-                  ProjectPath="%(BuildableDesktopTestAssetProjects.FullPath)"
-                  ToolPath="$(Stage0PjDirectory)" />
-  </Target>
-
-  <Target Name="RestoreDesktopTestAssetProjects"
-          Condition=" '$(IsDesktopAvailable)' == 'True' "
-          DependsOnTargets="CreateTestAssetPackageNuPkgs;
-                            SetupRestoreDesktopTestAssetProjectsInputs;"
-          Inputs="@(RestoreDesktopTestAssetProjectsInputs)"
-          Outputs="@(RestoreDesktopTestAssetProjectsInputs->'%(RelativeDir)/project.lock.json')">
-
-    <DotNetRestorePj  FallbackSource="$(TestPackagesDir)"
-                      ToolPath="$(Stage0PjDirectory)"
-                      WorkingDirectory="$(RepoRoot)TestAssets\DesktopTestProjects\" />
-  </Target>
-
-  <Target Name="SetupRestoreDesktopTestAssetProjectsInputs">
-    <ItemGroup>
-      <RestoreDesktopTestAssetProjectsInputs Include="$(RepoRoot)TestAssets\DesktopTestProjects\**\project.json" />
     </ItemGroup>
   </Target>
 

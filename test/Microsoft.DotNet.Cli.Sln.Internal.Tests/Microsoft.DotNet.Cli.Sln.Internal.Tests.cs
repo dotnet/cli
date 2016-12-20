@@ -14,21 +14,24 @@ namespace Microsoft.DotNet.Cli.Sln.Internal.Tests
     public class GivenAnSlnFile : TestBase
     {
         [Fact]
-        public void WhenGivenAValidPathItReadsAnSlnFile()
+        public void WhenGivenAValidPathItReadsASlnFile()
         {
             var solutionDirectory =
-                TestAssetsManager.CreateTestInstance("TestAppWithSln", callingMethod: "p").Path;
+                TestAssets.Get("PJTestAppWithSln")
+                    .CreateInstance()
+                    .WithSourceFiles()
+                    .Root;
 
-            var solutionFullPath = Path.Combine(solutionDirectory, "TestAppWithSln.sln");
+            var solutionFile = solutionDirectory.GetFile("TestAppWithSln.sln");
 
-            var slnFile = SlnFile.Read(solutionFullPath);
+            var slnFile = SlnFile.Read(solutionFile);
 
             slnFile.FormatVersion.Should().Be("12.00");
             slnFile.ProductDescription.Should().Be("Visual Studio 14");
             slnFile.VisualStudioVersion.Should().Be("14.0.25420.1");
             slnFile.MinimumVisualStudioVersion.Should().Be("10.0.40219.1");
-            slnFile.BaseDirectory.Should().Be(solutionDirectory);
-            slnFile.FullPath.Should().Be(solutionFullPath);
+            slnFile.BaseDirectory.Should().Be(solutionDirectory.FullName);
+            slnFile.FullPath.Should().Be(solutionFile.FullName);
 
             slnFile.Projects.Count.Should().Be(1);
             var project = slnFile.Projects[0];
@@ -42,12 +45,16 @@ namespace Microsoft.DotNet.Cli.Sln.Internal.Tests
         public void WhenGivenAValidPathItReadsModifiesThenWritesAnSln()
         {
             var solutionDirectory =
-                TestAssetsManager.CreateTestInstance("TestAppWithSln", callingMethod: "p").Path;
+                TestAssets.Get("PJTestAppWithSln")
+                    .CreateInstance()
+                    .WithSourceFiles()
+                    .Root;
 
-            var solutionFullPath = Path.Combine(solutionDirectory, "TestAppWithSln.sln");
+            var solutionFile = solutionDirectory
+                .GetFile("TestAppWithSln.sln");
 
-            var slnFile = SlnFile.Read(solutionFullPath);
-            slnFile.FullPath.Should().Be(solutionFullPath);
+            var slnFile = SlnFile.Read(solutionFile);
+            slnFile.FullPath.Should().Be(solutionFile.FullName);
 
             slnFile.Projects.Count.Should().Be(1);
             var project = slnFile.Projects[0];
@@ -56,17 +63,20 @@ namespace Microsoft.DotNet.Cli.Sln.Internal.Tests
             project.FilePath.Should().Be("TestAppWithSln.xproj");
             project.FilePath = "New File Path";
 
-            var newSolutionFullPath = Path.Combine(solutionDirectory, "TestAppWithSln_modified.sln");
-            slnFile.Write(newSolutionFullPath);
+            var newSolutionFile = solutionDirectory
+                .GetFile("TestAppWithSln_modified.sln");
 
-            slnFile = SlnFile.Read(newSolutionFullPath);
+            slnFile.Write(newSolutionFile);
+
+            slnFile = SlnFile.Read(newSolutionFile);
             slnFile.FormatVersion.Should().Be("12.00");
             slnFile.ProductDescription.Should().Be("Visual Studio 14");
             slnFile.VisualStudioVersion.Should().Be("14.0.25420.1");
             slnFile.MinimumVisualStudioVersion.Should().Be("10.0.40219.1");
-            slnFile.BaseDirectory.Should().Be(solutionDirectory);
-            slnFile.FullPath.Should().Be(newSolutionFullPath);
+            slnFile.BaseDirectory.Should().Be(solutionDirectory.FullName);
+            slnFile.FullPath.Should().Be(newSolutionFile.FullName);
             slnFile.Projects.Count.Should().Be(1);
+
             project = slnFile.Projects[0];
             project.Id.Should().Be("{0138CB8F-4AA9-4029-A21E-C07C30F425BA}");
             project.TypeGuid.Should().Be("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}");

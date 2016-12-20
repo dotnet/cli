@@ -18,9 +18,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         [Fact(Skip="Emitting this until x-targetting full support is in")]
         public void MigratingNetcoreappProjectDoesNotPopulateTargetFrameworkIdentifierAndTargetFrameworkVersion()
         {
-            var testDirectory = Temp.CreateDirectory().Path;
-            var testPJ = new ProjectJsonBuilder(TestAssetsManager)
-                .FromTestAssetBase("TestAppWithRuntimeOptions")
+            var testDirectory = TestAssets.CreateTestDirectory().FullName;
+            var testPJ = new ProjectJsonBuilder(TestAssets)
+                .FromTestAssetBase("PJTestAppWithRuntimeOptions")
                 .WithCustomProperty("buildOptions", new Dictionary<string, string>
                 {
                     { "emitEntryPoint", "false" }
@@ -46,8 +46,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         [Fact]
         public void MigratingMultiTFMProjectPopulatesTargetFrameworksWithShortTfms()
         {
-            var testDirectory = Temp.CreateDirectory().Path;
-            var testPJ = new ProjectJsonBuilder(TestAssetsManager)
+            var testDirectory = TestAssets.CreateTestDirectory().FullName;
+            var testPJ = new ProjectJsonBuilder(TestAssets)
                 .FromTestAssetBase("TestLibraryWithMultipleFrameworks")
                 .SaveToDisk(testDirectory);
 
@@ -71,8 +71,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         [Fact]
         public void MigratingDesktopTFMsAddsAllRuntimeIdentifiersIfTheProjectDoesNothaveAnyAlready()
         {
-            var testDirectory = Temp.CreateDirectory().Path;
-            var testPJ = new ProjectJsonBuilder(TestAssetsManager)
+            var testDirectory = TestAssets.CreateTestDirectory().FullName;
+            var testPJ = new ProjectJsonBuilder(TestAssets)
                 .FromTestAssetBase("TestLibraryWithMultipleFrameworks")
                 .SaveToDisk(testDirectory);
 
@@ -96,8 +96,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         [Fact]
         public void MigrateTFMRuleDoesNotAddRuntimesWhenMigratingDesktopTFMsWithRuntimesAlready()
         {
-            var testDirectory = Temp.CreateDirectory().Path;
-            var testPJ = new ProjectJsonBuilder(TestAssetsManager)
+            var testDirectory = TestAssets.CreateTestDirectory().FullName;
+            var testPJ = new ProjectJsonBuilder(TestAssets)
                 .FromTestAssetBase("TestAppWithMultipleFrameworksAndRuntimes")
                 .SaveToDisk(testDirectory);
 
@@ -120,9 +120,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         [Fact]
         public void MigratingSingleTFMProjectPopulatesTargetFramework()
         {
-            var testDirectory = Temp.CreateDirectory().Path;
-            var testPJ = new ProjectJsonBuilder(TestAssetsManager)
-                .FromTestAssetBase("TestAppWithRuntimeOptions")
+            var testDirectory = TestAssets.CreateTestDirectory().FullName;
+            var testPJ = new ProjectJsonBuilder(TestAssets)
+                .FromTestAssetBase("PJTestAppWithRuntimeOptions")
                 .WithCustomProperty("buildOptions", new Dictionary<string, string>
                 {
                     { "emitEntryPoint", "false" }

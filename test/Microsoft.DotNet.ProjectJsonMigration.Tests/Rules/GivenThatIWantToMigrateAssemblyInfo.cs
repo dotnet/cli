@@ -21,10 +21,16 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         public GivenThatIWantToMigrateAssemblyInfo()
         {
             var projectDirectory =
-                TestAssetsManager.CreateTestInstance("AppWithAssemblyInfo").Path;
+                TestAssets.Get("PJAppWithAssemblyInfo")
+                    .CreateInstance()
+                    .WithSourceFiles()
+                    .Root.FullName;
+
             var projectContext =
                 ProjectContext.Create(projectDirectory, FrameworkConstants.CommonFrameworks.NetCoreApp10);
+
             _mockProject = ProjectRootElement.Create();
+
             var testSettings = MigrationSettings.CreateMigrationSettingsTestHook(projectDirectory, projectDirectory, _mockProject, null);
             var testInputs = new MigrationRuleInputs(
                 new[] {projectContext},
