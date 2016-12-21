@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.DotNet.Tools.New3
 {
@@ -25,6 +26,8 @@ namespace Microsoft.DotNet.Tools.New3
         public const string ListsTemplates = "List templates containing the specified name.";
 
         public const string NameOfOutput = "The name for the output being created. If no name is specified, the name of the current directory is used.";
+
+        public const string OutputPath = "Location to place the generated output.";
 
         public const string CreateDirectoryHelp = "Indicates whether to create a directory for the generated content.";
 
@@ -60,6 +63,8 @@ namespace Microsoft.DotNet.Tools.New3
 
         public const string MissingRequiredParameter = "Mandatory parameter {0} missing for template {1}.";
 
+        public const string InvalidParameterValues = "Error: Invalid values for parameter(s) [{0}] for template {1}.";
+
         public const string GettingReady = "Getting ready...";
 
         public const string InvalidInputSwitch = "Invalid input switch:";
@@ -79,6 +84,12 @@ namespace Microsoft.DotNet.Tools.New3
         public const string ShortName = "Short Name";
 
         public const string Alias = "Alias";
+
+        public const string Tags = "Tags";
+
+        public const string Language = "Language";
+
+        public const string LanguageParameter = "Specifies the language of the template to create";
 
         public const string CurrentConfiguration = "Current configuration:";
 

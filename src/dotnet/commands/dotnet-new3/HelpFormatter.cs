@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +23,7 @@ namespace Microsoft.DotNet.Tools.New3
         private readonly List<ColumnDefinition> _columns = new List<ColumnDefinition>();
         private readonly char? _headerSeparator;
         private readonly IEnumerable<T> _items;
+        private readonly List<Tuple<int, bool, IComparer<string>>> _ordering = new List<Tuple<int, bool, IComparer<string>>>();
 
         public HelpFormatter(IEnumerable<T> items, int columnPadding, char? headerSeparator, bool blankLineBetweenRows)
         {
@@ -32,6 +36,14 @@ namespace Microsoft.DotNet.Tools.New3
         public HelpFormatter<T> DefineColumn(Func<T, string> binder, string header = null, int maxWidth = 0, bool alwaysMaximizeWidth = false)
         {
             _columns.Add(new ColumnDefinition(header, binder, maxWidth, alwaysMaximizeWidth));
+            return this;
+        }
+
+        public HelpFormatter<T> DefineColumn(Func<T, string> binder, out object column, string header = null, int maxWidth = 0, bool alwaysMaximizeWidth = false)
+        {
+            ColumnDefinition c = new ColumnDefinition(header, binder, maxWidth, alwaysMaximizeWidth);
+            _columns.Add(c);
+            column = c;
             return this;
         }
 
@@ -96,8 +108,38 @@ namespace Microsoft.DotNet.Tools.New3
                 b.AppendLine("".PadRight(totalWidth, _headerSeparator.Value));
             }
 
+            IEnumerable<TextWrapper[]> rows = textByRow;
+
+            if (_ordering.Count > 0)
+            {
+                IOrderedEnumerable<TextWrapper[]> orderedRows;
+                if (_ordering[0].Item2)
+                {
+                    orderedRows = rows.OrderByDescending(x => x[_ordering[0].Item1].RawText, _ordering[0].Item3);
+                }
+                else
+                {
+                    orderedRows = rows.OrderBy(x => x[_ordering[0].Item1].RawText, _ordering[0].Item3);
+                }
+
+                for (int i = 1; i < _ordering.Count; ++i)
+                {
+                    int localI = i;
+                    if (_ordering[i].Item2)
+                    {
+                        orderedRows = orderedRows.ThenByDescending(x => x[_ordering[localI].Item1].RawText, _ordering[i].Item3);
+                    }
+                    else
+                    {
+                        orderedRows = orderedRows.ThenBy(x => x[_ordering[localI].Item1].RawText, _ordering[i].Item3);
+                    }
+                }
+
+                rows = orderedRows;
+            }
+
             int currentLine = 0;
-            foreach (TextWrapper[] line in textByRow)
+            foreach (TextWrapper[] line in rows)
             {
                 for (int j = 0; j < lineCountLookup[currentLine]; ++j)
                 {
@@ -184,6 +226,7 @@ namespace Microsoft.DotNet.Tools.New3
 
                 _lines = lines;
                 MaxWidth = realMaxWidth;
+                RawText = text;
             }
 
             public int LineCount => _lines.Count;
@@ -220,9 +263,39 @@ namespace Microsoft.DotNet.Tools.New3
                 {
                     int properMax = Math.Min(maxLength - 1, text.Length - position);
                     lines.Add(text.Substring(position, properMax) + '-');
-                    position += maxLength - 1;
+                    position += properMax;
                 }
             }
+
+            public string RawText { get; }
+        }
+
+        public HelpFormatter<T> OrderBy(object columnToken, IComparer<string> comparer = null)
+        {
+            comparer = comparer ?? StringComparer.Ordinal;
+            int index = _columns.IndexOf(columnToken as ColumnDefinition);
+
+            if(index < 0)
+            {
+                return this;
+            }
+
+            _ordering.Add(Tuple.Create(index, false, comparer));
+            return this;
+        }
+
+        public HelpFormatter<T> OrderByDescending(object columnToken, IComparer<string> comparer = null)
+        {
+            comparer = comparer ?? StringComparer.Ordinal;
+            int index = _columns.IndexOf(columnToken as ColumnDefinition);
+
+            if (index < 0)
+            {
+                return this;
+            }
+
+            _ordering.Add(Tuple.Create(index, true, comparer));
+            return this;
         }
     }
 }

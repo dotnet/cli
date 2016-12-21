@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -23,6 +26,8 @@ namespace Microsoft.DotNet.Tools.New3
         private IDictionary<string, string> _templateParamCanonicalMapping;
         // Canonical form -> data type
         private IDictionary<string, string> _templateParamDataTypeMapping;
+        // Maps the canonical param to the actual input param format
+        private IDictionary<string, string> _templateCanonicalToInputFormatMapping;
 
         // stores the parsed values
         private IDictionary<string, string> _parsedTemplateParams;
@@ -42,6 +47,7 @@ namespace Microsoft.DotNet.Tools.New3
             _hiddenCommandCanonicalMapping = new Dictionary<string, string>();
             _templateParamCanonicalMapping = new Dictionary<string, string>();
             _templateParamDataTypeMapping = new Dictionary<string, string>();
+            _templateCanonicalToInputFormatMapping = new Dictionary<string, string>();
 
             _parsedTemplateParams = new Dictionary<string, string>();
             _parsedInternalParams = new Dictionary<string, IList<string>>();
@@ -136,6 +142,12 @@ namespace Microsoft.DotNet.Tools.New3
             return value;
         }
 
+        public string TemplateParamInputFormat(string canonicalName)
+        {
+            _templateCanonicalToInputFormatMapping.TryGetValue(canonicalName, out string inputName);
+            return inputName;
+        }
+
         // returns a copy of the template params
         public IReadOnlyDictionary<string, string> AllTemplateParams
         {
@@ -183,6 +195,7 @@ namespace Microsoft.DotNet.Tools.New3
             _parsedTemplateParams = new Dictionary<string, string>();
             _parsedInternalParams = new Dictionary<string, IList<string>>();
             _parsedRemainingParams = new Dictionary<string, IList<string>>();
+            _templateCanonicalToInputFormatMapping = new Dictionary<string, string>();
 
             if (extraArgFileNames == null)
             {
@@ -234,6 +247,7 @@ namespace Microsoft.DotNet.Tools.New3
 
                         // TODO: allow for multi-valued params
                         _parsedTemplateParams[canonicalName] = param.Value[0];
+                        _templateCanonicalToInputFormatMapping[canonicalName] = param.Key;
                     }
                 }
                 else
