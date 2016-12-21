@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.DotNet.Tools.New3
@@ -7,12 +9,12 @@ namespace Microsoft.DotNet.Tools.New3
     {
         public int Compare(string x, string y)
         {
-            if(string.Equals(x, y, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(x, y, StringComparison.OrdinalIgnoreCase))
             {
                 return 0;
             }
 
-            if(string.IsNullOrEmpty(x) && string.IsNullOrEmpty(y))
+            if (string.IsNullOrEmpty(x) && string.IsNullOrEmpty(y))
             {
                 return 0;
             }

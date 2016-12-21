@@ -47,19 +47,19 @@ namespace Microsoft.DotNet.Tools.New3
 
         public const string TemplateArgumentHelp = "The template to instantiate.";
 
-        public const string BadLocaleError = "Invalid format for input locale: [{0}]. Example valid formats: [en] [en-US]";
+        public const string BadLocaleError = "Invalid format for input locale: \"{0}\". Example valid formats: [en] [en-US]";
 
         public const string AliasCreated = "Alias creation successful";
 
-        public const string AliasAlreadyExists = "Specified alias {0} already exists. Please specify a different alias.";
+        public const string AliasAlreadyExists = "Specified alias \"{0}\" already exists. Please specify a different alias.";
 
-        public const string CreateSuccessful = "The template {0} created successfully.";
+        public const string CreateSuccessful = "The template \"{0}\" created successfully.";
 
-        public const string CreateFailed = "Template {0} could not be created. Error returned was: {1}";
+        public const string CreateFailed = "Template \"{0}\" could not be created. Error returned was: {1}";
 
-        public const string InstallSuccessful = "{0} was installed successfully.";
+        public const string InstallSuccessful = "\"{0}\" was installed successfully.";
 
-        public const string InstallFailed = "{0} could not be installed. Error returned was: {1}.";
+        public const string InstallFailed = "\"{0}\" could not be installed. Error returned was: {1}.";
 
         public const string MissingRequiredParameter = "Mandatory parameter {0} missing for template {1}.";
 
@@ -77,7 +77,7 @@ namespace Microsoft.DotNet.Tools.New3
 
         public const string InstallingUpdates = "Installing updates...";
 
-        public const string BadPackageSpec = "Package [{0}] is not a valid package specification";
+        public const string BadPackageSpec = "Package \"{0}\" is not a valid package specification";
 
         public const string Templates = "Templates";
 

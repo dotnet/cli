@@ -275,7 +275,7 @@ namespace Microsoft.DotNet.Tools.New3
             comparer = comparer ?? StringComparer.Ordinal;
             int index = _columns.IndexOf(columnToken as ColumnDefinition);
 
-            if(index < 0)
+            if (index < 0)
             {
                 return this;
             }

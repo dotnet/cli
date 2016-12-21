@@ -32,6 +32,8 @@ namespace Microsoft.DotNet.Tools.New3
         private static readonly Version HostVersion = typeof(Program).GetTypeInfo().Assembly.GetName().Version;
         private static DefaultTemplateEngineHost Host;
 
+        public static IInstaller Installer { get; set; } = new Installer();
+
         private static readonly Regex LocaleFormatRegex = new Regex(@"
             ^
                 [a-z]{2}
@@ -52,7 +54,7 @@ namespace Microsoft.DotNet.Tools.New3
 
         public string Alias => _app.InternalParamValue("--alias");
 
-        public bool DebugAttachHasValue => _app.InternalParamHasValue("--debug:attach");
+        public bool DebugAttachHasValue => _app.RemainingArguments.Any(x => x.Equals("--debug:attach", StringComparison.Ordinal));
 
         public bool ExtraArgsHasValue => _app.InternalParamHasValue("--extra-args");
 
@@ -155,7 +157,7 @@ namespace Microsoft.DotNet.Tools.New3
             return result;
         }
 
-        private async Task ConfigureEnvironmentAsync()
+        private void ConfigureEnvironment()
         {
             string[] packageList;
 
@@ -164,7 +166,7 @@ namespace Microsoft.DotNet.Tools.New3
                 packageList = Paths.Global.DefaultInstallPackageList.ReadAllText().Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 if (packageList.Length > 0)
                 {
-                    await InstallPackagesAsync(packageList, true).ConfigureAwait(false);
+                    Installer.InstallPackages(packageList);
                 }
             }
 
@@ -173,7 +175,7 @@ namespace Microsoft.DotNet.Tools.New3
                 packageList = Paths.Global.DefaultInstallTemplateList.ReadAllText().Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 if (packageList.Length > 0)
                 {
-                    await InstallPackagesAsync(packageList, true);
+                    Installer.InstallPackages(packageList);
                 }
             }
         }
@@ -267,7 +269,7 @@ namespace Microsoft.DotNet.Tools.New3
                 Host.UpdateLocale(newLocale);
             }
 
-            int resultCode = await InitializationAndDebuggingAsync().ConfigureAwait(false);
+            int resultCode = InitializationAndDebugging();
             if (_shouldExit)
             {
                 return resultCode;
@@ -280,7 +282,7 @@ namespace Microsoft.DotNet.Tools.New3
                 return resultCode;
             }
 
-            resultCode = await MaintenanceAndInfoAsync().ConfigureAwait(false);
+            resultCode = MaintenanceAndInfo();
             if (_shouldExit)
             {
                 return resultCode;
@@ -351,7 +353,7 @@ namespace Microsoft.DotNet.Tools.New3
             Reporter.Output.WriteLine();
         }
 
-        private async Task<int> InitializationAndDebuggingAsync()
+        private int InitializationAndDebugging()
         {
             bool reinitFlag = _app.RemainingArguments.Any(x => x == "--debug:reinit");
             if (reinitFlag)
@@ -377,7 +379,12 @@ namespace Microsoft.DotNet.Tools.New3
                     Reporter.Output.WriteLine(LocalizableStrings.GettingReady);
                 }
 
-                await ConfigureEnvironmentAsync().ConfigureAwait(false);
+                ConfigureEnvironment();
+                Installer.InstallPackages(
+                    "Microsoft.DotNet.Common.ItemTemplates::1.0.0-beta1-20161220-0",
+                    "Microsoft.DotNet.Common.ProjectTemplates::1.0.0-beta1-20161220-0",
+                    "Microsoft.DotNet.Test.ProjectTemplates::1.0.0-beta1-20161220-0",
+                    "Microsoft.DotNet.Web.ProjectTemplates::1.0.0-beta1-20161220-0");
                 Paths.User.FirstRunCookie.WriteAllText("");
             }
 
@@ -390,57 +397,6 @@ namespace Microsoft.DotNet.Tools.New3
 
             _shouldExit = false;
             return 0;
-        }
-
-        private async Task InstallPackagesAsync(IReadOnlyList<string> packageNames, bool quiet = false)
-        {
-            List<string> toInstall = new List<string>();
-
-            foreach (string package in packageNames)
-            {
-                string pkg = package.Trim();
-                pkg = Environment.ExpandEnvironmentVariables(pkg);
-                string pattern = null;
-
-                int wildcardIndex = pkg.IndexOfAny(new[] { '*', '?' });
-
-                if (wildcardIndex > -1)
-                {
-                    int lastSlashBeforeWildcard = pkg.LastIndexOfAny(new[] { '\\', '/' });
-                    pattern = pkg.Substring(lastSlashBeforeWildcard + 1);
-                    pkg = pkg.Substring(0, lastSlashBeforeWildcard);
-                }
-
-                try
-                {
-                    if (pattern != null)
-                    {
-                        string fullDirectory = new DirectoryInfo(pkg).FullName;
-                        string fullPathGlob = Path.Combine(fullDirectory, pattern);
-                        TemplateCache.Scan(fullPathGlob);
-                    }
-                    else if (Directory.Exists(pkg) || File.Exists(pkg))
-                    {
-                        string packageLocation = new DirectoryInfo(pkg).FullName;
-                        TemplateCache.Scan(packageLocation);
-                    }
-                    else
-                    {
-                        EngineEnvironmentSettings.Host.OnNonCriticalError("InvalidPackageSpecification", string.Format(LocalizableStrings.BadPackageSpec, pkg), null, 0);
-                    }
-                }
-                catch
-                {
-                    EngineEnvironmentSettings.Host.OnNonCriticalError("InvalidPackageSpecification", string.Format(LocalizableStrings.BadPackageSpec, pkg), null, 0);
-                }
-            }
-
-            TemplateCache.WriteTemplateCaches();
-
-            if (!quiet)
-            {
-                ListTemplates(string.Empty);
-            }
         }
 
         private void ListTemplates(string templateName = null)
@@ -487,7 +443,7 @@ namespace Microsoft.DotNet.Tools.New3
             }
         }
 
-        private async Task<int> MaintenanceAndInfoAsync()
+        private int MaintenanceAndInfo()
         {
             if (IsListFlagSpecified)
             {
@@ -504,7 +460,13 @@ namespace Microsoft.DotNet.Tools.New3
 
             if (InstallHasValue)
             {
-                await InstallPackagesAsync(Install.ToList(), IsQuietFlagSpecified).ConfigureAwait(false);
+                Installer.InstallPackages(Install.ToList());
+
+                if (!IsQuietFlagSpecified)
+                {
+                    ListTemplates(string.Empty);
+                }
+
                 _shouldExit = true;
                 return 0;
             }
