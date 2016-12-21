@@ -6,7 +6,7 @@
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.3"
+      "version": "1.0.4-servicing-004616-00"
     },
     "System.Runtime.Serialization.Primitives": "4.1.1",
     "Microsoft.DotNet.ProjectModel": {
