@@ -380,11 +380,13 @@ namespace Microsoft.DotNet.Tools.New3
                 }
 
                 ConfigureEnvironment();
-                Installer.InstallPackages(
-                    "Microsoft.DotNet.Common.ItemTemplates::1.0.0-beta1-20161220-0",
-                    "Microsoft.DotNet.Common.ProjectTemplates::1.0.0-beta1-20161220-0",
-                    "Microsoft.DotNet.Test.ProjectTemplates::1.0.0-beta1-20161220-0",
-                    "Microsoft.DotNet.Web.ProjectTemplates::1.0.0-beta1-20161220-0");
+                Installer.InstallPackages(new []
+                {
+                    "Microsoft.DotNet.Common.ItemTemplates::1.0.0-beta1-20161221-48",
+                    "Microsoft.DotNet.Common.ProjectTemplates::1.0.0-beta1-20161221-48",
+                    "Microsoft.DotNet.Test.ProjectTemplates::1.0.0-beta1-20161221-48",
+                    "Microsoft.DotNet.Web.ProjectTemplates::1.0.0-beta1-20161221-48"
+                });
                 Paths.User.FirstRunCookie.WriteAllText("");
             }
 
