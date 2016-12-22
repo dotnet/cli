@@ -315,15 +315,14 @@ namespace Microsoft.DotNet.TestFramework
 
             var trackedFiles = _inventoryFiles.AllInventoryFiles.SelectMany(f => LoadInventory(f));
 
-            var assetFiles = _root.GetFiles("*", SearchOption.AllDirectories)
-                .Where(f => !_dataDirectory.Contains(f));
+            var assetFiles = GetFileList();
 
             var untrackedFiles = assetFiles.Where(a => !trackedFiles.Any(t => t.FullName.Equals(a.FullName)));
 
             if (untrackedFiles.Any())
             {
                 var message = $"TestAsset {_assetName} has untracked files." +
-                    "Consider cleaning the asset and deleting its `.tam` directory to" + 
+                    "Consider cleaning the asset and deleting its `.tam` directory to " + 
                     "recreate tracking files.\n\n" +
                     $".tam directory: {_dataDirectory.FullName}\n" +
                     "Untracked Files: \n";
@@ -350,7 +349,7 @@ namespace Microsoft.DotNet.TestFramework
             if (updatedSourceFiles.Any())
             {
                 var message = $"TestAsset {_assetName} has updated files." +
-                    "Consider cleaning the asset and deleting its `.tam` directory to" + 
+                    "Consider cleaning the asset and deleting its `.tam` directory to " + 
                     "recreate tracking files.\n\n" +
                     $".tam directory: {_dataDirectory.FullName}\n" +
                     "Updated Files: \n";
