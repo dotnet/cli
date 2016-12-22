@@ -44,9 +44,9 @@ namespace Microsoft.DotNet.TestFramework
 
         internal TestAssetInfo(DirectoryInfo root, string assetName, FileInfo dotnetExeFile, string projectFilePattern)
         {
-            if (!root.Exists)
+            if (root == null)
             {
-                throw new DirectoryNotFoundException($"Directory not found at '{root.FullName}'");
+                throw new ArgumentNullException(nameof(root));
             }
 
             if (string.IsNullOrWhiteSpace(assetName))
@@ -54,9 +54,9 @@ namespace Microsoft.DotNet.TestFramework
                 throw new ArgumentException("Argument cannot be null or whitespace", nameof(assetName));
             }
 
-            if (!dotnetExeFile.Exists)
+            if (dotnetExeFile == null)
             {
-                throw new FileNotFoundException($"File not found at '{dotnetExeFile.FullName}'");
+                throw new ArgumentNullException(nameof(dotnetExeFile));
             }
 
             if (string.IsNullOrWhiteSpace(projectFilePattern))
@@ -80,59 +80,62 @@ namespace Microsoft.DotNet.TestFramework
             {
                 _dataDirectory
             };
-
-            if (!_dataDirectory.Exists)
-            {
-                _dataDirectory.Create();
-            }
         }
 
         public TestAssetInstance CreateInstance([CallerMemberName] string callingMethod = "", string identifier = "")
         {
-            var instancePath = GetTestDestinationDirectoryPath(callingMethod, identifier);
+            var instancePath = GetTestDestinationDirectory(callingMethod, identifier);
 
-            var testInstance = new TestAssetInstance(this, new DirectoryInfo(instancePath));
+            var testInstance = new TestAssetInstance(this, instancePath);
 
             return testInstance;
         }
 
         internal IEnumerable<FileInfo> GetSourceFiles()
         {
+            ThrowIfTestAssetDoesNotExist();
+
             ThrowIfAssetSourcesHaveChanged();
             
-            return GetInventory(_inventoryFiles.Source, null, () => {});
+            return GetInventory(
+                _inventoryFiles.Source, 
+                null, 
+                () => {});
         }
 
         internal IEnumerable<FileInfo> GetRestoreFiles()
         {
+            ThrowIfTestAssetDoesNotExist();
+
             ThrowIfAssetSourcesHaveChanged();
             
-            return GetInventory(_inventoryFiles.Restore, GetSourceFiles, DoRestoreWithLock);
+            return GetInventory(
+                _inventoryFiles.Restore, 
+                GetSourceFiles, 
+                DoRestoreWithLock);
         }
 
         internal IEnumerable<FileInfo> GetBuildFiles()
         {
+            ThrowIfTestAssetDoesNotExist();
+
             ThrowIfAssetSourcesHaveChanged();
             
             return GetInventory(
                 _inventoryFiles.Build,
-                () =>
-                {
-                    var preInventory = new List<FileInfo>(GetRestoreFiles());
-                    preInventory.AddRange(GetSourceFiles());
-                    return preInventory;
-                },
+                () => GetRestoreFiles()
+                        .Concat(GetSourceFiles()),
                 DoBuildWithLock);
         }
 
-        private string GetTestDestinationDirectoryPath(string callingMethod, string identifier)
+        private DirectoryInfo GetTestDestinationDirectory(string callingMethod, string identifier)
         {
 #if NET451
             string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 #else
             string baseDirectory = AppContext.BaseDirectory;
 #endif
-            return Path.Combine(baseDirectory, callingMethod + identifier, _assetName);
+            return new DirectoryInfo(Path.Combine(baseDirectory, callingMethod + identifier, _assetName));
         }
 
         private List<FileInfo> LoadInventory(FileInfo file)
@@ -159,6 +162,11 @@ namespace Microsoft.DotNet.TestFramework
             FileUtility.ReplaceWithLock(
                 filePath =>
                 {
+                    if (!_dataDirectory.Exists)
+                    {
+                        _dataDirectory.Create();
+                    }
+
                     using (var stream =
                         new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
                     {
@@ -358,6 +366,14 @@ namespace Microsoft.DotNet.TestFramework
 
                 throw new Exception(message);
             }
+        }
+
+        private void ThrowIfTestAssetDoesNotExist()
+        {
+            if (!_root.Exists)
+            { 
+                throw new DirectoryNotFoundException($"Directory not found at '{_root.FullName}'"); 
+            } 
         }
     }
 }
