@@ -104,6 +104,20 @@ namespace Microsoft.DotNet.Tools.Add.ProjectToSolution
                 };
 
                 slnFile.Projects.Add(slnProject);
+
+                if (slnFile.ProjectConfigurationsSection.Any())
+                {
+                    var existingBuildConfigs = slnFile.ProjectConfigurationsSection.First();
+                    var buildConfigsForAddedProject = new SlnPropertySet(slnProject.Id);
+
+                    foreach (var config in existingBuildConfigs)
+                    {
+                        buildConfigsForAddedProject[config.Key] = config.Value;
+                    }
+
+                    slnFile.ProjectConfigurationsSection.Add(buildConfigsForAddedProject);
+                }
+
                 Reporter.Output.WriteLine(
                     string.Format(CommonLocalizableStrings.ProjectAddedToTheSolution, projectPath));
             }

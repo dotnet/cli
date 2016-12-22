@@ -75,6 +75,8 @@ namespace Microsoft.DotNet.Tools.Remove.ProjectFromSolution
             {
                 foreach (var slnProject in projectsToRemove)
                 {
+                    var buildConfigsToRemove = slnFile.ProjectConfigurationsSection.GetPropertySet(slnProject.Id);
+                    slnFile.ProjectConfigurationsSection.Remove(buildConfigsToRemove);
                     slnFile.Projects.Remove(slnProject);
                     Reporter.Output.WriteLine(
                         string.Format(CommonLocalizableStrings.ProjectReferenceRemoved, slnProject.FilePath));

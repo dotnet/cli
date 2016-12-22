@@ -207,14 +207,33 @@ Additional Arguments:
                 slnProject.Id.Should().Be(projectGuid);
             }
 
-            var restoreCmd = new DotnetCommand()
+            new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)
-                .Execute($"restore {Path.Combine("App", "App.csproj")}");
+                .Execute($"restore App.sln")
+                .Should().Pass();
 
-            var buildCmd = new DotnetCommand()
+            new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)
-                .Execute("build App.sln");
-            buildCmd.Should().Pass();
+                .Execute("build App.sln --configuration Release")
+                .Should().Pass();
+
+            var reasonString = "should be built in release mode, otherwise it means build configurations are missing from the sln file";
+
+            var releaseDirectory = Directory.EnumerateDirectories(
+                Path.Combine(projectDirectory, "App", "bin"),
+                "Release",
+                SearchOption.AllDirectories);
+            releaseDirectory.Count().Should().Be(1, $"App {reasonString}");
+            Directory.EnumerateFiles(releaseDirectory.Single(), "App.dll", SearchOption.AllDirectories)
+                .Count().Should().Be(1, $"App {reasonString}");
+
+            releaseDirectory = Directory.EnumerateDirectories(
+                Path.Combine(projectDirectory, "Lib", "bin"),
+                "Release",
+                SearchOption.AllDirectories);
+            releaseDirectory.Count().Should().Be(1, $"Lib {reasonString}");
+            Directory.EnumerateFiles(releaseDirectory.Single(), "Lib.dll", SearchOption.AllDirectories)
+                .Count().Should().Be(1, $"Lib {reasonString}");
         }
 
         [Fact]

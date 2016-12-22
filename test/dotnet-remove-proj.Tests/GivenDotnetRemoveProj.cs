@@ -6,6 +6,7 @@ using Microsoft.DotNet.Cli.Sln.Internal;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using System;
 using System.IO;
+using System.Linq;
 using Xunit;
 
 namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
@@ -272,6 +273,57 @@ Project reference `idontexisteither.csproj` could not be found.";
             slnFile = SlnFile.Read(solutionPath);
             slnFile.Projects.Count.Should().Be(1);
             slnFile.Projects[0].FilePath.Should().Be(Path.Combine("App", "App.csproj"));
+        }
+
+        [Fact]
+        public void WhenReferenceIsRemovedBuildConfigsAreAlsoRemovedAndSlnBuilds()
+        {
+            var projectDirectory = TestAssets
+                .Get("TestAppWithSlnAndCsprojToRemove")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root
+                .FullName;
+
+            var solutionPath = Path.Combine(projectDirectory, "App.sln");
+            SlnFile slnFile = SlnFile.Read(solutionPath);
+            slnFile.Projects.Count.Should().Be(2);
+
+            var projectToRemove = Path.Combine("Lib", "Lib.csproj");
+            var cmd = new DotnetCommand()
+                .WithWorkingDirectory(projectDirectory)
+                .ExecuteWithCapturedOutput($"remove project {projectToRemove}");
+            cmd.Should().Pass();
+
+            string outputText = $@"Project reference `{projectToRemove}` removed.";
+            cmd.StdOut.Should().Be(outputText);
+
+            slnFile = SlnFile.Read(solutionPath);
+            slnFile.Projects.Count.Should().Be(1);
+            slnFile.Projects[0].FilePath.Should().Be(Path.Combine("App", "App.csproj"));
+            slnFile.ProjectConfigurationsSection
+                .Where(p => p.Id != slnFile.Projects[0].Id)
+                .Count().Should().Be(0, "Lib build configurations should also be removed");
+
+            new DotnetCommand()
+                .WithWorkingDirectory(projectDirectory)
+                .Execute($"restore App.sln")
+                .Should().Pass();
+
+            new DotnetCommand()
+                .WithWorkingDirectory(projectDirectory)
+                .Execute("build App.sln --configuration Release")
+                .Should().Pass();
+
+            var reasonString = "should be built in release mode, otherwise it means build configurations are missing from the sln file";
+
+            var releaseDirectory = Directory.EnumerateDirectories(
+                Path.Combine(projectDirectory, "App", "bin"),
+                "Release",
+                SearchOption.AllDirectories);
+            releaseDirectory.Count().Should().Be(1, $"App {reasonString}");
+            Directory.EnumerateFiles(releaseDirectory.Single(), "App.dll", SearchOption.AllDirectories)
+                .Count().Should().Be(1, $"App {reasonString}");
         }
     }
 }
