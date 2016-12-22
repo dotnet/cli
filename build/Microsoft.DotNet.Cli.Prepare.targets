@@ -69,6 +69,10 @@
       <Output TaskParameter="BranchName" PropertyName="BranchName" />
     </GenerateBuildVersionInfo>
 
+    <GenerateNuGetPackagesArchiveVersion RepoRoot="$(RepoRoot)">
+      <Output TaskParameter="Version" PropertyName="NuGetPackagesArchiveVersion"/>
+    </GenerateNuGetPackagesArchiveVersion>
+
     <PropertyGroup>
       <VersionBadge>$(BaseOutputDirectory)/$(VersionBadgeMoniker)_$(Configuration)_version_badge.svg</VersionBadge>
       <SdkVersion>$(NugetVersion)</SdkVersion>
@@ -128,6 +132,7 @@
     <PropertyGroup>
       <CoreSetupBlobRootUrl>https://dotnetcli.azureedge.net/dotnet/$(CoreSetupChannel)</CoreSetupBlobRootUrl>
       <SharedFrameworkArchiveBlobRootUrl>$(CoreSetupBlobRootUrl)/Binaries/$(SharedFrameworkVersion)</SharedFrameworkArchiveBlobRootUrl>
+      <NuGetPackagesArchiveBlobRootUrl>$(CoreSetupBlobRootUrl)/Binaries/$(NuGetPackagesArchiveVersion)</NuGetPackagesArchiveBlobRootUrl>
       <CoreSetupInstallerBlobRootUrl>$(CoreSetupBlobRootUrl)/Installers</CoreSetupInstallerBlobRootUrl>
 
       <CoreSetupDownloadDirectory>$(IntermediateDirectory)/coreSetupDownload/$(SharedFrameworkVersion)</CoreSetupDownloadDirectory>
