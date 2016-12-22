@@ -78,7 +78,7 @@ A command is running to initially populate your local package cache, to improve 
         }
 
     	[Fact]
-    	public void ItRestoresTheNuGetPackagesToTheNuGetCacheFolder()
+    	public void ItCreatesASentinelFileUnderTheNuGetCacheFolder()
     	{
             _nugetCacheFolder
                 .Should()
@@ -86,11 +86,67 @@ A command is running to initially populate your local package cache, to improve 
     	}
 
         [Fact]
-        public void ItCreatesASentinelFileUnderTheNuGetCacheFolder()
+        public void ItRestoresTheNuGetPackagesToTheNuGetCacheFolder()
         {
             _nugetCacheFolder
                 .Should()
                 .HaveDirectory("microsoft.netcore.app");
+
+            _nugetCacheFolder
+                .Should()
+                .HaveDirectory("microsoft.aspnetcore.diagnostics");
+
+            _nugetCacheFolder
+                .Should()
+                .HaveDirectory("microsoft.aspnetcore.mvc");
+
+            _nugetCacheFolder
+                .Should()
+                .HaveDirectory("microsoft.aspnetcore.razor.tools");
+
+            _nugetCacheFolder
+                .Should()
+                .HaveDirectory("microsoft.aspnetcore.routing");
+
+            _nugetCacheFolder
+                .Should()
+                .HaveDirectory("microsoft.aspnetcore.server.iisintegration");
+
+            _nugetCacheFolder
+                .Should()
+                .HaveDirectory("microsoft.aspnetcore.server.kestrel");
+
+            _nugetCacheFolder
+                .Should()
+                .HaveDirectory("microsoft.aspnetcore.staticfiles");
+
+            _nugetCacheFolder
+                .Should()
+                .HaveDirectory("microsoft.extensions.configuration.environmentvariables");
+
+            _nugetCacheFolder
+                .Should()
+                .HaveDirectory("microsoft.extensions.configuration.json");
+
+            _nugetCacheFolder
+                .Should()
+                .HaveDirectory("microsoft.extensions.logging");
+
+            _nugetCacheFolder
+                .Should()
+                .HaveDirectory("microsoft.extensions.logging.console");
+
+            _nugetCacheFolder
+                .Should()
+                .HaveDirectory("microsoft.extensions.logging.debug");
+
+            _nugetCacheFolder
+                .Should()
+                .HaveDirectory("microsoft.extensions.options.configurationextensions");
+
+            _nugetCacheFolder
+                .Should()
+                .HaveDirectory("microsoft.visualstudio.web.browserlink.loader");
         }
 
     	private string GetDotnetVersion()
