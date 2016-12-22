@@ -11,15 +11,15 @@ namespace Microsoft.DotNet.New3.Tests
         [Fact]
         public void When_dotnet_new_is_invoked_mupliple_times_it_should_fail()
         {
-            var rootPath = TestAssetsManager.CreateTestDirectory().Path;
+            var rootPath = TestAssetsManager.CreateTestDirectory(identifier: "When_dotnet_new_is_invoked_mupliple_times_it_should_fail").Path;
 
-            new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute("new3");
+            new TestCommand("dotnet")
+                .Execute($"new3 console -o {rootPath}");
 
             DateTime expectedState = Directory.GetLastWriteTime(rootPath);
 
-            var result = new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .ExecuteWithCapturedOutput("new3");
+            var result = new TestCommand("dotnet")
+                .ExecuteWithCapturedOutput($"new3 console -o {rootPath}");
 
             DateTime actualState = Directory.GetLastWriteTime(rootPath);
 
@@ -34,7 +34,7 @@ namespace Microsoft.DotNet.New3.Tests
         {
             string[] cSharpTemplates = new[] { "console", "classlib", "mstest", "xunit", "web", "mvc", "webapi" };
 
-            var rootPath = TestAssetsManager.CreateTestDirectory().Path;
+            var rootPath = TestAssetsManager.CreateTestDirectory(identifier: "new3_RestoreDoesNotUseAnyCliProducedPackagesOnItsTemplates").Path;
             var packagesDirectory = Path.Combine(rootPath, "packages");
 
             foreach (string cSharpTemplate in cSharpTemplates)
@@ -53,8 +53,8 @@ namespace Microsoft.DotNet.New3.Tests
             string projectFolder,
             string packagesDirectory)
         {
-            new TestCommand("dotnet") { WorkingDirectory = projectFolder }
-                .Execute($"new3 {projectType}")
+            new TestCommand("dotnet")
+                .Execute($"new3 {projectType} -o {projectFolder}")
                 .Should().Pass();
 
             new RestoreCommand()
