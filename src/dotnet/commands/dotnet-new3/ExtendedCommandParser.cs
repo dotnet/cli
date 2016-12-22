@@ -271,8 +271,7 @@ namespace Microsoft.DotNet.Tools.New3
                     continue;
                 }
 
-                string flagFullText;
-                if (parameterNameMap == null || !parameterNameMap.TryGetValue(parameter.Name, out flagFullText))
+                if (parameterNameMap == null || !parameterNameMap.TryGetValue(parameter.Name, out string flagFullText))
                 {
                     flagFullText = parameter.Name;
                 }

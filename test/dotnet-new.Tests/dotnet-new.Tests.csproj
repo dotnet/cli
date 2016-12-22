@@ -1,13 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\dir.props" />
-  
   <PropertyGroup>
     <TargetFramework>netcoreapp1.0</TargetFramework>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <AssemblyName>dotnet-new.Tests</AssemblyName>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.DotNet.Tools.Tests.Utilities\Microsoft.DotNet.Tools.Tests.Utilities.csproj" />
     <ProjectReference Include="..\..\src\dotnet\dotnet.csproj" />
@@ -31,13 +29,11 @@
       <FromP2P>true</FromP2P>
     </ProjectReference>
   </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <Reference Include="System.Runtime">
       <FromP2P>true</FromP2P>
     </Reference>
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk">
       <Version>15.0.0-preview-20161024-02</Version>
@@ -55,7 +51,9 @@
       <Version>2.2.0-beta4-build3444</Version>
     </PackageReference>
   </ItemGroup>
-
+  <ItemGroup>
+    <Folder Include="New3\" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
   </PropertyGroup>
