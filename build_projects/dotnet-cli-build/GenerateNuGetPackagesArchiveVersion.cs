@@ -1,10 +1,12 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.Build.Construction;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -33,15 +35,29 @@ namespace Microsoft.DotNet.Cli.Build
                 "CSharp_Web",
                 "$projectName$.csproj");
 
-            var sha256 = SHA256.Create();
+            var rootElement = ProjectRootElement.Open(webTemplatePath);
+            var packageRefs = rootElement.Items.Where(i => i.ItemType == "PackageReference").ToList();
 
-            using (var fs = File.OpenRead(webTemplatePath))
+            var dataToHash = string.Empty;
+            foreach (var packageRef in packageRefs)
             {
-                var hashBytes = sha256.ComputeHash(fs);
-                Version = GetHashString(hashBytes);
-
-                Log.LogMessage($"NuGet Packages Archive Version: '{Version}'");
+                dataToHash += $"{packageRef.Include},";
+                if (packageRef.HasMetadata)
+                {
+                    foreach (var metadata in packageRef.Metadata)
+                    {
+                        dataToHash += $"{metadata.Name}={metadata.Value};";
+                    }
+                }
             }
+
+            Log.LogMessage($"NuGet Packages Archive Data To Hash: '{dataToHash}'");
+
+            var sha256 = SHA256.Create();
+            var hashBytes = sha256.ComputeHash(Encoding.Unicode.GetBytes(dataToHash));
+            Version = GetHashString(hashBytes);
+
+            Log.LogMessage($"NuGet Packages Archive Version: '{Version}'");
 
             return true;
         }
