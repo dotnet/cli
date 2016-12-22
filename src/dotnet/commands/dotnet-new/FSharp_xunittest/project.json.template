@@ -10,7 +10,7 @@
     }
   },
   "tools": {
-    "dotnet-compile-fsc":"1.0.0-preview2-*"
+    "dotnet-compile-fsc": "1.0.0-preview2-*"
   },
   "dependencies": {
     "System.Runtime.Serialization.Primitives": "4.1.1",
@@ -23,7 +23,7 @@
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.0.3"
+          "version": "1.0.4-servicing-004618-00"
         },
         "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-160629"
       },
