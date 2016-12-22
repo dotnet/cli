@@ -98,16 +98,22 @@ namespace Microsoft.DotNet.TestFramework
 
         internal IEnumerable<FileInfo> GetSourceFiles()
         {
+            ThrowIfAssetSourcesHaveChanged();
+            
             return GetInventory(_inventoryFiles.Source, null, () => {});
         }
 
         internal IEnumerable<FileInfo> GetRestoreFiles()
         {
+            ThrowIfAssetSourcesHaveChanged();
+            
             return GetInventory(_inventoryFiles.Restore, GetSourceFiles, DoRestoreWithLock);
         }
 
         internal IEnumerable<FileInfo> GetBuildFiles()
         {
+            ThrowIfAssetSourcesHaveChanged();
+            
             return GetInventory(
                 _inventoryFiles.Build,
                 () =>
@@ -131,29 +137,21 @@ namespace Microsoft.DotNet.TestFramework
 
         private List<FileInfo> LoadInventory(FileInfo file)
         {
-            return Task.Run(async () => await ConcurrencyUtilities.ExecuteWithFileLockedAsync<List<FileInfo>>(
-                _dataDirectory.FullName, 
-                async lockedToken =>
-                {
-                    RemoveDataDirectoryIfAssetChanged();
-                    
-                    if (!file.Exists)
-                    {
-                        return null;
-                    }
+            if (!file.Exists)
+            {
+                return null;
+            }
 
-                    var inventory = new List<FileInfo>();
+            var inventory = new List<FileInfo>();
 
-                    var lines = file.OpenText();
+            var lines = file.OpenText();
 
-                    while (lines.Peek() > 0)
-                    {
-                        inventory.Add(new FileInfo(lines.ReadLine()));
-                    }
+            while (lines.Peek() > 0)
+            {
+                inventory.Add(new FileInfo(lines.ReadLine()));
+            }
 
-                    return inventory;     
-                },
-                CancellationToken.None)).Result;
+            return inventory;
         }
 
         private void SaveInventory(FileInfo file, IEnumerable<FileInfo> inventory)
@@ -301,7 +299,7 @@ namespace Microsoft.DotNet.TestFramework
             }
         }
 
-        private void RemoveDataDirectoryIfAssetChanged()
+        private void ThrowIfAssetSourcesHaveChanged()
         {
             if (!_dataDirectory.Exists)
             {
@@ -324,9 +322,15 @@ namespace Microsoft.DotNet.TestFramework
 
             if (untrackedFiles.Any())
             {
-                _dataDirectory.Delete(true);
+                var message = $"TestAsset {_assetName} has untracked files." +
+                    "Consider cleaning the asset and deleting its `.tam` directory to" + 
+                    "recreate tracking files.\n\n" +
+                    $".tam directory: {_dataDirectory.FullName}\n" +
+                    "Untracked Files: \n";
 
-                return;
+                message += String.Join("\n", untrackedFiles.Select(f => $" - {f.FullName}\n"));
+
+                throw new Exception(message);
             }
 
             var earliestDataDirectoryTimestamp =
@@ -340,14 +344,20 @@ namespace Microsoft.DotNet.TestFramework
                 return;
             }
 
-            var latestAssetFileTimeStamp = assetFiles
-                .OrderByDescending(f => f.LastWriteTime)
-                .First()
-                .LastWriteTime;
+            var updatedSourceFiles = LoadInventory(_inventoryFiles.Source)
+                .Where(f => f.LastWriteTime > earliestDataDirectoryTimestamp);
 
-            if (earliestDataDirectoryTimestamp <= latestAssetFileTimeStamp)
+            if (updatedSourceFiles.Any())
             {
-                _dataDirectory.Delete(true);
+                var message = $"TestAsset {_assetName} has updated files." +
+                    "Consider cleaning the asset and deleting its `.tam` directory to" + 
+                    "recreate tracking files.\n\n" +
+                    $".tam directory: {_dataDirectory.FullName}\n" +
+                    "Updated Files: \n";
+
+                message += String.Join("\n", updatedSourceFiles.Select(f => $" - {f.FullName}\n"));
+
+                throw new Exception(message);
             }
         }
     }
