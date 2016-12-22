@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.PlatformAbstractions;
@@ -29,6 +30,10 @@ namespace Microsoft.DotNet.TestFramework
 
         private readonly TestAssetInventoryFiles _inventoryFiles;
 
+        private readonly FileInfo _dotnetExeFile;
+
+        private readonly string _projectFilePattern;
+
         internal DirectoryInfo Root 
         {
             get
@@ -37,18 +42,37 @@ namespace Microsoft.DotNet.TestFramework
             }
         }
 
-        internal TestAssetInfo(DirectoryInfo root, string assetName)
+        internal TestAssetInfo(DirectoryInfo root, string assetName, FileInfo dotnetExeFile, string projectFilePattern)
         {
             if (!root.Exists)
             {
-                throw new DirectoryNotFoundException($"Directory not found at '{root}'");
+                throw new DirectoryNotFoundException($"Directory not found at '{root.FullName}'");
             }
 
-            _assetName = assetName;
+            if (string.IsNullOrWhiteSpace(assetName))
+            {
+                throw new ArgumentException("Argument cannot be null or whitespace", nameof(assetName));
+            }
+
+            if (!dotnetExeFile.Exists)
+            {
+                throw new FileNotFoundException($"File not found at '{dotnetExeFile.FullName}'");
+            }
+
+            if (string.IsNullOrWhiteSpace(projectFilePattern))
+            {
+                throw new ArgumentException("Argument cannot be null or whitespace", nameof(projectFilePattern));
+            }
 
             _root = root;
 
-            _dataDirectory = new DirectoryInfo(Path.Combine(_root.FullName, DataDirectoryName));
+            _assetName = assetName;
+
+            _dotnetExeFile = dotnetExeFile;
+
+            _projectFilePattern = projectFilePattern;
+
+            _dataDirectory = _root.GetDirectory(DataDirectoryName);
 
             _inventoryFiles = new TestAssetInventoryFiles(_dataDirectory);
 
@@ -72,6 +96,29 @@ namespace Microsoft.DotNet.TestFramework
             return testInstance;
         }
 
+        internal IEnumerable<FileInfo> GetSourceFiles()
+        {
+            return GetInventory(_inventoryFiles.Source, null, () => {});
+        }
+
+        internal IEnumerable<FileInfo> GetRestoreFiles()
+        {
+            return GetInventory(_inventoryFiles.Restore, GetSourceFiles, DoRestoreWithLock);
+        }
+
+        internal IEnumerable<FileInfo> GetBuildFiles()
+        {
+            return GetInventory(
+                _inventoryFiles.Build,
+                () =>
+                {
+                    var preInventory = new List<FileInfo>(GetRestoreFiles());
+                    preInventory.AddRange(GetSourceFiles());
+                    return preInventory;
+                },
+                DoBuildWithLock);
+        }
+
         private string GetTestDestinationDirectoryPath(string callingMethod, string identifier)
         {
 #if NET451
@@ -84,21 +131,29 @@ namespace Microsoft.DotNet.TestFramework
 
         private List<FileInfo> LoadInventory(FileInfo file)
         {
-            if (!file.Exists)
-            {
-                return null;
-            }
+            return Task.Run(async () => await ConcurrencyUtilities.ExecuteWithFileLockedAsync<List<FileInfo>>(
+                _dataDirectory.FullName, 
+                async lockedToken =>
+                {
+                    RemoveDataDirectoryIfAssetChanged();
+                    
+                    if (!file.Exists)
+                    {
+                        return null;
+                    }
 
-            var inventory = new List<FileInfo>();
+                    var inventory = new List<FileInfo>();
 
-            var lines = file.OpenText();
+                    var lines = file.OpenText();
 
-            while (lines.Peek() > 0)
-            {
-                inventory.Add(new FileInfo(lines.ReadLine()));
-            }
+                    while (lines.Peek() > 0)
+                    {
+                        inventory.Add(new FileInfo(lines.ReadLine()));
+                    }
 
-            return inventory;
+                    return inventory;     
+                },
+                CancellationToken.None)).Result;
         }
 
         private void SaveInventory(FileInfo file, IEnumerable<FileInfo> inventory)
@@ -126,29 +181,6 @@ namespace Microsoft.DotNet.TestFramework
             return _root.GetFiles("*.*", SearchOption.AllDirectories)
                         .Where(f => !_directoriesToExclude.Any(d => d.Contains(f)))
                         .Where(f => !FilesToExclude.Contains(f.Name));    
-        }
-
-        internal IEnumerable<FileInfo> GetSourceFiles()
-        {
-            return GetInventory(_inventoryFiles.Source, null, () => {});
-        }
-
-        internal IEnumerable<FileInfo> GetRestoreFiles()
-        {
-            return GetInventory(_inventoryFiles.Restore, GetSourceFiles, DoRestore);
-        }
-
-        internal IEnumerable<FileInfo> GetBuildFiles()
-        {
-            return GetInventory(
-                _inventoryFiles.Build,
-                () =>
-                {
-                    var preInventory = new List<FileInfo>(GetRestoreFiles());
-                    preInventory.AddRange(GetSourceFiles());
-                    return preInventory;
-                },
-                DoBuild);
         }
 
         private IEnumerable<FileInfo> GetInventory(
@@ -187,20 +219,46 @@ namespace Microsoft.DotNet.TestFramework
             return inventory;
         }
 
+        private void DoRestoreWithLock()
+        {
+             Task.Run(async () => await ConcurrencyUtilities.ExecuteWithFileLockedAsync<object>(
+                _dataDirectory.FullName, 
+                lockedToken =>
+                {
+                    DoRestore();
+
+                    return Task.FromResult(new Object());
+                },
+                CancellationToken.None)).Wait();
+        }
+
+        private void DoBuildWithLock()
+        {
+            Task.Run(async () => await ConcurrencyUtilities.ExecuteWithFileLockedAsync<object>(
+                _dataDirectory.FullName, 
+                lockedToken =>
+                {
+                    DoBuild();
+
+                    return Task.FromResult(new Object());
+                },
+                CancellationToken.None)).Wait();
+        }
+
         private void DoRestore()
         {
             Console.WriteLine($"TestAsset Restore '{_assetName}'");
 
-            var projFiles = _root.GetFiles("*.csproj", SearchOption.AllDirectories);
+            var projFiles = _root.GetFiles(_projectFilePattern, SearchOption.AllDirectories);
 
             foreach (var projFile in projFiles)
             {
-                var restoreArgs = new string[] { "restore", projFile.FullName, "/p:SkipInvalidConfigurations=true" };
+                var restoreArgs = new string[] { "restore", projFile.FullName };
 
-                var commandResult = Command.Create(new PathCommandResolverPolicy(), "dotnet", restoreArgs)
-                                       .CaptureStdOut()
-                                       .CaptureStdErr()
-                                       .Execute();
+                var commandResult = Command.Create(_dotnetExeFile.FullName, restoreArgs)
+                                    .CaptureStdOut()
+                                    .CaptureStdErr()
+                                    .Execute();
 
                 int exitCode = commandResult.ExitCode;
 
@@ -223,11 +281,11 @@ namespace Microsoft.DotNet.TestFramework
 
             Console.WriteLine($"TestAsset Build '{_assetName}'");
 
-            var commandResult = Command.Create(new PathCommandResolverPolicy(), "dotnet", args) 
-                                       .WorkingDirectory(_root.FullName)
-                                       .CaptureStdOut()
-                                       .CaptureStdErr()
-                                       .Execute();
+            var commandResult = Command.Create(_dotnetExeFile.FullName, args) 
+                                    .WorkingDirectory(_root.FullName)
+                                    .CaptureStdOut()
+                                    .CaptureStdErr()
+                                    .Execute();
 
             int exitCode = commandResult.ExitCode;
 
@@ -240,6 +298,56 @@ namespace Microsoft.DotNet.TestFramework
                 string message = string.Format($"TestAsset Build '{_assetName}' Failed with {exitCode}");
                 
                 throw new Exception(message);
+            }
+        }
+
+        private void RemoveDataDirectoryIfAssetChanged()
+        {
+            if (!_dataDirectory.Exists)
+            {
+                return;
+            }
+
+            var dataDirectoryFiles = _dataDirectory.GetFiles("*", SearchOption.AllDirectories);
+
+            if (!dataDirectoryFiles.Any())
+            {
+                return;
+            }
+
+            var trackedFiles = _inventoryFiles.AllInventoryFiles.SelectMany(f => LoadInventory(f));
+
+            var assetFiles = _root.GetFiles("*", SearchOption.AllDirectories)
+                .Where(f => !_dataDirectory.Contains(f));
+
+            var untrackedFiles = assetFiles.Where(a => !trackedFiles.Any(t => t.FullName.Equals(a.FullName)));
+
+            if (untrackedFiles.Any())
+            {
+                _dataDirectory.Delete(true);
+
+                return;
+            }
+
+            var earliestDataDirectoryTimestamp =
+                dataDirectoryFiles
+                    .OrderBy(f => f.LastWriteTime)
+                    .First()
+                    .LastWriteTime;
+
+            if (earliestDataDirectoryTimestamp == null)
+            {
+                return;
+            }
+
+            var latestAssetFileTimeStamp = assetFiles
+                .OrderByDescending(f => f.LastWriteTime)
+                .First()
+                .LastWriteTime;
+
+            if (earliestDataDirectoryTimestamp <= latestAssetFileTimeStamp)
+            {
+                _dataDirectory.Delete(true);
             }
         }
     }
