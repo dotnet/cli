@@ -234,6 +234,7 @@ namespace Microsoft.DotNet.Tools.New3
             else if (templates.Count == 1)
             {
                 ITemplateInfo templateInfo = templates.First();
+                EngineEnvironmentSettings.Host.LogMessage(_app.GetOptionsHelp());
                 return TemplateHelp(templateInfo, _app.AllTemplateParams);
             }
             else
@@ -336,6 +337,12 @@ namespace Microsoft.DotNet.Tools.New3
 
             foreach (ITemplateParameter parameter in filteredParams)
             {
+                if (string.Equals(parameter.DataType, "bool", StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(parameter.DefaultValue, "false", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
                 string displayParameter;
                 if (!parameterNameMap.TryGetValue(parameter.Name, out displayParameter))
                 {
@@ -344,7 +351,7 @@ namespace Microsoft.DotNet.Tools.New3
 
                 Reporter.Output.Write($" --{displayParameter}");
 
-                if (!string.IsNullOrEmpty(parameter.DefaultValue))
+                if (!string.IsNullOrEmpty(parameter.DefaultValue) && !string.Equals(parameter.DataType, "bool", StringComparison.OrdinalIgnoreCase))
                 {
                     Reporter.Output.Write($" {parameter.DefaultValue}");
                 }

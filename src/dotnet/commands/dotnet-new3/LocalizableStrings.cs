@@ -5,7 +5,7 @@ namespace Microsoft.DotNet.Tools.New3
 {
     internal class LocalizableStrings
     {
-        public const string DisplaysHelp = "Displays help for this command.";
+        public const string DisplaysHelp = "Displays help for this command";
 
         public const string ParameterNamePrefixError = "Parameter names must start with -- or -";
 
@@ -23,11 +23,11 @@ namespace Microsoft.DotNet.Tools.New3
 
         public const string OptionVariantAlreadyDefined = "Option variant {0} for canonical {1} was already defined for canonical {2}";
 
-        public const string ListsTemplates = "List templates containing the specified name.";
+        public const string ListsTemplates = "List templates containing the specified name";
 
-        public const string NameOfOutput = "The name for the output being created. If no name is specified, the name of the current directory is used.";
+        public const string NameOfOutput = "The name for the output being created. If no name is specified, the name of the current directory is used";
 
-        public const string OutputPath = "Location to place the generated output.";
+        public const string OutputPath = "Location to place the generated output";
 
         public const string CreateDirectoryHelp = "Indicates whether to create a directory for the generated content.";
 
