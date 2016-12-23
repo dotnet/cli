@@ -155,7 +155,18 @@ namespace Microsoft.DotNet.Tools.New
                                }
             };
 
-            var languages = new[] { csharp, fsharp };
+            var visualBasic = new { Name = "VB", Alias = new[] { "vb", "visualBasic" }, TemplatePrefix = "VisualBasic", 
+                               Templates = new[] 
+                               { 
+                                   new { Name = "Console", isMsBuild = true }, 
+                                   new { Name = "Web", isMsBuild = true }, 
+                                   new { Name = "Lib", isMsBuild = true },
+                                   new { Name = "Mstest", isMsBuild = true },
+                                   new { Name = "Xunittest", isMsBuild = true }
+                               }
+            };
+
+            var languages = new[] { csharp, fsharp, visualBasic };
 
             string langValuesString = string.Join(", ", languages.Select(l => l.Name));
             var typeValues = 
