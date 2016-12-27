@@ -63,7 +63,6 @@ namespace Microsoft.DotNet.Tools.New3
             _helpDisplayer.ShowHelp();
         }
 
-        // note: this is mostly copy-pased from CommandLineApplication.ShowHelp()
         public string GetOptionsHelp()
         {
             StringBuilder optionsBuilder = new StringBuilder();
@@ -413,9 +412,7 @@ namespace Microsoft.DotNet.Tools.New3
                     {
                         string variant = variantToCanonical.Key;
                         string canonical = variantToCanonical.Value;
-
-                        IList<string> variantList;
-                        if (!_canonicalToVariantsTemplateParamMap.TryGetValue(canonical, out variantList))
+                        if (!_canonicalToVariantsTemplateParamMap.TryGetValue(canonical, out IList<string> variantList))
                         {
                             variantList = new List<string>();
                             _canonicalToVariantsTemplateParamMap.Add(canonical, variantList);

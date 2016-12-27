@@ -5,7 +5,9 @@ namespace Microsoft.DotNet.Tools.New3
 {
     internal class LocalizableStrings
     {
-        public const string DisplaysHelp = "Displays help for this command";
+        public const string ShowsAllTemplates = "Shows all templates";
+
+        public const string DisplaysHelp = "Displays help for this command.";
 
         public const string ParameterNamePrefixError = "Parameter names must start with -- or -";
 

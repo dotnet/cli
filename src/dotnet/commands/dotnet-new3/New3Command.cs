@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.Tools.New3
     {
         private const string CommandName = "new3";
         private static readonly string HostIdentifier = "dotnetcli";
-        private static readonly Version HostVersion = typeof(Program).GetTypeInfo().Assembly.GetName().Version;
+        private static readonly string HostVersion = typeof(Program).GetTypeInfo().Assembly.GetName().Version.ToString();
         private static DefaultTemplateEngineHost Host;
 
         public static IInstaller Installer { get; set; } = new Installer();
@@ -45,6 +45,7 @@ namespace Microsoft.DotNet.Tools.New3
 
         private bool _shouldExit;
         private CommandArgument _templateName;
+        private IReadOnlyCollection<IFilteredTemplateInfo> _allResults;
 
         public New3Command(ExtendedCommandParser app, CommandArgument templateNames)
         {
@@ -63,6 +64,8 @@ namespace Microsoft.DotNet.Tools.New3
         public bool InstallHasValue => _app.InternalParamHasValue("--install");
 
         public bool IsHelpFlagSpecified => _app.InternalParamHasValue("--help");
+
+        public bool IsShowAllFlagSpecified => _app.InternalParamHasValue("--show-all");
 
         public bool IsListFlagSpecified => _app.InternalParamHasValue("--list");
 
@@ -97,13 +100,13 @@ namespace Microsoft.DotNet.Tools.New3
                 { new Guid("F2B423D7-3C23-4489-816A-41D8D2A98596"), () => typeof(NowMacro) },
                 { new Guid("011E8DC1-8544-4360-9B40-65FD916049B7"), () => typeof(RandomMacro) },
                 { new Guid("8A4D4937-E23F-426D-8398-3BDBD1873ADB"), () => typeof(RegexMacro) },
-                { new Guid("B57D64E0-9B4F-4ABE-9366-711170FD5294"), () => typeof(SwitchMacro) }
+                { new Guid("B57D64E0-9B4F-4ABE-9366-711170FD5294"), () => typeof(SwitchMacro) },
+                { new Guid("10919118-4E13-4FA9-825C-3B4DA855578E"), () => typeof(CaseChangeMacro) }
             };
 
             // Initial host setup has the current locale. May need to be changed based on inputs.
             Host = new DefaultTemplateEngineHost(HostIdentifier, HostVersion, CultureInfo.CurrentCulture.Name, new Dictionary<string, string> { { "prefs:language", "C#" } }, builtIns.ToList());
             EngineEnvironmentSettings.Host = Host;
-
 
             ExtendedCommandParser app = new ExtendedCommandParser()
             {
@@ -178,6 +181,14 @@ namespace Microsoft.DotNet.Tools.New3
                     Installer.InstallPackages(packageList);
                 }
             }
+
+            string templatesDir = Path.Combine(Paths.Global.BaseDir, "Templates");
+
+            if (templatesDir.Exists())
+            {
+                IEnumerable<string> layoutIncludedPackages = Host.FileSystem.EnumerateFiles(templatesDir, "*.nupkg", SearchOption.TopDirectoryOnly);
+                Installer.InstallPackages(layoutIncludedPackages);
+            }
         }
 
         private async Task<int> CreateTemplateAsync(ITemplateInfo template)
@@ -224,16 +235,30 @@ namespace Microsoft.DotNet.Tools.New3
                 }
             }
 
-            IReadOnlyCollection<ITemplateInfo> templates = TemplateCreator.List(_templateName.Value, language);
+            IReadOnlyCollection<IFilteredTemplateInfo> templates = TemplateCreator.List
+                (
+                false,
+                WellKnownSearchFilters.AliasFilter(_templateName.Value),
+                WellKnownSearchFilters.NameFilter(_templateName.Value),
+                WellKnownSearchFilters.ClassificationsFilter(_templateName.Value),
+                WellKnownSearchFilters.LanguageFilter(language)
+                );
 
-            if (templates.Count > 1)
+            IList<IFilteredTemplateInfo> matchedTemplates = templates.Where(x => x.IsMatch).ToList();
+
+            if (matchedTemplates.Count == 0)
+            {
+                matchedTemplates = templates.Where(x => x.IsMatch).ToList();
+            }
+
+            if (matchedTemplates.Count > 1)
             {
                 ListTemplates();
                 return -1;
             }
-            else if (templates.Count == 1)
+            else if (matchedTemplates.Count == 1)
             {
-                ITemplateInfo templateInfo = templates.First();
+                ITemplateInfo templateInfo = matchedTemplates.First().Info;
                 EngineEnvironmentSettings.Host.LogMessage(_app.GetOptionsHelp());
                 return TemplateHelp(templateInfo, _app.AllTemplateParams);
             }
@@ -277,6 +302,39 @@ namespace Microsoft.DotNet.Tools.New3
             }
 
             string language = Language;
+            string outputPath = OutputPath ?? Host.FileSystem.GetCurrentDirectory();
+
+            string context = null;
+            if (!IsShowAllFlagSpecified)
+            {
+                if (Host.FileSystem.DirectoryExists(outputPath) && Host.FileSystem.EnumerateFiles(outputPath, "*.*proj", SearchOption.TopDirectoryOnly).Any())
+                {
+                    context = "item";
+                }
+                else
+                {
+                    context = "project";
+                }
+            }
+
+            _allResults = TemplateCreator.List
+            (
+                false,
+                WellKnownSearchFilters.AliasFilter(_templateName.Value),
+                WellKnownSearchFilters.NameFilter(_templateName.Value),
+                WellKnownSearchFilters.ClassificationsFilter(_templateName.Value),
+                WellKnownSearchFilters.LanguageFilter(language),
+                WellKnownSearchFilters.ContextFilter(context)
+            );
+
+            if (string.IsNullOrEmpty(language))
+            {
+                if (EngineEnvironmentSettings.Host.TryGetHostParamDefault("prefs:language", out string l))
+                {
+                    language = l;
+                }
+            }
+
             resultCode = ParseTemplateArgs(language);
             if (_shouldExit)
             {
@@ -289,22 +347,29 @@ namespace Microsoft.DotNet.Tools.New3
                 return resultCode;
             }
 
-            if (string.IsNullOrEmpty(language))
+            IReadOnlyList<IFilteredTemplateInfo> matchingResults = _allResults.Where(x => x.IsMatch).ToList();
+
+            if (matchingResults.Count > 1)
             {
-                if (EngineEnvironmentSettings.Host.TryGetHostParamDefault("prefs:language", out string l))
+                matchingResults = matchingResults.Where(x => x.Info.Tags != null && x.Info.Tags.TryGetValue("language", out string lang) && (string.IsNullOrEmpty(lang) || string.Equals(lang, language, StringComparison.OrdinalIgnoreCase))).ToList();
+            }
+
+            if (matchingResults.Count > 1)
+            {
+                IReadOnlyList<IFilteredTemplateInfo> exactMatches = matchingResults.Where(x => x.MatchDisposition.Any(y => (y.Location == MatchLocation.Name || y.Location == MatchLocation.ShortName) && y.Kind == MatchKind.Exact)).ToList();
+
+                if (exactMatches.Count > 0)
                 {
-                    language = l;
+                    matchingResults = exactMatches.ToList();
                 }
             }
 
-            IReadOnlyList<ITemplateInfo> results = TemplateCreator.List(_templateName.Value, language).ToList();
-
-            if (results.Count == 0)
+            if (matchingResults.Count == 0)
             {
                 EngineEnvironmentSettings.Host.LogMessage(string.Format(LocalizableStrings.CreateFailed, _templateName.Value, "Not Found"));
                 return -1;
             }
-            else if (results.Count > 1)
+            else if (matchingResults.Count > 1)
             {
                 EngineEnvironmentSettings.Host.LogMessage(string.Format(LocalizableStrings.CreateFailed, _templateName.Value, "Multiple matches"));
                 ListTemplates();
@@ -313,11 +378,11 @@ namespace Microsoft.DotNet.Tools.New3
 
             if (Alias != null)
             {
-                AliasRegistry.SetTemplateAlias(Alias, results[0]);
+                AliasRegistry.SetTemplateAlias(Alias, matchingResults[0].Info);
+                return 0;
             }
 
-
-            return await CreateTemplateAsync(results[0]).ConfigureAwait(false);
+            return await CreateTemplateAsync(matchingResults[0].Info).ConfigureAwait(false);
         }
 
         private static IEnumerable<ITemplateParameter> FilterParamsForHelp(IParameterSet allParams)
@@ -387,13 +452,6 @@ namespace Microsoft.DotNet.Tools.New3
                 }
 
                 ConfigureEnvironment();
-                Installer.InstallPackages(new []
-                {
-                    "Microsoft.DotNet.Common.ItemTemplates::1.0.0-beta1-20161221-48",
-                    "Microsoft.DotNet.Common.ProjectTemplates::1.0.0-beta1-20161221-48",
-                    "Microsoft.DotNet.Test.ProjectTemplates::1.0.0-beta1-20161221-48",
-                    "Microsoft.DotNet.Web.ProjectTemplates::1.0.0-beta1-20161221-48"
-                });
                 Paths.User.FirstRunCookie.WriteAllText("");
             }
 
@@ -408,10 +466,62 @@ namespace Microsoft.DotNet.Tools.New3
             return 0;
         }
 
+        private async Task InstallPackagesAsync(IReadOnlyList<string> packageNames, bool quiet = false)
+        {
+            List<string> toInstall = new List<string>();
+
+            foreach (string package in packageNames)
+            {
+                string pkg = package.Trim();
+                pkg = Environment.ExpandEnvironmentVariables(pkg);
+                string pattern = null;
+
+                int wildcardIndex = pkg.IndexOfAny(new[] { '*', '?' });
+
+                if (wildcardIndex > -1)
+                {
+                    int lastSlashBeforeWildcard = pkg.LastIndexOfAny(new[] { '\\', '/' });
+                    pattern = pkg.Substring(lastSlashBeforeWildcard + 1);
+                    pkg = pkg.Substring(0, lastSlashBeforeWildcard);
+                }
+
+                try
+                {
+                    if (pattern != null)
+                    {
+                        string fullDirectory = new DirectoryInfo(pkg).FullName;
+                        string fullPathGlob = Path.Combine(fullDirectory, pattern);
+                        TemplateCache.Scan(fullPathGlob);
+                    }
+                    else if (Directory.Exists(pkg) || File.Exists(pkg))
+                    {
+                        string packageLocation = new DirectoryInfo(pkg).FullName;
+                        TemplateCache.Scan(packageLocation);
+                    }
+                    else
+                    {
+                        EngineEnvironmentSettings.Host.OnNonCriticalError("InvalidPackageSpecification", string.Format(LocalizableStrings.BadPackageSpec, pkg), null, 0);
+                    }
+                }
+                catch
+                {
+                    EngineEnvironmentSettings.Host.OnNonCriticalError("InvalidPackageSpecification", string.Format(LocalizableStrings.BadPackageSpec, pkg), null, 0);
+                }
+            }
+
+            TemplateCache.WriteTemplateCaches();
+
+            if (!quiet)
+            {
+                ListTemplates(string.Empty);
+            }
+        }
+
         private void ListTemplates(string templateName = null)
         {
             templateName = templateName ?? _templateName.Value;
-            IEnumerable<ITemplateInfo> results = TemplateCreator.List(templateName, Language);
+            IEnumerable<ITemplateInfo> results = _allResults.Where(x => x.IsMatch).Select(x => x.Info);
+
             IEnumerable<IGrouping<string, ITemplateInfo>> grouped = results.GroupBy(x => x.GroupIdentity);
             EngineEnvironmentSettings.Host.TryGetHostParamDefault("prefs:language", out string defaultLanguage);
 
@@ -589,7 +699,13 @@ namespace Microsoft.DotNet.Tools.New3
         {
             try
             {
-                IReadOnlyCollection<ITemplateInfo> templates = TemplateCreator.List(_templateName.Value, language);
+                IReadOnlyCollection<ITemplateInfo> templates = _allResults.Where(x => x.IsMatch).Select(x => x.Info).ToList();
+
+                if (templates.Count > 1)
+                {
+                    templates = templates.Where(x => x.Tags != null && x.Tags.TryGetValue("language", out string lang) && (string.IsNullOrEmpty(lang) || string.Equals(lang, language))).ToList();
+                }
+
                 if (templates.Count == 1)
                 {
                     ITemplateInfo templateInfo = templates.First();
@@ -635,6 +751,7 @@ namespace Microsoft.DotNet.Tools.New3
             appExt.InternalOption("-n|--name", "--name", LocalizableStrings.NameOfOutput, CommandOptionType.SingleValue);
             appExt.InternalOption("-o|--output", "--output", LocalizableStrings.OutputPath, CommandOptionType.SingleValue);
             appExt.InternalOption("-h|--help", "--help", LocalizableStrings.DisplaysHelp, CommandOptionType.NoValue);
+            appExt.InternalOption("-all|--show-all", "--show-all", LocalizableStrings.ShowsAllTemplates, CommandOptionType.NoValue);
 
             // hidden
             appExt.HiddenInternalOption("-a|--alias", "--alias", CommandOptionType.SingleValue);
@@ -681,7 +798,7 @@ namespace Microsoft.DotNet.Tools.New3
             const int ExamplesToShow = 2;
             IReadOnlyList<string> preferredNameList = new List<string>() { "mvc" };
             int numShown = 0;
-            IList<ITemplateInfo> templateList = TemplateCreator.List(string.Empty, null).ToList();
+            IList<ITemplateInfo> templateList = TemplateCreator.List(false).Select(x => x.Info).ToList();
 
             if (templateList.Count == 0)
             {
