@@ -132,9 +132,7 @@
     <PropertyGroup>
       <CoreSetupBlobRootUrl>https://dotnetcli.azureedge.net/dotnet/$(CoreSetupChannel)</CoreSetupBlobRootUrl>
       <SharedFrameworkArchiveBlobRootUrl>$(CoreSetupBlobRootUrl)/Binaries/$(SharedFrameworkVersion)</SharedFrameworkArchiveBlobRootUrl>
-      <NuGetPackagesArchiveBlobRootUrl>$(CoreSetupBlobRootUrl)/Binaries/$(NuGetPackagesArchiveVersion)</NuGetPackagesArchiveBlobRootUrl>
       <CoreSetupInstallerBlobRootUrl>$(CoreSetupBlobRootUrl)/Installers</CoreSetupInstallerBlobRootUrl>
-
       <CoreSetupDownloadDirectory>$(IntermediateDirectory)/coreSetupDownload/$(SharedFrameworkVersion)</CoreSetupDownloadDirectory>
       <CombinedSharedHostAndFrameworkArchive>$(CoreSetupDownloadDirectory)/combinedSharedHostAndFrameworkArchive</CombinedSharedHostAndFrameworkArchive>
     </PropertyGroup>

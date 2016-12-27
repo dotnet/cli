@@ -90,7 +90,7 @@
         <ArchiverDll>$(ToolsOutputDirectory)/Archiver.dll</ArchiverDll>
         <IntermediateArchive>$(IntermediateDirectory)/$(NugetPackagesArchiveName)</IntermediateArchive>
         <FinalArchive>$(Stage2Directory)/sdk/$(SdkVersion)/nuGetPackagesArchive.lzma</FinalArchive>
-        <NugetPackagesArchiveBlobUrl>$(NuGetPackagesArchiveBlobRootUrl)/$(NugetPackagesArchiveName)</NugetPackagesArchiveBlobUrl>
+        <NugetPackagesArchiveBlobUrl>$(SharedFrameworkArchiveBlobRootUrl)/$(NugetPackagesArchiveName)</NugetPackagesArchiveBlobUrl>
       </PropertyGroup>
     </Target>
 </Project>
