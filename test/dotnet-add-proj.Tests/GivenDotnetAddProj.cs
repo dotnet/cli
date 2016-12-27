@@ -201,7 +201,7 @@ Additional Arguments:
             matchingProjects.Count.Should().Be(1);
             var slnProject = matchingProjects[0];
             slnProject.FilePath.Should().Be(projectPath);
-            slnProject.TypeGuid.Should().Be(ProjectTypeGuids.CPSProjectTypeGuid);
+            slnProject.TypeGuid.Should().Be(ProjectTypeGuids.CSharpProjectTypeGuid);
             if (!string.IsNullOrEmpty(projectGuid))
             {
                 slnProject.Id.Should().Be(projectGuid);
