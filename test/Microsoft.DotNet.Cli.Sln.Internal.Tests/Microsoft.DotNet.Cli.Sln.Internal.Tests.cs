@@ -13,21 +13,18 @@ namespace Microsoft.DotNet.Cli.Sln.Internal.Tests
 {
     public class GivenAnSlnFile : TestBase
     {
-        private const string SolutionWithAppProject = @"
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26006.2
-MinimumVisualStudioVersion = 10.0.40219.1
-Project(""{9A19103F-16F7-4668-BE54-9A1E7A4F7556}"") = ""App"", ""App\App.csproj"", ""{7072A694-548F-4CAE-A58F-12D257D5F486}""
+        private const string SolutionModified = @"
+Microsoft Visual Studio Solution File, Format Version 14.00
+# Visual Studio 16
+VisualStudioVersion = 16.0.26006.2
+MinimumVisualStudioVersion = 11.0.40219.1
+Project(""{7072A694-548F-4CAE-A58F-12D257D5F486}"") = ""AppModified"", ""AppModified\AppModified.csproj"", ""{9A19103F-16F7-4668-BE54-9A1E7A4F7556}""
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
-		Release|Any CPU = Release|Any CPU
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{7072A694-548F-4CAE-A58F-12D257D5F486}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -44,7 +41,7 @@ Global
 		{7072A694-548F-4CAE-A58F-12D257D5F486}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
+		HideSolutionNode = TRUE
 	EndGlobalSection
 EndGlobal
 ";
@@ -239,7 +236,44 @@ EndGlobal
         [Fact]
         public void WhenGivenAValidSlnFileItModifiesSavesAndVerifiesContents()
         {
+            var tmpFile = Temp.CreateFile();
+            tmpFile.WriteAllText(SolutionWithAppAndLibProjects);
 
+            SlnFile slnFile = SlnFile.Read(tmpFile.Path);
+
+            slnFile.FormatVersion = "14.00";
+            slnFile.ProductDescription = "Visual Studio 16";
+            slnFile.VisualStudioVersion = "16.0.26006.2";
+            slnFile.MinimumVisualStudioVersion = "11.0.40219.1";
+
+            slnFile.Projects.Count.Should().Be(2);
+            var project = slnFile.Projects[0];
+            project.Id = "{9A19103F-16F7-4668-BE54-9A1E7A4F7556}";
+            project.TypeGuid = "{7072A694-548F-4CAE-A58F-12D257D5F486}";
+            project.Name = "AppModified";
+            project.FilePath = Path.Combine("AppModified", "AppModified.csproj");
+            slnFile.Projects.Remove(slnFile.Projects[1]);
+
+            slnFile.SolutionConfigurationsSection.Count.Should().Be(6);
+            slnFile.SolutionConfigurationsSection.Remove("Release|Any CPU");
+            slnFile.SolutionConfigurationsSection.Remove("Release|x64");
+            slnFile.SolutionConfigurationsSection.Remove("Release|x86");
+
+            slnFile.ProjectConfigurationsSection.Count.Should().Be(2);
+            var projectConfigSection = slnFile
+                .ProjectConfigurationsSection
+                .GetPropertySet("{21D9159F-60E6-4F65-BC6B-D01B71B15FFC}");
+            slnFile.ProjectConfigurationsSection.Remove(projectConfigSection);
+
+            slnFile.Sections.Count.Should().Be(3);
+            var solutionPropertiesSection = slnFile.Sections.GetSection("SolutionProperties");
+            solutionPropertiesSection.Properties.Count.Should().Be(1);
+            solutionPropertiesSection.Properties.SetValue("HideSolutionNode", "TRUE");
+
+            slnFile.Write();
+
+            File.ReadAllText(tmpFile.Path)
+                .Should().Be(SolutionModified);
         }
 
         [Fact]
