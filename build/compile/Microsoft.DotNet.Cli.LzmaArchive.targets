@@ -43,13 +43,18 @@
                     ContinueOnError="WarnAndContinue" />
     </Target>
 
+    <PropertyGroup>
+      <UploadNuGetPackagesArchiveToAzure>false</UploadNuGetPackagesArchiveToAzure>
+    </PropertyGroup>
+
     <Target Name="GenerateNuGetPackagesArchive"
             DependsOnTargets="SetupNuGetPackagesArchiveInputsOutputs"
             Inputs="$(IntermediateArchive)"
             Outputs="$(IntermediateArchive)">
-      <PropertyGroup>
-        <UploadNuGetPackagesArchiveToAzure>true</UploadNuGetPackagesArchiveToAzure>
-      </PropertyGroup>
+
+      <CreateProperty Value="true">
+        <Output TaskParameter="ValueSetByTask" PropertyName="UploadNuGetPackagesArchiveToAzure" />
+      </CreateProperty>
 
       <ItemGroup>
         <FilesToClean Include="$(NuGetPackagesArchiveProject)/**/*" />
