@@ -9,7 +9,7 @@ using FluentAssertions;
 
 namespace Microsoft.DotNet.New3.Tests
 {
-    public class GivenThatIWantANewAppWithSpecifiedType : TestBase
+    public class GivenThatIWantANewAppWithSpecifiedType : New3TestBase
     {
         [Theory]
         [InlineData("C#", "console", false)]

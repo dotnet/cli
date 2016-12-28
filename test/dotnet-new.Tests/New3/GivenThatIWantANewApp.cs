@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Microsoft.DotNet.New3.Tests
 {
-    public class GivenThatIWantANewApp : TestBase
+    public class GivenThatIWantANewApp : New3TestBase
     {
         [Fact]
         public void When_dotnet_new_is_invoked_mupliple_times_it_should_fail()
