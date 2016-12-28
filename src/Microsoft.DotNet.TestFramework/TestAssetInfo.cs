@@ -329,7 +329,7 @@ namespace Microsoft.DotNet.TestFramework
 
             if (untrackedFiles.Any())
             {
-                var message = $"TestAsset {_assetName} has untracked files." +
+                var message = $"TestAsset {_assetName} has untracked files. " +
                     "Consider cleaning the asset and deleting its `.tam` directory to " + 
                     "recreate tracking files.\n\n" +
                     $".tam directory: {_dataDirectory.FullName}\n" +
@@ -356,7 +356,7 @@ namespace Microsoft.DotNet.TestFramework
 
             if (updatedSourceFiles.Any())
             {
-                var message = $"TestAsset {_assetName} has updated files." +
+                var message = $"TestAsset {_assetName} has updated files. " +
                     "Consider cleaning the asset and deleting its `.tam` directory to " + 
                     "recreate tracking files.\n\n" +
                     $".tam directory: {_dataDirectory.FullName}\n" +
@@ -364,7 +364,7 @@ namespace Microsoft.DotNet.TestFramework
 
                 message += String.Join("\n", updatedSourceFiles.Select(f => $" - {f.FullName}\n"));
 
-                throw new Exception(message);
+                throw new GracefulException(message);
             }
         }
 
