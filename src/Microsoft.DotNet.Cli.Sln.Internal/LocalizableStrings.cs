@@ -2,6 +2,12 @@
 {
     internal class LocalizableStrings
     {
+        // {0} is the line number
+        // {1} is the error message details
+        public const string ErrorMessageFormatString = "Invalid format in line {0}: {1}";
+
+        public const string ExpectedCharacterNotFoundFormatString = "Expected to find character {0} after position {1}";
+
         public const string GlobalSectionMoreThanOnceError = "Global section specified more than once";
 
         public const string GlobalSectionNotClosedError = "Global section not closed";
