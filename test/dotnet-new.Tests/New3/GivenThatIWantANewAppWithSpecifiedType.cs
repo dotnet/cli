@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.New3.Tests
         [InlineData("F#", "classlib", false)]
         [InlineData("F#", "mstest", false)]
         [InlineData("F#", "xunit", false)]
-        [InlineData("F#", "web", true)]
+        [InlineData("F#", "mvc", true)]
         public void TemplateRestoresAndBuildsWithoutWarnings(
             string language,
             string projectType,
@@ -31,8 +31,8 @@ namespace Microsoft.DotNet.New3.Tests
         {
             string rootPath = TestAssetsManager.CreateTestDirectory(identifier: $"new3_{language}_{projectType}").Path;
 
-            new TestCommand("dotnet")
-                .Execute($"new3 {projectType} -lang {language} -o {rootPath}")
+            new TestCommand("dotnet") { WorkingDirectory = rootPath }
+                .Execute($"new3 {projectType} -lang {language}")
                 .Should().Pass();
 
             if (useNuGetConfigForAspNet)
