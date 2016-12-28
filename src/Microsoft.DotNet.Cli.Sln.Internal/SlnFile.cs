@@ -348,12 +348,13 @@ namespace Microsoft.DotNet.Cli.Sln.Internal
 
         private void FindNext(int ln, string line, ref int i, char c)
         {
+            var inputIndex = i;
             i = line.IndexOf(c, i);
             if (i == -1)
             {
                 throw new InvalidSolutionFormatException(
                     ln,
-                    string.Format(LocalizableStrings.ExpectedCharacterNotFoundFormatString, c, i));
+                    string.Format(LocalizableStrings.ProjectParsingErrorFormatString, c, inputIndex));
             }
         }
 
@@ -528,7 +529,7 @@ namespace Microsoft.DotNet.Cli.Sln.Internal
             {
                 throw new InvalidSolutionFormatException(
                     curLineNum,
-                    string.Format(LocalizableStrings.ExpectedCharacterNotFoundFormatString, ')', k));
+                    LocalizableStrings.SectionIdMissingError);
             }
             Id = line.Substring(k + 1, k2 - k - 1);
 
@@ -574,7 +575,7 @@ namespace Microsoft.DotNet.Cli.Sln.Internal
                     {
                         throw new InvalidSolutionFormatException(
                             _baseIndex + n,
-                            string.Format(LocalizableStrings.ExpectedCharacterNotFoundFormatString, '.', 0));
+                            string.Format(LocalizableStrings.InvalidPropertySetFormatString, '.'));
                     }
                     var id = line.Substring(0, i);
                     if (curSet == null || id != curSet.Id)
