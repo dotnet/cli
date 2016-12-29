@@ -698,17 +698,34 @@ namespace Microsoft.DotNet.Cli.Sln.Internal
 
         internal void Write(TextWriter writer)
         {
-            foreach (DictionaryEntry e in _values)
+            if (_isMetadata)
             {
-                if (!_isMetadata)
+                foreach (DictionaryEntry e in _values)
+                {
+                    if (Id != null)
+                    {
+                        writer.Write(Id + ".");
+                    }
+                    writer.WriteLine(e.Key + " = " + e.Value);
+                }
+            }
+            else
+            {
+                SortedDictionary<string, string> sortedValues = new SortedDictionary<string, string>();
+                foreach (DictionaryEntry e in _values)
+                {
+                    sortedValues[e.Key.ToString()] = e.Value.ToString();
+                }
+
+                foreach (var e in sortedValues)
                 {
                     writer.Write("\t\t");
+                    if (Id != null)
+                    {
+                        writer.Write(Id + ".");
+                    }
+                    writer.WriteLine(e.Key + " = " + e.Value);
                 }
-                if (Id != null)
-                {
-                    writer.Write(Id + ".");
-                }
-                writer.WriteLine(e.Key + " = " + e.Value);
             }
         }
 

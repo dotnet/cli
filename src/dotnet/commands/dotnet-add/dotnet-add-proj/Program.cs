@@ -8,6 +8,7 @@ using Microsoft.DotNet.Cli.Sln.Internal;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools.Common;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -105,21 +106,91 @@ namespace Microsoft.DotNet.Tools.Add.ProjectToSolution
 
                 slnFile.Projects.Add(slnProject);
 
-                if (slnFile.ProjectConfigurationsSection.Any())
-                {
-                    var existingBuildConfigs = slnFile.ProjectConfigurationsSection.First();
-                    var buildConfigsForAddedProject = new SlnPropertySet(slnProject.Id);
-
-                    foreach (var config in existingBuildConfigs)
-                    {
-                        buildConfigsForAddedProject[config.Key] = config.Value;
-                    }
-
-                    slnFile.ProjectConfigurationsSection.Add(buildConfigsForAddedProject);
-                }
+                EnsureBuildConfigurationsAreValidAndComplete(slnFile);
 
                 Reporter.Output.WriteLine(
                     string.Format(CommonLocalizableStrings.ProjectAddedToTheSolution, projectPath));
+            }
+        }
+
+        private void EnsureBuildConfigurationsAreValidAndComplete(SlnFile slnFile)
+        {
+            HashSet<string> _buildConfigurations = new HashSet<string>()
+            {
+                "Debug",
+                "Release",
+            };
+
+            HashSet<string> _buildPlatforms = new HashSet<string>()
+            {
+                "Any CPU",
+                "x64",
+                "x86",
+            };
+
+            var invalidConfigs = new List<string>();
+            foreach (var configPlatformCombo in slnFile.SolutionConfigurationsSection.Keys)
+            {
+                var configPlatformComponents = configPlatformCombo.Split('|');
+                if (configPlatformComponents.Length != 2)
+                {
+                    invalidConfigs.Add(configPlatformCombo);
+                }
+                else
+                {
+                    var config = configPlatformComponents[0].Trim();
+                    if (!_buildConfigurations.Contains(config))
+                    {
+                        _buildConfigurations.Add(config);
+                    }
+
+                    var platform = configPlatformComponents[1].Trim();
+                    if (!_buildPlatforms.Contains(platform))
+                    {
+                        _buildPlatforms.Add(platform);
+                    }
+                }
+            }
+
+            foreach (var invalidConfig in invalidConfigs)
+            {
+                slnFile.SolutionConfigurationsSection.Remove(invalidConfig);
+            }
+
+            var validConfigPlatformCombos = new List<string>();
+            foreach (var buildConfig in _buildConfigurations)
+            {
+                foreach (var buildPlatform in _buildPlatforms)
+                {
+                    validConfigPlatformCombos.Add($"{buildConfig}|{buildPlatform}");
+                }
+            }
+
+            foreach (var buildConfig in validConfigPlatformCombos)
+            {
+                if (!slnFile.SolutionConfigurationsSection.ContainsKey(buildConfig))
+                {
+                    slnFile.SolutionConfigurationsSection[buildConfig] = buildConfig;
+                }
+            }
+
+            foreach (var slnProject in slnFile.Projects)
+            {
+                var buildConfigsPropSet = slnFile.ProjectConfigurationsSection.GetOrCreatePropertySet(slnProject.Id);
+                foreach (var buildConfig in slnFile.SolutionConfigurationsSection)
+                {
+                    var activeCfgKey = $"{buildConfig.Key}.ActiveCfg";
+                    if (!buildConfigsPropSet.ContainsKey(activeCfgKey))
+                    {
+                        buildConfigsPropSet[activeCfgKey] = buildConfig.Value;
+                    }
+
+                    var build0Key = $"{buildConfig.Key}.Build.0";
+                    if (!buildConfigsPropSet.ContainsKey(build0Key))
+                    {
+                        buildConfigsPropSet[build0Key] = buildConfig.Value;
+                    }
+                }
             }
         }
     }
