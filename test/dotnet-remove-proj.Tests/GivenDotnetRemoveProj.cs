@@ -9,7 +9,7 @@ using System.IO;
 using System.Linq;
 using Xunit;
 
-namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
+namespace Microsoft.DotNet.Cli.Remove.Project.Tests
 {
     public class GivenDotnetRemoveProj : TestBase
     {
@@ -35,7 +35,7 @@ Additional Arguments:
             var cmd = new DotnetCommand()
                 .ExecuteWithCapturedOutput($"remove project {helpArg}");
             cmd.Should().Pass();
-            cmd.StdOut.Should().Be(HelpText);
+            cmd.StdOut.Should().BeVisuallyEquivalentTo(HelpText);
         }
 
         [Fact]
@@ -71,7 +71,7 @@ Additional Arguments:
                 .ExecuteWithCapturedOutput($"remove {solutionName} project p.csproj");
             cmd.Should().Fail();
             cmd.StdErr.Should().Be($"Could not find solution or directory `{solutionName}`.");
-            cmd.StdOut.Should().Be(HelpText);
+            cmd.StdOut.Should().BeVisuallyEquivalentTo(HelpText);
         }
 
         [Fact]
@@ -89,8 +89,8 @@ Additional Arguments:
                 .WithWorkingDirectory(projectDirectory)
                 .ExecuteWithCapturedOutput($"remove InvalidSolution.sln project {projectToRemove}");
             cmd.Should().Fail();
-            cmd.StdErr.Should().Be("Invalid solution `InvalidSolution.sln`.");
-            cmd.StdOut.Should().Be(HelpText);
+            cmd.StdErr.Should().Be("Invalid solution `InvalidSolution.sln`. Invalid format in line 1: File header is missing");
+            cmd.StdOut.Should().BeVisuallyEquivalentTo(HelpText);
         }
 
         [Fact]
@@ -109,8 +109,8 @@ Additional Arguments:
                 .WithWorkingDirectory(projectDirectory)
                 .ExecuteWithCapturedOutput($"remove project {projectToRemove}");
             cmd.Should().Fail();
-            cmd.StdErr.Should().Be($"Invalid solution `{solutionPath}`.");
-            cmd.StdOut.Should().Be(HelpText);
+            cmd.StdErr.Should().Be($"Invalid solution `{solutionPath}`. Invalid format in line 1: File header is missing");
+            cmd.StdOut.Should().BeVisuallyEquivalentTo(HelpText);
         }
 
         [Fact]
@@ -128,7 +128,7 @@ Additional Arguments:
                 .ExecuteWithCapturedOutput(@"remove App.sln project");
             cmd.Should().Fail();
             cmd.StdErr.Should().Be("You must specify at least one project to remove.");
-            cmd.StdOut.Should().Be(HelpText);
+            cmd.StdOut.Should().BeVisuallyEquivalentTo(HelpText);
         }
 
         [Fact]
@@ -147,7 +147,7 @@ Additional Arguments:
                 .ExecuteWithCapturedOutput(@"remove project App.csproj");
             cmd.Should().Fail();
             cmd.StdErr.Should().Be($"Specified solution file {solutionPath + Path.DirectorySeparatorChar} does not exist, or there is no solution file in the directory.");
-            cmd.StdOut.Should().Be(HelpText);
+            cmd.StdOut.Should().BeVisuallyEquivalentTo(HelpText);
         }
 
         [Fact]
@@ -166,7 +166,7 @@ Additional Arguments:
                 .ExecuteWithCapturedOutput($"remove project {projectToRemove}");
             cmd.Should().Fail();
             cmd.StdErr.Should().Be($"Found more than one solution file in {projectDirectory + Path.DirectorySeparatorChar}. Please specify which one to use.");
-            cmd.StdOut.Should().Be(HelpText);
+            cmd.StdOut.Should().BeVisuallyEquivalentTo(HelpText);
         }
 
         [Fact]
@@ -238,7 +238,7 @@ Additional Arguments:
 
             string outputText = $@"Project reference `{projectToRemove}` removed.
 Project reference `{projectToRemove}` removed.";
-            cmd.StdOut.Should().Be(outputText);
+            cmd.StdOut.Should().BeVisuallyEquivalentTo(outputText);
 
             slnFile = SlnFile.Read(solutionPath);
             slnFile.Projects.Count.Should().Be(1);
@@ -268,7 +268,7 @@ Project reference `{projectToRemove}` removed.";
             string outputText = $@"Project reference `idontexist.csproj` could not be found.
 Project reference `{projectToRemove}` removed.
 Project reference `idontexisteither.csproj` could not be found.";
-            cmd.StdOut.Should().Be(outputText);
+            cmd.StdOut.Should().BeVisuallyEquivalentTo(outputText);
 
             slnFile = SlnFile.Read(solutionPath);
             slnFile.Projects.Count.Should().Be(1);
