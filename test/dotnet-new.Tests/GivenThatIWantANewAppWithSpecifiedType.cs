@@ -26,6 +26,12 @@ namespace Microsoft.DotNet.New.Tests
         [InlineData("F#", "Web", true)]
         [InlineData("F#", "Mstest", false)]
         [InlineData("F#", "XUnittest", false)]
+        [InlineData("VB", "Console", false)]
+        [InlineData("VB", "Lib", false)]
+        [InlineData("VB", "Web", true)]
+        [InlineData("VB", "Mstest", false)]
+        [InlineData("VB", "XUnittest", false)]
+        [InlineData("VB", "Console", false)]
         public void TemplateRestoresAndBuildsWithoutWarnings(
             string language,
             string projectType,
