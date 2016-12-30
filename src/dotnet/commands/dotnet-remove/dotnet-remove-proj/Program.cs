@@ -49,6 +49,8 @@ namespace Microsoft.DotNet.Tools.Remove.ProjectFromSolution
                 slnChanged |= RemoveProject(slnFile, path);
             }
 
+            RemoveEmptyConfigurationSections(slnFile);
+
             if (slnChanged)
             {
                 slnFile.Write();
@@ -85,25 +87,28 @@ namespace Microsoft.DotNet.Tools.Remove.ProjectFromSolution
                         string.Format(CommonLocalizableStrings.ProjectReferenceRemoved, slnProject.FilePath));
                 }
 
-                if (slnFile.Projects.Count == 0)
-                {
-                    var solutionConfigs = slnFile.Sections.GetSection("SolutionConfigurationPlatforms");
-                    if (solutionConfigs != null)
-                    {
-                        slnFile.Sections.Remove(solutionConfigs);
-                    }
-
-                    var projectConfigs = slnFile.Sections.GetSection("ProjectConfigurationPlatforms");
-                    if (projectConfigs != null)
-                    {
-                        slnFile.Sections.Remove(projectConfigs);
-                    }
-                }
-
                 projectRemoved = true;
             }
 
             return projectRemoved;
+        }
+
+        private void RemoveEmptyConfigurationSections(SlnFile slnFile)
+        {
+            if (slnFile.Projects.Count == 0)
+            {
+                var solutionConfigs = slnFile.Sections.GetSection("SolutionConfigurationPlatforms");
+                if (solutionConfigs != null)
+                {
+                    slnFile.Sections.Remove(solutionConfigs);
+                }
+
+                var projectConfigs = slnFile.Sections.GetSection("ProjectConfigurationPlatforms");
+                if (projectConfigs != null)
+                {
+                    slnFile.Sections.Remove(projectConfigs);
+                }
+            }
         }
     }
 }

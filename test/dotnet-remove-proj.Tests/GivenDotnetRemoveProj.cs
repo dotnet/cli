@@ -229,7 +229,7 @@ EndGlobal
             cmd.Should().Pass();
             cmd.StdOut.Should().Be("Project reference `referenceDoesNotExistInSln.csproj` could not be found.");
             File.ReadAllText(solutionPath)
-                .Should().Be(contentBefore);
+                .Should().BeVisuallyEquivalentTo(contentBefore);
         }
 
         [Fact]
@@ -318,7 +318,7 @@ Project reference `idontexisteither.csproj` could not be found.";
         }
 
         [Fact]
-        public void WhenReferenceIsRemovedBuildConfigsAreAlsoRemovedAndSlnBuilds()
+        public void WhenReferenceIsRemovedBuildConfigsAreAlsoRemoved()
         {
             var projectDirectory = TestAssets
                 .Get("TestAppWithSlnAndCsprojToRemove")
@@ -337,11 +337,29 @@ Project reference `idontexisteither.csproj` could not be found.";
                 .ExecuteWithCapturedOutput($"remove project {projectToRemove}");
             cmd.Should().Pass();
 
-            string outputText = $@"Project reference `{projectToRemove}` removed.";
-            cmd.StdOut.Should().Be(outputText);
-
             File.ReadAllText(solutionPath)
-                .Should().Be(ExpectedSlnContentsAfterRemove);
+                .Should().BeVisuallyEquivalentTo(ExpectedSlnContentsAfterRemove);
+        }
+
+        [Fact]
+        public void WhenReferenceIsRemovedSlnBuilds()
+        {
+            var projectDirectory = TestAssets
+                .Get("TestAppWithSlnAndCsprojToRemove")
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root
+                .FullName;
+
+            var solutionPath = Path.Combine(projectDirectory, "App.sln");
+            SlnFile slnFile = SlnFile.Read(solutionPath);
+            slnFile.Projects.Count.Should().Be(2);
+
+            var projectToRemove = Path.Combine("Lib", "Lib.csproj");
+            var cmd = new DotnetCommand()
+                .WithWorkingDirectory(projectDirectory)
+                .ExecuteWithCapturedOutput($"remove project {projectToRemove}");
+            cmd.Should().Pass();
 
             new DotnetCommand()
                 .WithWorkingDirectory(projectDirectory)
@@ -386,12 +404,8 @@ Project reference `idontexisteither.csproj` could not be found.";
                 .ExecuteWithCapturedOutput($"remove project {projectsToRemove}");
             cmd.Should().Pass();
 
-            string outputText = $@"Project reference `{libPath}` removed.
-Project reference `{appPath}` removed.";
-            cmd.StdOut.Should().Be(outputText);
-
             File.ReadAllText(solutionPath)
-                .Should().Be(ExpectedSlnContentsAfterRemoveAllProjects);
+                .Should().BeVisuallyEquivalentTo(ExpectedSlnContentsAfterRemoveAllProjects);
         }
     }
 }

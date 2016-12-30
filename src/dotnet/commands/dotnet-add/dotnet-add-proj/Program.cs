@@ -104,92 +104,67 @@ namespace Microsoft.DotNet.Tools.Add.ProjectToSolution
                     FilePath = projectPathNormalized
                 };
 
-                slnFile.Projects.Add(slnProject);
+                AddDefaultBuildConfigurations(slnFile, slnProject);
 
-                EnsureBuildConfigurationsAreValidAndComplete(slnFile);
+                slnFile.Projects.Add(slnProject);
 
                 Reporter.Output.WriteLine(
                     string.Format(CommonLocalizableStrings.ProjectAddedToTheSolution, projectPath));
             }
         }
 
-        private void EnsureBuildConfigurationsAreValidAndComplete(SlnFile slnFile)
+        private void AddDefaultBuildConfigurations(SlnFile slnFile, SlnProject slnProject)
         {
-            HashSet<string> _buildConfigurations = new HashSet<string>()
+            var defaultConfigurations = new List<string>()
             {
-                "Debug",
-                "Release",
+                "Debug|Any CPU",
+                "Debug|x64",
+                "Debug|x86",
+                "Release|Any CPU",
+                "Release|x64",
+                "Release|x86",
             };
 
-            HashSet<string> _buildPlatforms = new HashSet<string>()
-            {
-                "Any CPU",
-                "x64",
-                "x86",
-            };
+            // NOTE: The order you create the sections determines the order they are written to the sln
+            // file. In the case of an empty sln file, in order to make sure the solution configurations
+            // section comes first we need to add it first. This doesn't affect correctness but does 
+            // stop VS from re-ordering things later on. Since we are keeping the SlnFile class low-level
+            // it shouldn't care about the VS implementation details. That's why we handle this here.
+            AddDefaultSolutionConfigurations(defaultConfigurations, slnFile.SolutionConfigurationsSection);
+            AddDefaultProjectConfigurations(
+                defaultConfigurations,
+                slnFile.ProjectConfigurationsSection.GetOrCreatePropertySet(slnProject.Id));
+        }
 
-            var invalidConfigs = new List<string>();
-            foreach (var configPlatformCombo in slnFile.SolutionConfigurationsSection.Keys)
+        private void AddDefaultSolutionConfigurations(
+            List<string> defaultConfigurations,
+            SlnPropertySet solutionConfigs)
+        {
+            foreach (var config in defaultConfigurations)
             {
-                var configPlatformComponents = configPlatformCombo.Split('|');
-                if (configPlatformComponents.Length != 2)
+                if (!solutionConfigs.ContainsKey(config))
                 {
-                    invalidConfigs.Add(configPlatformCombo);
-                }
-                else
-                {
-                    var config = configPlatformComponents[0].Trim();
-                    if (!_buildConfigurations.Contains(config))
-                    {
-                        _buildConfigurations.Add(config);
-                    }
-
-                    var platform = configPlatformComponents[1].Trim();
-                    if (!_buildPlatforms.Contains(platform))
-                    {
-                        _buildPlatforms.Add(platform);
-                    }
+                    solutionConfigs[config] = config;
                 }
             }
+        }
 
-            foreach (var invalidConfig in invalidConfigs)
+        private void AddDefaultProjectConfigurations(
+            List<string> defaultConfigurations,
+            SlnPropertySet projectConfigs)
+        {
+            foreach (var config in defaultConfigurations)
             {
-                slnFile.SolutionConfigurationsSection.Remove(invalidConfig);
-            }
-
-            var validConfigPlatformCombos = new List<string>();
-            foreach (var buildConfig in _buildConfigurations)
-            {
-                foreach (var buildPlatform in _buildPlatforms)
+                var activeCfgKey = $"{config}.ActiveCfg";
+                if (!projectConfigs.ContainsKey(activeCfgKey))
                 {
-                    validConfigPlatformCombos.Add($"{buildConfig}|{buildPlatform}");
+                    projectConfigs[activeCfgKey] = config;
                 }
-            }
 
-            foreach (var buildConfig in validConfigPlatformCombos)
-            {
-                if (!slnFile.SolutionConfigurationsSection.ContainsKey(buildConfig))
+                var build0Key = $"{config}.Build.0";
+                if (!projectConfigs.ContainsKey(build0Key))
                 {
-                    slnFile.SolutionConfigurationsSection[buildConfig] = buildConfig;
-                }
-            }
-
-            foreach (var slnProject in slnFile.Projects)
-            {
-                var buildConfigsPropSet = slnFile.ProjectConfigurationsSection.GetOrCreatePropertySet(slnProject.Id);
-                foreach (var buildConfig in slnFile.SolutionConfigurationsSection)
-                {
-                    var activeCfgKey = $"{buildConfig.Key}.ActiveCfg";
-                    if (!buildConfigsPropSet.ContainsKey(activeCfgKey))
-                    {
-                        buildConfigsPropSet[activeCfgKey] = buildConfig.Value;
-                    }
-
-                    var build0Key = $"{buildConfig.Key}.Build.0";
-                    if (!buildConfigsPropSet.ContainsKey(build0Key))
-                    {
-                        buildConfigsPropSet[build0Key] = buildConfig.Value;
-                    }
+                    projectConfigs[build0Key] = config;
                 }
             }
         }
