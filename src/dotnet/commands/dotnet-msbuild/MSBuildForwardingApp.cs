@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.Tools.MSBuild
             };
         
         private readonly IEnumerable<string> _msbuildRequiredParameters = 
-            new List<string> { "/m", "/v:m" };
+            new List<string> { "/m" };
 
         public MSBuildForwardingApp(IEnumerable<string> argsToForward)
         {
