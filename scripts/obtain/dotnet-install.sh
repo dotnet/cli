@@ -373,15 +373,17 @@ get_specific_version_from_version() {
 # args:
 # azure_feed - $1
 # azure_channel - $2
-# normalized_architecture - $3
-# specific_version - $4
+# azure_sdk_path - $3
+# normalized_architecture - $4
+# specific_version - $5
 construct_download_link() {
     eval $invocation
     
     local azure_feed=$1
     local azure_channel=$2
-    local normalized_architecture=$3
-    local specific_version=${4//[$'\t\r\n']}
+    local azure_sdk_path=$3
+    local normalized_architecture=$4
+    local specific_version=${5//[$'\t\r\n']}
     
     local osname
     osname=$(get_current_os_name) || return 1
@@ -390,7 +392,7 @@ construct_download_link() {
     if [ "$shared_runtime" = true ]; then
         download_link="$azure_feed/$azure_channel/Binaries/$specific_version/dotnet-$osname-$normalized_architecture.$specific_version.tar.gz"
     else
-        download_link="$azure_feed/Sdk/$specific_version/dotnet-dev-$osname-$normalized_architecture.$specific_version.tar.gz"
+        download_link="$azure_feed/$azure_sdk_path/$specific_version/dotnet-dev-$osname-$normalized_architecture.$specific_version.tar.gz"
     fi
     
     echo "$download_link"
@@ -540,7 +542,7 @@ calculate_vars() {
         return 1
     fi
     
-    download_link=$(construct_download_link $azure_feed $azure_channel $normalized_architecture $specific_version)
+    download_link=$(construct_download_link $azure_feed $azure_channel $azure_sdk_path $normalized_architecture $specific_version)
     say_verbose "download_link=$download_link"
     
     install_root=$(resolve_installation_path $install_dir)
@@ -581,6 +583,7 @@ debug_symbols=false
 dry_run=false
 no_path=false
 azure_feed="https://dotnetcli.azureedge.net/dotnet"
+azure_sdk_path="Sdk"
 uncached_feed="https://dotnetcli.blob.core.windows.net/dotnet"
 verbose=false
 shared_runtime=false
@@ -624,6 +627,10 @@ do
             shift
             azure_feed="$1"
             ;;
+        --azure-sdk-path|-[Aa]zure[Ss]dk[Pp]ath)
+            shift
+            azure_sdk_path="$1"
+            ;;
         -?|--?|-h|--help|-[Hh]elp)
             script_name="$(basename $0)"
             echo ".NET Tools Installer"
@@ -648,6 +655,7 @@ do
             echo "  --no-path, -NoPath             Do not set PATH for the current process."
             echo "  --verbose,-Verbose             Display diagnostics information."
             echo "  --azure-feed,-AzureFeed        Azure feed location. Defaults to $azure_feed"
+            echo "  --azure-sdk-path,-AzureSdkPath Azure dev SDK path. Defaults to $azure_sdk_path"
             echo "  -?,--?,-h,--help,-Help         Shows this help message"
             echo ""
             echo "Install Location:"
