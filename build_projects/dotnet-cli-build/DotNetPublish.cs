@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.Cli.Build
 
         protected override string Args
         {
-            get { return $"{GetProjectPath()} {GetConfiguration()} {GetFramework()} {GetNativeSubdirectory()} {GetBuildBasePath()} {GetOutput()} {GetVersionSuffix()} {GetRuntime()} {MSBuildArgs}"; }
+            get { return $"{GetProjectPath()} {GetConfiguration()} {GetFramework()} {GetNativeSubdirectory()} {GetBuildBasePath()} {GetOutput()} {GetVersionSuffix()} {GetRuntime()} {GetMSBuildArgs()}"; }
         }
 
         public string BuildBasePath { get; set; }
@@ -68,6 +68,16 @@ namespace Microsoft.DotNet.Cli.Build
             if (NativeSubDirectory)
             {
                 return $"--native-subdirectory";
+            }
+
+            return null;
+        }
+
+        private string GetMSBuildArgs()
+        {
+            if (!string.IsNullOrEmpty(MSBuildArgs))
+            {
+                return $"{MSBuildArgs}";
             }
 
             return null;
