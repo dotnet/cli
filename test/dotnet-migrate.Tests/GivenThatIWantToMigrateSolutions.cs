@@ -60,10 +60,11 @@ namespace Microsoft.DotNet.Migration.Tests
                 .Execute($"restore \"{solutionRelPath}\"")
                 .Should().Pass();
 
-            new DotnetCommand()
-                .WithWorkingDirectory(projectDirectory)
-                .Execute($"build \"{solutionRelPath}\"")
-                .Should().Pass();
+            //ISSUE: https://github.com/dotnet/cli/issues/5205
+            //new DotnetCommand()
+            //    .WithWorkingDirectory(projectDirectory)
+            //    .Execute($"build \"{solutionRelPath}\"")
+            //    .Should().Pass();
 
             SlnFile slnFile = SlnFile.Read(Path.Combine(projectDirectory.FullName, solutionRelPath));
             var nonSolutionFolderProjects = slnFile.Projects

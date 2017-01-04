@@ -437,7 +437,7 @@ Project reference `idontexisteither.csproj` could not be found.";
         {
             var projectDirectory = TestAssets
                 .Get("TestAppWithSlnAndCsprojToRemove")
-                .CreateInstance("1")
+                .CreateInstance()
                 .WithSourceFiles()
                 .Root
                 .FullName;
