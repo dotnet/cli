@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.Tools.New3
 {
     internal class New3CommandShim
     {
-        private const string HostIdentifier = "dotnet";
+        private const string HostIdentifier = "dotnetcli";
         private const string HostVersion = "1.0.0";
         private const string CommandName = "new3";
 
