@@ -71,9 +71,7 @@
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions">
       <Version>1.0.1-beta-000933</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.TemplateEngine.Utils" Version="$(TemplateEngineVersion)" />
-    <PackageReference Include="Microsoft.TemplateEngine.Abstractions" Version="$(TemplateEngineVersion)" />
-    <PackageReference Include="Microsoft.TemplateEngine.Edge" Version="$(TemplateEngineVersion)" />
+    <PackageReference Include="Microsoft.TemplateEngine.Cli" Version="$(TemplateEngineVersion)" />
     <PackageReference Include="Microsoft.TemplateEngine.Orchestrator.RunnableProjects" Version="$(TemplateEngineVersion)" />
   </ItemGroup>
 
