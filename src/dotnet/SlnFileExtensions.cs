@@ -8,9 +8,9 @@ using System.Linq;
 
 namespace Microsoft.DotNet.Tools.Common
 {
-    public static class SlnHelper
+    public static class SlnFileExtensions
     {
-        public static IList<string> GetSolutionFoldersFromProject(SlnProject project)
+        public static IList<string> GetSolutionFoldersFromProject(this SlnFile slnFile, SlnProject project)
         {
             var currentDirString = $".{Path.DirectorySeparatorChar}";
 
@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.Tools.Common
                 : new List<string>(directoryPath.Split(Path.DirectorySeparatorChar));
         }
 
-        public static HashSet<string> GetReferencedSolutionFolders(SlnProjectCollection projects)
+        public static HashSet<string> GetReferencedSolutionFolders(this SlnFile slnFile, SlnProjectCollection projects)
         {
             var referencedSolutionFolders = new HashSet<string>();
 
@@ -41,7 +41,7 @@ namespace Microsoft.DotNet.Tools.Common
 
                 foreach (var project in nonSolutionFolderProjects)
                 {
-                    var solutionFolders = GetSolutionFoldersFromProject(project);
+                    var solutionFolders = slnFile.GetSolutionFoldersFromProject(project);
                     foreach (var solutionFolder in solutionFolders)
                     {
                         if (!referencedSolutionFolders.Contains(solutionFolder))

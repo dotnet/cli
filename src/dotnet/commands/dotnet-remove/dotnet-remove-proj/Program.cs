@@ -125,7 +125,7 @@ namespace Microsoft.DotNet.Tools.Remove.ProjectFromSolution
 
         private void RemoveEmptySolutionFolders(SlnFile slnFile)
         {
-            var referencedSolutionFolders = SlnHelper.GetReferencedSolutionFolders(slnFile.Projects);
+            var referencedSolutionFolders = slnFile.GetReferencedSolutionFolders(slnFile.Projects);
 
             var solutionFolderProjects = slnFile.Projects
                 .Where(p => p.TypeGuid == ProjectTypeGuids.SolutionFolderGuid)
