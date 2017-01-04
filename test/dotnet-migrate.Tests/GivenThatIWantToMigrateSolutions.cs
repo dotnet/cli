@@ -66,17 +66,20 @@ namespace Microsoft.DotNet.Migration.Tests
                 .Should().Pass();
 
             SlnFile slnFile = SlnFile.Read(Path.Combine(projectDirectory.FullName, solutionRelPath));
-            slnFile.Projects.Count.Should().Be(3);
+            var nonSolutionFolderProjects = slnFile.Projects
+                .Where(p => p.TypeGuid != ProjectTypeGuids.SolutionFolderGuid);
 
-            var slnProject = slnFile.Projects.Where((p) => p.Name == "TestApp").Single();
+            nonSolutionFolderProjects.Count().Should().Be(3);
+
+            var slnProject = nonSolutionFolderProjects.Where((p) => p.Name == "TestApp").Single();
             slnProject.TypeGuid.Should().Be(ProjectTypeGuids.CSharpProjectTypeGuid);
             slnProject.FilePath.Should().Be("TestApp.csproj");
 
-            slnProject = slnFile.Projects.Where((p) => p.Name == "TestLibrary").Single();
+            slnProject = nonSolutionFolderProjects.Where((p) => p.Name == "TestLibrary").Single();
             slnProject.TypeGuid.Should().Be(ProjectTypeGuids.CSharpProjectTypeGuid);
             slnProject.FilePath.Should().Be(Path.Combine("..", "TestLibrary", "TestLibrary.csproj"));
 
-            slnProject = slnFile.Projects.Where((p) => p.Name == "subdir").Single();
+            slnProject = nonSolutionFolderProjects.Where((p) => p.Name == "subdir").Single();
             slnProject.TypeGuid.Should().Be(subdirProjectTypeGuid);
             slnProject.FilePath.Should().Be(Path.Combine("src", "subdir", "subdir.csproj"));
         }
