@@ -173,28 +173,16 @@ namespace Microsoft.DotNet.Tools.Add.ProjectToSolution
 
         private void AddSolutionFolders(SlnFile slnFile, SlnProject slnProject)
         {
-            var currentDirString = $".{Path.DirectorySeparatorChar}";
+            var solutionFolders = SlnHelper.GetSolutionFoldersFromProject(slnProject);
 
-            var directoryPath = Path.GetDirectoryName(slnProject.FilePath);
-            if (directoryPath.StartsWith(currentDirString))
-            {
-                directoryPath = directoryPath.Substring(currentDirString.Length);
-            }
-
-            if (directoryPath.StartsWith(".."))
-            {
-                return;
-            }
-
-            var dirs = directoryPath.Split(Path.DirectorySeparatorChar);
-            if (dirs.Length > 0)
+            if (solutionFolders.Any())
             {
                 var nestedProjectsSection = slnFile.Sections.GetOrCreateSection(
                     "NestedProjects",
                     SlnSectionType.PreProcess);
 
                 string parentDirGuid = null;
-                foreach (var dir in dirs)
+                foreach (var dir in solutionFolders)
                 {
                     var solutionFolder = new SlnProject
                     {

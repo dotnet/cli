@@ -11,10 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib", "Lib", "{EAB71280-AF3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib", "src\Lib\Lib.csproj", "{84A45D44-B677-492D-A6DA-B3A71135AB8E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NotLastProjInSrc", "NotLastProjInSrc", "{1C5EE322-7073-4298-A077-B7816B1CE15F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotLastProjInSrc", "src\NotLastProjInSrc\NotLastProjInSrc.csproj", "{96E9FA7D-FE59-4866-AE1E-F9EC2BB2FC67}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,13 +46,8 @@ Global
 		{84A45D44-B677-492D-A6DA-B3A71135AB8E}.Release|x86.ActiveCfg = Release|x86
 		{84A45D44-B677-492D-A6DA-B3A71135AB8E}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{EAB71280-AF32-4531-8703-43CDBA261AA3} = {7B86CE74-F620-4B32-99FE-82D40F8D6BF2}
 		{84A45D44-B677-492D-A6DA-B3A71135AB8E} = {EAB71280-AF32-4531-8703-43CDBA261AA3}
-		{1C5EE322-7073-4298-A077-B7816B1CE15F} = {7B86CE74-F620-4B32-99FE-82D40F8D6BF2}
-		{96E9FA7D-FE59-4866-AE1E-F9EC2BB2FC67} = {1C5EE322-7073-4298-A077-B7816B1CE15F}
 	EndGlobalSection
 EndGlobal
