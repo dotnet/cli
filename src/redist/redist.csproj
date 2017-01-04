@@ -42,7 +42,7 @@
     <ProjectReference Include="..\Microsoft.DotNet.InternalAbstractions\Microsoft.DotNet.InternalAbstractions.csproj" />
     <ProjectReference Include="..\Microsoft.DotNet.ProjectJsonMigration\Microsoft.DotNet.ProjectJsonMigration.csproj" />
     <ProjectReference Include="..\Microsoft.DotNet.TestFramework\Microsoft.DotNet.TestFramework.csproj" />
-    <ProjectReference Include="..\tool_csc\tool_csc.csproj" />
+    <ProjectReference Include="..\tool_roslyn\tool_roslyn.csproj" />
     <ProjectReference Include="..\tool_msbuild\tool_msbuild.csproj" />
     <ProjectReference Include="..\tool_nuget\tool_nuget.csproj" />
   </ItemGroup>
