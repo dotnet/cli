@@ -13,14 +13,14 @@
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.0.3"
+          "version": "1.0.4-servicing-004632-00"
         }
       }
     },
     "netstandard1.6": {
       "dependencies": {
         "NETStandard.Library": "1.6.0",
-        "Microsoft.NETCore.Runtime.CoreCLR": "1.0.5"
+        "Microsoft.NETCore.Runtime.CoreCLR": "1.0.6-servicing-24904-01"
       }
     }
   },
