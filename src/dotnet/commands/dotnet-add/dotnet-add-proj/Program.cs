@@ -173,7 +173,7 @@ namespace Microsoft.DotNet.Tools.Add.ProjectToSolution
 
         private void AddSolutionFolders(SlnFile slnFile, SlnProject slnProject)
         {
-            var solutionFolders = slnFile.GetSolutionFoldersFromProject(slnProject);
+            var solutionFolders = slnProject.GetSolutionFoldersFromProject();
 
             if (solutionFolders.Any())
             {
