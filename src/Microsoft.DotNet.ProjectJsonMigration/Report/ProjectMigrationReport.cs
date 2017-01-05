@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 namespace Microsoft.DotNet.ProjectJsonMigration
 {
+    /// Any changes to this need to be reflected in roslyn-project-system
+    /// https://github.com/dotnet/roslyn-project-system/blob/master/src/Microsoft.VisualStudio.ProjectSystem.CSharp.VS/ProjectSystem/VS/Xproj/ProjectMigrationReport.cs
     internal class ProjectMigrationReport
     {
         public string ProjectDirectory { get; }
@@ -22,7 +24,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration
         public bool Skipped { get; }
 
         public bool Failed => Errors.Any();
-        
+
         public bool Succeeded => !Errors.Any();
 
         public ProjectMigrationReport(string projectDirectory, string projectName, bool skipped)
