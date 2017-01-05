@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\dir.props" />
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\dir.tasks" />
 
   <PropertyGroup>
     <VersionPrefix>1.0.0-preview5</VersionPrefix>
@@ -35,6 +36,15 @@
   <Target Name="MakeCscRunnableAndMoveToPublishDir"
           AfterTargets="Publish"
           BeforeTargets="RemoveFilesAfterPublish">
+    <ItemGroup>
+      <AssetsToRemoveFromDeps Include="csc" />
+      <AssetsToRemoveFromDeps Include="vbc" />
+    </ItemGroup>
+    
+    <RemoveAssetFromDepsPackages DepsFile="$(PublishDir)/$(TargetName).deps.json"
+                                 SectionName="runtimeTargets"
+                                 AssetPath="runtimes/any/native/%(AssetsToRemoveFromDeps.Identity).exe" />
+
     <Copy SourceFiles="$(PublishDir)/runtimes/any/native/csc.exe;
                        $(PublishDir)/$(TargetName).runtimeconfig.json;
                        $(PublishDir)/$(TargetName).deps.json;"
