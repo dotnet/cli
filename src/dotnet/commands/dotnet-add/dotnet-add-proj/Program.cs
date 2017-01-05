@@ -79,8 +79,8 @@ namespace Microsoft.DotNet.Tools.Add.ProjectToSolution
 
                 var slnProject = new SlnProject
                 {
-                    Id = GetProjectId(projectInstance),
-                    TypeGuid = GetProjectTypeGuid(projectInstance),
+                    Id = projectInstance.GetProjectId(),
+                    TypeGuid = projectInstance.GetProjectTypeGuid(),
                     Name = Path.GetFileNameWithoutExtension(relativeProjectPath),
                     FilePath = relativeProjectPath
                 };
@@ -94,42 +94,6 @@ namespace Microsoft.DotNet.Tools.Add.ProjectToSolution
                 Reporter.Output.WriteLine(
                     string.Format(CommonLocalizableStrings.ProjectAddedToTheSolution, relativeProjectPath));
             }
-        }
-
-        private string GetProjectId(ProjectInstance projectInstance)
-        {
-            var projectGuidProperty = projectInstance.GetPropertyValue("ProjectGuid");
-            var projectGuid = string.IsNullOrEmpty(projectGuidProperty)
-                ? Guid.NewGuid()
-                : new Guid(projectGuidProperty);
-            return projectGuid.ToString("B").ToUpper();
-        }
-
-        private string GetProjectTypeGuid(ProjectInstance projectInstance)
-        {
-            string projectTypeGuid = null;
-
-            var projectTypeGuidProperty = projectInstance.GetPropertyValue("ProjectTypeGuid");
-            if (!string.IsNullOrEmpty(projectTypeGuidProperty))
-            {
-                projectTypeGuid = projectTypeGuidProperty.Split(';').Last();
-            }
-            else
-            {
-                projectTypeGuid = projectInstance.GetPropertyValue("DefaultProjectTypeGuid");
-            }
-
-            if (string.IsNullOrEmpty(projectTypeGuid))
-            {
-                //ISSUE: https://github.com/dotnet/sdk/issues/522
-                //The real behavior we want (once DefaultProjectTypeGuid support is in) is to throw
-                //when we cannot find ProjectTypeGuid or DefaultProjectTypeGuid. But for now we
-                //need the same behavior we had before this change.
-                //throw new GracefulException(CommonLocalizableStrings.UnsupportedProjectType);
-                projectTypeGuid = "{13B669BE-BB05-4DDF-9536-439F39A36129}"; // CPS guid
-            }
-
-            return projectTypeGuid;
         }
 
         private void AddDefaultBuildConfigurations(SlnFile slnFile, SlnProject slnProject)
