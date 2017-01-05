@@ -24,7 +24,7 @@
       <Version>2.0.0-beta6-60922-08</Version>
     </PackageReference>
     <PackageReference Include="NuGet.Build.Tasks">
-      <Version>4.0.0-rc2</Version>
+      <Version>4.0.0-rc3</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.TestPlatform.CLI">
       <Version>$(CLI_TestPlatform_Version)</Version>
