@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.Cli.List.P2P.Tests
 Usage: dotnet list <PROJECT> p2ps [options]
 
 Arguments:
-  <PROJECT>  The project to operation on. If a file is not specified, the current directory is searched.
+  <PROJECT>  The project file to operate on. If a file is not specified, the command will search the current directory for one.
 
 Options:
   -h|--help  Show help information";

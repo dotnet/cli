@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.Cli.Remove.P2P.Tests
 Usage: dotnet remove <PROJECT> p2p [options] [args]
 
 Arguments:
-  <PROJECT>  The project to operation on. If a file is not specified, the current directory is searched.
+  <PROJECT>  The project file to operate on. If a file is not specified, the command will search the current directory for one.
 
 Options:
   -h|--help                   Show help information
