@@ -138,11 +138,11 @@ namespace Microsoft.DotNet.TestFramework
             return new DirectoryInfo(Path.Combine(baseDirectory, callingMethod + identifier, _assetName));
         }
 
-        private List<FileInfo> LoadInventory(FileInfo file)
+        private IEnumerable<FileInfo> LoadInventory(FileInfo file)
         {
             if (!file.Exists)
             {
-                return null;
+                return Enumerable.Empty<FileInfo>();
             }
 
             var inventory = new List<FileInfo>();
