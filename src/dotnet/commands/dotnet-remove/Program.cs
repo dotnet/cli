@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.Tools.Remove.PackageReference;
 using Microsoft.DotNet.Tools.Remove.ProjectToProjectReference;
 
 namespace Microsoft.DotNet.Tools.Remove
@@ -19,6 +20,7 @@ namespace Microsoft.DotNet.Tools.Remove
             new List<Func<DotNetSubCommandBase>>
             {
                 RemoveProjectToProjectReferenceCommand.Create,
+                RemovePackageReferenceCommand.Create
             };
 
         public static int Run(string[] args)
