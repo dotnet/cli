@@ -2,11 +2,8 @@
   <!-- workaround for https://github.com/Microsoft/msbuild/issues/885 -->
   <!-- renaming the property because the original property is a global property and therefore
        cannot be redefined at runtime. -->
-  <PropertyGroup>
-    <CLIBuildDllPath>$([MSBuild]::Unescape($(CLIBuildDll)))</CLIBuildDllPath>
-  </PropertyGroup>
 
-  <UsingTask TaskName="DotNetRestore" AssemblyFile="$(CLIBuildDllPath)" />
+  <Import Project="Microsoft.DotNet.Cli.tasks" />
 
   <Target Name="CopyTemplateToOutput"
           DependsOnTargets="PrepareBundledTemplateProps;
