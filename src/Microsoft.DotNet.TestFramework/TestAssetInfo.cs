@@ -112,7 +112,7 @@ namespace Microsoft.DotNet.TestFramework
             return GetInventory(
                 _inventoryFiles.Restore, 
                 GetSourceFiles, 
-                DoRestoreWithLock);
+                DoRestore);
         }
 
         internal IEnumerable<FileInfo> GetBuildFiles()
@@ -125,7 +125,7 @@ namespace Microsoft.DotNet.TestFramework
                 _inventoryFiles.Build,
                 () => GetRestoreFiles()
                         .Concat(GetSourceFiles()),
-                DoBuildWithLock);
+                DoBuild);
         }
 
         private DirectoryInfo GetTestDestinationDirectory(string callingMethod, string identifier)
@@ -216,39 +216,28 @@ namespace Microsoft.DotNet.TestFramework
                 preInventory = beforeAction();
             }
 
-            action();
-
-            inventory = GetFileList().Where(i => !preInventory.Select(p => p.FullName).Contains(i.FullName));
-
-            SaveInventory(file, inventory);
-
-            return inventory;
-        }
-
-        private void DoRestoreWithLock()
-        {
-             Task.Run(async () => await ConcurrencyUtilities.ExecuteWithFileLockedAsync<object>(
-                _dataDirectory.FullName, 
-                lockedToken =>
-                {
-                    DoRestore();
-
-                    return Task.FromResult(new Object());
-                },
-                CancellationToken.None)).Wait();
-        }
-
-        private void DoBuildWithLock()
-        {
             Task.Run(async () => await ConcurrencyUtilities.ExecuteWithFileLockedAsync<object>(
                 _dataDirectory.FullName, 
                 lockedToken =>
                 {
-                    DoBuild();
+                    if (file.Exists)
+                    {
+                        inventory = LoadInventory(file);
+                    }
+                    else
+                    {
+                        action();
+
+                        inventory = GetFileList().Where(i => !preInventory.Select(p => p.FullName).Contains(i.FullName));
+
+                        SaveInventory(file, inventory);
+                    }
 
                     return Task.FromResult(new Object());
                 },
                 CancellationToken.None)).Wait();
+
+            return inventory;
         }
 
         private void DoRestore()
