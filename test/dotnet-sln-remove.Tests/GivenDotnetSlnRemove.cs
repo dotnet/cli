@@ -9,9 +9,9 @@ using System.IO;
 using System.Linq;
 using Xunit;
 
-namespace Microsoft.DotNet.Cli.Remove.Project.Tests
+namespace Microsoft.DotNet.Cli.Sln.Remove.Tests
 {
-    public class GivenDotnetRemoveProj : TestBase
+    public class GivenDotnetSlnRemove : TestBase
     {
         private const string HelpText = @".NET Remove Project from Solution Command
 

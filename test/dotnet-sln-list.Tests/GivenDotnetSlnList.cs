@@ -9,9 +9,9 @@ using System.IO;
 using System.Linq;
 using Xunit;
 
-namespace Microsoft.DotNet.Cli.List.Proj.Tests
+namespace Microsoft.DotNet.Cli.Sln.List.Tests
 {
-    public class GivenDotnetListProj : TestBase
+    public class GivenDotnetSlnList : TestBase
     {
         private const string HelpText = @".NET Projects in Solution viewer
 

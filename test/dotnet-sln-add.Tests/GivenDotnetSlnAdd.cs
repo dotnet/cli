@@ -10,9 +10,9 @@ using System.IO;
 using System.Linq;
 using Xunit;
 
-namespace Microsoft.DotNet.Cli.Add.Proj.Tests
+namespace Microsoft.DotNet.Cli.Sln.Add.Tests
 {
-    public class GivenDotnetAddProj : TestBase
+    public class GivenDotnetSlnAdd : TestBase
     {
         private string HelpText = @".NET Add Project to Solution Command
 
