@@ -23,8 +23,8 @@ namespace Microsoft.DotNet.Tools.Sln.Add
             var command = new AddProjectToSolutionCommand()
             {
                 Name = "add",
-                FullName = LocalizableStrings.AddSubcommandFullName,
-                Description = LocalizableStrings.AddSubcommandDescription,
+                FullName = LocalizableStrings.AddAppFullName,
+                Description = LocalizableStrings.AddSubcommandHelpText,
                 HandleRemainingArguments = true,
                 ArgumentSeparatorHelpText = LocalizableStrings.AddSubcommandHelpText,
             };

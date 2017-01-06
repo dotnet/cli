@@ -20,8 +20,8 @@ namespace Microsoft.DotNet.Tools.Sln.Remove
             var command = new RemoveProjectFromSolutionCommand()
             {
                 Name = "remove",
-                FullName = LocalizableStrings.RemoveSubcommandFullName,
-                Description = LocalizableStrings.RemoveSubcommandDescription,
+                FullName = LocalizableStrings.RemoveAppFullName,
+                Description = LocalizableStrings.RemoveSubcommandHelpText,
                 HandleRemainingArguments = true,
                 ArgumentSeparatorHelpText = LocalizableStrings.RemoveSubcommandHelpText,
             };

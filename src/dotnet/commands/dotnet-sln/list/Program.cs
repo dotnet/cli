@@ -16,8 +16,8 @@ namespace Microsoft.DotNet.Tools.Sln.List
             var command = new ListProjectsInSolutionCommand()
             {
                 Name = "list",
-                FullName = LocalizableStrings.ListSubcommandFullName,
-                Description = LocalizableStrings.ListSubcommandDescription,
+                FullName = LocalizableStrings.ListAppFullName,
+                Description = LocalizableStrings.ListSubcommandHelpText,
             };
 
             command.HelpOption("-h|--help");
