@@ -27,19 +27,25 @@ namespace Microsoft.DotNet.Tools.New
                 {
                     // Check if other files from the template exists already, before extraction
                     IEnumerable<string> fileNames = archive.Entries.Select(e => e.FullName);
+                    string projectDirectory = Directory.GetCurrentDirectory();
+
                     foreach (var entry in fileNames)
                     {
-                        if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), entry)))
+                        if (File.Exists(Path.Combine(projectDirectory, entry)))
                         {
                             Reporter.Error.WriteLine(string.Format(LocalizableStrings.ProjectContainsError, languageName, entry));
                             return 1;
                         }
                     }
 
-                    string projectDirectory = Directory.GetCurrentDirectory();
+                    if (File.Exists(Path.Combine(projectDirectory, "global.json")))
+                    {
+                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.ProjectContainsError, languageName, "global.json"));
+                        return 1;
+                    }
 
                     archive.ExtractToDirectory(projectDirectory);
-
+                    WriteGlobalJson(projectDirectory);
                     ReplaceFileTemplateNames(projectDirectory);
                 }
                 catch (IOException ex)
@@ -69,6 +75,15 @@ namespace Microsoft.DotNet.Tools.New
                         Path.Combine(Path.GetDirectoryName(file), $"{projectName}{extension}"));
                 }
             }
+        }
+
+        private static void WriteGlobalJson(string projectDirectory)
+        {
+            File.WriteAllText(Path.Combine(projectDirectory, "global.json"), $@"{{
+    ""sdk"": {{
+        ""version"": ""{Product.Version}""
+    }}
+}}");
         }
 
         public static int Run(string[] args)
