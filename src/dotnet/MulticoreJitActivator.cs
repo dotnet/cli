@@ -54,7 +54,7 @@ namespace Microsoft.DotNet.Cli
             }
             catch (Exception e)
             {
-                e.MarkAsHandled();
+                e.ReportAsWarning();
                 return false;
             }
         }

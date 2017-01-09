@@ -7,9 +7,9 @@ namespace Microsoft.DotNet.Cli.Utils.ExceptionExtensions
 {
     internal static class ExceptionExtensions
     {
-        public static void MarkAsHandled(this Exception e)
+        public static void ReportAsWarning(this Exception e)
         {
-            Reporter.Verbose.WriteLine($"Ignoring exception: {e.Message.Red()}");
+            Reporter.Verbose.WriteLine($"Warning: Ignoring exception: {e.ToString().Yellow()}");
         }
     }
 }
