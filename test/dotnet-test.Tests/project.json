@@ -3,7 +3,7 @@
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.3"
+      "version": "1.0.4-servicing-004640-00"
     },
     "Newtonsoft.Json": "9.0.1",
     "Microsoft.DotNet.Tools.Tests.Utilities": {
