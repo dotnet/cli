@@ -203,7 +203,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         {
             var testDirectory = Temp.CreateDirectory().Path;
             var testPJ = new ProjectJsonBuilder(TestAssetsManager)
-                .FromTestAssetBase("PJLibWithMultipleFrameworks")
+                .FromTestAssetBase("TestLibraryWithMultipleFrameworks")
                 .SaveToDisk(testDirectory);
 
             var projectContexts = ProjectContext.CreateContextForEachFramework(testDirectory);

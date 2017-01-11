@@ -184,7 +184,7 @@ namespace Microsoft.DotNet.Migration.Tests
 
         [Theory]
         [InlineData("TestLibraryWithTwoFrameworks")]
-        [InlineData("PJLibWithMultipleFrameworks")]
+        [InlineData("TestLibraryWithMultipleFrameworks")]
         public void ItMigratesProjectsWithMultipleTFMs(string projectName)
         {
             var projectDirectory =
