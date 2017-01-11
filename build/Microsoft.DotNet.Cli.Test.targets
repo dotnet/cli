@@ -36,7 +36,6 @@
     <ItemGroup>
       <ProjectsToTest Include="build/test/RunTest.proj">
         <Properties>
-          CLIBuildDll=$(CLIBuildDll);
           Configuration=$(Configuration);
           EnvironmentVariables=$(RunTestEnvironmentVariables);
           TestProject=%(TestProjects.ProjectPath);
