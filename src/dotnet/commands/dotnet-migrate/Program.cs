@@ -80,13 +80,8 @@ namespace Microsoft.DotNet.Tools.Migrate
             }
             catch (Exception ex)
             {
-#if DEBUG
-                Reporter.Error.WriteLine(ex.ToString());
-#else
-                Reporter.Error.WriteLine(ex.Message);
-#endif
                 Reporter.Error.WriteLine(LocalizableStrings.MigrationFailedError);
-                return 1;
+                throw ex;
             }
         }
     }
