@@ -38,14 +38,7 @@ namespace Microsoft.DotNet.Tools.New
                         }
                     }
 
-                    if (File.Exists(Path.Combine(projectDirectory, "global.json")))
-                    {
-                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.ProjectContainsError, languageName, "global.json"));
-                        return 1;
-                    }
-
                     archive.ExtractToDirectory(projectDirectory);
-                    WriteGlobalJson(projectDirectory);
                     ReplaceFileTemplateNames(projectDirectory);
                 }
                 catch (IOException ex)
@@ -75,15 +68,6 @@ namespace Microsoft.DotNet.Tools.New
                         Path.Combine(Path.GetDirectoryName(file), $"{projectName}{extension}"));
                 }
             }
-        }
-
-        private static void WriteGlobalJson(string projectDirectory)
-        {
-            File.WriteAllText(Path.Combine(projectDirectory, "global.json"), $@"{{
-    ""sdk"": {{
-        ""version"": ""{Product.Version}""
-    }}
-}}");
         }
 
         public static int Run(string[] args)
