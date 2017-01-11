@@ -73,7 +73,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         {
             var testDirectory = Temp.CreateDirectory().Path;
             var testPJ = new ProjectJsonBuilder(TestAssetsManager)
-                .FromTestAssetBase("TestLibraryWithMultipleFrameworks")
+                .FromTestAssetBase("PJAppWithMultipleFrameworks")
                 .SaveToDisk(testDirectory);
 
             var projectContexts = ProjectContext.CreateContextForEachFramework(testDirectory);
@@ -98,7 +98,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         {
             var testDirectory = Temp.CreateDirectory().Path;
             var testPJ = new ProjectJsonBuilder(TestAssetsManager)
-                .FromTestAssetBase("TestLibraryWithMultipleFrameworks")
+                .FromTestAssetBase("PJAppWithMultipleFrameworks")
                 .SaveToDisk(testDirectory);
 
             var projectContexts = ProjectContext.CreateContextForEachFramework(testDirectory);
@@ -203,7 +203,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         {
             var testDirectory = Temp.CreateDirectory().Path;
             var testPJ = new ProjectJsonBuilder(TestAssetsManager)
-                .FromTestAssetBase("TestLibraryWithMultipleFrameworks")
+                .FromTestAssetBase("PJLibWithMultipleFrameworks")
                 .SaveToDisk(testDirectory);
 
             var projectContexts = ProjectContext.CreateContextForEachFramework(testDirectory);
