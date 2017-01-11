@@ -44,10 +44,6 @@ namespace Microsoft.DotNet.New.Tests
                 File.Copy("NuGet.tempaspnetpatch.config", Path.Combine(rootPath, "NuGet.Config"));
             }
 
-            string globalJsonPath = Path.Combine(rootPath, "global.json");
-            Assert.True(File.Exists(globalJsonPath));
-            Assert.Contains(Product.Version, File.ReadAllText(globalJsonPath));
-
             new TestCommand("dotnet")
                 .WithWorkingDirectory(rootPath)
                 .Execute($"restore")
