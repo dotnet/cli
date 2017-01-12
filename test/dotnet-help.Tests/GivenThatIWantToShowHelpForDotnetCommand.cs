@@ -56,6 +56,7 @@ Advanced Commands:
         [Theory]
         [InlineData("--help")]
         [InlineData("-h")]
+        [InlineData("-?")]
         [InlineData("/?")]
         public void WhenHelpOptionIsPassedToDotnetItPrintsUsage(string helpArg)
         {
