@@ -134,7 +134,7 @@ namespace Microsoft.DotNet.Cli
                         PrintInfo();
                         return 0;
                     }
-                    else if (IsArg(args[lastArg], "h", "help"))
+                    else if (IsArg(args[lastArg], "h", "help") || args[lastArg] == "/?")
                     {
                         HelpCommand.PrintHelp();
                         return 0;

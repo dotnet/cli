@@ -167,6 +167,11 @@ namespace Microsoft.DotNet.Cli.CommandLine
                         break;
                     }
                 }
+                else if (arg == "/?")
+                {
+                    command.ShowHelp();
+                    return 0;
+                }
                 else
                 {
                     var subcommand = ParseSubCommand(arg, command);

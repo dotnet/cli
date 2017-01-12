@@ -182,6 +182,7 @@ EndGlobal
         [Theory]
         [InlineData("--help")]
         [InlineData("-h")]
+        [InlineData("/?")]
         public void WhenHelpOptionIsPassedItPrintsUsage(string helpArg)
         {
             var cmd = new DotnetCommand()
