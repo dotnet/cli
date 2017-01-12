@@ -93,11 +93,18 @@ while [[ $# > 0 ]]; do
             args=( "${args[@]/$2}" )
             shift
             ;;
+        --env-vars)
+            IFS=',' read -r -a envVars <<< $2
+            args=( "${args[@]/$1}" )
+            args=( "${args[@]/$2}" )
+            shift
+            ;;
         --help)
             echo "Usage: $0 [--configuration <CONFIGURATION>] [--targets <TARGETS...>] [--skip-prereqs] [--nopackage] [--docker <IMAGENAME>] [--help]"
             echo ""
             echo "Options:"
             echo "  --configuration <CONFIGURATION>     Build the specified Configuration (Debug or Release, default: Debug)"
+            echo "  --env-vars <'V1=val1','V2=val2'...> Comma separated list of environment variables"
             echo "  --skip-prereqs                      Skip checks for pre-reqs in dotnet_install"
             echo "  --nopackage                         Skip packaging targets"
             echo "  --nobuild                           Skip building, showing the command that would be used to build"
@@ -187,6 +194,7 @@ export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 echo "${args[@]}"
 
 if [ $BUILD -eq 1 ]; then
+    export ${envVars[@]}
     dotnet msbuild build.proj /m /v:diag /p:Architecture=$ARCHITECTURE "${args[@]}"
 else
     echo "Not building due to --nobuild"

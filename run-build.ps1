@@ -8,6 +8,7 @@ param(
     [string]$Architecture="x64",
     # This is here just to eat away this parameter because CI still passes this in.
     [string]$Targets="Default",
+    [string[]]$EnvVars=@(),
     [switch]$NoPackage,
     [switch]$NoBuild,
     [switch]$Help,
@@ -21,6 +22,7 @@ if($Help)
     Write-Host "Options:"
     Write-Host "  -Configuration <CONFIGURATION>     Build the specified Configuration (Debug or Release, default: Debug)"
     Write-Host "  -Architecture <ARCHITECTURE>       Build the specified architecture (x64 or x86 (supported only on Windows), default: x64)"
+    Write-Host "  -EnvVars <'V1=val1','V2=val2'...>  Comma separated list of environment variable name-value pairs"
     Write-Host "  -NoPackage                         Skip packaging targets"
     Write-Host "  -NoBuild                           Skip building the product"
     Write-Host "  -Help                              Display this help message"
@@ -114,6 +116,11 @@ if ($LastExitCode -ne 0)
 
 # Put the stage0 on the path
 $env:PATH = "$env:DOTNET_INSTALL_DIR;$env:PATH"
+
+$EnvVars | ForEach-Object {
+    $splat = $_.Split([char[]]@("="), 2)
+    Set-Content "env:\$($splat[0])" -Value $splat[1]
+}
 
 if ($NoBuild)
 {
