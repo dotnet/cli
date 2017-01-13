@@ -95,7 +95,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             var candidatePath = directoryPath;
 
             var suffix = 1;
-            while (Directory.Exists(directoryPath))
+            while (Directory.Exists(candidatePath))
             {
                 candidatePath = $"{directoryPath}_{suffix++}";
             }
