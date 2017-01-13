@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
     public partial class MigrationBackupPlanTests
     {
         [Fact]
-        public void TheRootBackupDirectoryIsASiblingOfTheRootProject()
+        public void TheRootBackupDirectoryIsASubfolderOfTheRootProject()
         {
             var dir = new DirectoryInfo(Path.Combine("src", "some-proj"));
 
@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             .RootBackupDirectory
             .FullName
             .Should()
-            .Be(new DirectoryInfo(Path.Combine("src", "backup")).FullName.EnsureTrailingSlash());
+            .Be(new DirectoryInfo(Path.Combine("src", "RootProject", "backup")).FullName.EnsureTrailingSlash());
         }
 
         [Fact]
@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             .ProjectBackupDirectory
             .FullName
             .Should()
-            .Be(new DirectoryInfo(Path.Combine("src", "backup", "RootProject")).FullName.EnsureTrailingSlash());
+            .Be(new DirectoryInfo(Path.Combine("src", "RootProject", "backup", "RootProject")).FullName.EnsureTrailingSlash());
         }
 
         [Fact]
@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
              .ProjectBackupDirectory
              .FullName
              .Should()
-             .Be(new DirectoryInfo(Path.Combine("src", "backup", "Dependency")).FullName.EnsureTrailingSlash());
+             .Be(new DirectoryInfo(Path.Combine("src", "RootProject", "backup", "Dependency")).FullName.EnsureTrailingSlash());
         }
 
         [Fact]
@@ -64,7 +64,6 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             .FilesToMove
             .Should()
             .Contain(_ => _.FullName == Path.Combine(root.FullName, "project.json"));
-
         }
 
         [Fact]
@@ -79,7 +78,6 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             .FilesToMove
             .Should()
             .Contain(_ => _.FullName == Path.Combine(dependency.FullName, "project.json"));
-
         }
 
         private MigrationBackupPlan WhenMigrating(

@@ -27,17 +27,18 @@ namespace Microsoft.DotNet.ProjectJsonMigration
                 throw new ArgumentNullException(nameof(workspaceDirectory));
             }
 
+            projectDirectory = new DirectoryInfo(projectDirectory.FullName.EnsureTrailingSlash());
+            workspaceDirectory = new DirectoryInfo(workspaceDirectory.FullName.EnsureTrailingSlash());
+
             globalJson = new FileInfo(Path.Combine(
                            workspaceDirectory.FullName,
                            "global.json"));
 
-            projectDirectory = new DirectoryInfo(projectDirectory.FullName.EnsureTrailingSlash());
-            workspaceDirectory = new DirectoryInfo(workspaceDirectory.FullName.EnsureTrailingSlash());
-
             RootBackupDirectory = new DirectoryInfo(
-                Path.Combine(
-                        workspaceDirectory.Parent.FullName,
-                        "backup")
+                GetUniqueDirectoryPath(
+                    Path.Combine(
+                        workspaceDirectory.FullName,
+                        "backup"))
                     .EnsureTrailingSlash());
 
             ProjectBackupDirectory = new DirectoryInfo(
@@ -72,9 +73,10 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             {
                 PathUtility.EnsureDirectoryExists(RootBackupDirectory.FullName);
 
-                globalJson.MoveTo(Path.Combine(
-                    ProjectBackupDirectory.Parent.FullName,
-                    globalJson.Name));
+                globalJson.MoveTo(
+                    Path.Combine(
+                        ProjectBackupDirectory.Parent.FullName,
+                        globalJson.Name));
             }
 
             PathUtility.EnsureDirectoryExists(ProjectBackupDirectory.FullName);
@@ -83,8 +85,22 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             {
                 file.MoveTo(
                     Path.Combine(
-                        ProjectBackupDirectory.FullName, file.Name));
+                        ProjectBackupDirectory.FullName,
+                        file.Name));
             }
+        }
+
+        private static string GetUniqueDirectoryPath(string directoryPath)
+        {
+            var candidatePath = directoryPath;
+
+            var suffix = 1;
+            while (Directory.Exists(directoryPath))
+            {
+                candidatePath = $"{directoryPath}_{suffix++}";
+            }
+
+            return candidatePath;
         }
     }
 }
