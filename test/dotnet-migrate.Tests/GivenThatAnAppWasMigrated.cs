@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.Migration.Tests
                 .CreateTestInstance(testProjectName)
                 .Path;
 
-            var backupRoot = Path.Combine(testRoot, "backup", testProjectName);
+            var backupRoot = Path.Combine(testRoot, "backup");
 
             var migratableArtifacts = GetProjectJsonArtifacts(testRoot);
 
