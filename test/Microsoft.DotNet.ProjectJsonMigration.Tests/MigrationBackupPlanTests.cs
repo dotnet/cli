@@ -35,22 +35,22 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             WhenMigrating(
                 projectDirectory: Path.Combine("src", "RootProject"),
                 workspaceDirectory: Path.Combine("src", "RootProject"))
-            .ProjectBackupDirectory
+            .ProjectBackupDirectories.Single()
             .FullName
             .Should()
-            .Be(new DirectoryInfo(Path.Combine("src", "RootProject", "backup", "RootProject")).FullName.EnsureTrailingSlash());
+            .Be(new DirectoryInfo(Path.Combine("src", "RootProject", "backup")).FullName.EnsureTrailingSlash());
         }
 
         [Fact]
         public void ADependentProjectsMigrationBackupDirectoryIsASubfolderOfTheRootBackupDirectory()
         {
             WhenMigrating(
-                 projectDirectory: Path.Combine("src", "Dependency"),
-                 workspaceDirectory: Path.Combine("src", "RootProject"))
-             .ProjectBackupDirectory
-             .FullName
-             .Should()
-             .Be(new DirectoryInfo(Path.Combine("src", "RootProject", "backup", "Dependency")).FullName.EnsureTrailingSlash());
+                projectDirectory: Path.Combine("src", "Dependency"),
+                workspaceDirectory: Path.Combine("src", "RootProject"))
+            .ProjectBackupDirectories.Single()
+            .FullName
+            .Should()
+            .Be(new DirectoryInfo(Path.Combine("src", "RootProject", "backup", "Dependency")).FullName.EnsureTrailingSlash());
         }
 
         [Fact]
@@ -58,10 +58,12 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         {
             var root = new DirectoryInfo(Path.Combine("src", "RootProject"));
 
-            WhenMigrating(
+            var whenMigrating = WhenMigrating(
                 projectDirectory: root.FullName,
-                workspaceDirectory: root.FullName)
-            .FilesToMove
+                workspaceDirectory: root.FullName);
+
+            whenMigrating
+            .FilesToMove(whenMigrating.ProjectBackupDirectories.Single())
             .Should()
             .Contain(_ => _.FullName == Path.Combine(root.FullName, "project.json"));
         }
@@ -72,10 +74,12 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             var root = new DirectoryInfo(Path.Combine("src", "RootProject"));
             var dependency = new DirectoryInfo(Path.Combine("src", "RootProject"));
 
-            WhenMigrating(
+            var whenMigrating = WhenMigrating(
                 projectDirectory: dependency.FullName,
-                workspaceDirectory: root.FullName)
-            .FilesToMove
+                workspaceDirectory: root.FullName);
+
+            whenMigrating
+            .FilesToMove(whenMigrating.ProjectBackupDirectories.Single())
             .Should()
             .Contain(_ => _.FullName == Path.Combine(dependency.FullName, "project.json"));
         }
@@ -84,9 +88,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             string projectDirectory,
             string workspaceDirectory) =>
             new MigrationBackupPlan(
-                new DirectoryInfo(projectDirectory),
+                new [] { new DirectoryInfo(projectDirectory) },
                 new DirectoryInfo(workspaceDirectory),
                 dir => new[] { new FileInfo(Path.Combine(dir.FullName, "project.json")) });
-
     }
 }

@@ -193,14 +193,17 @@ namespace Microsoft.DotNet.Tools.Migrate
 
         private void BackupProjects(MigrationReport migrationReport)
         {
+            var projectDirectories = new List<DirectoryInfo>();
             foreach (var report in migrationReport.ProjectMigrationReports)
             {
-                var backupPlan = new MigrationBackupPlan(
-                    new DirectoryInfo(report.ProjectDirectory),
-                    _workspaceDirectory);
-
-                backupPlan.PerformBackup();
+                projectDirectories.Add(new DirectoryInfo(report.ProjectDirectory));
             }
+
+            var backupPlan = new MigrationBackupPlan(
+                projectDirectories,
+                _workspaceDirectory);
+
+            backupPlan.PerformBackup();
         }
 
         private void WriteReport(MigrationReport migrationReport)
