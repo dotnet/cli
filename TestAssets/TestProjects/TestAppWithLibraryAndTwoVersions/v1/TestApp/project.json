@@ -1,15 +1,11 @@
-{
+﻿{
   "version": "1.0.0-*",
   "buildOptions": {
-    "emitEntryPoint": true,
-    "preserveCompilationContext": true
+    "emitEntryPoint": true
   },
   "dependencies": {
-    "TestLibrary": {
-      "target": "project",
-      "version": "1.0.0-*"
-    },
-    "Microsoft.NETCore.App": "1.0.1"
+    "Microsoft.NETCore.App": "1.0.1",
+    "TestLibrary": "1.0.1-*"
   },
   "frameworks": {
     "netcoreapp1.0": {}
