@@ -12,17 +12,29 @@ namespace Microsoft.DotNet.Tools.Common
     {
         public static IList<string> GetSolutionFoldersFromProject(this SlnProject project)
         {
-            var currentDirString = $".{Path.DirectorySeparatorChar}";
+            var solutionFolders = new List<string>();
 
-            var directoryPath = Path.GetDirectoryName(project.FilePath);
-            if (directoryPath.StartsWith(currentDirString))
+            var projectFilePath = project.FilePath;
+            if (!projectFilePath.StartsWith(".."))
             {
-                directoryPath = directoryPath.Substring(currentDirString.Length);
+                var currentDirString = $".{Path.DirectorySeparatorChar}";
+                if (projectFilePath.StartsWith(currentDirString))
+                {
+                    projectFilePath = projectFilePath.Substring(currentDirString.Length);
+                }
+
+                var projectDirectoryPath = Path.GetDirectoryName(projectFilePath);
+                if (!string.IsNullOrEmpty(projectDirectoryPath))
+                {
+                    var solutionFoldersPath = Path.GetDirectoryName(projectDirectoryPath);
+                    if (!string.IsNullOrEmpty(solutionFoldersPath))
+                    {
+                        solutionFolders.AddRange(solutionFoldersPath.Split(Path.DirectorySeparatorChar));
+                    }
+                }
             }
 
-            return directoryPath.StartsWith("..")
-                ? new List<string>()
-                : new List<string>(directoryPath.Split(Path.DirectorySeparatorChar));
+            return solutionFolders;
         }
     }
 }

@@ -39,5 +39,12 @@ namespace Microsoft.DotNet.Tools.Common
 
             return referencedSolutionFolders;
         }
+
+        public static IEnumerable<SlnProject> GetProjectsByType(
+            this SlnProjectCollection projects,
+            string typeGuid)
+        {
+            return projects.Where(p => p.TypeGuid == typeGuid);
+        }
     }
 }
