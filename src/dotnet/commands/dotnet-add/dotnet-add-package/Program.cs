@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.Tools.Add.PackageReference
 
         public override int Run(string fileOrDirectory)
         {
-            if (_packageNameArgument.Values.Count != 1 || string.IsNullOrWhiteSpace(_packageNameArgument.Value))
+            if (_packageNameArgument.Values.Count != 1 || string.IsNullOrWhiteSpace(_packageNameArgument.Value) || RemainingArguments.Count > 0)
             {
                 throw new GracefulException(LocalizableStrings.SpecifyExactlyOnePackageReference);
             }
