@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.Tools.Common
             var solutionFolders = new List<string>();
 
             var projectFilePath = project.FilePath;
-            if (!projectFilePath.StartsWith(".."))
+            if (IsPathInTreeRootedAtSolutionDirectory(projectFilePath))
             {
                 var currentDirString = $".{Path.DirectorySeparatorChar}";
                 if (projectFilePath.StartsWith(currentDirString))
@@ -23,10 +23,10 @@ namespace Microsoft.DotNet.Tools.Common
                     projectFilePath = projectFilePath.Substring(currentDirString.Length);
                 }
 
-                var projectDirectoryPath = Path.GetDirectoryName(projectFilePath);
+                var projectDirectoryPath = TrimProject(projectFilePath);
                 if (!string.IsNullOrEmpty(projectDirectoryPath))
                 {
-                    var solutionFoldersPath = Path.GetDirectoryName(projectDirectoryPath);
+                    var solutionFoldersPath = TrimProjectDirectory(projectDirectoryPath);
                     if (!string.IsNullOrEmpty(solutionFoldersPath))
                     {
                         solutionFolders.AddRange(solutionFoldersPath.Split(Path.DirectorySeparatorChar));
@@ -35,6 +35,21 @@ namespace Microsoft.DotNet.Tools.Common
             }
 
             return solutionFolders;
+        }
+
+        private static bool IsPathInTreeRootedAtSolutionDirectory(string path)
+        {
+            return !path.StartsWith("..");
+        }
+
+        private static string TrimProject(string path)
+        {
+            return Path.GetDirectoryName(path);
+        }
+
+        private static string TrimProjectDirectory(string path)
+        {
+            return Path.GetDirectoryName(path);
         }
     }
 }
