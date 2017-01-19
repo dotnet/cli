@@ -34,8 +34,7 @@ namespace Microsoft.DotNet.Tools.Add.PackageReference
                 Name = "package",
                 FullName = LocalizableStrings.AppFullName,
                 Description = LocalizableStrings.AppDescription,
-                HandleRemainingArguments = true,
-                ArgumentSeparatorHelpText = LocalizableStrings.AppHelpText,
+                HandleRemainingArguments = false
             };
 
             command.HelpOption("-h|--help");
