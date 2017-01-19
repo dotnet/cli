@@ -7,10 +7,9 @@ The best way to get help is to [file an issue](https://github.com/dotnet/cli/iss
 CLI is a very high-traffic repository in terms of issues. In order to be able to respond fast to migration issues, we need the issue to be formatted in a certain way:
 
 * Add `[MIGRATION]:` prefix to the title of the issue.
-* Add your `project.json` to the issue either attaching it or copy-pasting the contents into the issue.
+* Add your `project.json` to the issue either attaching it or copy-pasting the contents into the issue, or by poitining to it if it is in an repo we can access (for example on GitHub).
     * If you migrated, the file can be found in the `backup` folder in your project folder (it is moved there by migration automatically).
-* Add a detailed repro of the steps that you took to migrate. 
-* Add all of the errors that any operation like `dotnet restore`, `dotnet build` or others reported. This will help us speedily triage where the potential problem will be. 
+ * Add all of the errors that any operation like `dotnet restore`, `dotnet build` or others reported. This will help us speedily triage where the potential problem will be. 
 * Add output of `dotnet --info` to the issue so we know what build you are running. 
 * Mention @blackdwarf and @livarcocc in the issue body. 
 
