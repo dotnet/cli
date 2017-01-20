@@ -12,13 +12,7 @@
 
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
 
-    <VersionMajor>2</VersionMajor>
-    <VersionMinor>0</VersionMinor>
-    <VersionPatch>0</VersionPatch>
-    <ReleaseSuffix>alpha</ReleaseSuffix>
-    <Channel>master</Channel>
-    <BranchName>master</BranchName>
-    <CliVersionPrefix>$(VersionMajor).$(VersionMinor).$(VersionPatch)-$(ReleaseSuffix)</CliVersionPrefix>
 
+    <CliVersionPrefix>1.0.0-rc4</CliVersionPrefix>
   </PropertyGroup>
 </Project>

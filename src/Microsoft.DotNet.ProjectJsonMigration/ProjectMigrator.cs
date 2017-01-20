@@ -3,12 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Microsoft.Build.Construction;
 using Microsoft.DotNet.Internal.ProjectModel;
 using Microsoft.DotNet.Internal.ProjectModel.Graph;
 using Microsoft.DotNet.Cli;
-using System.Linq;
-using System.IO;
+using Microsoft.DotNet.Cli.Utils.ExceptionExtensions;
 using Microsoft.DotNet.Cli.Sln.Internal;
 using Microsoft.DotNet.ProjectJsonMigration.Rules;
 using Microsoft.DotNet.Tools.Common;
@@ -37,11 +38,19 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             // Try to read the project dependencies, ignore an unresolved exception for now
             MigrationRuleInputs rootInputs = ComputeMigrationRuleInputs(rootSettings);
             IEnumerable<ProjectDependency> projectDependencies = null;
+            var projectMigrationReports = new List<ProjectMigrationReport>();
 
             try
             {
                 // Verify up front so we can prefer these errors over an unresolved project dependency
                 VerifyInputs(rootInputs, rootSettings);
+
+                projectMigrationReports.Add(MigrateProject(rootSettings));
+                
+                if (skipProjectReferences)
+                {
+                    return new MigrationReport(projectMigrationReports);
+                }
 
                 projectDependencies = ResolveTransitiveClosureProjectDependencies(
                     rootSettings.ProjectDirectory, 
@@ -59,14 +68,6 @@ namespace Microsoft.DotNet.ProjectJsonMigration
                             new List<MigrationError> {e.Error},
                             null)
                     });
-            }
-
-            var projectMigrationReports = new List<ProjectMigrationReport>();
-            projectMigrationReports.Add(MigrateProject(rootSettings));
-            
-            if (skipProjectReferences)
-            {
-                return new MigrationReport(projectMigrationReports);
             }
 
             foreach(var project in projectDependencies)
@@ -87,14 +88,22 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             try
             {
                 File.Delete(Path.Combine(rootsettings.ProjectDirectory, "project.json"));
-            } catch {} 
+            }
+            catch (Exception e)
+            {
+                e.ReportAsWarning();
+            }
 
             foreach (var projectDependency in projectDependencies)
             {
                 try 
                 {
                     File.Delete(projectDependency.ProjectFilePath);
-                } catch { }
+                }
+                catch (Exception e)
+                {
+                    e.ReportAsWarning();
+                }
             }
         }
 
