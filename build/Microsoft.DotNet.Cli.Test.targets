@@ -11,7 +11,7 @@
 
   <Target Name="Test"
           Condition=" '$(CLIBUILD_SKIP_TESTS)' != 'true' "
-          DependsOnTargets="PrepareTests;">
+          DependsOnTargets="BuildTests;">
 
     <PropertyGroup>
       <PathListSeparator>:</PathListSeparator>
@@ -38,7 +38,7 @@
           EnvironmentVariables=$(RunTestEnvironmentVariables);
           TestProject=%(TestProjects.Identity);
           TestResultXmlDir=$(TestResultXmlDir);
-          ToolPath=$(Stage0Directory)
+          ToolPath=$(Stage0Directory);
           WorkingDirectory=$([System.IO.Directory]::GetParent(%(TestProjects.Identity))) 
         </Properties>
       </ProjectsToTest>
@@ -72,14 +72,20 @@
   </Target>
 
   <Target Name="RestoreTests"
-          DependsOnTargets="CreateTestAssetPackageNuPkgs;">
+          DependsOnTargets="PrepareTests;
+                            CreateTestAssetPackageNuPkgs;">
     <DotNetRestore ToolPath="$(Stage0Directory)"
                    ProjectPath="&quot;$(TestDirectory)/Microsoft.DotNet.Cli.Tests.sln&quot;" />
   </Target>
 
+  <Target Name="BuildTests"
+          DependsOnTargets="RestoreTests;">
+    <DotNetBuild ToolPath="$(Stage0Directory)"
+                 ProjectPath="&quot;$(TestDirectory)/Microsoft.DotNet.Cli.Tests.sln&quot;" />
+  </Target>
+
   <Target Name="CreateTestAssetPackageNuPkgs"
-          DependsOnTargets="PrepareTests;
-                            SetupTestPackageProjectData;"
+          DependsOnTargets="SetupTestPackageProjectData;"
           Inputs="%(TestPackageProject.PackInputs)"
           Outputs="%(TestPackageProject.PackOutputs)">
 
