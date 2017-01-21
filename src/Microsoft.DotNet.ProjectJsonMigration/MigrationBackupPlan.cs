@@ -117,7 +117,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration
                     file.MoveTo(
                         Path.Combine(
                             projectBackupDirectory.FullName,
-                            file.Name));
+                            fileName));
                 }
             }
         }
