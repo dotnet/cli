@@ -7,12 +7,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.DotNet.Internal.ProjectModel.Utilities;
-using Microsoft.DotNet.Cli.Utils;
 
 namespace Microsoft.DotNet.ProjectJsonMigration
 {
     internal class MigrationBackupPlan
     {
+        private const string TempCsprojExtention = ".migration_in_place_backup";
+
         private readonly FileInfo globalJson;
         private readonly Dictionary<DirectoryInfo, IEnumerable<FileInfo>> mapOfProjectBackupDirectoryToFilesToMove;
 
@@ -109,6 +110,10 @@ namespace Microsoft.DotNet.ProjectJsonMigration
 
                 foreach (var file in filesToMove)
                 {
+                    var fileName = file.Name.EndsWith(TempCsprojExtention)
+                        ? Path.GetFileNameWithoutExtension(file.Name)
+                        : file.Name;
+
                     file.MoveTo(
                         Path.Combine(
                             projectBackupDirectory.FullName,
@@ -146,7 +151,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             => file.Name == "project.json"
             || file.Extension == ".xproj"
             || file.FullName.EndsWith(".xproj.user")
-            || file.FullName.EndsWith(".lock.json");
+            || file.FullName.EndsWith(".lock.json")
+            || file.FullName.EndsWith(TempCsprojExtention);
 
         private static string GetUniqueDirectoryPath(string directoryPath)
         {
@@ -167,7 +173,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             var shortestLength = int.MaxValue;
             for (int i = 0; i < paths.Length; i++)
             {
-                pathSplits[i] = paths[i].FullName.Split(new [] { Path.DirectorySeparatorChar });
+                pathSplits[i] = paths[i].FullName.Split(new[] { Path.DirectorySeparatorChar });
                 shortestLength = Math.Min(shortestLength, pathSplits[i].Length);
             }
 
@@ -198,6 +204,18 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             }
 
             return new DirectoryInfo(builder.ToString().EnsureTrailingSlash());
+        }
+
+        public static void RenameCsprojFromMigrationOutputNameToTempName(string outputProject)
+        {
+            var backupFileName = $"{outputProject}{TempCsprojExtention}";
+
+            if (File.Exists(backupFileName))
+            {
+                File.Delete(backupFileName);
+            }
+
+            File.Move(outputProject, backupFileName);
         }
     }
 }
