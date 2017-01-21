@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Microsoft.DotNet.Internal.ProjectModel.Utilities;
+using Microsoft.DotNet.Cli.Utils;
 
 namespace Microsoft.DotNet.ProjectJsonMigration
 {
@@ -30,13 +32,31 @@ namespace Microsoft.DotNet.ProjectJsonMigration
                 throw new ArgumentNullException(nameof(projectDirectories));
             }
 
+            if (!projectDirectories.Any())
+            {
+                throw new ArgumentException("No project directories provided.", nameof(projectDirectories));
+            }
+
             if (workspaceDirectory == null)
             {
                 throw new ArgumentNullException(nameof(workspaceDirectory));
             }
 
+            MigrationTrace.Instance.WriteLine("Computing migration backup plan...");
+
             projectDirectories = projectDirectories.Select(pd => new DirectoryInfo(pd.FullName.EnsureTrailingSlash()));
             workspaceDirectory = new DirectoryInfo(workspaceDirectory.FullName.EnsureTrailingSlash());
+
+            MigrationTrace.Instance.WriteLine($"    Workspace: {workspaceDirectory.FullName}");
+            foreach (var projectDirectory in projectDirectories)
+            {
+                MigrationTrace.Instance.WriteLine($"    Project: {projectDirectory.FullName}");
+            }
+
+            var rootDirectory = FindCommonRootPath(projectDirectories.ToArray()) ?? workspaceDirectory;
+            rootDirectory = new DirectoryInfo(rootDirectory.FullName.EnsureTrailingSlash());
+
+            MigrationTrace.Instance.WriteLine($"    Root: {rootDirectory.FullName}");
 
             globalJson = new FileInfo(
                 Path.Combine(
@@ -46,9 +66,11 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             RootBackupDirectory = new DirectoryInfo(
                 GetUniqueDirectoryPath(
                     Path.Combine(
-                        workspaceDirectory.FullName,
+                        rootDirectory.FullName,
                         "backup"))
                     .EnsureTrailingSlash());
+
+            MigrationTrace.Instance.WriteLine($"    Root Backup: {RootBackupDirectory.FullName}");
 
             var projectBackupDirectories = new List<DirectoryInfo>();
             mapOfProjectBackupDirectoryToFilesToMove = new Dictionary<DirectoryInfo, IEnumerable<FileInfo>>();
@@ -56,7 +78,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration
 
             foreach (var projectDirectory in projectDirectories)
             {
-                var projectBackupDirectory = ComputeProjectBackupDirectoryPath(workspaceDirectory, projectDirectory, RootBackupDirectory);
+                var projectBackupDirectory = ComputeProjectBackupDirectoryPath(rootDirectory, projectDirectory, RootBackupDirectory);
                 var filesToMove = getFiles(projectDirectory).Where(NeedsBackup);
 
                 projectBackupDirectories.Add(projectBackupDirectory);
@@ -96,12 +118,12 @@ namespace Microsoft.DotNet.ProjectJsonMigration
         }
 
         private static DirectoryInfo ComputeProjectBackupDirectoryPath(
-            DirectoryInfo workspaceDirectory, DirectoryInfo projectDirectory, DirectoryInfo rootBackupDirectory)
+            DirectoryInfo rootDirectory, DirectoryInfo projectDirectory, DirectoryInfo rootBackupDirectory)
         {
-            if (PathUtility.IsChildOfDirectory(workspaceDirectory.FullName, projectDirectory.FullName))
+            if (PathUtility.IsChildOfDirectory(rootDirectory.FullName, projectDirectory.FullName))
             {
                 var relativePath = PathUtility.GetRelativePath(
-                    workspaceDirectory.FullName,
+                    rootDirectory.FullName,
                     projectDirectory.FullName);
 
                 return new DirectoryInfo(
@@ -111,7 +133,6 @@ namespace Microsoft.DotNet.ProjectJsonMigration
                         .EnsureTrailingSlash());
             }
 
-            // For projects whose directory is not a child of the workspace directory (is that even possible?)
             // Ensure that we use a unique name to avoid collisions as a fallback.
             return new DirectoryInfo(
                 GetUniqueDirectoryPath(
@@ -138,6 +159,45 @@ namespace Microsoft.DotNet.ProjectJsonMigration
             }
 
             return candidatePath;
+        }
+
+        private static DirectoryInfo FindCommonRootPath(DirectoryInfo[] paths)
+        {
+            var pathSplits = new string[paths.Length][];
+            var shortestLength = int.MaxValue;
+            for (int i = 0; i < paths.Length; i++)
+            {
+                pathSplits[i] = paths[i].FullName.Split(new [] { Path.DirectorySeparatorChar });
+                shortestLength = Math.Min(shortestLength, pathSplits[i].Length);
+            }
+
+            var builder = new StringBuilder();
+            var splitIndex = 0;
+            while (splitIndex < shortestLength)
+            {
+                var split = pathSplits[0][splitIndex];
+
+                var done = false;
+                for (int i = 1; i < pathSplits.Length; i++)
+                {
+                    if (pathSplits[i][splitIndex] != split)
+                    {
+                        done = true;
+                        break;
+                    }
+                }
+
+                if (done)
+                {
+                    break;
+                }
+
+                builder.Append(split);
+                builder.Append(Path.DirectorySeparatorChar);
+                splitIndex++;
+            }
+
+            return new DirectoryInfo(builder.ToString().EnsureTrailingSlash());
         }
     }
 }

@@ -204,6 +204,8 @@ namespace Microsoft.DotNet.Tools.Migrate
                 _workspaceDirectory);
 
             backupPlan.PerformBackup();
+
+            Reporter.Output.WriteLine($"Files backed up to {backupPlan.RootBackupDirectory.FullName}");
         }
 
         private void WriteReport(MigrationReport migrationReport)
