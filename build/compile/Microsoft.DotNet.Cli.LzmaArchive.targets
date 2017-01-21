@@ -88,7 +88,7 @@
 
       <DotNetNew ToolPath="$(Stage2Directory)"
                  TemplateType="--debug:reinit"
-                 WorkingDirectory="$(NuGetPackagesArchiveProject)/temp" />
+                 WorkingDirectory="$(NuGetPackagesArchiveProject)" />
 
       <DotNetNew ToolPath="$(Stage2Directory)"
                  TemplateType="Mvc"
