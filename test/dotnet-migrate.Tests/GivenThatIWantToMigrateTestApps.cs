@@ -168,7 +168,7 @@ namespace Microsoft.DotNet.Migration.Tests
         {
             var solutionDirectory =
                 TestAssetsManager.CreateTestInstance("AppWithPackageNamedAfterFolder").Path;
-            var appProject = Path.Combine(solutionDirectory, "App", "App.csproj");
+            var appProject = Path.Combine(solutionDirectory, "src", "App", "App.csproj");
 
             MigrateProject(solutionDirectory);
 
@@ -176,6 +176,18 @@ namespace Microsoft.DotNet.Migration.Tests
             projectRootElement.Items.Where(
                 i => i.Include == "EntityFramework" && i.ItemType == "PackageReference")
                 .Should().HaveCount(2);
+        }
+        [Fact]
+        public void ItMigratesAProjectThatDependsOnAMigratedProjectWithTheSkipProjectReferenceFlag()
+        {
+            const string dependentProject = "ProjectA";
+            const string dependencyProject = "ProjectB";
+
+            var projectDirectory = TestAssetsManager.CreateTestInstance("TestAppDependencyGraph").Path;
+
+            MigrateProject(Path.Combine(projectDirectory, dependencyProject));
+
+            MigrateProject("--skip-project-references", Path.Combine(projectDirectory, dependentProject));
         }
 
         [Fact]
