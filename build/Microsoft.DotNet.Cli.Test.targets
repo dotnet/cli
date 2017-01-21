@@ -39,6 +39,7 @@
           TestProject=%(TestProjects.Identity);
           TestResultXmlDir=$(TestResultXmlDir);
           ToolPath=$(Stage0Directory)
+          WorkingDirectory=$([System.IO.Directory]::GetParent(%(TestProjects.Identity))) 
         </Properties>
       </ProjectsToTest>
     </ItemGroup>
