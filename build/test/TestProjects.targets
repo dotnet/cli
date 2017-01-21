@@ -12,9 +12,6 @@
       -->
       <PreTestProjectsToExclude Include="test$(PathSeparator)binding-redirects.Tests$(PathSeparator)binding-redirects.Tests.csproj;" />
 
-      <PreTestProjectsToExclude Condition=" 'https://github.com/dotnet/cli/issues/3216' != 'fixed' "
-                             Include="test$(PathSeparator)Kestrel.Tests$(PathSeparator)Kestrel.Tests.csproj" />
-      
       <PreTestProjectsToExclude Condition=" 'Non-test projects in test directory' != 'consider moving elsewhere' "
                              Include="test$(PathSeparator)ArgumentsReflector$(PathSeparator)ArgumentsReflector.csproj;
                                       test$(PathSeparator)Microsoft.DotNet.Tools.Tests.Utilities$(PathSeparator)Microsoft.DotNet.Tools.Tests.Utilities.csproj;
