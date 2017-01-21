@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
                 string projectDirectory = directory.Path;
 
                 string newArgs = "console";
-                new New3CommandShim()
+                new NewCommandShim()
                     .WithWorkingDirectory(projectDirectory)
                     .Execute(newArgs)
                     .Should().Pass();

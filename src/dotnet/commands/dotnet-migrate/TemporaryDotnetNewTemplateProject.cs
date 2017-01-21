@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.Tools.Migrate
             }
             Directory.CreateDirectory(tempDir);
 
-            RunCommand("new3", new string[] { "console" }, tempDir);
+            RunCommand("new", new string[] { "console" }, tempDir);
 
             return tempDir;
         }
@@ -66,7 +66,7 @@ namespace Microsoft.DotNet.Tools.Migrate
         private void RunCommand(string commandToExecute, IEnumerable<string> args, string workingDirectory)
         {
             List<string> argsWithDirectory = new List<string>(args);
-            if (string.Equals(commandToExecute, "new3", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(workingDirectory))
+            if (string.Equals(commandToExecute, "new", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(workingDirectory))
             {
                 argsWithDirectory.Add("-o");
                 argsWithDirectory.Add(workingDirectory);

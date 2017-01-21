@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.Restore.Tests
             string fullPath = Path.GetFullPath(Path.Combine(rootPath, dir));
 
             string newArgs = $"console -o \"{rootPath}\"";
-            new New3CommandShim()
+            new NewCommandShim()
                 .WithWorkingDirectory(rootPath)
                 .Execute(newArgs)
                 .Should()
@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.Restore.Tests
             string fullPath = Path.GetFullPath(Path.Combine(rootPath, dir));
 
             string newArgs = $"classlib -o \"{rootPath}\"";
-            new New3CommandShim()
+            new NewCommandShim()
                 .WithWorkingDirectory(rootPath)
                 .Execute(newArgs)
                 .Should()

@@ -56,7 +56,7 @@ Additional Arguments:
             try
             {
                 string newArgs = $"classlib -o \"{dir.Path}\"";
-                new New3CommandShim()
+                new NewCommandShim()
                     .WithWorkingDirectory(dir.Path)
                     .ExecuteWithCapturedOutput(newArgs)
                 .Should().Pass();

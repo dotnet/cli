@@ -55,9 +55,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
             nugetCachePrimer.PrimeCache();
         }
 
-        // warning: This mock setup must match the template creation calls.
-        // The list of calls is setup in NuGetCachePrimer._templatesUsedToPrimeCache
-        // and executed in NuGetCachePrimer.RunCommand() - which may adjust params.
         private Mock<ICommandFactory> SetupCommandFactoryMock()
         {
             var commandFactoryMock = new Mock<ICommandFactory>();
@@ -66,10 +63,10 @@ namespace Microsoft.DotNet.Configurer.UnitTests
             SetupCommandMock(_dotnetNewCommandMock);
 
             commandFactoryMock
-                .Setup(c => c.Create("new3", new[] { "mvc", "-f", "1.0" }, null, Constants.DefaultConfiguration))
+                .Setup(c => c.Create("new", new[] { "mvc", "-f", "1.0", "-au", "Individual" }, null, Constants.DefaultConfiguration))
                 .Returns(_dotnetNewCommandMock.Object);
             commandFactoryMock
-                .Setup(c => c.Create("new3", new[] { "mvc", "-f", "1.1" }, null, Constants.DefaultConfiguration))
+                .Setup(c => c.Create("new", new[] { "mvc", "-f", "1.1", "-au", "Individual" }, null, Constants.DefaultConfiguration))
                 .Returns(_dotnetNewCommandMock.Object);
 
             _dotnetRestoreCommandMock = new Mock<ICommand>();

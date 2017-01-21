@@ -194,14 +194,14 @@ Options:
             try
             {
                 string newArgs = $"classlib -o \"{dir.Path}\"";
-                new New3CommandShim()
+                new NewCommandShim()
                     .WithWorkingDirectory(dir.Path)
                     .ExecuteWithCapturedOutput(newArgs)
                 .Should().Pass();
             }
             catch (System.ComponentModel.Win32Exception e)
             {
-                throw new Exception($"Intermittent error in `dotnet new3` occurred when running it in dir `{dir.Path}`\nException:\n{e}");
+                throw new Exception($"Intermittent error in `dotnet new` occurred when running it in dir `{dir.Path}`\nException:\n{e}");
             }
 
             return dir;

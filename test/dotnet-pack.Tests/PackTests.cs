@@ -217,7 +217,7 @@ namespace Microsoft.DotNet.Tools.Pack.Tests
             string args = $"--packages {dir}";
 
             string newArgs = $"console -o \"{rootPath}\"";
-            new New3CommandShim()
+            new NewCommandShim()
                 .WithWorkingDirectory(rootPath)
                 .Execute(newArgs)
                 .Should()

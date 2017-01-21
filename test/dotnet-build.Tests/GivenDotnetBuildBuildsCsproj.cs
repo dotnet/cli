@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.Cli.Build.Tests
             string args = $"--packages {dir}";
 
             string newArgs = $"console -o \"{rootPath}\"";
-            new New3CommandShim()
+            new NewCommandShim()
                 .WithWorkingDirectory(rootPath)
                 .Execute(newArgs)
                 .Should()

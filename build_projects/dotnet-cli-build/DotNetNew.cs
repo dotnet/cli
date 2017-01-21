@@ -17,11 +17,13 @@ namespace Microsoft.DotNet.Cli.Build
 
         public string TemplateType { get; set; }
 
+        public string TemplateArgs { get; set; }
+
         private string GetTemplateType()
         {
             if (!string.IsNullOrEmpty(TemplateType))
             {
-                return $"--type {TemplateType}";
+                return $"{TemplateType}";
             }
 
             return null;

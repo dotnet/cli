@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.Tests
             command.Environment["SkipInvalidConfigurations"] = "true";
 
             _firstDotnetNonVerbUseCommandResult = command.ExecuteWithCapturedOutput("--info");
-            _firstDotnetVerbUseCommandResult = command.ExecuteWithCapturedOutput("new3");
+            _firstDotnetVerbUseCommandResult = command.ExecuteWithCapturedOutput("new");
 
             _nugetCacheFolder = new DirectoryInfo(testNugetCache);
         }        

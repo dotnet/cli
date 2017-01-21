@@ -12,8 +12,8 @@ namespace Microsoft.DotNet.Configurer
     {
         private static IReadOnlyList<IReadOnlyList<string>> _templatesUsedToPrimeCache = new List<IReadOnlyList<string>>()
         {
-            new List<string>() { "mvc", "-f", "1.0" },
-            new List<string>() { "mvc", "-f", "1.1" }
+            new List<string>() { "mvc", "-f", "1.0", "-au", "Individual" },
+            new List<string>() { "mvc", "-f", "1.1", "-au", "Individual" }
         };
 
         private readonly ICommandFactory _commandFactory;
@@ -104,7 +104,7 @@ namespace Microsoft.DotNet.Configurer
         private bool CreateTemporaryProject(string workingDirectory, IReadOnlyList<string> templateInfo)
         {
             return RunCommand(
-                "new3",
+                "new",
                 templateInfo,
                 workingDirectory);
         }
