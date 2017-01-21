@@ -30,10 +30,10 @@ namespace Microsoft.DotNet.New3.Tests
             string projectType,
             bool useNuGetConfigForAspNet)
         {
-            string rootPath = TestAssetsManager.CreateTestDirectory(identifier: $"new3_{language}_{projectType}").Path;
+            string rootPath = TestAssetsManager.CreateTestDirectory(identifier: $"{language}_{projectType}").Path;
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute($"new3 {projectType} -lang {language}")
+                .Execute($"new3 {projectType} -lang {language} -o {rootPath}")
                 .Should().Pass();
 
             if (useNuGetConfigForAspNet)

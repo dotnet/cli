@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.New3.Tests
         [Fact]
         public void When_dotnet_new_is_invoked_mupliple_times_it_should_fail()
         {
-            var rootPath = TestAssetsManager.CreateTestDirectory(identifier: "new3").Path;
+            var rootPath = TestAssetsManager.CreateTestDirectory().Path;
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
                 .Execute($"new3 console");
@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.New3.Tests
         {
             string[] cSharpTemplates = new[] { "console", "classlib", "mstest", "xunit", "web", "mvc", "webapi" };
 
-            var rootPath = TestAssetsManager.CreateTestDirectory(identifier: "new3").Path;
+            var rootPath = TestAssetsManager.CreateTestDirectory().Path;
             var packagesDirectory = Path.Combine(rootPath, "packages");
 
             foreach (string cSharpTemplate in cSharpTemplates)

@@ -2,12 +2,15 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Microsoft.DotNet.Cli.Utils;
+using Xunit;
+
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
 {
-    public sealed class NewCommand : TestCommand
+    public sealed class New3CommandShim : TestCommand
     {
-        public NewCommand()
+        public New3CommandShim()
             : base("dotnet")
         {
 
@@ -15,13 +18,13 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         public override CommandResult Execute(string args = "")
         {
-            args = $"new {args}";
+            args = $"new3 {args}";
             return base.Execute(args);
         }
 
         public override CommandResult ExecuteWithCapturedOutput(string args = "")
         {
-            args = $"new {args}";
+            args = $"new3 {args}";
             return base.ExecuteWithCapturedOutput(args);
         }
     }

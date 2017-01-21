@@ -43,7 +43,6 @@ namespace Microsoft.DotNet.Cli
             ["list"] = ListCommand.Run,
             ["migrate"] = MigrateCommand.Run,
             ["msbuild"] = MSBuildCommand.Run,
-            ["new"] = NewCommand.Run,
             ["new3"] = New3CommandShim.Run,
             ["nuget"] = NuGetCommand.Run,
             ["pack"] = PackCommand.Run,

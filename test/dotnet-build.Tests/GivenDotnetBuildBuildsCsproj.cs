@@ -46,9 +46,10 @@ namespace Microsoft.DotNet.Cli.Build.Tests
             string dir = "pkgs";
             string args = $"--packages {dir}";
 
-            new NewCommand()
+            string newArgs = $"console -o \"{rootPath}\"";
+            new New3CommandShim()
                 .WithWorkingDirectory(rootPath)
-                .Execute()
+                .Execute(newArgs)
                 .Should()
                 .Pass();
 
