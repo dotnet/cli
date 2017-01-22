@@ -2,12 +2,15 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Microsoft.DotNet.Cli.Utils;
+using Xunit;
+
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
 {
-    public sealed class NewCommand : TestCommand
+    public sealed class NewCommandShim : TestCommand
     {
-        public NewCommand()
+        public NewCommandShim()
             : base("dotnet")
         {
 

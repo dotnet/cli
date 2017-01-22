@@ -72,7 +72,12 @@
       <MakeDir Directories="@(NuGetPackagesArchiveDirectory)"/>
 
       <DotNetNew ToolPath="$(Stage2Directory)"
-                 TemplateType="Web"
+                 TemplateType="--debug:reinit"
+                 WorkingDirectory="$(NuGetPackagesArchiveProject)" />
+
+      <DotNetNew ToolPath="$(Stage2Directory)"
+                 TemplateType="Mvc"
+                 TemplateArgs="-au Individual"
                  WorkingDirectory="$(NuGetPackagesArchiveProject)/Web" />
 
       <DotNetRestore ToolPath="$(Stage2Directory)"
@@ -81,7 +86,8 @@
                      WorkingDirectory="$(NuGetPackagesArchiveProject)/Web" />
 
       <DotNetNew ToolPath="$(Stage2Directory)"
-                 TemplateType="Web1.1"
+                 TemplateType="Mvc"
+                 TemplateArgs="-au Individual -f 1.1"
                  WorkingDirectory="$(NuGetPackagesArchiveProject)/Web1.1" />
 
       <DotNetRestore ToolPath="$(Stage2Directory)"

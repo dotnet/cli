@@ -11,9 +11,11 @@ using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
 using FluentAssertions;
 
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
+
 namespace Microsoft.DotNet.Tests
 {
-	public class GivenThatTheUserIsRunningDotNetForTheFirstTime : TestBase
+    public class GivenThatTheUserIsRunningDotNetForTheFirstTime : TestBase
     {
         private static CommandResult _firstDotnetNonVerbUseCommandResult;
         private static CommandResult _firstDotnetVerbUseCommandResult;
@@ -77,13 +79,13 @@ A command is running to initially populate your local package cache, to improve 
                      .And.NotContain("Restore completed in");
         }
 
-    	[Fact]
-    	public void ItCreatesASentinelFileUnderTheNuGetCacheFolder()
-    	{
+        [Fact]
+        public void ItCreatesASentinelFileUnderTheNuGetCacheFolder()
+        {
             _nugetCacheFolder
                 .Should()
-                .HaveFile($"{GetDotnetVersion()}.dotnetSentinel");            
-    	}
+                .HaveFile($"{GetDotnetVersion()}.dotnetSentinel");
+        }
 
         [Fact]
         public void ItRestoresTheNuGetPackagesToTheNuGetCacheFolder()
@@ -120,10 +122,10 @@ A command is running to initially populate your local package cache, to improve 
         }
 
         private string GetDotnetVersion()
-    	{
-    		return new DotnetCommand().ExecuteWithCapturedOutput("--version").StdOut
-    			.TrimEnd(Environment.NewLine.ToCharArray());
-    	}
+        {
+            return new DotnetCommand().ExecuteWithCapturedOutput("--version").StdOut
+                .TrimEnd(Environment.NewLine.ToCharArray());
+        }
 
         private static string NormalizeLineEndings(string s)
         {
