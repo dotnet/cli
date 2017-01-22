@@ -434,17 +434,18 @@ namespace Microsoft.DotNet.Migration.Tests
          }
 
          [Theory]
-         [InlineData("src", "ProjectH")]
-         [InlineData("src with spaces", "ProjectJ")]
-         public void ItMigratesAndBuildsProjectsInGlobalJson(string path, string projectName)
+         [InlineData("src", "H")]
+         [InlineData("src with spaces", "J")]
+         public void ItMigratesAndBuildsProjectsInGlobalJson(string path, string projectNameSuffix)
          {
             var assetsDir = TestAssets
-                .GetProjectJson("TestAppDependencyGraph")
-                .CreateInstance(identifier: projectName)
+                .GetProjectJson("ProjectsWithGlobalJson")
+                .CreateInstance(identifier: projectNameSuffix)
                 .WithSourceFiles()
                 .WithRestoreFiles()
-                .Root
-                .GetDirectory("ProjectsWithGlobalJson");
+                .Root;
+
+            var projectName = $"Project{projectNameSuffix}";
 
             var globalJson = assetsDir.GetFile("global.json");
 
