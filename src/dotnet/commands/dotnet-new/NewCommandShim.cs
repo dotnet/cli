@@ -16,13 +16,13 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros;
 using Microsoft.TemplateEngine.Utils;
 
-namespace Microsoft.DotNet.Tools.New3
+namespace Microsoft.DotNet.Tools.New
 {
-    internal class New3CommandShim
+    internal class NewCommandShim
     {
         private const string HostIdentifier = "dotnetcli";
         private const string HostVersion = "1.0.0";
-        private const string CommandName = "new3";
+        private const string CommandName = "new";
 
         public static int Run(string[] args)
         {

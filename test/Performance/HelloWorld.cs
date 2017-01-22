@@ -76,9 +76,13 @@ namespace Microsoft.DotNet.Tests.Performance
             // Todo: this is a hack until corefx is on nuget.org remove this After RC 2 Release
             NuGetConfig.Write(RestoredTestProjectDirectory);
 
-            var newCommand = new NewCommand();
+            var newCommand = new NewCommandShim();
+            string newArgs = $"console -o \"{RestoredTestProjectDirectory}\"";
             newCommand.WorkingDirectory = RestoredTestProjectDirectory;
-            newCommand.Execute().Should().Pass();
+            newCommand
+                .Execute(newArgs)
+                .Should()
+                .Pass();
 
             var restoreCommand = new RestoreCommand();
             restoreCommand.WorkingDirectory = RestoredTestProjectDirectory;

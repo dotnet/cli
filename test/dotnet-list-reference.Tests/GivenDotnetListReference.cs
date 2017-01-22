@@ -28,6 +28,11 @@ Options:
         const string FrameworkNetCoreApp10Arg = "-f netcoreapp1.0";
         const string ConditionFrameworkNetCoreApp10 = "== 'netcoreapp1.0'";
 
+        static GivenDotnetListReference()
+        {
+            new TestCommand("dotnet").Execute("new --debug:reinit");
+        }
+
         [Theory]
         [InlineData("--help")]
         [InlineData("-h")]
@@ -193,9 +198,10 @@ Options:
 
             try
             {
-                new NewCommand()
+                string newArgs = $"classlib -o \"{dir.Path}\"";
+                new NewCommandShim()
                     .WithWorkingDirectory(dir.Path)
-                    .ExecuteWithCapturedOutput("-t Lib")
+                    .ExecuteWithCapturedOutput(newArgs)
                 .Should().Pass();
             }
             catch (System.ComponentModel.Win32Exception e)
