@@ -193,7 +193,7 @@ Options:
 
             try
             {
-                string newArgs = $"classlib -o \"{dir.Path}\"";
+                string newArgs = $"classlib -o \"{dir.Path}\" --debug:ephemeral-hive";
                 new NewCommandShim()
                     .WithWorkingDirectory(dir.Path)
                     .ExecuteWithCapturedOutput(newArgs)

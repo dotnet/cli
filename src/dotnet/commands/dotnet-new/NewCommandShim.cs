@@ -59,13 +59,14 @@ namespace Microsoft.DotNet.Tools.New
             return new DefaultTemplateEngineHost(HostIdentifier, HostVersion, CultureInfo.CurrentCulture.Name, preferences, builtIns);
         }
 
-        private static void FirstRun(ITemplateEngineHost host, IInstaller installer)
+        private static void FirstRun(IEngineEnvironmentSettings environmentSettings, IInstaller installer)
         {
-            var templatesDir = Path.Combine(Paths.Global.BaseDir, "Templates");
+            Paths paths = new Paths(environmentSettings);
+            var templatesDir = Path.Combine(paths.Global.BaseDir, "Templates");
 
-            if (templatesDir.Exists())
+            if (paths.Exists(templatesDir))
             {
-                var layoutIncludedPackages = host.FileSystem.EnumerateFiles(templatesDir, "*.nupkg", SearchOption.TopDirectoryOnly);
+                var layoutIncludedPackages = environmentSettings.Host.FileSystem.EnumerateFiles(templatesDir, "*.nupkg", SearchOption.TopDirectoryOnly);
                 installer.InstallPackages(layoutIncludedPackages);
             }
         }

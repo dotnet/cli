@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.Tools.Migrate
             }
             Directory.CreateDirectory(tempDir);
 
-            RunCommand("new", new string[] { "console" }, tempDir);
+            RunCommand("new", new string[] { "console", "-o", tempDir, "--debug:ephemeral-hive" }, tempDir);
 
             return tempDir;
         }
@@ -65,15 +65,8 @@ namespace Microsoft.DotNet.Tools.Migrate
 
         private void RunCommand(string commandToExecute, IEnumerable<string> args, string workingDirectory)
         {
-            List<string> argsWithDirectory = new List<string>(args);
-            if (string.Equals(commandToExecute, "new", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(workingDirectory))
-            {
-                argsWithDirectory.Add("-o");
-                argsWithDirectory.Add(workingDirectory);
-            }
-
             var command = new DotNetCommandFactory()
-                .Create(commandToExecute, argsWithDirectory)
+                .Create(commandToExecute, args)
                 .WorkingDirectory(workingDirectory)
                 .CaptureStdOut()
                 .CaptureStdErr();
@@ -85,7 +78,7 @@ namespace Microsoft.DotNet.Tools.Migrate
                 MigrationTrace.Instance.WriteLine(commandResult.StdOut);
                 MigrationTrace.Instance.WriteLine(commandResult.StdErr);
 
-                string argList = string.Join(", ", argsWithDirectory);
+                string argList = string.Join(", ", args);
                 throw new GracefulException($"Failed to run {commandToExecute} with args: {argList} ... workingDirectory = {workingDirectory}");
             }
         }

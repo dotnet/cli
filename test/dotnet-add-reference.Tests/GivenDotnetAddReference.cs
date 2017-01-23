@@ -58,7 +58,7 @@ Additional Arguments:
 
             try
             {
-                string args = $"classlib -o \"{dir.Path}\"";
+                string args = $"classlib -o \"{dir.Path}\" --debug:ephemeral-hive";
                 new NewCommandShim()
                     .WithWorkingDirectory(dir.Path)
                     .ExecuteWithCapturedOutput(args)

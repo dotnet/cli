@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             {
                 string projectDirectory = directory.Path;
 
-                string newArgs = "console";
+                string newArgs = "console --debug:ephemeral-hive";
                 new NewCommandShim()
                     .WithWorkingDirectory(projectDirectory)
                     .Execute(newArgs)

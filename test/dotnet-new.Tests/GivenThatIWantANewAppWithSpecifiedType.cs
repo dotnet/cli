@@ -10,7 +10,7 @@ using Microsoft.DotNet.Cli.Utils;
 
 namespace Microsoft.DotNet.New.Tests
 {
-    public class GivenThatIWantANewAppWithSpecifiedType : NewTestBase
+    public class GivenThatIWantANewAppWithSpecifiedType : TestBase
     {
         [Theory]
         [InlineData("C#", "console", false)]
@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.New.Tests
             string rootPath = TestAssetsManager.CreateTestDirectory(identifier: $"{language}_{projectType}").Path;
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute($"new {projectType} -lang {language} -o {rootPath}")
+                .Execute($"new {projectType} -lang {language} -o {rootPath} --debug:ephemeral-hive")
                 .Should().Pass();
 
             if (useNuGetConfigForAspNet)

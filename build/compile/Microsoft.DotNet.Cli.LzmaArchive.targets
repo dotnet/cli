@@ -87,12 +87,8 @@
                         Lines="$(NuGetConfigContent)" />
 
       <DotNetNew ToolPath="$(Stage2Directory)"
-                 TemplateType="--debug:reinit"
-                 WorkingDirectory="$(NuGetPackagesArchiveProject)" />
-
-      <DotNetNew ToolPath="$(Stage2Directory)"
                  TemplateType="Mvc"
-                 TemplateArgs="-au Individual"
+                 TemplateArgs="-au Individual --debug:ephemeral-hive"
                  WorkingDirectory="$(NuGetPackagesArchiveProject)/Web" />
 
       <DotNetRestore ToolPath="$(Stage2Directory)"
@@ -102,7 +98,7 @@
 
       <DotNetNew ToolPath="$(Stage2Directory)"
                  TemplateType="Mvc"
-                 TemplateArgs="-au Individual -f 1.1"
+                 TemplateArgs="-au Individual -f 1.1 --debug:ephemeral-hive"
                  WorkingDirectory="$(NuGetPackagesArchiveProject)/Web1.1" />
 
       <DotNetRestore ToolPath="$(Stage2Directory)"
@@ -124,6 +120,9 @@
 
     <Target Name="SetupNuGetPackagesArchiveInputsOutputs"
             DependsOnTargets="Prepare;SetupStage;SetupAzureBlobInformation">
+      <GenerateNuGetPackagesArchiveVersion ToolPath="$(Stage2Directory)">
+        <Output TaskParameter="Version" PropertyName="NuGetPackagesArchiveVersion"/>
+      </GenerateNuGetPackagesArchiveVersion>
       <PropertyGroup>
         <NugetPackagesArchiveName>nuGetPackagesArchive.$(NuGetPackagesArchiveVersion).lzma</NugetPackagesArchiveName>
         <NuGetPackagesArchiveProject>$(IntermediateDirectory)/NuGetPackagesArchiveProject</NuGetPackagesArchiveProject>

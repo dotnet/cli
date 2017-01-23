@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.Tests
             command.Environment["SkipInvalidConfigurations"] = "true";
 
             _firstDotnetNonVerbUseCommandResult = command.ExecuteWithCapturedOutput("--info");
-            _firstDotnetVerbUseCommandResult = command.ExecuteWithCapturedOutput("new");
+            _firstDotnetVerbUseCommandResult = command.ExecuteWithCapturedOutput("new --debug:ephemeral-hive");
 
             _nugetCacheFolder = new DirectoryInfo(testNugetCache);
         }        

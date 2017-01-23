@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Microsoft.DotNet.New.Tests
 {
-    public class GivenThatIWantANewApp : NewTestBase
+    public class GivenThatIWantANewApp : TestBase
     {
         [Fact]
         public void When_dotnet_new_is_invoked_mupliple_times_it_should_fail()
@@ -17,12 +17,12 @@ namespace Microsoft.DotNet.New.Tests
             var rootPath = TestAssetsManager.CreateTestDirectory().Path;
 
             new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .Execute($"new console");
+                .Execute($"new console --debug:ephemeral-hive");
 
             DateTime expectedState = Directory.GetLastWriteTime(rootPath);
 
             var result = new TestCommand("dotnet") { WorkingDirectory = rootPath }
-                .ExecuteWithCapturedOutput($"new console");
+                .ExecuteWithCapturedOutput($"new console --debug:ephemeral-hive");
 
             DateTime actualState = Directory.GetLastWriteTime(rootPath);
 
@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.New.Tests
             string packagesDirectory)
         {
             new TestCommand("dotnet") { WorkingDirectory = projectFolder }
-                .Execute($"new {projectType}")
+                .Execute($"new {projectType} --debug:ephemeral-hive")
                 .Should().Pass();
 
             new RestoreCommand()
