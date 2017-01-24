@@ -49,17 +49,19 @@
       <Output TaskParameter="CommitHash" PropertyName="CommitHash" />
     </GetCommitHash>
 
-    <GenerateBuildVersionInfo RepoRoot="$(RepoRoot)"
-                              VersionMajor="$(VersionMajor)"
-                              VersionMinor="$(VersionMinor)"
-                              VersionPatch="$(VersionPatch)"
-                              ReleaseSuffix="$(ReleaseSuffix)">
+    <GenerateBuildVersionInfo RepoRoot="$(RepoRoot)">
+      <Output TaskParameter="VersionMajor" PropertyName="VersionMajor" />
+      <Output TaskParameter="VersionMinor" PropertyName="VersionMinor" />
+      <Output TaskParameter="VersionPatch" PropertyName="VersionPatch" />
       <Output TaskParameter="CommitCount" PropertyName="CommitCount" />
+      <Output TaskParameter="ReleaseSuffix" PropertyName="ReleaseSuffix" />
       <Output TaskParameter="VersionSuffix" PropertyName="VersionSuffix" />
       <Output TaskParameter="SimpleVersion" PropertyName="SimpleVersion" />
       <Output TaskParameter="NugetVersion" PropertyName="NugetVersion" />
       <Output TaskParameter="MsiVersion" PropertyName="MsiVersion" />
       <Output TaskParameter="VersionBadgeMoniker" PropertyName="VersionBadgeMoniker" />
+      <Output TaskParameter="Channel" PropertyName="Channel" />
+      <Output TaskParameter="BranchName" PropertyName="BranchName" />
     </GenerateBuildVersionInfo>
 
     <GenerateNuGetPackagesArchiveVersion RepoRoot="$(RepoRoot)">
@@ -69,15 +71,10 @@
     <PropertyGroup>
       <VersionBadge>$(BaseOutputDirectory)/$(VersionBadgeMoniker)_$(Configuration)_version_badge.svg</VersionBadge>
       <SdkVersion>$(NugetVersion)</SdkVersion>
-<<<<<<< HEAD
-	  
+
       <SdkNugetVersion>$(VersionMajor).$(VersionMinor).$(VersionPatch)-rc4-$(CommitCount)</SdkNugetVersion>
       <ProjectModelNugetVersion>$(VersionMajor).$(VersionMinor).$(VersionPatch)-rc4-$(CommitCount)</ProjectModelNugetVersion>
       <DependencyModelAndInternalAbstractionsNugetVersion>$(VersionMajor).$(VersionMinor).1-beta-$(CommitCount)</DependencyModelAndInternalAbstractionsNugetVersion>
-=======
-
-      <SdkNugetVersion>$(SdkVersion)</SdkNugetVersion>
->>>>>>> upstream/master
 
       <ArchiveExtension Condition=" '$(OSName)' == 'win' ">.zip</ArchiveExtension>
       <ArchiveExtension Condition=" '$(OSName)' != 'win' ">.tar.gz</ArchiveExtension>
