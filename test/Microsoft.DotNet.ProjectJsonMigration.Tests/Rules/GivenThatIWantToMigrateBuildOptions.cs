@@ -420,12 +420,13 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Theory]
-        [InlineData("compile", "Compile")]
-        [InlineData("embed", "EmbeddedResource")]
-        [InlineData("copyToOutput", "Content")]
+        [InlineData("compile", "Compile", 3)]
+        [InlineData("embed", "EmbeddedResource", 3)]
+        [InlineData("copyToOutput", "Content", 2)]
         private void MigratingGroupIncludeExcludePopulatesAppropriateProjectItemElement(
             string group,
-            string itemName)
+            string itemName,
+            int expectedNumberOfCompileItems)
         {
             var testDirectory = Temp.CreateDirectory().Path;
             WriteExtraFiles(testDirectory);
@@ -445,7 +446,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             var mockProj = RunBuildOptionsRuleOnPj(pj,
                 testDirectory: testDirectory);
 
-            mockProj.Items.Count(i => i.ItemType.Equals(itemName, StringComparison.Ordinal)).Should().Be(2);
+            mockProj.Items.Count(i => i.ItemType.Equals(itemName, StringComparison.Ordinal))
+                .Should().Be(expectedNumberOfCompileItems);
 
             var defaultIncludePatterns = GetDefaultIncludePatterns(group);
             var defaultExcludePatterns = GetDefaultExcludePatterns(group);
@@ -454,7 +456,12 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             {
                 VerifyContentMetadata(item);
 
-                if (item.Include.Contains(@"src\file1.cs"))
+                if (string.IsNullOrEmpty(item.Include))
+                {
+                    item.Remove.Should()
+                        .Be(@"src\**\*;rootfile.cs;src\file2.cs");
+                }
+                else if (item.Include.Contains(@"src\file1.cs"))
                 {
                     item.Include.Should().Be(@"src\file1.cs;src\file2.cs");
                     item.Exclude.Should().Be(@"src\file2.cs");
