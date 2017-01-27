@@ -583,6 +583,36 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             mockProj.Items.First(i => i.ItemType == "None").Include.Should().Be("App.config");
         }
 
+        [Fact]
+        public void MigratingCompileIncludeWithPlainFileNamesRemovesThem()
+        {
+            var mockProj = RunBuildOptionsRuleOnPj(@"
+                {
+                    ""buildOptions"": {
+                        ""compile"": {
+                            ""include"": [""filename1.cs"", ""filename2.cs""],
+                        }
+                    }
+                }");
+
+            mockProj.Items.Count(i => i.ItemType.Equals("Compile", StringComparison.Ordinal)).Should().Be(0);
+        }
+
+        [Fact]
+        public void MigratingCompileIncludeFilesWithPlainFileNamesRemovesThem()
+        {
+            var mockProj = RunBuildOptionsRuleOnPj(@"
+                {
+                    ""buildOptions"": {
+                        ""compile"": {
+                            ""includeFiles"": [""filename1.cs"", ""filename2.cs""],
+                        }
+                    }
+                }");
+
+            mockProj.Items.Count(i => i.ItemType.Equals("Compile", StringComparison.Ordinal)).Should().Be(0);
+        }
+
         private static IEnumerable<string> GetDefaultExcludePatterns(string group)
         {
             var defaultExcludePatterns = new List<string>(group == "copyToOutput" ?

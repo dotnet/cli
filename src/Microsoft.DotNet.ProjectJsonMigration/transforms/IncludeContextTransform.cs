@@ -19,11 +19,13 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Transforms
             (itemName) =>
                 new AddItemTransform<IncludeContext>(
                     itemName,
-                    includeContext => FormatGlobPatternsForMsbuild(includeContext.IncludeFiles, includeContext.SourceBasePath),
+                    includeContext => FormatGlobPatternsForMsbuild(includeContext.IncludeFiles.OrEmptyIfNull()
+                                                                       .Where((pattern) => !_excludePatternRule(pattern)),
+                                                                   includeContext.SourceBasePath),
                     includeContext => FormatGlobPatternsForMsbuild(includeContext.ExcludeFiles, includeContext.SourceBasePath),
                     includeContext => includeContext != null 
                         && includeContext.IncludeFiles != null 
-                        && includeContext.IncludeFiles.Count > 0);
+                        && includeContext.IncludeFiles.Where((pattern) => !_excludePatternRule(pattern)).Count() > 0);
 
         protected virtual Func<string, AddItemTransform<IncludeContext>> IncludeExcludeTransformGetter =>
             (itemName) => new AddItemTransform<IncludeContext>(
