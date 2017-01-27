@@ -14,8 +14,56 @@ namespace Microsoft.DotNet.ProjectJsonMigration
     {
         public static string GetProjectName(this ProjectContext projectContext)
         {
-            // _ here is just an arbitrary configuration value so we can obtain the output name
-            return Path.GetFileNameWithoutExtension(projectContext.GetOutputPaths("_").CompilationFiles.Assembly);
+            var projectDirectory = projectContext.ProjectDirectory;
+            
+            return Path.GetFileName(projectDirectory);
+        }
+
+        public static bool HasRuntimes(this IEnumerable<ProjectContext> projectContexts)
+        {
+            return projectContexts.Any(p => p.ProjectFile.Runtimes.Any());
+        }
+
+        public static bool HasBothCoreAndFullFrameworkTFMs(this IEnumerable<ProjectContext> projectContexts)
+        {
+            return projectContexts.HasCoreTFM() && projectContexts.HasFullFrameworkTFM();
+        }
+
+        public static bool HasCoreTFM(this IEnumerable<ProjectContext> projectContexts)
+        {
+            return projectContexts.Any(p => !p.IsFullFramework());
+        }
+
+        public static bool HasFullFrameworkTFM(this IEnumerable<ProjectContext> projectContexts)
+        {
+            return projectContexts.Any(p => p.IsFullFramework());
+        }
+
+        public static bool HasExeOutput(this IEnumerable<ProjectContext> projectContexts)
+        {
+            return projectContexts.Any(p => p.IsExe());
+        }
+
+        public static bool HasLibraryOutput(this IEnumerable<ProjectContext> projectContexts)
+        {
+            return projectContexts.Any(p => p.IsLibrary());
+        }
+
+        public static bool IsFullFramework(this ProjectContext projectContext)
+        {
+            return !projectContext.TargetFramework.IsPackageBased;
+        }
+
+        public static bool IsExe(this ProjectContext projectContext)
+        {
+            var compilerOptions = projectContext.ProjectFile.GetCompilerOptions(null, null);
+            return (compilerOptions.EmitEntryPoint != null && compilerOptions.EmitEntryPoint.Value);
+        }
+
+        public static bool IsLibrary(this ProjectContext projectContext)
+        {
+            var compilerOptions = projectContext.ProjectFile.GetCompilerOptions(null, null);
+            return (compilerOptions.EmitEntryPoint == null || !compilerOptions.EmitEntryPoint.Value);
         }
     }
 }

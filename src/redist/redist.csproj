@@ -1,44 +1,30 @@
-﻿<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\dir.props" />
   
   <PropertyGroup>
-    <VersionPrefix>1.0.0-preview5</VersionPrefix>
-    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <VersionPrefix>$(CliVersionPrefix)</VersionPrefix>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dotnet5.4</PackageTargetFallback>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">$(PackageTargetFallback);dotnet5.4</PackageTargetFallback>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="RunCsc.sh;RunCsc.cmd">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Sdk">
-      <Version>$(CLI_NETSDK_Version)</Version>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.App">
-      <Version>1.0.1</Version>
+      <Version>1.1.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Build.Runtime">
       <Version>$(CLI_MSBuild_Version)</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.Build.Tasks">
-      <Version>2.0.0-beta6-60922-08</Version>
-    </PackageReference>
     <PackageReference Include="NuGet.Build.Tasks">
-      <Version>4.0.0-rc2</Version>
+      <Version>$(CLI_NuGet_Version)</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.TestPlatform.CLI">
-      <Version>15.0.0-preview-20161123-03</Version>
+      <Version>$(CLI_TestPlatform_Version)</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.TestPlatform.Build">
-      <Version>15.0.0-preview-20161123-03</Version>
+      <Version>$(CLI_TestPlatform_Version)</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
+  <ItemGroup>
     <ProjectReference Include="..\dotnet\dotnet.csproj" />
     <ProjectReference Include="..\Microsoft.DotNet.Archive\Microsoft.DotNet.Archive.csproj" />
     <ProjectReference Include="..\Microsoft.DotNet.Cli.Sln.Internal\Microsoft.DotNet.Cli.Sln.Internal.csproj" />
@@ -47,15 +33,10 @@
     <ProjectReference Include="..\Microsoft.DotNet.InternalAbstractions\Microsoft.DotNet.InternalAbstractions.csproj" />
     <ProjectReference Include="..\Microsoft.DotNet.ProjectJsonMigration\Microsoft.DotNet.ProjectJsonMigration.csproj" />
     <ProjectReference Include="..\Microsoft.DotNet.TestFramework\Microsoft.DotNet.TestFramework.csproj" />
-    <ProjectReference Include="..\tool_csc\tool_csc.csproj" />
     <ProjectReference Include="..\tool_msbuild\tool_msbuild.csproj" />
     <ProjectReference Include="..\tool_nuget\tool_nuget.csproj" />
   </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
-    <DefineConstants>$(DefineConstants);NETCOREAPP1_0</DefineConstants>
-  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
   </PropertyGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

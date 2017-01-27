@@ -13,6 +13,7 @@ using Microsoft.DotNet.Internal.ProjectModel;
 using Microsoft.DotNet.Tools.Common;
 using NuGet.Frameworks;
 using NuGet.LibraryModel;
+using NuGet.Versioning;
 
 namespace Microsoft.DotNet.ProjectJsonMigration.Rules
 {
@@ -22,10 +23,14 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
         private readonly  ProjectDependencyFinder _projectDependencyFinder;
         private string _projectDirectory;
 
+        private SupportedPackageVersions _supportedPackageVersions;
+
         public MigratePackageDependenciesAndToolsRule(ITransformApplicator transformApplicator = null)
         {
             _transformApplicator = transformApplicator ?? new TransformApplicator();
             _projectDependencyFinder = new ProjectDependencyFinder();
+
+            _supportedPackageVersions = new SupportedPackageVersions();
         }
 
         public void Apply(MigrationSettings migrationSettings, MigrationRuleInputs migrationRuleInputs)
@@ -55,12 +60,15 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                 migrationSettings.SolutionFile,
                 itemGroup: noFrameworkPackageReferenceItemGroup);
             
-            MigrationTrace.Instance.WriteLine($"Migrating {targetFrameworks.Count()} target frameworks");
+            MigrationTrace.Instance.WriteLine(String.Format(LocalizableStrings.MigratingCountTargetFrameworks, targetFrameworks.Count()));
             foreach (var targetFramework in targetFrameworks)
             {
-                MigrationTrace.Instance.WriteLine($"Migrating framework {targetFramework.FrameworkName.GetShortFolderName()}");
-                
-                MigrateImports(migrationRuleInputs.CommonPropertyGroup, targetFramework);
+                MigrationTrace.Instance.WriteLine(String.Format(LocalizableStrings.MigratingFramework, targetFramework.FrameworkName.GetShortFolderName()));
+
+                MigrateImports(
+                    migrationRuleInputs.CommonPropertyGroup,
+                    targetFramework,
+                    migrationRuleInputs.IsMultiTFM);
 
                 MigrateDependencies(
                     project,
@@ -88,7 +96,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                         PackageDependencyInfoTransform().Transform(
                             new PackageDependencyInfo
                             {
-                                Name = PackageConstants.TestSdkPackageName,
+                                Name = SupportedPackageVersions.TestSdkPackageName,
                                 Version = ConstantPackageVersions.TestSdkPackageVersion
                             }),
                         noFrameworkPackageReferenceItemGroup,
@@ -100,7 +108,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                             PackageDependencyInfoTransform().Transform(
                                 new PackageDependencyInfo
                                 {
-                                    Name = PackageConstants.XUnitPackageName,
+                                    Name = SupportedPackageVersions.XUnitPackageName,
                                     Version = ConstantPackageVersions.XUnitPackageVersion
                                 }),
                             noFrameworkPackageReferenceItemGroup,
@@ -110,7 +118,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                             PackageDependencyInfoTransform().Transform(
                                 new PackageDependencyInfo
                                 {
-                                    Name = PackageConstants.XUnitRunnerPackageName,
+                                    Name = SupportedPackageVersions.XUnitRunnerPackageName,
                                     Version = ConstantPackageVersions.XUnitRunnerPackageVersion
                                 }),
                             noFrameworkPackageReferenceItemGroup,
@@ -122,7 +130,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                             PackageDependencyInfoTransform().Transform(
                                 new PackageDependencyInfo
                                 {
-                                    Name = PackageConstants.MstestTestAdapterName,
+                                    Name = SupportedPackageVersions.MstestTestAdapterName,
                                     Version = ConstantPackageVersions.MstestTestAdapterVersion
                                 }),
                             noFrameworkPackageReferenceItemGroup,
@@ -132,7 +140,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                             PackageDependencyInfoTransform().Transform(
                                 new PackageDependencyInfo
                                 {
-                                    Name = PackageConstants.MstestTestFrameworkName,
+                                    Name = SupportedPackageVersions.MstestTestFrameworkName,
                                     Version = ConstantPackageVersions.MstestTestFrameworkVersion
                                 }),
                             noFrameworkPackageReferenceItemGroup,
@@ -141,14 +149,14 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                     break;
                 case ProjectType.Library:
                     if (!project.HasDependency(
-                        (dep) => dep.Name.Trim().ToLower() == PackageConstants.NetStandardPackageName.ToLower()))
+                        (dep) => dep.Name.Trim().ToLower() == SupportedPackageVersions.NetStandardPackageName.ToLower()))
                     {
                         _transformApplicator.Execute(
                             PackageDependencyInfoTransform().Transform(
                                 new PackageDependencyInfo
                                 {
-                                    Name = PackageConstants.NetStandardPackageName,
-                                    Version = PackageConstants.NetStandardPackageVersion
+                                    Name = SupportedPackageVersions.NetStandardPackageName,
+                                    Version = SupportedPackageVersions.NetStandardPackageVersion
                                 }),
                             noFrameworkPackageReferenceItemGroup,
                             mergeExisting: true);
@@ -161,18 +169,19 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
 
         private void MigrateImports(
             ProjectPropertyGroupElement commonPropertyGroup,
-            TargetFrameworkInformation targetFramework)
+            TargetFrameworkInformation targetFramework,
+            bool isMultiTFM)
         {
             var transform = ImportsTransformation.Transform(targetFramework);
 
             if (transform != null)
             {
-                transform.Condition = targetFramework.FrameworkName.GetMSBuildCondition();
+                transform.Condition = isMultiTFM ? targetFramework.FrameworkName.GetMSBuildCondition() : null;
                 _transformApplicator.Execute(transform, commonPropertyGroup, mergeExisting: true);
             }
             else
             {
-                MigrationTrace.Instance.WriteLine($"{nameof(MigratePackageDependenciesAndToolsRule)}: imports transform null for {targetFramework.FrameworkName.GetShortFolderName()}");
+                MigrationTrace.Instance.WriteLine(String.Format(LocalizableStrings.ImportsTransformNullFor, nameof(MigratePackageDependenciesAndToolsRule), targetFramework.FrameworkName.GetShortFolderName()));
             }
         }
 
@@ -204,7 +213,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                 _transformApplicator.Execute(
                     ToolTransform().Transform(ToPackageDependencyInfo(
                         tool,
-                        PackageConstants.ProjectToolPackages)),
+                        SupportedPackageVersions.ProjectToolPackages)),
                     itemGroup,
                     mergeExisting: true);
             }
@@ -262,7 +271,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                 _transformApplicator.Execute(
                     transform.Transform(ToPackageDependencyInfo(
                         packageDependency,
-                        PackageConstants.ProjectDependencyPackages)),
+                        _supportedPackageVersions.ProjectDependencyPackages)),
                     itemGroup,
                     mergeExisting: true);
             }
@@ -270,21 +279,31 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
 
         private PackageDependencyInfo ToPackageDependencyInfo(
             ProjectLibraryDependency dependency,
-            IDictionary<string, PackageDependencyInfo> dependencyToVersionMap)
+            IDictionary<PackageDependencyInfo, PackageDependencyInfo> dependencyToVersionMap)
         {
             var name = dependency.Name;
             var version = dependency.LibraryRange?.VersionRange?.OriginalString;
+            var minRange = dependency.LibraryRange?.VersionRange?.ToNonSnapshotRange().MinVersion;
 
-            if (dependencyToVersionMap.ContainsKey(name))
+            var possibleMappings =
+                dependencyToVersionMap.Where(c => c.Key.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            if (possibleMappings.Any() && !string.IsNullOrEmpty(version))
             {
-                var dependencyInfo = dependencyToVersionMap[name];
-                if (dependencyInfo == null)
+                var possibleVersions = possibleMappings.Select(p => VersionRange.Parse(p.Key.Version));
+                var matchVersion = possibleVersions.FirstOrDefault(p => p.Satisfies(minRange));
+                if (matchVersion != null)
                 {
-                    return null;
-                }
+                    var dependencyInfo = possibleMappings.First(c =>
+                        c.Key.Version.Equals(matchVersion.OriginalString, StringComparison.OrdinalIgnoreCase)).Value;
 
-                name = dependencyInfo.Name;
-                version = dependencyInfo.Version;
+                    if (dependencyInfo == null)
+                    {
+                        return null;
+                    }
+
+                    name = dependencyInfo.Name;
+                    version = dependencyInfo.Version;
+                }
             }
             
             return new PackageDependencyInfo
@@ -394,7 +413,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                 dep => dep.Name,
                 dep => "",
                 dep => dep != null)
-                .WithMetadata("Version", r => r.Version);
+                .WithMetadata("Version", r => r.Version, expressedAsAttribute: true);
 
         private AddItemTransform<PackageDependencyInfo> SdkPackageDependencyTransform => 
             PackageDependencyInfoTransform()
@@ -406,7 +425,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                 dep => dep.Name,
                 dep => "",
                 dep => dep != null)
-                .WithMetadata("Version", r => r.Version);
+                .WithMetadata("Version", r => r.Version, expressedAsAttribute: true);
 
         private AddPropertyTransform<TargetFrameworkInformation> ImportsTransformation => 
             new AddPropertyTransform<TargetFrameworkInformation>(

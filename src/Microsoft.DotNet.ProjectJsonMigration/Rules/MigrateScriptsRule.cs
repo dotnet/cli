@@ -23,25 +23,38 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
         public void Apply(MigrationSettings migrationSettings, MigrationRuleInputs migrationRuleInputs)
         {
             var csproj = migrationRuleInputs.OutputMSBuildProject;
+            var commonPropertyGroup = migrationRuleInputs.CommonPropertyGroup;
             var projectContext = migrationRuleInputs.DefaultProjectContext;
             var scripts = projectContext.ProjectFile.Scripts;
 
             foreach (var scriptSet in scripts)
             {
-                MigrateScriptSet(csproj, migrationRuleInputs.CommonPropertyGroup, scriptSet.Value, scriptSet.Key);
+                MigrateScriptSet(
+                    csproj,
+                    commonPropertyGroup,
+                    scriptSet.Value,
+                    scriptSet.Key,
+                    migrationRuleInputs.IsMultiTFM);
             }
         }
 
-        public ProjectTargetElement MigrateScriptSet(ProjectRootElement csproj,
-            ProjectPropertyGroupElement propertyGroup,
+        public ProjectTargetElement MigrateScriptSet(
+            ProjectRootElement csproj,
+            ProjectPropertyGroupElement commonPropertyGroup,
             IEnumerable<string> scriptCommands,
-            string scriptSetName)
+            string scriptSetName,
+            bool isMultiTFM)
         {
-            var target = CreateTarget(csproj, scriptSetName);
+            var target = CreateTarget(csproj, scriptSetName, isMultiTFM);
             foreach (var scriptCommand in scriptCommands)
             {
                 if (CommandIsNotNeededInMSBuild(scriptCommand))
                 {
+                    continue;
+                }
+                else if (IsRazorPrecompilationCommand(scriptCommand))
+                {
+                    EnableRazorCompilationOnPublish(commonPropertyGroup);
                     continue;
                 }
 
@@ -65,7 +78,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                     if (ScriptVariableToMSBuildMap[key] == null)
                     {
                         MigrationErrorCodes.MIGRATE1016(
-                                $"{key} is currently an unsupported script variable for project migration")
+                                String.Format(LocalizableStrings.MIGRATE1016Arg, key))
                             .Throw();
                     }
 
@@ -89,12 +102,22 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
             return command.Contains("dotnet publish-iis");
         }
 
+        private static bool IsRazorPrecompilationCommand(string command)
+        {
+            return command.Contains("dotnet razor-precompile");
+        }
+
+        private static void EnableRazorCompilationOnPublish(ProjectPropertyGroupElement commonPropertyGroup)
+        {
+            commonPropertyGroup.AddProperty("MvcRazorCompileOnPublish", "true");
+        }
+
         private bool IsPathRootedForAnyOS(string path)
         {
             return path.StartsWith("/") || path.Substring(1).StartsWith(":\\");
         }
 
-        private ProjectTargetElement CreateTarget(ProjectRootElement csproj, string scriptSetName)
+        private ProjectTargetElement CreateTarget(ProjectRootElement csproj, string scriptSetName, bool isMultiTFM)
         {
             var targetName = $"{scriptSetName[0].ToString().ToUpper()}{string.Concat(scriptSetName.Skip(1))}Script";
 
@@ -102,7 +125,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
             if(!ScriptSetToMSBuildHookTargetMap.TryGetValue(scriptSetName, out targetHookInfo))
             {
                 MigrationErrorCodes.MIGRATE1019(
-                        $"{scriptSetName} is an unsupported script event hook for project migration")
+                        String.Format(LocalizableStrings.MIGRATE1019Arg, scriptSetName))
                     .Throw();
             }
 
@@ -117,10 +140,17 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                 target.AfterTargets = targetHookInfo.TargetName;
             }
 
-            // Run Scripts After each inner build
-            target.Condition = " '$(IsCrossTargetingBuild)' != 'true' ";
+            if (isMultiTFM)
+            {
+                ConditionTargetToRunScriptsAfterEachInnerBuild(target);
+            }
 
             return target;
+        }
+
+        private void ConditionTargetToRunScriptsAfterEachInnerBuild(ProjectTargetElement target)
+        {
+            target.Condition = " '$(IsCrossTargetingBuild)' != 'true' ";
         }
 
         private void AddExec(ProjectTargetElement target, string command)

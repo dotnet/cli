@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
+using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.Sln.Internal;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ProjectJsonMigration;
@@ -19,9 +20,12 @@ namespace Microsoft.DotNet.Tools.Migrate
 {
     public partial class MigrateCommand
     {
+        private const string ProductDescription = "Visual Studio 15";
+        private const string VisualStudioVersion = "15.0.26114.2";
+        private const string MinimumVisualStudioVersion = "10.0.40219.1";
+
         private SlnFile _slnFile;
         private readonly DirectoryInfo _workspaceDirectory;
-        private readonly DirectoryInfo _backupDirectory;
         private readonly string _templateFile;
         private readonly string _projectArg;
         private readonly string _sdkVersion;
@@ -32,21 +36,20 @@ namespace Microsoft.DotNet.Tools.Migrate
         private readonly bool _skipBackup;
 
         public MigrateCommand(
-            string templateFile, 
-            string projectArg, 
-            string sdkVersion, 
-            string xprojFilePath, 
-            string reportFile, 
-            bool skipProjectReferences, 
+            string templateFile,
+            string projectArg,
+            string sdkVersion,
+            string xprojFilePath,
+            string reportFile,
+            bool skipProjectReferences,
             bool reportFormatJson,
             bool skipBackup)
-        {            
+        {
             _templateFile = templateFile;
             _projectArg = projectArg ?? Directory.GetCurrentDirectory();
             _workspaceDirectory = File.Exists(_projectArg)
                 ? new FileInfo(_projectArg).Directory
                 : new DirectoryInfo(_projectArg);
-            _backupDirectory = new DirectoryInfo(Path.Combine(_workspaceDirectory.FullName, "backup"));
             _sdkVersion = sdkVersion;
             _xprojFilePath = xprojFilePath;
             _skipProjectReferences = skipProjectReferences;
@@ -100,7 +103,24 @@ namespace Microsoft.DotNet.Tools.Migrate
 
         private void UpdateSolutionFile(MigrationReport migrationReport)
         {
-            if (_slnFile == null)
+            if(_slnFile != null)
+            {
+                UpdateSolutionFile(migrationReport, _slnFile);
+            }
+            else
+            {
+                foreach (var slnPath in _workspaceDirectory.EnumerateFiles("*.sln"))
+                {
+                    var slnFile = SlnFile.Read(slnPath.FullName);
+
+                    UpdateSolutionFile(migrationReport, slnFile);
+                }
+            }
+        }
+
+        private void UpdateSolutionFile(MigrationReport migrationReport, SlnFile slnFile)
+        {
+            if (slnFile == null)
             {
                 return;
             }
@@ -110,24 +130,98 @@ namespace Microsoft.DotNet.Tools.Migrate
                 return;
             }
 
-            foreach (var project in _slnFile.Projects)
+            var csprojFilesToAdd = new HashSet<string>();
+
+            var slnPathWithTrailingSlash = PathUtility.EnsureTrailingSlash(slnFile.BaseDirectory);
+            foreach (var report in migrationReport.ProjectMigrationReports)
             {
-                var projectDirectory = Path.Combine(
-                    _slnFile.BaseDirectory, 
-                    Path.GetDirectoryName(project.FilePath));
+                var reportPathWithTrailingSlash = PathUtility.EnsureTrailingSlash(report.ProjectDirectory);
+                var relativeReportPath = PathUtility.GetRelativePath(
+                    slnPathWithTrailingSlash,
+                    reportPathWithTrailingSlash);
 
-                var csprojFiles = new DirectoryInfo(projectDirectory)
-                    .EnumerateFiles()
-                    .Where(f => f.Extension == ".csproj");
+                var xprojPath = Path.Combine(relativeReportPath, report.ProjectName + ".xproj");
+                var xprojProjectsReferencedBySolution = slnFile.Projects.Where(p => p.FilePath == xprojPath);
 
-                if (csprojFiles.Count() == 1)
+                var migratedProjectName = report.ProjectName + ".csproj";
+                if (xprojProjectsReferencedBySolution.Count() == 1)
                 {
-                    project.FilePath = Path.Combine(Path.GetDirectoryName(project.FilePath), csprojFiles.First().Name);
-                    project.TypeGuid = ProjectTypeGuids.CSharpProjectTypeGuid;
+                    var slnProject = xprojProjectsReferencedBySolution.Single();
+                    slnProject.FilePath = Path.Combine(
+                        Path.GetDirectoryName(slnProject.FilePath),
+                        migratedProjectName);
+                    slnProject.TypeGuid = ProjectTypeGuids.CSharpProjectTypeGuid;
+                }
+                else
+                {
+                    var csprojPath = Path.Combine(relativeReportPath, migratedProjectName);
+                    var solutionContainsCsprojPriorToMigration = slnFile.Projects
+                        .Where(p => p.FilePath == csprojPath)
+                        .Any();
+
+                    if (!solutionContainsCsprojPriorToMigration)
+                    {
+                        csprojFilesToAdd.Add(Path.Combine(report.ProjectDirectory, migratedProjectName));
+                    }
+                }
+
+                foreach (var preExisting in report.PreExistingCsprojDependencies)
+                {
+                    csprojFilesToAdd.Add(Path.Combine(report.ProjectDirectory, preExisting));
                 }
             }
 
-            _slnFile.Write();
+            Version version;
+            if (!Version.TryParse(slnFile.VisualStudioVersion, out version) || version.Major < 15)
+            {
+                slnFile.ProductDescription = ProductDescription;
+                slnFile.VisualStudioVersion = VisualStudioVersion;
+                slnFile.MinimumVisualStudioVersion = MinimumVisualStudioVersion;
+            }
+
+            RemoveReferencesToMigratedFiles(slnFile);
+
+            slnFile.Write();
+
+            foreach (var csprojFile in csprojFilesToAdd)
+            {
+                AddProject(slnFile.FullPath, csprojFile);
+            }
+        }
+
+        private void RemoveReferencesToMigratedFiles(SlnFile slnFile)
+        {
+            var solutionFolders = slnFile.Projects.GetProjectsByType(ProjectTypeGuids.SolutionFolderGuid);
+
+            foreach (var solutionFolder in solutionFolders)
+            {
+                var solutionItems = solutionFolder.Sections.GetSection("SolutionItems");
+                if (solutionItems != null && solutionItems.Properties.ContainsKey("global.json"))
+                {
+                    solutionItems.Properties.Remove("global.json");
+                    if (solutionItems.IsEmpty)
+                    {
+                        solutionFolder.Sections.Remove(solutionItems);
+                    }
+                }
+            }
+
+            slnFile.RemoveEmptySolutionFolders();
+        }
+
+        private void AddProject(string slnPath, string csprojPath)
+        {
+            List<string> args = new List<string>()
+                {
+                    "sln",
+                    slnPath,
+                    "add",
+                    csprojPath,
+                };
+
+            var dotnetPath = Path.Combine(AppContext.BaseDirectory, "dotnet.dll");
+            var addCommand = new ForwardingApp(dotnetPath, args);
+            addCommand.Execute();
         }
 
         private void MoveProjectJsonArtifactsToBackup(MigrationReport migrationReport)
@@ -136,61 +230,32 @@ namespace Microsoft.DotNet.Tools.Migrate
             {
                 return;
             }
-            
+
             if (migrationReport.FailedProjectsCount > 0)
             {
                 return;
             }
-            
-            BackupGlobalJson();
 
             BackupProjects(migrationReport);
-            
         }
 
-        private void BackupGlobalJson()
-        {   
-            _backupDirectory.Create();
-
-            var globalJson = Path.Combine(_workspaceDirectory.FullName, GlobalSettings.FileName);
-
-            if (File.Exists(globalJson))
-            {
-                File.Move(globalJson, Path.Combine(_backupDirectory.FullName, GlobalSettings.FileName));
-            }
-        }
-        
         private void BackupProjects(MigrationReport migrationReport)
         {
+            var projectDirectories = new List<DirectoryInfo>();
             foreach (var report in migrationReport.ProjectMigrationReports)
             {
-                MigrateProject(report);
+                projectDirectories.Add(new DirectoryInfo(report.ProjectDirectory));
             }
-        }
 
-        private void MigrateProject(ProjectMigrationReport report)
-        {
-            var projectDirectory = PathUtility.EnsureTrailingSlash(report.ProjectDirectory);
-            
-            var relativeDirectory = PathUtility.GetRelativePath(PathUtility.EnsureTrailingSlash(_workspaceDirectory.FullName), projectDirectory);
+            var backupPlan = new MigrationBackupPlan(
+                projectDirectories,
+                _workspaceDirectory);
 
-            var targetDirectory = String.IsNullOrEmpty(relativeDirectory)
-                ? _backupDirectory.FullName
-                :  Path.Combine(_backupDirectory.FullName, relativeDirectory);
+            backupPlan.PerformBackup();
 
-            PathUtility.EnsureDirectory(PathUtility.EnsureTrailingSlash(targetDirectory));
-
-            var movableFiles = new DirectoryInfo(projectDirectory)
-                .EnumerateFiles()
-                .Where(f => f.Name == Project.FileName 
-                         || f.Extension == ".xproj"
-                         || f.FullName.EndsWith(".xproj.user")
-                         || f.FullName.EndsWith(".lock.json"));
-            
-            foreach (var movableFile in movableFiles)
-            {
-                movableFile.MoveTo(Path.Combine(targetDirectory, movableFile.Name));
-            }
+            Reporter.Output.WriteLine(string.Format(
+                LocalizableStrings.MigrateFilesBackupLocation,
+                backupPlan.RootBackupDirectory.FullName));
         }
 
         private void WriteReport(MigrationReport migrationReport)
@@ -214,6 +279,8 @@ namespace Microsoft.DotNet.Tools.Migrate
             {
                 var errorContent = GetProjectReportErrorContent(projectMigrationReport, colored: true);
                 var successContent = GetProjectReportSuccessContent(projectMigrationReport, colored: true);
+                var warningContent = GetProjectReportWarningContent(projectMigrationReport, colored: true);
+                Reporter.Output.WriteLine(warningContent);
                 if (!string.IsNullOrEmpty(errorContent))
                 {
                     Reporter.Error.WriteLine(errorContent);
@@ -225,6 +292,8 @@ namespace Microsoft.DotNet.Tools.Migrate
             }
 
             Reporter.Output.WriteLine(GetReportSummary(migrationReport));
+
+            Reporter.Output.WriteLine(LocalizableStrings.MigrationAdditionalHelp);
         }
 
         private string GetReportContent(MigrationReport migrationReport, bool colored = false)
@@ -240,6 +309,8 @@ namespace Microsoft.DotNet.Tools.Migrate
             {
                 var errorContent = GetProjectReportErrorContent(projectMigrationReport, colored: colored);
                 var successContent = GetProjectReportSuccessContent(projectMigrationReport, colored: colored);
+                var warningContent = GetProjectReportWarningContent(projectMigrationReport, colored: colored);
+                sb.AppendLine(warningContent);
                 if (!string.IsNullOrEmpty(errorContent))
                 {
                     sb.AppendLine(errorContent);
@@ -259,10 +330,15 @@ namespace Microsoft.DotNet.Tools.Migrate
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine("Summary");
-            sb.AppendLine($"Total Projects: {migrationReport.MigratedProjectsCount}");
-            sb.AppendLine($"Succeeded Projects: {migrationReport.SucceededProjectsCount}");
-            sb.AppendLine($"Failed Projects: {migrationReport.FailedProjectsCount}");
+            sb.AppendLine(LocalizableStrings.MigrationReportSummary);
+            sb.AppendLine(
+                string.Format(LocalizableStrings.MigrationReportTotalProjects, migrationReport.MigratedProjectsCount));
+            sb.AppendLine(string.Format(
+                LocalizableStrings.MigrationReportSucceededProjects,
+                migrationReport.SucceededProjectsCount));
+            sb.AppendLine(string.Format(
+                LocalizableStrings.MigrationReportFailedProjects,
+                migrationReport.FailedProjectsCount));
 
             return sb.ToString();
         }
@@ -270,7 +346,23 @@ namespace Microsoft.DotNet.Tools.Migrate
         private string GetProjectReportSuccessContent(ProjectMigrationReport projectMigrationReport, bool colored)
         {
             Func<string, string> GreenIfColored = (str) => colored ? str.Green() : str;
-            return GreenIfColored($"Project {projectMigrationReport.ProjectName} migration succeeded ({projectMigrationReport.ProjectDirectory})");
+            return GreenIfColored(string.Format(
+                LocalizableStrings.ProjectMigrationSucceeded,
+                projectMigrationReport.ProjectName,
+                projectMigrationReport.ProjectDirectory));
+        }
+
+        private string GetProjectReportWarningContent(ProjectMigrationReport projectMigrationReport, bool colored)
+        {
+            StringBuilder sb = new StringBuilder();
+            Func<string, string> YellowIfColored = (str) => colored ? str.Yellow() : str;
+
+            foreach (var warning in projectMigrationReport.Warnings)
+            {
+                sb.AppendLine(YellowIfColored(warning));
+            }
+
+            return sb.ToString();
         }
 
         private string GetProjectReportErrorContent(ProjectMigrationReport projectMigrationReport, bool colored)
@@ -280,8 +372,10 @@ namespace Microsoft.DotNet.Tools.Migrate
 
             if (projectMigrationReport.Errors.Any())
             {
-
-                sb.AppendLine(RedIfColored($"Project {projectMigrationReport.ProjectName} migration failed ({projectMigrationReport.ProjectDirectory})"));
+                sb.AppendLine(RedIfColored(string.Format(
+                    LocalizableStrings.ProjectMigrationFailed,
+                    projectMigrationReport.ProjectName,
+                    projectMigrationReport.ProjectDirectory)));
 
                 foreach (var error in projectMigrationReport.Errors.Select(e => e.GetFormattedErrorMessage()))
                 {
@@ -311,7 +405,7 @@ namespace Microsoft.DotNet.Tools.Migrate
 
                 if (!projects.Any())
                 {
-                    throw new Exception("Unable to find any projects in global.json");
+                    throw new GracefulException(LocalizableStrings.MigrationFailedToFindProjectInGlobalJson);
                 }
             }
             else if (File.Exists(projectArg) && 
@@ -321,7 +415,8 @@ namespace Microsoft.DotNet.Tools.Migrate
 
                 if (!projects.Any())
                 {
-                    throw new Exception($"Unable to find any projects in {projectArg}");
+                    throw new GracefulException(
+                        string.Format(LocalizableStrings.MigrationUnableToFindProjects, projectArg));
                 }
             }
             else if (Directory.Exists(projectArg))
@@ -330,15 +425,17 @@ namespace Microsoft.DotNet.Tools.Migrate
 
                 if (!projects.Any())
                 {
-                    throw new Exception($"No project.json file found in '{projectArg}'");
+                    throw new GracefulException(
+                        string.Format(LocalizableStrings.MigrationProjectJsonNotFound, projectArg));
                 }
             }
             else
             {
-                throw new Exception($"Invalid project argument - '{projectArg}' is not a project.json, global.json, or solution.sln file and a directory named '{projectArg}' doesn't exist.");
+                throw new GracefulException(
+                    string.Format(LocalizableStrings.MigrationInvalidProjectArgument, projectArg));
             }
-            
-            foreach(var project in projects)
+
+            foreach (var project in projects)
             {
                 yield return GetProjectJsonPath(project);
             }
@@ -348,7 +445,7 @@ namespace Microsoft.DotNet.Tools.Migrate
         {
             if (variable == null)
             {
-                throw new Exception(message);
+                throw new GracefulException(message);
             }
         }
 
@@ -361,17 +458,12 @@ namespace Microsoft.DotNet.Tools.Migrate
                 return projectJson;
             }
 
-            throw new Exception($"Unable to find project file at {projectJson}");
+            throw new GracefulException(string.Format(LocalizableStrings.MigratonUnableToFindProjectJson, projectJson));
         }
 
         private IEnumerable<string> GetProjectsFromGlobalJson(string globalJson)
         {
-            if (!File.Exists(globalJson))
-            {
-                throw new Exception($"Unable to find global settings file at {globalJson}");
-            }
-
-            var searchPaths = ProjectDependencyFinder.GetGlobalPaths(Path.GetDirectoryName(globalJson));
+            var searchPaths = ProjectDependencyFinder.GetGlobalPaths(GetGlobalJsonDirectory(globalJson));
 
             foreach (var searchPath in searchPaths)
             {
@@ -394,11 +486,24 @@ namespace Microsoft.DotNet.Tools.Migrate
             }
         }
 
+        private string GetGlobalJsonDirectory(string globalJson)
+        {
+            if (!File.Exists(globalJson))
+            {
+                throw new GracefulException(
+                    string.Format(LocalizableStrings.MigrationUnableToFindGlobalJson, globalJson));
+            }
+
+            var globalJsonDirectory = Path.GetDirectoryName(globalJson);
+            return string.IsNullOrEmpty(globalJsonDirectory) ? "." : globalJsonDirectory;
+        }
+
         private IEnumerable<string> GetProjectsFromSolution(string slnPath)
         {
             if (!File.Exists(slnPath))
             {
-                throw new Exception($"Unable to find the solution file at {slnPath}");
+                throw new GracefulException(
+                    string.Format(LocalizableStrings.MigrationUnableToFindSolutionFile, slnPath));
             }
 
             _slnFile = SlnFile.Read(slnPath);

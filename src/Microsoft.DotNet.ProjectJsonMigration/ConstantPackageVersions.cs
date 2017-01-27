@@ -5,13 +5,16 @@ namespace Microsoft.DotNet.ProjectJsonMigration
 {
     internal class ConstantPackageVersions
     {
-        public const string AspNetToolsVersion = "1.0.0-msbuild1-final";
-        public const string TestSdkPackageVersion = "15.0.0-preview-20161024-02";
-        public const string XUnitPackageVersion = "2.2.0-beta4-build3444";
-        public const string XUnitRunnerPackageVersion = "2.2.0-beta4-build1194";
-        public const string MstestTestAdapterVersion = "1.1.3-preview";
-        public const string MstestTestFrameworkVersion = "1.0.4-preview";
+        public const string AspNetToolsVersion = "1.0.0-msbuild3-final";
+        public const string AspNet110ToolsVersion = "1.1.0-msbuild3-final";
+        public const string AspNetLTSPackagesVersion = "1.0.2";
+        public const string EntityFrameworkLTSPackagesVersion = "1.0.2";
+        public const string TestSdkPackageVersion = "15.0.0-preview-20170106-08";
+        public const string XUnitPackageVersion = "2.2.0-beta5-build3474";
+        public const string XUnitRunnerPackageVersion = "2.2.0-beta5-build1225";
+        public const string MstestTestAdapterVersion = "1.1.8-rc";
+        public const string MstestTestFrameworkVersion = "1.0.8-rc";
         public const string BundleMinifierToolVersion = "2.2.301";
-        public const string WebSdkPackageVersion = "1.0.0-alpha-20161117-1-119" ;
+        public const string WebSdkPackageVersion = "1.0.0-alpha-20161205-1-154" ;
     }
 }

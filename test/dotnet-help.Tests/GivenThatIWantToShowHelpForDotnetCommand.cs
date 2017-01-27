@@ -32,14 +32,16 @@ Host options (passed before the command):
   --info                Display .NET CLI Info
 
 Commands:
-  new           Initialize a basic .NET project
-  restore       Restore dependencies specified in the .NET project
-  build         Builds a .NET project
-  publish       Publishes a .NET project for deployment (including the runtime)
-  run           Compiles and immediately executes a .NET project
-  test          Runs unit tests using the test runner specified in the project
-  pack          Creates a NuGet package
-  migrate       Migrates a project.json based project to a msbuild based project
+  new           Initialize .NET projects.
+  restore       Restore dependencies specified in the .NET project.
+  build         Builds a .NET project.
+  publish       Publishes a .NET project for deployment (including the runtime).
+  run           Compiles and immediately executes a .NET project.
+  test          Runs unit tests using the test runner specified in the project.
+  pack          Creates a NuGet package.
+  migrate       Migrates a project.json based project to a msbuild based project.
+  clean         Clean build output(s).
+  sln           Modify solution (SLN) files.
 
 Project modification commands:
   add           Add items to the project
@@ -47,18 +49,21 @@ Project modification commands:
   list          List items in the project
 
 Advanced Commands:
-  nuget         Provides additional NuGet commands
-  msbuild       msbuilds a project and all of its dependencies
-  vstest        Runs tests from the specified files";
+  nuget         Provides additional NuGet commands.
+  msbuild       Runs Microsoft Build Engine (MSBuild).
+  vstest        Runs Microsoft Test Execution Command Line Tool.";
 
         [Theory]
         [InlineData("--help")]
         [InlineData("-h")]
+        [InlineData("-?")]
+        [InlineData("/?")]
         public void WhenHelpOptionIsPassedToDotnetItPrintsUsage(string helpArg)
         {
             var cmd = new DotnetCommand()
                 .ExecuteWithCapturedOutput($"{helpArg}");
-            cmd.Should().Pass().And.HaveStdOutContaining(HelpText);
+            cmd.Should().Pass();
+            cmd.StdOut.Should().ContainVisuallySameFragment(HelpText);
         }
     }
 }

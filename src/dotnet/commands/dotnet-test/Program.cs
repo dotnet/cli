@@ -21,11 +21,11 @@ namespace Microsoft.DotNet.Tools.Test
             {
                 Name = "dotnet test",
                 FullName = LocalizableStrings.AppFullName,
-                Description = LocalizableStrings.AppDescription
+                Description = LocalizableStrings.AppDescription,
+                HandleRemainingArguments = true,
+                ArgumentSeparatorHelpText = LocalizableStrings.RunSettingsArgsHelpText
             };
 
-            cmd.AllowArgumentSeparator = true;
-            cmd.ArgumentSeparatorHelpText = HelpMessageStrings.MSBuildAdditionalArgsHelpText;
             cmd.HelpOption("-h|--help");
 
             var argRoot = cmd.Argument(
@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.Tools.Test
                 CommandOptionType.NoValue);
 
             var testCaseFilterOption = cmd.Option(
-                $"--test-case-filter <{LocalizableStrings.CmdTestCaseFilterExpression}>",
+                $"--filter <{LocalizableStrings.CmdTestCaseFilterExpression}>",
                 LocalizableStrings.CmdTestCaseFilterDescription,
                 CommandOptionType.SingleValue);
 
@@ -83,6 +83,11 @@ namespace Microsoft.DotNet.Tools.Test
                LocalizableStrings.CmdNoBuildDescription,
                CommandOptionType.NoValue);
 
+            var resultsDirectoryOption = cmd.Option(
+                "-r|--results-directory",
+                LocalizableStrings.CmdResultsDirectoryDescription,
+                CommandOptionType.SingleValue);
+
             CommandOption verbosityOption = MSBuildForwardingApp.AddVerbosityOption(cmd);
 
             cmd.OnExecute(() =>
@@ -116,7 +121,7 @@ namespace Microsoft.DotNet.Tools.Test
 
                 if (loggerOption.HasValue())
                 {
-                    msbuildArgs.Add($"/p:VSTestLogger={string.Join(";", loggerOption.Values)}");
+                    msbuildArgs.Add($"/p:VSTestLogger={string.Join(";", GetSemiColonEscapedArgs(loggerOption.Values))}");
                 }
 
                 if (configurationOption.HasValue())
@@ -127,6 +132,11 @@ namespace Microsoft.DotNet.Tools.Test
                 if (frameworkOption.HasValue())
                 {
                     msbuildArgs.Add($"/p:TargetFramework={frameworkOption.Value()}");
+                }
+
+                if (resultsDirectoryOption.HasValue())
+                {
+                    msbuildArgs.Add($"/p:VSTestResultsDirectory={resultsDirectoryOption.Value()}");
                 }
 
                 if (outputOption.HasValue())
@@ -155,7 +165,7 @@ namespace Microsoft.DotNet.Tools.Test
 
                 string defaultproject = GetSingleTestProjectToRunTestIfNotProvided(argRoot.Value, cmd.RemainingArguments);
 
-                if(!string.IsNullOrEmpty(defaultproject))
+                if (!string.IsNullOrEmpty(defaultproject))
                 {
                     msbuildArgs.Add(defaultproject);
                 }
@@ -163,6 +173,13 @@ namespace Microsoft.DotNet.Tools.Test
                 if (!string.IsNullOrEmpty(argRoot.Value))
                 {
                     msbuildArgs.Add(argRoot.Value);
+                }
+
+                // Get runsetings options specified after -- 
+                if (cmd.RemainingArguments != null && cmd.RemainingArguments.Count > 0)
+                {
+                    var runSettingsOptions = GetRunSettingsOptions(cmd.RemainingArguments);
+                    msbuildArgs.Add(string.Format("/p:VSTestCLIRunSettings=\"{0}\"", string.Join(";", runSettingsOptions)));
                 }
 
                 // Add remaining arguments that the parser did not understand,
@@ -241,6 +258,60 @@ namespace Microsoft.DotNet.Tools.Test
             }
 
             return projectFiles[0];
+        }
+
+        private static string[] GetRunSettingsOptions(List<string> remainingArgs)
+        {
+            List<string> runsettingsArgs = new List<string>();
+            List<string> argsToRemove = new List<string>();
+
+            bool readRunSettings = false;
+            foreach (string arg in remainingArgs)
+            {
+                if (!readRunSettings)
+                {
+                    if (arg.Equals("--"))
+                    {
+                        readRunSettings = true;
+                        argsToRemove.Add(arg);
+                    }
+
+                    continue;
+                }
+
+                runsettingsArgs.Add(GetSemiColonEsacpedstring(arg));
+                argsToRemove.Add(arg);
+            }
+
+            foreach (string arg in argsToRemove)
+            {
+                remainingArgs.Remove(arg);
+            }
+
+            return runsettingsArgs.ToArray();
+        }
+
+        private static string GetSemiColonEsacpedstring(string arg)
+        {
+            if (arg.IndexOf(";") != -1)
+            {
+                return arg.Replace(";", "%3b");
+            }
+
+            return arg;
+        }
+
+        private static string[] GetSemiColonEscapedArgs(List<string> args)
+        {
+            int counter = 0;
+            string[] array = new string[args.Count];
+
+            foreach (string arg in args)
+            {
+                array[counter++] = GetSemiColonEsacpedstring(arg);
+            }
+
+            return array;
         }
     }
 }
