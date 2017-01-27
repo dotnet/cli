@@ -12,21 +12,11 @@ namespace Microsoft.DotNet.Cli.Build
 
         protected override string Args
         {
-            get { return $"{GetTemplateType()} {TemplateArgs}"; }
+            get { return $"{TemplateType} {TemplateArgs}"; }
         }
 
         public string TemplateType { get; set; }
 
         public string TemplateArgs { get; set; }
-
-        private string GetTemplateType()
-        {
-            if (!string.IsNullOrEmpty(TemplateType))
-            {
-                return $"{TemplateType}";
-            }
-
-            return null;
-        }
     }
 }
