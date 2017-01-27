@@ -420,12 +420,13 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Theory]
-        [InlineData("compile", "Compile")]
-        [InlineData("embed", "EmbeddedResource")]
-        [InlineData("copyToOutput", "Content")]
+        [InlineData("compile", "Compile", "")]
+        [InlineData("embed", "EmbeddedResource", ";rootfile.cs")]
+        [InlineData("copyToOutput", "Content", ";rootfile.cs")]
         private void MigratingGroupIncludeExcludePopulatesAppropriateProjectItemElement(
             string group,
-            string itemName)
+            string itemName,
+            string expectedRootFiles)
         {
             var testDirectory = Temp.CreateDirectory().Path;
             WriteExtraFiles(testDirectory);
@@ -449,8 +450,6 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
 
             var defaultIncludePatterns = GetDefaultIncludePatterns(group);
             var defaultExcludePatterns = GetDefaultExcludePatterns(group);
-
-            string expectedRootFiles = group != "compile" ? ";rootfile.cs" : "";
 
             foreach (var item in mockProj.Items.Where(i => i.ItemType.Equals(itemName, StringComparison.Ordinal)))
             {
@@ -490,12 +489,13 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Theory]
-        [InlineData("compile", "Compile")]
-        [InlineData("embed", "EmbeddedResource")]
-        [InlineData("copyToOutput", "Content")]
+        [InlineData("compile", "Compile", "")]
+        [InlineData("embed", "EmbeddedResource", ";rootfile.cs")]
+        [InlineData("copyToOutput", "Content", ";rootfile.cs")]
         private void MigratingGroupIncludeOnlyPopulatesAppropriateProjectItemElement(
             string group,
-            string itemName)
+            string itemName,
+            string expectedRootFiles)
         {
             var testDirectory = Temp.CreateDirectory().Path;
             WriteExtraFiles(testDirectory);
@@ -516,8 +516,6 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
 
             var defaultIncludePatterns = GetDefaultIncludePatterns(group);
             var defaultExcludePatterns = GetDefaultExcludePatterns(group);
-
-            string expectedRootFiles = group != "compile" ? ";rootfile.cs" : "";
 
             foreach (var item in mockProj.Items.Where(i => i.ItemType.Equals(itemName, StringComparison.Ordinal)))
             {
