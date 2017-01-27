@@ -1,8 +1,11 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.DotNet.Tools.Common;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace Microsoft.DotNet.ProjectJsonMigration.Transforms
 {
@@ -61,6 +64,20 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Transforms
             {
                 return pattern;
             }
+        }
+
+        private bool PatternIsDirectory(string pattern, string projectDirectory)
+        {
+            // TODO: what about /some/path/**/somedir?
+            // Should this even be migrated?
+            var path = pattern;
+
+            if (!Path.IsPathRooted(path))
+            {
+                path = Path.Combine(projectDirectory, path);
+            }
+
+            return Directory.Exists(path);
         }
 
         protected string ConvertTargetPathToMsbuildMetadata(string targetPath)

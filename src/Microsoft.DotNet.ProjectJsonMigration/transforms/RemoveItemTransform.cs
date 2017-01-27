@@ -27,6 +27,12 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Transforms
             _removeValueFunc = removeValueFunc;
         }
 
+        public RemoveItemTransform<T> WithMetadata(ItemMetadataValue<T> metadata)
+        {
+            _metadata.Add(metadata);
+            return this;
+        }
+
         public RemoveItemTransform<T> WithMetadata(
             string metadataName,
             string metadataValue,
@@ -43,7 +49,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Transforms
         {
             string removeValue = _removeValueFunc(source);
             
-            var item = _itemObjectGenerator.AddItem(_itemName, string.Empty);
+            var item = _itemObjectGenerator.AddItem(_itemName, "PlaceHolderSinceNullOrEmptyCannotBePassedToConstructor");
+            item.Include = null;
             item.Remove = removeValue;
 
             foreach (var metadata in _metadata)

@@ -181,19 +181,5 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Transforms
         {
             return _mappingsToTransfrom(addItemTransform, targetPath);
         }
-
-        private bool PatternIsDirectory(string pattern, string projectDirectory)
-        {
-            // TODO: what about /some/path/**/somedir?
-            // Should this even be migrated?
-            var path = pattern;
-
-            if (!Path.IsPathRooted(path))
-            {
-                path = Path.Combine(projectDirectory, path);
-            }
-
-            return Directory.Exists(path);
-        }
     }
 }
