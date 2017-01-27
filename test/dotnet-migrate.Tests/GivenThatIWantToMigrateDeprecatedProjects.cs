@@ -378,11 +378,10 @@ namespace Microsoft.DotNet.Migration.Tests
                  .Execute("restore")
                  .Should().Pass();
 
-            // Issue: https://github.com/dotnet/cli/issues/5461
-            //new DotnetCommand()
-            //     .WithWorkingDirectory(projectDirectory)
-            //     .Execute("build -c Debug")
-            //     .Should().Pass();
+            new DotnetCommand()
+                 .WithWorkingDirectory(projectDirectory)
+                 .Execute("build -c Debug")
+                 .Should().Pass();
         }
 
         [Fact]
@@ -530,17 +529,16 @@ namespace Microsoft.DotNet.Migration.Tests
                  .Execute("restore")
                  .Should().Pass();
 
-            // Issue: https://github.com/dotnet/cli/issues/5461
-            //new DotnetCommand()
-            //     .WithWorkingDirectory(projectDirectory)
-            //     .Execute("build -c Debug")
-            //     .Should().Pass();
+            new DotnetCommand()
+                 .WithWorkingDirectory(projectDirectory)
+                 .Execute("build -c Debug")
+                 .Should().Pass();
 
-            //var cmd = new DotnetCommand()
-            //     .WithWorkingDirectory(projectDirectory)
-            //     .ExecuteWithCapturedOutput("run -c Debug");
-            //cmd.Should().Pass();
-            //cmd.StdOut.Should().Contain("0 Resources Found:");
+            var cmd = new DotnetCommand()
+                 .WithWorkingDirectory(projectDirectory)
+                 .ExecuteWithCapturedOutput("run -c Debug");
+            cmd.Should().Pass();
+            cmd.StdOut.Should().Contain("0 Resources Found:");
         }
     }
 }
