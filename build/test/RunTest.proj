@@ -1,16 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTarget="RunTest" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
- 
-  <!-- workaround for https://github.com/Microsoft/msbuild/issues/885 --> 
-  <!-- renaming the property because the original property is a global property and therefore 
-       cannot be redefined at runtime. --> 
-  <PropertyGroup> 
-    <CLIBuildDllPath>$([MSBuild]::Unescape($(CLIBuildDll)))</CLIBuildDllPath> 
-  </PropertyGroup> 
- 
-  <UsingTask TaskName="DotNetTest" AssemblyFile="$(CLIBuildDllPath)" /> 
+  <!-- workaround for https://github.com/Microsoft/msbuild/issues/885 -->
+  <!-- renaming the property because the original property is a global property and therefore
+       cannot be redefined at runtime. -->
+  <PropertyGroup>
+    <CLIBuildDllPath>$([MSBuild]::Unescape($(CLIBuildDll)))</CLIBuildDllPath>
+  </PropertyGroup>
+
+  <UsingTask TaskName="DotNetTest" AssemblyFile="$(CLIBuildDllPath)" />
+  <UsingTask TaskName="SetEnvVar" AssemblyFile="$(CLIBuildDll)" />
   
   <Target Name="RunTest">
+
+    <SetEnvVar Name="CscToolExe" 
+                Value="" />  
+    <SetEnvVar Name="MSBuildExtensionsPath" 
+                Value="" />  
+    <SetEnvVar Name="MSBuildSDKsPath" 
+                Value="" />  
+    <SetEnvVar Name="MSBuildToolsPath" 
+                Value="" />
+
+    <Message Text="AfterSetEnvVar MSBuildExtensionsPath: $(MSBuildExtensionsPath)" Importance="High" />
+
     <DotNetTest EnvironmentVariables="$(EnvironmentVariables)"
                 ToolPath="$(ToolPath)"
                 Configuration="$(Configuration)"

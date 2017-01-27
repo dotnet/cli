@@ -48,6 +48,9 @@ namespace Microsoft.DotNet.Cli.Utils
         };
 
         public static readonly string MSBUILD_EXE_PATH = "MSBUILD_EXE_PATH";
+        public static readonly string MSBuildExtensionsPath = "MSBuildExtensionsPath";
+        public static readonly string MSBuildSDKsPath = "MSBuildSDKsPath";
+        public static readonly string MSBuildToolsPath = "MSBuildToolsPath";
 
         public static readonly string ProjectArgumentName = "<PROJECT>";
         public static readonly string SolutionArgumentName = "<SLN_FILE>";

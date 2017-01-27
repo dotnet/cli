@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Microsoft.DotNet.ProjectJsonMigration.Tests
 {
-    public partial class MigrationBackupPlanTests
+    public class MigrationBackupPlanTests
     {
         [Fact]
         public void TheBackupDirectoryIsASubfolderOfTheMigratedProject()

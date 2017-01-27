@@ -311,9 +311,7 @@ namespace Microsoft.DotNet.Tests
 
         private ProjectToolsCommandResolver SetupProjectToolsCommandResolver()
         {
-            Environment.SetEnvironmentVariable(
-                Constants.MSBUILD_EXE_PATH,
-                Path.Combine(new RepoDirectoriesProvider().Stage2Sdk, "MSBuild.dll"));
+            
 
             var packagedCommandSpecFactory = new PackagedCommandSpecFactoryWithCliRuntime();
 

@@ -1,0 +1,13 @@
+﻿<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask TaskName="TaskFoundOnlyInOneVersion" 
+             AssemblyFile="$(MSBuildThisFileDirectory)/../lib/netcoreapp1.0/DependsOn.Other.Microsoft.DotNet.Cli.Utils.dll" />
+
+  <PropertyGroup>
+    <ApplicationName>$(AssemblyName)</ApplicationName>
+    <ApplicationName Condition="'$(AssemblyName)' == ''">$(MsBuildProjectName)</ApplicationName>
+  </PropertyGroup>
+
+  <Target Name="TaskFoundOnlyInOneVersion">
+    <TaskFoundOnlyInOneVersion />
+  </Target>
+</Project>

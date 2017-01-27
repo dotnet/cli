@@ -8,6 +8,7 @@ using System.Linq;
 using Microsoft.Build.Evaluation;
 using NuGet.Frameworks;
 using NuGet.ProjectModel;
+using static Microsoft.DotNet.Cli.Utils.ToolPath;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
@@ -80,10 +81,7 @@ namespace Microsoft.DotNet.Cli.Utils
         {
             _projectRoot = msBuildExePath;
 
-            var globalProperties = new Dictionary<string, string>()
-            {
-               { "MSBuildExtensionsPath", Path.GetDirectoryName(msBuildExePath) }
-            };
+            var globalProperties = new Dictionary<string, string>();
 
             if(framework != null)
             {

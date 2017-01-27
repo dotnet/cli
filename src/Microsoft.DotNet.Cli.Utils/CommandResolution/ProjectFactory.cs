@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.Build.Exceptions;
 using NuGet.Frameworks;
+using static Microsoft.DotNet.Cli.Utils.ToolPath;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
@@ -31,13 +32,13 @@ namespace Microsoft.DotNet.Cli.Utils
             return GetMSBuildProj(projectDirectory, framework, configuration, outputPath);
         }
 
-        private IProject GetMSBuildProj(string projectDirectory, NuGetFramework framework, string configuration, string outputPath)
+        private IProject GetMSBuildProj(
+            string projectDirectory, 
+            NuGetFramework framework, 
+            string configuration, 
+            string outputPath)
         {
-            var msBuildExePath = _environment.GetEnvironmentVariable(Constants.MSBUILD_EXE_PATH);
-
-            msBuildExePath = string.IsNullOrEmpty(msBuildExePath) ?
-                Path.Combine(AppContext.BaseDirectory, "MSBuild.dll") :
-                msBuildExePath;
+            var msBuildExePath = MSBuildDll().FullName;
 
             Reporter.Verbose.WriteLine(string.Format(
                 LocalizableStrings.MSBuildExePath,
@@ -58,7 +59,12 @@ namespace Microsoft.DotNet.Cli.Utils
 
             try
             {
-                return new MSBuildProject(msBuildProjectPath, framework, configuration, outputPath, msBuildExePath);
+                return new MSBuildProject(
+                    msBuildProjectPath, 
+                    framework, 
+                    configuration, 
+                    outputPath, 
+                    msBuildExePath);
             }
             catch (InvalidProjectFileException ex)
             {

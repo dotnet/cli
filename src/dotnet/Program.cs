@@ -28,6 +28,7 @@ using Microsoft.DotNet.Tools.Sln;
 using Microsoft.DotNet.Tools.Test;
 using Microsoft.DotNet.Tools.VSTest;
 using NuGet.Frameworks;
+using static Microsoft.DotNet.Cli.Utils.ToolPath;
 
 namespace Microsoft.DotNet.Cli
 {
@@ -58,6 +59,8 @@ namespace Microsoft.DotNet.Cli
 
         public static int Main(string[] args)
         {
+            SetUpEnvironment();
+
             DebugHelper.HandleDebugSwitch(ref args);
 
             new MulticoreJitActivator().TryActivateMulticoreJit();
@@ -90,6 +93,18 @@ namespace Microsoft.DotNet.Cli
                     PerfTraceOutput.Print(Reporter.Output, PerfTrace.GetEvents());
                 }
             }
+        }
+
+        private static void SetUpEnvironment()
+        {
+            Environment.SetEnvironmentVariable(Constants.MSBUILD_EXE_PATH, 
+                                               MSBuildDll().FullName);
+            Environment.SetEnvironmentVariable(Constants.MSBuildExtensionsPath, 
+                                               MSBuildExtensionsPath().FullName);
+            Environment.SetEnvironmentVariable(Constants.MSBuildSDKsPath, 
+                                               MSBuildSdksPath().FullName);
+            Environment.SetEnvironmentVariable(Constants.MSBuildToolsPath, 
+                                               MSBuildToolsPath().FullName);
         }
 
         internal static int ProcessArgs(string[] args, ITelemetry telemetryClient = null)

@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.CommandLine;
+using static Microsoft.DotNet.Cli.Utils.ToolPath;
 
 namespace Microsoft.DotNet.Tools.MSBuild
 {
@@ -16,21 +17,15 @@ namespace Microsoft.DotNet.Tools.MSBuild
     {
         internal const string TelemetrySessionIdEnvironmentVariableName = "DOTNET_CLI_TELEMETRY_SESSIONID";
 
-        private const string MSBuildExeName = "MSBuild.dll";
-
-        private const string SdksDirectoryName = "Sdks";
-
         private readonly ForwardingApp _forwardingApp;
 
         private readonly Dictionary<string, string> _msbuildRequiredEnvironmentVariables =
             new Dictionary<string, string>
             {
-                { "MSBuildExtensionsPath", AppContext.BaseDirectory },
-                { "CscToolExe", GetRunCscPath() },
-                { "MSBuildSDKsPath", GetMSBuildSDKsPath() }
+                { "CscToolExe", GetRunCscPath() }
             };
-        
-        private readonly IEnumerable<string> _msbuildRequiredParameters = 
+
+        private readonly IEnumerable<string> _msbuildRequiredParameters =
             new List<string> { "/m", "/v:m" };
 
         public MSBuildForwardingApp(IEnumerable<string> argsToForward)
@@ -53,7 +48,7 @@ namespace Microsoft.DotNet.Tools.MSBuild
             }
 
             _forwardingApp = new ForwardingApp(
-                GetMSBuildExePath(),
+                MSBuildDll().FullName,
                 _msbuildRequiredParameters.Concat(argsToForward),
                 environmentVariables: _msbuildRequiredEnvironmentVariables);
         }
@@ -77,31 +72,13 @@ namespace Microsoft.DotNet.Tools.MSBuild
             return app.Option("-v|--verbosity", LocalizableStrings.VerbosityOptionDescription, CommandOptionType.SingleValue);
         }
 
-        private static string GetMSBuildExePath()
-        {
-            return Path.Combine(
-                AppContext.BaseDirectory,
-                MSBuildExeName);
-        }
-
-        private static string GetMSBuildSDKsPath()
-        {
-            var envMSBuildSDKsPath = Environment.GetEnvironmentVariable("MSBuildSDKsPath");
-
-            if (envMSBuildSDKsPath != null)
-            {
-                return envMSBuildSDKsPath;
-            }
-
-            return Path.Combine(
-                AppContext.BaseDirectory,
-                SdksDirectoryName);
-        }
-
         private static string GetRunCscPath()
         {
             var scriptExtension = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".cmd" : ".sh";
-            return Path.Combine(AppContext.BaseDirectory, "Roslyn", $"RunCsc{scriptExtension}");
+            
+            return Path.Combine(
+                RoslynPath().FullName,
+                $"RunCsc{scriptExtension}");
         }
     }
 }

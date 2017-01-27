@@ -118,8 +118,23 @@ namespace Microsoft.DotNet.Cli.MSBuild.IntegrationTests
 
             cmd.ExitCode.Should().NotBe(0);
 
-            cmd.StdOut.Should().Contain("Expected 'AnyString")
+            cmd.StdOut.Should().Contain("AnyString")
                            .And.Contain("to exist, but it does not.");
+        }
+        
+        [Fact]
+        public void WhenBuildTargetDependsOnADifferentVersionOfAnAssemblyTheCliDependsOnThenThereIsNoConflict()
+        {
+            var testInstance = TestAssets.Get("AppWithCliConflictingDependency")
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
+
+            var msbuild = new DotnetCommand()
+                .WithWorkingDirectory(testInstance.Root)
+                .ExecuteWithCapturedOutput($"msbuild /t:TaskFoundOnlyInOneVersion");
+
+            msbuild.Should().Pass();
         }
     }
 }
