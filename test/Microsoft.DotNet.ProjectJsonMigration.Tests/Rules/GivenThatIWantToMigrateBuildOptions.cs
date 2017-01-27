@@ -450,6 +450,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             var defaultIncludePatterns = GetDefaultIncludePatterns(group);
             var defaultExcludePatterns = GetDefaultExcludePatterns(group);
 
+            string expectedRootFiles = group != "compile" ? ";rootfile.cs" : "";
+
             foreach (var item in mockProj.Items.Where(i => i.ItemType.Equals(itemName, StringComparison.Ordinal)))
             {
                 VerifyContentMetadata(item);
@@ -464,12 +466,12 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
                     if (defaultIncludePatterns.Any())
                     {
                         item.Include.Should()
-                            .Be(@"root\**\*;src\**\*;rootfile.cs;" + string.Join(";", defaultIncludePatterns).Replace("/", "\\"));
+                            .Be($@"root\**\*;src\**\*{expectedRootFiles};" + string.Join(";", defaultIncludePatterns).Replace("/", "\\"));
                     }
                     else
                     {
                         item.Include.Should()
-                            .Be(@"root\**\*;src\**\*;rootfile.cs");
+                            .Be($@"root\**\*;src\**\*{expectedRootFiles}");
                     }
 
                     if (defaultExcludePatterns.Any())
@@ -515,6 +517,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             var defaultIncludePatterns = GetDefaultIncludePatterns(group);
             var defaultExcludePatterns = GetDefaultExcludePatterns(group);
 
+            string expectedRootFiles = group != "compile" ? ";rootfile.cs" : "";
+
             foreach (var item in mockProj.Items.Where(i => i.ItemType.Equals(itemName, StringComparison.Ordinal)))
             {
                 VerifyContentMetadata(item);
@@ -522,12 +526,12 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
                 if (defaultIncludePatterns.Any())
                 {
                     item.Include.Should()
-                        .Be(@"root\**\*;src\**\*;rootfile.cs;" + string.Join(";", defaultIncludePatterns).Replace("/", "\\"));
+                        .Be($@"root\**\*;src\**\*{expectedRootFiles};" + string.Join(";", defaultIncludePatterns).Replace("/", "\\"));
                 }
                 else
                 {
                     item.Include.Should()
-                        .Be(@"root\**\*;src\**\*;rootfile.cs");
+                        .Be($@"root\**\*;src\**\*{expectedRootFiles}");
                 }
 
                 if (defaultExcludePatterns.Any())
