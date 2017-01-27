@@ -9,10 +9,6 @@ namespace Microsoft.DotNet.Cli.Build
 {
     public abstract class DotNetMSBuildTool : DotNetTool
     {
-        public DotNetMSBuildTool()
-        {
-        }
-
         public int MaxCpuCount {get; set;} = 0;
 
         protected override string Args 
