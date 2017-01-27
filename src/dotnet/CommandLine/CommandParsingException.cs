@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.Cli.CommandLine
             Command = command;
             _isRequireSubCommandMissing = isRequireSubCommandMissing;
 
-            Data.Add(ExceptionExtensions.CLI_User_Displayed_Exception, true);
+            Data.Add("CLI_User_Displayed_Exception", true);
         }
 
         public CommandLineApplication Command { get; }
