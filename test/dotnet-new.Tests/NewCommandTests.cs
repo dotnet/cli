@@ -12,13 +12,6 @@ namespace Microsoft.DotNet.New.Tests
 {
     public class NewCommandTests
     {
-		private readonly ITestOutputHelper output;
-
-		public NewCommandTests(ITestOutputHelper output)
-		{
-			this.output = output;
-		}
-
         [Fact]
         public void WhenSwitchIsSkippedThenItPrintsError()
         {
