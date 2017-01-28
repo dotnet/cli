@@ -511,7 +511,7 @@ namespace Microsoft.DotNet.Migration.Tests
         }
 
         [Fact]
-        public void WhenMigratingDeprecatedResourceExcludeItSucceeds()
+        public void WhenMigrateDeprecatedResExcludeItSucceeds()
         {
             var projectDirectory = TestAssets
                 .GetProjectJson(TestAssetKinds.NonRestoredTestProjects, "PJAppWithDeprecatedResourceExcludeOptions")
