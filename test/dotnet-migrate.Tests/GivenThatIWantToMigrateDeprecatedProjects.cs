@@ -82,17 +82,17 @@ namespace Microsoft.DotNet.Migration.Tests
 
             var outputDir = projectDirectory.GetDirectory("bin", "Debug");
             outputDir.Should().Exist()
-                .And.HaveFile("PJAppWithDeprecatedPackOptions.1.0.0.nupkg");
+                .And.HaveFile("PJDeprecatedPack.1.0.0.nupkg");
 
-            var outputPackage = outputDir.GetFile("PJAppWithDeprecatedPackOptions.1.0.0.nupkg");
+            var outputPackage = outputDir.GetFile("PJDeprecatedPack.1.0.0.nupkg");
 
             var zip = ZipFile.Open(outputPackage.FullName, ZipArchiveMode.Read);
-            zip.Entries.Should().Contain(e => e.FullName == "PJAppWithDeprecatedPackOptions.nuspec")
+            zip.Entries.Should().Contain(e => e.FullName == "PJDeprecatedPack.nuspec")
                 .And.Contain(e => e.FullName == "content/Content1.txt")
                 .And.Contain(e => e.FullName == "content/Content2.txt");
 
             var manifestReader = new StreamReader(
-                zip.Entries.First(e => e.FullName == "PJAppWithDeprecatedPackOptions.nuspec").Open());
+                zip.Entries.First(e => e.FullName == "PJDeprecatedPack.nuspec").Open());
 
             // NOTE: Commented out those that are not migrated.
             // https://microsoft.sharepoint.com/teams/netfx/corefx/_layouts/15/WopiFrame.aspx?sourcedoc=%7B0cfbc196-0645-4781-84c6-5dffabd76bee%7D&action=edit&wd=target%28Planning%2FMSBuild%20CLI%20integration%2Eone%7C41D470DD-CF44-4595-8E05-0CE238864B55%2FProject%2Ejson%20Migration%7CA553D979-EBC6-484B-A12E-036E0730864A%2F%29
