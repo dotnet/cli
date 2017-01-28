@@ -360,7 +360,7 @@ namespace Microsoft.DotNet.Migration.Tests
         }
 
         [Fact]
-        public void WhenMigratingAProjectWithDeprecatedCompileExcludeOptionsItSucceeds()
+        public void WhenMigratingDeprecatedCompileExcludeItSucceeds()
         {
             var projectDirectory = TestAssets
                 .GetProjectJson(TestAssetKinds.NonRestoredTestProjects, "PJAppWithDeprecatedCompileExcludeOptions")
