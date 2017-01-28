@@ -420,13 +420,14 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Theory]
-        [InlineData("compile", "Compile", 3)]
-        [InlineData("embed", "EmbeddedResource", 3)]
-        [InlineData("copyToOutput", "Content", 2)]
+        [InlineData("compile", "Compile", 3, "")]
+        [InlineData("embed", "EmbeddedResource", 3, ";rootfile.cs")]
+        [InlineData("copyToOutput", "Content", 2, ";rootfile.cs")]
         private void MigratingGroupIncludeExcludePopulatesAppropriateProjectItemElement(
             string group,
             string itemName,
-            int expectedNumberOfCompileItems)
+            int expectedNumberOfCompileItems, 
+            string expectedRootFiles)
         {
             var testDirectory = Temp.CreateDirectory().Path;
             WriteExtraFiles(testDirectory);
