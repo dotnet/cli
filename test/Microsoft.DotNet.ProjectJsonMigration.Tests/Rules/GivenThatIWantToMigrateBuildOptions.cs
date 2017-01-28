@@ -420,13 +420,14 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Theory]
-        [InlineData("compile", "Compile", 3)]
-        [InlineData("embed", "EmbeddedResource", 3)]
-        [InlineData("copyToOutput", "Content", 2)]
+        [InlineData("compile", "Compile", 3, "")]
+        [InlineData("embed", "EmbeddedResource", 3, ";rootfile.cs")]
+        [InlineData("copyToOutput", "Content", 2, ";rootfile.cs")]
         private void MigratingGroupIncludeExcludePopulatesAppropriateProjectItemElement(
             string group,
             string itemName,
-            int expectedNumberOfCompileItems)
+            int expectedNumberOfCompileItems, 
+            string expectedRootFiles)
         {
             var testDirectory = Temp.CreateDirectory().Path;
             WriteExtraFiles(testDirectory);
@@ -471,12 +472,12 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
                     if (defaultIncludePatterns.Any())
                     {
                         item.Include.Should()
-                            .Be(@"root\**\*;src\**\*;rootfile.cs;" + string.Join(";", defaultIncludePatterns).Replace("/", "\\"));
+                            .Be($@"root\**\*;src\**\*{expectedRootFiles};" + string.Join(";", defaultIncludePatterns).Replace("/", "\\"));
                     }
                     else
                     {
                         item.Include.Should()
-                            .Be(@"root\**\*;src\**\*;rootfile.cs");
+                            .Be($@"root\**\*;src\**\*{expectedRootFiles}");
                     }
 
                     if (defaultExcludePatterns.Any())
@@ -495,12 +496,13 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Theory]
-        [InlineData("compile", "Compile")]
-        [InlineData("embed", "EmbeddedResource")]
-        [InlineData("copyToOutput", "Content")]
+        [InlineData("compile", "Compile", "")]
+        [InlineData("embed", "EmbeddedResource", ";rootfile.cs")]
+        [InlineData("copyToOutput", "Content", ";rootfile.cs")]
         private void MigratingGroupIncludeOnlyPopulatesAppropriateProjectItemElement(
             string group,
-            string itemName)
+            string itemName,
+            string expectedRootFiles)
         {
             var testDirectory = Temp.CreateDirectory().Path;
             WriteExtraFiles(testDirectory);
@@ -529,12 +531,12 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
                 if (defaultIncludePatterns.Any())
                 {
                     item.Include.Should()
-                        .Be(@"root\**\*;src\**\*;rootfile.cs;" + string.Join(";", defaultIncludePatterns).Replace("/", "\\"));
+                        .Be($@"root\**\*;src\**\*{expectedRootFiles};" + string.Join(";", defaultIncludePatterns).Replace("/", "\\"));
                 }
                 else
                 {
                     item.Include.Should()
-                        .Be(@"root\**\*;src\**\*;rootfile.cs");
+                        .Be($@"root\**\*;src\**\*{expectedRootFiles}");
                 }
 
                 if (defaultExcludePatterns.Any())
@@ -584,6 +586,36 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
 
             mockProj.Items.Count(i => i.ItemType == "None").Should().Be(1);
             mockProj.Items.First(i => i.ItemType == "None").Include.Should().Be("App.config");
+        }
+
+        [Fact]
+        public void MigratingCompileIncludeWithPlainFileNamesRemovesThem()
+        {
+            var mockProj = RunBuildOptionsRuleOnPj(@"
+                {
+                    ""buildOptions"": {
+                        ""compile"": {
+                            ""include"": [""filename1.cs"", ""filename2.cs""],
+                        }
+                    }
+                }");
+
+            mockProj.Items.Count(i => i.ItemType.Equals("Compile", StringComparison.Ordinal)).Should().Be(0);
+        }
+
+        [Fact]
+        public void MigratingCompileIncludeFilesWithPlainFileNamesRemovesThem()
+        {
+            var mockProj = RunBuildOptionsRuleOnPj(@"
+                {
+                    ""buildOptions"": {
+                        ""compile"": {
+                            ""includeFiles"": [""filename1.cs"", ""filename2.cs""],
+                        }
+                    }
+                }");
+
+            mockProj.Items.Count(i => i.ItemType.Equals("Compile", StringComparison.Ordinal)).Should().Be(0);
         }
 
         private static IEnumerable<string> GetDefaultExcludePatterns(string group)
