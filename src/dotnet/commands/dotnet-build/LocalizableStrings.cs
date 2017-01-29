@@ -5,9 +5,7 @@
         public const string AppDescription = "Builder for the .NET Platform. Delegates to the MSBuild 'Build' target in the project file.";
 
         public const string AppFullName = ".NET Builder";
-
-        public const string ConfigurationOptionDescription = "Configuration to use for building the project. Default for most projects is  \"Debug\".";
-
+ 
         public const string ConfigurationOptionName = "CONFIGURATION";
 
         public const string FrameworkOptionDescription = "Target framework to build for. The target framework has to be specified in the project file.";

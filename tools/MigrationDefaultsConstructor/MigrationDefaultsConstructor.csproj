@@ -7,9 +7,6 @@
     <OutputType>Exe</OutputType>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="**\*.cs" />
-  </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
     <ProjectReference Include="..\..\src\dotnet\dotnet.csproj" />
     <PackageReference Include="Microsoft.NETCore.App">
