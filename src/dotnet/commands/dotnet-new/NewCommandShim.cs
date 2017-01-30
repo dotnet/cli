@@ -21,7 +21,6 @@ namespace Microsoft.DotNet.Tools.New
     internal class NewCommandShim
     {
         private const string HostIdentifier = "dotnetcli";
-        private const string HostVersion = "1.0.0";
         private const string CommandName = "new";
 
         public static int Run(string[] args)
@@ -56,7 +55,7 @@ namespace Microsoft.DotNet.Tools.New
                 { "dotnet-cli-version", Product.Version }
             };
 
-            return new DefaultTemplateEngineHost(HostIdentifier, HostVersion, CultureInfo.CurrentCulture.Name, preferences, builtIns);
+            return new DefaultTemplateEngineHost(HostIdentifier, Product.Version, CultureInfo.CurrentCulture.Name, preferences, builtIns);
         }
 
         private static void FirstRun(IEngineEnvironmentSettings environmentSettings, IInstaller installer)
