@@ -349,7 +349,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
                 var configurationOutput =
                     removeContextTransformExecutes(configurationCompilerOptions, projectDirectory, projectType);
 
-                if (!ItemRemovesAreEqual(nonConfigurationOutput, configurationOutput))
+                if (configurationOutput != null &&
+                    !ItemRemovesAreEqual(nonConfigurationOutput, configurationOutput))
                 {
                     transformApplicator.Execute(configurationOutput, itemGroup, mergeExisting: true);
                 }
