@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.New.Tests
 
             cmd.ExitCode.Should().NotBe(0);
             
-			cmd.StdErr.Should().Be("No templates matched the input template name: [Web1.1]\n");
+			cmd.StdErr.Should().StartWith("No templates matched the input template name: [Web1.1]\n");
 		}
 	}
 }
