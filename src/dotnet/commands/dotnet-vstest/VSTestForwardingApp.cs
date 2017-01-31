@@ -5,6 +5,7 @@ using Microsoft.DotNet.Cli.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using static Microsoft.DotNet.Cli.Utils.ToolPath;
 
 namespace Microsoft.DotNet.Cli
 {
@@ -25,9 +26,10 @@ namespace Microsoft.DotNet.Cli
             return _forwardingApp.Execute();
         }
 
-        private string GetVSTestExePath()
-        {
-            return Path.Combine(AppContext.BaseDirectory, VstestAppName);
-        }
+        private string GetVSTestExePath() =>
+            Path.Combine(
+                MSBuildExtensionsPath().FullName,
+                VstestAppName);
+
     }
 }

@@ -20,9 +20,6 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         public GivenAProjectDependenciesCommandFactory()
         {
             _repoDirectoriesProvider = new RepoDirectoriesProvider();
-            Environment.SetEnvironmentVariable(
-                Constants.MSBUILD_EXE_PATH,
-                Path.Combine(_repoDirectoriesProvider.Stage2Sdk, "MSBuild.dll"));
         }
 
         [WindowsOnlyFact]
@@ -182,10 +179,6 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         [Fact]
         public void It_resolves_tools_whose_package_name_is_different_than_dll_name()
         {
-            Environment.SetEnvironmentVariable(
-                Constants.MSBUILD_EXE_PATH,
-                Path.Combine(new RepoDirectoriesProvider().Stage2Sdk, "MSBuild.dll"));
-
             var configuration = "Debug";
 
             var testInstance = TestAssets.Get("AppWithDirectDepWithOutputName")

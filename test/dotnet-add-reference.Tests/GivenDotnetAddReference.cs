@@ -204,7 +204,9 @@ Additional Arguments:
             var cmd = new AddReferenceCommand()
                 .WithWorkingDirectory(setup.TestRoot)
                 .WithProject(lib.CsProjPath)
+                .WithForwardingToConsole()
                 .Execute($"{FrameworkNet451Arg} \"{setup.ValidRefCsprojPath}\"");
+           
             cmd.Should().Pass();
             cmd.StdOut.Should().Be("Reference `DotnetAddP2PProjects\\ValidRef\\ValidRef.csproj` added to the project.");
             cmd.StdErr.Should().BeEmpty();
@@ -655,6 +657,7 @@ Reference `DotnetAddP2PProjects\ValidRef\ValidRef.csproj` added to the project."
             var csProjContent = lib.CsProjContent();
             var cmd = new AddReferenceCommand()
                     .WithProject(lib.CsProjPath)
+                    .WithForwardingToConsole()
                     .Execute($"-f {framework} \"{net45lib.CsProjPath}\"");
             cmd.Should().Fail();
             cmd.StdErr.Should().Be($"Project `{setup.LibCsprojPath}` does not target framework `{framework}`.");
@@ -674,7 +677,9 @@ Reference `DotnetAddP2PProjects\ValidRef\ValidRef.csproj` added to the project."
             var csProjContent = net45lib.CsProjContent();
             var cmd = new AddReferenceCommand()
                     .WithProject(net45lib.CsProjPath)
+                    .WithForwardingToConsole()
                     .Execute($"{frameworkArg} \"{lib.CsProjPath}\"");
+                    
             cmd.Should().Fail();
             cmd.StdErr.Should().MatchRegex(ProjectNotCompatibleErrorMessageRegEx);
             cmd.StdErr.Should().MatchRegex(" - net45");

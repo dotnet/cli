@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp1.0</TargetFramework>
+	  <AssemblyName>DependsOn.Other.Microsoft.DotNet.Cli.Utils</AssemblyName>
+    <PackageId>PackagedTaskWithCliDependencyConflict</PackageId>
+    <Version>1.0.0-preview</Version>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference 
+      Include="..\Other.Microsoft.DotNet.Cli.Utils\Other.Microsoft.DotNet.Cli.Utils.csproj" 
+      TreatAsPackageReference="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="build\PackagedTaskWithCliDependencyConflict.targets" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="build\*.targets">
+      <Pack>true</Pack>
+      <PackagePath>build\</PackagePath>
+    </Content>
+    <Content Include="..\Other.Microsoft.DotNet.Cli.Utils\bin\Debug\netcoreapp1.0\Microsoft.DotNet.Cli.Utils.dll">
+      <Pack>true</Pack>
+      <PackagePath>lib\$(TargetFramework)</PackagePath>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETCore.App"
+                      Version="1.0.3" />
+	  <PackageReference Include="Microsoft.Build.Framework"
+                      Version="15.1.0-preview-000458-02" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core"
+                      Version="15.1.0-preview-000458-02" />
+  </ItemGroup>
+
+</Project>

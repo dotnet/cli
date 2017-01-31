@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\dir.props" />
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\dir.tasks" />
+
+  <PropertyGroup>
+    <VersionPrefix>1.0.0-preview5</VersionPrefix>
+    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NetCore.App" 
+                      Version="1.0.3" />
+    <PackageReference Include="Microsoft.TestPlatform.Build" 
+                      Version="$(CLI_TestPlatform_Version)" />
+    <PackageReference Include="Microsoft.TestPlatform.CLI" 
+                      Version="$(CLI_TestPlatform_Version)" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" 
+                      Version="1.0.1-beta-000933" />
+    <PackageReference Include="Microsoft.Build.Runtime"
+                      Version="$(CLI_MSBuild_Version)" />
+    <PackageReference Include="NuGet.Build.Tasks" 
+                      Version="4.0.0-rc3" />
+  </ItemGroup>
+
+  <Target Name="AddHackFilesToPublish" 
+          AfterTargets="ComputeFilesToPublish">
+    <ItemGroup>
+    
+       <!--Workaround for https://github.com/dotnet/sdk/issues/115 -->
+      <HackFilesToCopy 
+        Include="$(NuGetPackagesDir)\microsoft.build.runtime\$(CLI_MSBuild_Version)\contentFiles\any\netcoreapp1.0\**;
+                 $(NuGetPackagesDir)\Microsoft.TestPlatform.CLI\$(CLI_TestPlatform_Version)\contentFiles\any\any\**;
+                 $(NuGetPackagesDir)\Microsoft.TestPlatform.Build\$(CLI_TestPlatform_Version)\runtimes\any\native\**;
+                  $(NuGetPackagesDir)\nuget.build.tasks\4.0.0-rc3\runtimes\any\native\**" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(HackFilesToCopy)"
+          DestinationFiles="@(HackFilesToCopy->'$(PublishDir)/%(RecursiveDir)%(Filename)%(Extension)')" />
+ 
+    <ItemGroup>
+      <MSBuildImportsContent Include="$(MSBuildImportsDir)/**/*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(MSBuildImportsContent)"
+          DestinationFolder="$(PublishDir)/%(RecursiveDir)" />
+  </Target> 
+
+ <Target Name="MakeCscRunnableAndMoveToPublishDir"
+         AfterTargets="Publish"
+         BeforeTargets="RemoveFilesAfterPublish">
+    
+    <RemoveAssetFromDepsPackages DepsFile="$(PublishDir)/$(TargetName).deps.json"
+                                 SectionName="runtimeTargets"
+                                 AssetPath="runtimes/any/native/%(AssetsToRemoveFromDeps.Identity).exe" />
+
+  </Target>
+
+  <Target Name="RemoveFilesAfterPublish"
+          AfterTargets="Publish">
+    <Delete Files="$(PublishDir)/$(TargetName).dll" />
+    <Delete Files="$(PublishDir)/$(TargetName).pdb" />
+    <Delete Files="$(PublishDir)/$(TargetName).runtimeconfig.json" />
+    <Delete Files="$(PublishDir)/$(TargetName).deps.json" />
+  </Target>
+</Project>

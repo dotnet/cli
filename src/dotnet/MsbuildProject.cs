@@ -1,10 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Exceptions;
@@ -12,6 +8,11 @@ using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools.Common;
 using Microsoft.DotNet.Tools.ProjectExtensions;
 using NuGet.Frameworks;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using static Microsoft.DotNet.Cli.Utils.ToolPath;
 
 namespace Microsoft.DotNet.Tools
 {
@@ -32,7 +33,9 @@ namespace Microsoft.DotNet.Tools
             ProjectDirectory = PathUtility.EnsureTrailingSlash(ProjectRootElement.DirectoryPath);
         }
 
-        public static MsbuildProject FromFileOrDirectory(ProjectCollection projects, string fileOrDirectory)
+        public static MsbuildProject FromFileOrDirectory(
+            ProjectCollection projects,
+            string fileOrDirectory)
         {
             if (File.Exists(fileOrDirectory))
             {

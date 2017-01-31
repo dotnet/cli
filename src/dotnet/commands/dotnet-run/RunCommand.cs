@@ -67,10 +67,7 @@ namespace Microsoft.DotNet.Tools.Run
 
         private ICommand GetRunCommand()
         {
-            Dictionary<string, string> globalProperties = new Dictionary<string, string>()
-            {
-                { LocalizableStrings.RunCommandMSBuildExtensionsPath, AppContext.BaseDirectory }
-            };
+            var globalProperties = new Dictionary<string, string>();
 
             if (!string.IsNullOrWhiteSpace(Configuration))
             {

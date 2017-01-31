@@ -18,13 +18,6 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
     {
         private TestAssetInstance MSBuildTestProjectInstance;
 
-        public GivenAProjectDependencyCommandResolver()
-        {
-            Environment.SetEnvironmentVariable(
-                Constants.MSBUILD_EXE_PATH,
-                Path.Combine(new RepoDirectoriesProvider().Stage2Sdk, "MSBuild.dll"));
-        }
-
         [Fact]
         public void ItReturnsACommandSpecWhenToolIsInAProjectRef()
         {
@@ -157,10 +150,6 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             IEnvironmentProvider environment = null,
             IPackagedCommandSpecFactory packagedCommandSpecFactory = null)
         {
-            Environment.SetEnvironmentVariable(
-                Constants.MSBUILD_EXE_PATH,
-                Path.Combine(new RepoDirectoriesProvider().Stage2Sdk, "MSBuild.dll"));
-
             CommandContext.SetVerbose(true);
 
             environment = environment ?? new EnvironmentProvider();

@@ -18,6 +18,15 @@
   <Target Name="InitializeCommonProps"
           DependsOnTargets="BuildDotnetCliBuildFramework" >
 
+    <SetEnvVar Name="CscToolExe" 
+                Value="" />  
+    <SetEnvVar Name="MSBuildExtensionsPath" 
+                Value="" />  
+    <SetEnvVar Name="MSBuildSDKsPath" 
+                Value="" />  
+    <SetEnvVar Name="MSBuildToolsPath" 
+                Value="" />
+
     <!-- Current Runtime Information -->
     <GetCurrentRuntimeInformation OverrideRid="$(OverrideRid)">
       <Output TaskParameter="Rid" PropertyName="Rid" />

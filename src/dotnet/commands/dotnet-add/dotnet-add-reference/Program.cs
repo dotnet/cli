@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using static Microsoft.DotNet.Cli.Utils.ToolPath;
 
 namespace Microsoft.DotNet.Tools.Add.ProjectToProjectReference
 {
@@ -42,6 +43,7 @@ namespace Microsoft.DotNet.Tools.Add.ProjectToProjectReference
         public override int Run(string fileOrDirectory)
         {
             var projects = new ProjectCollection();
+            
             MsbuildProject msbuildProj = MsbuildProject.FromFileOrDirectory(projects, fileOrDirectory);
 
             if (RemainingArguments.Count == 0)

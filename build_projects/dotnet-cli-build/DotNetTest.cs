@@ -1,6 +1,8 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
 namespace Microsoft.DotNet.Cli.Build
 {
     public class DotNetTest : DotNetMSBuildTool
@@ -52,7 +54,7 @@ namespace Microsoft.DotNet.Cli.Build
 
             return null;
         }
-        
+
         private string GetNoBuild()
         {
             if (NoBuild)
@@ -61,6 +63,21 @@ namespace Microsoft.DotNet.Cli.Build
             }
 
             return null;
+        }
+
+        public override bool Execute()
+        { 
+            // clear environment variables so that child processes will re-evaluate them as needed
+            Environment.SetEnvironmentVariable(
+                "MSBUILD_EXE_PATH", null);
+            Environment.SetEnvironmentVariable(
+                "MSBuildExtensionsPath", null);
+            Environment.SetEnvironmentVariable(
+                "MSBuildSDKsPath", null);
+            Environment.SetEnvironmentVariable(
+                "MSBuildToolsPath", null);
+
+            return base.Execute();
         }
     }
 }
