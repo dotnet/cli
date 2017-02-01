@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Configurer;
 using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.DotNet.Tools.Add;
@@ -16,7 +17,6 @@ using Microsoft.DotNet.Tools.List;
 using Microsoft.DotNet.Tools.Migrate;
 using Microsoft.DotNet.Tools.MSBuild;
 using Microsoft.DotNet.Tools.New;
-using Microsoft.DotNet.Tools.New3;
 using Microsoft.DotNet.Tools.NuGet;
 using Microsoft.DotNet.Tools.Pack;
 using Microsoft.DotNet.Tools.Publish;
@@ -42,8 +42,7 @@ namespace Microsoft.DotNet.Cli
             ["list"] = ListCommand.Run,
             ["migrate"] = MigrateCommand.Run,
             ["msbuild"] = MSBuildCommand.Run,
-            ["new"] = NewCommand.Run,
-            ["new3"] = New3CommandShim.Run,
+            ["new"] = NewCommandShim.Run,
             ["nuget"] = NuGetCommand.Run,
             ["pack"] = PackCommand.Run,
             ["publish"] = PublishCommand.Run,
@@ -76,9 +75,11 @@ namespace Microsoft.DotNet.Cli
                     return ProcessArgs(args);
                 }
             }
-            catch (GracefulException e)
+            catch (Exception e) when (e.ShouldBeDisplayedAsError())
             {
-                Reporter.Error.WriteLine(CommandContext.IsVerbose() ? e.ToString().Red().Bold() : e.Message.Red().Bold());
+                Reporter.Error.WriteLine(CommandContext.IsVerbose() ? 
+                        e.ToString().Red().Bold() : 
+                        e.Message.Red().Bold());
 
                 return 1;
             }
