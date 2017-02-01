@@ -26,8 +26,8 @@ namespace Microsoft.DotNet.Cli.Build
 
         private static string[][] _templatesAndArgs = new string[][]
         {
-            new string[] { "mvc", "-au Individual -f 1.0" },
-            new string[] { "mvc", "-au Individual -f 1.1" }
+            new string[] { "mvc", "-au Individual -f netcoreapp1.0" },
+            new string[] { "mvc", "-au Individual -f netcoreapp1.1" }
         };
 
         public override bool Execute()

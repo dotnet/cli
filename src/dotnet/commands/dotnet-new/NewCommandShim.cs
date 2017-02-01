@@ -55,7 +55,7 @@ namespace Microsoft.DotNet.Tools.New
                 { "dotnet-cli-version", Product.Version }
             };
 
-            return new DefaultTemplateEngineHost(HostIdentifier, Product.Version, CultureInfo.CurrentCulture.Name, preferences, builtIns);
+            return new DefaultTemplateEngineHost(HostIdentifier, "v" + Product.Version, CultureInfo.CurrentCulture.Name, preferences, builtIns);
         }
 
         private static void FirstRun(IEngineEnvironmentSettings environmentSettings, IInstaller installer)
