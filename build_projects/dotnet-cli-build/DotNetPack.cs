@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.Cli.Build
 
         protected override string Args
         {
-            get { return $"{base.Args} {GetProjectPath()} {GetConfiguration()} {GetNoBuild()} {GetOutput()} {GetVersionSuffix()} {GetRuntime()}"; }
+            get { return $"{GetProjectPath()} {GetConfiguration()} {GetNoBuild()} {GetOutput()} {GetVersionSuffix()} {GetRuntime()} {base.Args}"; }
         }
 
         public string Configuration { get; set; }
