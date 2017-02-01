@@ -41,6 +41,17 @@ namespace Microsoft.DotNet.Cli.Utils
             }
         }
 
+        public string AppConfigPath
+        {
+            get
+            {
+                return _project
+                    .AllEvaluatedProperties
+                    .FirstOrDefault(p => p.Name.Equals("AppConfigForCompiler"))
+                    .EvaluatedValue;
+            }
+        }
+
         public string FullOutputPath
         {
             get

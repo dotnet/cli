@@ -22,6 +22,7 @@ namespace Microsoft.DotNet.Cli.Utils
 
         string FullOutputPath { get; }
 
+        string AppConfigPath { get; }
         Dictionary<string, string> EnvironmentVariables { get; }
     }
 }

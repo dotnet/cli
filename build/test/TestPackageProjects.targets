@@ -96,6 +96,7 @@
         <VersionPrefix>1.0.0-rc-</VersionPrefix>
         <VersionSuffix>rc-$(TestPackageBuildVersionSuffix)</VersionSuffix>
         <Clean>True</Clean>
+        <RestoreArgs>/p:RuntimeIdentifier=$(CoreCLRRid)</RestoreArgs>
         <MsbuildArgs>/p:RuntimeIdentifier=$(CoreCLRRid)</MsbuildArgs>
       </BaseTestPackageProject>
       <BaseTestPackageProject Include="TestAssets/TestPackages/dotnet-hello/v1/dotnet-hello">

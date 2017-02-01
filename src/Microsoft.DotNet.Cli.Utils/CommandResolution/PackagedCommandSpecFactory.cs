@@ -27,7 +27,8 @@ namespace Microsoft.DotNet.Cli.Utils
             string nugetPackagesRoot,
             CommandResolutionStrategy commandResolutionStrategy,
             string depsFilePath,
-            string runtimeConfigPath)
+            string runtimeConfigPath,
+            string appConfigPath)
         {
             Reporter.Verbose.WriteLine(string.Format(
                 LocalizableStrings.AttemptingToFindCommand,
@@ -66,7 +67,8 @@ namespace Microsoft.DotNet.Cli.Utils
                 depsFilePath, 
                 commandResolutionStrategy,
                 nugetPackagesRoot,
-                runtimeConfigPath);
+                runtimeConfigPath,
+                appConfigPath);
         }
 
         private string GetCommandFilePath(
@@ -90,7 +92,8 @@ namespace Microsoft.DotNet.Cli.Utils
             string depsFilePath,
             CommandResolutionStrategy commandResolutionStrategy,
             string nugetPackagesRoot,
-            string runtimeConfigPath)
+            string runtimeConfigPath,
+            string appConfigPath)
         {
             var commandExtension = Path.GetExtension(commandPath);
 
@@ -104,7 +107,18 @@ namespace Microsoft.DotNet.Cli.Utils
                     nugetPackagesRoot,
                     runtimeConfigPath);
             }
-            
+
+            // Reporter.Verbose.WriteLine(string.Format(
+            //     LocalizableStrings.AttemptingToFindCommand,
+            //     PackagedCommandSpecFactoryName,
+            //     commandName,
+            //     toolLibrary.Name));
+Console.WriteLine($"appconfig: {appConfigPath} -> {commandPath}.config");
+            if (appConfigPath != null && File.Exists(appConfigPath))
+            {
+                File.Copy(appConfigPath, $"{commandPath}.config");
+            }
+
             return CreateCommandSpec(commandPath, commandArguments, commandResolutionStrategy);
         }
 
