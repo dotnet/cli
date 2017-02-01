@@ -7,7 +7,7 @@
   <Import Project="Microsoft.DotNet.Cli.DependencyVersions.props" />
 
   <Target Name="Prepare"
-          DependsOnTargets="Init;DownloadHostAndSharedFxArtifacts;RestoreSrcPackages;RestoreToolsPackages;ZipTemplates" />
+          DependsOnTargets="Init;DownloadHostAndSharedFxArtifacts;RestoreSrcPackages;RestoreToolsPackages" />
 
   <Target Name="Init"
           DependsOnTargets="InitializeCommonProps;
@@ -57,22 +57,21 @@
       <Output TaskParameter="VersionMajor" PropertyName="VersionMajor" />
       <Output TaskParameter="VersionMinor" PropertyName="VersionMinor" />
       <Output TaskParameter="VersionPatch" PropertyName="VersionPatch" />
-      <Output TaskParameter="CommitCount" PropertyName="CommitCount" />
+      <Output TaskParameter="CommitCount" PropertyName="DefaultCommitCount" />
       <Output TaskParameter="ReleaseSuffix" PropertyName="ReleaseSuffix" />
-      <Output TaskParameter="VersionSuffix" PropertyName="VersionSuffix" />
-      <Output TaskParameter="SimpleVersion" PropertyName="SimpleVersion" />
-      <Output TaskParameter="NugetVersion" PropertyName="NugetVersion" />
       <Output TaskParameter="MsiVersion" PropertyName="MsiVersion" />
       <Output TaskParameter="VersionBadgeMoniker" PropertyName="VersionBadgeMoniker" />
       <Output TaskParameter="Channel" PropertyName="Channel" />
       <Output TaskParameter="BranchName" PropertyName="BranchName" />
     </GenerateBuildVersionInfo>
 
-    <GenerateNuGetPackagesArchiveVersion RepoRoot="$(RepoRoot)">
-      <Output TaskParameter="Version" PropertyName="NuGetPackagesArchiveVersion"/>
-    </GenerateNuGetPackagesArchiveVersion>
-
     <PropertyGroup>
+      <CommitCount Condition=" '$(CommitCount)' == '' ">$(DefaultCommitCount)</CommitCount>
+
+      <SimpleVersion>$(VersionMajor).$(VersionMinor).$(VersionPatch).$(CommitCount)</SimpleVersion>
+      <VersionSuffix>$(ReleaseSuffix)-$(CommitCount)</VersionSuffix>
+      <NugetVersion>$(VersionMajor).$(VersionMinor).$(VersionPatch)-$(VersionSuffix)</NugetVersion>
+
       <VersionBadge>$(BaseOutputDirectory)/$(VersionBadgeMoniker)_$(Configuration)_version_badge.svg</VersionBadge>
       <SdkVersion>$(NugetVersion)</SdkVersion>
 
@@ -301,29 +300,6 @@
     <ItemGroup>
       <RestoreToolsPackagesInput Include="$(RepoRoot)/tools/**/*.csproj" />
     </ItemGroup>
-  </Target>
-
-  <Target Name="SetupZipTemplatesInputsOutputs">
-    <PropertyGroup>
-      <_DotNetNewFolder>$(RepoRoot)/src/dotnet/commands/dotnet-new</_DotNetNewFolder>
-    </PropertyGroup>
-    <ItemGroup>
-      <DotNetNewArchive Include="$([System.IO.Directory]::GetDirectories($(_DotNetNewFolder)))" />
-
-      <ZipTemplatesInput Include="$(_DotNetNewFolder)/**" Exclude="$(_DotNetNewFolder)/*.zip" />
-      <ZipTemplatesOutput Include="@(DotNetNewArchive->'%(RelativeDir)/$([System.IO.Path]::GetFileName('%(DotNetNewArchive.FullPath)')).zip')" />
-    </ItemGroup>
-  </Target>
-
-  <Target Name="ZipTemplates"
-          DependsOnTargets="SetupZipTemplatesInputsOutputs"
-          Inputs="@(ZipTemplatesInput)"
-          Outputs="@(ZipTemplatesOutput)">
-
-    <ZipFileCreateFromDirectory
-          SourceDirectory="%(DotNetNewArchive.FullPath)"
-          DestinationArchive="%(DotNetNewArchive.RelativeDir)/$([System.IO.Path]::GetFileName(%(DotNetNewArchive.FullPath))).zip"
-          OverwriteDestination="True" />
   </Target>
 
 </Project>
