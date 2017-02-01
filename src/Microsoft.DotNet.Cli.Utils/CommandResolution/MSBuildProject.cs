@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.Cli.Utils
                 return _project
                     .AllEvaluatedProperties
                     .FirstOrDefault(p => p.Name.Equals("AppConfigForCompiler"))
-                    .EvaluatedValue;
+                    ?.EvaluatedValue;
             }
         }
 
