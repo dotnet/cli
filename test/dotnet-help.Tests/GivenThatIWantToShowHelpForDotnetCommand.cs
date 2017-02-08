@@ -68,6 +68,9 @@ Advanced Commands:
         }
 
         [Theory]
+        [InlineData("add", "Usage: dotnet add [arguments] [options] [command]")]
+        [InlineData("add package", "Usage: dotnet add <PROJECT> package [arguments] [options]")]
+        [InlineData("add reference", "Usage: dotnet add <PROJECT> reference [options] [args]")]
         [InlineData("pack", "Usage: dotnet pack [arguments] [options] [args]")]
         [InlineData("new", "Usage: dotnet new [arguments] [options]")]
         [InlineData("restore", "Usage: dotnet restore [arguments] [options] [args]")]
