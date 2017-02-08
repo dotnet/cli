@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.Tools.Pack
 
             CommandLineApplication cmd = new CommandLineApplication(throwOnUnexpectedArg: false)
             {
-                Name = "pack",
+                Name = "dotnet pack",
                 FullName = LocalizableStrings.AppFullName,
                 Description = LocalizableStrings.AppDescription,
                 HandleRemainingArguments = true,

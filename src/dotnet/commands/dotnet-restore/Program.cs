@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.Tools.Restore
 
             CommandLineApplication cmd = new CommandLineApplication(throwOnUnexpectedArg: false)
             {
-                Name = "restore",
+                Name = "dotnet restore",
                 FullName = LocalizableStrings.AppFullName,
                 Description = LocalizableStrings.AppDescription,
                 HandleRemainingArguments = true,
