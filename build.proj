@@ -65,6 +65,7 @@
           Outputs="@(RestoreDotnetCliBuildFrameworkOutputs)">
 
     <PropertyGroup>
+      <ExtraRestoreArgs Condition=" '$(GeneratingPropsFile)' == 'true' ">$(ExtraRestoreArgs) /p:GeneratingPropsFile=$(GeneratingPropsFile)</ExtraRestoreArgs>
       <ExtraRestoreArgs Condition="'$(OS)' != 'Windows_NT'">$(ExtraRestoreArgs) --disable-parallel</ExtraRestoreArgs>
     </PropertyGroup>
 
