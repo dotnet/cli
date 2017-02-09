@@ -93,9 +93,8 @@ Advanced Commands:
                 .Execute($"{command} -h");
             
             cmd.Should().Pass();
-            
-            var actualUsage = cmd.StdOut.Split('\n').ElementAt(2);
-            actualUsage.Should().Be(expectedUsage);
+          
+            cmd.StdOut.Should().Contain(Environment.NewLine + expectedUsage + Environment.NewLine);
         }    
     }
 }
