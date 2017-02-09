@@ -1,0 +1,18 @@
+<Project>
+    <PropertyGroup>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <VersionPatch>0</VersionPatch>
+      <ReleaseSuffix>alpha</ReleaseSuffix>
+      <Channel>master</Channel>
+      <BranchName>master</BranchName>
+
+      <CliVersionPrefix>$(VersionMajor).$(VersionMinor).$(VersionPatch)-$(ReleaseSuffix)</CliVersionPrefix>
+      <SimpleVersion>$(VersionMajor).$(VersionMinor).$(VersionPatch).$(CommitCount)</SimpleVersion>
+      <VersionSuffix>$(ReleaseSuffix)-$(CommitCount)</VersionSuffix>
+      <NugetVersion>$(VersionMajor).$(VersionMinor).$(VersionPatch)-$(VersionSuffix)</NugetVersion>
+      
+      <SdkVersion>$(NugetVersion)</SdkVersion>
+      <SdkNugetVersion>$(SdkVersion)</SdkNugetVersion>
+    </PropertyGroup>
+</Project>
