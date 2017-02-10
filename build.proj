@@ -25,9 +25,6 @@
     <ExeExtension>.exe</ExeExtension>
     <ExeExtension Condition=" '$(OS)' != 'Windows_NT' "></ExeExtension>
 
-    <Stage0Directory>$(RepoRoot)/.dotnet_stage0/$(Architecture)</Stage0Directory>
-    <Stage0PjDirectory>$(RepoRoot)/.dotnet_stage0PJ/$(Architecture)</Stage0PjDirectory>
-    <DotnetStage0>$(Stage0Directory)/dotnet$(ExeExtension)</DotnetStage0>
     <DotnetCliBuildDirectory>$(RepoRoot)/build_projects/dotnet-cli-build</DotnetCliBuildDirectory>
     <PackagesDir>$(RepoRoot)/.nuget</PackagesDir>
   </PropertyGroup>
@@ -50,7 +47,7 @@
           DependsOnTargets="MSBuildWorkaroundTarget;
                             RestoreDotnetCliBuildFramework">
 
-    <Exec Command="$(DotnetStage0) publish -o $(DotnetCliBuildDirectory)/bin --framework netcoreapp1.0" 
+    <Exec Command="$(DotnetStage0) publish -o $(DotnetCliBuildDirectory)/bin --framework netcoreapp1.0 /p:GeneratingPropsFile=true" 
           WorkingDirectory="$(DotnetCliBuildDirectory)"/>
   </Target>
   
