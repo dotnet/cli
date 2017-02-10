@@ -17,10 +17,7 @@
   <Import Project="build/Microsoft.DotNet.Cli.Version.props" />
   <Import Project="build/Microsoft.DotNet.Cli.Branding.props" />
   
-  <!-- NuGet Information -->
   <PropertyGroup>
-    <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
-
     <NuGetPackagesDir>$(NUGET_PACKAGES)</NuGetPackagesDir>
     <NuGetPackagesDir Condition=" '$(NuGetPackagesDir)' == '' ">$(RepoRoot)/.nuget/packages</NuGetPackagesDir>
 
