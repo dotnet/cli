@@ -42,6 +42,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{89905EC4
 		build\Microsoft.DotNet.Cli.Signing.proj = build\Microsoft.DotNet.Cli.Signing.proj
 		build\Microsoft.DotNet.Cli.tasks = build\Microsoft.DotNet.Cli.tasks
 		build\Microsoft.DotNet.Cli.Test.targets = build\Microsoft.DotNet.Cli.Test.targets
+		build\Microsoft.DotNet.Cli.Version.props = build\Microsoft.DotNet.Cli.Version.props
+		build\Microsoft.DotNet.Cli.Stage0.props = build\Microsoft.DotNet.Cli.Stage0.props
+		build\Microsoft.DotNet.Cli.OutputDirectories.props = build\Microsoft.DotNet.Cli.OutputDirectories.props
+		build\Microsoft.DotNet.Cli.FileExtensions.props = build\Microsoft.DotNet.Cli.FileExtensions.props
+		build\Microsoft.DotNet.Cli.Branding.props = build\Microsoft.DotNet.Cli.Branding.props
+		build\Microsoft.DotNet.Cli.BranchInfo.props = build\Microsoft.DotNet.Cli.BranchInfo.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "package", "package", "{FD7D515A-D10F-4F49-B8AE-21CF7ED071AE}"
