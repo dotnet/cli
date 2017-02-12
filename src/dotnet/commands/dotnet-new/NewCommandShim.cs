@@ -49,9 +49,11 @@ namespace Microsoft.DotNet.Tools.New
                 { new Guid("10919118-4E13-4FA9-825C-3B4DA855578E"), () => typeof(CaseChangeMacro) }
             }.ToList();
 
+            string preferredLang = Environment.GetEnvironmentVariable("DOTNET_NEW_PREFERRED_LANG") ?? "C#";
+
             var preferences = new Dictionary<string, string>
             {
-                { "prefs:language", "C#" },
+                { "prefs:language", preferredLang },
                 { "dotnet-cli-version", Product.Version }
             };
 
