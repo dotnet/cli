@@ -73,7 +73,7 @@ namespace Microsoft.DotNet.New.Tests
         [Fact]
         public void NewClassLibRestoresCorrectNetStandardLibraryVersion()
         {
-            var rootPath = TestAssetsManager.CreateTestDirectory().Path;
+            var rootPath = TestAssets.CreateTestDirectory().FullName;
             var packagesDirectory = Path.Combine(rootPath, "packages");
             var projectName = "Library";
             var projectFileName = $"{projectName}.csproj";
