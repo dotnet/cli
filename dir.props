@@ -16,6 +16,7 @@
   <Import Project="build/Microsoft.DotNet.Cli.Stage0.props" />
   <Import Project="build/Microsoft.DotNet.Cli.Version.props" />
   <Import Project="build/Microsoft.DotNet.Cli.Branding.props" />
+  <Import Project="build/Microsoft.DotNet.Cli.VersionBadge.props" />
   
   <PropertyGroup>
     <NuGetPackagesDir>$(NUGET_PACKAGES)</NuGetPackagesDir>
