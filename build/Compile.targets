@@ -245,6 +245,15 @@
   <Target Name="PublishSdks"
           DependsOnTargets="Prepare">
     <ItemGroup>
+      <BundledSdk Include="NuGet.Build.Tasks.Pack" Version="$(CLI_NuGet_Version)" />
+      <BundledSdk Include="Microsoft.NET.Sdk" Version="$(CLI_NETSDK_Version)" />
+      <BundledSdk Include="Microsoft.NET.Sdk.Web" Version="$(CLI_WEBSDK_Version)" />
+      <BundledSdk Include="Microsoft.NET.Sdk.Publish" Version="$(CLI_WEBSDK_Version)" />
+      <BundledSdk Include="Microsoft.NET.Sdk.Web.ProjectSystem" Version="$(CLI_WEBSDK_Version)" />
+      <BundledSdk Include="FSharp.NET.Sdk" Version="1.0.0-beta-040011" />
+    </ItemGroup>
+
+    <ItemGroup>
       <SdksToBundle Include="build/BundledSdks.proj">
         <Properties>
           CLIBuildDll=$(CLIBuildDll);
