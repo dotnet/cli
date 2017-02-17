@@ -7,9 +7,9 @@ namespace Microsoft.DotNet.Cli.Build
 {
     public class CliDependencyVersions
     {
-        public static readonly string SharedFrameworkVersion = "1.0.3";
-        public static readonly string SharedHostVersion = "1.0.1";
-        public static readonly string HostFxrVersion = "1.0.1";
+        public static readonly string SharedFrameworkVersion = "1.0.4-servicing-004640-00";
+        public static readonly string SharedHostVersion = "DEPENDENCY 'Microsoft.NETCore.DotNetHost' NOT FOUND";
+        public static readonly string HostFxrVersion = "DEPENDENCY 'Microsoft.NETCore.DotNetHostResolver' NOT FOUND";
 
         public static readonly string SharedFrameworkChannel = "preview";
         public static readonly string SharedHostChannel = "preview";
