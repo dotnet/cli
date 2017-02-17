@@ -55,13 +55,13 @@
     },
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.3"
+      "version": "1.0.4-servicing-004638-00"
     },
     "System.Diagnostics.TraceSource": "4.0.0",
     "System.Diagnostics.TextWriterTraceListener": "4.0.0",
     "System.Resources.Writer": "4.0.0",
     "System.Runtime.Serialization.Primitives": "4.1.1",
-    "System.Private.DataContractSerialization": "4.1.1",
+    "System.Private.DataContractSerialization": "4.1.2-servicing-24909-02",
     "System.Text.RegularExpressions": "4.1.0",
     "Microsoft.Win32.Registry": {
       "version": "4.0.0",
