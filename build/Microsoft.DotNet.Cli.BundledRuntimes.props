@@ -1,24 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="Microsoft.DotNet.Cli.tasks" />
-  <Import Project="prepare/CheckPrereqs.targets" />
-  <Import Project="Microsoft.DotNet.Cli.BundledSdks.props" />
-  <Import Project="Microsoft.DotNet.Cli.BundledTemplates.props" />
-
-  <Target Name="Prepare"
-          DependsOnTargets="Init;DownloadHostAndSharedFxArtifacts;RestoreSrcPackages;RestoreToolsPackages" />
-
-  <Target Name="Init"
-          DependsOnTargets="InitializeCommonProps;
-                            BuildDotnetCliBuildFramework;
-                            CheckPrereqs;">
-  </Target>
-
-  <Target Name="InitializeCommonProps"
-          DependsOnTargets="BuildDotnetCliBuildFramework" >
-
-
-
+<Project>
     <PropertyGroup>
 
       <!-- Downloaded Installers + Archives -->
@@ -35,7 +15,7 @@
     </PropertyGroup>
 
     <!-- Additional Shared Framework to be installed -->
-    <PropertyGroup>
+    <PropertyGroup Condition=" '$(IncludeAdditionalSharedFrameworks)' == 'true' ">
       <AdditionalCoreSetupChannel>preview</AdditionalCoreSetupChannel>
       <AdditionalSharedFrameworkVersion>1.0.3</AdditionalSharedFrameworkVersion>
       <AdditionalSharedHostVersion>1.0.1</AdditionalSharedHostVersion>
@@ -53,15 +33,8 @@
 
       <AdditionalCombinedFrameworkHostCompressedFileName>dotnet-$(ProductMonikerRid).$(AdditionalSharedFrameworkVersion)$(ArchiveExtension)</AdditionalCombinedFrameworkHostCompressedFileName>
     </PropertyGroup>
-
-
-    <!-- SetTelemetryProfile -->
-    <SetEnvVar Name="DOTNET_CLI_TELEMETRY_PROFILE" Value="$(DOTNET_CLI_TELEMETRY_PROFILE);https://github.com/dotnet/cli;$(CommitHash)" />
-  </Target>
-
-  <Target Name="SetupDownloadHostAndSharedFxInputsOutputs" DependsOnTargets="Init">
     <PropertyGroup>
-      <CoreSetupBlobRootUrl>https://dotnetcli.azureedge.net/dotnet/</CoreSetupBlobRootUrl>
+      <CoreSetupBlobRootUrl Condition="'$(CoreSetupBlobRootUrl)' == ''">https://dotnetcli.azureedge.net/dotnet/</CoreSetupBlobRootUrl>
       <CoreSetupBlobRootUrlWithChannel>$(CoreSetupBlobRootUrl)$(CoreSetupChannel)</CoreSetupBlobRootUrlWithChannel>
       <SharedFrameworkArchiveBlobRootUrl>$(CoreSetupBlobRootUrlWithChannel)/Binaries/$(SharedFrameworkVersion)</SharedFrameworkArchiveBlobRootUrl>
       <CoreSetupInstallerBlobRootUrl>$(CoreSetupBlobRootUrlWithChannel)/Installers</CoreSetupInstallerBlobRootUrl>
@@ -78,21 +51,21 @@
       </_DownloadAndExtractItem>
 
       <_DownloadAndExtractItem Include="DownloadedSharedFrameworkInstallerFile"
-                               Condition="!Exists('$(DownloadedSharedFrameworkInstallerFile)') And '$(InstallerExtension)' != ''">
+                               Condition="'$(SkipBuildingInstallers)' != 'true' And !Exists('$(DownloadedSharedFrameworkInstallerFile)') And '$(InstallerExtension)' != ''">
         <Url>$(CoreSetupInstallerBlobRootUrl)/$(SharedFrameworkVersion)/$(DownloadedSharedFrameworkInstallerFileName)</Url>
         <DownloadFileName>$(DownloadedSharedFrameworkInstallerFile)</DownloadFileName>
         <ExtractDestination></ExtractDestination>
       </_DownloadAndExtractItem>
 
       <_DownloadAndExtractItem Include="DownloadedSharedHostInstallerFile"
-                               Condition="!Exists('$(DownloadedSharedHostInstallerFile)') And '$(InstallerExtension)' != ''">
+                               Condition="'$(SkipBuildingInstallers)' != 'true' And !Exists('$(DownloadedSharedHostInstallerFile)') And '$(InstallerExtension)' != ''">
         <Url>$(CoreSetupInstallerBlobRootUrl)/$(SharedHostVersion)/$(DownloadedSharedHostInstallerFileName)</Url>
         <DownloadFileName>$(DownloadedSharedHostInstallerFile)</DownloadFileName>
         <ExtractDestintation></ExtractDestintation>
       </_DownloadAndExtractItem>
 
       <_DownloadAndExtractItem Include="DownloadedHostFxrInstallerFile"
-                               Condition="!Exists('$(DownloadedHostFxrInstallerFile)') And '$(InstallerExtension)' != ''">
+                               Condition="'$(SkipBuildingInstallers)' != 'true' And !Exists('$(DownloadedHostFxrInstallerFile)') And '$(InstallerExtension)' != ''">
         <Url>$(CoreSetupInstallerBlobRootUrl)/$(HostFxrVersion)/$(DownloadedHostFxrInstallerFileName)</Url>
         <DownloadFileName>$(DownloadedHostFxrInstallerFile)</DownloadFileName>
         <ExtractDestintation></ExtractDestintation>
@@ -100,7 +73,7 @@
     </ItemGroup>
 
     <!-- Additional Shared Framework to be installed -->
-    <PropertyGroup>
+    <PropertyGroup Condition=" '$(IncludeAdditionalSharedFrameworks)' != 'false' ">
       <AdditionalCoreSetupBlobRootUrlWithChannel>$(CoreSetupBlobRootUrl)$(AdditionalCoreSetupChannel)</AdditionalCoreSetupBlobRootUrlWithChannel>
       <AdditionalSharedFrameworkArchiveBlobRootUrl>$(AdditionalCoreSetupBlobRootUrlWithChannel)/Binaries/$(AdditionalSharedFrameworkVersion)</AdditionalSharedFrameworkArchiveBlobRootUrl>
       <AdditionalCoreSetupInstallerBlobRootUrl>$(AdditionalCoreSetupBlobRootUrlWithChannel)/Installers</AdditionalCoreSetupInstallerBlobRootUrl>
@@ -108,7 +81,7 @@
       <AdditionalCombinedSharedHostAndFrameworkArchive>$(AdditionalCoreSetupDownloadDirectory)/combinedSharedHostAndFrameworkArchive</AdditionalCombinedSharedHostAndFrameworkArchive>
     </PropertyGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition=" '$(IncludeAdditionalSharedFrameworks)' != 'false' ">
       <_DownloadAndExtractItem Include="AdditionalCombinedSharedHostAndFrameworkArchive"
                                Condition="!Exists('$(AdditionalCombinedSharedHostAndFrameworkArchive)')">
         <Url>$(AdditionalSharedFrameworkArchiveBlobRootUrl)/$(AdditionalCombinedFrameworkHostCompressedFileName)</Url>
@@ -119,99 +92,24 @@
       </_DownloadAndExtractItem>
 
       <_DownloadAndExtractItem Include="AdditionalDownloadedSharedFrameworkInstallerFile"
-                               Condition="!Exists('$(AdditionalDownloadedSharedFrameworkInstallerFile)') And '$(InstallerExtension)' != ''">
+                               Condition="'$(SkipBuildingInstallers)' != 'true' And !Exists('$(AdditionalDownloadedSharedFrameworkInstallerFile)') And '$(InstallerExtension)' != ''">
         <Url>$(AdditionalCoreSetupInstallerBlobRootUrl)/$(AdditionalSharedFrameworkVersion)/$(AdditionalDownloadedSharedFrameworkInstallerFileName)</Url>
         <DownloadFileName>$(AdditionalDownloadedSharedFrameworkInstallerFile)</DownloadFileName>
         <ExtractDestination></ExtractDestination>
       </_DownloadAndExtractItem>
 
       <_DownloadAndExtractItem Include="AdditionalDownloadedSharedHostInstallerFile"
-                               Condition="!Exists('$(AdditionalDownloadedSharedHostInstallerFile)') And '$(InstallerExtension)' != ''">
+                               Condition="'$(SkipBuildingInstallers)' != 'true' And !Exists('$(AdditionalDownloadedSharedHostInstallerFile)') And '$(InstallerExtension)' != ''">
         <Url>$(AdditionalCoreSetupInstallerBlobRootUrl)/$(AdditionalSharedHostVersion)/$(AdditionalDownloadedSharedHostInstallerFileName)</Url>
         <DownloadFileName>$(AdditionalDownloadedSharedHostInstallerFile)</DownloadFileName>
         <ExtractDestintation></ExtractDestintation>
       </_DownloadAndExtractItem>
 
       <_DownloadAndExtractItem Include="AdditionalDownloadedHostFxrInstallerFile"
-                               Condition="!Exists('$(AdditionalDownloadedHostFxrInstallerFile)') And '$(InstallerExtension)' != ''">
+                               Condition="'$(SkipBuildingInstallers)' != 'true' And !Exists('$(AdditionalDownloadedHostFxrInstallerFile)') And '$(InstallerExtension)' != ''">
         <Url>$(AdditionalCoreSetupInstallerBlobRootUrl)/$(AdditionalHostFxrVersion)/$(AdditionalDownloadedHostFxrInstallerFileName)</Url>
         <DownloadFileName>$(AdditionalDownloadedHostFxrInstallerFile)</DownloadFileName>
         <ExtractDestintation></ExtractDestintation>
       </_DownloadAndExtractItem>
     </ItemGroup>
-  </Target>
-
-  <Target Name="DownloadHostAndSharedFxArtifacts"
-          DependsOnTargets="SetupDownloadHostAndSharedFxInputsOutputs">
-
-    <PropertyGroup>
-      <OverwriteExtractionDestination>%(_DownloadAndExtractItem.OverwriteDestination)</OverwriteExtractionDestination>
-      <OverwriteExtractionDestination Condition="'$(OverwriteExtractionDestination)' == ''">True</OverwriteExtractionDestination>
-    </PropertyGroup>
-    
-    <DownloadFile Condition=" '@(_DownloadAndExtractItem)' != '' "
-                  Uri="%(_DownloadAndExtractItem.Url)"
-                  DestinationPath="%(_DownloadAndExtractItem.DownloadFileName)" />
-
-    <ZipFileExtractToDirectory Condition=" '%(_DownloadAndExtractItem.ExtractDestination)' != '' AND '$(OSName)' == 'win' "
-                               SourceArchive="%(_DownloadAndExtractItem.DownloadFileName)"
-                               DestinationDirectory="%(_DownloadAndExtractItem.ExtractDestination)"
-                               OverwriteDestination="$(OverwriteExtractionDestination)" />
-
-    <TarGzFileExtractToDirectory Condition=" '%(_DownloadAndExtractItem.ExtractDestination)' != '' AND '$(OSName)' != 'win' "
-                               SourceArchive="%(_DownloadAndExtractItem.DownloadFileName)"
-                               DestinationDirectory="%(_DownloadAndExtractItem.ExtractDestination)"
-                               OverwriteDestination="$(OverwriteExtractionDestination)" />
-  </Target>
-
-  <Target Name="RestoreSrcPackages"
-          DependsOnTargets="SetupRestoreSrcPackagesInputsOutputs;Init"
-          Inputs="@(RestoreSrcPackagesInput)"
-          Outputs="@(RestoreSrcPackagesInput->'%(RelativeDir)/obj/project.assets.json');@(RestoreSrcPackagesInput->'%(RelativeDir)/obj/%(Filename).csproj.nuget.g.props');@(RestoreSrcPackagesInput->'%(RelativeDir)/obj/%(Filename).csproj.nuget.g.targets')">
-
-    <CallTarget Targets="CleanSrcLockFiles" />
-
-    <DotNetRestore ToolPath="$(DotNetPath)"
-                   ProjectPath="&quot;%(RestoreSrcPackagesInput.FullPath)&quot;" />
-
-  </Target>
-
-  <Target Name="CleanSrcLockFiles" >
-    <ItemGroup>
-      <SrcLockFiles Include="$(RepoRoot)/src/**/project.assets.json;$(RepoRoot)/src/**/*.csproj.nuget.g.props;$(RepoRoot)/src/**/*.csproj.nuget.g.targets" />
-    </ItemGroup>
-    <Delete Files="@(SrcLockFiles)" />
-  </Target>
-
-  <Target Name="SetupRestoreSrcPackagesInputsOutputs">
-    <ItemGroup>
-      <RestoreSrcPackagesInput Include="$(RepoRoot)/src/**/*.csproj" Exclude="$(RepoRoot)/src/**/%24projectName%24.csproj"/>
-    </ItemGroup>
-  </Target>
-
-  <Target Name="RestoreToolsPackages"
-          DependsOnTargets="SetupRestoreToolsPackagesInputsOutputs;Init"
-          Inputs="@(RestoreToolsPackagesInput)"
-          Outputs="@(RestoreToolsPackagesInput->'%(RelativeDir)/obj/project.assets.json');@(RestoreToolsPackagesInput->'%(RelativeDir)/obj/%(Filename).csproj.nuget.g.props');@(RestoreToolsPackagesInput->'%(RelativeDir)/obj/%(Filename).csproj.nuget.g.targets')">
-
-    <CallTarget Targets="CleanToolsLockFiles" />
-
-    <DotNetRestore ToolPath="$(DotNetPath)"
-                   ProjectPath="&quot;%(RestoreToolsPackagesInput.FullPath)&quot;" />
-
-  </Target>
-
-  <Target Name="CleanToolsLockFiles" >
-    <ItemGroup>
-      <ToolsLockFiles Include="$(RepoRoot)/tools/**/project.assets.json;$(RepoRoot)/tools/**/*.csproj.nuget.g.props;$(RepoRoot)/tools/**/*.csproj.nuget.g.targets" />
-    </ItemGroup>
-    <Delete Files="@(ToolsLockFiles)" />
-  </Target>
-
-  <Target Name="SetupRestoreToolsPackagesInputsOutputs">
-    <ItemGroup>
-      <RestoreToolsPackagesInput Include="$(RepoRoot)/tools/**/*.csproj" />
-    </ItemGroup>
-  </Target>
-
 </Project>

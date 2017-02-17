@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="Microsoft.DotNet.Cli.tasks" />
+  <Import Project="prepare/CheckPrereqs.targets" />
+  <Import Project="BundledSdks.props" />
+  <Import Project="BundledTemplates.props" />
+
+  <Target Name="Prepare"
+          DependsOnTargets="Init;DownloadHostAndSharedFxArtifacts;RestoreSrcPackages;RestoreToolsPackages" />
+
+  <Target Name="Init"
+          DependsOnTargets="SetTelemetryProfile;
+                            BuildDotnetCliBuildFramework;
+                            CheckPrereqs;">
+  </Target>
+
+  <Target Name="SetTelemetryProfile"
+          DependsOnTargets="BuildDotnetCliBuildFramework" >
+    <SetEnvVar Name="DOTNET_CLI_TELEMETRY_PROFILE" Value="$(DOTNET_CLI_TELEMETRY_PROFILE);https://github.com/dotnet/cli;$(CommitHash)" />
+  </Target>
+
+  <Target Name="DownloadHostAndSharedFxArtifacts">
+
+    <PropertyGroup>
+      <OverwriteExtractionDestination>%(_DownloadAndExtractItem.OverwriteDestination)</OverwriteExtractionDestination>
+      <OverwriteExtractionDestination Condition="'$(OverwriteExtractionDestination)' == ''">True</OverwriteExtractionDestination>
+    </PropertyGroup>
+    
+    <DownloadFile Condition=" '@(_DownloadAndExtractItem)' != '' "
+                  Uri="%(_DownloadAndExtractItem.Url)"
+                  DestinationPath="%(_DownloadAndExtractItem.DownloadFileName)" />
+
+    <ZipFileExtractToDirectory Condition=" '%(_DownloadAndExtractItem.ExtractDestination)' != '' AND '$(OSName)' == 'win' "
+                               SourceArchive="%(_DownloadAndExtractItem.DownloadFileName)"
+                               DestinationDirectory="%(_DownloadAndExtractItem.ExtractDestination)"
+                               OverwriteDestination="$(OverwriteExtractionDestination)" />
+
+    <TarGzFileExtractToDirectory Condition=" '%(_DownloadAndExtractItem.ExtractDestination)' != '' AND '$(OSName)' != 'win' "
+                               SourceArchive="%(_DownloadAndExtractItem.DownloadFileName)"
+                               DestinationDirectory="%(_DownloadAndExtractItem.ExtractDestination)"
+                               OverwriteDestination="$(OverwriteExtractionDestination)" />
+  </Target>
+
+  <Target Name="RestoreSrcPackages"
+          DependsOnTargets="SetupRestoreSrcPackagesInputsOutputs;Init"
+          Inputs="@(RestoreSrcPackagesInput)"
+          Outputs="@(RestoreSrcPackagesInput->'%(RelativeDir)/obj/project.assets.json');@(RestoreSrcPackagesInput->'%(RelativeDir)/obj/%(Filename).csproj.nuget.g.props');@(RestoreSrcPackagesInput->'%(RelativeDir)/obj/%(Filename).csproj.nuget.g.targets')">
+
+    <CallTarget Targets="CleanSrcLockFiles" />
+
+    <DotNetRestore ToolPath="$(DotNetPath)"
+                   ProjectPath="&quot;%(RestoreSrcPackagesInput.FullPath)&quot;" />
+
+  </Target>
+
+  <Target Name="CleanSrcLockFiles" >
+    <ItemGroup>
+      <SrcLockFiles Include="$(RepoRoot)/src/**/project.assets.json;$(RepoRoot)/src/**/*.csproj.nuget.g.props;$(RepoRoot)/src/**/*.csproj.nuget.g.targets" />
+    </ItemGroup>
+    <Delete Files="@(SrcLockFiles)" />
+  </Target>
+
+  <Target Name="SetupRestoreSrcPackagesInputsOutputs">
+    <ItemGroup>
+      <RestoreSrcPackagesInput Include="$(RepoRoot)/src/**/*.csproj" Exclude="$(RepoRoot)/src/**/%24projectName%24.csproj"/>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="RestoreToolsPackages"
+          DependsOnTargets="SetupRestoreToolsPackagesInputsOutputs;Init"
+          Inputs="@(RestoreToolsPackagesInput)"
+          Outputs="@(RestoreToolsPackagesInput->'%(RelativeDir)/obj/project.assets.json');@(RestoreToolsPackagesInput->'%(RelativeDir)/obj/%(Filename).csproj.nuget.g.props');@(RestoreToolsPackagesInput->'%(RelativeDir)/obj/%(Filename).csproj.nuget.g.targets')">
+
+    <CallTarget Targets="CleanToolsLockFiles" />
+
+    <DotNetRestore ToolPath="$(DotNetPath)"
+                   ProjectPath="&quot;%(RestoreToolsPackagesInput.FullPath)&quot;" />
+
+  </Target>
+
+  <Target Name="CleanToolsLockFiles" >
+    <ItemGroup>
+      <ToolsLockFiles Include="$(RepoRoot)/tools/**/project.assets.json;$(RepoRoot)/tools/**/*.csproj.nuget.g.props;$(RepoRoot)/tools/**/*.csproj.nuget.g.targets" />
+    </ItemGroup>
+    <Delete Files="@(ToolsLockFiles)" />
+  </Target>
+
+  <Target Name="SetupRestoreToolsPackagesInputsOutputs">
+    <ItemGroup>
+      <RestoreToolsPackagesInput Include="$(RepoRoot)/tools/**/*.csproj" />
+    </ItemGroup>
+  </Target>
+
+</Project>

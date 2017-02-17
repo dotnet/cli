@@ -2,33 +2,6 @@
 <Project ToolsVersion="14.0" DefaultTargets="BuildTheWholeCli" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\dir.props" />
 
-  <PropertyGroup>
-    <!--
-      $(OS) is set to Unix/Windows_NT. This comes from an environment variable on Windows and MSBuild on Unix.
-    -->
-    <PlatformScriptHost Condition=" '$(OS)' == 'Windows_NT' ">powershell -NoProfile -NoLogo -Command </PlatformScriptHost>
-    <PlatformScriptHost Condition=" '$(OS)' != 'Windows_NT' "></PlatformScriptHost>
-
-    <PlatformScriptExtension Condition=" '$(OS)' == 'Windows_NT' ">.ps1</PlatformScriptExtension>
-    <PlatformScriptExtension Condition=" '$(OS)' != 'Windows_NT' ">.sh</PlatformScriptExtension>
-
-    <CLITargets Condition=" '$(CLITargets)' == '' ">Prepare;Compile;Test;Package;Publish</CLITargets>
-
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-
-    <CoreSetupChannel>master</CoreSetupChannel>
-    <SharedFrameworkName>Microsoft.NETCore.App</SharedFrameworkName>
-    <SharedFrameworkVersion>$(CLI_SharedFrameworkVersion)</SharedFrameworkVersion>
-    <SharedHostVersion>$(CLI_SharedFrameworkVersion)</SharedHostVersion>
-    <HostFxrVersion>$(CLI_SharedFrameworkVersion)</HostFxrVersion>
-
-    <ExeExtension>.exe</ExeExtension>
-    <ExeExtension Condition=" '$(OS)' != 'Windows_NT' "></ExeExtension>
-
-    <DotnetCliBuildDirectory>$(RepoRoot)/build_projects/dotnet-cli-build</DotnetCliBuildDirectory>
-    <PackagesDir>$(RepoRoot)/.nuget</PackagesDir>
-  </PropertyGroup>
-
   <ItemGroup>
     <DotnetCliBuildFrameworkInputs Include="build_projects/**/*.cs" Exclude="build_projects/**/obj/**/*.cs" />
     <DotnetCliBuildFrameworkInputs Include="build_projects/**/*.csproj" />
@@ -72,14 +45,14 @@
 
   <Target Name="BuildTheWholeCli" DependsOnTargets="$(CLITargets)" />
 
-  <Import Project="build/Microsoft.DotNet.Cli.GitCommitInfo.targets" />
-  <Import Project="build/Microsoft.DotNet.Cli.HostInfo.targets" />
-  <Import Project="build/Microsoft.DotNet.Cli.Prepare.targets" />
-  <Import Project="build/Microsoft.DotNet.Cli.Compile.targets" />
-  <Import Project="build/Microsoft.DotNet.Cli.Package.targets" />
-  <Import Project="build/Microsoft.DotNet.Cli.Test.targets" />
-  <Import Project="build/Microsoft.DotNet.Cli.Publish.targets" />
-  <Import Project="build/Microsoft.DotNet.Cli.Run.targets" />
+  <Import Project="build/GitCommitInfo.targets" />
+  <Import Project="build/HostInfo.targets" />
+  <Import Project="build/Prepare.targets" />
+  <Import Project="build/Compile.targets" />
+  <Import Project="build/Package.targets" />
+  <Import Project="build/Test.targets" />
+  <Import Project="build/Publish.targets" />
+  <Import Project="build/Run.targets" />
 
-  <Import Project="build/Microsoft.DotNet.Cli.InitRepo.targets" />
+  <Import Project="build/InitRepo.targets" />
 </Project>
