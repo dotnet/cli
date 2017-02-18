@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.BindingRedirects.Tests
             _appWithoutConfigProjectRoot = testSetup.AppWithoutConfigProjectRoot;
         }
 
-        [Fact(Skip="https://github.com/dotnet/cli/issues/4514")]
+        [Fact]
         public void Tool_Command_Runs_Executable_Dependency_For_App_With_Config()
         {
             new DependencyToolInvokerCommand()
@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.BindingRedirects.Tests
                 .Should().Pass().And.NotHaveStdErr();
         }
 
-        [Fact(Skip="https://github.com/dotnet/cli/issues/4514")]
+        [Fact]
         public void Tool_Command_Runs_Executable_Dependency_For_App_Without_Config()
         {
             new DependencyToolInvokerCommand()

@@ -120,6 +120,8 @@ namespace Microsoft.DotNet.Cli.Utils
             var normalizedNugetPackagesRoot =
                 PathUtility.EnsureNoTrailingDirectorySeparator(lockFile.PackageFolders.First().Path);
 
+            var appConfigPath = project.AppConfigPath;
+
             var commandSpec = _packagedCommandSpecFactory.CreateCommandSpecFromLibrary(
                         toolLibrary,
                         commandName,
@@ -128,7 +130,8 @@ namespace Microsoft.DotNet.Cli.Utils
                         normalizedNugetPackagesRoot,
                         s_commandResolutionStrategy,
                         depsFilePath,
-                        runtimeConfigPath);
+                        runtimeConfigPath,
+                        appConfigPath);
 
             commandSpec?.AddEnvironmentVariablesFromProject(project);
 

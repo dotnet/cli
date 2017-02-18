@@ -177,6 +177,7 @@ namespace Microsoft.DotNet.Cli.Utils
                     normalizedNugetPackagesRoot,
                     s_commandResolutionStrategy,
                     depsFilePath,
+                    null,
                     null);
 
             if (commandSpec == null)

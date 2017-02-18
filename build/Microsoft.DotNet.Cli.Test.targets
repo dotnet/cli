@@ -92,7 +92,8 @@
     <DotNetRestore ToolPath="$(Stage2Directory)"
                    Source="$(TestPackagesDir)"
                    ConfigFile="$(RepoRoot)\NuGet.Config"
-                   ProjectPath="%(TestPackageProject.ProjectPath)" />
+                   ProjectPath="%(TestPackageProject.ProjectPath)"
+                   MsbuildArgs="%(TestPackageProjects.MsbuildArgs)" />
  
     <!-- https://github.com/NuGet/Home/issues/4063 -->
     <DotNetPack Output="$(TestPackagesDir)"

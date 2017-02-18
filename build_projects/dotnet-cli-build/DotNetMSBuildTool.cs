@@ -11,11 +11,13 @@ namespace Microsoft.DotNet.Cli.Build
     {
         public int MaxCpuCount {get; set;} = 0;
 
+        public string MSBuildArgs { get; set; }
+
         protected override string Args 
         { 
             get
             {
-                return $"{GetMaxCpuCountArg()}";
+                return $"{GetMaxCpuCountArg()} {GetMSBuildArgs()}";
             } 
         }
 
@@ -24,6 +26,16 @@ namespace Microsoft.DotNet.Cli.Build
             if (MaxCpuCount > 0)
             {
                 return $"/m:{MaxCpuCount}";
+            }
+
+            return null;
+        }
+
+        private string GetMSBuildArgs()
+        {
+            if (!string.IsNullOrEmpty(MSBuildArgs))
+            {
+                return $"{MSBuildArgs}";
             }
 
             return null;

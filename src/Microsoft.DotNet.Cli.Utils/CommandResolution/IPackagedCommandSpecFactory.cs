@@ -13,7 +13,8 @@ namespace Microsoft.DotNet.Cli.Utils
             string nugetPackagesRoot,
             CommandResolutionStrategy commandResolutionStrategy,
             string depsFilePath,
-            string runtimeConfigPath);
+            string runtimeConfigPath,
+            string appConfigPath);
         
     }
 }

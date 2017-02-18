@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.Cli.Build
 
         protected override string Args
         {
-            get { return $"{base.Args} {GetArguments()}"; }
+            get { return $"{GetArguments()} {base.Args}"; }
         }
 
         public string Arguments { get; set; }
