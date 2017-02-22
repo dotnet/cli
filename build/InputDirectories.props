@@ -4,6 +4,7 @@
     <DotnetCliBuildDirectory>$(RepoRoot)/build_projects/dotnet-cli-build</DotnetCliBuildDirectory>
     <MSBuildImportsDir>$(RepoRoot)/resources/MSBuildImports</MSBuildImportsDir>
     <SrcDirectory>$(RepoRoot)/src</SrcDirectory>
+    <ProjectsSrcDirectory>$(RepoRoot)/src</ProjectsSrcDirectory>
     <TestDirectory>$(RepoRoot)/test/</TestDirectory>
   </PropertyGroup>
 </Project>

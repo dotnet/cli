@@ -25,5 +25,15 @@
       <TestPackagesDir>$(TestOutputDir)/packages/</TestPackagesDir>
       <TestArtifactsDir>$(TestOutputDir)/artifacts/</TestArtifactsDir>
       <TestResultXmlDir>$(TestOutputDir)/results/</TestResultXmlDir>
+      <ArchiveOutputDirectory>$(PackagesDirectory)</ArchiveOutputDirectory>
+      <InstallerOutputDirectory>$(PackagesDirectory)</InstallerOutputDirectory>
+      <SdkDebianIntermediateDirectory>$(IntermediateDirectory)/debian/sdk</SdkDebianIntermediateDirectory>
+      <DotNetDebToolOutputDirectory>$(SdkDebianIntermediateDirectory)/deb-tool-output</DotNetDebToolOutputDirectory>
+      <NupkgOutputDirectory>$(PackagesDirectory)</NupkgOutputDirectory>
+      <LayoutDirectory>$(IntermediateDirectory)/layouts</LayoutDirectory>
+      <SdkLayoutOutputDirectory>$(LayoutDirectory)/$(ArtifactNameSdk)</SdkLayoutOutputDirectory>
+      <SdkDebugLayoutOutputDirectory>$(LayoutDirectory)/$(ArtifactNameSdkDebug)</SdkDebugLayoutOutputDirectory>
+      <CombinedHostHostFxrFrameworkSdkOutputDirectory>$(LayoutDirectory)/$(ArtifactNameCombinedHostHostFxrFrameworkSdk)</CombinedHostHostFxrFrameworkSdkOutputDirectory>
+      <CombinedFrameworkSdkOutputDirectory>$(LayoutDirectory)/$(ArtifactNameCombinedFrameworkSdk)</CombinedFrameworkSdkOutputDirectory>
   </PropertyGroup>
 </Project>

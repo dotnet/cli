@@ -17,6 +17,9 @@
     <NugetVersion Condition=" '$(NugetVersion)' == '' ">$(VersionMajor).$(VersionMinor).$(VersionPatch)</NugetVersion> 
 
     <SdkVersion>$(NugetVersion)</SdkVersion>
-    <SdkNugetVersion>$(NugetVersion)</SdkNugetVersion> 
+    <SdkDebianPackageVersion>$(SdkVersion)</SdkDebianPackageVersion>
+    <SdkNugetVersion>$(NugetVersion)</SdkNugetVersion>
+
+    <DotnetDebToolVersion Condition=" '$(DotnetDebToolVersion)' == '' ">1.0.0-*</DotnetDebToolVersion>
   </PropertyGroup>
 </Project>

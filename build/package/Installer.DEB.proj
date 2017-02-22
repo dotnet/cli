@@ -6,8 +6,7 @@
   <Import Project="Installer.DEB.targets" />
 
   <Target Name="GenerateDebs"
-          DependsOnTargets="SetupDebProps;
-                            TestDebuild;
+          DependsOnTargets="TestDebuild;
                             BuildSdkDeb;
                             TestSdkDeb;"
           Condition=" '$(OSName)' == 'ubuntu' " 

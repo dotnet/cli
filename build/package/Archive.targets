@@ -32,10 +32,6 @@
 
   <Target Name="SetupGenerateArchivesInputsOutputs"
           DependsOnTargets="Init">
-    <PropertyGroup>
-      <ArchiveOutputDirectory>$(PackagesDirectory)</ArchiveOutputDirectory>
-    </PropertyGroup>
-
     <ItemGroup>
       <GenerateArchivesInputsOutputs Include="%(LayoutDefinition.Name)">
         <Inputs>%(LayoutDefinition.OutputFiles)</Inputs>
