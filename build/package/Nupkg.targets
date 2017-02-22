@@ -8,7 +8,7 @@
   <Target Name="SetupProjectsToPack"
           DependsOnTargets="Init">
     <ItemGroup>
-      <ProjectsToPack Include="$(ProjectsSrcDirectory)/Microsoft.DotNet.Cli.Utils" >
+      <ProjectsToPack Include="$(SrcDirectory)/Microsoft.DotNet.Cli.Utils" >
         <ProjectName>Microsoft.DotNet.Cli.Utils</ProjectName>
         <Version>$(SdkNugetVersion)</Version>
       </ProjectsToPack>

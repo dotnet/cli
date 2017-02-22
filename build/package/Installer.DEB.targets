@@ -3,6 +3,7 @@
   <!-- dotnet deb-tool -->
   <PropertyGroup>
     <DotnetDebToolPackageId>dotnet-deb-tool</DotnetDebToolPackageId>
+    <DotnetDebToolVersion Condition=" '$(DotnetDebToolVersion)' == '' ">1.0.0-*</DotnetDebToolVersion>
     <DotnetDebToolConsumerProjectName>dotnet-deb-tool-consumer</DotnetDebToolConsumerProjectName>
     <DotnetDebToolDir>$(IntermediateDirectory)/$(DotnetDebToolConsumerProjectName)</DotnetDebToolDir>
     <DotnetDebToolPackageSource Condition=" '$(DotnetDebToolPackageSource)' == '' "></DotnetDebToolPackageSource>
