@@ -5,6 +5,10 @@
 
   <Import Project="Installer.DEB.targets" />
 
+  <PropertyGroup>
+    <DotNetDebToolOutputDirectory>$(SdkDebianIntermediateDirectory)/deb-tool-output</DotNetDebToolOutputDirectory>
+  </PropertyGroup>
+
   <Target Name="GenerateDebs"
           DependsOnTargets="TestDebuild;
                             BuildSdkDeb;

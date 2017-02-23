@@ -3,6 +3,7 @@
 
   <PropertyGroup>
     <PackagingBuildBasePath>$(Stage2CompilationDirectory)/forPackaging</PackagingBuildBasePath>
+    <NupkgOutputDirectory>$(PackagesDirectory)</NupkgOutputDirectory>
   </PropertyGroup>
 
   <Target Name="SetupProjectsToPack"
