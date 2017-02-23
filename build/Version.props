@@ -17,6 +17,7 @@
     <NugetVersion Condition=" '$(NugetVersion)' == '' ">$(VersionMajor).$(VersionMinor).$(VersionPatch)</NugetVersion> 
 
     <SdkVersion>$(NugetVersion)</SdkVersion>
-    <SdkNugetVersion>$(NugetVersion)</SdkNugetVersion> 
+    <SdkDebianPackageVersion>$(SdkVersion)</SdkDebianPackageVersion>
+    <SdkNugetVersion>$(NugetVersion)</SdkNugetVersion>
   </PropertyGroup>
 </Project>

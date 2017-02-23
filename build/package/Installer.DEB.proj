@@ -5,9 +5,12 @@
 
   <Import Project="Installer.DEB.targets" />
 
+  <PropertyGroup>
+    <DotNetDebToolOutputDirectory>$(SdkDebianIntermediateDirectory)/deb-tool-output</DotNetDebToolOutputDirectory>
+  </PropertyGroup>
+
   <Target Name="GenerateDebs"
-          DependsOnTargets="SetupDebProps;
-                            TestDebuild;
+          DependsOnTargets="TestDebuild;
                             BuildSdkDeb;
                             TestSdkDeb;"
           Condition=" '$(OSName)' == 'ubuntu' " 

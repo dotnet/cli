@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup>
+    <SdkInstallerFile>$(InstallerOutputDirectory)/$(ArtifactNameWithVersionSdk)$(InstallerExtension)</SdkInstallerFile>
+    <CombinedFrameworkSdkHostInstallerFile>$(InstallerOutputDirectory)/$(ArtifactNameWithVersionCombinedHostHostFxrFrameworkSdk)$(BundleExtension)</CombinedFrameworkSdkHostInstallerFile>
+  </PropertyGroup>
+
+  <!-- Consumed By Publish -->
+  <ItemGroup>
+    <GeneratedInstallers Condition=" '$(OSName)' == 'ubuntu' "
+                         Include="$(SdkInstallerFile)"/>
+    <GeneratedInstallers Condition=" '$(OSName)' != 'ubuntu' "
+                         Include="$(SdkInstallerFile);$(CombinedFrameworkSdkHostInstallerFile)" />
+  </ItemGroup>
+</Project>

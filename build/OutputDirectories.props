@@ -27,5 +27,9 @@
       <TestResultXmlDir>$(TestOutputDir)/results/</TestResultXmlDir>
       <NuGetPackagesArchiveProject>$(IntermediateDirectory)/NuGetPackagesArchiveProject</NuGetPackagesArchiveProject>
       <NuGetPackagesArchiveFolder>$(IntermediateDirectory)/NuGetPackagesArchiveFolder</NuGetPackagesArchiveFolder>
+      <InstallerOutputDirectory>$(PackagesDirectory)</InstallerOutputDirectory>
+      <SdkDebianIntermediateDirectory>$(IntermediateDirectory)/debian/sdk</SdkDebianIntermediateDirectory>
+      <LayoutDirectory>$(IntermediateDirectory)/layouts</LayoutDirectory>
+      <SdkLayoutOutputDirectory>$(LayoutDirectory)/$(ArtifactNameSdk)</SdkLayoutOutputDirectory>
   </PropertyGroup>
 </Project>
