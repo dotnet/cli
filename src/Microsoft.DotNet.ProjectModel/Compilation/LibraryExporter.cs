@@ -196,6 +196,14 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             var builder = LibraryExportBuilder.Create(library);
             builder.AddNativeLibraryGroup(new LibraryAssetGroup(PopulateAssets(library, library.NativeLibraries)));
             builder.AddRuntimeAssemblyGroup(new LibraryAssetGroup(PopulateAssets(library, library.RuntimeAssemblies)));
+            foreach (var runtimeAsset in builder.RuntimeAssemblyGroups.GetDefaultAssets())
+            {
+                var pdbPath = Path.ChangeExtension(runtimeAsset.ResolvedPath, ".pdb");
+                if (File.Exists(pdbPath))
+                {
+                    builder.AddRuntimeAsset(new LibraryAsset(Path.GetFileName(pdbPath), Path.GetFileName(pdbPath), pdbPath));
+                }
+            }
             builder.WithResourceAssemblies(PopulateResources(library, library.ResourceAssemblies));
             builder.WithCompilationAssemblies(PopulateAssets(library, library.CompileTimeAssemblies));
 
@@ -211,7 +219,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                 Action<Stream, Stream> transform = (input, output) => PPFilePreprocessor.Preprocess(input, output, parameters);
 
                 var sourceCodeLanguage = _rootProject.Project.GetSourceCodeLanguage();
-                var languageGroups = library.ContentFiles.GroupBy(file => file.CodeLanguage);
+                var languageGroups = library.ContentFiles.GroupBy(file => file.CodeLanguage).ToArray();
                 var selectedGroup = languageGroups.FirstOrDefault(g => g.Key == sourceCodeLanguage) ??
                                     languageGroups.FirstOrDefault(g => g.Key == null);
                 if (selectedGroup != null)
