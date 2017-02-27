@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.Cli.Build
         nameof(PackageTargets.CopyHostFxrLayout),
         nameof(PackageTargets.CopySharedFxLayout),
         nameof(PackageTargets.CopyCombinedFrameworkSDKHostLayout),
-        nameof(PackageTargets.CopyCombinedFrameworkSDKLayout))]
+        nameof(PackageTargets.CopySDKLayout))]
         public static BuildTargetResult InitPackage(BuildTargetContext c)
         {
             Directory.CreateDirectory(Dirs.Packages);
@@ -164,9 +164,9 @@ namespace Microsoft.DotNet.Cli.Build
         }
 
         [Target]
-        public static BuildTargetResult CopyCombinedFrameworkSDKLayout(BuildTargetContext c)
+        public static BuildTargetResult CopySDKLayout(BuildTargetContext c)
         {
-            var combinedRoot = Path.Combine(Dirs.Output, "obj", "combined-framework-sdk");
+            var combinedRoot = Path.Combine(Dirs.Output, "obj", "sdk");
             if (Directory.Exists(combinedRoot))
             {
                 Utils.DeleteDirectory(combinedRoot);
@@ -178,7 +178,7 @@ namespace Microsoft.DotNet.Cli.Build
             string sharedFrameworkPublishRoot = c.BuildContext.Get<string>("SharedFrameworkPublishRoot");
             Utils.CopyDirectoryRecursively(sharedFrameworkPublishRoot, combinedRoot);
 
-            c.BuildContext["CombinedFrameworkSDKRoot"] = combinedRoot;
+            c.BuildContext["SDKRoot"] = combinedRoot;
             return c.Success();
         }
 
@@ -193,7 +193,7 @@ namespace Microsoft.DotNet.Cli.Build
         public static BuildTargetResult GenerateZip(BuildTargetContext c)
         {
             CreateZipFromDirectory(c.BuildContext.Get<string>("CombinedFrameworkSDKHostRoot"), c.BuildContext.Get<string>("CombinedFrameworkSDKHostCompressedFile"));
-            CreateZipFromDirectory(c.BuildContext.Get<string>("CombinedFrameworkSDKRoot"), c.BuildContext.Get<string>("CombinedFrameworkSDKCompressedFile"));
+            CreateZipFromDirectory(c.BuildContext.Get<string>("SDKRoot"), c.BuildContext.Get<string>("SDKCompressedFile"));
             CreateZipFromDirectory(Path.Combine(Dirs.Stage2Symbols, "sdk"), c.BuildContext.Get<string>("SdkSymbolsCompressedFile"));
 
             return c.Success();
