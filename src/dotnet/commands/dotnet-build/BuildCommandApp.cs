@@ -35,6 +35,8 @@ namespace Microsoft.DotNet.Tools.Compiler
         private CommandOption _shouldNotUseIncrementalityArgument;
         private CommandOption _shouldSkipDependenciesArgument;
 
+        private CommandOption _isServiceable;
+
 
         public string BuildBasePathValue { get; set; }
         public string RuntimeValue { get; set; }
@@ -45,6 +47,8 @@ namespace Microsoft.DotNet.Tools.Compiler
         public bool ShouldPrintIncrementalPreconditions { get; set; }
         public bool ShouldNotUseIncrementality { get; set; }
         public bool ShouldSkipDependencies { get; set; }
+
+        public bool IsServiceable { get; set; }
 
         public BuildWorkspace Workspace { get; private set; }
 
@@ -85,6 +89,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             _shouldPrintIncrementalPreconditionsArgument = _app.Option(BuildProfileFlag, "Set this flag to print the incremental safety checks that prevent incremental compilation", CommandOptionType.NoValue);
             _shouldNotUseIncrementalityArgument = _app.Option(NoIncrementalFlag, "Set this flag to turn off incremental build", CommandOptionType.NoValue);
             _shouldSkipDependenciesArgument = _app.Option("--no-dependencies", "Set this flag to ignore project to project references and only build the root project", CommandOptionType.NoValue);
+            _isServiceable = _app.Option("--Serviceable", "Adds the Serviceable attribute to output binaries", CommandOptionType.NoValue);
         }
 
         public int Execute(OnExecute execute, string[] args)
@@ -105,6 +110,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                 ShouldPrintIncrementalPreconditions = _shouldPrintIncrementalPreconditionsArgument.HasValue();
                 ShouldNotUseIncrementality = _shouldNotUseIncrementalityArgument.HasValue();
                 ShouldSkipDependencies = _shouldSkipDependenciesArgument.HasValue();
+                IsServiceable = _isServiceable.HasValue() ? true : false;
 
                 // Set defaults based on the environment
                 if (Workspace == null)

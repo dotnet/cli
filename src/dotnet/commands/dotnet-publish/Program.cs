@@ -31,6 +31,7 @@ namespace Microsoft.DotNet.Tools.Publish
             var projectPath = app.Argument("<PROJECT>", "The project to publish, defaults to the current directory. Can be a path to a project.json or a project directory");
             var nativeSubdirectories = app.Option("--native-subdirectory", "Temporary mechanism to include subdirectories from native assets of dependency packages in output", CommandOptionType.NoValue);
             var noBuild = app.Option("--no-build", "Do not build projects before publishing", CommandOptionType.NoValue);
+            var serviceable = app.Option("--Serviceable", "Adds the Serviceable attribute to output binaries", CommandOptionType.NoValue);
 
             app.OnExecute(() =>
             {
@@ -45,6 +46,7 @@ namespace Microsoft.DotNet.Tools.Publish
                 publish.ProjectPath = projectPath.Value;
                 publish.VersionSuffix = versionSuffix.Value();
                 publish.ShouldBuild = !noBuild.HasValue();
+                publish.IsServiceable = serviceable.HasValue() ? true : false;
 
                 publish.Workspace = BuildWorkspace.Create(versionSuffix.Value());
 

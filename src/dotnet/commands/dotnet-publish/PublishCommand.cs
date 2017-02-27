@@ -37,6 +37,7 @@ namespace Microsoft.DotNet.Tools.Publish
         public int NumberOfProjects { get; private set; }
         public int NumberOfPublishedProjects { get; private set; }
         public bool ShouldBuild { get; set; }
+        public bool IsServiceable { get; set; }
 
         public bool TryPrepareForPublish()
         {
@@ -260,6 +261,11 @@ namespace Microsoft.DotNet.Tools.Publish
             {
                 args.Add("--build-base-path");
                 args.Add(buildBasePath);
+            }
+
+            if (IsServiceable)
+            {
+                args.Add("--Serviceable");
             }
 
             var result = Build.BuildCommand.Run(args.ToArray(), Workspace);

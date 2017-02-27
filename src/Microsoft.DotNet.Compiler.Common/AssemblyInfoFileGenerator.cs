@@ -79,6 +79,11 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
                 attributes[typeof(TargetFrameworkAttribute)] = EscapeCharacters(metadata.TargetFramework);
             };
 
+            if (metadata.IsServiceable)
+            {
+                attributes[typeof(AssemblyMetadataAttribute)] = "Serviceable\", \"True";
+            }
+
             return attributes;
         }
 

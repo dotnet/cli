@@ -32,6 +32,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Csc
             CommonCompilerOptionsCommandLine commonCompilerCommandLine = CommonCompilerOptionsCommandLine.AddOptions(app);
             AssemblyInfoOptionsCommandLine assemblyInfoCommandLine = AssemblyInfoOptionsCommandLine.AddOptions(app);
 
+            CommandOption serviceable = app.Option("--serviceable", "Adds the Serviceable attribute to output binaries", CommandOptionType.NoValue);
             CommandOption tempOutput = app.Option("--temp-output <arg>", "Compilation temporary directory", CommandOptionType.SingleValue);
             CommandOption outputName = app.Option("--out <arg>", "Name of the output assembly", CommandOptionType.SingleValue);
             CommandOption references = app.Option("--reference <arg>...", "Path to a compiler metadata reference", CommandOptionType.MultipleValue);
@@ -50,6 +51,7 @@ namespace Microsoft.DotNet.Tools.Compiler.Csc
                 CommonCompilerOptions commonOptions = commonCompilerCommandLine.GetOptionValues();
 
                 AssemblyInfoOptions assemblyInfoOptions = assemblyInfoCommandLine.GetOptionValues();
+                assemblyInfoOptions.IsServiceable = serviceable.HasValue() ? true : false;
 
                 var translated = TranslateCommonOptions(commonOptions, outputName.Value());
 

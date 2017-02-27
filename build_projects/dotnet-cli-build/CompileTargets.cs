@@ -110,7 +110,8 @@ namespace Microsoft.DotNet.Cli.Build
             var result = CompileCliSdk(c,
                 dotnet: DotNetCli.Stage1,
                 rootOutputDirectory: Dirs.Stage2,
-                generateNugetPackagesArchive: true);
+                generateNugetPackagesArchive: true,
+                isServiceable: true);
 
             if (!result.Success)
             {
@@ -162,7 +163,8 @@ namespace Microsoft.DotNet.Cli.Build
             BuildTargetContext c,
             DotNetCli dotnet,
             string rootOutputDirectory,
-            bool generateNugetPackagesArchive = false)
+            bool generateNugetPackagesArchive = false,
+            bool isServiceable = false)
         {
             var configuration = c.BuildContext.Get<string>("Configuration");
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
@@ -177,26 +179,56 @@ namespace Microsoft.DotNet.Cli.Build
 
             foreach (var project in ProjectsToPublish)
             {
-                dotnet.Publish(
-                    "--native-subdirectory",
-                    "--output", sdkOutputDirectory,
-                    "--configuration", configuration,
-                    "--version-suffix", buildVersion.CommitCountString,
-                    Path.Combine(srcDir, project))
+                if (isServiceable)
+                {
+                    dotnet.Publish(
+                        "--Serviceable",
+                        "--native-subdirectory",
+                        "--output", sdkOutputDirectory,
+                        "--configuration", configuration,
+                        "--version-suffix", buildVersion.CommitCountString,
+                        Path.Combine(srcDir, project))
                     .Execute()
                     .EnsureSuccessful();
+                }
+                else
+                {
+                    dotnet.Publish(
+                        "--native-subdirectory",
+                        "--output", sdkOutputDirectory,
+                        "--configuration", configuration,
+                        "--version-suffix", buildVersion.CommitCountString,
+                        Path.Combine(srcDir, project))
+                    .Execute()
+                    .EnsureSuccessful();
+                }
+                
             }
 
             FixModeFlags(sdkOutputDirectory);
 
             string compilersProject = Path.Combine(Dirs.RepoRoot, "src", "compilers");
-            dotnet.Publish(compilersProject,
+            if (isServiceable)
+            {
+                dotnet.Publish(compilersProject,
+                    "--Serviceable",
                     "--output",
                     sdkOutputDirectory,
                     "--framework",
                     "netcoreapp1.0")
-                    .Execute()
-                    .EnsureSuccessful();
+                .Execute()
+                .EnsureSuccessful();
+            }
+            else
+            {
+                dotnet.Publish(compilersProject,
+                    "--output",
+                    sdkOutputDirectory,
+                    "--framework",
+                    "netcoreapp1.0")
+                .Execute()
+                .EnsureSuccessful();
+            }
 
             var compilersDeps = Path.Combine(sdkOutputDirectory, "compilers.deps.json");
             var compilersRuntimeConfig = Path.Combine(sdkOutputDirectory, "compilers.runtimeconfig.json");

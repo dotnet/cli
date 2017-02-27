@@ -45,6 +45,8 @@ namespace Microsoft.DotNet.Cli.Compiler.Common
 
         public string TargetFramework { get; set; }
 
+        public bool IsServiceable { get; set; }
+
         public static AssemblyInfoOptions CreateForProject(ProjectContext context)
         {
             var project = context.ProjectFile;
