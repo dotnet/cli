@@ -31,5 +31,5 @@
     </DotNetCliToolReference>
   </ItemGroup>
 
-  <Import Project="$(MSBuildExtensionsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
