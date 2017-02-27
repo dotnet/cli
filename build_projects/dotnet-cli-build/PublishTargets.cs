@@ -191,6 +191,7 @@ namespace Microsoft.DotNet.Cli.Build
         [Target(
             nameof(PublishTargets.PublishCombinedHostFrameworkSdkArchiveToAzure),
             nameof(PublishTargets.PublishCombinedFrameworkSDKArchiveToAzure),
+            nameof(PublishTargets.PublishSDKArchiveToAzure),
             nameof(PublishTargets.PublishSDKSymbolsArchiveToAzure))]
         public static BuildTargetResult PublishArchivesToAzure(BuildTargetContext c) => c.Success();
 
@@ -241,6 +242,18 @@ namespace Microsoft.DotNet.Cli.Build
         {
             var version = CliNuGetVersion;
             var archiveFile = c.BuildContext.Get<string>("CombinedFrameworkSDKCompressedFile");
+
+            AzurePublisherTool.PublishArchive(archiveFile, Channel, version);
+
+            return c.Success();
+        }
+
+        [Target]
+        [BuildPlatforms(BuildPlatform.Windows)]
+        public static BuildTargetResult PublishSDKArchiveToAzure(BuildTargetContext c)
+        {
+            var version = CliNuGetVersion;
+            var archiveFile = c.BuildContext.Get<string>("SdkCompressedFile");
 
             AzurePublisherTool.PublishArchive(archiveFile, Channel, version);
 

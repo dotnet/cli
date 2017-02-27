@@ -194,6 +194,7 @@ namespace Microsoft.DotNet.Cli.Build
         {
             CreateZipFromDirectory(c.BuildContext.Get<string>("CombinedFrameworkSDKHostRoot"), c.BuildContext.Get<string>("CombinedFrameworkSDKHostCompressedFile"));
             CreateZipFromDirectory(c.BuildContext.Get<string>("CombinedFrameworkSDKRoot"), c.BuildContext.Get<string>("CombinedFrameworkSDKCompressedFile"));
+            CreateZipFromDirectory(c.BuildContext.Get<string>("CLISDKRoot"), c.BuildContext.Get<string>("SdkCompressedFile"));
             CreateZipFromDirectory(Path.Combine(Dirs.Stage2Symbols, "sdk"), c.BuildContext.Get<string>("SdkSymbolsCompressedFile"));
 
             return c.Success();
