@@ -40,15 +40,15 @@ namespace Microsoft.DotNet.ProjectJsonMigration
                         "backup")
                     .EnsureTrailingSlash());
 
-            ProjectBackupDirectory = new DirectoryInfo(
-                Path.Combine(
-                        RootBackupDirectory.FullName,
-                        projectDirectory.Name)
-                    .EnsureTrailingSlash());
-
             var relativeDirectory = PathUtility.GetRelativePath(
                 workspaceDirectory.FullName,
                 projectDirectory.FullName);
+
+            ProjectBackupDirectory = new DirectoryInfo(
+                Path.Combine(
+                        RootBackupDirectory.FullName,
+                        relativeDirectory)
+                    .EnsureTrailingSlash());
 
             getFiles = getFiles ??
                        (dir => dir.EnumerateFiles());

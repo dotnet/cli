@@ -13,6 +13,7 @@ namespace Microsoft.DotNet.Migration.Tests
     {
         [Theory]
         [InlineData("TestAppWithLibrary")]
+        [InlineData("TestAppWithLibraryAndTwoVersions")]
         public void WhenProjectMigrationSucceedsThenProjectJsonArtifactsGetMovedToBackup(string testProjectName)
         {
             var testRoot = TestAssetsManager
