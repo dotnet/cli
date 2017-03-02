@@ -297,7 +297,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Rules
 
             var possibleMappings =
                 dependencyToVersionMap.Where(c => c.Key.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-            if (possibleMappings.Any() && !string.IsNullOrEmpty(version))
+            if (possibleMappings.Any() && !string.IsNullOrEmpty(version) && minRange != null)
             {
                 var possibleVersions = possibleMappings.Select(p => VersionRange.Parse(p.Key.Version));
                 var matchVersion = possibleVersions.FirstOrDefault(p => p.Satisfies(minRange));
