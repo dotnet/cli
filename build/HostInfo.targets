@@ -1,6 +1,5 @@
 <Project ToolsVersion="15.0">
   <Target Name="WriteHostInfoProps"
-          Condition=" !Exists('$(HostInfoProps)') "
           DependsOnTargets="BuildDotnetCliBuildFramework">
     <!-- Current Runtime Information -->
     <GetCurrentRuntimeInformation>
@@ -10,6 +9,15 @@
     </GetCurrentRuntimeInformation>
 
     <PropertyGroup>
+      <ShouldOverWriteThePropsFile
+        Condition=" '$(Rid)' != '$(HostRid)' Or 
+                    '$(Architecture)' != '$(HostArchitecture)' Or 
+                    '$(OSName)' != '$(HostOSName)' ">true</ShouldOverWriteThePropsFile>
+
+      <HostRid Condition=" '$(OverrideRid)' != '' ">$(OverrideRid)</HostRid>
+      <HostArchitecture Condition=" '$(OverrideArchitecture)' != '' ">$(OverrideArchitecture)</HostArchitecture>
+      <HostOSName Condition=" '$(OverrideOSName)' != '' ">$(OverrideOSName)</HostOSName>
+
       <HostInfoPropsContent>
 &lt;Project ToolsVersion=&quot;15.0&quot;&gt;
     &lt;PropertyGroup&gt;
@@ -23,6 +31,7 @@
 
     <WriteLinesToFile File="$(HostInfoProps)"
                       Lines="$(HostInfoPropsContent)"
+                      Condition=" '$(ShouldOverWriteThePropsFile)' == 'true' "
                       Overwrite="true"  />
   </Target>
 </Project>

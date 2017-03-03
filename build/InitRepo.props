@@ -3,5 +3,8 @@
     <GeneratedPropsDir>$(RepoRoot)/artifacts/obj</GeneratedPropsDir>
     <GitCommitInfoProps>$(GeneratedPropsDir)/GitCommitInfo.props</GitCommitInfoProps>
     <HostInfoProps>$(GeneratedPropsDir)/HostInfo.props</HostInfoProps>
+    <OverrideArchitecture>$(Architecture)</OverrideArchitecture>
+    <OverrideOSName>$(OSName)</OverrideOSName>
+    <OverrideRid>$(Rid)</OverrideRid>
   </PropertyGroup>
 </Project>
