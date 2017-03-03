@@ -11,10 +11,6 @@
     </Exec>
 
     <PropertyGroup>
-      <ShouldOverWriteThePropsFile 
-        Condition=" '$(CommitCount)' != '$(GitInfoCommitCount)' Or 
-                    '$(CommitHash)' != '$(GitInfoCommitHash)' ">true</ShouldOverWriteThePropsFile>
-
       <GitCommitInfoPropsContent>
 &lt;Project ToolsVersion=&quot;15.0&quot;&gt;
     &lt;PropertyGroup&gt;
@@ -23,11 +19,20 @@
     &lt;/PropertyGroup&gt;
 &lt;/Project&gt;
       </GitCommitInfoPropsContent>
-    </PropertyGroup>
 
-    <WriteLinesToFile File="$(GitCommitInfoProps)"
-                      Lines="$(GitCommitInfoPropsContent)"
-                      Condition=" '$(ShouldOverWriteThePropsFile)' == 'true' "
-                      Overwrite="true" />
+      <ExistingGitCommitInfoProps Condition=" Exists('$(GitCommitInfoProps)') ">
+        $([System.IO.File]::ReadAllText($(GitCommitInfoProps)))
+      </ExistingGitCommitInfoProps>
+
+      <ShouldOverwriteGitCommitInfoPropsFile>false</ShouldOverwriteGitCommitInfoPropsFile>
+      <ShouldOverwriteGitCommitInfoPropsFile
+        Condition=" !Exists('$(GitCommitInfoProps)') Or
+                    '$(ExistingGitCommitInfoProps.Trim())' != '$(GitCommitInfoPropsContent.Trim())' ">true</ShouldOverwriteGitCommitInfoPropsFile>
+  </PropertyGroup>
+
+  <WriteLinesToFile File="$(GitCommitInfoProps)"
+                    Lines="$(GitCommitInfoPropsContent)"
+                    Condition=" '$(ShouldOverwriteGitCommitInfoPropsFile)' == 'true' "
+                    Overwrite="true" />
   </Target>
 </Project>

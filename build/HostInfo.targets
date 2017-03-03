@@ -9,14 +9,9 @@
     </GetCurrentRuntimeInformation>
 
     <PropertyGroup>
-      <ShouldOverWriteThePropsFile
-        Condition=" '$(Rid)' != '$(HostRid)' Or 
-                    '$(Architecture)' != '$(HostArchitecture)' Or 
-                    '$(OSName)' != '$(HostOSName)' ">true</ShouldOverWriteThePropsFile>
-
-      <HostRid Condition=" '$(OverrideRid)' != '' ">$(OverrideRid)</HostRid>
-      <HostArchitecture Condition=" '$(OverrideArchitecture)' != '' ">$(OverrideArchitecture)</HostArchitecture>
-      <HostOSName Condition=" '$(OverrideOSName)' != '' ">$(OverrideOSName)</HostOSName>
+      <HostRid Condition=" '$(Rid)' != '' ">$(Rid)</HostRid>
+      <HostArchitecture Condition=" '$(Architecture)' != '' ">$(Architecture)</HostArchitecture>
+      <HostOSName Condition=" '$(OSName)' != '' ">$(OSName)</HostOSName>
 
       <HostInfoPropsContent>
 &lt;Project ToolsVersion=&quot;15.0&quot;&gt;
@@ -27,11 +22,20 @@
     &lt;/PropertyGroup&gt;
 &lt;/Project&gt;
       </HostInfoPropsContent>
+
+      <ExistingHostInfoPropsContent Condition=" Exists('$(HostInfoProps)') ">
+        $([System.IO.File]::ReadAllText($(HostInfoProps)))
+      </ExistingHostInfoPropsContent>
+
+      <ShouldOverwriteHostInfoPropsFile>false</ShouldOverwriteHostInfoPropsFile>
+      <ShouldOverwriteHostInfoPropsFile
+        Condition=" !Exists('$(HostInfoProps)') Or
+                    '$(ExistingHostInfoPropsContent.Trim())' != '$(HostInfoPropsContent.Trim())' ">true</ShouldOverwriteHostInfoPropsFile>
     </PropertyGroup>
 
     <WriteLinesToFile File="$(HostInfoProps)"
                       Lines="$(HostInfoPropsContent)"
-                      Condition=" '$(ShouldOverWriteThePropsFile)' == 'true' "
+                      Condition=" '$(ShouldOverwriteHostInfoPropsFile)' == 'true' "
                       Overwrite="true"  />
   </Target>
 </Project>
