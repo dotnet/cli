@@ -55,6 +55,9 @@ source "$REPOROOT/scripts/common/_prettyprint.sh"
 
 BUILD=1
 
+LINUX_PORTABLE_INSTALL_ARGS=
+LINUX_PORTABLE_BUILD_ARGS=
+
 # Set nuget package cache under the repo
 export NUGET_PACKAGES="$REPOROOT/.nuget/packages"
 
@@ -92,6 +95,11 @@ while [[ $# > 0 ]]; do
             args=( "${args[@]/$1}" )
             args=( "${args[@]/$2}" )
             shift
+            ;;
+        --linux-portable)
+            LINUX_PORTABLE_INSTALL_ARGS="--linux-portable --version 2.0.0-alpha-005151"
+            LINUX_PORTABLE_BUILD_ARGS="/p:Rid=\"linux-x64\" /p:OSName=\"linux\" /p:IncludeAdditionalSharedFrameworks=false"
+            args=( "${args[@]/$1}" )
             ;;
         --help)
             echo "Usage: $0 [--configuration <CONFIGURATION>] [--targets <TARGETS...>] [--skip-prereqs] [--nopackage] [--docker <IMAGENAME>] [--help]"
@@ -155,8 +163,8 @@ if [ $? != 0 ]; then
 fi
 
 # now execute the script
-echo "installing CLI: $dotnetInstallPath --channel \"master\" --install-dir $DOTNET_INSTALL_DIR --architecture \"$ARCHITECTURE\""
-$dotnetInstallPath --channel "master" --install-dir $DOTNET_INSTALL_DIR --architecture "$ARCHITECTURE"
+echo "installing CLI: $dotnetInstallPath --channel \"master\" --install-dir $DOTNET_INSTALL_DIR --architecture \"$ARCHITECTURE\" $LINUX_PORTABLE_INSTALL_ARGS"
+$dotnetInstallPath --channel "master" --install-dir $DOTNET_INSTALL_DIR --architecture "$ARCHITECTURE" $LINUX_PORTABLE_INSTALL_ARGS
 if [ $? != 0 ]; then
     echo "run-build: Error: Boot-strapping post-PJ stage0 with exit code $?." >&2
     exit $?
@@ -179,9 +187,9 @@ export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 echo "${args[@]}"
 
 if [ $BUILD -eq 1 ]; then
-    dotnet msbuild build.proj /p:Architecture=$ARCHITECTURE /p:GeneratingPropsFile=true /t:WriteDynamicPropsToStaticPropsFiles
-    dotnet msbuild build.proj /m /v:diag /fl /flp:v=diag /p:Architecture=$ARCHITECTURE "${args[@]}"
+    dotnet msbuild build.proj /p:Architecture=$ARCHITECTURE $LINUX_PORTABLE_BUILD_ARGS /p:GeneratingPropsFile=true /t:WriteDynamicPropsToStaticPropsFiles
+    dotnet msbuild build.proj /m /v:diag /fl /flp:v=diag /p:Architecture=$ARCHITECTURE $LINUX_PORTABLE_BUILD_ARGS "${args[@]}"
 else
     echo "Not building due to --nobuild"
-    echo "Command that would be run is: 'dotnet msbuild build.proj /m /p:Architecture=$ARCHITECTURE ${args[@]}'"
+    echo "Command that would be run is: 'dotnet msbuild build.proj /m /p:Architecture=$ARCHITECTURE $LINUX_PORTABLE_BUILD_ARGS ${args[@]}'"
 fi
