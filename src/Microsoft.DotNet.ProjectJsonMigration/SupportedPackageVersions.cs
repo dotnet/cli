@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration
         {
             get
             {
-                return !string.IsNullOrEmpty(Name) && 
+                return !string.IsNullOrEmpty(Name) &&
                     (Name.Equals("Microsoft.NETCore.App", StringComparison.OrdinalIgnoreCase) ||
                      Name.Equals("NETStandard.Library", StringComparison.OrdinalIgnoreCase));
             }
@@ -186,6 +186,30 @@ namespace Microsoft.DotNet.ProjectJsonMigration
                         {
                             Name = "Microsoft.VisualStudio.Web.CodeGeneration.Design",
                             Version = ConstantPackageVersions.AspNetToolsVersion
+                        }
+                    },
+                    {
+                        new PackageDependencyInfo
+                        {
+                            Name = "Microsoft.VisualStudio.Web.BrowserLink.Loader",
+                            Version = "[14.1.0-*,)"
+                        },
+                        new PackageDependencyInfo
+                        {
+                            Name = "Microsoft.VisualStudio.Web.BrowserLink",
+                            Version = "1.1.0"
+                        }
+                    },
+                    {
+                        new PackageDependencyInfo
+                        {
+                            Name = "Microsoft.VisualStudio.Web.BrowserLink.Loader",
+                            Version = "[14.0.0-*,14.1.0)"
+                        },
+                        new PackageDependencyInfo
+                        {
+                            Name = "Microsoft.VisualStudio.Web.BrowserLink",
+                            Version = "1.0.1"
                         }
                     },
                     {

@@ -1,4 +1,7 @@
-﻿using Microsoft.Build.Construction;
+﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using Microsoft.Build.Construction;
 using Microsoft.DotNet.ProjectJsonMigration;
 using Microsoft.DotNet.Internal.ProjectModel;
 using Microsoft.DotNet.Tools.Test.Utilities;
@@ -15,7 +18,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
 {
     public class GivenThatIWantToMigrateTFMs : TestBase
     {
-        [Fact(Skip="Emitting this until x-targetting full support is in")]
+        [Fact(Skip="Emitting this until x-targeting full support is in")]
         public void MigratingNetcoreappProjectDoesNotPopulateTargetFrameworkIdentifierAndTargetFrameworkVersion()
         {
             var testDirectory = Temp.CreateDirectory().Path;
@@ -32,8 +35,8 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
 
             var migrationSettings = MigrationSettings.CreateMigrationSettingsTestHook(testDirectory, testDirectory, mockProj);
             var migrationInputs = new MigrationRuleInputs(
-                new[] { projectContext }, 
-                mockProj, 
+                new[] { projectContext },
+                mockProj,
                 mockProj.AddItemGroup(),
                 mockProj.AddPropertyGroup());
 
@@ -56,9 +59,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
 
             var migrationSettings = MigrationSettings.CreateMigrationSettingsTestHook(testDirectory, testDirectory, mockProj);
             var migrationInputs = new MigrationRuleInputs(
-                projectContexts, 
-                mockProj, 
-                mockProj.AddItemGroup(), 
+                projectContexts,
+                mockProj,
+                mockProj.AddItemGroup(),
                 mockProj.AddPropertyGroup());
 
             new MigrateTFMRule().Apply(migrationSettings, migrationInputs);
@@ -69,7 +72,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Fact]
-        public void MigratingCoreAndDesktopTFMsAddsAllRuntimeIdentifiersIfTheProjectDoesNothaveAnyAlready()
+        public void MigratingCoreAndDesktopTFMsDoesNoAddRuntimeIdentifiersOrRuntimeIdentifierWhenTheProjectDoesNothaveAnyAlready()
         {
             var testDirectory = Temp.CreateDirectory().Path;
             var testPJ = new ProjectJsonBuilder(TestAssets)
@@ -81,42 +84,15 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
 
             var migrationSettings = MigrationSettings.CreateMigrationSettingsTestHook(testDirectory, testDirectory, mockProj);
             var migrationInputs = new MigrationRuleInputs(
-                projectContexts, 
-                mockProj, 
-                mockProj.AddItemGroup(), 
+                projectContexts,
+                mockProj,
+                mockProj.AddItemGroup(),
                 mockProj.AddPropertyGroup());
 
             new MigrateTFMRule().Apply(migrationSettings, migrationInputs);
 
-            mockProj.Properties.Count(p => p.Name == "RuntimeIdentifiers").Should().Be(1);
-            mockProj.Properties.First(p => p.Name == "RuntimeIdentifiers")
-                .Value.Should().Be("win7-x64;win7-x86;osx.10.10-x64;osx.10.11-x64;ubuntu.14.04-x64;ubuntu.16.04-x64;centos.7-x64;rhel.7.2-x64;debian.8-x64;fedora.23-x64;opensuse.13.2-x64");
-        }
-
-        [Fact]
-        public void MigratingCoreAndDesktopTFMsAddsRuntimeIdentifierWithWin7x86ConditionOnAllFullFrameworksWhenNoRuntimesExistAlready()
-        {
-            var testDirectory = Temp.CreateDirectory().Path;
-            var testPJ = new ProjectJsonBuilder(TestAssets)
-                .FromTestAssetBase("PJAppWithMultipleFrameworks")
-                .SaveToDisk(testDirectory);
-
-            var projectContexts = ProjectContext.CreateContextForEachFramework(testDirectory);
-            var mockProj = ProjectRootElement.Create();
-
-            var migrationSettings = MigrationSettings.CreateMigrationSettingsTestHook(testDirectory, testDirectory, mockProj);
-            var migrationInputs = new MigrationRuleInputs(
-                projectContexts, 
-                mockProj, 
-                mockProj.AddItemGroup(), 
-                mockProj.AddPropertyGroup());
-
-            new MigrateTFMRule().Apply(migrationSettings, migrationInputs);
-
-            mockProj.Properties.Count(p => p.Name == "RuntimeIdentifier").Should().Be(1);
-            var runtimeIdentifier = mockProj.Properties.First(p => p.Name == "RuntimeIdentifier");
-            runtimeIdentifier.Value.Should().Be("win7-x86");
-            runtimeIdentifier.Condition.Should().Be(" '$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net461' ");
+            mockProj.Properties.Count(p => p.Name == "RuntimeIdentifiers").Should().Be(0);
+            mockProj.Properties.Count(p => p.Name == "RuntimeIdentifier").Should().Be(0);
         }
 
         [Fact]
@@ -133,9 +109,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             var migrationSettings =
                 MigrationSettings.CreateMigrationSettingsTestHook(testDirectory, testDirectory, mockProj);
             var migrationInputs = new MigrationRuleInputs(
-                projectContexts, 
-                mockProj, 
-                mockProj.AddItemGroup(), 
+                projectContexts,
+                mockProj,
+                mockProj.AddItemGroup(),
                 mockProj.AddPropertyGroup());
 
             new MigrateTFMRule().Apply(migrationSettings, migrationInputs);
@@ -144,11 +120,11 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Fact]
-        public void MigratingProjectWithFullFrameworkTFMsOnlyAddsARuntimeIdentifierWin7x86WhenNoRuntimesExistAlready()
+        public void MigratingProjectWithFullFrameworkTFMsDoesNotAddRuntimeIdentifiersOrRuntimeIdentiferWhenNoRuntimesExistAlready()
         {
             var testDirectory = Temp.CreateDirectory().Path;
             var testPJ = new ProjectJsonBuilder(TestAssets)
-                .FromTestAssetBase("TestAppWithMultipleFullFrameworksOnly")
+                .FromTestAssetBase("AppWith4netTfm0Rid")
                 .SaveToDisk(testDirectory);
 
             var projectContexts = ProjectContext.CreateContextForEachFramework(testDirectory);
@@ -157,16 +133,15 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             var migrationSettings =
                 MigrationSettings.CreateMigrationSettingsTestHook(testDirectory, testDirectory, mockProj);
             var migrationInputs = new MigrationRuleInputs(
-                projectContexts, 
-                mockProj, 
-                mockProj.AddItemGroup(), 
+                projectContexts,
+                mockProj,
+                mockProj.AddItemGroup(),
                 mockProj.AddPropertyGroup());
 
             new MigrateTFMRule().Apply(migrationSettings, migrationInputs);
 
             mockProj.Properties.Count(p => p.Name == "RuntimeIdentifiers").Should().Be(0);
-            mockProj.Properties.Where(p => p.Name == "RuntimeIdentifier").Should().HaveCount(1);
-            mockProj.Properties.Single(p => p.Name == "RuntimeIdentifier").Value.Should().Be("win7-x86");
+            mockProj.Properties.Where(p => p.Name == "RuntimeIdentifier").Should().HaveCount(0);
         }
 
         [Fact]
@@ -187,9 +162,9 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
             // Run BuildOptionsRule
             var migrationSettings = MigrationSettings.CreateMigrationSettingsTestHook(testDirectory, testDirectory, mockProj);
             var migrationInputs = new MigrationRuleInputs(
-                projectContexts, 
-                mockProj, 
-                mockProj.AddItemGroup(), 
+                projectContexts,
+                mockProj,
+                mockProj.AddItemGroup(),
                 mockProj.AddPropertyGroup());
 
             new MigrateTFMRule().Apply(migrationSettings, migrationInputs);

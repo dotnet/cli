@@ -15,52 +15,52 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
     public class GivenThatIWantToMigratePackOptions : TestBase
     {
         [Fact]
-        public void It_does_not_migrate_Summary()
+        public void ItDoesNotMigrateSummary()
         {
             var mockProj = RunPackOptionsRuleOnPj(@"
                 {
                     ""packOptions"": {
                         ""summary"": ""Some not important summary""
-                    }                    
-                }");
-            
-            EmitsOnlyAlwaysEmittedPackOptionsProperties(mockProj);            
-        }
-
-        [Fact]
-        public void It_does_not_migrate_Owner()
-        {
-            var mockProj = RunPackOptionsRuleOnPj(@"
-                {
-                    ""packOptions"": {
-                        ""owner"": ""Some not important owner""
-                    }                    
+                    }
                 }");
 
             EmitsOnlyAlwaysEmittedPackOptionsProperties(mockProj);
         }
 
         [Fact]
-        public void Migrating__empty_tags_does_not_populate_PackageTags()
+        public void ItDoesNotMigrateOwner()
+        {
+            var mockProj = RunPackOptionsRuleOnPj(@"
+                {
+                    ""packOptions"": {
+                        ""owner"": ""Some not important owner""
+                    }
+                }");
+
+            EmitsOnlyAlwaysEmittedPackOptionsProperties(mockProj);
+        }
+
+        [Fact]
+        public void MigratingEmptyTagsDoesNotPopulatePackageTags()
         {
             var mockProj = RunPackOptionsRuleOnPj(@"
                 {
                     ""packOptions"": {
                         ""tags"": []
-                    }                    
+                    }
                 }");
 
             mockProj.Properties.Count(p => p.Name == "PackageTags").Should().Be(0);
         }
 
         [Fact]
-        public void Migrating_tags_populates_PackageTags_semicolon_delimited()
+        public void MigratingTagsPopulatesPackageTagsSemicolonDelimited()
         {
             var mockProj = RunPackOptionsRuleOnPj(@"
                 {
                     ""packOptions"": {
                         ""tags"": [""hyperscale"", ""cats""]
-                    }                    
+                    }
                 }");
 
             mockProj.Properties.Count(p => p.Name == "PackageTags").Should().Be(1);
@@ -68,13 +68,13 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Fact]
-        public void Migrating_ReleaseNotes_populates_PackageReleaseNotes()
+        public void MigratingReleaseNotesPopulatesPackageReleaseNotes()
         {
             var mockProj = RunPackOptionsRuleOnPj(@"
                 {
                     ""packOptions"": {
                         ""releaseNotes"": ""Some release notes value.""
-                    }                    
+                    }
                 }");
 
             mockProj.Properties.Count(p => p.Name == "PackageReleaseNotes").Should().Be(1);
@@ -83,13 +83,13 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Fact]
-        public void Migrating_IconUrl_populates_PackageIconUrl()
+        public void MigratingIconUrlPopulatesPackageIconUrl()
         {
             var mockProj = RunPackOptionsRuleOnPj(@"
                 {
                     ""packOptions"": {
                         ""iconUrl"": ""http://www.mylibrary.gov/favicon.ico""
-                    }                    
+                    }
                 }");
 
             mockProj.Properties.Count(p => p.Name == "PackageIconUrl").Should().Be(1);
@@ -98,13 +98,13 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Fact]
-        public void Migrating_ProjectUrl_populates_PackageProjectUrl()
+        public void MigratingProjectUrlPopulatesPackageProjectUrl()
         {
             var mockProj = RunPackOptionsRuleOnPj(@"
                 {
                     ""packOptions"": {
                         ""projectUrl"": ""http://www.url.to.library.com""
-                    }                    
+                    }
                 }");
 
             mockProj.Properties.Count(p => p.Name == "PackageProjectUrl").Should().Be(1);
@@ -113,13 +113,13 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Fact]
-        public void Migrating_LicenseUrl_populates_PackageLicenseUrl()
+        public void MigratingLicenseUrlPopulatesPackageLicenseUrl()
         {
             var mockProj = RunPackOptionsRuleOnPj(@"
                 {
                     ""packOptions"": {
                         ""licenseUrl"": ""http://www.url.to.library.com/licence""
-                    }                    
+                    }
                 }");
 
             mockProj.Properties.Count(p => p.Name == "PackageLicenseUrl").Should().Be(1);
@@ -128,13 +128,13 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Fact]
-        public void Migrating_RequireLicenseAcceptance_populates_PackageRequireLicenseAcceptance()
+        public void MigratingRequireLicenseAcceptancePopulatesPackageRequireLicenseAcceptance()
         {
             var mockProj = RunPackOptionsRuleOnPj(@"
                 {
                     ""packOptions"": {
                         ""requireLicenseAcceptance"": ""true""
-                    }                    
+                    }
                 }");
 
             mockProj.Properties.Count(p => p.Name == "PackageRequireLicenseAcceptance").Should().Be(1);
@@ -142,13 +142,13 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Fact]
-        public void Migrating_RequireLicenseAcceptance_populates_PackageRequireLicenseAcceptance_even_if_its_value_is_false()
+        public void MigratingRequireLicenseAcceptancePopulatesPackageRequireLicenseAcceptanceEvenIfItsValueIsFalse()
         {
             var mockProj = RunPackOptionsRuleOnPj(@"
                 {
                     ""packOptions"": {
                         ""requireLicenseAcceptance"": ""false""
-                    }                    
+                    }
                 }");
 
             mockProj.Properties.Count(p => p.Name == "PackageRequireLicenseAcceptance").Should().Be(1);
@@ -156,7 +156,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Fact]
-        public void Migrating_Repository_Type_populates_RepositoryType()
+        public void MigratingRepositoryTypePopulatesRepositoryType()
         {
             var mockProj = RunPackOptionsRuleOnPj(@"
                 {
@@ -164,7 +164,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
                         ""repository"": {
                             ""type"": ""git""
                         }
-                    }                    
+                    }
                 }");
 
             mockProj.Properties.Count(p => p.Name == "RepositoryType").Should().Be(1);
@@ -172,7 +172,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Fact]
-        public void Migrating_Repository_Url_populates_RepositoryUrl()
+        public void MigratingRepositoryUrlPopulatesRepositoryUrl()
         {
             var mockProj = RunPackOptionsRuleOnPj(@"
                 {
@@ -188,7 +188,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         }
 
         [Fact]
-        public void Migrating_Files_without_mappings_populates_content_with_same_path_as_include_and_pack_true()
+        public void MigratingFilesWithoutMappingsPopulatesContentWithSamePathAsIncludeAndPackTrue()
         {
             var mockProj = RunPackOptionsRuleOnPj(@"
                 {
@@ -200,15 +200,57 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
                 }");
 
             var contentItems = mockProj.Items
-                .Where(item => item.ItemType.Equals("Content", StringComparison.Ordinal))
+                .Where(item => item.ItemType.Equals("None", StringComparison.Ordinal))
                 .Where(item => item.GetMetadataWithName("Pack").Value == "true");
 
             contentItems.Count().Should().Be(1);
-            contentItems.First().Include.Should().Be(@"path\to\some\file.cs;path\to\some\other\file.cs");
+            contentItems.First().Update.Should().Be(@"path\to\some\file.cs;path\to\some\other\file.cs");
         }
 
         [Fact]
-        public void Migrating_Files_with_mappings_populates_content_PackagePath_metadata()
+        public void MigratingFilesWithExcludePopulatesNoneWithPackFalseForTheExcludedFiles()
+        {
+            var mockProj = RunPackOptionsRuleOnPj(@"
+                {
+                    ""packOptions"": {
+                        ""files"": {
+                            ""include"": [""path/to/some/file.cs"", ""path/to/some/other/file.cs""],
+                            ""exclude"": [""path/to/file/to/exclude.cs""]
+                        }
+                    }
+                }");
+
+            foreach (var item in mockProj.Items.Where(i => i.ItemType.Equals("None", StringComparison.Ordinal)))
+            {
+                Console.WriteLine($"Update: {item.Update}, Include: {item.Include}, Remove: {item.Remove}");
+                foreach(var meta in item.Metadata)
+                {
+                    Console.WriteLine($"\tMetadata: Name: {meta.Name}, Value: {meta.Value}");
+                }
+
+                foreach(var condition in item.ConditionChain())
+                {
+                    Console.WriteLine($"\tCondition: {condition}");
+                }
+            }
+
+            var contentItemsToInclude = mockProj.Items
+                .Where(item => item.ItemType.Equals("None", StringComparison.Ordinal))
+                .Where(item => item.GetMetadataWithName("Pack").Value == "true");
+
+            contentItemsToInclude.Count().Should().Be(1);
+            contentItemsToInclude.First().Update.Should().Be(@"path\to\some\file.cs;path\to\some\other\file.cs");
+
+            var contentItemsToExclude = mockProj.Items
+                .Where(item => item.ItemType.Equals("None", StringComparison.Ordinal))
+                .Where(item => item.GetMetadataWithName("Pack").Value == "false");
+
+            contentItemsToExclude.Count().Should().Be(1);
+            contentItemsToExclude.First().Update.Should().Be(@"path\to\file\to\exclude.cs");
+        }
+
+        [Fact]
+        public void MigratingFilesWithMappingsPopulatesContentPackagePathMetadata()
         {
             var mockProj = RunPackOptionsRuleOnPj(@"
                 {
@@ -223,19 +265,19 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
                 }");
 
             var contentItems = mockProj.Items
-                .Where(item => item.ItemType.Equals("Content", StringComparison.Ordinal))
+                .Where(item => item.ItemType.Equals("None", StringComparison.Ordinal))
                 .Where(item =>
                     item.GetMetadataWithName("Pack").Value == "true" &&
                     item.GetMetadataWithName("PackagePath") != null);
 
             contentItems.Count().Should().Be(1);
-            contentItems.First().Include.Should().Be(@"path\to\some\file.cs");
+            contentItems.First().Update.Should().Be(@"path\to\some\file.cs");
             contentItems.First().GetMetadataWithName("PackagePath").Value.Should().Be(
                 Path.Combine("some", "other", "path"));
         }
 
         [Fact]
-        public void Migrating_Files_with_mappings_to_root_populates_content_PackagePath_metadata_but_leaves_it_empty()
+        public void MigratingFilesWithMappingsToRootPopulatesContentPackagePathMetadataButLeavesItEmpty()
         {
             var mockProj = RunPackOptionsRuleOnPj(@"
                 {
@@ -250,18 +292,18 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
                 }");
 
             var contentItems = mockProj.Items
-                .Where(item => item.ItemType.Equals("Content", StringComparison.Ordinal))
+                .Where(item => item.ItemType.Equals("None", StringComparison.Ordinal))
                 .Where(item =>
                     item.GetMetadataWithName("Pack").Value == "true" &&
                     item.GetMetadataWithName("PackagePath") != null);
 
             contentItems.Count().Should().Be(1);
-            contentItems.First().Include.Should().Be(@"path\to\some\file.cs");
+            contentItems.First().Update.Should().Be(@"path\to\some\file.cs");
             contentItems.First().GetMetadataWithName("PackagePath").Value.Should().BeEmpty();
         }
 
         [Fact]
-        public void Migrating_same_file_with_multiple_mappings_string_joins_the_mappings_in_PackagePath()
+        public void MigratingSameFileWithMultipleMappingsStringJoinsTheMappingsInPackagePath()
         {
             var mockProj = RunPackOptionsRuleOnPj(@"
                 {
@@ -277,20 +319,20 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
                 }");
 
             var expectedPackagePath = string.Join(
-                ";", 
-                new [] {                    
+                ";",
+                new [] {
                     Path.Combine("different", "path"),
                     Path.Combine("other", "path")
                 });
 
             var contentItems = mockProj.Items
-                .Where(item => item.ItemType.Equals("Content", StringComparison.Ordinal))
+                .Where(item => item.ItemType.Equals("None", StringComparison.Ordinal))
                 .Where(item =>
                     item.GetMetadataWithName("Pack").Value == "true" &&
                     item.GetMetadataWithName("PackagePath") != null);
 
             contentItems.Count().Should().Be(1);
-            contentItems.First().Include.Should().Be(@"path\to\some\file.cs");
+            contentItems.First().Update.Should().Be(@"path\to\some\file.cs");
             contentItems.First().GetMetadataWithName("PackagePath").Value.Should().Be(expectedPackagePath);
         }
 
@@ -307,6 +349,6 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         {
             project.Properties.Count().Should().Be(1);
             project.Properties.All(p => p.Name == "PackageRequireLicenseAcceptance").Should().BeTrue();
-        }   
+        }
     }
 }

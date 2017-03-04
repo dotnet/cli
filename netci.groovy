@@ -9,7 +9,7 @@ def project = GithubProject
 def branch = GithubBranchName
 def isPR = true
 
-def platformList = ['Linux:x64:Release', 'Debian8.2:x64:Debug', 'Ubuntu:x64:Release', 'Ubuntu16.04:x64:Debug', 'OSX:x64:Release', 'Windows_NT:x64:Release', 'Windows_NT:x86:Debug', 'RHEL7.2:x64:Release', 'CentOS7.1:x64:Debug', 'Fedora23:x64:Debug', 'OpenSUSE13.2:x64:Debug']
+def platformList = ['Linux:x64:Release', 'Debian8.2:x64:Debug', 'Ubuntu:x64:Release', 'Ubuntu16.04:x64:Debug', 'OSX:x64:Release', 'Windows_NT:x64:Release', 'Windows_NT:x86:Debug', 'RHEL7.2:x64:Release', 'CentOS7.1:x64:Debug']
 
 def static getBuildJobName(def configuration, def os, def architecture) {
     return configuration.toLowerCase() + '_' + os.toLowerCase() + '_' + architecture.toLowerCase()
@@ -59,7 +59,7 @@ platformList.each { platform ->
 
     Utilities.setMachineAffinity(newJob, os, 'latest-or-auto')
     Utilities.standardJobSetup(newJob, project, isPR, "*/${branch}")
-    Utilities.addXUnitDotNETResults(newJob, '**/*-testResults.xml')
+    Utilities.addMSTestResults(newJob, '**/*.trx')
     Utilities.addGithubPRTriggerForBranch(newJob, branch, "${os} ${architecture} ${configuration} Build")
 }
 

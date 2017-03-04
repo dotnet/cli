@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net46;netcoreapp1.0</TargetFrameworks>
+    <TargetFrameworks>net46;netcoreapp2.0</TargetFrameworks>
     <RuntimeIdentifiers>win7-x86</RuntimeIdentifiers>
     <RuntimeIdentifier Condition=" '$(TargetFramework)' == 'net46' ">win7-x86</RuntimeIdentifier>
   </PropertyGroup>
@@ -12,21 +12,13 @@
     <DefineConstants>DESKTOP;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp1.0'">
-    <PackageReference Include="Microsoft.NETCore.App">
-      <Version>1.0.3</Version>
-    </PackageReference>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
+    <PackageReference Include="Microsoft.NETCore.App" Version="2.0.0-beta-001509-00" />
   </ItemGroup>
 
-  <ItemGroup>    
-    <PackageReference Include="Microsoft.NET.Test.Sdk">
-      <Version>$(CLI_TestPlatform_Version)</Version>
-    </PackageReference>
-    <PackageReference Include="xunit">
-      <Version>2.2.0-beta4-build3444</Version>
-    </PackageReference>
-    <PackageReference Include="xunit.runner.visualstudio">
-      <Version>2.2.0-beta4-build1194</Version>
-    </PackageReference>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(CLI_TestPlatform_Version)" />
+    <PackageReference Include="xunit" Version="2.2.0-beta4-build3444" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0-beta4-build1194" />
   </ItemGroup>
 </Project>

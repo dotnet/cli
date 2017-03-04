@@ -209,7 +209,7 @@ The following arguments are needed for the installation script:
 
 | dotnet-install.sh arg (Linux, OSX) 	| dotnet-install.ps1 arg (Windows) 	| Defaults              	| Description                                                                                                                                                                                                                                   	|
 |--------------------------------------	|------------------------------------	|-----------------------	|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
-| --channel                            	| -Channel                           	| "Production"          	| Which channel (i.e. "Future", "preview", "production") to install from.                                                                                                                                                                       	|
+| --channel                            	| -Channel                           	| "preview"          	| Which channel (i.e. "Future", "preview", "production", "release/1.1.0") to install from.                                                                                                                                                                       	|
 | --version                            	| -Version                           	| global.json or Latest 	| Which version of CLI to install; you need to specify the version as 3-part version (i.e. 1.0.0-13232). If omitted, it will default to the first global.json that contains the sdkVersion property; if that is not present it will use Latest. 	|
 | --install-dir                         | -InstallDir                        	| .dotnet               	| Path to where to install the CLI bundle. The directory is created if it doesn't exist. On Linux/OSX this directory is created in the user home directory (`$HOME`). On Windows, this directory is created in `%LocalAppData%`.                	|
 | --debug                              	| -Debug                             	| false                 	| Whether to use the "fat" packages that contain debugging symbols or not.                                                                                                                                                                      	|
@@ -217,6 +217,18 @@ The following arguments are needed for the installation script:
 | --shared-runtime                     	| -SharedRuntime                     	| false                 	| Install just the shared runtime bits, not the entire SDK.                                                                                                                                                                                     	|
 
 Note: Powershell arg naming convention is supported on Windows and non-Windows platforms. Non-Windows platforms do additionally support convention specific to their platform.
+
+##### Install the 1.1.0 of the shared runtime
+
+Windows:
+```
+./dotnet-install.ps1 -Channel 'release/1.1.0' -SharedRuntime -Version 1.1.1
+```
+
+macOS/Linux:
+```
+./dotnet-install.sh --channel 'release/1.1.0' --shared-runtime --version 1.1.1
+```
 
 ##### Install the latest Future CLI
 
@@ -422,7 +434,7 @@ ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]
 
 Installing 1.1.0-567890 (RTM) which is incompatible since 1.0.2
 
-Note: User is unable to run apps targetting 1.0.1 or 1.0.2 until compatible version is installed.
+Note: User is unable to run apps targeting 1.0.1 or 1.0.2 until compatible version is installed.
 
 ```
 NOP HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.0-rc1=1
@@ -445,7 +457,7 @@ ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]
 
 Installing 1.0.0-rc2-123456 to a clean machine
 
-Note: User is unable to run apps targetting 1.0.0 until RTM is installed.
+Note: User is unable to run apps targeting 1.0.0 until RTM is installed.
 
 ```
 ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.0-rc1=1
@@ -455,7 +467,7 @@ ADD HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]
 
 Installing 1.0.1-rc1-234567
 
-Note: User is still unable to run apps targetting 1.0.0 until any 1.0.0+ RTM is installed.
+Note: User is still unable to run apps targeting 1.0.0 until any 1.0.0+ RTM is installed.
 
 ```
 NOP HKLM\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sdk\[REG_DWORD]1.0.0-rc1=1
