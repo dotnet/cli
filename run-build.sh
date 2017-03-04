@@ -97,8 +97,11 @@ while [[ $# > 0 ]]; do
             shift
             ;;
         --linux-portable)
+            # Pass in a specific version (the one we set up to bootstrap this experience). Once 
+            # we have an official build we can remove the version parameter and use the latest.
             LINUX_PORTABLE_INSTALL_ARGS="--linux-portable --version 2.0.0-alpha-005151"
-            LINUX_PORTABLE_BUILD_ARGS="/p:Rid=\"linux-x64\" /p:OSName=\"linux\" /p:IncludeAdditionalSharedFrameworks=false"
+            # Until we get test support for 2.0 we need to pass in the targets without test.
+            LINUX_PORTABLE_BUILD_ARGS="/p:Rid=\"linux-x64\" /p:OSName=\"linux\" /p:IncludeAdditionalSharedFrameworks=false /p:CLITargets=\"Prepare;Compile;Package;Publish\""
             args=( "${args[@]/$1}" )
             ;;
         --help)
