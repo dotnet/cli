@@ -1,41 +1,26 @@
 <Project ToolsVersion="15.0">
   <Target Name="WriteHostInfoProps"
+          Condition=" !Exists('$(HostInfoProps)') "
           DependsOnTargets="BuildDotnetCliBuildFramework">
-    <!-- Current Runtime Information -->
+
     <GetCurrentRuntimeInformation>
       <Output TaskParameter="Rid" PropertyName="HostRid" />
-      <Output TaskParameter="Architecture" PropertyName="HostArchitecture" />
       <Output TaskParameter="OSName" PropertyName="HostOSName" />
     </GetCurrentRuntimeInformation>
 
     <PropertyGroup>
-      <HostRid Condition=" '$(Rid)' != '' ">$(Rid)</HostRid>
-      <HostArchitecture Condition=" '$(Architecture)' != '' ">$(Architecture)</HostArchitecture>
-      <HostOSName Condition=" '$(OSName)' != '' ">$(OSName)</HostOSName>
-
       <HostInfoPropsContent>
 &lt;Project ToolsVersion=&quot;15.0&quot;&gt;
     &lt;PropertyGroup&gt;
-        &lt;Rid&gt;$(HostRid)&lt;/Rid&gt;
-        &lt;Architecture&gt;$(HostArchitecture)&lt;/Architecture&gt;
-        &lt;OSName&gt;$(HostOSName)&lt;/OSName&gt;
+        &lt;HostRid&gt;$(HostRid)&lt;/HostRid&gt;
+        &lt;HostOSName&gt;$(HostOSName)&lt;/HostOSName&gt;
     &lt;/PropertyGroup&gt;
 &lt;/Project&gt;
       </HostInfoPropsContent>
-
-      <ExistingHostInfoPropsContent Condition=" Exists('$(HostInfoProps)') ">
-        $([System.IO.File]::ReadAllText($(HostInfoProps)))
-      </ExistingHostInfoPropsContent>
-
-      <ShouldOverwriteHostInfoPropsFile>false</ShouldOverwriteHostInfoPropsFile>
-      <ShouldOverwriteHostInfoPropsFile
-        Condition=" !Exists('$(HostInfoProps)') Or
-                    '$(ExistingHostInfoPropsContent.Trim())' != '$(HostInfoPropsContent.Trim())' ">true</ShouldOverwriteHostInfoPropsFile>
     </PropertyGroup>
 
     <WriteLinesToFile File="$(HostInfoProps)"
                       Lines="$(HostInfoPropsContent)"
-                      Condition=" '$(ShouldOverwriteHostInfoPropsFile)' == 'true' "
                       Overwrite="true"  />
   </Target>
 </Project>

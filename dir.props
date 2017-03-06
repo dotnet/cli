@@ -16,6 +16,7 @@
   <Import Project="build/InitRepo.props" />
   <Import Condition=" '$(GeneratingPropsFile)' != 'true' " Project="$(GitCommitInfoProps)" />
   <Import Condition=" '$(GeneratingPropsFile)' != 'true' " Project="$(HostInfoProps)" />
+  <Import Condition=" '$(GeneratingPropsFile)' != 'true' " Project="$(BuildInfoProps)" />
 
   <Import Project="build/BranchInfo.props" />
 
