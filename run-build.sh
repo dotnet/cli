@@ -56,7 +56,7 @@ source "$REPOROOT/scripts/common/_prettyprint.sh"
 BUILD=1
 
 LINUX_PORTABLE_INSTALL_ARGS=
-LINUX_PORTABLE_BUILD_ARGS=
+CUSTOM_BUILD_ARGS=
 
 # Set nuget package cache under the repo
 export NUGET_PACKAGES="$REPOROOT/.nuget/packages"
@@ -97,11 +97,9 @@ while [[ $# > 0 ]]; do
             shift
             ;;
         --linux-portable)
-            # Pass in a specific version (the one we set up to bootstrap this experience). Once 
-            # we have an official build we can remove the version parameter and use the latest.
-            LINUX_PORTABLE_INSTALL_ARGS="--linux-portable --version 2.0.0-alpha-005151"
+            LINUX_PORTABLE_INSTALL_ARGS="--linux-portable"
             # Until we get test support for 2.0 we need to pass in the targets without test.
-            LINUX_PORTABLE_BUILD_ARGS="/p:Rid=\"linux-x64\" /p:OSName=\"linux\" /p:IncludeAdditionalSharedFrameworks=false /p:CLITargets=\"Prepare;Compile;Package;Publish\""
+            CUSTOM_BUILD_ARGS="/p:Rid=\"linux-x64\" /p:OSName=\"linux\" /p:CLITargets=\"Prepare;Compile;Package;Publish\""
             args=( "${args[@]/$1}" )
             ;;
         --help)
@@ -113,6 +111,7 @@ while [[ $# > 0 ]]; do
             echo "  --nopackage                         Skip packaging targets"
             echo "  --nobuild                           Skip building, showing the command that would be used to build"
             echo "  --docker <IMAGENAME>                Build in Docker using the Dockerfile located in scripts/docker/IMAGENAME"
+            echo "  --linux-portable                    Builds with the Linux portable .NET Tools instead of a distro-specific version."
             echo "  --help                              Display this help message"
             exit 0
             ;;
@@ -166,8 +165,8 @@ if [ $? != 0 ]; then
 fi
 
 # now execute the script
-echo "installing CLI: $dotnetInstallPath --channel \"master\" --install-dir $DOTNET_INSTALL_DIR --architecture \"$ARCHITECTURE\" $LINUX_PORTABLE_INSTALL_ARGS"
-$dotnetInstallPath --channel "master" --install-dir $DOTNET_INSTALL_DIR --architecture "$ARCHITECTURE" $LINUX_PORTABLE_INSTALL_ARGS
+echo "installing CLI: $dotnetInstallPath --channel \"master\" --version \"2.0.0-alpha-005151\" --install-dir $DOTNET_INSTALL_DIR --architecture \"$ARCHITECTURE\" $LINUX_PORTABLE_INSTALL_ARGS"
+$dotnetInstallPath --channel "master" --version "2.0.0-alpha-005151" --install-dir $DOTNET_INSTALL_DIR --architecture "$ARCHITECTURE" $LINUX_PORTABLE_INSTALL_ARGS
 if [ $? != 0 ]; then
     echo "run-build: Error: Boot-strapping post-PJ stage0 with exit code $?." >&2
     exit $?
@@ -190,9 +189,9 @@ export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 echo "${args[@]}"
 
 if [ $BUILD -eq 1 ]; then
-    dotnet msbuild build.proj /p:Architecture=$ARCHITECTURE $LINUX_PORTABLE_BUILD_ARGS /p:GeneratingPropsFile=true /t:WriteDynamicPropsToStaticPropsFiles
-    dotnet msbuild build.proj /m /v:diag /fl /flp:v=diag /p:Architecture=$ARCHITECTURE $LINUX_PORTABLE_BUILD_ARGS "${args[@]}"
+    dotnet msbuild build.proj /p:Architecture=$ARCHITECTURE $CUSTOM_BUILD_ARGS /p:GeneratingPropsFile=true /t:WriteDynamicPropsToStaticPropsFiles
+    dotnet msbuild build.proj /m /v:diag /fl /flp:v=diag /p:Architecture=$ARCHITECTURE $CUSTOM_BUILD_ARGS "${args[@]}"
 else
     echo "Not building due to --nobuild"
-    echo "Command that would be run is: 'dotnet msbuild build.proj /m /p:Architecture=$ARCHITECTURE $LINUX_PORTABLE_BUILD_ARGS ${args[@]}'"
+    echo "Command that would be run is: 'dotnet msbuild build.proj /m /p:Architecture=$ARCHITECTURE $CUSTOM_BUILD_ARGS ${args[@]}'"
 fi
