@@ -1,11 +1,7 @@
 .NET Core Command-Line Tools UX Guidelines
 -------------------------------------------
 
-This document will cover the CLI UX guidelines that anyone adding or suggesting
-a new command should take into consideration. It does not deal with
-implementation details. The main goal of the document is to provide guidelines
-for new authors that wish to make pull requests and add new functionalities and
-commands to the .NET Core command line tools (CLI).
+This document outlines the User Experience (UX) of the .NET Core command lline tools (CLI).These guideliens are intended for anyone that wants to add a new command to the CLI. 
 
 The guidelines presented in this document have been adopted to provide a clear and concise 
 command line syntax that is easy to learn, remember and work with, and that has an added benefit 
@@ -89,7 +85,7 @@ standard. The summary is:
 
 There are common options in the CLI that are reserved for certain concepts. The
 table below outlines those common options. If a command needs to accept the same
-options, it should use these and it must not override their semantics (e.g. use
+options, it should use these and it must not replace their semantics (e.g. use
 “--output” to mean something different or redefine what “-f” means for just that
 command).
 
@@ -112,12 +108,12 @@ that, there are two additional requirements with regards to options:
     “/t:\<target\>” and “/target:\<target\>” options and throw an error that is
     pre-defined in the CLI.
 
-It is important to note that commands that want to invoke user-specified targets
+It is important to note that commands that invoke user-specified targets
 should not be submitted to the CLI, since the CLI comes with “dotnet msbuild”
 command that does precisely that.
 
 ## Arguments
-Arguments can be named however the commands needs them. We do have predefined
+Arguments can have any name that authors of the commands being added need. We do have predefined
 argument names for the SLN file and project file. They are defined in the CLI
 source code and should be used if the command has the need to use those two
 arguments.
@@ -133,13 +129,18 @@ itself.
 
 In case of a long running operation, the command needs to provide a feedback
 mechanism to the user to help the user reason about whether the command has
-crashed or is just waiting for I/O.
+crashed or is just waiting for I/O. The feedback mechanism guidelines are below:
+
+1. Feedback should not require fonts with special glyphs for display. 
+2. Pure text is acceptable (e.g. `Running background process...`) as a feedback mechanism. 
+3. Spinners that conform to rule \#1 above are also acceptable.
+
 
 ### Verbosity
 If the command interacts with MSBuild, it is required that it can accept a
 “--verbosity \| -v” argument and pass it to MSBuild verbatim.
 
-If the command’s verbosity levels cannot fit naturally in MSBuild’s levels, it
+If the command’s verbosity levels cannot fit naturally in [MSBuild’s verbosity levels](https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild-command-line-reference) or the command does not interact with MSBuild but still has an option to set the verbosity, it
 is the job of the command to map them in the most appropriate way. This way, the
 verbosity levels will be uniform across all commands which brings consistency to
 the toolset.
@@ -147,7 +148,7 @@ the toolset.
 #### Example
 As an example, let us consider a “dotnet configure” command. It doesn’t interact
 with MSBuild. I wish to have verbosity on it, but it really has only two levels:
-quiet (just successes or errors) and verbose (every operation). To satisfy the
+quiet (just successes or errors) and verbose (every operation) that I've defined for the command. To satisfy the
 above-mentioned requirement, in my command I would define the “--verbosity \|
 -v” option and would map the arguments in the following way:
 
