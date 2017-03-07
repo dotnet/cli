@@ -7,6 +7,11 @@ implementation details. The main goal of the document is to provide guidelines
 for new authors that wish to make pull requests and add new functionalities and
 commands to the .NET Core command line tools (CLI).
 
+The guidelines presented in this document have been adopted to provide a clear and concise 
+command line syntax that is easy to learn, remember and work with, and that has an added benefit 
+of being familiar to people who have used other command-line interfaces as well as existing 
+Visual Studio users. 
+
 ## Naming the commands
 
 In the .NET Core CLI, commands should be **verbs**. This rule was adopted
@@ -17,11 +22,10 @@ example of this is the “dotnet add reference” command. If there is a need to
 a subcommand, that subcommand should usually specialize what the parent command
 does.
 
-## CRUD commands
-If a new CRUD command is to be added, its naming should be determined with the
-following logic:
+## Create/Read/Update/Delete (CRUD) commands
+New CRUD commands should be named according to the following logic:
 
--   Does the command work on the data in the project (either properties or
+-   Does the command work on data in the project (either properties or
     items)? If yes, then it should be added as a noun to the “dotnet
     add/list/remove/update”, e.g. “dotnet add foo”.
 
@@ -35,9 +39,6 @@ following logic:
 -   If the command adds a new artifact to the project, it should become an item
     template that is dropped with “dotnet new” command.
 
-This setup was adopted to provide a clear namespacing that the users can
-remember and that fits well with usage patterns observed in other CLI toolsets a
-well as Visual Studio.
 
 If none of the above applies, the proposal should clearly outline why none of
 the above applies and suggest an alternative naming that will be decided on
@@ -55,7 +56,7 @@ to the sub-command as part of the overall options. The sub-command is expected
 to consider this optional argument.
 
 ## Options 
-CLI follows the GNU convention for options’ format, which is based on the POSIX
+CLI follows the [GNU convention](https://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html) for options’ format, which is based on the POSIX
 standard. The summary is:
 
 -   Command can have both short and long options.
@@ -81,7 +82,7 @@ standard. The summary is:
 -   Windows-style forward slash options (e.g. “/p”) are supported **only for
     MSBuild parameters.**
 
--   PowerShell-style single dashes with a work (e.g. “-Filter”) are **not
+-   PowerShell-style single dashes with a word (e.g. “-Filter”) are **not
     supported**.
 
 -   Help options are predefined as “-h \| --help” and those should be used.

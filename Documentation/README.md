@@ -9,6 +9,11 @@ Documents Index
 - [Roadmap and OS support](https://github.com/dotnet/core/blob/master/roadmap.md)
 - [Comprehensive CLI documentation](https://docs.microsoft.com/en-us/dotnet/articles/core/preview3/tools/)
 
+## Working with the CLI repo
+
+- [Developer Guide](project-docs/developer-guide.md)
+- [How to file issues](project-docs/issue-filing.guide.md)
+
 ## Troubleshooting and issues reporting
 
 - [CLI Known Issues](https://github.com/dotnet/core/blob/master/cli/known-issues.md)
@@ -20,7 +25,3 @@ Documents Index
 - [Corehost specification](specs/corehost.md)
 - [Runtime configuration file specification](specs/runtime-configuration-file.md)
 
-## Working with the CLI repo
-
-- [Developer Guide](working-repo/developer-guide.md)
-- [How to file issues](working-repo/issue-filing.guide.md)

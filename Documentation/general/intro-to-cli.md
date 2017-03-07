@@ -7,26 +7,14 @@ Goals:
 
 - Language agnostic - embrace "common language runtime".
 - Target agnostic - multi-targets.
-- Runtime agnostic.
 - Simple extensibility and layering - "you had one job!"
 - Cross-platform - support and personality.
-- Outside-in philosophy - higher-level tools drive the CLI.
-
-Historical Context - DNX
-========================
-
-We've been using [DNX](http://blogs.msdn.com/b/dotnet/archive/2015/04/29/net-announcements-at-build-2015.aspx#dnx) for all .NET Core scenarios for nearly two years. It provides a lot of great experiences, but doesn't have great "pay for play" characteristics. DNX is a big leap from  building the [CoreCLR](https://github.com/dotnet/coreclr) and [CoreFX](https://github.com/dotnet/corefx) repos and wanting to build an app with a simple environment. In fact, one of the open source contributors to CoreCLR said: "I can build CoreCLR, but I don't know how to build 'Hello World'." We cannot have that!
-
-.NET Core includes three new components: a set of standalone command-line (CLI) tools, a shared framework and a set of runtime services. These components will replace DNX and are essentially DNX split in three parts. 
-
-The DNX services will be offered as a hosting option available to apps. You can opt to use a host that offers one or more of these services, like file change watching or NuGet package servicing. You can also opt to use a shared framework, to ease deployment of dependencies and for performance reasons. Some of this is still being designed and isn't yet implemented.
-
-ASP.NET 5 will transition to the new tools for RC2. This is already in progress. There will be a smooth transition from DNX to these new .NET Core components.
+- Semantic user interface over [MSBuild](https://github.com/Microsoft/msbuild).
 
 Experience 
 ==========
 
-The [CLI tools](https://github.com/dotnet/cli) present the "dotnet" tool as the entry-point tool. It provides higher-level commands, often using multiple tools together to complete a task. It's a convenience wrapper over the other tools, which can also be used directly. "dotnet" isn't magical at all, but a very simple aggregator of other tools.
+The [.NET Core command-line tools](https://github.com/dotnet/cli) present the "dotnet" tool as the entry-point tool. It provides higher-level commands, often using multiple tools together to complete a task. It's a convenience wrapper over the other tools, which can also be used directly. "dotnet" isn't magical at all, but a very simple aggregator of other tools.
 
 You can get a sense of using the tools from the examples below.
 
@@ -40,9 +28,7 @@ You can get a sense of using the tools from the examples below.
 
 **dotnet build**
 
-`dotnet build --native` native compiles your app into a single executable file.
-
-`dotnet build` compiles your app or library as an IL binary. In the case of an app, `build` generates runnable assets by copying an executable host to make the IL binary runable. The host relies on a shared framework for dependencies, including a runtime.
+`dotnet build` compiles your app or library as an IL binary.
 
 Design
 ======
@@ -69,6 +55,8 @@ Adding a new command to the .NET Core CLI
 =========================================
 
 If you want to contribute to the actual .NET Core CLI by adding a new command that you think would be useful, please refer to the [developer guide](developer-guide.md) in this directory. It contains all of the guidance on both the process as well as the infrastructure that you need to adhere to when adding a new command to the CLI toolchain. 
+
+After you familiarize yourself with the process of working with the source code in the repo, please consult the [CLI UX guidelines](cli-ux-guidelines.md) to get to know the user experience tenants the CLI has. 
 
 Adding a new command locally
 ============================ 
