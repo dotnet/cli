@@ -26,8 +26,7 @@
 
       <ShouldOverwriteGitCommitInfoPropsFile>false</ShouldOverwriteGitCommitInfoPropsFile>
       <ShouldOverwriteGitCommitInfoPropsFile
-        Condition=" !Exists('$(GitCommitInfoProps)') Or
-                    '$(ExistingGitCommitInfoProps.Trim())' != '$(GitCommitInfoPropsContent.Trim())' ">true</ShouldOverwriteGitCommitInfoPropsFile>
+        Condition=" '$(ExistingGitCommitInfoProps.Trim())' != '$(GitCommitInfoPropsContent.Trim())' ">true</ShouldOverwriteGitCommitInfoPropsFile>
   </PropertyGroup>
 
   <WriteLinesToFile File="$(GitCommitInfoProps)"

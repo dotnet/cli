@@ -28,8 +28,7 @@
 
       <ShouldOverwriteBuildInfoPropsFile>false</ShouldOverwriteBuildInfoPropsFile>
       <ShouldOverwriteBuildInfoPropsFile
-        Condition=" !Exists('$(BuildInfoProps)') Or
-                    '$(ExistingBuildInfoPropsContent.Trim())' != '$(BuildInfoPropsContent.Trim())' ">true</ShouldOverwriteBuildInfoPropsFile>
+        Condition=" '$(ExistingBuildInfoPropsContent.Trim())' != '$(BuildInfoPropsContent.Trim())' ">true</ShouldOverwriteBuildInfoPropsFile>
     </PropertyGroup>
 
     <WriteLinesToFile File="$(BuildInfoProps)"
