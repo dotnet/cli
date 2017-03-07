@@ -1,5 +1,5 @@
-Intro to .NET Core CLI
-======================
+Introduction to .NET Core CLI
+=============================
 
 The .NET Core CLI is a simple, extensible and standalone set of tools for building, managing and otherwise operating on .NET projects. It will or already includes commands such as compilation, NuGet package management and launching a debugger session. It is intended to be fully featured, enabling extensive library and app development functionality appropriate at the command-line. It should provide everything you'd need to develop an app in an SSH session! It is also intended to be a fundamental building block for building finished experiences in tools such as Visual Studio.
 
@@ -24,7 +24,7 @@ You can get a sense of using the tools from the examples below.
 
 **dotnet run**
 
-`dotnet run` compiles and runs your app with one step. Same as `dnx run`.
+`dotnet run` compiles and runs your app with one step.
 
 **dotnet build**
 
@@ -53,9 +53,9 @@ Adding a new command locally
 ============================ 
 If you wish to extend the CLI, you can read more about supported extensibility models in the [official extensibility document](https://docs.microsoft.com/en-us/dotnet/articles/core/tools/extensibility)/. 
 
-Guidances on how to write a command 
-===================================
-How you write a given command depends largely on whether you are trying to add it to the CLI project or want to add the command locally, i.e. on your machine or server. 
+Guidance on how to write a command 
+==================================
+How you write a given command depends largely on whether you are trying to add it to the CLI project or want to add the command locally, that is on your machine or server. 
 
 For the former case, the [developer guide](developer-guide.md) has all of the details that you will need to get going. 
 
