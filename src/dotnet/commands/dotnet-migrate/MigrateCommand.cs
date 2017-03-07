@@ -131,6 +131,7 @@ namespace Microsoft.DotNet.Tools.Migrate
             }
 
             var csprojFilesToAdd = new HashSet<string>();
+            var xprojFilesToRemove = new HashSet<string>();
 
             var slnPathWithTrailingSlash = PathUtility.EnsureTrailingSlash(slnFile.BaseDirectory);
             foreach (var report in migrationReport.ProjectMigrationReports)
@@ -140,34 +141,34 @@ namespace Microsoft.DotNet.Tools.Migrate
                     slnPathWithTrailingSlash,
                     reportPathWithTrailingSlash);
 
-                var xprojPath = Path.Combine(relativeReportPath, report.ProjectName + ".xproj");
-                var xprojProjectsReferencedBySolution = slnFile.Projects.Where(p => p.FilePath == xprojPath);
-
                 var migratedProjectName = report.ProjectName + ".csproj";
-                if (xprojProjectsReferencedBySolution.Count() == 1)
-                {
-                    var slnProject = xprojProjectsReferencedBySolution.Single();
-                    slnProject.FilePath = Path.Combine(
-                        Path.GetDirectoryName(slnProject.FilePath),
-                        migratedProjectName);
-                    slnProject.TypeGuid = ProjectTypeGuids.CSharpProjectTypeGuid;
-                }
-                else
-                {
-                    var csprojPath = Path.Combine(relativeReportPath, migratedProjectName);
-                    var solutionContainsCsprojPriorToMigration = slnFile.Projects
-                        .Where(p => p.FilePath == csprojPath)
-                        .Any();
+                var csprojPath = Path.Combine(relativeReportPath, migratedProjectName);
+                var solutionContainsCsprojPriorToMigration = slnFile.Projects
+                    .Where(p => p.FilePath == csprojPath)
+                    .Any();
 
-                    if (!solutionContainsCsprojPriorToMigration)
-                    {
-                        csprojFilesToAdd.Add(Path.Combine(report.ProjectDirectory, migratedProjectName));
-                    }
+                if (!solutionContainsCsprojPriorToMigration)
+                {
+                    csprojFilesToAdd.Add(Path.Combine(report.ProjectDirectory, migratedProjectName));
                 }
 
                 foreach (var preExisting in report.PreExistingCsprojDependencies)
                 {
                     csprojFilesToAdd.Add(Path.Combine(report.ProjectDirectory, preExisting));
+                }
+
+                var projectDirectory = new DirectoryInfo(report.ProjectDirectory);
+                foreach (var xprojFileName in projectDirectory.EnumerateFiles("*.xproj"))
+                {
+                    var xprojPath = Path.Combine(relativeReportPath, xprojFileName.FullName);
+                    var solutionContainsXprojFileToRemove = slnFile.Projects
+                        .Where(p => p.FilePath == xprojPath)
+                        .Any();
+
+                    if (solutionContainsXprojFileToRemove)
+                    {
+                        xprojFilesToRemove.Add(xprojPath);
+                    }
                 }
             }
 
@@ -186,6 +187,11 @@ namespace Microsoft.DotNet.Tools.Migrate
             foreach (var csprojFile in csprojFilesToAdd)
             {
                 AddProject(slnFile.FullPath, csprojFile);
+            }
+
+            foreach (var xprojFile in xprojFilesToRemove)
+            {
+                RemoveProject(slnFile.FullPath, xprojFile);
             }
         }
 
@@ -222,6 +228,21 @@ namespace Microsoft.DotNet.Tools.Migrate
             var dotnetPath = Path.Combine(AppContext.BaseDirectory, "dotnet.dll");
             var addCommand = new ForwardingApp(dotnetPath, args);
             addCommand.Execute();
+        }
+
+        private void RemoveProject(string slnPath, string projPath)
+        {
+            List<string> args = new List<string>()
+                {
+                    "sln",
+                    slnPath,
+                    "remove",
+                    projPath,
+                };
+
+            var dotnetPath = Path.Combine(AppContext.BaseDirectory, "dotnet.dll");
+            var removeCommand = new ForwardingApp(dotnetPath, args);
+            removeCommand.Execute();
         }
 
         private void MoveProjectJsonArtifactsToBackup(MigrationReport migrationReport)
