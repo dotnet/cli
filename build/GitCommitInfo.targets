@@ -10,8 +10,17 @@
       <Output TaskParameter="ConsoleOutput" PropertyName="GitInfoCommitHash" />
     </Exec>
 
+    <ItemGroup>
+      <GitInfoCommitCountLines Include="$(GitInfoCommitCount)" />
+      <GitInfoCommitHashLines Include="$(GitInfoCommitHash)" />
+    </ItemGroup>
+
     <PropertyGroup>
+      <!-- Batching in GitInfoCommitCount and GitInfoCommitHash here ensures that the property contains only the last line of the output -->
+      <GitInfoCommitCount>%(GitInfoCommitCountLines.Identity)</GitInfoCommitCount>
       <GitInfoCommitCount>$(GitInfoCommitCount.PadLeft(6,'0'))</GitInfoCommitCount>
+      
+      <GitInfoCommitHash>%(GitInfoCommitHashLines.Identity)</GitInfoCommitHash>
 
       <GitCommitInfoPropsContent>
 &lt;Project ToolsVersion=&quot;15.0&quot;&gt;
