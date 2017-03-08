@@ -142,19 +142,19 @@ namespace Microsoft.DotNet.Tools.Migrate
                     reportPathWithTrailingSlash);
 
                 var migratedProjectName = report.ProjectName + ".csproj";
-                var csprojPath = Path.Combine(relativeReportPath, migratedProjectName);
+                var csprojPath = Path.Combine(slnFile.BaseDirectory, relativeReportPath, migratedProjectName);
                 var solutionContainsCsprojPriorToMigration = slnFile.Projects
                     .Where(p => p.FilePath == csprojPath)
                     .Any();
 
                 if (!solutionContainsCsprojPriorToMigration)
                 {
-                    csprojFilesToAdd.Add(Path.Combine(report.ProjectDirectory, migratedProjectName));
+                    csprojFilesToAdd.Add(Path.Combine(slnFile.BaseDirectory, relativeReportPath, migratedProjectName));
                 }
 
                 foreach (var preExisting in report.PreExistingCsprojDependencies)
                 {
-                    csprojFilesToAdd.Add(Path.Combine(report.ProjectDirectory, preExisting));
+                    csprojFilesToAdd.Add(Path.Combine(slnFile.BaseDirectory, relativeReportPath, preExisting));
                 }
 
                 var projectDirectory = new DirectoryInfo(report.ProjectDirectory);
@@ -167,7 +167,7 @@ namespace Microsoft.DotNet.Tools.Migrate
 
                     if (solutionContainsXprojFileToRemove)
                     {
-                        xprojFilesToRemove.Add(Path.Combine(report.ProjectDirectory, xprojPath));
+                        xprojFilesToRemove.Add(Path.Combine(slnFile.BaseDirectory, xprojPath));
                     }
                 }
             }
