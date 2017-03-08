@@ -160,7 +160,7 @@ namespace Microsoft.DotNet.Tools.Migrate
                 var projectDirectory = new DirectoryInfo(report.ProjectDirectory);
                 foreach (var xprojFileName in projectDirectory.EnumerateFiles("*.xproj"))
                 {
-                    var xprojPath = Path.Combine(relativeReportPath, xprojFileName.FullName);
+                    var xprojPath = Path.Combine(relativeReportPath, xprojFileName.Name);
                     var solutionContainsXprojFileToRemove = slnFile.Projects
                         .Where(p => p.FilePath == xprojPath)
                         .Any();
