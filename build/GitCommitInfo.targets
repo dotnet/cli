@@ -11,6 +11,8 @@
     </Exec>
 
     <PropertyGroup>
+      <GitInfoCommitCount>$(GitInfoCommitCount.PadLeft(6,'0'))</GitInfoCommitCount>
+
       <GitCommitInfoPropsContent>
 &lt;Project ToolsVersion=&quot;15.0&quot;&gt;
     &lt;PropertyGroup&gt;
