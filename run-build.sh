@@ -111,7 +111,7 @@ while [[ $# > 0 ]]; do
             echo "  --nopackage                         Skip packaging targets"
             echo "  --nobuild                           Skip building, showing the command that would be used to build"
             echo "  --docker <IMAGENAME>                Build in Docker using the Dockerfile located in scripts/docker/IMAGENAME"
-            echo "  --linux-portable                    Builds with the Linux portable .NET Tools instead of a distro-specific version."
+            echo "  --linux-portable                    Builds the Linux portable .NET Tools instead of a distro-specific version."
             echo "  --help                              Display this help message"
             exit 0
             ;;
