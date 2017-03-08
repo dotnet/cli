@@ -167,7 +167,7 @@ namespace Microsoft.DotNet.Tools.Migrate
 
                     if (solutionContainsXprojFileToRemove)
                     {
-                        xprojFilesToRemove.Add(xprojPath);
+                        xprojFilesToRemove.Add(Path.Combine(report.ProjectDirectory, xprojPath));
                     }
                 }
             }
