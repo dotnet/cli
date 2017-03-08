@@ -29,11 +29,11 @@
       <ShouldOverwriteGitCommitInfoPropsFile>false</ShouldOverwriteGitCommitInfoPropsFile>
       <ShouldOverwriteGitCommitInfoPropsFile
         Condition=" '$(ExistingGitCommitInfoProps.Trim())' != '$(GitCommitInfoPropsContent.Trim())' ">true</ShouldOverwriteGitCommitInfoPropsFile>
-  </PropertyGroup>
+    </PropertyGroup>
 
-  <WriteLinesToFile File="$(GitCommitInfoProps)"
-                    Lines="$(GitCommitInfoPropsContent)"
-                    Condition=" '$(ShouldOverwriteGitCommitInfoPropsFile)' == 'true' "
-                    Overwrite="true" />
+    <WriteLinesToFile File="$(GitCommitInfoProps)"
+                      Lines="$(GitCommitInfoPropsContent)"
+                      Condition=" '$(ShouldOverwriteGitCommitInfoPropsFile)' == 'true' "
+                      Overwrite="true" />
   </Target>
 </Project>
