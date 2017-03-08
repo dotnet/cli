@@ -3,6 +3,8 @@
 
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using Microsoft.DotNet.VersionTools.Automation;
+using System.IO;
 
 namespace Microsoft.DotNet.Cli.Build
 {
@@ -11,15 +13,21 @@ namespace Microsoft.DotNet.Cli.Build
         [Required]
         public string BranchName { get; set; }
 
+        [Required]
+        public string PackagesDirectory { get; set; }
+
+        [Required]
+        public string GitHubPassword { get; set; }
+
         public override bool Execute()
         {
-            string githubAuthToken = EnvVars.EnsureVariable("GITHUB_PASSWORD");
-            string nupkgFilePath = Dirs.Packages;
-            string branchName = BranchName;
-            string versionsRepoPath = $"build-info/dotnet/cli/{branchName}/Latest";
+            string versionsRepoPath = $"build-info/dotnet/cli/{BranchName}";
 
-            VersionRepoUpdater repoUpdater = new VersionRepoUpdater(githubAuthToken);
-            repoUpdater.UpdatePublishedVersions(nupkgFilePath, versionsRepoPath).Wait();
+            GitHubAuth auth = new GitHubAuth(GitHubPassword);
+            GitHubVersionsRepoUpdater repoUpdater = new GitHubVersionsRepoUpdater(auth);
+            repoUpdater.UpdateBuildInfoAsync(
+                Directory.GetFiles(PackagesDirectory, "*.nupkg"),
+                versionsRepoPath).Wait();
 
             return true;
         }

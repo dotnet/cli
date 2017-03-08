@@ -95,8 +95,8 @@ if ($LastExitCode -ne 0)
 # install the post-PJnistic stage0
 $dotnetInstallPath = Join-Path $toolsLocalPath "dotnet-install.ps1"
 
-Write-Host "$dotnetInstallPath -Channel ""master"" -InstallDir $env:DOTNET_INSTALL_DIR -Architecture ""$Architecture"""
-Invoke-Expression "$dotnetInstallPath -Channel ""master"" -InstallDir $env:DOTNET_INSTALL_DIR -Architecture ""$Architecture"""
+Write-Host "$dotnetInstallPath -Channel ""master"" -Version ""2.0.0-alpha-005165"" -InstallDir $env:DOTNET_INSTALL_DIR -Architecture ""$Architecture"""
+Invoke-Expression "$dotnetInstallPath -Channel ""master"" -Version ""2.0.0-alpha-005165"" -InstallDir $env:DOTNET_INSTALL_DIR -Architecture ""$Architecture"""
 if ($LastExitCode -ne 0)
 {
     Write-Output "The .NET CLI installation failed with exit code $LastExitCode"
@@ -114,7 +114,7 @@ if ($NoBuild)
 }
 else
 {
-    dotnet msbuild build.proj /p:Architecture=$Architecture /p:GeneratingPropsFile=true /t:WriteDynamicPropsToStaticPropsFiles
+    dotnet msbuild build.proj /p:Architecture=$Architecture /p:GeneratePropsFile=true /t:WriteDynamicPropsToStaticPropsFiles
     dotnet msbuild build.proj /m /v:diag /fl /flp:v=diag /p:Architecture=$Architecture $ExtraParameters
     if($LASTEXITCODE -ne 0) { throw "Failed to build" } 
 }
