@@ -20,11 +20,7 @@
           DependsOnTargets="MSBuildWorkaroundTarget;
                             RestoreDotnetCliBuildFramework">
 
-    <PropertyGroup>
-      <GeneratePropsFileArg Condition=" '$(GeneratePropsFile)' == 'true' ">/p:GeneratePropsFile=true</GeneratePropsFileArg>
-    </PropertyGroup>
-
-    <Exec Command="$(DotnetStage0) publish -o $(DotnetCliBuildDirectory)/bin --framework netcoreapp1.0 $(GeneratePropsFileArg)" 
+    <Exec Command="$(DotnetStage0) publish -o $(DotnetCliBuildDirectory)/bin --framework netcoreapp1.0 /p:GeneratePropsFile=$(GeneratePropsFile)" 
           WorkingDirectory="$(DotnetCliBuildDirectory)"/>
   </Target>
   
@@ -39,7 +35,7 @@
           Outputs="@(RestoreDotnetCliBuildFrameworkOutputs)">
 
     <PropertyGroup>
-      <ExtraRestoreArgs Condition=" '$(GeneratePropsFile)' == 'true' ">$(ExtraRestoreArgs) /p:GeneratePropsFile=$(GeneratePropsFile)</ExtraRestoreArgs>
+      <ExtraRestoreArgs>$(ExtraRestoreArgs) /p:GeneratePropsFile=$(GeneratePropsFile)</ExtraRestoreArgs>
       <ExtraRestoreArgs Condition="'$(OS)' != 'Windows_NT'">$(ExtraRestoreArgs) --disable-parallel</ExtraRestoreArgs>
     </PropertyGroup>
 
