@@ -83,7 +83,7 @@ In order to download just the .NET Core runtime without the SDK, please visit ht
 | **Mac OS X** | [Installer][osx-installer] - [Checksum][osx-installer-checksum]<br>[tar.gz][osx-targz] - [Checksum][osx-targz-checksum] |
 | **CentOS 7.1 / Oracle Linux 7** | [tar.gz][centos-targz] - [Checksum][centos-targz-checksum] |
 | **RHEL 7.2** | [tar.gz][rhel-targz] - [Checksum][rhel-targz-checksum] |
-| **Linux x64* | [tar.gz][linux-targz] - [Checksum][linux-targz-checksum] |
+| **Linux x64** | [tar.gz][linux-targz] - [Checksum][linux-targz-checksum] |
 
 *Note: Our Debian packages are put together slightly differently than the other OS specific installers. Instead of combining everything, we have separate component packages that depend on each other. If you're installing these directly from the .deb files (via dpkg or similar), then you'll need to install the [corresponding Host, Host FX Resolver, and Shared Framework packages](https://github.com/dotnet/core-setup#daily-builds) before installing the Sdk package.*
 
