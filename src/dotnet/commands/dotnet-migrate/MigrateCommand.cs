@@ -186,12 +186,12 @@ namespace Microsoft.DotNet.Tools.Migrate
 
             foreach (var csprojFile in csprojFilesToAdd)
             {
-                AddProject(slnFile.FullPath, csprojFile);
+                RunDotnetSlnCommand(slnFile.FullPath, csprojFile, "add");
             }
 
             foreach (var xprojFile in xprojFilesToRemove)
             {
-                RemoveProject(slnFile.FullPath, xprojFile);
+                RunDotnetSlnCommand(slnFile.FullPath, xprojFile, "remove");
             }
         }
 
@@ -215,34 +215,19 @@ namespace Microsoft.DotNet.Tools.Migrate
             slnFile.RemoveEmptySolutionFolders();
         }
 
-        private void AddProject(string slnPath, string csprojPath)
+        private void RunDotnetSlnCommand(string slnPath, string projPath, string commandName)
         {
-            List<string> args = new List<string>()
+            var args = new List<string>()
                 {
                     "sln",
                     slnPath,
-                    "add",
-                    csprojPath,
-                };
-
-            var dotnetPath = Path.Combine(AppContext.BaseDirectory, "dotnet.dll");
-            var addCommand = new ForwardingApp(dotnetPath, args);
-            addCommand.Execute();
-        }
-
-        private void RemoveProject(string slnPath, string projPath)
-        {
-            List<string> args = new List<string>()
-                {
-                    "sln",
-                    slnPath,
-                    "remove",
+                    commandName,
                     projPath,
                 };
 
             var dotnetPath = Path.Combine(AppContext.BaseDirectory, "dotnet.dll");
-            var removeCommand = new ForwardingApp(dotnetPath, args);
-            removeCommand.Execute();
+            var command = new ForwardingApp(dotnetPath, args);
+            command.Execute();
         }
 
         private void MoveProjectJsonArtifactsToBackup(MigrationReport migrationReport)
