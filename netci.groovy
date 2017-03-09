@@ -19,6 +19,7 @@ def static getBuildJobName(def configuration, def os, def architecture) {
 platformList.each { platform ->
     // Calculate names
     def (os, architecture, configuration) = platform.tokenize(':')
+    def osUsedForMachineAffinity = os;
 
     // Calculate job name
     def jobName = getBuildJobName(configuration, os, architecture)
@@ -34,10 +35,10 @@ platformList.each { platform ->
     else if (os == 'Ubuntu') {
         buildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --docker ubuntu.14.04 --targets Default"
     }
-	else if (os == 'Linux') {
-		os = 'Ubuntu16.04';
-		buildCommand = "./build.sh --linux-portable --skip-prereqs --configuration ${configuration} --targets Default"
-	}
+    else if (os == 'Linux') {
+        osUsedForMachineAffinity = 'Ubuntu16.04';
+        buildCommand = "./build.sh --linux-portable --skip-prereqs --configuration ${configuration} --targets Default"
+    }
     else {
         // Jenkins non-Ubuntu CI machines don't have docker
         buildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --targets Default"
@@ -57,9 +58,13 @@ platformList.each { platform ->
         }
     }
 
-    Utilities.setMachineAffinity(newJob, os, 'latest-or-auto')
+    Utilities.setMachineAffinity(newJob, osUsedForMachineAffinity, 'latest-or-auto')
     Utilities.standardJobSetup(newJob, project, isPR, "*/${branch}")
-    Utilities.addMSTestResults(newJob, '**/*.trx')
+    // Remove this check once tests work for 2.0. Until that time Linux portable tests will fail so we 
+    // don't run the tests and there won't be any .trx file.
+    if (os != 'Linux') {
+        Utilities.addMSTestResults(newJob, '**/*.trx')
+    }
     Utilities.addGithubPRTriggerForBranch(newJob, branch, "${os} ${architecture} ${configuration} Build")
 }
 
