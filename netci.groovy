@@ -19,6 +19,7 @@ def static getBuildJobName(def configuration, def os, def architecture) {
 platformList.each { platform ->
     // Calculate names
     def (os, architecture, configuration) = platform.tokenize(':')
+	def osDisplayName = os;
 
     // Calculate job name
     def jobName = getBuildJobName(configuration, os, architecture)
@@ -60,7 +61,7 @@ platformList.each { platform ->
     Utilities.setMachineAffinity(newJob, os, 'latest-or-auto')
     Utilities.standardJobSetup(newJob, project, isPR, "*/${branch}")
     Utilities.addMSTestResults(newJob, '**/*.trx')
-    Utilities.addGithubPRTriggerForBranch(newJob, branch, "${os} ${architecture} ${configuration} Build")
+    Utilities.addGithubPRTriggerForBranch(newJob, branch, "${osDisplayName} ${architecture} ${configuration} Build")
 }
 
 
