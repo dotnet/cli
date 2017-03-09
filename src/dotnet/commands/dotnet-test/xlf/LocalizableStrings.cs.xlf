@@ -73,9 +73,9 @@
       </trans-unit>
       <trans-unit id="CmdLoggerDescription">
         <source>Specify a logger for test results. 
-                                        Example: --logger "trx[;LogFileName=&lt;Defaults to unique file name&gt;]"</source>
+                                        Example: --logger "trx;LogFileName=&lt;Defaults to unique file name&gt;"</source>
         <target state="translated">Zadejte protokolovací nástroj pro výsledky testů. 
-                                        Příklad: --logger "trx[;LogFileName=&lt;Standardně se nastaví jedinečný název souboru&gt;]"</target>
+                                        Příklad: --logger "trx;LogFileName=&lt;Standardně se nastaví jedinečný název souboru&gt;"</target>
         <note />
       </trans-unit>
       <trans-unit id="CmdConfiguration">
