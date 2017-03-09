@@ -19,7 +19,7 @@ def static getBuildJobName(def configuration, def os, def architecture) {
 platformList.each { platform ->
     // Calculate names
     def (os, architecture, configuration) = platform.tokenize(':')
-	def osDisplayName = os;
+    def osUsedForMachineAffinity = os;
 
     // Calculate job name
     def jobName = getBuildJobName(configuration, os, architecture)
@@ -35,10 +35,10 @@ platformList.each { platform ->
     else if (os == 'Ubuntu') {
         buildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --docker ubuntu.14.04 --targets Default"
     }
-	else if (os == 'Linux') {
-		os = 'Ubuntu16.04';
-		buildCommand = "./build.sh --linux-portable --skip-prereqs --configuration ${configuration} --targets Default"
-	}
+    else if (os == 'Linux') {
+        osUsedForMachineAffinity = 'Ubuntu16.04';
+        buildCommand = "./build.sh --linux-portable --skip-prereqs --configuration ${configuration} --targets Default"
+    }
     else {
         // Jenkins non-Ubuntu CI machines don't have docker
         buildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --targets Default"
@@ -58,10 +58,10 @@ platformList.each { platform ->
         }
     }
 
-    Utilities.setMachineAffinity(newJob, os, 'latest-or-auto')
+    Utilities.setMachineAffinity(newJob, osUsedForMachineAffinity, 'latest-or-auto')
     Utilities.standardJobSetup(newJob, project, isPR, "*/${branch}")
     Utilities.addMSTestResults(newJob, '**/*.trx')
-    Utilities.addGithubPRTriggerForBranch(newJob, branch, "${osDisplayName} ${architecture} ${configuration} Build")
+    Utilities.addGithubPRTriggerForBranch(newJob, branch, "${os} ${architecture} ${configuration} Build")
 }
 
 
