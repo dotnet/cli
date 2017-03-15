@@ -5,8 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Cli.CommandLine;
+using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Configurer;
 using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.DotNet.Tools.Add;
@@ -22,13 +22,13 @@ using Microsoft.DotNet.Tools.Pack;
 using Microsoft.DotNet.Tools.Publish;
 using Microsoft.DotNet.Tools.Remove;
 using Microsoft.DotNet.Tools.Restore;
-using Microsoft.DotNet.Tools.RestoreProjectJson;
 using Microsoft.DotNet.Tools.Run;
 using Microsoft.DotNet.Tools.Sln;
 using Microsoft.DotNet.Tools.Test;
 using Microsoft.DotNet.Tools.VSTest;
 using Microsoft.DotNet.Tools.Cache;
 using NuGet.Frameworks;
+using Command = Microsoft.DotNet.Cli.Utils.Command;
 
 namespace Microsoft.DotNet.Cli
 {
@@ -54,6 +54,8 @@ namespace Microsoft.DotNet.Cli
             ["sln"] = SlnCommand.Run,
             ["test"] = TestCommand.Run,
             ["vstest"] = VSTestCommand.Run,
+            ["complete"] = CompleteCommand.Run,
+            ["parse"] = ParseCommand.Run
         };
 
         public static int Main(string[] args)
@@ -76,11 +78,28 @@ namespace Microsoft.DotNet.Cli
                     return ProcessArgs(args);
                 }
             }
+            catch (HelpException e)
+            {
+                Reporter.Output.WriteLine(e.Message);
+                return 0;
+            }
             catch (Exception e) when (e.ShouldBeDisplayedAsError())
             {
-                Reporter.Error.WriteLine(CommandContext.IsVerbose() ? 
-                        e.ToString().Red().Bold() : 
-                        e.Message.Red().Bold());
+                Reporter.Error.WriteLine(CommandContext.IsVerbose() 
+                    ? e.ToString().Red().Bold() 
+                    : e.Message.Red().Bold());
+
+                var commandParsingException = e as CommandParsingException;
+                if (commandParsingException != null)
+                {
+                    Reporter.Output.WriteLine(commandParsingException.HelpText);
+                }
+
+                return 1;
+            }
+            catch (Exception e) when (!e.ShouldBeDisplayedAsError())
+            {
+                Reporter.Error.WriteLine(e.ToString().Red().Bold());
 
                 return 1;
             }

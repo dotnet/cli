@@ -80,6 +80,8 @@ namespace Microsoft.DotNet.Cli
                 UseShellExecute = false
             };
 
+            Reporter.Output.WriteLine($"[Forwarding] {processInfo.FileName} {processInfo.Arguments}");
+
             if (_environmentVariables != null)
             {
                 foreach (var entry in _environmentVariables)
