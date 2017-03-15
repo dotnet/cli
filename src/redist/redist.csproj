@@ -150,20 +150,44 @@
           AfterTargets="Publish">
   </Target>
 
+  <ItemGroup>
+    <VSTestNETCore10Assembly Include="System.ComponentModel.Primitives.dll">
+      <TFM>netstandard1.0</TFM>
+    </VSTestNETCore10Assembly>
+    <VSTestNETCore10Assembly Include="System.Collections.Specialized.dll;
+                                      System.Collections.NonGeneric.dll;
+                                      System.Private.DataContractSerialization.dll">
+      <TFM>netstandard1.3</TFM>
+    </VSTestNETCore10Assembly>
+  </ItemGroup>
+
+  <Target Name="RetargetVSTestConsole"
+          AfterTargets="Publish">
+    <PropertyGroup>
+      <VSTestName>vstest.console</VSTestName>
+      <VSTestRuntimeConfigPath>$(PublishDir)/$(VSTestName).runtimeconfig.json</VSTestRuntimeConfigPath>
+    </PropertyGroup>
+
+    <!-- The following two hacks are necessary until vstest is built for netcoreapp2.0
+         https://github.com/Microsoft/vstest/issues/494 -->
+
+    <ReplaceFileContents InputFile="$(VSTestRuntimeConfigPath)"
+                         DestinationFile="$(VSTestRuntimeConfigPath)"
+                         ReplacementPatterns="1.0.0"
+                         ReplacementStrings="$(CLI_SharedFrameworkVersion)" />
+
+    <RemoveAssetFromDepsPackages DepsFile="$(PublishDir)/$(VSTestName).deps.json"
+                                 SectionName="runtime"
+                                 AssetPath="lib/%(VSTestNETCore10Assembly.TFM)/%(VSTestNETCore10Assembly.Identity)" />
+  </Target>
+  
   <Target Name="CrossgenPublishDir"
           Condition=" '$(DISABLE_CROSSGEN)' == '' "
           AfterTargets="PublishMSBuildExtensions">
-    <ItemGroup>
-      <NETCore10Assemblies Include="$(PublishDir)/System.ComponentModel.Primitives.dll;
-                                    $(PublishDir)/System.Collections.Specialized.dll;
-                                    $(PublishDir)/System.Collections.NonGeneric.dll;
-                                    $(PublishDir)/System.Private.DataContractSerialization.dll" />
-    </ItemGroup>
-
     <!-- Move these "1.0" assemblies that TestPlatform lays down out of the way so crossgen doesn't pick them up.
           We need https://github.com/dotnet/cli/issues/5464 fixed, so test platform is in a separate directory -->
-    <Move SourceFiles="@(NETCore10Assemblies)"
-          DestinationFiles="@(NETCore10Assemblies->'$(PublishDir)/%(Filename)%(Extension).bak')" />
+    <Move SourceFiles="@(VSTestNETCore10Assembly->'$(PublishDir)%(Filename)%(Extension)')"
+          DestinationFiles="@(VSTestNETCore10Assembly->'$(PublishDir)%(Filename)%(Extension).bak')" />
 
     <ItemGroup>
       <!-- Removing Full CLR built TestHost assemblies from getting Crossgen as it is throwing error -->
@@ -197,8 +221,8 @@
                                      $(SharedFrameworkNameVersionPath)" />
 
     <!-- Move the "1.0" assemblies back -->
-    <Move SourceFiles="@(NETCore10Assemblies->'$(PublishDir)/%(Filename)%(Extension).bak')"
-          DestinationFiles="@(NETCore10Assemblies)" />
+    <Move SourceFiles="@(VSTestNETCore10Assembly->'$(PublishDir)%(Filename)%(Extension).bak')"
+          DestinationFiles="@(VSTestNETCore10Assembly->'$(PublishDir)%(Filename)%(Extension)')" />
   </Target>
 
   <Target Name="RemoveVbc"
