@@ -156,6 +156,7 @@
     </VSTestNETCore10Assembly>
     <VSTestNETCore10Assembly Include="System.Collections.Specialized.dll;
                                       System.Collections.NonGeneric.dll;
+                                      System.Runtime.Serialization.Primitives.dll;
                                       System.Private.DataContractSerialization.dll">
       <TFM>netstandard1.3</TFM>
     </VSTestNETCore10Assembly>
