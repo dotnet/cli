@@ -17,7 +17,7 @@ Defaults to current directory if nothing is specified.";
 
         public const string CmdTemplateDescription = "Base MSBuild template to use for migrated app. The default is the project included in dotnet new.";
 
-        public const string CmdVersionDescription = "The version of the sdk package that will be referenced in the migrated app. The default is the version of the sdk in dotnet new.";
+        public const string CmdVersionDescription = "The version of the SDK package that will be referenced in the migrated app. The default is the version of the SDK in dotnet new.";
 
         public const string CmdXprojFileDescription = "The path to the xproj file to use. Required when there is more than one xproj in a project directory.";
 
