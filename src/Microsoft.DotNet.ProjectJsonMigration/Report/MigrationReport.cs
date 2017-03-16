@@ -8,7 +8,7 @@ using System.Linq;
 namespace Microsoft.DotNet.ProjectJsonMigration
 {
     /// Any changes to this need to be reflected in roslyn-project-system
-    /// TODO add link
+    /// https://github.com/dotnet/roslyn-project-system/blob/master/src/Microsoft.VisualStudio.ProjectSystem.CSharp.VS/ProjectSystem/VS/Xproj/MigrationReport.cs
     internal class MigrationReport
     {
         public List<ProjectMigrationReport> ProjectMigrationReports { get; }

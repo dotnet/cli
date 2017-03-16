@@ -3,6 +3,8 @@
 
 namespace Microsoft.DotNet.ProjectJsonMigration
 {
+    /// Any changes to this need to be reflected in roslyn-project-system
+    // https://github.com/dotnet/roslyn-project-system/blob/master/src/Microsoft.VisualStudio.ProjectSystem.CSharp.VS/ProjectSystem/VS/Xproj/MigrationError.cs
     internal class MigrationError
     {
         public string ErrorCode { get; }
