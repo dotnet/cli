@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "dotnet api": {
+      "commandName": "dotnet api",
+      "commandLineArgs": "XmlReader"
+    }
+  }
+}
