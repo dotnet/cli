@@ -1,0 +1,7 @@
+#!/bin/bash
+
+possible_commands=( $(compgen -c dotnet-) )
+possible_commands=( "${possible_commands[@]#dotnet-}" )
+
+echo "Available dotnet commands: "
+printf '%s\n' "${possible_commands[@]}"
