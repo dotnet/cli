@@ -63,7 +63,7 @@ In order to download just the .NET Core runtime without the SDK, please visit ht
 > **Note:** please be aware that below installers are the **latest bits**. If you 
 > want to install the latest released versions, please check out the [section above](#download-links).)
 
-| Platform | master<br>[![][version-badge]][version] |
+| Platform | master<br>[![][version-badge]][version] | |
 |----------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | **Windows x64** | [Installer][win-x64-installer] - [Checksum][win-x64-installer-checksum]<br>[zip][win-x64-zip] - [Checksum][win-x64-zip-checksum] |
 | **Windows x86** | [Installer][win-x86-installer] - [Checksum][win-x86-installer-checksum]<br>[zip][win-x86-zip] - [Checksum][win-x86-zip-checksum] |
