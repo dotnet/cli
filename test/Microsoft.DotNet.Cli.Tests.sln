@@ -72,6 +72,10 @@ Project("{13B669BE-BB05-4DDF-9536-439F39A36129}") = "dotnet-sln-remove.Tests", "
 EndProject
 Project("{13B669BE-BB05-4DDF-9536-439F39A36129}") = "dotnet-add-package.Tests", "dotnet-add-package.Tests\dotnet-add-package.Tests.csproj", "{3501AB72-3E05-45EE-9000-9515F5A139AC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dotnet-sln-create.Tests", "dotnet-sln-create.Tests", "{852533F9-A299-4036-B57F-1C5259C11C64}"
+EndProject
+Project("{13B669BE-BB05-4DDF-9536-439F39A36129}") = "dotnet-sln-create.Tests", "dotnet-sln-create.Tests\dotnet-sln-create.Tests.csproj", "{E3EF818A-9E8D-4763-B5E3-6EB6FCA6FFC1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -230,6 +234,7 @@ Global
 		{92BA9F90-E25B-4A1C-9598-2295D3DFC12F}.Release|x64.Build.0 = Release|x64
 		{92BA9F90-E25B-4A1C-9598-2295D3DFC12F}.Release|x86.ActiveCfg = Release|x86
 		{92BA9F90-E25B-4A1C-9598-2295D3DFC12F}.Release|x86.Build.0 = Release|x86
+<<<<<<< 45727ab4e3dd6dd65a012732788cd108f81da089
 		{3501AB72-3E05-45EE-9000-9515F5A139AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3501AB72-3E05-45EE-9000-9515F5A139AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3501AB72-3E05-45EE-9000-9515F5A139AC}.Debug|x64.ActiveCfg = Debug|x64
@@ -242,6 +247,20 @@ Global
 		{3501AB72-3E05-45EE-9000-9515F5A139AC}.Release|x64.Build.0 = Release|x64
 		{3501AB72-3E05-45EE-9000-9515F5A139AC}.Release|x86.ActiveCfg = Release|x86
 		{3501AB72-3E05-45EE-9000-9515F5A139AC}.Release|x86.Build.0 = Release|x86
+=======
+		{E3EF818A-9E8D-4763-B5E3-6EB6FCA6FFC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3EF818A-9E8D-4763-B5E3-6EB6FCA6FFC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3EF818A-9E8D-4763-B5E3-6EB6FCA6FFC1}.Debug|x64.ActiveCfg = Debug|x64
+		{E3EF818A-9E8D-4763-B5E3-6EB6FCA6FFC1}.Debug|x64.Build.0 = Debug|x64
+		{E3EF818A-9E8D-4763-B5E3-6EB6FCA6FFC1}.Debug|x86.ActiveCfg = Debug|x86
+		{E3EF818A-9E8D-4763-B5E3-6EB6FCA6FFC1}.Debug|x86.Build.0 = Debug|x86
+		{E3EF818A-9E8D-4763-B5E3-6EB6FCA6FFC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3EF818A-9E8D-4763-B5E3-6EB6FCA6FFC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3EF818A-9E8D-4763-B5E3-6EB6FCA6FFC1}.Release|x64.ActiveCfg = Release|x64
+		{E3EF818A-9E8D-4763-B5E3-6EB6FCA6FFC1}.Release|x64.Build.0 = Release|x64
+		{E3EF818A-9E8D-4763-B5E3-6EB6FCA6FFC1}.Release|x86.ActiveCfg = Release|x86
+		{E3EF818A-9E8D-4763-B5E3-6EB6FCA6FFC1}.Release|x86.Build.0 = Release|x86
+>>>>>>> Add dotnet sln create command
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -250,5 +269,6 @@ Global
 		{FC849626-89C9-4F50-A2CA-53C4315A87F8} = {5FF48976-B083-4E3B-A8E7-6FCD225D5C8E}
 		{5767D8F0-4ED9-4083-8BDC-ED9E65AA86EF} = {15DDC326-69C3-4081-8AA1-B578B2BDE2C6}
 		{92BA9F90-E25B-4A1C-9598-2295D3DFC12F} = {BB393A93-1770-4753-B7D6-56F0DD378177}
+		{E3EF818A-9E8D-4763-B5E3-6EB6FCA6FFC1} = {852533F9-A299-4036-B57F-1C5259C11C64}
 	EndGlobalSection
 EndGlobal

@@ -8,6 +8,7 @@ using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools.Sln.Add;
 using Microsoft.DotNet.Tools.Sln.List;
 using Microsoft.DotNet.Tools.Sln.Remove;
+using Microsoft.DotNet.Tools.Sln.Create;
 
 namespace Microsoft.DotNet.Tools.Sln
 {
@@ -22,7 +23,9 @@ namespace Microsoft.DotNet.Tools.Sln
             {
                 AddProjectToSolutionCommand.Create,
                 ListProjectsInSolutionCommand.Create,
-                RemoveProjectFromSolutionCommand.Create
+                RemoveProjectFromSolutionCommand.Create,
+                CreateSlnFileSolutionCommand.Create
+
             };
 
         public static int Run(string[] args)
