@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  webapplication4:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "80"
