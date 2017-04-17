@@ -47,6 +47,10 @@
 .PARAMETER AzureFeed
     Default: https://dotnetcli.azureedge.net/dotnet
     This parameter should not be usually changed by user. It allows to change URL for the Azure feed used by this installer.
+.PARAMETER AzureSdkPath
+    Default: Sdk
+    This parameter should not be usually changed by user. It allows changing the path used to find SDK packages in
+    blob storage.
 .PARAMETER ProxyAddress
     If set, the installer will use the proxy when making web requests
 #>
@@ -61,6 +65,7 @@ param(
    [switch]$DryRun,
    [switch]$NoPath,
    [string]$AzureFeed="https://dotnetcli.azureedge.net/dotnet",
+   [string]$AzureSdkPath="Sdk",
    [string]$UncachedFeed="https://dotnetcli.blob.core.windows.net/dotnet",
    [string]$ProxyAddress
 )
@@ -219,7 +224,7 @@ function Get-Specific-Version-From-Version([string]$AzureFeed, [string]$AzureCha
     }
 }
 
-function Get-Download-Links([string]$AzureFeed, [string]$AzureChannel, [string]$SpecificVersion, [string]$CLIArchitecture) {
+function Get-Download-Links([string]$AzureFeed, [string]$AzureChannel, [string]$AzureSdkPath, [string]$SpecificVersion, [string]$CLIArchitecture) {
     Say-Invocation $MyInvocation
     
     $ret = @()
@@ -228,7 +233,7 @@ function Get-Download-Links([string]$AzureFeed, [string]$AzureChannel, [string]$
         $PayloadURL = "$AzureFeed/$AzureChannel/Binaries/$SpecificVersion/dotnet-win-$CLIArchitecture.$SpecificVersion.zip"
     }
     else {
-        $PayloadURL = "$AzureFeed/Sdk/$SpecificVersion/dotnet-dev-win-$CLIArchitecture.$SpecificVersion.zip"
+        $PayloadURL = "$AzureFeed/$AzureSdkPath/$SpecificVersion/dotnet-dev-win-$CLIArchitecture.$SpecificVersion.zip"
     }
 
     Say-Verbose "Constructed payload URL: $PayloadURL"
@@ -393,7 +398,7 @@ function Prepend-Sdk-InstallRoot-To-Path([string]$InstallRoot, [string]$BinFolde
 $AzureChannel = Get-Azure-Channel-From-Channel -Channel $Channel
 $CLIArchitecture = Get-CLIArchitecture-From-Architecture $Architecture
 $SpecificVersion = Get-Specific-Version-From-Version -AzureFeed $AzureFeed -AzureChannel $AzureChannel -CLIArchitecture $CLIArchitecture -Version $Version
-$DownloadLinks = Get-Download-Links -AzureFeed $AzureFeed -AzureChannel $AzureChannel -SpecificVersion $SpecificVersion -CLIArchitecture $CLIArchitecture
+$DownloadLinks = Get-Download-Links -AzureFeed $AzureFeed -AzureChannel $AzureChannel -AzureSdkPath $AzureSdkPath -SpecificVersion $SpecificVersion -CLIArchitecture $CLIArchitecture
 
 if ($DryRun) {
     Say "Payload URLs:"
