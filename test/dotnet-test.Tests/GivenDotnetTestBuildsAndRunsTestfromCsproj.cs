@@ -17,20 +17,7 @@ namespace Microsoft.DotNet.Cli.Test.Tests
         [Fact]
         public void MSTestSingleTFM()
         {
-            // Copy VSTestDotNetCore project in output directory of project dotnet-vstest.Tests
-            string testAppName = "VSTestDotNetCore";
-            var testInstance = TestAssets.Get(testAppName)
-                            .CreateInstance()
-                            .WithSourceFiles();
-
-            var testProjectDirectory = testInstance.Root.FullName;
-
-            // Restore project VSTestDotNetCore
-            new RestoreCommand()
-                .WithWorkingDirectory(testProjectDirectory)
-                .Execute()
-                .Should()
-                .Pass();
+            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp();
 
             // Call test
             CommandResult result = new DotnetTestCommand()
@@ -155,10 +142,11 @@ namespace Microsoft.DotNet.Cli.Test.Tests
             }
         }
 
-        [Fact(Skip = "https://github.com/dotnet/cli/issues/5035")]
+        [Fact]
         public void ItBuildsAndTestsAppWhenRestoringToSpecificDirectory()
         {
-            var rootPath = TestAssets.Get("VSTestDotNetCore").CreateInstance().WithSourceFiles().Root.FullName;
+            // Creating folder with name short name "RestoreTest" to avoid PathTooLongException
+            var rootPath = TestAssets.Get("VSTestDotNetCore").CreateInstance("RestoreTest").WithSourceFiles().Root.FullName;
 
             string dir = "pkgs";
             string fullPath = Path.GetFullPath(Path.Combine(rootPath, dir));
@@ -184,6 +172,24 @@ namespace Microsoft.DotNet.Cli.Test.Tests
             result.StdOut.Should().Contain("Total tests: 2. Passed: 1. Failed: 1. Skipped: 0.");
             result.StdOut.Should().Contain("Passed   TestNamespace.VSTestTests.VSTestPassTest");
             result.StdOut.Should().Contain("Failed   TestNamespace.VSTestTests.VSTestFailTest");
+        }
+
+        [Fact]
+        public void ItUsesVerbosityPassedToDefineVerbosityOfConsoleLoggerOfTheTests()
+        {
+            // Copy and restore VSTestDotNetCore project in output directory of project dotnet-vstest.Tests
+            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp();
+
+            // Call test
+            CommandResult result = new DotnetTestCommand()
+                                        .WithWorkingDirectory(testProjectDirectory)
+                                        .ExecuteWithCapturedOutput("-v q");
+
+            // Verify
+            result.StdOut.Should().Contain("Total tests: 2. Passed: 1. Failed: 1. Skipped: 0.");
+            result.StdOut.Should().NotContain("Passed   TestNamespace.VSTestTests.VSTestPassTest");
+            result.StdOut.Should().NotContain("Failed   TestNamespace.VSTestTests.VSTestFailTest");
+            result.ExitCode.Should().Be(1);
         }
 
         private string CopyAndRestoreVSTestDotNetCoreTestApp([CallerMemberName] string callingMethod = "")
