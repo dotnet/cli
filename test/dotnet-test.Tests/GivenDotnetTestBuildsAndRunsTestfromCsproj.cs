@@ -160,7 +160,8 @@ namespace Microsoft.DotNet.Cli.Test.Tests
         {
             var rootPath = TestAssets.Get("VSTestDotNetCore").CreateInstance().WithSourceFiles().Root.FullName;
 
-            string dir = "pkgs";
+            // Moving pkgs folder on top to avoid PathTooLongException
+            string dir = @"..\..\..\..\pkgs";
             string fullPath = Path.GetFullPath(Path.Combine(rootPath, dir));
 
             string args = $"--packages \"{dir}\"";
