@@ -145,10 +145,10 @@ namespace Microsoft.DotNet.Cli.Test.Tests
         [Fact]
         public void ItBuildsAndTestsAppWhenRestoringToSpecificDirectory()
         {
-            // Creating folder with name short name "RestoreTest" to avoid PathTooLongException
-            var rootPath = TestAssets.Get("VSTestDotNetCore").CreateInstance("RestoreTest").WithSourceFiles().Root.FullName;
+            var rootPath = TestAssets.Get("VSTestDotNetCore").CreateInstance().WithSourceFiles().Root.FullName;
 
-            string dir = "pkgs";
+            // Moving pkgs folder on top to avoid PathTooLongException
+            string dir = @"..\..\..\..\pkgs";
             string fullPath = Path.GetFullPath(Path.Combine(rootPath, dir));
 
             string args = $"--packages \"{dir}\"";
