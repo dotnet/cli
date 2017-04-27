@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.Cli.MSBuild.IntegrationTests
         [InlineData("pack")]
         [InlineData("publish")]
         [InlineData("test")]
-        public void When_dotnet_command_invokes_msbuild_Then_env_vars_and_m_are_passed(string command)
+        public void WhenDotnetCommandInvokesMsbuildThenEnvVarsAndMArePassed(string command)
         {
             var testInstance = TestAssets.Get("MSBuildIntegration")
                 .CreateInstance(identifier: command)
@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.Cli.MSBuild.IntegrationTests
         [InlineData("msbuild")]
         [InlineData("pack")]
         [InlineData("publish")]
-        public void When_dotnet_command_invokes_msbuild_with_no_args_verbosity_is_set_to_minimum(string command)
+        public void WhenDotnetCommandInvokesMsbuildWithNoArgsVerbosityIsSetToNormal(string command)
         {
             var testInstance = TestAssets.Get("MSBuildIntegration")
                 .CreateInstance(identifier: command)
@@ -51,8 +51,9 @@ namespace Microsoft.DotNet.Cli.MSBuild.IntegrationTests
             cmd.Should().Pass();
 
             cmd.StdOut
-                .Should().NotContain("Message with normal importance", "Because verbosity is set to minimum")
-                     .And.Contain("Message with high importance", "Because high importance messages are shown on minimum verbosity");
+                .Should().Contain("Message with normal importance", "Because verbosity is set to normal")
+                     .And.Contain("Message with high importance", "Because high importance messages are shown on normal verbosity")
+                     .And.NotContain("Message with low importance", "Because low importance messages are not shown on normal verbosity");
         }
 
         [Theory]
@@ -60,7 +61,7 @@ namespace Microsoft.DotNet.Cli.MSBuild.IntegrationTests
         [InlineData("clean")]
         [InlineData("pack")]
         [InlineData("publish")]
-        public void When_dotnet_command_invokes_msbuild_with_diag_verbosity_Then_arg_is_passed(string command)
+        public void WhenDotnetCommandInvokesMsbuildWithDiagVerbosityThenArgIsPassed(string command)
         {
             var testInstance = TestAssets.Get("MSBuildIntegration")
                 .CreateInstance(identifier: command)
@@ -76,7 +77,7 @@ namespace Microsoft.DotNet.Cli.MSBuild.IntegrationTests
         }
 
         [Fact]
-        public void When_dotnet_test_invokes_msbuild_with_no_args_verbosity_is_set_to_quiet()
+        public void WhenDotnetTestInvokesMsbuildWithNoArgsVerbosityIsSetToQuiet()
         {
             var testInstance = TestAssets.Get("MSBuildIntegration")
                 .CreateInstance()
@@ -91,7 +92,7 @@ namespace Microsoft.DotNet.Cli.MSBuild.IntegrationTests
         }
 
         [Fact]
-        public void When_dotnet_msbuild_command_is_invoked_with_non_msbuild_switch_Then_it_fails()
+        public void WhenDotnetMsbuildCommandIsInvokedWithNonMsbuildSwitchThenItFails()
         {
             var testInstance = TestAssets.Get("MSBuildIntegration")
                 .CreateInstance()
@@ -105,7 +106,7 @@ namespace Microsoft.DotNet.Cli.MSBuild.IntegrationTests
         }
 
         [Fact]
-        public void When_MSBuildSDKsPath_is_set_by_env_var_then_it_is_not_overridden()
+        public void WhenMSBuildSDKsPathIsSetByEnvVarThenItIsNotOverridden()
         {
             var testInstance = TestAssets.Get("MSBuildIntegration")
                 .CreateInstance()
