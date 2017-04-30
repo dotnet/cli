@@ -241,6 +241,7 @@ namespace Microsoft.DotNet.ProjectJsonMigration.Tests
         [InlineData("Microsoft.CodeAnalysis.CSharp", "1.0.0", "Microsoft.CodeAnalysis.CSharp", "1.3.0")]
         [InlineData("Microsoft.CodeAnalysis.VisualBasic", "1.0.0", "Microsoft.CodeAnalysis.VisualBasic", "1.3.0")]
         [InlineData("Microsoft.CSharp", "1.0.0", "Microsoft.CSharp", "4.0.1")]
+        [InlineData("Microsoft.CSharp", "*", "Microsoft.CSharp", "*")]
         [InlineData("Microsoft.VisualBasic", "1.0.0", "Microsoft.VisualBasic", "10.0.1")]
         [InlineData("Microsoft.Win32.Primitives", "1.0.0", "Microsoft.Win32.Primitives", "4.0.1")]
         [InlineData("Microsoft.Win32.Registry", "1.0.0", "Microsoft.Win32.Registry", "4.0.0")]
