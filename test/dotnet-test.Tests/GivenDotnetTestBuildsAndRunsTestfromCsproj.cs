@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.Cli.Test.Tests
         [Fact]
         public void MSTestSingleTFM()
         {
-            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp();
+            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp("3");
 
             // Call test
             CommandResult result = new DotnetTestCommand()
@@ -34,15 +34,15 @@ namespace Microsoft.DotNet.Cli.Test.Tests
         [Fact]
         public void XunitSingleTFM()
         {
-            // Copy VSTestXunitDotNetCore project in output directory of project dotnet-vstest.Tests
-            string testAppName = "VSTestXunitDotNetCore";
+            // Copy XunitCore project in output directory of project dotnet-vstest.Tests
+            string testAppName = "XunitCore";
             var testInstance = TestAssets.Get(testAppName)
-                            .CreateInstance()
+                            .CreateInstance("4")
                             .WithSourceFiles();
 
             var testProjectDirectory = testInstance.Root.FullName;
 
-            // Restore project VSTestXunitDotNetCore
+            // Restore project XunitCore
             new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .Execute()
@@ -64,11 +64,11 @@ namespace Microsoft.DotNet.Cli.Test.Tests
         [Fact]
         public void TestWillNotBuildTheProjectIfNoBuildArgsIsGiven()
         {
-            // Copy and restore VSTestDotNetCore project in output directory of project dotnet-vstest.Tests
-            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp();
+            // Copy and restore VSTestCore project in output directory of project dotnet-vstest.Tests
+            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp("5");
             string configuration = Environment.GetEnvironmentVariable("CONFIGURATION") ?? "Debug";
             string expectedError = Path.Combine(testProjectDirectory, "bin",
-                                   configuration, "netcoreapp2.0", "VSTestDotNetCore.dll");
+                                   configuration, "netcoreapp2.0", "VSTestCore.dll");
             expectedError = "The test source file " + "\"" + expectedError + "\"" + " provided was not found.";
 
             // Call test
@@ -83,10 +83,10 @@ namespace Microsoft.DotNet.Cli.Test.Tests
         [Fact]
         public void TestWillCreateTrxLoggerInTheSpecifiedResultsDirectoryBySwitch()
         {
-            // Copy and restore VSTestDotNetCore project in output directory of project dotnet-vstest.Tests
-            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp();
+            // Copy and restore VSTestCore project in output directory of project dotnet-vstest.Tests
+            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp("6");
 
-            string trxLoggerDirectory = Path.Combine(testProjectDirectory, "TestResults", "netcoreappx.y");
+            string trxLoggerDirectory = Path.Combine(testProjectDirectory, "TR", "x.y");
 
             // Delete trxLoggerDirectory if it exist
             if (Directory.Exists(trxLoggerDirectory))
@@ -114,10 +114,10 @@ namespace Microsoft.DotNet.Cli.Test.Tests
         [Fact]
         public void ItCreatesTrxReportInTheSpecifiedResultsDirectoryByArgs()
         {
-            // Copy and restore VSTestDotNetCore project in output directory of project dotnet-vstest.Tests
-            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp();
+            // Copy and restore VSTestCore project in output directory of project dotnet-vstest.Tests
+            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp("7");
 
-            string trxLoggerDirectory = Path.Combine(testProjectDirectory, "ResultsDirectory");
+            string trxLoggerDirectory = Path.Combine(testProjectDirectory, "RD");
 
             // Delete trxLoggerDirectory if it exist
             if (Directory.Exists(trxLoggerDirectory))
@@ -146,7 +146,7 @@ namespace Microsoft.DotNet.Cli.Test.Tests
         public void ItBuildsAndTestsAppWhenRestoringToSpecificDirectory()
         {
             // Creating folder with name short name "RestoreTest" to avoid PathTooLongException
-            var rootPath = TestAssets.Get("VSTestDotNetCore").CreateInstance("RestoreTest").WithSourceFiles().Root.FullName;
+            var rootPath = TestAssets.Get("VSTestCore").CreateInstance("8").WithSourceFiles().Root.FullName;
 
             // Moving pkgs folder on top to avoid PathTooLongException
             string dir = @"..\..\..\..\pkgs";
@@ -178,8 +178,8 @@ namespace Microsoft.DotNet.Cli.Test.Tests
         [Fact]
         public void ItUsesVerbosityPassedToDefineVerbosityOfConsoleLoggerOfTheTests()
         {
-            // Copy and restore VSTestDotNetCore project in output directory of project dotnet-vstest.Tests
-            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp();
+            // Copy and restore VSTestCore project in output directory of project dotnet-vstest.Tests
+            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp("9");
 
             // Call test
             CommandResult result = new DotnetTestCommand()
@@ -195,15 +195,15 @@ namespace Microsoft.DotNet.Cli.Test.Tests
 
         private string CopyAndRestoreVSTestDotNetCoreTestApp([CallerMemberName] string callingMethod = "")
         {
-            // Copy VSTestDotNetCore project in output directory of project dotnet-vstest.Tests
-            string testAppName = "VSTestDotNetCore";
+            // Copy VSTestCore project in output directory of project dotnet-vstest.Tests
+            string testAppName = "VSTestCore";
             var testInstance = TestAssets.Get(testAppName)
                             .CreateInstance(callingMethod)
                             .WithSourceFiles();
 
             var testProjectDirectory = testInstance.Root.FullName;
 
-            // Restore project VSTestDotNetCore
+            // Restore project VSTestCore
             new RestoreCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .Execute()
