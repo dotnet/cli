@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  webapplication4:
+    image: webapplication4:dev
+    build:
+      args:
+        source: ${DOCKER_BUILD_SOURCE}
+    environment:
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+    volumes:
+      - ./WebApplication4:/app
+      - ${NUGET_PACKAGES}:/root/.nuget/packages:ro
+      - ${VSDBG_PATH}:/remote_debugger:ro
+    entrypoint: tail -f /dev/null
+    labels:
+      - "com.microsoft.visualstudio.targetoperatingsystem=linux"

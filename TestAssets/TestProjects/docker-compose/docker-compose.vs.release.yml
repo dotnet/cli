@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  webapplication4:
+    build:
+      args:
+        source: ${DOCKER_BUILD_SOURCE}
+    volumes:
+      - ${VSDBG_PATH}:/remote_debugger:ro
+    entrypoint: tail -f /dev/null
+    labels:
+      - "com.microsoft.visualstudio.targetoperatingsystem=linux"
