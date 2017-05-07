@@ -13,7 +13,7 @@
   
   <ItemGroup>
     <PackageReference Include="Microsoft.NetCore.App"                Version="$(CLI_SharedFrameworkVersion)" />
-    <PackageReference Include="microsoft.fsharp.core.netcore"        Version="$(CLI_FSharp_Version)" />
+    <PackageReference Include="Microsoft.FSharp.Core.netcore"        Version="$(CLI_FSharp_Version)" />
     <PackageReference Include="Microsoft.FSharp.Compiler.netcore"    Version="$(CLI_FSharp_Version)" />
   </ItemGroup>
 
@@ -41,7 +41,8 @@
     <Copy SourceFiles="$(PublishDir)/runtimes/any/native/default.win32manifest;
                        $(PublishDir)/runtimes/any/native/Microsoft.FSharp.Targets;
                        $(PublishDir)/runtimes/any/native/Microsoft.Portable.FSharp.Targets;
-                       $(PublishDir)/runtimes/any/native/Microsoft.NET.Sdk.FSharp.props;
+                       $(PublishDir)/runtimes/any/native/Microsoft.FSharp.NetSdk.props;
+                       $(PublishDir)/runtimes/any/native/Microsoft.FSharp.NetSdk.targets;
                        $(PublishDir)/runtimes/any/native/FSharp.Core.optdata;
                        $(PublishDir)/runtimes/any/native/FSharp.Core.sigdata;
                        $(PublishDir)/runtimes/any/native/FSharp.Core.xml;
@@ -51,7 +52,8 @@
                       "$(PublishDir)/default.win32manifest;
                        $(PublishDir)/Microsoft.FSharp.Targets;
                        $(PublishDir)/Microsoft.Portable.FSharp.Targets;
-                       $(PublishDir)/Microsoft.NET.Sdk.FSharp.props;
+                       $(PublishDir)/Microsoft.FSharp.NetSdk.props;
+                       $(PublishDir)/Microsoft.FSharp.NetSdk.targets;
                        $(PublishDir)/FSharp.Core.optdata;
                        $(PublishDir)/FSharp.Core.sigdata;
                        $(PublishDir)/FSharp.Core.xml;
