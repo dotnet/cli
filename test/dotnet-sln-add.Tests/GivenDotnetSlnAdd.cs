@@ -26,6 +26,23 @@ Arguments:
 Options:
   -h, --help   Show help information
 ";
+
+        private const string SlnCommandHelpText = @".NET modify solution file command
+
+Usage: dotnet sln [options] <SLN_FILE> [command]
+
+Arguments:
+  <SLN_FILE>   Solution file to operate on. If not specified, the command will search the current directory for one.
+
+Options:
+  -h, --help   Show help information
+
+Commands:
+  add <args>      .NET Add project(s) to a solution file Command
+  list            .NET List project(s) in a solution file Command
+  remove <args>   .NET Remove project(s) from a solution file Command
+";
+
         private ITestOutputHelper _output;
 
         public GivenDotnetSlnAdd(ITestOutputHelper output)
@@ -193,6 +210,7 @@ EndGlobal
                 .ExecuteWithCapturedOutput($"sln {commandName}");
             cmd.Should().Fail();
             cmd.StdErr.Should().Be("Required command was not provided.");
+            cmd.StdOut.Should().BeVisuallyEquivalentTo(SlnCommandHelpText);
         }
 
         [Fact]
@@ -460,6 +478,35 @@ EndGlobal
             cmd.Should().Pass();
             cmd.StdOut.Should().Be($"Project `{projectPath}` added to the solution.");
             cmd.StdErr.Should().BeEmpty();
+        }
+
+        [Theory]
+        [InlineData("TestAppWithSlnAndCsprojFiles")]
+        [InlineData("TestAppWithSlnAndCsprojProjectGuidFiles")]
+        [InlineData("TestAppWithEmptySln")]
+        public void WhenInvalidProjectIsPassedItDoesNotGetAdded(string testAsset)
+        {
+            var projectDirectory = TestAssets
+                .Get(testAsset)
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root
+                .FullName;
+
+            var projectToAdd = "Lib/Library.cs";
+            var projectPath = Path.Combine("Lib", "Library.cs");
+            var slnFile = SlnFile.Read(Path.Combine(projectDirectory, "App.sln"));
+            var expectedNumberOfProjects = slnFile.Projects.Count();
+
+            var cmd = new DotnetCommand()
+                .WithWorkingDirectory(projectDirectory)
+                .ExecuteWithCapturedOutput($"sln App.sln add {projectToAdd}");
+            cmd.Should().Pass();
+            cmd.StdOut.Should().BeEmpty();
+            cmd.StdErr.Should().Match("Invalid project `*`. The project file could not be loaded.*");
+
+            slnFile = SlnFile.Read(Path.Combine(projectDirectory, "App.sln"));
+            slnFile.Projects.Count().Should().Be(expectedNumberOfProjects);
         }
 
         [Theory]
