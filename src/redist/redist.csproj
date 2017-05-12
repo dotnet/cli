@@ -179,7 +179,6 @@
           AfterTargets="PublishMSBuildExtensions">
     <ItemGroup>
       <!-- Removing Full CLR built TestHost assemblies from getting Crossgen as it is throwing error -->
-      <!-- Temporarily removing F# Compiler assemblies from getting Crossgen until we can upgrade dependencies -->
       <SdkFiles Include="$(PublishDir)/**/*" Exclude="$(PublishDir)/TestHost*/**/*;$(PublishDir)/Sdks/**/*;" />
     </ItemGroup>
 
