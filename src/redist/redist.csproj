@@ -179,7 +179,7 @@
           AfterTargets="PublishMSBuildExtensions">
     <ItemGroup>
       <!-- Removing Full CLR built TestHost assemblies from getting Crossgen as it is throwing error -->
-      <SdkFiles Include="$(PublishDir)/**/*" Exclude="$(PublishDir)/TestHost*/**/*;$(PublishDir)/Sdks/**/*;" />
+      <SdkFiles Include="$(PublishDir)/**/*" Exclude="$(PublishDir)/TestHost*/**/*;$(PublishDir)/Sdks/**/*" />
     </ItemGroup>
 
     <AddMetadataIsPE Items="@(SdkFiles)">

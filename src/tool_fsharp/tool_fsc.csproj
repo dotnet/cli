@@ -5,7 +5,6 @@
   <PropertyGroup>
     <VersionPrefix>$(CliVersionPrefix)</VersionPrefix>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <RuntimeFrameworkVersion>$(CLI_SharedFrameworkVersion)</RuntimeFrameworkVersion>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <PublishDir>$(FSharpDirectory)</PublishDir>
     <VersionSuffix>$(CommitCount)</VersionSuffix>
@@ -32,11 +31,10 @@
                               SectionName="runtime"/>
     </ItemGroup>
 
-    
     <RemoveAssetFromDepsPackages DepsFile="$(PublishDir)/$(TargetName).deps.json"
                                  SectionName="%(AssetsToRemoveFromDeps.SectionName)"
                                  AssetPath="%(AssetsToRemoveFromDeps.Identity)" />
-   
+
     <Copy SourceFiles="$(PublishDir)/runtimes/any/native/default.win32manifest;
                        $(PublishDir)/runtimes/any/native/Microsoft.FSharp.Targets;
                        $(PublishDir)/runtimes/any/native/Microsoft.Portable.FSharp.Targets;
@@ -47,18 +45,18 @@
                        $(PublishDir)/runtimes/any/native/FSharp.Core.xml;
                        $(PublishDir)/$(TargetName).runtimeconfig.json;
                        $(PublishDir)/$(TargetName).deps.json;"
-          DestinationFiles=
-                      "$(PublishDir)/default.win32manifest;
-                       $(PublishDir)/Microsoft.FSharp.Targets;
-                       $(PublishDir)/Microsoft.Portable.FSharp.Targets;
-                       $(PublishDir)/Microsoft.FSharp.NetSdk.props;
-                       $(PublishDir)/Microsoft.FSharp.NetSdk.targets;
-                       $(PublishDir)/FSharp.Core.optdata;
-                       $(PublishDir)/FSharp.Core.sigdata;
-                       $(PublishDir)/FSharp.Core.xml;
-                       $(PublishDir)/fsc.runtimeconfig.json;
-                       $(PublishDir)/fsc.deps.json;"/>
+          DestinationFiles="$(PublishDir)/default.win32manifest;
+                            $(PublishDir)/Microsoft.FSharp.Targets;
+                            $(PublishDir)/Microsoft.Portable.FSharp.Targets;
+                            $(PublishDir)/Microsoft.FSharp.NetSdk.props;
+                            $(PublishDir)/Microsoft.FSharp.NetSdk.targets;
+                            $(PublishDir)/FSharp.Core.optdata;
+                            $(PublishDir)/FSharp.Core.sigdata;
+                            $(PublishDir)/FSharp.Core.xml;
+                            $(PublishDir)/fsc.runtimeconfig.json;
+                            $(PublishDir)/fsc.deps.json;"/>
   </Target>
+
   <Target Name="RemoveFilesAfterPublish"
           AfterTargets="Publish">
     <Delete Files="$(PublishDir)/$(TargetName).dll" />
