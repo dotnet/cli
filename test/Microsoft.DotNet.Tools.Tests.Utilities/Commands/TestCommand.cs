@@ -55,32 +55,37 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 
         public async virtual Task<CommandResult> ExecuteAsync(string args = "")
         {
-            var resolvedCommand = _command;
-
-            ResolveCommand(ref resolvedCommand, ref args);
-
-            Console.WriteLine($"Executing - {resolvedCommand} {args} - {WorkingDirectoryInfo()}");
-            
-            return await ExecuteAsyncInternal(resolvedCommand, args);
+            return await ExecuteAsyncInternal(
+                             _command, 
+                             args, 
+                             captureOutput: false);
         }
 
         public virtual CommandResult ExecuteWithCapturedOutput(string args = "")
         {
+            return Task.Run(async () => await ExecuteAsyncInternal(
+                                                  _command, 
+                                                  args, 
+                                                  captureOutput: true)).Result;
+        }
+
+        private async Task<CommandResult> ExecuteAsyncInternal(
+            string executable, 
+            string args,
+            bool captureOutput)
+        {
             var resolvedCommand = _command;
 
             ResolveCommand(ref resolvedCommand, ref args);
-
-            var commandPath = Env.GetCommandPath(resolvedCommand, ".exe", ".cmd", "") ??
+            
+            Console.WriteLine($"[TestCommand] {WorkingDirectory}$ {resolvedCommand} {args}");
+            
+            if (captureOutput)
+            { 
+                var commandPath = Env.GetCommandPath(resolvedCommand, ".exe", ".cmd", "") ??
                 Env.GetCommandPathFromRootPath(_baseDirectory, resolvedCommand, ".exe", ".cmd", "");
+            }
 
-            Console.WriteLine($"Executing (Captured Output) - {commandPath} {args} - {WorkingDirectoryInfo()}");
-
-            return Task.Run(async () => await ExecuteAsyncInternal(resolvedCommand, args)).Result;
-        }
-
-
-        private async Task<CommandResult> ExecuteAsyncInternal(string executable, string args)
-        {
             var stdOut = new List<String>();
 
             var stdErr = new List<String>();
@@ -158,16 +163,6 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
             process.EnableRaisingEvents = true;
 
             return process;
-        }
-
-        private string WorkingDirectoryInfo()
-        {
-            if (WorkingDirectory == null)
-            { 
-                return "";
-            }
-
-            return $" in pwd {WorkingDirectory}";
         }
 
         private void RemoveNullTerminator(List<string> strings)
