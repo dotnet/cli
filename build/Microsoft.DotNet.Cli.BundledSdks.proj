@@ -16,9 +16,6 @@
           Outputs="@(SdkContent->'$(SdkLayoutDirectory)/%(RecursiveDir)%(FileName)%(Extension)')">
     <Copy SourceFiles="@(SdkContent)"
           DestinationFiles="@(SdkContent->'$(SdkLayoutDirectory)/%(RecursiveDir)%(FileName)%(Extension)')" />
-    
-    <!-- Remove unused directories for FSharp.NET.Sdk, just Sdk directory is needed -->
-    <RemoveDir Condition=" '$([System.IO.Path]::GetFileName($(SdkLayoutDirectory)))' == 'FSharp.NET.Sdk' " Directories="$(SdkLayoutDirectory)/build;$(SdkLayoutDirectory)/buildCrossTargeting" />
 
     <Message Text="Copied Sdk $(SdkPackageName) from $(SdkNuPkgPath) to $(SdkLayoutDirectory)."
              Importance="High" />
