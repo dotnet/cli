@@ -201,17 +201,8 @@
                                      $(SharedFrameworkNameVersionPath)" />
   </Target>
 
-  <Target Name="RemoveVbc"
-          AfterTargets="CrossgenPublishDir">
-    <ItemGroup>
-      <_VbcPath Include="$(PublishDir)/**/vbc.exe" />
-    </ItemGroup>
-
-    <Delete Files="@(_VbcPath)" />
-  </Target>
-
   <Target Name="ChmodPublishDir"
-          AfterTargets="RemoveVbc"
+          AfterTargets="CrossgenPublishDir"
           Condition=" '$(OSName)' != 'win' ">
     
     <Exec Command="find $(SdkOutputDirectory) -type d -exec chmod 755 {} \;" />
@@ -220,7 +211,7 @@
   </Target>
 
   <Target Name="CreateSymbolsDirectory"
-          AfterTargets="RemoveVbc">
+          AfterTargets="CrossgenPublishDir">
     <ItemGroup>
       <_AllSdkFiles Include="$(PublishDir)/**/*" />
     </ItemGroup>
