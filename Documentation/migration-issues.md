@@ -1,3 +1,21 @@
+## Migration from project.json/xproj to csproj
+
+* For Windows:
+   * Install Visual Studio 2017 RC with the .NET Core workload
+   * Launch Visual Studio 2017 RC
+   * Open your sln or project containing global.json or project.json/xproj
+   * Build 
+   * Run
+
+* For Non-Windows:
+   * Install .NET Core 1.1 SDK
+   * Open the command prompt
+   * Navigate to your project directory containing global.json or project.json/xproj
+   * dotnet migrate
+   * dotnet restore
+   * dotnet build
+   * dotnet run
+
 ## Getting help on migration issues
 You're using the new .NET Core tools that are MSBuild-based. You took your project.json project and ran `dotnet migrate` or migrated from Visual Studio 2017...and you maybe ran into problems. 
 
