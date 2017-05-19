@@ -35,10 +35,23 @@ namespace Microsoft.DotNet.Configurer
 
         private void PrintFirstTimeUseNotice()
         {
-            const string firstTimeUseWelcomeMessage = LocalizableStrings.FirstTimeWelcomeMessage;
+            const string firstTimeUseWelcomeMessage = LocalizableStrings.FirstTimeUseWelcomeMessage;
+            const string firstTimeUseTelemetryEnabledMessage = LocalizableStrings.FirstTimeUseTelemetryEnabledMessage;
+            const string firstTimeUseConfiguringMessage = LocalizableStrings.FirstTimeUseConfiguringMessage;
 
             Reporter.Output.WriteLine();
             Reporter.Output.WriteLine(firstTimeUseWelcomeMessage);
+
+            var telemetryEnabled = 
+                _environmentProvider.GetEnvironmentVariableAsBool("DOTNET_CLI_TELEMETRY_OPTOUT", false);
+            
+            if (telemetryEnabled) {
+                Reporter.Output.WriteLine();
+                Reporter.Output.WriteLine(firstTimeUseTelemetryEnabledMessage);
+            }
+
+            Reporter.Output.WriteLine();
+            Reporter.Output.WriteLine(firstTimeUseConfiguringMessage);
         }
 
         private bool ShouldPrimeNugetCache()
