@@ -1,6 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.DotNet.Cli.Utils;
@@ -84,12 +85,22 @@ namespace Microsoft.DotNet.Configurer
                     using (var temporaryDotnetNewDirectory = _directory.CreateTemporaryDirectory())
                     {
                         var workingDirectory = temporaryDotnetNewDirectory.DirectoryPath;
+                        var nugetConfigPath = Path.Combine(workingDirectory, "NuGet.Config");
+
+                        _file.WriteAllText(
+                            nugetConfigPath,
+                            $@"<?xml version=""1.0"" encoding=""utf-8""?>
+<configuration>
+  <packageSources>
+    <add key=""extractedArchive"" value=""{extractedPackagesArchiveDirectory}"" />
+  </packageSources>
+</configuration>");
 
                         succeeded &= CreateTemporaryProject(workingDirectory, templateInfo);
 
                         if (succeeded)
                         {
-                            succeeded &= RestoreTemporaryProject(extractedPackagesArchiveDirectory, workingDirectory);
+                            succeeded &= RestoreTemporaryProject(nugetConfigPath, workingDirectory);
                         }
                     }
                 }
@@ -109,11 +120,11 @@ namespace Microsoft.DotNet.Configurer
                 workingDirectory);
         }
 
-        private bool RestoreTemporaryProject(string extractedPackagesArchiveDirectory, string workingDirectory)
+        private bool RestoreTemporaryProject(string nugetConfigPath, string workingDirectory)
         {
             return RunCommand(
                 "restore",
-                new[] { "-s", extractedPackagesArchiveDirectory },
+                new[] { "--configfile", nugetConfigPath },
                 workingDirectory);
         }
 
