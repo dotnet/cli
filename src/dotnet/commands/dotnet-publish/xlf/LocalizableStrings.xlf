@@ -32,7 +32,7 @@
         <note />
       </trans-unit>
       <trans-unit id="RuntimeOptionDescription">
-        <source>Publish the project for a given runtime. This is used when creating self-contained deployment. Default is to publish a framework-dependented app.</source>
+        <source>Publish the project for a given runtime. This is used when creating self-contained deployment. Default is to publish a framework-dependent app.</source>
         <note />
       </trans-unit>
       <trans-unit id="OutputOption">
@@ -48,7 +48,7 @@
         <note />
       </trans-unit>
       <trans-unit id="ConfigurationOptionDescription">
-        <source>Configuration to use for building the project.  Default for most projects is  "Debug".</source>
+        <source>Configuration to use for building the project.  Default for most projects is "Debug".</source>
         <note />
       </trans-unit>
       <trans-unit id="VersionSuffixOption">
