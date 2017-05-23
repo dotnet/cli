@@ -85,28 +85,35 @@ A command is running to initially populate your local package cache, to improve 
         [Fact]
         public void ItShowsTheAppropriateMessageToTheUserWhenEnvironmentVariablesAreSet()
         {
-            string telemetryEnabledMessage = NormalizeLineEndings(@"Telemetry
+            string telemetryOptInMessage = NormalizeLineEndings(@"Telemetry
 --------------
 The .NET Core tools collect usage data in order to improve your experience. The data is anonymous and does not include command-line arguments. The data is collected by Microsoft and shared with the community.
 You can opt out of telemetry by setting a DOTNET_CLI_TELEMETRY_OPTOUT environment variable to 1 using your favorite shell.
 You can read more about .NET Core tools telemetry @ https://aka.ms/dotnet-cli-telemetry.");
 
-            var rootPath = TestAssets.CreateTestDirectory().FullName;
+            var telemetryOptInRootPath = TestAssets.CreateTestDirectory().FullName;
+            var telemetryOptInNuGetHome = Path.Combine(telemetryOptInRootPath, "nuget_home");
+            var telemetryOptInCommand = new DotnetCommand()
+                .WithWorkingDirectory(telemetryOptInRootPath);
+            telemetryOptInCommand.Environment["HOME"] = telemetryOptInNuGetHome;
+            telemetryOptInCommand.Environment["USERPROFILE"] = telemetryOptInNuGetHome;
+            telemetryOptInCommand.Environment["APPDATA"] = telemetryOptInNuGetHome;
+            telemetryOptInCommand.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "";
+            var telemetryOptInCommandResult = telemetryOptInCommand.ExecuteWithCapturedOutput("new --debug:ephemeral-hive");
+            NormalizeLineEndings(telemetryOptInCommandResult.StdOut)
+                .Should().Contain(telemetryOptInMessage);
 
-            var telemetryEnabledCommand = new DotnetCommand()
-                .WithWorkingDirectory(rootPath);
-
-            telemetryEnabledCommand.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "";
-            var telemetryEnabledCommandResult = telemetryEnabledCommand.ExecuteWithCapturedOutput("new --debug:ephemeral-hive");
-            NormalizeLineEndings(telemetryEnabledCommandResult.StdOut)
-                .Should().Contain(telemetryEnabledMessage);
-
-            var telemetryDisabledCommand = new DotnetCommand()
-                .WithWorkingDirectory(rootPath);
-            telemetryDisabledCommand.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1";
-            var telemetryDisabledCommandResult = telemetryDisabledCommand.ExecuteWithCapturedOutput("new --debug:ephemeral-hive");
-            NormalizeLineEndings(telemetryDisabledCommandResult.StdOut)
-                .Should().NotContain(telemetryEnabledMessage);
+            var telemetryOptOutRootPath = TestAssets.CreateTestDirectory().FullName;
+            var telemetryOptOutNuGetHome = Path.Combine(telemetryOptOutRootPath, "nuget_home");
+            var telemetryOptOutCommand = new DotnetCommand()
+                .WithWorkingDirectory(telemetryOptOutRootPath);
+            telemetryOptOutCommand.Environment["HOME"] = telemetryOptOutNuGetHome;
+            telemetryOptOutCommand.Environment["USERPROFILE"] = telemetryOptOutNuGetHome;
+            telemetryOptOutCommand.Environment["APPDATA"] = telemetryOptOutNuGetHome;
+            telemetryOptOutCommand.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1";
+            var telemetryOptOutCommandResult = telemetryOptOutCommand.ExecuteWithCapturedOutput("new --debug:ephemeral-hive");
+            NormalizeLineEndings(telemetryOptOutCommandResult.StdOut)
+                .Should().NotContain(telemetryOptInMessage);
         }
 
         [Fact]
