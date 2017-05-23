@@ -98,7 +98,7 @@ You can read more about .NET Core tools telemetry @ https://aka.ms/dotnet-cli-te
 
             telemetryEnabledCommand.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "";
             var telemetryEnabledCommandResult = telemetryEnabledCommand.ExecuteWithCapturedOutput("new --debug:ephemeral-hive");
-            NormalizeLineEndings(telemetryDisabledCommandResult.StdOut)
+            NormalizeLineEndings(telemetryEnabledCommandResult.StdOut)
                 .Should().Contain(telemetryEnabledMessage);
 
             var telemetryDisabledCommand = new DotnetCommand()
