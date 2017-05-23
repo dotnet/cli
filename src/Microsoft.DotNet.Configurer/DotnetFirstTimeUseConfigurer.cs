@@ -40,12 +40,9 @@ namespace Microsoft.DotNet.Configurer
             const string firstTimeUseConfiguringMessage = LocalizableStrings.FirstTimeUseConfiguringMessage;
 
             Reporter.Output.WriteLine();
-            Reporter.Output.WriteLine(firstTimeUseWelcomeMessage);
-
-            var telemetryEnabled = 
-                _environmentProvider.GetEnvironmentVariableAsBool("DOTNET_CLI_TELEMETRY_OPTOUT", false);
+            Reporter.Output.WriteLine(firstTimeUseWelcomeMessage)
             
-            if (telemetryEnabled) {
+            if (IsTelemetryEnabled()) {
                 Reporter.Output.WriteLine();
                 Reporter.Output.WriteLine(firstTimeUseTelemetryEnabledMessage);
             }
@@ -62,6 +59,14 @@ namespace Microsoft.DotNet.Configurer
             return !skipFirstTimeExperience &&
                 !_nugetCacheSentinel.Exists() &&
                 !_nugetCacheSentinel.InProgressSentinelAlreadyExists();
+        }
+
+        private bool IsTelemetryEnabled()
+        {
+            var cliTelemetryOptout = 
+                _environmentProvider.GetEnvironmentVariableAsBool("DOTNET_CLI_TELEMETRY_OPTOUT", false);
+
+            return !cliTelemetryOptout;
         }
     }
 }

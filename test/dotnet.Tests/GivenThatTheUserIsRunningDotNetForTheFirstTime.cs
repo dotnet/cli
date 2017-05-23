@@ -32,6 +32,7 @@ namespace Microsoft.DotNet.Tests
             command.Environment["USERPROFILE"] = testNuGetHome;
             command.Environment["APPDATA"] = testNuGetHome;
             command.Environment["DOTNET_SKIP_FIRST_TIME_EXPERIENCE"] = "";
+            command.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "";
             command.Environment["SkipInvalidConfigurations"] = "true";
 
             _firstDotnetNonVerbUseCommandResult = command.ExecuteWithCapturedOutput("--info");
@@ -79,6 +80,33 @@ A command is running to initially populate your local package cache, to improve 
             NormalizeLineEndings(_firstDotnetVerbUseCommandResult.StdOut)
                 .Should().Contain(firstTimeUseWelcomeMessage)
                      .And.NotContain("Restore completed in");
+        }
+
+        [Fact]
+        public void ItShowsTheAppropriateMessageToTheUserWhenEnvironmentVariablesAreSet()
+        {
+            string telemetryEnabledMessage = NormalizeLineEndings(@"Telemetry
+--------------
+The .NET Core tools collect usage data in order to improve your experience. The data is anonymous and does not include command-line arguments. The data is collected by Microsoft and shared with the community.
+You can opt out of telemetry by setting a DOTNET_CLI_TELEMETRY_OPTOUT environment variable to 1 using your favorite shell.
+You can read more about .NET Core tools telemetry @ https://aka.ms/dotnet-cli-telemetry.");
+
+            var rootPath = TestAssets.CreateTestDirectory().FullName;
+
+            var telemetryEnabledCommand = new DotnetCommand()
+                .WithWorkingDirectory(rootPath);
+
+            telemetryEnabledCommand.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "";
+            var telemetryEnabledCommandResult = telemetryEnabledCommand.ExecuteWithCapturedOutput("new --debug:ephemeral-hive");
+            NormalizeLineEndings(telemetryDisabledCommandResult.StdOut)
+                .Should().Contain(telemetryEnabledMessage);
+
+            var telemetryDisabledCommand = new DotnetCommand()
+                .WithWorkingDirectory(rootPath);
+            telemetryDisabledCommand.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1";
+            var telemetryDisabledCommandResult = telemetryDisabledCommand.ExecuteWithCapturedOutput("new --debug:ephemeral-hive");
+            NormalizeLineEndings(telemetryDisabledCommandResult.StdOut)
+                .Should().NotContain(telemetryEnabledMessage);
         }
 
         [Fact]
