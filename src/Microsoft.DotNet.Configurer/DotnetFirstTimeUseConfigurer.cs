@@ -40,8 +40,8 @@ namespace Microsoft.DotNet.Configurer
             const string firstTimeUseConfiguringMessage = LocalizableStrings.FirstTimeUseConfiguringMessage;
 
             Reporter.Output.WriteLine();
-            Reporter.Output.WriteLine(firstTimeUseWelcomeMessage)
-            
+            Reporter.Output.WriteLine(firstTimeUseWelcomeMessage);
+
             if (IsTelemetryEnabled()) {
                 Reporter.Output.WriteLine();
                 Reporter.Output.WriteLine(firstTimeUseTelemetryEnabledMessage);
