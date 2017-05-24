@@ -35,10 +35,20 @@ namespace Microsoft.DotNet.Configurer
 
         private void PrintFirstTimeUseNotice()
         {
-            const string firstTimeUseWelcomeMessage = LocalizableStrings.FirstTimeWelcomeMessage;
+            const string firstTimeUseWelcomeMessage = LocalizableStrings.FirstTimeUseWelcomeMessage;
+            const string firstTimeUseTelemetryEnabledMessage = LocalizableStrings.FirstTimeUseTelemetryEnabledMessage;
+            const string firstTimeUseConfiguringMessage = LocalizableStrings.FirstTimeUseConfiguringMessage;
 
             Reporter.Output.WriteLine();
             Reporter.Output.WriteLine(firstTimeUseWelcomeMessage);
+
+            if (IsTelemetryEnabled()) {
+                Reporter.Output.WriteLine();
+                Reporter.Output.WriteLine(firstTimeUseTelemetryEnabledMessage);
+            }
+
+            Reporter.Output.WriteLine();
+            Reporter.Output.WriteLine(firstTimeUseConfiguringMessage);
         }
 
         private bool ShouldPrimeNugetCache()
@@ -49,6 +59,14 @@ namespace Microsoft.DotNet.Configurer
             return !skipFirstTimeExperience &&
                 !_nugetCacheSentinel.Exists() &&
                 !_nugetCacheSentinel.InProgressSentinelAlreadyExists();
+        }
+
+        private bool IsTelemetryEnabled()
+        {
+            var cliTelemetryOptout = 
+                _environmentProvider.GetEnvironmentVariableAsBool("DOTNET_CLI_TELEMETRY_OPTOUT", false);
+
+            return !cliTelemetryOptout;
         }
     }
 }
