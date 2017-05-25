@@ -36,5 +36,8 @@ namespace Microsoft.DotNet.Tools.Restore
         public const string CmdIgnoreFailedSourcesOptionDescription = "Treat package source failures as warnings.";
 
         public const string CmdNoDependenciesOptionDescription = "Set this flag to ignore project to project references and only restore the root project.";
+
+        public const string CmdForceRestoreOptionDescription = "Set this flag to force all dependencies to be resolved even if the last restore was successful. This is equivalent to deleting project.assets.json.";
+
     }
 }
