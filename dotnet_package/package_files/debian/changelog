@@ -1,0 +1,5 @@
+dotnet (1.0-1) UNRELEASED; urgency=medium
+
+  * Initial release. (Closes: #XXXXXX)
+
+ -- brthor <brthor@microsoft.com>  Tue, 15 Sep 2015 17:51:21 -0700

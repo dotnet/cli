@@ -1,0 +1,14 @@
+*.dsc
+*.tar.gz
+*.build
+*.changes
+*.deb
+*.pyc
+*.pyo
+
+
+dotnet-*/*
+
+./src/*
+!./src/project.json
+!./src/coreclr/*

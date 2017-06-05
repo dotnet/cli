@@ -1,0 +1,2 @@
+#!/bin/bash
+/usr/share/dotnet/coreclr/CoreRun /usr/share/dotnet/driver/dotnet.dll "$@"
