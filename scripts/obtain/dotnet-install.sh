@@ -143,6 +143,9 @@ get_distro_specific_os_name() {
             if [ -n "$os" ]; then
                 echo "$os"
                 return 0
+            elif [ "$uname" = "Linux" ]; then
+                echo "linux"
+                return 0
             fi
         fi
     fi
