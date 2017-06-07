@@ -130,6 +130,7 @@ get_distro_specific_os_name() {
     eval $invocation
 
     local uname=$(uname)
+    local osName="undefined"
     if [ "$uname" = "Darwin" ]; then
         echo "osx"
         return 0
@@ -139,7 +140,8 @@ get_distro_specific_os_name() {
     else
         if [ -e /etc/os-release ]; then
             . /etc/os-release
-            os=$(get_os_download_name_from_platform "$ID.$VERSION_ID" || echo "")
+            osName="${ID}${VERSION_ID:+.${VERSION_ID}}"
+            os=$(get_os_download_name_from_platform "${osName}" || echo "")
             if [ -n "$os" ]; then
                 echo "$os"
                 return 0
@@ -147,7 +149,7 @@ get_distro_specific_os_name() {
         fi
     fi
     
-    say_err "OS name could not be detected: $ID.$VERSION_ID"
+    say_err "OS name could not be detected: $osName"
     return 1
 }
 
