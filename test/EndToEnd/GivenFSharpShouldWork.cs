@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             {
                 string projectDirectory = directory.Path;
 
-                string newArgsLib = "lib -n lib -lang f# -f netcoreapp2.0 --debug:ephemeral-hive --no-restore";
+                string newArgsLib = "lib -n lib -lang f# -f netstandard2.0 --debug:ephemeral-hive --no-restore";
                 new NewCommandShim()
                     .WithWorkingDirectory(projectDirectory)
                     .Execute(newArgsLib)
