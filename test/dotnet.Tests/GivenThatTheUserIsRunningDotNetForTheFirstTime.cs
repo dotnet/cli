@@ -73,7 +73,7 @@ You can read more about .NET Core tools telemetry @ https://aka.ms/dotnet-cli-te
 
 Configuring...
 -------------------
-A command is running to initially populate your local package cache, to improve restore speed and enable offline access. This command will take up to a minute to complete and will only happen once.");
+A command is running to populate your local package cache. This will improve restore speed and enable offline access. It will take up to a minute to complete and will only happen once.");
 
             // normalizing line endings as git is occasionally replacing line endings in this file causing this test to fail
             NormalizeLineEndings(_firstDotnetVerbUseCommandResult.StdOut)
