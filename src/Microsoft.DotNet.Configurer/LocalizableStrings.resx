@@ -130,7 +130,7 @@ You can read more about .NET Core tools telemetry @ https://aka.ms/dotnet-cli-te
 
 Configuring...
 -------------------
-A command is running to initially populate your local package cache, to improve restore speed and enable offline access. This command will take up to a minute to complete and will only happen once.</value>
+A command is running to populate your local package cache. This will improve restore speed and enable offline access. It will take up to a minute to complete and will only happen once.</value>
   </data>
   <data name="FailedToPrimeCacheError" xml:space="preserve">
     <value>Failed to prime the NuGet cache. {0} failed with: {1}</value>
