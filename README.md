@@ -115,15 +115,15 @@ In order to download just the .NET Core runtime without the SDK, please visit ht
 [ubuntu-16.10-installer]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/master/dotnet-sdk-latest-ubuntu.16.10-x64.deb
 [ubuntu-16.10-installer-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/master/dotnet-sdk-latest-ubuntu.16.10-x64.deb.sha
 
-[debian-8-installer]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/release/2.0.0/dotnet-sdk-latest-debian-x64.deb
-[debian-8-installer-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/release/2.0.0/dotnet-sdk-latest-debian-x64.deb.sha
+[debian-8-installer]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/master/dotnet-sdk-latest-debian-x64.deb
+[debian-8-installer-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/master/dotnet-sdk-latest-debian-x64.deb.sha
 
-[rhel-7-installer]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/release/2.0.0/dotnet-sdk-latest-rhel-x64.rpm
-[rhel-7-installer-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/release/2.0.0/dotnet-sdk-latest-rhel-x64.rpm.sha
+[rhel-7-installer]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/master/dotnet-sdk-latest-rhel-x64.rpm
+[rhel-7-installer-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/master/dotnet-sdk-latest-rhel-x64.rpm.sha
 
 # Debian daily feed
 
-Newest SDK binaries for 2.0.0 in debian feed may be delayed due to external issues by up to 24h.
+Newest SDK binaries for 2.1.0 in debian feed may be delayed due to external issues by up to 24h.
 
 ## Obtaining binaries
 
@@ -171,7 +171,7 @@ sudo apt-get install <DebianPackageName>=<Version>
 
 ### To list available packages:
 ```
-apt-cache search dotnet-sdk | grep 2.0.0
+apt-cache search dotnet-sdk | grep 2.1.0
 ```
 
 Docker
