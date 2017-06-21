@@ -47,17 +47,6 @@ let main argv =
                     .Execute("add app reference lib/lib.fsproj")
                     .Should().Pass();
 
-                new RestoreCommand()
-                    .WithWorkingDirectory(projectDirectory)
-                    //.Execute("/p:SkipInvalidConfigurations=true")
-                    .Execute("app")
-                    .Should().Pass();
-
-                new BuildCommand()
-                    .WithWorkingDirectory(projectDirectory)
-                    .Execute("app")
-                    .Should().Pass();
-
                 new RunCommand()
                     .WithWorkingDirectory(projectDirectory)
                     .ExecuteWithCapturedOutput("-p app")
