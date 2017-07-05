@@ -193,7 +193,7 @@
       }
     },
     {
-      "enabled": false,
+      "enabled": true,
       "continueOnError": true,
       "alwaysRun": false,
       "displayName": "Remove non-CLI files",
