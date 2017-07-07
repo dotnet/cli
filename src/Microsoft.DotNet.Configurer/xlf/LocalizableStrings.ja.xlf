@@ -9,8 +9,8 @@ Learn more about .NET Core @ https://aka.ms/dotnet-docs. Use dotnet --help to se
 
 Telemetry
 --------------
-The .NET Core tools collect usage data in order to improve your experience. The data is anonymous and does not include command-line arguments. The data is collected by Microsoft and shared with the community.
-You can opt out of telemetry by setting a DOTNET_CLI_TELEMETRY_OPTOUT environment variable to 1 using your favorite shell.
+The .NET Core tools can collect usage data in order to improve your experience. The data is anonymous and does not include command-line arguments. The data is collected by Microsoft and shared with the community.
+You can opt in on telemetry by setting a DOTNET_CLI_TELEMETRY_OPTIN environment variable to 1 using your favorite shell.
 You can read more about .NET Core tools telemetry @ https://aka.ms/dotnet-cli-telemetry.</source>
         <target state="needs-review-translation">.NET Core へようこそ!
 ---------------------
@@ -18,9 +18,9 @@ You can read more about .NET Core tools telemetry @ https://aka.ms/dotnet-cli-te
 
 テレメトリ
 --------------
-.NET Core ツールは、操作性を向上させるために利用状況データを収集します。データは匿名で、コマンドライン引数が含まれません。データは Microsoft によって収集され、コミュニティと共有されます。
-テレメトリを無効にするには、お好きなシェルを使用して、DOTNET_CLI_TELEMETRY_OPTOUT 環境変数を 1 に設定します。
-.NET Core ツールのテレメトリについて詳しくは、https://aka.ms/dotnet-cli-telemetry をお読みください。
+.NETのコアツールは、あなたの経験を向上させるために、使用状況データを収集することができます。データは匿名で、コマンドライン引数が含まれていません。データはマイクロソフトによって収集し、コミュニティと共有されています。
+あなたの好きなシェルを使用して1にDOTNET_CLI_TELEMETRY_OPTIN環境変数を設定することにより、遠隔測定にオプトインすることができます。
+あなたはhttps://aka.ms/dotnet-cli-telemetry.
 
 構成中...
 -------------------

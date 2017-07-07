@@ -9,8 +9,8 @@ Learn more about .NET Core @ https://aka.ms/dotnet-docs. Use dotnet --help to se
 
 Telemetry
 --------------
-The .NET Core tools collect usage data in order to improve your experience. The data is anonymous and does not include command-line arguments. The data is collected by Microsoft and shared with the community.
-You can opt out of telemetry by setting a DOTNET_CLI_TELEMETRY_OPTOUT environment variable to 1 using your favorite shell.
+The .NET Core tools can collect usage data in order to improve your experience. The data is anonymous and does not include command-line arguments. The data is collected by Microsoft and shared with the community.
+You can opt in on telemetry by setting a DOTNET_CLI_TELEMETRY_OPTIN environment variable to 1 using your favorite shell.
 You can read more about .NET Core tools telemetry @ https://aka.ms/dotnet-cli-telemetry.</source>
         <target state="needs-review-translation">Willkommen bei .NET Core!
 ---------------------
@@ -18,9 +18,9 @@ Weitere Informationen zu .NET Core finden Sie unter https://aka.ms/dotnet-docs. 
 
 Telemetrie
 --------------
-Über die .NET Core-Tools werden Nutzungsdaten erfasst, damit wir die Benutzeroberfläche weiter für Sie verbessern können. Die Daten sind anonym und enthalten keine Befehlszeilenargumente. Die Daten werden von Microsoft gesammelt und mit der Community geteilt.
-Sie können die Erfassung von Telemetriedaten deaktivieren, indem Sie die Umgebungsvariable DOTNET_CLI_TELEMETRY_OPTOUT mithilfe Ihrer bevorzugten Shell auf 1 festlegen.
-Weitere Informationen zur Telemetrie der .NET Core-Tools finden Sie unter https://aka.ms/dotnet-cli-telemetry.
+Die .NET Core Tools können Nutzdaten sammeln, um Ihre Erfahrungen zu verbessern. Die Daten sind anonym und enthalten keine Befehlszeilenargumente. Die Daten werden von Microsoft gesammelt und mit der Community geteilt.
+Sie können sich bei der Telemetrie entscheiden, indem Sie eine Umgebungsvariable DOTNET_CLI_TELEMETRY_OPTIN auf 1 mit Ihrer Lieblings-Shell setzen.
+Sie können mehr über .NET Core Tools telemetry @ https://aka.ms/dotnet-cli-telemetry lesen.
 
 Konfiguration wird durchgeführt...
 -------------------

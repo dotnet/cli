@@ -9,8 +9,8 @@ Learn more about .NET Core @ https://aka.ms/dotnet-docs. Use dotnet --help to se
 
 Telemetry
 --------------
-The .NET Core tools collect usage data in order to improve your experience. The data is anonymous and does not include command-line arguments. The data is collected by Microsoft and shared with the community.
-You can opt out of telemetry by setting a DOTNET_CLI_TELEMETRY_OPTOUT environment variable to 1 using your favorite shell.
+The .NET Core tools can collect usage data in order to improve your experience. The data is anonymous and does not include command-line arguments. The data is collected by Microsoft and shared with the community.
+You can opt in on telemetry by setting a DOTNET_CLI_TELEMETRY_OPTIN environment variable to 1 using your favorite shell.
 You can read more about .NET Core tools telemetry @ https://aka.ms/dotnet-cli-telemetry.</source>
         <target state="needs-review-translation">Vítá vás .NET Core!
 ---------------------
@@ -18,9 +18,9 @@ Další informace o .NET Core najdete na https://aka.ms/dotnet-docs. Dostupné p
 
 Telemetrie
 --------------
-Nástroje .NET Core shromažďují data o využití s cílem vylepšit vaše prostředí. Data jsou anonymní a nezahrnují argumenty příkazového řádku. Data shromažďuje Microsoft, který je sdílí s komunitou.
-S telemetrií můžete vyjádřit výslovný nesouhlas, a to nastavením proměnné prostředí DOTNET_CLI_TELEMETRY_OPTOUT na 1 prostřednictvím vašeho oblíbeného rozhraní.
-Další informace o telemetrii nástrojů .NET Core si můžete přečíst na webu https://aka.ms/dotnet-cli-telemetry.
+Nástroje .NET Core mohou shromažďovat údaje o využití, aby se zlepšila vaše zkušenost. Data jsou anonymní a neobsahují argumenty příkazového řádku. Data jsou shromažďována společností Microsoft a sdílena s komunitou.
+Můžete se přihlásit do telemetrie nastavením proměnné prostředí DOTNET_CLI_TELEMETRY_OPTIN na hodnotu 1 pomocí oblíbeného shellu.
+Více o nástrojích .NET Core telemetry @ https://aka.ms/dotnet-cli-telemetry.
 
 Probíhá konfigurace...
 -------------------
