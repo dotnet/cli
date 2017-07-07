@@ -1,6 +1,6 @@
 # .NET CLI Tab Completion
 
-In version 2.0 of the .NET Core CLI, we have added support for providing suggestions when you press `tab`. While it's not yet enabled by default, you can try it out today by installing a [preview build](https://github.com/dotnet/cli#installers-and-binaries) from the master branch or by building from source. 
+In version 2.0 of the .NET Core CLI, we have added support for providing suggestions when you press `tab`. While it's not yet enabled by default, you can try it out today by installing a [preview build](https://github.com/dotnet/cli#installers-and-binaries) from the master branch or by building from source.
 
 Here are some examples of what it provides:
 
@@ -30,8 +30,8 @@ Learn more about .NET Core @ https://aka.ms/dotnet-docs. Use dotnet --help to se
 
 Telemetry
 --------------
-The .NET Core tools collect usage data in order to improve your experience. The data is anonymous and does not include command-line arguments. The data is collected by Microsoft and shared with the community.
-You can opt out of telemetry by setting a DOTNET_CLI_TELEMETRY_OPTOUT environment variable to 1 using your favorite shell.
+The .NET Core tools can collect usage data in order to improve your experience. The data is anonymous and does not include command-line arguments. The data is collected by Microsoft and shared with the community.
+You can opt in on telemetry by setting a DOTNET_CLI_TELEMETRY_OPTIN environment variable to 1 using your favorite shell.
 You can read more about .NET Core tools telemetry @ https://aka.ms/dotnet-cli-telemetry.
 
 Configuring...
@@ -56,16 +56,16 @@ To enable tab completion in PowerShell, edit your PowerShell profile:
 notepad $PROFILE
 ```
 
-Add the contents of [register-completions.ps1](https://github.com/dotnet/cli/blob/master/scripts/register-completions.ps1) to this file and save. 
+Add the contents of [register-completions.ps1](https://github.com/dotnet/cli/blob/master/scripts/register-completions.ps1) to this file and save.
 
 ### bash
 
 To enable tab completion in bash, edit your `.bashrc` file to add the contents of [register-completions.bash](https://github.com/dotnet/cli/blob/master/scripts/register-completions.bash).
 
-### zsh 
+### zsh
 
 To enable tab completion in zsh, edit your `.zshrc` file to add the contents of [register-completions.zsh](https://github.com/dotnet/cli/blob/master/scripts/register-completions.zsh).
 
 ## How it works
 
-Each of these scripts provides a hook for completions for its respective shell. The logic that determines which suggestions to provide is in the CLI itself, configured using [our new parser](https://github.com/dotnet/CliCommandLineParser). You can see a code example [here](https://github.com/dotnet/cli/blob/master/src/dotnet/commands/dotnet-add/dotnet-add-package/AddPackageParser.cs#L23). 
+Each of these scripts provides a hook for completions for its respective shell. The logic that determines which suggestions to provide is in the CLI itself, configured using [our new parser](https://github.com/dotnet/CliCommandLineParser). You can see a code example [here](https://github.com/dotnet/cli/blob/master/src/dotnet/commands/dotnet-add/dotnet-add-package/AddPackageParser.cs#L23).
