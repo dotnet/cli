@@ -16,8 +16,8 @@ namespace Microsoft.DotNet.Cli.MSBuild.Tests
 
         [Theory]
         [InlineData(new string[] { }, "")]
-        [InlineData(new string[] { "-o", "<packageoutputpath>" }, "/p:PackageOutputPath=<cwd><packageoutputpath>")]
-        [InlineData(new string[] { "--output", "<packageoutputpath>" }, "/p:PackageOutputPath=<cwd><packageoutputpath>")]
+        [InlineData(new string[] { "-o", "TestPackageOutputPath" }, "/p:PackageOutputPath=<cwd>TestPackageOutputPath")]
+        [InlineData(new string[] { "--output", "TestPackageOutputPath" }, "/p:PackageOutputPath=<cwd>TestPackageOutputPath")]
         [InlineData(new string[] { "--no-build" }, "/p:NoBuild=true")]
         [InlineData(new string[] { "--include-symbols" }, "/p:IncludeSymbols=true")]
         [InlineData(new string[] { "--include-source" }, "/p:IncludeSource=true")]
