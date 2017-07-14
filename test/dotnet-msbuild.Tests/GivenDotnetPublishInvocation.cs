@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.IO;
 using FluentAssertions;
 using System.Linq;
 using Microsoft.DotNet.Cli.CommandLine;
@@ -28,8 +29,8 @@ namespace Microsoft.DotNet.Cli.MSBuild.Tests
         [InlineData(new string[] { "--framework", "<tfm>" }, "/p:TargetFramework=<tfm>")]
         [InlineData(new string[] { "-r", "<rid>" }, "/p:RuntimeIdentifier=<rid>")]
         [InlineData(new string[] { "--runtime", "<rid>" }, "/p:RuntimeIdentifier=<rid>")]
-        [InlineData(new string[] { "-o", "<publishdir>" }, "/p:PublishDir=<publishdir>")]
-        [InlineData(new string[] { "--output", "<publishdir>" }, "/p:PublishDir=<publishdir>")]
+        [InlineData(new string[] { "-o", "<publishdir>" }, "/p:PublishDir=<cwd><publishdir>")]
+        [InlineData(new string[] { "--output", "<publishdir>" }, "/p:PublishDir=<cwd><publishdir>")]
         [InlineData(new string[] { "-c", "<config>" }, "/p:Configuration=<config>")]
         [InlineData(new string[] { "--configuration", "<config>" }, "/p:Configuration=<config>")]
         [InlineData(new string[] { "--version-suffix", "<versionsuffix>" }, "/p:VersionSuffix=<versionsuffix>")]
@@ -41,6 +42,7 @@ namespace Microsoft.DotNet.Cli.MSBuild.Tests
         public void MsbuildInvocationIsCorrect(string[] args, string expectedAdditionalArgs)
         {
             expectedAdditionalArgs = (string.IsNullOrEmpty(expectedAdditionalArgs) ? "" : $" {expectedAdditionalArgs}");
+            expectedAdditionalArgs = expectedAdditionalArgs.Replace("<cwd>", Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar);
 
             var msbuildPath = "<msbuildpath>";
             PublishCommand.FromArgs(args, msbuildPath)
@@ -55,8 +57,8 @@ namespace Microsoft.DotNet.Cli.MSBuild.Tests
         [InlineData(new string[] { "--framework", "<tfm>" }, "/p:TargetFramework=<tfm>")]
         [InlineData(new string[] { "-r", "<rid>" }, "/p:RuntimeIdentifier=<rid>")]
         [InlineData(new string[] { "--runtime", "<rid>" }, "/p:RuntimeIdentifier=<rid>")]
-        [InlineData(new string[] { "-o", "<publishdir>" }, "/p:PublishDir=<publishdir>")]
-        [InlineData(new string[] { "--output", "<publishdir>" }, "/p:PublishDir=<publishdir>")]
+        [InlineData(new string[] { "-o", "<publishdir>" }, "/p:PublishDir=<cwd><publishdir>")]
+        [InlineData(new string[] { "--output", "<publishdir>" }, "/p:PublishDir=<cwd><publishdir>")]
         [InlineData(new string[] { "-c", "<config>" }, "/p:Configuration=<config>")]
         [InlineData(new string[] { "--configuration", "<config>" }, "/p:Configuration=<config>")]
         [InlineData(new string[] { "--version-suffix", "<versionsuffix>" }, "/p:VersionSuffix=<versionsuffix>")]
@@ -65,6 +67,8 @@ namespace Microsoft.DotNet.Cli.MSBuild.Tests
         [InlineData(new string[] { "--verbosity", "minimal" }, "/verbosity:minimal")]
         public void OptionForwardingIsCorrect(string[] args, string expectedAdditionalArgs)
         {
+            expectedAdditionalArgs = expectedAdditionalArgs.Replace("<cwd>", Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar);
+            
             var expectedArgs = expectedAdditionalArgs.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
             var parser = Parser.Instance;

@@ -5,6 +5,7 @@ using Microsoft.DotNet.Tools.Pack;
 using FluentAssertions;
 using Xunit;
 using System;
+using System.IO;
 using System.Linq;
 
 namespace Microsoft.DotNet.Cli.MSBuild.Tests
@@ -15,8 +16,8 @@ namespace Microsoft.DotNet.Cli.MSBuild.Tests
 
         [Theory]
         [InlineData(new string[] { }, "")]
-        [InlineData(new string[] { "-o", "<packageoutputpath>" }, "/p:PackageOutputPath=<packageoutputpath>")]
-        [InlineData(new string[] { "--output", "<packageoutputpath>" }, "/p:PackageOutputPath=<packageoutputpath>")]
+        [InlineData(new string[] { "-o", "<packageoutputpath>" }, "/p:PackageOutputPath=<cwd><packageoutputpath>")]
+        [InlineData(new string[] { "--output", "<packageoutputpath>" }, "/p:PackageOutputPath=<cwd><packageoutputpath>")]
         [InlineData(new string[] { "--no-build" }, "/p:NoBuild=true")]
         [InlineData(new string[] { "--include-symbols" }, "/p:IncludeSymbols=true")]
         [InlineData(new string[] { "--include-source" }, "/p:IncludeSource=true")]
@@ -31,6 +32,7 @@ namespace Microsoft.DotNet.Cli.MSBuild.Tests
         public void MsbuildInvocationIsCorrect(string[] args, string expectedAdditionalArgs)
         {
             expectedAdditionalArgs = (string.IsNullOrEmpty(expectedAdditionalArgs) ? "" : $" {expectedAdditionalArgs}");
+            expectedAdditionalArgs = expectedAdditionalArgs.Replace("<cwd>", Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar);
 
             var msbuildPath = "<msbuildpath>";
             PackCommand.FromArgs(args, msbuildPath)
