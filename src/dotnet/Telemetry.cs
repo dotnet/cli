@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.Cli
         private Task _trackEventTask = null;
 
         private const string InstrumentationKey = "74cc1c9e-3e6e-4d05-b3fc-dde9101d0254";
-        private const string TelemetryOptout = "DOTNET_CLI_TELEMETRY_OPTOUT";
+        private const string TelemetryOptin = "DOTNET_CLI_TELEMETRY_OPTIN";
         private const string TelemetryProfileEnvironmentVariable = "DOTNET_CLI_TELEMETRY_PROFILE";
         private const string OSVersion = "OS Version";
         private const string OSPlatform = "OS Platform";
@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.Cli
 
         public Telemetry(IFirstTimeUseNoticeSentinel sentinel, string sessionId)
         {
-            Enabled = !Env.GetEnvironmentVariableAsBool(TelemetryOptout) && PermissionExists(sentinel);
+            Enabled = Env.GetEnvironmentVariableAsBool(TelemetryOptin) && PermissionExists(sentinel);
 
             if (!Enabled)
             {

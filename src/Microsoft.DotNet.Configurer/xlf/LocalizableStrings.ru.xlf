@@ -9,8 +9,8 @@ Learn more about .NET Core @ https://aka.ms/dotnet-docs. Use dotnet --help to se
 
 Telemetry
 --------------
-The .NET Core tools collect usage data in order to improve your experience. The data is anonymous and does not include command-line arguments. The data is collected by Microsoft and shared with the community.
-You can opt out of telemetry by setting a DOTNET_CLI_TELEMETRY_OPTOUT environment variable to 1 using your favorite shell.
+The .NET Core tools can collect usage data in order to improve your experience. The data is anonymous and does not include command-line arguments. The data is collected by Microsoft and shared with the community.
+You can opt in on telemetry by setting a DOTNET_CLI_TELEMETRY_OPTIN environment variable to 1 using your favorite shell.
 You can read more about .NET Core tools telemetry @ https://aka.ms/dotnet-cli-telemetry.</source>
         <target state="needs-review-translation">Добро пожаловать в .NET Core!
 ---------------------
@@ -18,9 +18,9 @@ You can read more about .NET Core tools telemetry @ https://aka.ms/dotnet-cli-te
 
 Телеметрия
 --------------
-Средства .NET Core собирают данные об использовании для улучшения взаимодействия с пользователем. Эти данные анонимны и не включают в себя аргументы командной строки. Сбор данных осуществляется корпорацией Майкрософт, которая предоставляет их сообществу.
-Вы можете явно отказаться от телеметрии, присвоив переменной среды DOTNET_CLI_TELEMETRY_OPTOUT значение 1 с помощью предпочитаемой оболочки.
-Дополнительные сведения о телеметрии в средствах .NET Core см. по адресу https://aka.ms/dotnet-cli-telemetry.
+Инструменты .NET Core могут собирать данные об использовании, чтобы улучшить ваш опыт. Данные анонимны и не содержат аргументов командной строки. Данные собираются корпорацией Майкрософт и совместно с сообществом.
+Вы можете выбрать телеметрию, установив переменную окружения DOTNET_CLI_TELEMETRY_OPTIN в 1, используя свою любимую оболочку.
+Вы можете больше узнать о телеметрических инструментах .NET Core @ https://aka.ms/dotnet-cli-telemetry.
 
 Настройка...
 -------------------
