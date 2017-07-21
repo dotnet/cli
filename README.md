@@ -222,7 +222,7 @@ Read over the [contributing guidelines](CONTRIBUTING.md) and [developer document
 Questions & Comments
 --------------------
 
-For any and all feedback, use the Issues on this repository.
+For all feedback, use the Issues on this repository.
 
 License
 -------
