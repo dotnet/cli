@@ -54,8 +54,7 @@ namespace Microsoft.DotNet.Cli.Build
                 { "OSX_x64", false },
                 { "Debian_x64", false },
                 { "CentOS_x64", false },
-                { "Fedora_23_x64", false },
-                { "openSUSE_13_2_x64", false }
+                { "Fedora_23_x64", false }
             };
 
             var versionBadgeName = $"{Monikers.GetBadgeMoniker()}";
