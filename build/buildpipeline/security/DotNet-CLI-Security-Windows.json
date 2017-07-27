@@ -171,7 +171,30 @@
       }
     },
     {
+      "environment": {},
       "enabled": true,
+      "continueOnError": true,
+      "alwaysRun": false,
+      "displayName": "Remove non-CLI folders",
+      "timeoutInMinutes": 0,
+      "condition": "succeeded()",
+      "refName": "PowerShell_22",
+      "task": {
+        "id": "e213ff0f-5d5c-4791-802d-52ea3e7be1f1",
+        "versionSpec": "1.*",
+        "definitionType": "task"
+      },
+      "inputs": {
+        "scriptType": "inlineScript",
+        "scriptName": "",
+        "arguments": "-SrcDir \"$(Build.SourcesDirectory)\"",
+        "workingFolder": "$(Build.SourcesDirectory)",
+        "inlineScript": "param($SrcDir)\n$secDir = Join-Path \"$SrcDir\" \"security\"\n\ngci \"$secDir\" | where {$_.PSIsContainer} | % {\n    gci $_.FullName | where {$_.PSIsContainer} | % {\n        if ($_.BaseName -ine \"sdk\" -and $_.BaseName -notmatch \"symbols\")\n        {\n            Remove-Item $_.FullName -Recurse -Force -ErrorAction Continue\n            Write-Host \"Removed $($_.FullName)\"\n        }\n    }\n}",
+        "failOnStandardError": "false"
+      }
+    },
+    {
+      "enabled": false,
       "continueOnError": true,
       "alwaysRun": false,
       "displayName": "Workaround for long path - DELETE files with path length greater than or equal to 240 characters",
@@ -189,28 +212,6 @@
         "arguments": "-SrcDir \"$(Build.SourcesDirectory)\"",
         "workingFolder": "$(Build.SourcesDirectory)",
         "inlineScript": "param($SrcDir)\n$longPath = New-Object System.Collections.ArrayList\ngci \"$SrcDir\\*\" -recurse | where {!$_.PSIsContainer}  | % {\nif ($($_.FullName.Length) -ge 240)\n{\n$longPath.Add($($_.Directory.FullName)) | Out-Null\n}\n}\n$longPath | % {\nStart-Process \"cmd\" -ArgumentList \"/c rd /S /Q $_\" -Wait\nWrite-Host \"DELETED $_\"\n}\n",
-        "failOnStandardError": "false"
-      }
-    },
-    {
-      "enabled": true,
-      "continueOnError": true,
-      "alwaysRun": false,
-      "displayName": "Remove non-CLI files",
-      "timeoutInMinutes": 0,
-      "condition": "succeeded()",
-      "refName": "PowerShell_22",
-      "task": {
-        "id": "e213ff0f-5d5c-4791-802d-52ea3e7be1f1",
-        "versionSpec": "1.*",
-        "definitionType": "task"
-      },
-      "inputs": {
-        "scriptType": "inlineScript",
-        "scriptName": "",
-        "arguments": "-SrcDir \"$(Build.SourcesDirectory)\"",
-        "workingFolder": "$(Build.SourcesDirectory)",
-        "inlineScript": "param($SrcDir)\n$secDir = Join-Path \"$SrcDir\" \"security\"\n$f=\"dotnet\", \"Microsoft.DotNet.Archive\", \"Microsoft.DotNet.Cli.Sln.Internal\", \"Microsoft.DotNet.Cli.Utils\", \"Microsoft.DotNet.Configurer\", \"Microsoft.DotNet.InternalAbstractions\", \"Microsoft.DotNet.TestFramework\"\ngci \"$secDir\" -recurse | where {!$_.PSIsContainer} | % {\nif ($f -inotcontains $_.BaseName) {\nif ($_.Extension -ine \".exe\" -and $_.Name -ine \"latest.version\") { \nRemove-Item $_.FullName\nWrite-Host \"Removed: $($_.FullName)\"\n}}}",
         "failOnStandardError": "false"
       }
     },
@@ -570,109 +571,109 @@
       }
     }
   ],
-    "options": [
-        {
-            "enabled": false,
-            "definition": {
-                "id": "5bc3cfb7-6b54-4a4b-b5d2-a3905949f8a6"
-            },
-            "inputs": {}
-        },
-        {
-            "enabled": false,
-            "definition": {
-                "id": "7c555368-ca64-4199-add6-9ebaf0b0137d"
-            },
-            "inputs": {
-                "multipliers": "[]",
-                "parallel": "false",
-                "continueOnError": "true",
-                "additionalFields": "{}"
-            }
-        },
-        {
-            "enabled": false,
-            "definition": {
-                "id": "a9db38f9-9fdc-478c-b0f9-464221e58316"
-            },
-            "inputs": {
-                "workItemType": "234347",
-                "assignToRequestor": "true",
-                "additionalFields": "{}"
-            }
-        },
-        {
-            "enabled": false,
-            "definition": {
-                "id": "57578776-4c22-4526-aeb0-86b6da17ee9c"
-            },
-            "inputs": {}
-        },
-        {
-            "enabled": false,
-            "definition": {
-                "id": "5d58cc01-7c75-450c-be18-a388ddb129ec"
-            },
-            "inputs": {
-                "branchFilters": "[\"+refs/heads/*\"]",
-                "additionalFields": "{}"
-            }
-        }
-    ],
-    "variables": {
-        "system.debug": {
-            "value": "false"
-        }
+  "options": [
+    {
+      "enabled": false,
+      "definition": {
+        "id": "5bc3cfb7-6b54-4a4b-b5d2-a3905949f8a6"
+      },
+      "inputs": {}
     },
-    "demands": [
-        "Agent.OS -equals windows_nt",
-        "msbuild"
-    ],
-    "retentionRules": [
-        {
-            "branches": [
-                "+refs/heads/*"
-            ],
-            "artifacts": [
-                "build.SourceLabel"
-            ],
-            "artifactTypesToDelete": [],
-            "daysToKeep": 10,
-            "minimumToKeep": 1,
-            "deleteBuildRecord": true,
-            "deleteTestResults": true
-        }
-    ],
-    "_links": {
-        "self": {
-            "href": "https://devdiv.visualstudio.com/0bdbc590-a062-4c3f-b0f6-9383f67865ee/_apis/build/Definitions/6661"
-        },
-        "web": {
-            "href": "https://devdiv.visualstudio.com/_permalink/_build/index?collectionId=011b8bdf-6d56-4f87-be0d-0092136884d9&projectId=0bdbc590-a062-4c3f-b0f6-9383f67865ee&definitionId=6661"
-        },
-        "editor": {
-            "href": "https://devdiv.visualstudio.com/_permalink/_build/definitionEditor?collectionId=011b8bdf-6d56-4f87-be0d-0092136884d9&projectId=0bdbc590-a062-4c3f-b0f6-9383f67865ee&definitionId=6661"
-        },
-        "badge": {
-            "href": "https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/6661/badge"
-        }
+    {
+      "enabled": false,
+      "definition": {
+        "id": "7c555368-ca64-4199-add6-9ebaf0b0137d"
+      },
+      "inputs": {
+        "multipliers": "[]",
+        "parallel": "false",
+        "continueOnError": "true",
+        "additionalFields": "{}"
+      }
     },
-    "buildNumberFormat": "$(date:yyyyMMdd)$(rev:-rr)",
-    "jobAuthorizationScope": 1,
-    "jobTimeoutInMinutes": 600,
-    "jobCancelTimeoutInMinutes": 5,
-    "badgeEnabled": true,
-    "repository": {
-        "properties": {
-            "cleanOptions": "3",
-            "labelSources": "0",
-            "labelSourcesFormat": "$(build.buildNumber)",
-            "reportBuildStatus": "true",
-            "gitLfsSupport": "false",
-            "skipSyncSource": "false",
-            "checkoutNestedSubmodules": "false",
-            "fetchDepth": "0"
-        },
+    {
+      "enabled": false,
+      "definition": {
+        "id": "a9db38f9-9fdc-478c-b0f9-464221e58316"
+      },
+      "inputs": {
+        "workItemType": "234347",
+        "assignToRequestor": "true",
+        "additionalFields": "{}"
+      }
+    },
+    {
+      "enabled": false,
+      "definition": {
+        "id": "57578776-4c22-4526-aeb0-86b6da17ee9c"
+      },
+      "inputs": {}
+    },
+    {
+      "enabled": false,
+      "definition": {
+        "id": "5d58cc01-7c75-450c-be18-a388ddb129ec"
+      },
+      "inputs": {
+        "branchFilters": "[\"+refs/heads/*\"]",
+        "additionalFields": "{}"
+      }
+    }
+  ],
+  "variables": {
+    "system.debug": {
+      "value": "false"
+    }
+  },
+  "demands": [
+    "Agent.OS -equals windows_nt",
+    "msbuild"
+  ],
+  "retentionRules": [
+    {
+      "branches": [
+        "+refs/heads/*"
+      ],
+      "artifacts": [
+        "build.SourceLabel"
+      ],
+      "artifactTypesToDelete": [],
+      "daysToKeep": 10,
+      "minimumToKeep": 1,
+      "deleteBuildRecord": true,
+      "deleteTestResults": true
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "https://devdiv.visualstudio.com/0bdbc590-a062-4c3f-b0f6-9383f67865ee/_apis/build/Definitions/6661"
+    },
+    "web": {
+      "href": "https://devdiv.visualstudio.com/_permalink/_build/index?collectionId=011b8bdf-6d56-4f87-be0d-0092136884d9&projectId=0bdbc590-a062-4c3f-b0f6-9383f67865ee&definitionId=6661"
+    },
+    "editor": {
+      "href": "https://devdiv.visualstudio.com/_permalink/_build/definitionEditor?collectionId=011b8bdf-6d56-4f87-be0d-0092136884d9&projectId=0bdbc590-a062-4c3f-b0f6-9383f67865ee&definitionId=6661"
+    },
+    "badge": {
+      "href": "https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/6661/badge"
+    }
+  },
+  "buildNumberFormat": "$(date:yyyyMMdd)$(rev:-rr)",
+  "jobAuthorizationScope": 1,
+  "jobTimeoutInMinutes": 600,
+  "jobCancelTimeoutInMinutes": 5,
+  "badgeEnabled": true,
+  "repository": {
+    "properties": {
+      "cleanOptions": "3",
+      "labelSources": "0",
+      "labelSourcesFormat": "$(build.buildNumber)",
+      "reportBuildStatus": "true",
+      "gitLfsSupport": "false",
+      "skipSyncSource": "false",
+      "checkoutNestedSubmodules": "false",
+      "fetchDepth": "0"
+    },
     "id": "ceac4423-53f8-4c97-bc62-173630412581",
     "type": "TfsGit",
     "name": "DotNet-Cli-Trusted",
@@ -681,38 +682,38 @@
     "clean": "true",
     "checkoutSubmodules": false
   },
-    "processParameters": {},
-    "quality": "definition",
-    "authoredBy": {
-        "id": "9d5fdf9f-36b6-4d0c-a12e-2737a673af94",
-        "displayName": "Ravi Eda",
-        "uniqueName": "raeda@microsoft.com",
-        "url": "https://app.vssps.visualstudio.com/Aa44b2c06-f247-425c-8464-4a0676af910a/_apis/Identities/9d5fdf9f-36b6-4d0c-a12e-2737a673af94",
-        "imageUrl": "https://devdiv.visualstudio.com/_api/_common/identityImage?id=9d5fdf9f-36b6-4d0c-a12e-2737a673af94"
-        },
-    "queue": {
-        "id": 36,
-        "name": "DotNet-Build",
-        "pool": {
-            "id": 39,
-            "name": "DotNet-Build"
-            }
-     },
-    "id": 6661,
-    "name": "DotNet-CLI-Security-Windows",
-    "url": "https://devdiv.visualstudio.com/0bdbc590-a062-4c3f-b0f6-9383f67865ee/_apis/build/Definitions/6661",
-    "uri": "vstfs:///Build/Definition/6661",
-    "path": "\\",
-    "type": 2,
-    "revision": 6,
-    "createdDate": "2017-06-21T21:58:12.397Z",
-    "project": {
-        "id": "0bdbc590-a062-4c3f-b0f6-9383f67865ee",
-        "name": "DevDiv",
-        "description": "Visual Studio and DevDiv team project for git source code repositories.  Work items will be added for Adams, Dev14 work items are tracked in vstfdevdiv.  ",
-        "url": "https://devdiv.visualstudio.com/_apis/projects/0bdbc590-a062-4c3f-b0f6-9383f67865ee",
-        "state": "wellFormed",
-        "revision": 418097676,
-        "visibility": 0
-        }
+  "processParameters": {},
+  "quality": "definition",
+  "authoredBy": {
+    "id": "9d5fdf9f-36b6-4d0c-a12e-2737a673af94",
+    "displayName": "Ravi Eda",
+    "uniqueName": "raeda@microsoft.com",
+    "url": "https://app.vssps.visualstudio.com/Aa44b2c06-f247-425c-8464-4a0676af910a/_apis/Identities/9d5fdf9f-36b6-4d0c-a12e-2737a673af94",
+    "imageUrl": "https://devdiv.visualstudio.com/_api/_common/identityImage?id=9d5fdf9f-36b6-4d0c-a12e-2737a673af94"
+  },
+  "queue": {
+    "id": 36,
+    "name": "DotNet-Build",
+    "pool": {
+      "id": 39,
+      "name": "DotNet-Build"
+    }
+  },
+  "id": 6733,
+  "name": "DotNet-CLI-Security-Windows",
+  "url": "https://devdiv.visualstudio.com/0bdbc590-a062-4c3f-b0f6-9383f67865ee/_apis/build/Definitions/6661",
+  "uri": "vstfs:///Build/Definition/6733",
+  "path": "\\",
+  "type": 2,
+  "revision": 6,
+  "createdDate": "2017-06-21T21:58:12.397Z",
+  "project": {
+    "id": "0bdbc590-a062-4c3f-b0f6-9383f67865ee",
+    "name": "DevDiv",
+    "description": "Visual Studio and DevDiv team project for git source code repositories.  Work items will be added for Adams, Dev14 work items are tracked in vstfdevdiv.  ",
+    "url": "https://devdiv.visualstudio.com/_apis/projects/0bdbc590-a062-4c3f-b0f6-9383f67865ee",
+    "state": "wellFormed",
+    "revision": 418097676,
+    "visibility": 0
+  }
 }
