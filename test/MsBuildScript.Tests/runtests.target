@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="RunMsBuildScriptTests" 
+  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="../../dir.props" />
+  <Import Project="$(RepoRoot)/build/compile/LzmaArchive.targets" />
+  <Import Project="$(RepoRoot)/build/package/Installer.DEB.targets" />
+  <Import Project="$(RepoRoot)/build/package/Installer.RPM.targets" />
+
+  <Target Name="Init"></Target>
+
+  <UsingTask TaskName="DownloadFile" AssemblyFile="$(CLIBuildDll)" />
+  <UsingTask TaskName="EnsureFileExistsOnAzureBlobStorage" AssemblyFile="$(CLIBuildDll)" />
+
+  <Target Name="RunMsBuildScriptTests" DependsOnTargets="SetupDebProps;EnsureAllDependencyFilesExist"></Target>
+
+  <Target Name="EnsureAllDependencyFilesExist" DependsOnTargets="SetupDebProps;">
+    <EnsureFileExistsOnAzureBlobStorage FileUrl="$(AspNetCoreRuntimeInstallerBlobRootUrl)/$(AspNetCoreRuntimeInstallerWixLibFileName)" />
+    <EnsureFileExistsOnAzureBlobStorage FileUrl="$(AspNetCoreRuntimeInstallerBlobRootUrl)/$(AspNetCoreRuntimeInstallerArchiveFileName)" />
+    <EnsureFileExistsOnAzureBlobStorage FileUrl="$(AspNetCoreRuntimeInstallerBlobRootUrl)/$(AspNetCoreSharedRuntimeVersionFileName)" />
+    <EnsureFileExistsOnAzureBlobStorage FileUrl="$(AspNetCoreRuntimeInstallerBlobRootUrl)/$(NugetPackagesArchiveName)" />
+    <EnsureFileExistsOnAzureBlobStorage Condition=" $(IsDebianBaseDistro) == 'true' " FileUrl="$(AspNetCoreRuntimeInstallerBlobRootUrl)/$(AspNetCoreRuntimeDebInstallerFileName)" />
+  </Target>
+</Project>
