@@ -147,6 +147,10 @@ namespace Microsoft.DotNet.Cli
             ["internal-reportinstallsuccess"] = new BuiltInCommandMetadata
             {
                 Command = InternalReportinstallsuccess.Run
+            },
+            ["firstrun"] = new BuiltInCommandMetadata
+            {
+                Command = FirstrunCommand.Run
             }
         };
     }
