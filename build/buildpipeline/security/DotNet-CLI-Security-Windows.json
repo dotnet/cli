@@ -286,8 +286,8 @@
         "softwareFolder": "$(Build.SourcesDirectory)\\security",
         "mpdFolder": "",
         "softwareName": "CLI",
-        "softwareVersionNum": "$(PB_BuildNumber)",
-        "softwareBuildNum": "$(PB_BuildNumber)",
+        "softwareVersionNum": "$(CliLatestPackageId)",
+        "softwareBuildNum": "$(CliLatestPackageId)",
         "modeType": "prerelease",
         "noCopySymbols": "false",
         "noCopyBinaries": "false",
@@ -318,9 +318,9 @@
       "inputs": {
         "scriptType": "inlineScript",
         "scriptName": "",
-        "arguments": "-SrcDir \"$(Build.SourcesDirectory)\" -git \"$(PB_Git)\"",
+        "arguments": "-sha \"$(CliLatestCommitSha)\" -git \"$(PB_Git)\"",
         "workingFolder": "$(Build.SourcesDirectory)",
-        "inlineScript": "param($SrcDir, $git)\n$secDir = Join-Path \"$SrcDir\" \"security\"\n$shaFile= Join-Path \"$secDir\" \"latest.version\"\n$sha = gc \"$shaFile\" -first 1\n\nif ([string]::IsNullOrWhiteSpace($sha))\n{ Write-Error \"Unable to determine latest commit SHA.\" }\n\nStart-Process \"$git\" -ArgumentList \"clean -df\" -Wait -Verbose -ErrorAction Stop\nStart-Process \"$git\" -ArgumentList \"checkout $sha\" -Wait -Verbose -ErrorAction Stop\nWrite-Host \"Checked out at $sha\"\n",
+        "inlineScript": "param($sha, $git)\n\nStart-Process \"$git\" -ArgumentList \"clean -df\" -Wait -Verbose -ErrorAction Stop\nStart-Process \"$git\" -ArgumentList \"checkout $sha\" -Wait -Verbose -ErrorAction Stop\nWrite-Host \"Checked out at $sha\"\n",
         "failOnStandardError": "true"
       }
     },
@@ -678,7 +678,7 @@
     "type": "TfsGit",
     "name": "DotNet-Cli-Trusted",
     "url": "https://devdiv.visualstudio.com/DevDiv/_git/DotNet-Cli-Trusted",
-    "defaultBranch": "refs/heads/master",
+    "defaultBranch": "refs/heads/sec_ext",
     "clean": "true",
     "checkoutSubmodules": false
   },
