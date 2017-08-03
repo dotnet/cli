@@ -238,6 +238,28 @@
       }
     },
     {
+      "environment": {},
+      "enabled": true,
+      "continueOnError": false,
+      "alwaysRun": false,
+      "displayName": "Get latest version info",
+      "timeoutInMinutes": 0,
+      "condition": "succeeded()",
+      "refName": "PowerShell23",
+      "task": {
+        "id": "e213ff0f-5d5c-4791-802d-52ea3e7be1f1",
+        "versionSpec": "1.*",
+        "definitionType": "task"
+      },
+      "inputs": {
+        "scriptType": "filePath",
+        "scriptName": "$(Build.SourcesDirectory)\\build\\buildpipeline\\security\\Get-LatestVersion.ps1",
+        "arguments": "-Branch \"$(CodeBase)\"",
+        "workingFolder": "$(Build.SourcesDirectory)\\$(PB_Repo)\\build\\buildpipeline\\security\\",
+        "failOnStandardError": "true"
+      }
+    },
+    {
       "enabled": true,
       "continueOnError": true,
       "alwaysRun": false,
