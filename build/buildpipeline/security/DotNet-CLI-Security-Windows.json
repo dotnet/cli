@@ -678,7 +678,7 @@
     "type": "TfsGit",
     "name": "DotNet-Cli-Trusted",
     "url": "https://devdiv.visualstudio.com/DevDiv/_git/DotNet-Cli-Trusted",
-    "defaultBranch": "refs/heads/sec_ext",
+    "defaultBranch": "refs/heads/master",
     "clean": "true",
     "checkoutSubmodules": false
   },
