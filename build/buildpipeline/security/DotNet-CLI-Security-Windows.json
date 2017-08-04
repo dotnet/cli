@@ -255,7 +255,7 @@
         "scriptType": "filePath",
         "scriptName": "$(Build.SourcesDirectory)\\build\\buildpipeline\\security\\Get-LatestVersion.ps1",
         "arguments": "-Branch \"$(CodeBase)\"",
-        "workingFolder": "$(Build.SourcesDirectory)\\$(PB_Repo)\\build\\buildpipeline\\security\\",
+        "workingFolder": "",
         "failOnStandardError": "true"
       }
     },

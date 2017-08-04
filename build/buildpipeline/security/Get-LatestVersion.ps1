@@ -27,13 +27,14 @@ function Get-VersionInfo
     $retryCount = 1
     $oldEap = $ErrorActionPreference
 
-    while ($retryCount -le 3)
+    while ($retryCount -le $retries)
     {
         $ErrorActionPreference = "Stop"
 
         try
         {
-            return (Invoke-WebRequest -Uri "$latestVersionUrl" -UseBasicParsing).Content.Split([Environment]::NewLine, [System.StringSplitOptions]::RemoveEmptyEntries)
+            $content = (Invoke-WebRequest -Uri "$latestVersionUrl" -UseBasicParsing).Content
+            return $content.Split([Environment]::NewLine, [System.StringSplitOptions]::RemoveEmptyEntries)
         }
         catch
         {
@@ -53,7 +54,7 @@ function Get-VersionInfo
 $latestVersionUrl = "$UrlPrefix/$Branch/$Filename"
 $latestVersionContent = Get-VersionInfo
 
-if (-not [string]::IsNullOrWhiteSpace($latestVersionContent) -and $latestVersionContent.Length -eq 2)
+if ($latestVersionContent -ne $null -and $latestVersionContent.Length -eq 2)
 {
     $CliLatestCommitSha = $latestVersionContent[0]
     $CliLatestPackageId = $latestVersionContent[1]
