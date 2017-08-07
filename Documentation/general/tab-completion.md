@@ -37,7 +37,7 @@ Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemet
 
 Configuring...
 --------------
-A command is running to populate your local package cache to improve restore speed and enable offline access. This command takes up to one minute to complete and only runs once.
+A command is running to populate your local package cache. This will improve restore speed and enable offline access. It will take up to one minute to complete and only runs once.
 Decompressing 100% 4936 ms
 Expanding 100% 17195 ms
 ```
