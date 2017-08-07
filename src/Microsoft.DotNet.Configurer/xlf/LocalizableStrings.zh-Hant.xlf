@@ -32,8 +32,8 @@ Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemet
       <trans-unit id="NugetCachePrimeMessage">
         <source>Configuring...
 --------------
-A command is running to populate your local package cache to improve restore speed and enable offline access. This command takes up to one minute to complete and only runs once.</source>
-        <target state="translated">正在設定...
+A command is running to populate your local package cache. This will improve restore speed and enable offline access. It will takes up to one minute to complete and only runs once.</source>
+        <target state="needs-review-translation">正在設定...
 -----------
 執行命令以初步填入您的本機套件快取，以改善還原速度並允許離線存取。此命令最長需要一分鐘的時間才可完成，且只會進行一次。</target>
         <note />

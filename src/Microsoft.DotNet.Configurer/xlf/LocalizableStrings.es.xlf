@@ -32,8 +32,8 @@ Puede leer más información sobre la telemetría de las herramientas de .NET Co
       <trans-unit id="NugetCachePrimeMessage">
         <source>Configuring...
 --------------
-A command is running to populate your local package cache to improve restore speed and enable offline access. This command takes up to one minute to complete and only runs once.</source>
-        <target state="translated">Configurando...
+A command is running to populate your local package cache. This will improve restore speed and enable offline access. It will takes up to one minute to complete and only runs once.</source>
+        <target state="needs-review-translation">Configurando...
 ---------------
 Se está ejecutando un comando para rellenar inicialmente la caché de paquetes local, para mejorar la velocidad de restauración y habilitar el acceso sin conexión. Este comando tardará en completarse un minuto y solo sucederá una vez.</target>
         <note />

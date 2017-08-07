@@ -32,8 +32,8 @@ Sık kullandığınız kabuk aracılığıyla DOTNET_CLI_TELEMETRY_OPTOUT ortam 
       <trans-unit id="NugetCachePrimeMessage">
         <source>Configuring...
 --------------
-A command is running to populate your local package cache to improve restore speed and enable offline access. This command takes up to one minute to complete and only runs once.</source>
-        <target state="translated">Yapılandırılıyor...
+A command is running to populate your local package cache. This will improve restore speed and enable offline access. It will takes up to one minute to complete and only runs once.</source>
+        <target state="needs-review-translation">Yapılandırılıyor...
 -------------------
 Yerel paket önbelleğinizi başlangıçta doldurmak, geri yükleme hızını artırmak ve çevrimdışı erişimi etkinleştirmek için bir komut çalıştırılıyor. Bu komutun tamamlanması yaklaşık bir dakika sürer ve bu işlem yalnızca bir kez gerçekleştirilir.</target>
         <note />
