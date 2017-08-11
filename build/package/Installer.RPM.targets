@@ -170,10 +170,9 @@
       <HostFxrRpmPackageName>dotnet-hostfxr-$(HostFxrRpmPackageVersion)</HostFxrRpmPackageName>
       <HostFxrRpmPackageName>$(HostFxrRpmPackageName.ToLower())</HostFxrRpmPackageName>
       <HostRpmPackageName>dotnet-host</HostRpmPackageName>
-      <HostRidInAspNetCoreRuntimeRpmInstallerFileName>$(HostRid)</HostRidInAspNetCoreRuntimeRpmInstallerFileName>
       <AspNetCoreRuntimePackageName>$(AspNetCoreRuntimePackageBrandName)-$(AspNetCoreRuntimePackageVersion)</AspNetCoreRuntimePackageName>
       <AspNetCoreRuntimePackageVersion>$(AspNetCoreRuntimePackageVersion)</AspNetCoreRuntimePackageVersion>
-      <AspNetCoreRuntimeDebInstallerFileName>$(AspNetCoreRuntimePackageBrandName)-$(AspNetCoreRuntimePackageVersion)-$(HostRid)-$(Architecture).rpm</AspNetCoreRuntimeDebInstallerFileName>
+      <AspNetCoreRuntimeRpmInstallerFileName>$(AspNetCoreRuntimePackageBrandName)-$(AspNetCoreRuntimePackageVersion)-$(HostRid)-$(Architecture).rpm</AspNetCoreRuntimeRpmInstallerFileName>
       <AfterInstallHostScriptTemplateFile>$(ScriptsDir)/$(AfterInstallHostScriptName)</AfterInstallHostScriptTemplateFile>
       <AfterInstallHostScriptDestinationFile>$(RpmLayoutScripts)/$(AfterInstallHostScriptName)</AfterInstallHostScriptDestinationFile>
     </PropertyGroup>
