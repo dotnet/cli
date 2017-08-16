@@ -3,7 +3,7 @@
 # Each line is expected to be in the format "[Name]=[Value]".
 MAJOR_VERSION=1
 MINOR_VERSION=1
-PATCH_VERSION=0
-RELEASE_SUFFIX=preview1
+PATCH_VERSION=1
+RELEASE_SUFFIX=servicing
 CHANNEL=rel-1.1.0
 BRANCH_NAME=rel/1.1.0
