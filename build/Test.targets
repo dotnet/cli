@@ -86,12 +86,12 @@
   </Target>
 
   <Target Name="TestsForBuildItself">
-    <DotNetMSBuild Arguments="/v:diag $(RepoRoot)/test/MsBuildScript.Tests/runtests.target"
+    <DotNetMSBuild Arguments="/v:m $(RepoRoot)/test/MsBuildScript.Tests/runtests.target"
                    ToolPath="$(Stage0Directory)" />
   </Target>
 
   <Target Name="EnsureStageSeparation">
-    <DotNetMSBuild Arguments="/v:diag $(RepoRoot)/build_projects/Microsoft.DotNet.Cli.Build.SelfTest/InvokeWithStage0.proj /p:OutputDirectory=&quot;$(OutputDirectory)&quot;"
+    <DotNetMSBuild Arguments="/v:m $(RepoRoot)/build_projects/Microsoft.DotNet.Cli.Build.SelfTest/InvokeWithStage0.proj /p:OutputDirectory=&quot;$(OutputDirectory)&quot;"
                    ToolPath="$(Stage0Directory)" />
   </Target>
 </Project>
