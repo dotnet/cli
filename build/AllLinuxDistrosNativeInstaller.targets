@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Layout" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildThisFileDirectory)/LinuxDistrosNativeInstaller.props" />
+
+  <ItemGroup>
+      <_MirrorOfRepoRootForTools Include="$(RepoRoot)/**/*.*" Exclude="$(RepoRoot)/sandBoxBin/**/*.*;$(RepoRoot)/nuget/**/*.*;$(RepoRoot)/bin/2/**/*.*" />
+      <_ArtifactsToPackage Include="$(RepoRoot)/bin/2/$(Rid)/**/*.*" />
+  </ItemGroup>
+
+  <Target Name="AllLiuxDistrosNativeInstaller" DependsOnTargets="Prepare;Compile;RunAllSandBoxAndPackage;MultiPublish">
+    <PropertyGroup>
+      <IsProducingAllLiuxDistrosNativeInstaller>true</IsProducingAllLiuxDistrosNativeInstaller>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="RunAllSandBoxAndPackage" >
+      <MSBuild Projects="$(MSBuildThisFileDirectory)/SandBoxAndPackageInParallel.proj" 
+      Targets="RunInSandBoxAndPackage"
+            Properties="RepoRoot=$(RepoRoot);
+            BuildConfiguration=$(BuildConfiguration);
+            InstallerOutputDirectory=$(InstallerOutputDirectory);
+            BuildInParallel='true'
+            " />
+  </Target>
+
+  <Target Name="MultiPublish" DependsOnTargets="OverrideGeneratedInstaller;Publish">
+  </Target>
+
+  <Target Name="OverrideGeneratedInstaller">
+    <ItemGroup>
+      <GeneratedInstallers Include="$(InstallerOutputDirectory)/$(DistroSpecificArtifactNameWithVersionCombinedHostHostFxrFrameworkSdkWithoutHostMonikerRid)%(LinuxDistrosNeedNativeInstaller.DistroNameInInstaller).%(LinuxDistrosNeedNativeInstaller.InstallerExtension)" />
+    </ItemGroup>
+  </Target>
+</Project>

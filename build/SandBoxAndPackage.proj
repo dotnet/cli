@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Layout" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <ItemGroup>
+    <_MirrorOfRepoRootForTools Include="$(RepoRoot)/**/*.*" Exclude="$(RepoRoot)/sandBoxBin/**/*.*;$(RepoRoot)/nuget/**/*.*;$(RepoRoot)/bin/2/**/*.*" />
+    <_ArtifactsToPackage Include="$(RepoRoot)/bin/2/$(Rid)/**/*.*" Exclude="$(RepoRoot)/bin/2/obj/**/*.*"/>
+    <_ArtifactsToPackage Include="$(RepoRoot)/bin/Directory.Build.props"/>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <RelativeSandBoxPackageOutputFolder>sandBoxBin/RelativeSandBoxPackageOutputFolder</RelativeSandBoxPackageOutputFolder>
+  </PropertyGroup>
+
+  <Target Name="SandBoxAndPackage" DependsOnTargets="PackageWithDocker;CopyPackageResult"/>
+
+  <Target Name="PrepareSandBox" >
+    <Copy
+      SourceFiles="@(_MirrorOfRepoRootForTools)"
+      DestinationFiles="@(_MirrorOfRepoRootForTools -> '$(RepoRoot)/sandBoxBin/$(LinuxDistrosNeedNativeInstaller)/%(RecursiveDir)%(Filename)%(Extension)')"/>
+
+    <Exec Command="sh -c 'cd $(RepoRoot)/sandBoxBin/$(LinuxDistrosNeedNativeInstaller) &amp;&amp; git clean -fxd'"/>
+
+    <Copy
+      SourceFiles="@(_ArtifactsToPackage)"
+      DestinationFiles="@(_ArtifactsToPackage -> '$(RepoRoot)/sandBoxBin/$(LinuxDistrosNeedNativeInstaller)/bin/2/$(Rid)/%(RecursiveDir)%(Filename)%(Extension)')"/>
+  </Target>
+
+  <Target Name="PackageWithDocker" DependsOnTargets="PrepareSandBox">
+    <Exec Command="$(RepoRoot)/sandBoxBin/$(LinuxDistrosNeedNativeInstaller)/build.sh --configuration $(BuildConfiguration) --docker $(DockerFolder) --skip-prereqs /target:GenerateInstallersAndCopyOutOfSandBox /p:RelativeSandBoxPackageOutputFolder=$(RelativeSandBoxPackageOutputFolder)"/>
+  </Target >
+
+  <Target Name="CopyPackageResult">
+    <ItemGroup>
+      <_SandboxPackageResultFiles Include="$(RepoRoot)/sandBoxBin/$(LinuxDistrosNeedNativeInstaller)/$(RelativeSandBoxPackageOutputFolder)/**/*.*"/>
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(_SandboxPackageResultFiles)"
+      DestinationFolder="$(InstallerOutputDirectory)/%(RecursiveDir)"/>
+  </Target >
+</Project>
