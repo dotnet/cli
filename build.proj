@@ -19,7 +19,7 @@
 
     <CoreSetupChannel>release/1.1.0</CoreSetupChannel>
     <SharedFrameworkName>Microsoft.NETCore.App</SharedFrameworkName>
-    <SharedFrameworkVersion>1.1.3-servicing-001602-00</SharedFrameworkVersion>
+    <SharedFrameworkVersion>1.1.3-servicing-001600-00</SharedFrameworkVersion>
     <SharedHostVersion>1.1.0</SharedHostVersion>
     <HostFxrContainerVersion>1.1.0</HostFxrContainerVersion>
     <HostFxrVersion Condition=" '$(OS)' != 'Windows_NT' ">1.1.0</HostFxrVersion>
