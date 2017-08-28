@@ -144,7 +144,7 @@
     <!-- Additional Shared Framework to be installed -->
     <PropertyGroup Condition=" '$(IncludeAdditionalSharedFrameworks)' == 'true' ">
       <AdditionalCoreSetupChannel>preview</AdditionalCoreSetupChannel>
-      <AdditionalSharedFrameworkVersion>1.0.6-servicing-004969-00</AdditionalSharedFrameworkVersion>
+      <AdditionalSharedFrameworkVersion>1.0.6-servicing-004968-00</AdditionalSharedFrameworkVersion>
       <AdditionalSharedHostVersion>1.0.1</AdditionalSharedHostVersion>
       <AdditionalHostFxrContainerVersion>1.0.1</AdditionalHostFxrContainerVersion>
       <AdditionalHostFxrVersion Condition=" '$(OSName)' != 'win' ">1.0.1</AdditionalHostFxrVersion>
