@@ -348,14 +348,6 @@ A command is running to initially populate your local package cache, to improve 
             _nugetCacheFolder
                 .Should()
                 .HaveDirectories(expectedDirectories);
-
-            _nugetCacheFolder
-                .GetDirectory("system.runtime")
-                .Should().HaveDirectories(new string[] { "4.1.0", "4.3.0" });
-
-            _nugetCacheFolder
-                .GetDirectory("microsoft.aspnetcore.mvc")
-                .Should().HaveDirectories(new string[] { "1.0.4", "1.1.3" });
         }
 
         private string GetDotnetVersion()
