@@ -47,6 +47,6 @@
       InputFile="$(VSTestRuntimeConfigPath)"
       DestinationFile="$(VSTestRuntimeConfigPath)"
       ReplacementPatterns="1.0.0"
-      ReplacementStrings="1.1.0" />
+      ReplacementStrings="$(CLI_SharedFrameworkVersion)" />
   </Target>
 </Project>
