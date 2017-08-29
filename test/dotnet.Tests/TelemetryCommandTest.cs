@@ -5,7 +5,9 @@ using FluentAssertions;
 using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.Telemetry;
 using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.Tools;
 using Microsoft.DotNet.Tools.Test.Utilities;
+using System;
 using System.Collections.Generic;
 using Xunit;
 
@@ -224,6 +226,16 @@ namespace Microsoft.DotNet.Tests
                 .LogEntries.Should()
                 .Contain(e => e.EventName == "reportinstallsuccess" && e.Properties.ContainsKey("exeName") &&
                               e.Properties["exeName"] == "dotnet-sdk-latest-win-x64.exe");
+        }
+
+        [Fact]
+        public void TopLevelCommandFailsIfNoValueIsSuppliedAsVerbosity()
+        {
+            string[] args = {"restore", "-v"};
+            Action action = () => Cli.Program.ProcessArgs(args);
+
+            action.ShouldThrow<GracefulException>().WithMessage(
+                string.Format(CommonLocalizableStrings.VerbosityOptionMissingValue, "restore"));
         }
 
         [Fact]

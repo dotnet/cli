@@ -502,6 +502,9 @@
   <data name="VerbosityOptionDescription" xml:space="preserve">
     <value>Set the verbosity level of the command. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].</value>
   </data>
+  <data name="VerbosityOptionMissingValue" xml:space="preserve">
+    <value>Command {0} is missing value for verbosity. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].</value>
+  </data>
   <data name="FrameworkOptionDescription" xml:space="preserve">
     <value>Target framework to publish for. The target framework has to be specified in the project file.</value>
   </data>
