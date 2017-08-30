@@ -40,6 +40,7 @@ platformList.each { platform ->
         buildCommand = "./build.sh --linux-portable --skip-prereqs --configuration ${configuration} --targets Default"
     }
     else if (os == 'Windows_NT_PTBR') {
+        osUsedForMachineAffinity = 'Windows_NT'
         buildCommand = ".\\build.cmd -Configuration ${configuration} -Architecture ${architecture} -Targets Default -DotnetLanguage pt-BR"
     }
     else {
