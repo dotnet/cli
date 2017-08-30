@@ -33,7 +33,9 @@
                      Condition=" '$(IslinuxPortable)' != 'true' "/>
       <ForPublishing Include="%(GenerateArchivesInputsOutputs.Outputs)"
                      Condition=" '$(IsLinuxDistroSpecific)' != 'true' "/>
-      <ForPublishing Include="$(PackagesDirectory)/Microsoft*.nupkg"
+      <ForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.*.nupkg"
+                     Condition=" '$(PUBLISH_NUPKG_TO_AZURE_BLOB)' != '' AND '$(IsLinuxDistroSpecific)' != 'true'"/>
+      <ForPublishing Include="$(PackagesDirectory)/VS.Redist.Common.Net.Core.*.nupkg"
                      Condition=" '$(PUBLISH_NUPKG_TO_AZURE_BLOB)' != '' AND '$(IsLinuxDistroSpecific)' != 'true'"/>
     </ItemGroup>
 
