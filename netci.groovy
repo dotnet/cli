@@ -51,7 +51,7 @@ platformList.each { platform ->
     def newJob = job(Utilities.getFullJobName(project, jobName, isPR)) {
         // Set the label.
         steps {
-            if (os == 'Windows_NT' || os == 'Windows_2016') {
+            if (osUsedForMachineAffinity == 'Windows_NT' || os == 'Windows_2016') {
                 // Batch
                 batchFile(buildCommand)
             }
