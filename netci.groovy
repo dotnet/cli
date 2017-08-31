@@ -9,7 +9,7 @@ def project = GithubProject
 def branch = GithubBranchName
 def isPR = true
 
-def platformList = ['Linux:x64:Release', 'Debian8.2:x64:Debug', 'Ubuntu:x64:Release', 'Ubuntu16.04:x64:Debug', 'Ubuntu16.10:x64:Debug', 'OSX10.12:x64:Release', 'Windows_NT:x64:Release', 'Windows_NT:x86:Debug', 'RHEL7.2:x64:Release', 'CentOS7.1:x64:Debug']
+def platformList = ['Linux:x64:Release', 'Debian8.2:x64:Debug', 'Ubuntu:x64:Release', 'Ubuntu16.04:x64:Debug', 'Ubuntu16.10:x64:Debug', 'OSX10.12:x64:Release', 'Windows_NT:x64:Release', 'Windows_NT:x86:Debug', 'Windows_NT_PTBR:x64:Debug', 'RHEL7.2:x64:Release', 'CentOS7.1:x64:Debug']
 
 def static getBuildJobName(def configuration, def os, def architecture) {
     return configuration.toLowerCase() + '_' + os.toLowerCase() + '_' + architecture.toLowerCase()
@@ -39,6 +39,10 @@ platformList.each { platform ->
         osUsedForMachineAffinity = 'Ubuntu16.04';
         buildCommand = "./build.sh --linux-portable --skip-prereqs --configuration ${configuration} --targets Default"
     }
+    else if (os == 'Windows_NT_PTBR') {
+        osUsedForMachineAffinity = 'Windows_NT'
+        buildCommand = ".\\build.cmd -Configuration ${configuration} -Architecture ${architecture} -Targets Default -DotnetLanguage pt-BR"
+    }
     else {
         // Jenkins non-Ubuntu CI machines don't have docker
         buildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --targets Default"
@@ -47,7 +51,7 @@ platformList.each { platform ->
     def newJob = job(Utilities.getFullJobName(project, jobName, isPR)) {
         // Set the label.
         steps {
-            if (os == 'Windows_NT' || os == 'Windows_2016') {
+            if (osUsedForMachineAffinity == 'Windows_NT' || os == 'Windows_2016') {
                 // Batch
                 batchFile(buildCommand)
             }

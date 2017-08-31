@@ -90,7 +90,13 @@ while [[ $# > 0 ]]; do
             args=( "${args[@]/$2}" )
             shift
             ;;
-        --runtime-id)
+        --dotnetlanguage)
+            export DOTNET_CLI_UI_LANGUAGE=$2
+            args=( "${args[@]/$1}" )
+            args=( "${args[@]/$2}" )
+            shift
+            ;;
+         --runtime-id)
             CUSTOM_BUILD_ARGS="/p:Rid=\"$2\""
             args=( "${args[@]/$1}" )
             args=( "${args[@]/$2}" )
@@ -112,6 +118,7 @@ while [[ $# > 0 ]]; do
             echo ""
             echo "Options:"
             echo "  --configuration <CONFIGURATION>     Build the specified Configuration (Debug or Release, default: Debug)"
+            echo "  --dotnetlanguage <CULTURENAME>      Run tests in the specified language (cs, de, es, fr, it, ja, ko, pl, pt-BR, ru, tr, zh-Hant, zh-Hant, default: en)"
             echo "  --skip-prereqs                      Skip checks for pre-reqs in dotnet_install"
             echo "  --nopackage                         Skip packaging targets"
             echo "  --nobuild                           Skip building, showing the command that would be used to build"

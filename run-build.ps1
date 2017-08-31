@@ -6,6 +6,7 @@
 param(
     [string]$Configuration="Debug",
     [string]$Architecture="x64",
+    [string]$DotnetLanguage="",
     # This is here just to eat away this parameter because CI still passes this in.
     [string]$Targets="Default",
     [switch]$NoPackage,
@@ -16,11 +17,12 @@ param(
 
 if($Help)
 {
-    Write-Output "Usage: .\build.ps1 [-Configuration <CONFIGURATION>] [-Architecture <ARCHITECTURE>] [-NoPackage] [-Help]"
+    Write-Output "Usage: .\run-build.ps1 [-Configuration <CONFIGURATION>] [-Architecture <ARCHITECTURE>] [-NoPackage] [-Help]"
     Write-Output ""
     Write-Output "Options:"
     Write-Output "  -Configuration <CONFIGURATION>     Build the specified Configuration (Debug or Release, default: Debug)"
     Write-Output "  -Architecture <ARCHITECTURE>       Build the specified architecture (x64 or x86 (supported only on Windows), default: x64)"
+    Write-Output "  -DotnetLanguage <culture name>     Run tests in the specified language (cs, de, es, fr, it, ja, ko, pl, pt-BR, ru, tr, zh-Hant, zh-Hant, default: en)"
     Write-Output "  -NoPackage                         Skip packaging targets"
     Write-Output "  -NoBuild                           Skip building the product"
     Write-Output "  -Help                              Display this help message"
@@ -31,6 +33,10 @@ $env:CONFIGURATION = $Configuration;
 $RepoRoot = "$PSScriptRoot"
 if(!$env:NUGET_PACKAGES){
   $env:NUGET_PACKAGES = "$RepoRoot\.nuget\packages"
+}
+
+if($DotnetLanguage){
+  $env:DOTNET_CLI_UI_LANGUAGE = $DotnetLanguage
 }
 
 if($NoPackage)
