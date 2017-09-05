@@ -13,6 +13,6 @@
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
 
 
-    <CliVersionPrefix>1.1.1</CliVersionPrefix>
+    <CliVersionPrefix>1.1.3</CliVersionPrefix>
   </PropertyGroup>
 </Project>
