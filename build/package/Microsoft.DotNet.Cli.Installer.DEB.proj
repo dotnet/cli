@@ -125,9 +125,6 @@
       <Exec Command="sudo dpkg -r $(HostDebianPackageName)" />
   </Target>
 
-  <!-- Disable TestSdkDeb for now while 1.x runtime is not stable. It cannot pass due to failed roll forward from stable to unstable -->
-  <Target Name="TestSdkDeb" />
-
   <Target Name="PrepareDotnetDebDirectories">
 
     <!-- Clean the workspace -->
