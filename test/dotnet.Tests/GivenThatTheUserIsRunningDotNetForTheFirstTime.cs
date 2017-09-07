@@ -1,4 +1,4 @@
-// Copyright (c) .NET Foundation and contributors. All rights reserved. 
+﻿// Copyright (c) .NET Foundation and contributors. All rights reserved. 
 // Licensed under the MIT license. See LICENSE file in the project root for full license information. 
 
 using System;
@@ -125,7 +125,7 @@ A command is running to initially populate your local package cache, to improve 
 
             _nugetCacheFolder
                 .GetDirectory("microsoft.aspnetcore.mvc")
-                .Should().HaveDirectories(new string[] { "1.0.4", "1.1.3" });
+                .Should().HaveDirectories(new string[] { "1.0.5", "1.1.4" });
         }
 
         private string GetDotnetVersion()

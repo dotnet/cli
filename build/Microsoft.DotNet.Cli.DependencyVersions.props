@@ -3,7 +3,7 @@
   <PropertyGroup>
     <CLI_SharedFrameworkVersion>1.1.3</CLI_SharedFrameworkVersion>
     <CLI_CoreCLRVersion>1.1.3</CLI_CoreCLRVersion>
-    <CLI_JitVersion>>1.1.3</CLI_JitVersion>
+    <CLI_JitVersion>1.1.3</CLI_JitVersion>
     <CLI_SharedHostVersion>1.1.0</CLI_SharedHostVersion>
     <CLI_HostFxrContainerVersion>1.1.0</CLI_HostFxrContainerVersion>
     <CLI_HostFxrVersion Condition="'$(OS)' != 'Windows_NT'">1.1.0</CLI_HostFxrVersion>
@@ -23,7 +23,7 @@
     <CLI_WEBSDK_Version>1.0.0-alpha-20170516-2-509</CLI_WEBSDK_Version>
     <CLI_TestPlatform_Version>15.0.0</CLI_TestPlatform_Version>
     <TemplateEngineVersion>1.0.0-beta2-20170629-269</TemplateEngineVersion>
-    <TemplateEngineTemplateVersion>1.0.0-beta2-20170629-269</TemplateEngineTemplateVersion>
+    <TemplateEngineTemplateVersion>1.0.0-beta2-20170907-306</TemplateEngineTemplateVersion>
     <PlatformAbstractionsVersion>1.0.3</PlatformAbstractionsVersion>
     <DependencyModelVersion>1.0.3</DependencyModelVersion>
   </PropertyGroup>
