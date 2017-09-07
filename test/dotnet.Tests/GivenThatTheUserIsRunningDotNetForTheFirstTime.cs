@@ -87,7 +87,7 @@ A command is running to initially populate your local package cache, to improve 
                      .And.NotContain("Restore completed in");
         }
 
-        [Fact(Skip = "https://github.com/dotnet/cli/issues/7508")]
+        [Fact]
         public void ItCreatesASentinelFileUnderTheNuGetCacheFolder()
         {
             _nugetCacheFolder
@@ -95,7 +95,7 @@ A command is running to initially populate your local package cache, to improve 
                 .HaveFile($"{GetDotnetVersion()}.dotnetSentinel");
     	}
 
-        [Fact(Skip = "https://github.com/dotnet/cli/issues/7508")]
+        [Fact]
         public void ItRestoresTheNuGetPackagesToTheNuGetCacheFolder()
         {
             List<string> expectedDirectories = new List<string>()

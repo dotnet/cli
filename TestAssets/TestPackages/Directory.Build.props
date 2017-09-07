@@ -1,6 +1,0 @@
-<Project>
-  <Import Project="../../build/Microsoft.DotNet.Cli.DependencyVersions.props" />
-  <PropertyGroup>
-    <RuntimeFrameworkVersion>$(CLI_SharedFrameworkVersion)</RuntimeFrameworkVersion>
-  </PropertyGroup>
-</Project>

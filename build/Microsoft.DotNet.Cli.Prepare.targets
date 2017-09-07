@@ -145,10 +145,9 @@
     <PropertyGroup Condition=" '$(IncludeAdditionalSharedFrameworks)' == 'true' ">
       <AdditionalCoreSetupChannel>preview</AdditionalCoreSetupChannel>
       <AdditionalSharedFrameworkVersion>$(CLI_SharedFrameworkVersion_1_0)</AdditionalSharedFrameworkVersion>
-      <AdditionalSharedHostVersion>1.0.1</AdditionalSharedHostVersion>
-      <AdditionalHostFxrContainerVersion>1.0.1</AdditionalHostFxrContainerVersion>
-      <AdditionalHostFxrVersion Condition=" '$(OSName)' != 'win' ">1.0.1</AdditionalHostFxrVersion>
-      <AdditionalHostFxrVersion Condition=" '$(OSName)' == 'win' ">1.0.5</AdditionalHostFxrVersion>
+      <AdditionalSharedHostVersion>$(CLI_SharedHostVersion_1_0)</AdditionalSharedHostVersion>
+      <AdditionalHostFxrContainerVersion>$(CLI_HostFxrContainerVersion_1_0)</AdditionalHostFxrContainerVersion>
+      <AdditionalHostFxrVersion>$(CLI_HostFxrVersion_1_0)</AdditionalHostFxrVersion>
 
       <!-- Additional Downloaded Installers + Archives -->
       <AdditionalDownloadedSharedHostInstallerFileName Condition=" '$(InstallerExtension)' != '' ">dotnet-host-$(ProductMonikerRid).$(AdditionalSharedHostVersion)$(InstallerExtension)</AdditionalDownloadedSharedHostInstallerFileName>
