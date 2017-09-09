@@ -13,6 +13,14 @@
                             CheckPrereqs;">
   </Target>
 
+  <Target Name="_SandBoxPrepare"
+          DependsOnTargets="PrintBuildInfo;
+                            CheckPrereqs;
+                            DownloadHostAndSharedFxArtifacts;
+                            IsolateArtifactsFromDirectoryBuildFiles;
+                            CreatePropsForNextStage">
+  </Target>
+
   <Target Name="PrintBuildInfo">
     <Message Text="Host info - Rid: $(HostRid), OSName: $(HostOSName)" Importance="High" />
     <Message Text="Build info - Rid: $(Rid), Architecture: $(Architecture), OSName: $(OSName)" Importance="High" />
@@ -133,3 +141,4 @@
   </Target>
 
 </Project>
+
