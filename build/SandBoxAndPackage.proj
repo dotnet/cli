@@ -42,7 +42,16 @@
   </Target>
 
   <Target Name="PackageWithDocker" DependsOnTargets="PrepareSandBox">
-    <Exec Command="$(SandBoxRepoRoot)/build.sh --configuration $(BuildConfiguration) --docker $(DockerFolder) --skip-prereqs /target:GenerateInstallersAndCopyOutOfSandBox /p:RelativeSandBoxPackageOutputFolder=$(RelativeSandBoxPackageOutputFolder)"/>
+    <PropertyGroup>
+      <CommandToInvokeBuildScriptInDockerToPackageInSandBox>$(SandBoxRepoRoot)/build.sh --configuration $(BuildConfiguration) --docker $(DockerFolder) --skip-prereqs /target:GenerateInstallersAndCopyOutOfSandBox /p:RelativeSandBoxPackageOutputFolder=$(RelativeSandBoxPackageOutputFolder)</CommandToInvokeBuildScriptInDockerToPackageInSandBox>
+      <CommandExitCodeFirstTime>0</CommandExitCodeFirstTime>
+    </PropertyGroup>
+
+    <Exec Command="$(CommandToInvokeBuildScriptInDockerToPackageInSandBox)" ContinueOnError="WarnAndContinue">
+      <Output TaskParameter="ExitCode" PropertyName="CommandExitCodeFirstTime"/>
+    </Exec>
+
+    <Exec Command="$(CommandToInvokeBuildScriptInDockerToPackageInSandBox)" Condition=" '$(CommandExitCodeFirstTime)' != '0' "/>
   </Target >
 
   <Target Name="CopyPackageResult">
