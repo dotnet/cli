@@ -45,9 +45,10 @@
     <PropertyGroup>
       <CommandToInvokeBuildScriptInDockerToPackageInSandBox>$(SandBoxRepoRoot)/build.sh --configuration $(BuildConfiguration) --docker $(DockerFolder) --skip-prereqs /target:GenerateInstallersAndCopyOutOfSandBox /p:RelativeSandBoxPackageOutputFolder=$(RelativeSandBoxPackageOutputFolder)</CommandToInvokeBuildScriptInDockerToPackageInSandBox>
       <CommandExitCodeFirstTime>0</CommandExitCodeFirstTime>
+      <PipeStderrToStdoutToCatchFirstFailure>2&gt;&amp;1</PipeStderrToStdoutToCatchFirstFailure>
     </PropertyGroup>
 
-    <Exec Command="$(CommandToInvokeBuildScriptInDockerToPackageInSandBox)" ContinueOnError="WarnAndContinue">
+    <Exec Command="$(CommandToInvokeBuildScriptInDockerToPackageInSandBox) $(PipeStderrToStdoutToCatchFirstFailure)" ContinueOnError="WarnAndContinue">
       <Output TaskParameter="ExitCode" PropertyName="CommandExitCodeFirstTime"/>
     </Exec>
 
