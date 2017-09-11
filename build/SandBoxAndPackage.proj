@@ -2,49 +2,52 @@
 <Project ToolsVersion="14.0" DefaultTargets="Layout" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(RepoRoot)/Directory.Build.props" />
 
-  <ItemGroup>
-    <_MirrorOfRepoRootForTools Include="$(RepoRoot)/**/*.*" Exclude="$(RepoRoot)/$(SandBoxFolderName)/**/*.*;$(RepoRoot)/nuget/**/*.*;$(RepoRoot)/bin/**/*.*" />
-    <_ArtifactsToPackage Include="$(RepoRoot)/bin/2/$(Rid)/**/*.*"/>
-    <_ArtifactsToPackage Include="$(RepoRoot)/bin/Directory.Build.props"/>
-    <_ToolsCacheToSpeedUp Include="$(RepoRoot)/$(RelativeCLIBuildBinaries)/**/*.*"/>
-    <_NugetCacheToSpeedUp Include="$(RepoRoot)/.nuget/**/*.*" />
-  </ItemGroup>
-
   <PropertyGroup>
     <SandBoxFolderName>sandBoxBin</SandBoxFolderName>
     <RelativeSandBoxPackageOutputFolder>$(SandBoxFolderName)/RelativeSandBoxPackageOutputFolder</RelativeSandBoxPackageOutputFolder>
+    <SandBoxRepoRoot>$(RepoRoot)/$(SandBoxFolderName)/$(LinuxDistrosNeedNativeInstaller)</SandBoxRepoRoot>
+    <NugetCacheFolderName>.nuget</NugetCacheFolderName>
+    <RelativeCompileOutputPath>bin/2</RelativeCompileOutputPath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <_MirrorOfRepoRootForTools Include="$(RepoRoot)/**/*.*" Exclude="$(RepoRoot)/$(SandBoxFolderName)/**/*.*;$(RepoRoot)/nuget/**/*.*;$(RepoRoot)/bin/**/*.*" />
+    <_ArtifactsToPackage Include="$(RepoRoot)/$(RelativeCompileOutputPath)/$(Rid)/**/*.*"/>
+    <_ArtifactsToPackage Include="$(RepoRoot)/bin/Directory.Build.props"/>
+    <_ToolsCacheToSpeedUp Include="$(RepoRoot)/$(RelativeCLIBuildBinaries)/**/*.*"/>
+    <_NugetCacheToSpeedUp Include="$(RepoRoot)/$(NugetCacheFolderName)/**/*.*" />
+  </ItemGroup>
 
   <Target Name="SandBoxAndPackage" DependsOnTargets="PackageWithDocker;CopyPackageResult"/>
 
   <Target Name="PrepareSandBox" >
     <Copy
       SourceFiles="@(_MirrorOfRepoRootForTools)"
-      DestinationFiles="@(_MirrorOfRepoRootForTools -> '$(RepoRoot)/$(SandBoxFolderName)/$(LinuxDistrosNeedNativeInstaller)/%(RecursiveDir)%(Filename)%(Extension)')"/>
+      DestinationFiles="@(_MirrorOfRepoRootForTools -> '$(SandBoxRepoRoot)/%(RecursiveDir)%(Filename)%(Extension)')"/>
 
-    <Exec Command="sh -c 'cd $(RepoRoot)/$(SandBoxFolderName)/$(LinuxDistrosNeedNativeInstaller) &amp;&amp; git clean -fxd'"/>
+    <Exec Command="sh -c 'cd $(SandBoxRepoRoot) &amp;&amp; git clean -fxd'"/>
 
     <Copy
       SourceFiles="@(_ArtifactsToPackage)"
-      DestinationFiles="@(_ArtifactsToPackage -> '$(RepoRoot)/$(SandBoxFolderName)/$(LinuxDistrosNeedNativeInstaller)/bin/2/$(Rid)/%(RecursiveDir)%(Filename)%(Extension)')"/>
+      DestinationFiles="@(_ArtifactsToPackage -> '$(SandBoxRepoRoot)/$(RelativeCompileOutputPath)/$(Rid)/%(RecursiveDir)%(Filename)%(Extension)')"/>
 
     <Copy
       SourceFiles="@(_ToolsCacheToSpeedUp)"
-      DestinationFiles="@(_ToolsCacheToSpeedUp -> '$(RepoRoot)/$(SandBoxFolderName)/$(LinuxDistrosNeedNativeInstaller)/$(RelativeCLIBuildBinaries)/%(RecursiveDir)%(Filename)%(Extension)')"/>
+      DestinationFiles="@(_ToolsCacheToSpeedUp -> '$(SandBoxRepoRoot)/$(RelativeCLIBuildBinaries)/%(RecursiveDir)%(Filename)%(Extension)')"/>
 
     <Copy
       SourceFiles="@(_NugetCacheToSpeedUp)"
-      DestinationFiles="@(_NugetCacheToSpeedUp -> '$(RepoRoot)/$(SandBoxFolderName)/$(LinuxDistrosNeedNativeInstaller)/.nuget/%(RecursiveDir)%(Filename)%(Extension)')"/>
+      DestinationFiles="@(_NugetCacheToSpeedUp -> '$(SandBoxRepoRoot)/$(NugetCacheFolderName)/%(RecursiveDir)%(Filename)%(Extension)')"/>
 
   </Target>
 
   <Target Name="PackageWithDocker" DependsOnTargets="PrepareSandBox">
-    <Exec Command="$(RepoRoot)/$(SandBoxFolderName)/$(LinuxDistrosNeedNativeInstaller)/build.sh --configuration $(BuildConfiguration) --docker $(DockerFolder) --skip-prereqs /target:GenerateInstallersAndCopyOutOfSandBox /p:RelativeSandBoxPackageOutputFolder=$(RelativeSandBoxPackageOutputFolder)"/>
+    <Exec Command="$(SandBoxRepoRoot)/build.sh --configuration $(BuildConfiguration) --docker $(DockerFolder) --skip-prereqs /target:GenerateInstallersAndCopyOutOfSandBox /p:RelativeSandBoxPackageOutputFolder=$(RelativeSandBoxPackageOutputFolder)"/>
   </Target >
 
   <Target Name="CopyPackageResult">
     <ItemGroup>
-      <_SandboxPackageResultFiles Include="$(RepoRoot)/$(SandBoxFolderName)/$(LinuxDistrosNeedNativeInstaller)/$(RelativeSandBoxPackageOutputFolder)/**/*.*"/>
+      <_SandboxPackageResultFiles Include="$(SandBoxRepoRoot)/$(RelativeSandBoxPackageOutputFolder)/**/*.*"/>
     </ItemGroup>
     <Copy
       SourceFiles="@(_SandboxPackageResultFiles)"
