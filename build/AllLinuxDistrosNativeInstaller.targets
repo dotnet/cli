@@ -2,11 +2,6 @@
 <Project ToolsVersion="14.0" DefaultTargets="Layout" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildThisFileDirectory)/LinuxDistrosNativeInstaller.props" />
 
-  <ItemGroup>
-      <_MirrorOfRepoRootForTools Include="$(RepoRoot)/**/*.*" Exclude="$(RepoRoot)/sandBoxBin/**/*.*;$(RepoRoot)/nuget/**/*.*;$(RepoRoot)/bin/2/**/*.*" />
-      <_ArtifactsToPackage Include="$(RepoRoot)/bin/2/$(Rid)/**/*.*" />
-  </ItemGroup>
-
   <Target Name="AllLiuxDistrosNativeInstaller" DependsOnTargets="Prepare;Compile;RunAllSandBoxAndPackage;MultiPublish">
     <PropertyGroup>
       <IsProducingAllLiuxDistrosNativeInstaller>true</IsProducingAllLiuxDistrosNativeInstaller>

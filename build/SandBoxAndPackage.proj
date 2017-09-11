@@ -3,7 +3,7 @@
   <Import Project="$(RepoRoot)/Directory.Build.props" />
 
   <ItemGroup>
-    <_MirrorOfRepoRootForTools Include="$(RepoRoot)/**/*.*" Exclude="$(RepoRoot)/sandBoxBin/**/*.*;$(RepoRoot)/nuget/**/*.*;$(RepoRoot)/bin/**/*.*" />
+    <_MirrorOfRepoRootForTools Include="$(RepoRoot)/**/*.*" Exclude="$(RepoRoot)/$(SandBoxFolderName)/**/*.*;$(RepoRoot)/nuget/**/*.*;$(RepoRoot)/bin/**/*.*" />
     <_ArtifactsToPackage Include="$(RepoRoot)/bin/2/$(Rid)/**/*.*"/>
     <_ArtifactsToPackage Include="$(RepoRoot)/bin/Directory.Build.props"/>
     <_ToolsCacheToSpeedUp Include="$(RepoRoot)/$(RelativeCLIBuildBinaries)/**/*.*"/>
@@ -11,7 +11,8 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <RelativeSandBoxPackageOutputFolder>sandBoxBin/RelativeSandBoxPackageOutputFolder</RelativeSandBoxPackageOutputFolder>
+    <SandBoxFolderName>sandBoxBin</SandBoxFolderName>
+    <RelativeSandBoxPackageOutputFolder>$(SandBoxFolderName)/RelativeSandBoxPackageOutputFolder</RelativeSandBoxPackageOutputFolder>
   </PropertyGroup>
 
   <Target Name="SandBoxAndPackage" DependsOnTargets="PackageWithDocker;CopyPackageResult"/>
@@ -19,31 +20,31 @@
   <Target Name="PrepareSandBox" >
     <Copy
       SourceFiles="@(_MirrorOfRepoRootForTools)"
-      DestinationFiles="@(_MirrorOfRepoRootForTools -> '$(RepoRoot)/sandBoxBin/$(LinuxDistrosNeedNativeInstaller)/%(RecursiveDir)%(Filename)%(Extension)')"/>
+      DestinationFiles="@(_MirrorOfRepoRootForTools -> '$(RepoRoot)/$(SandBoxFolderName)/$(LinuxDistrosNeedNativeInstaller)/%(RecursiveDir)%(Filename)%(Extension)')"/>
 
-    <Exec Command="sh -c 'cd $(RepoRoot)/sandBoxBin/$(LinuxDistrosNeedNativeInstaller) &amp;&amp; git clean -fxd'"/>
+    <Exec Command="sh -c 'cd $(RepoRoot)/$(SandBoxFolderName)/$(LinuxDistrosNeedNativeInstaller) &amp;&amp; git clean -fxd'"/>
 
     <Copy
       SourceFiles="@(_ArtifactsToPackage)"
-      DestinationFiles="@(_ArtifactsToPackage -> '$(RepoRoot)/sandBoxBin/$(LinuxDistrosNeedNativeInstaller)/bin/2/$(Rid)/%(RecursiveDir)%(Filename)%(Extension)')"/>
+      DestinationFiles="@(_ArtifactsToPackage -> '$(RepoRoot)/$(SandBoxFolderName)/$(LinuxDistrosNeedNativeInstaller)/bin/2/$(Rid)/%(RecursiveDir)%(Filename)%(Extension)')"/>
 
     <Copy
       SourceFiles="@(_ToolsCacheToSpeedUp)"
-      DestinationFiles="@(_ToolsCacheToSpeedUp -> '$(RepoRoot)/sandBoxBin/$(LinuxDistrosNeedNativeInstaller)/$(RelativeCLIBuildBinaries)/%(RecursiveDir)%(Filename)%(Extension)')"/>
+      DestinationFiles="@(_ToolsCacheToSpeedUp -> '$(RepoRoot)/$(SandBoxFolderName)/$(LinuxDistrosNeedNativeInstaller)/$(RelativeCLIBuildBinaries)/%(RecursiveDir)%(Filename)%(Extension)')"/>
 
     <Copy
       SourceFiles="@(_NugetCacheToSpeedUp)"
-      DestinationFiles="@(_NugetCacheToSpeedUp -> '$(RepoRoot)/sandBoxBin/$(LinuxDistrosNeedNativeInstaller)/.nuget/%(RecursiveDir)%(Filename)%(Extension)')"/>
+      DestinationFiles="@(_NugetCacheToSpeedUp -> '$(RepoRoot)/$(SandBoxFolderName)/$(LinuxDistrosNeedNativeInstaller)/.nuget/%(RecursiveDir)%(Filename)%(Extension)')"/>
 
   </Target>
 
   <Target Name="PackageWithDocker" DependsOnTargets="PrepareSandBox">
-    <Exec Command="$(RepoRoot)/sandBoxBin/$(LinuxDistrosNeedNativeInstaller)/build.sh --configuration $(BuildConfiguration) --docker $(DockerFolder) --skip-prereqs /target:GenerateInstallersAndCopyOutOfSandBox /p:RelativeSandBoxPackageOutputFolder=$(RelativeSandBoxPackageOutputFolder)"/>
+    <Exec Command="$(RepoRoot)/$(SandBoxFolderName)/$(LinuxDistrosNeedNativeInstaller)/build.sh --configuration $(BuildConfiguration) --docker $(DockerFolder) --skip-prereqs /target:GenerateInstallersAndCopyOutOfSandBox /p:RelativeSandBoxPackageOutputFolder=$(RelativeSandBoxPackageOutputFolder)"/>
   </Target >
 
   <Target Name="CopyPackageResult">
     <ItemGroup>
-      <_SandboxPackageResultFiles Include="$(RepoRoot)/sandBoxBin/$(LinuxDistrosNeedNativeInstaller)/$(RelativeSandBoxPackageOutputFolder)/**/*.*"/>
+      <_SandboxPackageResultFiles Include="$(RepoRoot)/$(SandBoxFolderName)/$(LinuxDistrosNeedNativeInstaller)/$(RelativeSandBoxPackageOutputFolder)/**/*.*"/>
     </ItemGroup>
     <Copy
       SourceFiles="@(_SandboxPackageResultFiles)"
