@@ -11,6 +11,7 @@
             DockerFolder=%(LinuxDistrosNeedNativeInstaller.DockerFolder);
             BuildConfiguration=$(BuildConfiguration);
             InstallerOutputDirectory=$(InstallerOutputDirectory);
+            BuildInParallel='true'
             " />
   </Target >
 </Project>
