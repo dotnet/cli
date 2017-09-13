@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.Tools;
 
 namespace Microsoft.DotNet.Cli.Telemetry
 {
@@ -77,11 +78,14 @@ namespace Microsoft.DotNet.Cli.Telemetry
             ParseResult parseResult,
             string topLevelCommandName)
         {
-            if (parseResult[DotnetName][topLevelCommandName]?.AppliedOptions != null &&
-                parseResult[DotnetName][topLevelCommandName].AppliedOptions.Contains("verbosity"))
+            var topLevelCommand = parseResult[DotnetName][topLevelCommandName];
+            if (topLevelCommand?.AppliedOptions != null &&
+                topLevelCommand.AppliedOptions.Contains("verbosity"))
             {
-                AppliedOption appliedOptions =
-                    parseResult[DotnetName][topLevelCommandName].AppliedOptions["verbosity"];
+                AppliedOption appliedOptions = topLevelCommand.AppliedOptions["verbosity"];
+
+                if (!appliedOptions.Arguments.Any())
+                    throw new GracefulException(CommonLocalizableStrings.VerbosityOptionMissingValue, topLevelCommandName);
 
                 result.Add(new ApplicationInsightsEntryFormat(
                     "dotnet-" + topLevelCommandName,

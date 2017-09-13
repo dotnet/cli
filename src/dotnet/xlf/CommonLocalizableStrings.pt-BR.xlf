@@ -674,6 +674,11 @@
         <target state="translated">Não faz uma restauração implícita ao executar o comando.</target>
         <note />
       </trans-unit>
+      <trans-unit id="VerbosityOptionMissingValue">
+        <source>Command {0} is missing value for verbosity. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].</source>
+        <target state="new">Command {0} is missing value for verbosity. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>
