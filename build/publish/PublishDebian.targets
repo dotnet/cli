@@ -6,7 +6,7 @@
 
   <Target Name="PublishDebFilesToDebianRepo"
           DependsOnTargets="SetupDebProps;"
-          Condition=" '$(IsProducingAllLiuxDistrosNativeInstaller)' == 'true' AND '$(SkipPublishToDebianRepo)' != 'true' AND '$(IslinuxPortable)' != 'true' " >
+          Condition=" '$(IsProducingAllLinuxDistrosNativeInstaller)' == 'true' AND '$(SkipPublishToDebianRepo)' != 'true' AND '$(IslinuxPortable)' != 'true' " >
     <Error Condition="'$(REPO_USER)' == ''" Text="REPO_USER must be set as a MsBuild Property variable for debian publishing." />
     <Error Condition="'$(REPO_PASS)' == ''" Text="REPO_PASS must be set as a MsBuild Property variable for debian publishing." />
     <Error Condition="'$(REPO_SERVER)' == ''" Text="REPO_SERVER must be set as a MsBuild Property variable for debian publishing." />

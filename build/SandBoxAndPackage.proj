@@ -3,7 +3,7 @@
   <Import Project="$(RepoRoot)/Directory.Build.props" />
 
   <PropertyGroup>
-    <SandBoxFolderName>sandBoxBin</SandBoxFolderName>
+    <SandBoxFolderName>bin/WorkingCopy</SandBoxFolderName>
     <RelativeSandBoxPackageOutputFolder>$(SandBoxFolderName)/RelativeSandBoxPackageOutputFolder</RelativeSandBoxPackageOutputFolder>
     <SandBoxRepoRoot>$(RepoRoot)/$(SandBoxFolderName)/$(LinuxDistrosNeedNativeInstaller)</SandBoxRepoRoot>
     <NugetCacheFolderName>.nuget</NugetCacheFolderName>

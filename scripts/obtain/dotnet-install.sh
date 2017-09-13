@@ -656,7 +656,7 @@ install_dotnet() {
     say_verbose "Zip path: $zip_path"
 
     say "Downloading link: $download_link"
-    # Failures are expected in legacy case. Do not output to stderr, since
+    # Failures are expected in the non-legacy case. Do not output to stderr, since
     # the output stderr are considered an error
     download "$download_link" $zip_path 2>&1 || download_failed=true
 

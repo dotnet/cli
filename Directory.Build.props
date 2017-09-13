@@ -22,8 +22,8 @@ tools\TestAssetsDependencies\TestAssetsDependencies.csproj
     <NuGetPackagesDir Condition=" '$(NuGetPackagesDir)' == '' ">$(RepoRoot)/.nuget/packages</NuGetPackagesDir>
 
     <RelativeCLIBuildBinaries>build_projects/dotnet-cli-build/bin</RelativeCLIBuildBinaries>
-    <RelativeCLIBuilddllName>dotnet-cli-build.dll</RelativeCLIBuilddllName>
-    <CLIBuildDll>$(RepoRoot)/$(RelativeCLIBuildBinaries)/$(RelativeCLIBuilddllName)</CLIBuildDll>
+    <RelativeCLIBuildDllName>dotnet-cli-build.dll</RelativeCLIBuildDllName>
+    <CLIBuildDll>$(RepoRoot)/$(RelativeCLIBuildBinaries)/$(RelativeCLIBuildDllName)</CLIBuildDll>
 
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <DisableImplicitPackageTargetFallback>true</DisableImplicitPackageTargetFallback>

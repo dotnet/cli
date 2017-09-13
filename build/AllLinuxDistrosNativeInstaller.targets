@@ -2,19 +2,18 @@
 <Project ToolsVersion="14.0" DefaultTargets="Layout" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildThisFileDirectory)/LinuxDistrosNativeInstaller.props" />
 
-  <Target Name="AllLiuxDistrosNativeInstaller" DependsOnTargets="Prepare;Compile;RunAllSandBoxAndPackage;MultiPublish">
+  <Target Name="AllLinuxDistrosNativeInstaller" DependsOnTargets="Prepare;Compile;RunAllSandBoxAndPackage;MultiPublish">
     <PropertyGroup>
-      <IsProducingAllLiuxDistrosNativeInstaller>true</IsProducingAllLiuxDistrosNativeInstaller>
+      <IsProducingAllLinuxDistrosNativeInstaller>true</IsProducingAllLinuxDistrosNativeInstaller>
     </PropertyGroup>
   </Target>
 
   <Target Name="RunAllSandBoxAndPackage" >
-      <MSBuild Projects="$(MSBuildThisFileDirectory)/SandBoxAndPackageInParallel.proj" 
+      <MSBuild Projects="$(MSBuildThisFileDirectory)/SandBoxAndPackageInParallel.proj"
       Targets="RunInSandBoxAndPackage"
             Properties="RepoRoot=$(RepoRoot);
             BuildConfiguration=$(BuildConfiguration);
             InstallerOutputDirectory=$(InstallerOutputDirectory);
-            BuildInParallel='true'
             " />
   </Target>
 
