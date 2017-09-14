@@ -70,10 +70,10 @@
 
   <Target Name="CopyPackageResult">
     <ItemGroup>
-      <_SandboxPackageResultFiles Include="$(SandBoxRepoRoot)/$(RelativeSandBoxPackageOutputFolder)/**/*.*"/>
+      <SandboxPackageResultFiles Include="$(SandBoxRepoRoot)/$(RelativeSandBoxPackageOutputFolder)/**/*.*"/>
     </ItemGroup>
     <Copy
-      SourceFiles="@(_SandboxPackageResultFiles)"
+      SourceFiles="@(SandboxPackageResultFiles)"
       DestinationFolder="$(InstallerOutputDirectory)/%(RecursiveDir)"/>
   </Target >
 </Project>
