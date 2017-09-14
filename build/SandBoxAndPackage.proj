@@ -61,7 +61,11 @@
       <Output TaskParameter="ExitCode" PropertyName="CommandExitCodeFirstTime"/>
     </Exec>
 
-    <Exec Command="$(CommandToInvokeBuildScriptInDockerToPackageInSandBox)" Condition=" '$(CommandExitCodeFirstTime)' != '0' "/>
+    <PropertyGroup>
+      <ShouldRetryDueToFirstTimeFailed Condition=" '$(CommandExitCodeFirstTime)' != '0' ">true</ShouldRetryDueToFirstTimeFailed>
+    </PropertyGroup>
+
+    <Exec Condition=" '$(ShouldRetryDueToFirstTimeFailed)' == 'true' " Command="$(CommandToInvokeBuildScriptInDockerToPackageInSandBox)" />
   </Target >
 
   <Target Name="CopyPackageResult">
