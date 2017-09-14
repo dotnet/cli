@@ -110,6 +110,26 @@
     </ItemGroup>
     <Copy SourceFiles="@(HackFilesToCopy)"
           DestinationFiles="@(HackFilesToCopy->'$(SdkOutputDirectory)/%(RecursiveDir)%(Filename)%(Extension)')" />
+
+    <!-- Begin Workaround lack of a stable package version for depedencies; copy into simulated stable version folders -->
+ 
+    <ItemGroup>  
+        <Stabilize_SourceFiles_1_1 Include="$(StageDirectory)/shared/Microsoft.NETCore.App/$(CLI_SharedFrameworkVersion)/*.*"/>  
+        <Stabilize_SourceFiles_1_0 Include="$(StageDirectory)/shared/Microsoft.NETCore.App/$(CLI_SharedFrameworkVersion_1_0)/*.*"/>  
+    </ItemGroup>  
+ 
+    <Copy
+        Condition=" '$(IsAdditionalSharedFrameworkPreReleaseVersion)' == 'True' "
+        SourceFiles="@(Stabilize_SourceFiles_1_0)"  
+        DestinationFiles="@(Stabilize_SourceFiles_1_0->'$(StageDirectory)/shared/Microsoft.NETCore.App/$(AdditionalSharedFrameworkStableVersion)/%(RecursiveDir)%(Filename)%(Extension)')"  
+    />  
+    <Copy
+        Condition=" '$(IsSharedFrameworkPreReleaseVersion)' == 'True' "
+        SourceFiles="@(Stabilize_SourceFiles_1_1)"  
+        DestinationFiles="@(Stabilize_SourceFiles_1_1->'$(StageDirectory)/shared/Microsoft.NETCore.App/$(SharedFrameworkStableVersion)/%(RecursiveDir)%(Filename)%(Extension)')"  
+    />   
+ 
+    <!-- End Workaround lack of a stable package version for depedencies; copy into simulated stable versions -->
     
     <!-- Publish DotNet -->
     <DotNetPublish ToolPath="%(Stage.DotnetDir)"
