@@ -17,10 +17,10 @@
             " />
   </Target>
 
-  <Target Name="MultiPublish" DependsOnTargets="OverrideGeneratedInstaller;Publish">
+  <Target Name="MultiPublish" DependsOnTargets="AddAllGeneratedInstaller;Publish">
   </Target>
 
-  <Target Name="OverrideGeneratedInstaller">
+  <Target Name="AddAllGeneratedInstaller">
     <ItemGroup>
       <GeneratedInstallers Include="$(InstallerOutputDirectory)/$(DistroSpecificArtifactNameWithVersionCombinedHostHostFxrFrameworkSdkWithoutHostMonikerRid)%(LinuxDistrosNeedNativeInstaller.DistroNameInInstaller).%(LinuxDistrosNeedNativeInstaller.InstallerExtension)" />
     </ItemGroup>
