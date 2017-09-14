@@ -11,33 +11,37 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <_MirrorOfRepoRootForTools Include="$(RepoRoot)/**/*.*" Exclude="$(RepoRoot)/$(SandBoxFolderName)/**/*.*;$(RepoRoot)/nuget/**/*.*;$(RepoRoot)/bin/**/*.*" />
-    <_ArtifactsToPackage Include="$(RepoRoot)/$(RelativeCompileOutputPath)/$(Rid)/**/*.*"/>
-    <_ArtifactsToPackage Include="$(RepoRoot)/bin/Directory.Build.props"/>
-    <_ToolsCacheToSpeedUp Include="$(RepoRoot)/$(RelativeCLIBuildBinaries)/**/*.*"/>
-    <_NugetCacheToSpeedUp Include="$(RepoRoot)/$(NugetCacheFolderName)/**/*.*" />
+    <MirrorOfRepoRootForTools Include="$(RepoRoot)/**/*.*" Exclude="$(RepoRoot)/$(SandBoxFolderName)/**/*.*;$(RepoRoot)/nuget/**/*.*;$(RepoRoot)/bin/**/*.*" />
+    <ArtifactsToPackage Include="$(RepoRoot)/$(RelativeCompileOutputPath)/$(Rid)/**/*.*"/>
+    <LocalDirectoryBuildpropsToPreventFurtherLookUpForIt Include="$(RepoRoot)/bin/Directory.Build.props"/>
+    <ToolsCacheToSpeedUp Include="$(RepoRoot)/$(RelativeCLIBuildBinaries)/**/*.*"/>
+    <NugetCacheToSpeedUp Include="$(RepoRoot)/$(NugetCacheFolderName)/**/*.*" />
   </ItemGroup>
 
   <Target Name="SandBoxAndPackage" DependsOnTargets="PackageWithDocker;CopyPackageResult"/>
 
   <Target Name="PrepareSandBox" >
     <Copy
-      SourceFiles="@(_MirrorOfRepoRootForTools)"
-      DestinationFiles="@(_MirrorOfRepoRootForTools -> '$(SandBoxRepoRoot)/%(RecursiveDir)%(Filename)%(Extension)')"/>
+      SourceFiles="@(MirrorOfRepoRootForTools)"
+      DestinationFiles="@(MirrorOfRepoRootForTools -> '$(SandBoxRepoRoot)/%(RecursiveDir)%(Filename)%(Extension)')"/>
 
     <Exec Command="sh -c 'cd $(SandBoxRepoRoot) &amp;&amp; git clean -fxd'"/>
 
     <Copy
-      SourceFiles="@(_ArtifactsToPackage)"
-      DestinationFiles="@(_ArtifactsToPackage -> '$(SandBoxRepoRoot)/$(RelativeCompileOutputPath)/$(Rid)/%(RecursiveDir)%(Filename)%(Extension)')"/>
+      SourceFiles="@(ArtifactsToPackage)"
+      DestinationFiles="@(ArtifactsToPackage -> '$(SandBoxRepoRoot)/$(RelativeCompileOutputPath)/$(Rid)/%(RecursiveDir)%(Filename)%(Extension)')"/>
 
     <Copy
-      SourceFiles="@(_ToolsCacheToSpeedUp)"
-      DestinationFiles="@(_ToolsCacheToSpeedUp -> '$(SandBoxRepoRoot)/$(RelativeCLIBuildBinaries)/%(RecursiveDir)%(Filename)%(Extension)')"/>
+      SourceFiles="@(LocalDirectoryBuildpropsToPreventFurtherLookUpForIt)"
+      DestinationFiles="@(LocalDirectoryBuildpropsToPreventFurtherLookUpForIt -> '$(SandBoxRepoRoot)/$(RelativeCompileOutputPath)/$(Rid)/%(RecursiveDir)%(Filename)%(Extension)')"/>
 
     <Copy
-      SourceFiles="@(_NugetCacheToSpeedUp)"
-      DestinationFiles="@(_NugetCacheToSpeedUp -> '$(SandBoxRepoRoot)/$(NugetCacheFolderName)/%(RecursiveDir)%(Filename)%(Extension)')"/>
+      SourceFiles="@(ToolsCacheToSpeedUp)"
+      DestinationFiles="@(ToolsCacheToSpeedUp -> '$(SandBoxRepoRoot)/$(RelativeCLIBuildBinaries)/%(RecursiveDir)%(Filename)%(Extension)')"/>
+
+    <Copy
+      SourceFiles="@(NugetCacheToSpeedUp)"
+      DestinationFiles="@(NugetCacheToSpeedUp -> '$(SandBoxRepoRoot)/$(NugetCacheFolderName)/%(RecursiveDir)%(Filename)%(Extension)')"/>
 
   </Target>
 
