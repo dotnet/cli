@@ -22,6 +22,6 @@
                             GenerateInstallers"  />
 
   <Target Name="GenerateInstallersAndCopyOutOfSandBox"
-          DependsOnTargets="_SandBoxPrepare;Layout;GenerateDebs;GenerateRpms;CopySandBoxPackageOut" />
+          DependsOnTargets="SandBoxPrepare;Layout;GenerateDebs;GenerateRpms;CopySandBoxPackageOut" />
 
 </Project>
