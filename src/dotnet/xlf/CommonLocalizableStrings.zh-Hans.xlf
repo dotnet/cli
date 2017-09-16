@@ -674,6 +674,11 @@
         <target state="translated">请勿在执行命令时进行隐式还原。</target>
         <note />
       </trans-unit>
+      <trans-unit id="PackageReferenceOneOrMore">
+        <source>Package reference(s)</source>
+        <target state="new">Package reference(s)</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

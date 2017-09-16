@@ -18,6 +18,7 @@ namespace Microsoft.DotNet.Tools
     internal class MsbuildProject
     {
         const string ProjectItemElementType = "ProjectReference";
+        const string PackageItemElementType = "PackageReference";
 
         public ProjectRootElement ProjectRootElement { get; private set; }
         public string ProjectDirectory { get; private set; }
@@ -148,6 +149,11 @@ namespace Microsoft.DotNet.Tools
         public IEnumerable<ProjectItemElement> GetProjectToProjectReferences()
         {
             return ProjectRootElement.GetAllItemsWithElementType(ProjectItemElementType);
+        }
+
+        public IEnumerable<ProjectItemElement> GetPackageReferences()
+        {
+            return ProjectRootElement.GetAllItemsWithElementType(PackageItemElementType);
         }
 
         public IEnumerable<string> GetRuntimeIdentifiers()

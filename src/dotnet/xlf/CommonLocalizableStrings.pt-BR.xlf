@@ -674,6 +674,11 @@
         <target state="translated">Não faz uma restauração implícita ao executar o comando.</target>
         <note />
       </trans-unit>
+      <trans-unit id="PackageReferenceOneOrMore">
+        <source>Package reference(s)</source>
+        <target state="new">Package reference(s)</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>
