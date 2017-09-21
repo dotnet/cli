@@ -55,9 +55,9 @@
     <ItemGroup>  
         <Stabilize_SourceFiles_1_1 Include="$(StageDirectory)/shared/Microsoft.NETCore.App/$(CLI_SharedFrameworkVersion)/*.*"/>  
         <Stabilize_SourceFiles_1_0 Include="$(StageDirectory)/shared/Microsoft.NETCore.App/$(CLI_SharedFrameworkVersion_1_0)/*.*"/>  
-        <HackedSharedFrameworkDirectories Condition=" '$(IsSharedFrameworkPreReleaseVersion)' == 'True' "
+        <SimulatedStableSharedFrameworkDirectories Condition=" '$(IsSharedFrameworkPreReleaseVersion)' == 'True' "
                                           Include="$(StableSharedFrameworkDirectory)" />
-        <HackedSharedFrameworkDirectories Condition=" '$(IsAdditionalSharedFrameworkPreReleaseVersion)' == 'True' "
+        <SimulatedStableSharedFrameworkDirectories Condition=" '$(IsAdditionalSharedFrameworkPreReleaseVersion)' == 'True' "
                                           Include="$(StableAdditionalSharedFrameworkDirectory)" />
     </ItemGroup>
 
@@ -85,7 +85,7 @@
 
     <!-- Begin Workaround lack of a stable package version for depedencies; remove simulated stable version folder. -->
 
-    <RemoveDir Directories="@(HackedSharedFrameworkDirectories)" />
+    <RemoveDir Directories="@(SimulatedStableSharedFrameworkDirectories)" />
  
     <!-- End Workaround lack of a stable package version for depedencies; remove simulated stable version folder. -->
   </Target>
