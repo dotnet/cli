@@ -45,6 +45,35 @@
       </ProjectsToTest>
     </ItemGroup>
 
+    <!-- Begin Workaround lack of a stable package version for depedencies; copy into simulated stable version folders -->
+ 
+    <PropertyGroup>
+        <StableSharedFrameworkDirectory>$(StageDirectory)/shared/Microsoft.NETCore.App/$(SharedFrameworkStableVersion)</StableSharedFrameworkDirectory>
+        <StableAdditionalSharedFrameworkDirectory>$(StageDirectory)/shared/Microsoft.NETCore.App/$(AdditionalSharedFrameworkStableVersion)</StableAdditionalSharedFrameworkDirectory>
+    </PropertyGroup>
+
+    <ItemGroup>  
+        <Stabilize_SourceFiles_1_1 Include="$(StageDirectory)/shared/Microsoft.NETCore.App/$(CLI_SharedFrameworkVersion)/*.*"/>  
+        <Stabilize_SourceFiles_1_0 Include="$(StageDirectory)/shared/Microsoft.NETCore.App/$(CLI_SharedFrameworkVersion_1_0)/*.*"/>  
+        <SimulatedStableSharedFrameworkDirectories Condition=" '$(IsSharedFrameworkPreReleaseVersion)' == 'True' "
+                                          Include="$(StableSharedFrameworkDirectory)" />
+        <SimulatedStableSharedFrameworkDirectories Condition=" '$(IsAdditionalSharedFrameworkPreReleaseVersion)' == 'True' "
+                                          Include="$(StableAdditionalSharedFrameworkDirectory)" />
+    </ItemGroup>
+
+    <Copy
+        Condition=" '$(IsAdditionalSharedFrameworkPreReleaseVersion)' == 'True' "
+        SourceFiles="@(Stabilize_SourceFiles_1_0)"  
+        DestinationFiles="@(Stabilize_SourceFiles_1_0->'$(StableAdditionalSharedFrameworkDirectory)/%(RecursiveDir)%(Filename)%(Extension)')"  
+    />  
+    <Copy
+        Condition=" '$(IsSharedFrameworkPreReleaseVersion)' == 'True' "
+        SourceFiles="@(Stabilize_SourceFiles_1_1)"  
+        DestinationFiles="@(Stabilize_SourceFiles_1_1->'$(StableSharedFrameworkDirectory)/%(RecursiveDir)%(Filename)%(Extension)')"  
+    />
+ 
+    <!-- End Workaround lack of a stable package version for depedencies; copy into simulated stable versions -->
+
     <Message Text="Starting test execution" Importance="High" />
   
     <MSBuild
@@ -53,6 +82,12 @@
     </MSBuild>
 
     <Message Text="Finished test execution" Importance="High" />
+
+    <!-- Begin Workaround lack of a stable package version for depedencies; remove simulated stable version folder. -->
+
+    <RemoveDir Directories="@(SimulatedStableSharedFrameworkDirectories)" />
+ 
+    <!-- End Workaround lack of a stable package version for depedencies; remove simulated stable version folder. -->
   </Target>
 
   <Target Name="PrepareTests"
@@ -89,9 +124,24 @@
           DependsOnTargets="SetupTestPackageProjectData;"
           Outputs="%(TestPackageProject.Identity)">
 
+    <PropertyGroup>
+      <TestAssetNuGetConfigContent>
+        &lt;configuration&gt;
+          &lt;packageSources&gt;
+            &lt;add key="configurable.source" value="$(TestPackagesDir)" /&gt;
+            &lt;add key="dotnet-core" value="https://dotnet.myget.org/F/dotnet-core/api/v3/index.json" /&gt;
+          &lt;/packageSources&gt;
+        &lt;/configuration&gt;
+      </TestAssetNuGetConfigContent>
+      <TestAssetNuGetConfigFilePath>$(TestOutputDir)/Nuget.config</TestAssetNuGetConfigFilePath>
+    </PropertyGroup>
+
+    <WriteLinesToFile Condition="!Exists('$(TestAssetNuGetConfigFilePath)')"
+                      File="$(TestAssetNuGetConfigFilePath)" 
+                      Lines="$(TestAssetNuGetConfigContent)" />    
+
     <DotNetRestore ToolPath="$(Stage2Directory)"
-                   Source="$(TestPackagesDir)"
-                   ConfigFile="$(RepoRoot)\NuGet.Config"
+                   ConfigFile="$(TestAssetNuGetConfigFilePath)"
                    ProjectPath="%(TestPackageProject.ProjectPath)" />
  
     <!-- https://github.com/NuGet/Home/issues/4063 -->

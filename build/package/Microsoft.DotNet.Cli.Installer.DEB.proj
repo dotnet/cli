@@ -83,7 +83,7 @@
   </Target>
 
   <Target Name="TestSdkDeb"
-      Condition=" '$(OSName)' == 'ubuntu' and '$(DebuildPresent)'  == 'true' "
+      Condition=" '$(OSName)' == 'ubuntu' and '$(DebuildPresent)'  == 'true' and '$(IsSharedFrameworkPreReleaseVersion)' != 'True' "
       Inputs="$(DownloadedSharedHostInstallerFile);
               $(DownloadedHostFxrInstallerFile);
               $(DownloadedSharedFrameworkInstallerFile);

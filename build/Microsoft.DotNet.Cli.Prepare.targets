@@ -162,6 +162,12 @@
       <AdditionalCombinedFrameworkHostCompressedFileName>dotnet-$(ProductMonikerRid).$(AdditionalSharedFrameworkVersion)$(ArchiveExtension)</AdditionalCombinedFrameworkHostCompressedFileName>
     </PropertyGroup>
 
+    <PropertyGroup>
+      <IsSharedFrameworkPreReleaseVersion>$([System.Text.RegularExpressions.Regex]::IsMatch($(SharedFrameworkVersion), '\d*\.\d*\.\d*-'))</IsSharedFrameworkPreReleaseVersion>
+      <SharedFrameworkStableVersion>$([System.Text.RegularExpressions.Regex]::Match($(SharedFrameworkVersion), '\d*\.\d*\.\d*').get_Groups().get_Item(0).ToString())</SharedFrameworkStableVersion>
+      <IsAdditionalSharedFrameworkPreReleaseVersion>$([System.Text.RegularExpressions.Regex]::IsMatch($(AdditionalSharedFrameworkVersion), '\d*\.\d*\.\d*-'))</IsAdditionalSharedFrameworkPreReleaseVersion>
+      <AdditionalSharedFrameworkStableVersion>$([System.Text.RegularExpressions.Regex]::Match($(AdditionalSharedFrameworkVersion), '\d*\.\d*\.\d*').get_Groups().get_Item(0).ToString())</AdditionalSharedFrameworkStableVersion>
+    </PropertyGroup>
 
     <!-- SetTelemetryProfile -->
     <SetEnvVar Name="DOTNET_CLI_TELEMETRY_PROFILE" Value="$(DOTNET_CLI_TELEMETRY_PROFILE);https://github.com/dotnet/cli;$(CommitHash)" />
