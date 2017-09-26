@@ -30,9 +30,9 @@
     <CliCommandLineParserVersion>0.1.1-alpha-167</CliCommandLineParserVersion>
     <CliMigrateVersion>1.2.1-alpha-002133</CliMigrateVersion>
     <MicroBuildVersion>0.2.0</MicroBuildVersion>
-    <SpaTemplateVersion>1.0.417</SpaTemplateVersion>
     <XliffTasksVersion>0.2.0-beta-000042</XliffTasksVersion>
     <DotNetCliArchiverVersion>0.2.0-beta-000059</DotNetCliArchiverVersion>
+    <AspNetTemplateVersion>2.1.0-preview1-10249</AspNetTemplateVersion>
     <AspNetCoreRuntimePackageBrandName>aspnetcore-store</AspNetCoreRuntimePackageBrandName>
     <AspNetCoreRuntimePackageFolderName>dev-26623</AspNetCoreRuntimePackageFolderName>
     <AspNetCoreRuntimePackageVersion>2.1.0-preview1-26623</AspNetCoreRuntimePackageVersion>
