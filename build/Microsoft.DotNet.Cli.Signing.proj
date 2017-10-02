@@ -35,6 +35,11 @@
       <!-- Built binaries -->
       <FilesToSign Include="$(Stage2Directory)/sdk/**/csc.exe;
                             $(Stage2Directory)/sdk/**/csc.dll;
+                            $(Stage2Directory)/sdk/**/vbc.exe;
+                            $(Stage2Directory)/sdk/**/vbc.dll;
+                            $(Stage2Directory)/sdk/**/fsc.exe;
+                            $(Stage2Directory)/sdk/**/fsi.exe;
+                            $(Stage2Directory)/sdk/**/FSharp.*.dll;
                             $(Stage2Directory)/sdk/**/dotnet.dll;
                             $(Stage2Directory)/sdk/**/System.*.dll;
                             $(Stage2Directory)/sdk/**/Microsoft.*.dll;
@@ -42,7 +47,8 @@
                             $(Stage2Directory)/sdk/**/datacollector.dll;
                             $(Stage2Directory)/sdk/**/MSBuild.dll;
                             $(Stage2Directory)/sdk/**/testhost.dll;
-                            $(Stage2Directory)/sdk/**/vstest.console.dll">
+                            $(Stage2Directory)/sdk/**/vstest.console.dll;
+                            $(Stage2Directory)/sdk/**/vstest.console.resources.dll">
         <Authenticode>$(InternalCertificateId)</Authenticode>
       </FilesToSign>
       <!-- Built files for the packages -->
