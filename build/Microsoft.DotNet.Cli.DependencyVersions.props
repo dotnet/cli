@@ -24,6 +24,7 @@
     <CLI_TestPlatform_Version>15.0.0</CLI_TestPlatform_Version>
     <TemplateEngineVersion>1.0.0-beta2-20170629-269</TemplateEngineVersion>
     <TemplateEngineTemplateVersion>1.0.0-beta2-20170907-306</TemplateEngineTemplateVersion>
+    <AspnetTemplateVersion>1.0.0-beta2-20170907-306</AspnetTemplateVersion>
     <PlatformAbstractionsVersion>1.0.3</PlatformAbstractionsVersion>
     <DependencyModelVersion>1.0.3</DependencyModelVersion>
   </PropertyGroup>
