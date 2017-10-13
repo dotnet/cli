@@ -40,8 +40,9 @@
   </Target>
 
   <Target Name="CrossgenPublishDir"
-          Condition=" '$(DISABLE_CROSSGEN)' == '' "
-          AfterTargets="PublishToolset">
+          Condition=" '$(DISABLE_CROSSGEN)' == '' ">
+<!-- Disabling crossgen until we have non-crossgened toolset -->          
+<!--          AfterTargets="PublishToolset"> -->
     <ItemGroup>
       <!-- Removing Full CLR built TestHost assemblies from getting Crossgen as it is throwing error -->
       <SdkFiles Include="$(PublishDir)/**/*" Exclude="$(PublishDir)/TestHost*/**/*;$(PublishDir)/Sdks/**/*" />
