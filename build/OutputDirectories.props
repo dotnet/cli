@@ -12,7 +12,8 @@
       <BaseIntermediateOutputPath>$([System.IO.Path]::GetFullPath('$(BaseOutputDirectory)/obj/$(MSBuildProjectName)'))</BaseIntermediateOutputPath>
       <OutputDirectory>$(BaseOutputDirectory)/dotnet</OutputDirectory>
       <Stage2WithBackwardsCompatibleRuntimesOutputDirectory>$(BaseOutputDirectory)/dotnetWithBackwardsCompatibleRuntimes</Stage2WithBackwardsCompatibleRuntimesOutputDirectory>
-      <SdkOutputDirectory>$(OutputDirectory)/sdk/$(SdkVersion)</SdkOutputDirectory>
+      <!-- licavalc: we will need to change this depending on how we expose toolset version in the SDK. Right now, keeping the toolset version -->
+      <SdkOutputDirectory>$(OutputDirectory)/sdk/$(ToolsetVersion)</SdkOutputDirectory>
       <SymbolsDirectory>$(BaseOutputDirectory)/symbols</SymbolsDirectory>
       <RoslynDirectory>$(SdkOutputDirectory)/Roslyn</RoslynDirectory>
       <FSharpDirectory>$(SdkOutputDirectory)/FSharp</FSharpDirectory>
@@ -20,6 +21,7 @@
       <IntermediateDirectory>$(BaseOutputDirectory)/intermediate</IntermediateDirectory>
       <PackagesDirectory>$(BaseOutputDirectory)/packages</PackagesDirectory>
       <SharedFrameworkPublishDirectory>$(IntermediateDirectory)/sharedFrameworkPublish</SharedFrameworkPublishDirectory>
+      <ToolsetPublishDirectory>$(IntermediateDirectory)/toolsetPublish</ToolsetPublishDirectory>
       <!-- The 'AspNetRuntimePackageStorePublishDirectory' needs to be very short due to path length constraints on Win8.1 -->
       <AspNetRuntimePackageStorePublishDirectory>$(BaseOutputDirectory)/AspRT</AspNetRuntimePackageStorePublishDirectory>
       <BackwardsCompatibleSharedFrameworksPublishDirectory>$(IntermediateDirectory)/backwardsCompatibleSharedFrameworksPublish</BackwardsCompatibleSharedFrameworksPublishDirectory>

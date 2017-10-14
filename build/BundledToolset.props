@@ -1,0 +1,22 @@
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ToolsetCompressedFileName>$(ArtifactNameSdk)-$(ToolsetVersion)-$(SharedFrameworkRid)$(ArchiveExtension)</ToolsetCompressedFileName>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- licavalc: we could publish the tool set to a toolset folder in the blob storage to disambiguate it from the crossgenned toolsets we need to produce for Antares -->
+    <ToolsetRootUrl>$(DotnetBlobRootUrl)/Sdk/$(ToolsetVersion)/</ToolsetRootUrl>
+    <ToolsetDownloadUrl>$(ToolsetRootUrl)$(ToolsetCompressedFileName)$(CoreSetupBlobAccessTokenParam)</ToolsetDownloadUrl>
+    <ToolsetDownloadDirectory>$(IntermediateDirectory)/toolsetDownload/$(ToolsetVersion)/</ToolsetDownloadDirectory>
+    <ToolsetArchive>$(ToolsetDownloadDirectory)$(ToolsetCompressedFileName)</ToolsetArchive>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <_DownloadAndExtractItem Include="ToolsetArchive"
+                           Condition="!Exists('$(ToolsetArchive)')">
+      <Url>$(ToolsetDownloadUrl)</Url>
+      <DownloadFileName>$(ToolsetArchive)</DownloadFileName>
+      <ExtractDestination>$(ToolsetPublishDirectory)</ExtractDestination>
+    </_DownloadAndExtractItem>
+  </ItemGroup>
+</Project>

@@ -66,7 +66,8 @@ $env:VSTEST_BUILD_TRACE=1
 $env:VSTEST_TRACE_BUILD=1
 
 # install a stage0
-$dotnetInstallPath = Join-Path $RepoRoot "scripts\obtain\dotnet-install.ps1"
+$dotnetInstallPath = Join-Path $env:DOTNET_INSTALL_DIR "dotnet-install.ps1"
+Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile "$dotnetInstallPath"
 
 Write-Output "$dotnetInstallPath -Channel ""release/2.0.0"" -InstallDir $env:DOTNET_INSTALL_DIR -Architecture ""$Architecture"""
 Invoke-Expression "$dotnetInstallPath -Channel ""release/2.0.0"" -InstallDir $env:DOTNET_INSTALL_DIR -Architecture ""$Architecture"""

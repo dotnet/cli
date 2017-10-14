@@ -119,7 +119,9 @@
             Inputs="@(GenerateMSBuildExtensionsMsiInputs)"
             Outputs="$(MSBuildExtensionsInstallerFile)">
 
-      <Exec Command="powershell -NoProfile -NoLogo $(MSBuildExtensionsGenerateMsiPowershellScript)
+      <!-- Disabling this for now because we don't have the MSBuildExtensions available. -->
+
+      <!-- <Exec Command="powershell -NoProfile -NoLogo $(MSBuildExtensionsGenerateMsiPowershellScript)
                       '$(MSBuildExtensionsOutputDirectory)'
                       '$(MSBuildExtensionsInstallerFile)'
                       '$(WixRoot)'
@@ -128,7 +130,7 @@
                       '$(SimpleVersion)'
                       '$(NugetVersion)'
                       '$(MSBuildExtensionsInstallerUpgradeCode)'
-                      '$(Architecture)'" />
+                      '$(Architecture)'" /> -->
     </Target>
 
     <Target Name="GenerateSdkBundle"
@@ -180,33 +182,17 @@
                     $(SdkGenerateNupkgPowershellScript)"
             Outputs="$(SdkMSBuildExtensionsNupkgFile);$(SdkMSBuildExtensionsSwrFile)">
 
-      <Exec Command="powershell -NoProfile -NoLogo $(SdkGenerateNupkgPowershellScript)
+      <!-- Disabling this for now because we don't have the MSBuildExtensions available. -->
+
+      <!-- <Exec Command="powershell -NoProfile -NoLogo $(SdkGenerateNupkgPowershellScript)
                       '$(MSBuildExtensionsLayoutDirectory)'
                       '$(FullNugetVersion)'
                       '$(SdkMSBuildExtensionsNuspecFile)'
                       '$(SdkMSBuildExtensionsNupkgFile)'" />
       
       <GenerateMSBuildExtensionsSWR MSBuildExtensionsLayoutDirectory="$(MSBuildExtensionsLayoutDirectory)"
-                                    OutputFile="$(SdkMSBuildExtensionsSwrFile)"/>
+                                    OutputFile="$(SdkMSBuildExtensionsSwrFile)"/> -->
       
-    </Target>
-
-    <Target Name="TestSdkMsi"
-            Inputs="$(SdkInstallerFile)"
-            Outputs="$(SdkMsiTestedSentinel)"
-            DependsOnTargets="Init;MsiTargetsSetupInputOutputs;GenerateSdkMsi"
-            Condition=" '$(OS)' == 'Windows_NT'" >
-
-      <Exec Command ="powershell -NoProfile -NoLogo $(SdkTestMsiPowershellScript)
-                      -InputMsi '$(SdkInstallerFile)'
-                      -DotnetDir '$(PreviousStageDirectory)'
-                      -TestDir '$(TestOutputDir)'" />
-
-      <WriteLinesToFile
-          File="$(SdkMsiTestedSentinel)"
-          Lines="$(SdkVersion)"
-          Overwrite="true"
-          Encoding="Unicode"/>
     </Target>
 
     <Target Name="GenerateMsis"
@@ -218,8 +204,7 @@
                             GenerateMSBuildExtensionsMsi;
                             GenerateSdkBundle;
                             GenerateSdkNupkg;
-                            GenerateSdkMSBuildExtensionsNupkg;
-                            TestSdkMsi"
+                            GenerateSdkMSBuildExtensionsNupkg"
           Condition=" '$(OS)' == 'Windows_NT'" />
 
     <!-- These targets are used in signing, don't remove them! -->

@@ -4,7 +4,7 @@
   <Import Project="prepare/CheckPrereqs.targets" />
 
   <Target Name="Prepare"
-          DependsOnTargets="Init;DownloadHostAndSharedFxArtifacts;RestoreSrcPackages;RestoreToolsPackages;IsolateArtifactsFromDirectoryBuildFiles;CreatePropsForNextStage" />
+          DependsOnTargets="Init;DownloadHostAndSharedFxArtifacts;DownloadToolsetArtifacts;RestoreSrcPackages;RestoreToolsPackages;IsolateArtifactsFromDirectoryBuildFiles;CreatePropsForNextStage" />
 
   <Target Name="Init"
           DependsOnTargets="PrintBuildInfo;
@@ -45,6 +45,9 @@
                                SourceArchive="%(_DownloadAndExtractItem.DownloadFileName)"
                                DestinationDirectory="%(_DownloadAndExtractItem.ExtractDestination)"
                                OverwriteDestination="$(OverwriteExtractionDestination)" />
+  </Target>
+
+  <Target Name="DownloadToolsetArtifacts">
   </Target>
 
   <Target Name="RestoreSrcPackages"
