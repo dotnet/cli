@@ -23,7 +23,7 @@
     <CLI_WEBSDK_Version>1.0.0-alpha-20170516-2-509</CLI_WEBSDK_Version>
     <CLI_TestPlatform_Version>15.0.0</CLI_TestPlatform_Version>
     <TemplateEngineVersion>1.0.0-beta2-20170629-269</TemplateEngineVersion>
-    <AspnetTemplateVersion>2.1.0-preview1-10350</AspnetTemplateVersion>
+    <AspnetTemplateVersion>2.1.0-preview1-10375</AspnetTemplateVersion>
     <TemplateEngineTemplateVersion>1.0.0-beta2-20170907-306</TemplateEngineTemplateVersion>
     <PlatformAbstractionsVersion>1.0.3</PlatformAbstractionsVersion>
     <DependencyModelVersion>1.0.3</DependencyModelVersion>
