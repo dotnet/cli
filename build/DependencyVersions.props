@@ -5,7 +5,7 @@
     <CLI_MSBuild_Version>15.4.8</CLI_MSBuild_Version>
     <CLI_NuGet_Version>4.4.0-preview3-4475</CLI_NuGet_Version>
 
-    <ToolsetVersion>2.0.3-servicing-007004</ToolsetVersion>
+    <ToolsetVersion>2.0.3-servicing-007037</ToolsetVersion>
     <SharedFrameworkVersion>$(CLI_SharedFrameworkVersion)</SharedFrameworkVersion>
     <SharedHostVersion>$(CLI_SharedFrameworkVersion)</SharedHostVersion>
     <HostFxrVersion>$(CLI_SharedFrameworkVersion)</HostFxrVersion>
