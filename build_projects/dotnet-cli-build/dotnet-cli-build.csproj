@@ -20,6 +20,7 @@
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.0.11" />
     <PackageReference Include="NuGet.Protocol" Version="$(CLI_NuGet_Version)" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="$(CLI_MSBuild_Version)" />
+    <PackageReference Include="Microsoft.DotNet.Build.Tasks.Feed" Version="1.0.0-prerelease-01929-02" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="2.0.0" />
     <PackageReference Include="Microsoft.DotNet.VersionTools" Version="$(VersionToolsVersion)" Condition="'$(DotNetBuildFromSource)' != 'true'" />
  </ItemGroup>
