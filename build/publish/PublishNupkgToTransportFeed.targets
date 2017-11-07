@@ -6,6 +6,12 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <BuildTasksFeedDll>$(NuGetPackagesDir)\microsoft.dotnet.build.tasks.feed\$(BuildTasksFeedDllVersion)\build\netstandard1.5\Microsoft.DotNet.Build.Tasks.Feed.dll</BuildTasksFeedDll>
+  </PropertyGroup>
+
+  <UsingTask TaskName="PushToBlobFeed" AssemblyFile="$(BuildTasksFeedDll)" />
+  
+  <PropertyGroup>
     <ExpectedFeedUrl>https://dotnetfeed.blob.core.windows.net/$(TransportFeedContainerName)/index.json</ExpectedFeedUrl>
   </PropertyGroup>
 
