@@ -7,7 +7,6 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
 {
     public class ExecutablePackageObtainer
     {
-
         private readonly Lazy<string> _bundledTargetFrameworkMoniker;
         private readonly Func<FilePath> _getTempProjectPath;
         private readonly ICanAddPackageToProjectFile _packageToProjectFileAdder;
@@ -100,6 +99,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
 
             ToolConfiguration toolConfiguration =
                 ToolConfigurationDeserializer.Deserialize(toolConfigurationPath.Value);
+
             return toolConfiguration;
         }
 
@@ -142,6 +142,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
                         targetframework,
                         individualToolVersion.Value));
             }
+
             return tempProjectPath;
         }
 
@@ -180,7 +181,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
                 Directory.CreateDirectory(path.Value);
             }
         }
-        
+
         private const string TemporaryProjectTemplate = @"<Project Sdk=""Microsoft.NET.Sdk"">
   <PropertyGroup>
     <TargetFramework>{0}</TargetFramework>
