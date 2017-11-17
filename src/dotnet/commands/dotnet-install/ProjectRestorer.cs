@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.Cli
         public void Restore(
             FilePath tempProjectPath,
             DirectoryPath assetJsonOutput,
-            FilePath nugetconfig)
+            FilePath? nugetconfig)
         {
             var argsToPassToRestore = new List<string>();
 
@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.Cli
             if (nugetconfig != null)
             {
                 argsToPassToRestore.Add("--configfile");
-                argsToPassToRestore.Add(nugetconfig.ToEscapedString());
+                argsToPassToRestore.Add(nugetconfig.Value.ToEscapedString());
             }
 
             argsToPassToRestore.AddRange(new List<string>

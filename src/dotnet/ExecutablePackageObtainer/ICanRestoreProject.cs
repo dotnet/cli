@@ -7,6 +7,6 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
         void Restore(
             FilePath tempProjectPath,
             DirectoryPath assetJsonOutput, 
-            FilePath nugetconfig);
+            FilePath? nugetconfig);
     }
 }

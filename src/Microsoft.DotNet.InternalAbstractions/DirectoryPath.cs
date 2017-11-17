@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Microsoft.Extensions.EnvironmentAbstractions
 {
-    public class DirectoryPath
+    public struct DirectoryPath
     {
         public string Value { get; }
 
@@ -20,7 +20,7 @@ namespace Microsoft.Extensions.EnvironmentAbstractions
             string[] insertValueInFront = new string[paths.Length + 1];
             insertValueInFront[0] = Value;
             Array.Copy(paths, 0, insertValueInFront, 1, paths.Length);
-            
+
             return new DirectoryPath(Path.Combine(insertValueInFront));
         }
 
@@ -42,31 +42,6 @@ namespace Microsoft.Extensions.EnvironmentAbstractions
         public DirectoryPath GetParentPath()
         {
             return new DirectoryPath(Directory.GetParent(Path.GetFullPath(Value)).FullName);
-        }
-    }
-
-    public class FilePath
-    {
-        public string Value { get; }
-
-        public FilePath(string value)
-        {
-            Value = value;
-        }
-        
-        public string ToEscapedString()
-        {
-            return $"\"{Value}\"";
-        }
-
-        public override string ToString()
-        {
-            return ToEscapedString();
-        }
-
-        public DirectoryPath GetDirectoryPath()
-        {
-            return new DirectoryPath(Path.GetDirectoryName(Value));
         }
     }
 }

@@ -27,13 +27,13 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
             _projectRestorer = projectRestorer ?? throw new ArgumentNullException(nameof(projectRestorer));
             _packageToProjectFileAdder = packageToProjectFileAdder ??
                                          throw new ArgumentNullException(nameof(packageToProjectFileAdder));
-            _toolsPath = toolsPath ?? throw new ArgumentNullException(nameof(toolsPath));
+            _toolsPath = toolsPath;
         }
 
         public ToolConfigurationAndExecutableDirectory ObtainAndReturnExecutablePath(
             string packageId,
             string packageVersion = null,
-            FilePath nugetconfig = null,
+            FilePath? nugetconfig = null,
             string targetframework = null)
         {
             if (packageId == null) throw new ArgumentNullException(nameof(packageId));
@@ -104,7 +104,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
         }
 
         private void InvokeRestore(
-            FilePath nugetconfig,
+            FilePath? nugetconfig,
             FilePath tempProjectPath,
             DirectoryPath individualToolVersion)
         {
@@ -146,14 +146,14 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
         }
 
         private void InvokeAddPackageRestore(
-            FilePath nugetconfig,
+            FilePath? nugetconfig,
             FilePath tempProjectPath,
             string packageId)
         {
             if (nugetconfig != null)
             {
                 File.Copy(
-                    nugetconfig.Value,
+                    nugetconfig.Value.Value,
                     tempProjectPath
                         .GetDirectoryPath()
                         .CreateFilePathWithCombineFollowing("nuget.config")
