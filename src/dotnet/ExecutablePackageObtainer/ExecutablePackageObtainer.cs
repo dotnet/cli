@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.ExecutablePackageObtainer
@@ -124,24 +125,24 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
             }
 
             EnsureDirectoryExists(tempProjectPath.GetDirectoryPath());
-            if (packageVersion.IsConcreteValue)
-            {
-                File.WriteAllText(tempProjectPath.Value,
-                    string.Format(
-                        TemporaryProjectTemplate,
-                        targetframework,
-                        individualToolVersion.Value,
-                        packageId,
-                        packageVersion.Value));
-            }
-            else
-            {
-                File.WriteAllText(tempProjectPath.Value,
-                    string.Format(
-                        TemporaryProjectTemplateWithoutPackage,
-                        targetframework,
-                        individualToolVersion.Value));
-            }
+            var tempProjectContent = new XDocument(
+                new XElement("Project",
+                    new XAttribute("Sdk", "Microsoft.NET.Sdk"),
+                    new XElement("PropertyGroup",
+                        new XElement("TargetFramework", targetframework),
+                        new XElement("RestorePackagesPath", individualToolVersion.Value),
+                        new XElement("DisableImplicitFrameworkReferences", "true")
+                    ),
+                    packageVersion.IsConcreteValue
+                        ? new XElement("ItemGroup",
+                            new XElement("PackageReference",
+                                new XAttribute("Include", packageId),
+                                new XAttribute("Version", packageVersion.Value)
+                            ))
+                        : null));
+
+            File.WriteAllText(tempProjectPath.Value,
+                tempProjectContent.ToString());
 
             return tempProjectPath;
         }
@@ -181,25 +182,5 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
                 Directory.CreateDirectory(path.Value);
             }
         }
-
-        private const string TemporaryProjectTemplate = @"<Project Sdk=""Microsoft.NET.Sdk"">
-  <PropertyGroup>
-    <TargetFramework>{0}</TargetFramework>
-    <RestorePackagesPath>{1}</RestorePackagesPath>
-    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include=""{2}"" Version=""{3}""/>
-  </ItemGroup>
-</Project>";
-
-        private const string TemporaryProjectTemplateWithoutPackage = @"<Project Sdk=""Microsoft.NET.Sdk"">
-  <PropertyGroup>
-    <TargetFramework>{0}</TargetFramework>
-    <RestorePackagesPath>{1}</RestorePackagesPath>
-    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
-  </PropertyGroup>
-</Project>";
     }
 }
