@@ -44,5 +44,11 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
                 throw new ToolConfigurationException("Configuration content error. " + e.Message);
             }
         }
+
+        public class DotnetToolMetadata
+        {
+            public string CommandName { get; set; }
+            public string ToolAssemblyEntryPoint { get; set; }
+        }
     }
 }
