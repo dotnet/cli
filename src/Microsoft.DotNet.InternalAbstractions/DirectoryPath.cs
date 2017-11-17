@@ -15,7 +15,7 @@ namespace Microsoft.Extensions.EnvironmentAbstractions
             Value = value;
         }
 
-        public DirectoryPath WithCombineFollowing(params string[] paths)
+        public DirectoryPath WithSubDirectories(params string[] paths)
         {
             string[] insertValueInFront = new string[paths.Length + 1];
             insertValueInFront[0] = Value;
@@ -24,19 +24,19 @@ namespace Microsoft.Extensions.EnvironmentAbstractions
             return new DirectoryPath(Path.Combine(insertValueInFront));
         }
 
-        public FilePath CreateFilePathWithCombineFollowing(string fileName)
+        public FilePath WithFile(string fileName)
         {
             return new FilePath(Path.Combine(Value, fileName));
         }
 
-        public string ToEscapedString()
+        public string ToQuotedString()
         {
             return $"\"{Value}\"";
         }
 
         public override string ToString()
         {
-            return ToEscapedString();
+            return ToQuotedString();
         }
 
         public DirectoryPath GetParentPath()

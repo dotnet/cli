@@ -68,9 +68,9 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
                 var concreteVersion =
                     new DirectoryInfo(
                         Directory.GetDirectories(
-                            individualToolVersion.WithCombineFollowing(packageId).Value).Single()).Name;
+                            individualToolVersion.WithSubDirectories(packageId).Value).Single()).Name;
                 DirectoryPath concreteVersionIndividualToolVersion =
-                    individualToolVersion.GetParentPath().WithCombineFollowing(concreteVersion);
+                    individualToolVersion.GetParentPath().WithSubDirectories(concreteVersion);
                 Directory.Move(individualToolVersion.Value, concreteVersionIndividualToolVersion.Value);
 
                 individualToolVersion = concreteVersionIndividualToolVersion;
@@ -81,7 +81,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
 
             return new ToolConfigurationAndExecutableDirectory(
                 toolConfiguration,
-                individualToolVersion.WithCombineFollowing(
+                individualToolVersion.WithSubDirectories(
                     packageId,
                     packageVersion,
                     "tools",
@@ -95,8 +95,8 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
         {
             FilePath toolConfigurationPath =
                 individualToolVersion
-                    .WithCombineFollowing(packageId, packageVersion, "tools")
-                    .CreateFilePathWithCombineFollowing("DotnetToolsConfig.xml");
+                    .WithSubDirectories(packageId, packageVersion, "tools")
+                    .WithFile("DotnetToolsConfig.xml");
 
             ToolConfiguration toolConfiguration =
                 ToolConfigurationDeserializer.Deserialize(toolConfigurationPath.Value);
@@ -156,7 +156,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
                     nugetconfig.Value.Value,
                     tempProjectPath
                         .GetDirectoryPath()
-                        .CreateFilePathWithCombineFollowing("nuget.config")
+                        .WithFile("nuget.config")
                         .Value);
             }
 
@@ -167,8 +167,8 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
             string packageId,
             PackageVersion packageVersion)
         {
-            DirectoryPath individualTool = _toolsPath.WithCombineFollowing(packageId);
-            DirectoryPath individualToolVersion = individualTool.WithCombineFollowing(packageVersion.Value);
+            DirectoryPath individualTool = _toolsPath.WithSubDirectories(packageId);
+            DirectoryPath individualToolVersion = individualTool.WithSubDirectories(packageVersion.Value);
             EnsureDirectoryExists(individualToolVersion);
             return individualToolVersion;
         }

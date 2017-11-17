@@ -14,14 +14,14 @@ namespace Microsoft.Extensions.EnvironmentAbstractions
             Value = value;
         }
 
-        public string ToEscapedString()
+        public string ToQuotedString()
         {
             return $"\"{Value}\"";
         }
 
         public override string ToString()
         {
-            return ToEscapedString();
+            return ToQuotedString();
         }
 
         public DirectoryPath GetDirectoryPath()

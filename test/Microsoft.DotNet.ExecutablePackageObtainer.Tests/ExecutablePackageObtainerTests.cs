@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
 
             var executable = toolConfigurationAndExecutableDirectory
                 .ExecutableDirectory
-                .CreateFilePathWithCombineFollowing(
+                .WithFile(
                     toolConfigurationAndExecutableDirectory
                         .Configuration
                         .ToolAssemblyEntryPoint);
@@ -60,7 +60,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
                 .GetParentPath()
                 .GetParentPath()
                 .GetParentPath()
-                .CreateFilePathWithCombineFollowing("project.assets.json").Value;
+                .WithFile("project.assets.json").Value;
 
             File.Exists(assetJsonPath)
                 .Should()
@@ -77,7 +77,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
 
             Directory.CreateDirectory(tempProjectDirectory.Value);
             File.Copy(nugetConfigPath.Value,
-                tempProjectDirectory.CreateFilePathWithCombineFollowing("nuget.config").Value);
+                tempProjectDirectory.WithFile("nuget.config").Value);
 
             var packageObtainer =
                 new ExecutablePackageObtainer(
@@ -93,7 +93,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
 
             var executable = toolConfigurationAndExecutableDirectory
                 .ExecutableDirectory
-                .CreateFilePathWithCombineFollowing(
+                .WithFile(
                     toolConfigurationAndExecutableDirectory
                         .Configuration
                         .ToolAssemblyEntryPoint);
@@ -118,7 +118,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
 
             var executable = toolConfigurationAndExecutableDirectory
                 .ExecutableDirectory
-                .CreateFilePathWithCombineFollowing(
+                .WithFile(
                     toolConfigurationAndExecutableDirectory
                         .Configuration
                         .ToolAssemblyEntryPoint);
@@ -138,7 +138,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
                 new ExecutablePackageObtainer(
                     new DirectoryPath(toolsPath),
                     GetUniqueTempProjectPathEachTest,
-                    new Lazy<string>(() => BundledTargetFramework.TargetFrameworkMoniker),
+                    new Lazy<string>(() => BundledTargetFramework.GetTargetFrameworkMoniker()),
                     new PackageToProjectFileAdder(),
                     new ProjectRestorer());
             ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory =
@@ -149,7 +149,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
 
             var executable = toolConfigurationAndExecutableDirectory
                 .ExecutableDirectory
-                .CreateFilePathWithCombineFollowing(
+                .WithFile(
                     toolConfigurationAndExecutableDirectory
                         .Configuration
                         .ToolAssemblyEntryPoint);
@@ -162,9 +162,9 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
         private static readonly Func<FilePath> GetUniqueTempProjectPathEachTest = () =>
         {
             var tempProjectDirectory =
-                new DirectoryPath(Path.GetTempPath()).WithCombineFollowing(Path.GetRandomFileName());
+                new DirectoryPath(Path.GetTempPath()).WithSubDirectories(Path.GetRandomFileName());
             var tempProjectPath =
-                tempProjectDirectory.CreateFilePathWithCombineFollowing(Path.GetRandomFileName() + ".csproj");
+                tempProjectDirectory.WithFile(Path.GetRandomFileName() + ".csproj");
             return tempProjectPath;
         };
 
@@ -194,7 +194,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
             return new FilePath(Path.GetFullPath(nugetConfigName));
         }
 
-        private readonly string _testTargetframework = BundledTargetFramework.TargetFrameworkMoniker;
+        private readonly string _testTargetframework = BundledTargetFramework.GetTargetFrameworkMoniker();
         private const string TestPackageVersion = "1.0.4";
         private const string TestPackageId = "global.tool.console.demo";
     }

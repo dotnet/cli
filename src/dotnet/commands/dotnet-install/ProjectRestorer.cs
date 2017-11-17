@@ -18,18 +18,18 @@ namespace Microsoft.DotNet.Cli
         {
             var argsToPassToRestore = new List<string>();
 
-            argsToPassToRestore.Add(tempProjectPath.ToEscapedString());
+            argsToPassToRestore.Add(tempProjectPath.ToQuotedString());
             if (nugetconfig != null)
             {
                 argsToPassToRestore.Add("--configfile");
-                argsToPassToRestore.Add(nugetconfig.Value.ToEscapedString());
+                argsToPassToRestore.Add(nugetconfig.Value.ToQuotedString());
             }
 
             argsToPassToRestore.AddRange(new List<string>
             {
                 "--runtime",
                 RuntimeEnvironment.GetRuntimeIdentifier(),
-                $"/p:BaseIntermediateOutputPath={assetJsonOutput.ToEscapedString()}"
+                $"/p:BaseIntermediateOutputPath={assetJsonOutput.ToQuotedString()}"
             });
 
             var command = new DotNetCommandFactory(alwaysRunOutOfProc: true)

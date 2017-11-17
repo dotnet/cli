@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.Tests
                 .Parse(targetFrameworkMoniker)
                 .GetShortFolderName();
             BundledTargetFramework
-                .TargetFrameworkMoniker
+                .GetTargetFrameworkMoniker()
                 .Should().Be(shortFolderName);
         }
 
