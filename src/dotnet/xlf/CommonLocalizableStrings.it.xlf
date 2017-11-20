@@ -674,6 +674,11 @@
         <target state="translated">Non esegue un ripristino implicito durante l'esecuzione del comando.</target>
         <note />
       </trans-unit>
+      <trans-unit id="PackageReferenceOneOrMore">
+        <source>Package reference(s)</source>
+        <target state="new">Package reference(s)</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

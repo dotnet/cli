@@ -21,6 +21,10 @@ namespace Microsoft.DotNet.Cli
                            Create.Command("reference",
                                           Tools.List.ProjectToProjectReferences.LocalizableStrings.AppFullName,
                                           Accept.ZeroOrOneArgument(),
+                                          CommonOptions.HelpOption()),
+                           Create.Command("package",
+                                          Tools.List.PackageReferences.LocalizableStrings.AppFullName,
+                                          Accept.ZeroOrOneArgument(),
                                           CommonOptions.HelpOption()));
     }
 }

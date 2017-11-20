@@ -147,6 +147,9 @@
   <data name="PackageReference" xml:space="preserve">
     <value>Package reference</value>
   </data>
+  <data name="PackageReferenceOneOrMore" xml:space="preserve">
+    <value>Package reference(s)</value>
+  </data>
   <data name="P2P" xml:space="preserve">
     <value>Project to Project</value>
   </data>

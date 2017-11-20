@@ -10,11 +10,11 @@ using System;
 using System.IO;
 using Xunit;
 
-namespace Microsoft.DotNet.Cli.List.Reference.Tests
+namespace Microsoft.DotNet.Cli.List.PackageReferences.Tests
 {
-    public class GivenDotnetListReference : TestBase
+    public class GivenDotnetListPackage : TestBase
     {
-        private const string HelpText = @"Usage: dotnet list <PROJECT> reference [options]
+        private const string HelpText = @"Usage: dotnet list <PROJECT> package [options]
 
 Arguments:
   <PROJECT>   The project file to operate on. If a file is not specified, the command will search the current directory for one.
@@ -46,7 +46,7 @@ Commands:
         [InlineData("-h")]
         public void WhenHelpOptionIsPassedItPrintsUsage(string helpArg)
         {
-            var cmd = new ListReferenceCommand().Execute(helpArg);
+            var cmd = new ListPackageCommand().Execute(helpArg);
             cmd.Should().Pass();
             cmd.StdOut.Should().BeVisuallyEquivalentToIfNotLocalized(HelpText);
         }
@@ -66,7 +66,7 @@ Commands:
         [Fact]
         public void WhenTooManyArgumentsArePassedItPrintsError()
         {
-            var cmd = new ListReferenceCommand()
+            var cmd = new ListPackageCommand()
                     .WithProject("one two three")
                     .Execute("proj.csproj");
             cmd.ExitCode.Should().NotBe(0);
@@ -81,7 +81,7 @@ Commands:
         {
             var setup = Setup();
 
-            var cmd = new ListReferenceCommand()
+            var cmd = new ListPackageCommand()
                     .WithWorkingDirectory(setup.TestRoot)
                     .WithProject(projName)
                     .Execute($"\"{setup.ValidRefCsprojPath}\"");
@@ -96,7 +96,7 @@ Commands:
             string projName = "Broken/Broken.csproj";
             var setup = Setup();
 
-            var cmd = new ListReferenceCommand()
+            var cmd = new ListPackageCommand()
                     .WithWorkingDirectory(setup.TestRoot)
                     .WithProject(projName)
                     .Execute($"\"{setup.ValidRefCsprojPath}\"");
@@ -111,7 +111,7 @@ Commands:
             var setup = Setup();
 
             var workingDir = Path.Combine(setup.TestRoot, "MoreThanOne");
-            var cmd = new ListReferenceCommand()
+            var cmd = new ListPackageCommand()
                     .WithWorkingDirectory(workingDir)
                     .Execute($"\"{setup.ValidRefCsprojRelToOtherProjPath}\"");
             cmd.ExitCode.Should().NotBe(0);
@@ -124,7 +124,7 @@ Commands:
         {
             var setup = Setup();
 
-            var cmd = new ListReferenceCommand()
+            var cmd = new ListPackageCommand()
                     .WithWorkingDirectory(setup.TestRoot)
                     .Execute($"\"{setup.ValidRefCsprojPath}\"");
             cmd.ExitCode.Should().NotBe(0);
@@ -133,30 +133,29 @@ Commands:
         }
 
         [Fact]
-        public void WhenNoProjectReferencesArePresentInTheProjectItPrintsError()
+        public void WhenNoPackageReferencesArePresentInTheProjectItPrintsError()
         {
             var lib = NewLib();
 
-            var cmd = new ListReferenceCommand()
+            var cmd = new ListPackageCommand()
                 .WithProject(lib.CsProjPath)
                 .Execute();
             cmd.Should().Pass();
-            cmd.StdOut.Should().Be(string.Format(CommonLocalizableStrings.NoReferencesFound, CommonLocalizableStrings.P2P, lib.CsProjPath));
+            cmd.StdOut.Should().Be(string.Format(CommonLocalizableStrings.NoReferencesFound, CommonLocalizableStrings.Package, lib.CsProjPath));
         }
 
         [Fact]
         public void ItPrintsSingleReference()
         {
-            string OutputText = CommonLocalizableStrings.ProjectReferenceOneOrMore;
+            string OutputText = CommonLocalizableStrings.PackageReferenceOneOrMore;
             OutputText += $@"
 {new string('-', OutputText.Length)}
-..\ref\ref.csproj";
+Newtonsoft.Json";
 
             var lib = NewLib("lib");
-            string ref1 = NewLib("ref").CsProjPath;
-            AddValidRef(ref1, lib);
+            AddValidPackageRef("Newtonsoft.Json", lib);
 
-            var cmd = new ListReferenceCommand()
+            var cmd = new ListPackageCommand()
                 .WithProject(lib.CsProjPath)
                 .Execute();
             cmd.Should().Pass();
@@ -166,23 +165,20 @@ Commands:
         [Fact]
         public void ItPrintsMultipleReferences()
         {
-            string OutputText = CommonLocalizableStrings.ProjectReferenceOneOrMore;
+            string OutputText = CommonLocalizableStrings.PackageReferenceOneOrMore;
             OutputText += $@"
 {new string('-', OutputText.Length)}
-..\ref1\ref1.csproj
-..\ref2\ref2.csproj
-..\ref3\ref3.csproj";
+Microsoft.Build.Framework
+Newtonsoft.Json
+xunit";
 
             var lib = NewLib("lib");
-            string ref1 = NewLib("ref1").CsProjPath;
-            string ref2 = NewLib("ref2").CsProjPath;
-            string ref3 = NewLib("ref3").CsProjPath;
 
-            AddValidRef(ref1, lib);
-            AddValidRef(ref2, lib);
-            AddValidRef(ref3, lib);
+            AddValidPackageRef("Newtonsoft.Json", lib);
+            AddValidPackageRef("xunit", lib);
+            AddValidPackageRef("Microsoft.Build.Framework", lib);
 
-            var cmd = new ListReferenceCommand()
+            var cmd = new ListPackageCommand()
                 .WithProject(lib.CsProjPath)
                 .Execute();
             cmd.Should().Pass();
@@ -224,11 +220,11 @@ Commands:
             return dir;
         }
 
-        private void AddValidRef(string path, ProjDir proj)
+        private void AddValidPackageRef(string packageName, ProjDir proj)
         {
-            new AddReferenceCommand()
+            new AddPackageCommand()
                 .WithProject(proj.CsProjPath)
-                .Execute($"\"{path}\"")
+                .Execute($"\"{packageName}\"")
                 .Should().Pass();
         }
     }
