@@ -24,6 +24,15 @@
 
     <Variable Name="DOTNETHOME" Type="string" Value="[ProgramFiles6432Folder]dotnet" bal:Overridable="no" />
     <Variable Name="BUNDLEMONIKER" Type="string" Value="$(var.ProductMoniker)" bal:Overridable="no" />
+    <Variable Name="DotNetSdkVersion" Type="string" Value="$(var.DisplayVersion)" bal:Overridable="no" />
+    <Variable Name="DotNetRuntimeVersion" Type="string" Value="$(var.DotNetRuntimeVersion)" bal:Overridable="no" />
+    <Variable Name="AspNetCoreVersion" Type="string" Value="$(var.AspNetCoreVersion)" bal:Overridable="no" />
+    <Variable Name="RoslynVersion" Type="string" Value="$(var.RoslynCompilerVersion)" bal:Overridable="no" />
+    <Variable Name="FSharpVersion" Type="string" Value="$(var.FSharpVersion)" bal:Overridable="no" />
+    <Variable Name="MSBuildVersion" Type="string" Value="$(var.MSBuildVersion)" bal:Overridable="no" />
+    <Variable Name="NuGetVersion" Type="string" Value="$(var.NuGetVersion)" bal:Overridable="no" />
+    <Variable Name="TestPlatformVersion" Type="string" Value="$(var.TestPlatformVersion)" bal:Overridable="no" />
+
 
     <Chain DisableSystemRestore="yes" ParallelCache="yes">
       <MsiPackage SourceFile="$(var.SharedFXMsiSourcePath)">
