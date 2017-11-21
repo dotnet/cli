@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
                 throw new ArgumentNullException(nameof(commandName), "Cannot be null or whitespace");
             }
 
-            EnsureNoInvalidCharacters(commandName, nameof(toolAssemblyEntryPoint));
+            EnsureNoInvalidFilenameCharacters(commandName, nameof(toolAssemblyEntryPoint));
 
             if (string.IsNullOrWhiteSpace(toolAssemblyEntryPoint))
             {
@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
             ToolAssemblyEntryPoint = toolAssemblyEntryPoint;
         }
 
-        private void EnsureNoInvalidCharacters(string commandName, string nameOfParam)
+        private void EnsureNoInvalidFilenameCharacters(string commandName, string nameOfParam)
         {
             // https://stackoverflow.com/questions/1976007/what-characters-are-forbidden-in-windows-and-linux-directory-names
             char[] invalidCharactors = {'/', '<', '>', ':', '"', '/', '\\', '|', '?', '*'};
@@ -42,12 +42,5 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
 
         public string CommandName { get; }
         public string ToolAssemblyEntryPoint { get; }
-    }
-
-    internal class ToolConfigurationException : ArgumentException
-    {
-        public ToolConfigurationException(string message) : base(message)
-        {
-        }
     }
 }
