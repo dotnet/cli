@@ -2,14 +2,14 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
+using Microsoft.DotNet.ExecutablePackageObtainer.ToolConfigurationDeserialization;
 
 namespace Microsoft.DotNet.ExecutablePackageObtainer
 {
-    public static class ToolConfigurationDeserializer
+    internal static class ToolConfigurationDeserializer
     {
         public static ToolConfiguration Deserialize(string pathToXml)
         {
@@ -56,29 +56,6 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
             {
                 throw new ToolConfigurationException("Configuration content error. " + e.Message);
             }
-        }
-
-        [DebuggerStepThrough]
-        [XmlRoot(Namespace = "", IsNullable = false)]
-        public class DotNetCliTool
-        {
-            [XmlArrayItem("Command", IsNullable = false)]
-            public DotNetCliToolCommand[] Commands { get; set; }
-        }
-
-        [Serializable]
-        [DebuggerStepThrough]
-        [XmlType(AnonymousType = true)]
-        public class DotNetCliToolCommand
-        {
-            [XmlAttribute]
-            public string Name { get; set; }
-
-            [XmlAttribute]
-            public string EntryPoint { get; set; }
-
-            [XmlAttribute]
-            public string Runner { get; set; }
         }
     }
 }

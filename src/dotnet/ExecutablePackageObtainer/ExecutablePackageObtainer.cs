@@ -6,7 +6,7 @@ using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.ExecutablePackageObtainer
 {
-    public class ExecutablePackageObtainer
+    internal class ExecutablePackageObtainer
     {
         private readonly Lazy<string> _bundledTargetFrameworkMoniker;
         private readonly Func<FilePath> _getTempProjectPath;

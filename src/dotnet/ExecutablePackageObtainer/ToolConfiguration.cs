@@ -5,7 +5,7 @@ using System;
 
 namespace Microsoft.DotNet.ExecutablePackageObtainer
 {
-    public class ToolConfiguration
+    internal class ToolConfiguration
     {
         public ToolConfiguration(
             string commandName,
@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
         public string ToolAssemblyEntryPoint { get; }
     }
 
-    public class ToolConfigurationException : ArgumentException
+    internal class ToolConfigurationException : ArgumentException
     {
         public ToolConfigurationException(string message) : base(message)
         {

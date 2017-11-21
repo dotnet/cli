@@ -5,7 +5,7 @@ using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.ExecutablePackageObtainer
 {
-    public class ToolConfigurationAndExecutableDirectory
+    internal class ToolConfigurationAndExecutableDirectory
     {
         public ToolConfigurationAndExecutableDirectory(
             ToolConfiguration toolConfiguration,
