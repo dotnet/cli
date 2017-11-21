@@ -12,17 +12,17 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
             if (packageVersion == null)
             {
                 Value = Path.GetRandomFileName();
-                IsPlaceHolder = true;
+                IsPlaceholder = true;
             }
             else
             {
                 Value = packageVersion;
-                IsPlaceHolder = false;
+                IsPlaceholder = false;
             }
         }
 
-        public bool IsPlaceHolder { get; }
+        public bool IsPlaceholder { get; }
         public string Value { get; }
-        public bool IsConcreteValue => !IsPlaceHolder;
+        public bool IsConcreteValue => !IsPlaceholder;
     }
 }

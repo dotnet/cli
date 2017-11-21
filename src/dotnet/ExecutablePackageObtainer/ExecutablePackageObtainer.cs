@@ -36,7 +36,11 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
             FilePath? nugetconfig = null,
             string targetframework = null)
         {
-            if (packageId == null) throw new ArgumentNullException(nameof(packageId));
+            if (packageId == null)
+            {
+                throw new ArgumentNullException(nameof(packageId));
+            }
+
             if (targetframework == null)
             {
                 targetframework = _bundledTargetFrameworkMoniker.Value;
@@ -53,7 +57,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
                 targetframework,
                 individualToolVersion);
 
-            if (packageVersionOrPlaceHolder.IsPlaceHolder)
+            if (packageVersionOrPlaceHolder.IsPlaceholder)
             {
                 InvokeAddPackageRestore(
                     nugetconfig,
@@ -63,7 +67,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
 
             InvokeRestore(nugetconfig, tempProjectPath, individualToolVersion);
 
-            if (packageVersionOrPlaceHolder.IsPlaceHolder)
+            if (packageVersionOrPlaceHolder.IsPlaceholder)
             {
                 var concreteVersion =
                     new DirectoryInfo(
