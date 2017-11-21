@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <RestoreSources Condition="'$(DotNetBuildOffline)' != 'true'">
+      $(ExternalRestoreSources);
+      https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json;
+      https://dotnet.myget.org/F/templating/api/v3/index.json;
+      https://dotnet.myget.org/F/dotnet-core/api/v3/index.json;
+      https://dotnet.myget.org/F/aspnetcore-release/api/v3/index.json;
+      https://dotnet.myget.org/F/dotnet-web/api/v3/index.json;
+      https://dotnet.myget.org/F/cli-deps/api/v3/index.json;
+      https://dotnet.myget.org/f/roslyn/api/v3/index.json;
+      https://dotnet.myget.org/f/symreader-native/api/v3/index.json;
+      https://www.myget.org/F/xunit/api/v3/index.json;
+      https://api.nuget.org/v3/index.json;
+      https://dotnet.myget.org/F/vstest/api/v3/index.json;
+      https://dotnet.myget.org/F/dotnet-web/api/v3/index.json;
+      https://dotnet.myget.org/F/symreader-native/api/v3/index.json;
+    </RestoreSources>
+  </PropertyGroup>
+</Project>

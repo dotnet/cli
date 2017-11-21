@@ -39,6 +39,7 @@
   <Import Project="build/BundledRuntimes.props" />
   <Import Project="build/CrossGen.props" />
   <Import Project="build/BackwardsCompatibilityRuntimes.props" />
+  <Import Project="build/RestoreSources.props" />
 
   <Import Project="build/AzureInfo.props" />
   <Import Project="build/InstallerInfo.props" />
