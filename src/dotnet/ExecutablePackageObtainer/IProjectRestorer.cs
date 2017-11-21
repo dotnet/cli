@@ -5,7 +5,7 @@ using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.ExecutablePackageObtainer
 {
-    internal interface ICanRestoreProject
+    internal interface IProjectRestorer
     {
         void Restore(
             FilePath tempProjectPath,

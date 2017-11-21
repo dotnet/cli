@@ -9,7 +9,7 @@ using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.Cli
 {
-    internal class ProjectRestorer : ICanRestoreProject
+    internal class ProjectRestorer : IProjectRestorer
     {
         public void Restore(
             FilePath tempProjectPath,
