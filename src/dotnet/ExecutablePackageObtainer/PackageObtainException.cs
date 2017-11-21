@@ -5,7 +5,7 @@ using System;
 
 namespace Microsoft.DotNet.ExecutablePackageObtainer
 {
-    public class PackageObtainException : Exception
+    internal class PackageObtainException : Exception
     {
         public PackageObtainException()
         {

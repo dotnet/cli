@@ -9,7 +9,7 @@ using Microsoft.Extensions.EnvironmentAbstractions;
 namespace Microsoft.DotNet.Cli
 {
 
-    internal class PackageToProjectFileAdder : ICanAddPackageToProjectFile
+    internal class PackageToProjectFileAdder : IPackageToProjectFileAdder
     {
         public void Add(FilePath projectPath, string packageId)
         {

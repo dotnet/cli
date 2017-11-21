@@ -5,7 +5,7 @@ using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.ExecutablePackageObtainer
 {
-    public interface ICanAddPackageToProjectFile
+    internal interface IPackageToProjectFileAdder
     {
         void Add(FilePath projectPath, string packageId);
     }

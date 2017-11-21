@@ -10,7 +10,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
     {
         private readonly Lazy<string> _bundledTargetFrameworkMoniker;
         private readonly Func<FilePath> _getTempProjectPath;
-        private readonly ICanAddPackageToProjectFile _packageToProjectFileAdder;
+        private readonly IPackageToProjectFileAdder _packageToProjectFileAdder;
         private readonly ICanRestoreProject _projectRestorer;
         private readonly DirectoryPath _toolsPath;
 
@@ -18,15 +18,15 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
             DirectoryPath toolsPath,
             Func<FilePath> getTempProjectPath,
             Lazy<string> bundledTargetFrameworkMoniker,
-            ICanAddPackageToProjectFile packageToProjectFileAdder,
+            IPackageToProjectFileAdder packageToProjectFileAdderAdder,
             ICanRestoreProject projectRestorer
         )
         {
             _getTempProjectPath = getTempProjectPath;
             _bundledTargetFrameworkMoniker = bundledTargetFrameworkMoniker;
             _projectRestorer = projectRestorer ?? throw new ArgumentNullException(nameof(projectRestorer));
-            _packageToProjectFileAdder = packageToProjectFileAdder ??
-                                         throw new ArgumentNullException(nameof(packageToProjectFileAdder));
+            _packageToProjectFileAdder = packageToProjectFileAdderAdder ??
+                                         throw new ArgumentNullException(nameof(packageToProjectFileAdderAdder));
             _toolsPath = toolsPath;
         }
 
