@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<DotnetToolMetadata>
-  <CommandName>demo</CommandName>
-  <ToolAssemblyEntryPoint>consoledemo.dll</ToolAssemblyEntryPoint>
-</DotnetToolMetadata>
+<DotNetCliTool>
+  <Commands>
+    <Command Name="demo" EntryPoint="consoledemo.dll" Runner="dotnet" />
+  </Commands>
+</DotNetCliTool>

@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
             ToolConfiguration toolConfiguration = ToolConfigurationDeserializer.Deserialize("DotnetToolsConfigGolden.xml");
 
             toolConfiguration.CommandName.Should().Be("sayhello");
-            toolConfiguration.ToolAssemblyEntryPoint.Should().Be("consoleappababab.dll");
+            toolConfiguration.ToolAssemblyEntryPoint.Should().Be("console.dll");
         }
 
         [Fact]

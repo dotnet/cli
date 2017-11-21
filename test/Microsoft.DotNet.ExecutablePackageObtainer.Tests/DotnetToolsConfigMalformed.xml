@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<DotnetToolMetadata>
-  <CommandName>sayhello</CommandName Malformed
-  <ToolAssemblyEntryPoint>consoleappababab.dll</ToolAssemblyEntryPoint>
-</DotnetToolMetadata>
+<DotNetCliTool>
+  <Commands Malformed=""
+    <Command Name="sayhello" EntryPoint="console.dll" Runner="dotnet" />
+  </Commands>
+</DotNetCliTool>
