@@ -60,7 +60,7 @@ namespace Microsoft.DotNet.New.Tests
             string projectFolder,
             string packagesDirectory)
         {
-            var repoRootNuGetConfig = Path.Combine(RepoDirectoriesProvider.RepoRoot, "NuGet.Config");
+            var repoRootNuGetConfig = Path.Combine(RepoDirectoriesProvider.RepoRoot, "test", "NuGet.Config");
 
             new NewCommand()
                 .WithWorkingDirectory(projectFolder)
@@ -83,7 +83,7 @@ namespace Microsoft.DotNet.New.Tests
             var packagesDirectory = Path.Combine(rootPath, "packages");
             var projectName = "Project";
             var expectedVersion = "2.0.0";
-            var repoRootNuGetConfig = Path.Combine(RepoDirectoriesProvider.RepoRoot, "NuGet.Config");
+            var repoRootNuGetConfig = Path.Combine(RepoDirectoriesProvider.RepoRoot, "test", "NuGet.Config");
 
             new NewCommand()
                 .WithWorkingDirectory(rootPath)
