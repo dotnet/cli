@@ -13,7 +13,10 @@ namespace Microsoft.DotNet.Cli
     {
         public void Add(FilePath projectPath, string packageId)
         {
-            if (packageId == null) throw new ArgumentNullException(nameof(packageId));
+            if (packageId == null)
+            {
+                throw new ArgumentNullException(nameof(packageId));
+            }
 
             var argsToPassToRestore = new List<string>
             {

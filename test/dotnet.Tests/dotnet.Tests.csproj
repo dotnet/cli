@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
   <PropertyGroup>
     <TargetFramework>$(CliTargetFramework)</TargetFramework>
     <RuntimeFrameworkVersion>$(CLI_SharedFrameworkVersion)</RuntimeFrameworkVersion>
@@ -9,6 +10,7 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <AssetTargetFallback>$(AssetTargetFallback);netstandardapp1.5;dotnet5.4;portable-net451+win8</AssetTargetFallback>
   </PropertyGroup>
+
   <ItemGroup>
     <Content Include="..\..\TestAssets\TestProjects\AppWithToolDependency\**\*">
       <Link>TestAssets/TestProjects/AppWithToolDependency/%(RecursiveDir)%(Filename)%(Extension)</Link>
@@ -21,13 +23,19 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
-  <Target Name="WriteExpectedVersion" BeforeTargets="BeforeBuild" DependsOnTargets="PrepareForBuild">
+
+  <Target Name="WriteExpectedVersion"
+           BeforeTargets="BeforeBuild"
+           DependsOnTargets="PrepareForBuild">
+
     <PropertyGroup>
       <ExpectedVersionFileInIntermediateFolder>$(IntermediateOutputPath)ExpectedSdkVersion.txt</ExpectedVersionFileInIntermediateFolder>
+
       <VersionFileContent>$(SdkVersion)</VersionFileContent>
       <ExistingVersionFileContent Condition=" Exists('$(ExpectedVersionFileInIntermediateFolder)') ">
         $([System.IO.File]::ReadAllText($(ExpectedVersionFileInIntermediateFolder)))
       </ExistingVersionFileContent>
+
       <ShouldOverwriteVersionFile>false</ShouldOverwriteVersionFile>
       <ShouldOverwriteVersionFile Condition=" '$(ExistingVersionFileContent.Trim())' != '$(VersionFileContent.Trim())' ">true</ShouldOverwriteVersionFile>
     </PropertyGroup>

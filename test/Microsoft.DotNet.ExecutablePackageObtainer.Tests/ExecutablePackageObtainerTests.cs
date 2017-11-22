@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
     public class ExecutablePackageObtainerTests : TestBase
     {
         [Fact]
-        public void GivenNugetConfigAndPackageNameAndVersionAndTargetFrameworkWhenCallItCanDownloadThePacakge()
+        public void GivenNugetConfigAndPackageNameAndVersionAndTargetFrameworkWhenCallItCanDownloadThePackage()
         {
             FilePath nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
@@ -68,7 +68,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
         }
 
         [Fact]
-        public void GivenAllButNoNugetConfigFilePathtCanDownloadThePacakge()
+        public void GivenAllButNoNugetConfigFilePathItCanDownloadThePackage()
         {
             var uniqueTempProjectPath = GetUniqueTempProjectPathEachTest();
             var tempProjectDirectory = uniqueTempProjectPath.GetDirectoryPath();
@@ -76,6 +76,13 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
             Directory.CreateDirectory(tempProjectDirectory.Value);
+
+            /*
+             * No nuget config means you don't need nuget config passed in during call
+             * NuGet needs a way to find the package, in production, it will keep look up folders for Nuget.Config 
+             * and use the feed there.
+             * In test, we don't want NuGet to keep look up, so we just copy paste beside the project.
+             */
             File.Copy(nugetConfigPath.Value,
                 tempProjectDirectory.WithFile("nuget.config").Value);
 
@@ -104,7 +111,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
         }
 
         [Fact]
-        public void GivenAllButNoPackageVersionItCanDownloadThePacakge()
+        public void GivenAllButNoPackageVersionItCanDownloadThePackage()
         {
             var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
@@ -129,7 +136,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
         }
 
         [Fact]
-        public void GivenAllButNoTargetFrameworkItCanDownloadThePacakge()
+        public void GivenAllButNoTargetFrameworkItCanDownloadThePackage()
         {
             var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
