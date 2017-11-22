@@ -8,7 +8,7 @@ namespace Microsoft.DotNet.ToolPackageObtainer
     internal interface IProjectRestorer
     {
         void Restore(
-            FilePath tempProjectPath,
+            FilePath projectPath,
             DirectoryPath assetJsonOutput, 
             FilePath? nugetconfig);
     }

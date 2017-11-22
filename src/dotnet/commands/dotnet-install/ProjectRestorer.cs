@@ -12,13 +12,13 @@ namespace Microsoft.DotNet.Cli
     internal class ProjectRestorer : IProjectRestorer
     {
         public void Restore(
-            FilePath tempProjectPath,
+            FilePath projectPath,
             DirectoryPath assetJsonOutput,
             FilePath? nugetconfig)
         {
             var argsToPassToRestore = new List<string>();
 
-            argsToPassToRestore.Add(tempProjectPath.ToQuotedString());
+            argsToPassToRestore.Add(projectPath.ToQuotedString());
             if (nugetconfig != null)
             {
                 argsToPassToRestore.Add("--configfile");
