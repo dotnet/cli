@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools.Test.Utilities;
@@ -14,13 +15,19 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
 {
     public class ShellShimMakerTests : TestBase
     {
+        private readonly string _pathToPlaceShim;
+
+        public ShellShimMakerTests()
+        {
+            _pathToPlaceShim = Path.GetTempPath();
+        }
+
         [Fact]
         public void GivenAnExecutablePathItCanGenerateShimFile()
         {
             var outputDll = MakeHelloWorldExecutableDll();
 
-            var muxer = new Muxer();
-            var shellShimMaker = new ShellShimMaker(Path.GetDirectoryName(muxer.MuxerPath));
+            var shellShimMaker = new ShellShimMaker(_pathToPlaceShim);
             var shellCommandName = nameof(ShellShimMakerTests) + Path.GetRandomFileName();
 
             shellShimMaker.CreateShim(
@@ -37,13 +44,11 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
         [Fact]
         public void GivenAnExecutablePathWithExistingSameNameShimItThrows()
         {
-            var muxer = new Muxer();
-            var pathToPlaceShim = Path.GetDirectoryName(muxer.MuxerPath);
             var shellCommandName = nameof(ShellShimMakerTests) + Path.GetRandomFileName();
 
-            MakeNameConflictingCommand(pathToPlaceShim, shellCommandName);
+            MakeNameConflictingCommand(_pathToPlaceShim, shellCommandName);
 
-            var shellShimMaker = new ShellShimMaker(pathToPlaceShim);
+            var shellShimMaker = new ShellShimMaker(_pathToPlaceShim);
 
             Action a = () => shellShimMaker.EnsureCommandNameUniqueness(shellCommandName);
             a.ShouldThrow<GracefulException>()
@@ -58,11 +63,9 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
         [Fact]
         public void GivenAnExecutablePathWithoutExistingSameNameShimItShouldNotThrow()
         {
-            var muxer = new Muxer();
-            var pathToPlaceShim = Path.GetDirectoryName(muxer.MuxerPath);
             var shellCommandName = nameof(ShellShimMakerTests) + Path.GetRandomFileName();
 
-            var shellShimMaker = new ShellShimMaker(pathToPlaceShim);
+            var shellShimMaker = new ShellShimMaker(_pathToPlaceShim);
 
             Action a = () => shellShimMaker.EnsureCommandNameUniqueness(shellCommandName);
             a.ShouldNotThrow();
@@ -77,7 +80,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
         }
 
 
-        private static string ExecuteInShell(string shellCommandName)
+        private string ExecuteInShell(string shellCommandName)
         {
             string stdOut;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -118,25 +121,27 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
             return outputDll;
         }
 
-        private static void ExecuteAndCaptureOutputWithAssert(ProcessStartInfo startInfo, out string stdOut)
+        private void ExecuteAndCaptureOutputWithAssert(ProcessStartInfo startInfo, out string stdOut)
         {
-            var outStream = new StreamForwarder().Capture();
-            var errStream = new StreamForwarder().Capture();
+            StreamForwarder outStream = new StreamForwarder().Capture();
+            StreamForwarder errStream = new StreamForwarder().Capture();
 
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
 
+            startInfo.WorkingDirectory = _pathToPlaceShim;
+
             var process = new Process
             {
-                StartInfo = startInfo
+                StartInfo = startInfo,
             };
 
             process.EnableRaisingEvents = true;
 
             process.Start();
 
-            var taskOut = outStream.BeginRead(process.StandardOutput);
-            var taskErr = errStream.BeginRead(process.StandardError);
+            Task taskOut = outStream.BeginRead(process.StandardOutput);
+            Task taskErr = errStream.BeginRead(process.StandardError);
 
             process.WaitForExit();
 
