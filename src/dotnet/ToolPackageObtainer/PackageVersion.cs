@@ -3,7 +3,7 @@
 
 using System.IO;
 
-namespace Microsoft.DotNet.ExecutablePackageObtainer
+namespace Microsoft.DotNet.ToolPackageObtainer
 {
     internal class PackageVersion
     {

@@ -9,9 +9,9 @@ using Microsoft.Extensions.EnvironmentAbstractions;
 using Microsoft.DotNet.Cli;
 using Xunit;
 
-namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
+namespace Microsoft.DotNet.ToolPackageObtainer.Tests
 {
-    public class ExecutablePackageObtainerTests : TestBase
+    public class ToolPackageObtainerTests : TestBase
     {
         [Fact]
         public void GivenNugetConfigAndPackageNameAndVersionAndTargetFrameworkWhenCallItCanDownloadThePackage()
@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
             FilePath nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
-            ExecutablePackageObtainer packageObtainer =
+            var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath);
             ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory = packageObtainer.ObtainAndReturnExecutablePath(
                 packageId: TestPackageId,
@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
             var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
-            ExecutablePackageObtainer packageObtainer =
+            var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath);
             ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory =
                 packageObtainer.ObtainAndReturnExecutablePath(
@@ -87,7 +87,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
                 tempProjectDirectory.WithFile("nuget.config").Value);
 
             var packageObtainer =
-                new ExecutablePackageObtainer(
+                new ToolPackageObtainer(
                     new DirectoryPath(toolsPath),
                     () => uniqueTempProjectPath,
                     new Lazy<string>(),
@@ -116,7 +116,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
             var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
-            ExecutablePackageObtainer packageObtainer =
+            var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath);
             ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory = packageObtainer.ObtainAndReturnExecutablePath(
                 packageId: TestPackageId,
@@ -142,7 +142,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
             var packageObtainer =
-                new ExecutablePackageObtainer(
+                new ToolPackageObtainer(
                     new DirectoryPath(toolsPath),
                     GetUniqueTempProjectPathEachTest,
                     new Lazy<string>(() => BundledTargetFramework.GetTargetFrameworkMoniker()),
@@ -175,9 +175,9 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer.Tests
             return tempProjectPath;
         };
 
-        private static ExecutablePackageObtainer ConstructDefaultPackageObtainer(string toolsPath)
+        private static ToolPackageObtainer ConstructDefaultPackageObtainer(string toolsPath)
         {
-            return new ExecutablePackageObtainer(
+            return new ToolPackageObtainer(
                 new DirectoryPath(toolsPath),
                 GetUniqueTempProjectPathEachTest,
                 new Lazy<string>(),

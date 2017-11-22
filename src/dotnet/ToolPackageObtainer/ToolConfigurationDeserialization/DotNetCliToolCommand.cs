@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Xml.Serialization;
 
-namespace Microsoft.DotNet.ExecutablePackageObtainer.ToolConfigurationDeserialization
+namespace Microsoft.DotNet.ToolPackageObtainer.ToolConfigurationDeserialization
 {
     [Serializable]
     [DebuggerStepThrough]

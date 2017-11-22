@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Microsoft.DotNet.ExecutablePackageObtainer
+namespace Microsoft.DotNet.ToolPackageObtainer
 {
     internal class ToolConfiguration
     {

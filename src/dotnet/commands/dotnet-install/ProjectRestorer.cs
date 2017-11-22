@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.DotNet.ExecutablePackageObtainer;
+using Microsoft.DotNet.ToolPackageObtainer;
 using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.EnvironmentAbstractions;
 

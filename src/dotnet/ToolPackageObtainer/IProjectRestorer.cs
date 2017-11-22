@@ -3,7 +3,7 @@
 
 using Microsoft.Extensions.EnvironmentAbstractions;
 
-namespace Microsoft.DotNet.ExecutablePackageObtainer
+namespace Microsoft.DotNet.ToolPackageObtainer
 {
     internal interface IProjectRestorer
     {

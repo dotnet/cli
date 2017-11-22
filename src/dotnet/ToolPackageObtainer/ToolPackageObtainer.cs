@@ -4,9 +4,9 @@ using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
-namespace Microsoft.DotNet.ExecutablePackageObtainer
+namespace Microsoft.DotNet.ToolPackageObtainer
 {
-    internal class ExecutablePackageObtainer
+    internal class ToolPackageObtainer
     {
         private readonly Lazy<string> _bundledTargetFrameworkMoniker;
         private readonly Func<FilePath> _getTempProjectPath;
@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.ExecutablePackageObtainer
         private readonly IProjectRestorer _projectRestorer;
         private readonly DirectoryPath _toolsPath;
 
-        public ExecutablePackageObtainer(
+        public ToolPackageObtainer(
             DirectoryPath toolsPath,
             Func<FilePath> getTempProjectPath,
             Lazy<string> bundledTargetFrameworkMoniker,
