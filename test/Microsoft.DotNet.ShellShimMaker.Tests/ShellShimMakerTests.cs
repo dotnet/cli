@@ -79,7 +79,6 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
             File.WriteAllText(Path.Combine(pathToPlaceShim, shellCommandName), string.Empty);
         }
 
-
         private string ExecuteInShell(string shellCommandName)
         {
             string stdOut;
@@ -97,7 +96,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
                 ExecuteAndCaptureOutputWithAssert(new ProcessStartInfo
                 {
                     FileName = "sh",
-                    Arguments = $"-c {shellCommandName}",
+                    Arguments = shellCommandName,
                     UseShellExecute = false
                 }, out stdOut);
             }
@@ -151,7 +150,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
             stdOut = outStream.CapturedOutput;
             var stdErr = errStream.CapturedOutput;
 
-            stdErr.Should().BeEmpty();
+            stdErr.Should().BeEmpty("Arguments: " + startInfo.Arguments + " WorkingDirectory: "+ startInfo.WorkingDirectory);
             process.ExitCode.Should().Be(0);
         }
     }

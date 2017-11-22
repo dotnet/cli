@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.ShellShimMaker
                 else
                 {
                     _reporter.WriteLine(
-                        $"Cannot find tools executable path in environement PATH. Please ensure {_packageExecutablePath} is added to your PATH.{Environment.NewLine}" +
+                        $"Cannot find tools executable path in environment PATH. Please ensure {_packageExecutablePath} is added to your PATH.{Environment.NewLine}" +
                         $"If you are using bash, you can add it by running following command:{Environment.NewLine}{Environment.NewLine}" +
                         $"setx PATH \\\"%PATH%;{_packageExecutablePath}\"{Environment.NewLine}");
                 }
