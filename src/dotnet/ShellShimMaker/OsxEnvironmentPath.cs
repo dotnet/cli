@@ -13,10 +13,12 @@ namespace Microsoft.DotNet.ShellShimMaker
         private const string PathName = "PATH";
         private readonly string _packageExecutablePathWIthTilde;
         private readonly string _fullPackageExecutablePath;
-        private const string PathDDotnetCliToolsPath = @"/etc/paths.d/dotnet-cli-tools";
         private readonly IFile _fileSystem;
         private readonly IEnvironmentProvider _environmentProvider;
         private readonly IReporter _reporter;
+        private static readonly string PathDDotnetCliToolsPath
+            = Environment.GetEnvironmentVariable("DOTNET_CLI_TEST_OSX_PATHSD_PATH")
+              ?? @"/etc/paths.d/dotnet-cli-tools";
 
         public OsxEnvironmentPath(
             string packageExecutablePathWIthTilde,

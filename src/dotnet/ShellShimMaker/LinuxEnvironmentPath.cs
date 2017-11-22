@@ -15,7 +15,9 @@ namespace Microsoft.DotNet.ShellShimMaker
         private readonly IReporter _reporter;
         private const string PathName = "PATH";
         private readonly string _packageExecutablePath;
-        private const string ProfiledDotnetCliToolsPath = @"/etc/profile.d/dotnet-cli-tools-bin-path.sh";
+        private readonly string _profiledDotnetCliToolsPath
+            = Environment.GetEnvironmentVariable("DOTNET_CLI_TEST_LINUX_PROFILED_PATH")
+              ?? @"/etc/profile.d/dotnet-cli-tools-bin-path.sh";
 
         internal LinuxEnvironmentPath(
             string packageExecutablePath,
@@ -37,7 +39,7 @@ namespace Microsoft.DotNet.ShellShimMaker
             if (PackageExecutablePathExists()) return;
 
             var script = $"export PATH=\"$PATH:{_packageExecutablePath}\"";
-            _fileSystem.WriteAllText(ProfiledDotnetCliToolsPath, script);
+            _fileSystem.WriteAllText(_profiledDotnetCliToolsPath, script);
         }
 
         private bool PackageExecutablePathExists()
@@ -51,7 +53,7 @@ namespace Microsoft.DotNet.ShellShimMaker
         {
             if (!PackageExecutablePathExists())
             {
-                if (_fileSystem.Exists(ProfiledDotnetCliToolsPath))
+                if (_fileSystem.Exists(_profiledDotnetCliToolsPath))
                 {
                     _reporter.WriteLine("You need logout to be able to run new installed command from shell");
                 }
