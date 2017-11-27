@@ -4,10 +4,6 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <OutputType>Exe</OutputType>
-    <RestoreSources>
-      https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json;
-      https://api.nuget.org/v3/index.json
-    </RestoreSources>
   </PropertyGroup>
 
   <ItemGroup>
