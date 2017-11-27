@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.ShellShimMaker
             if (File.Exists(Path.Combine(_pathToPlaceShim, shellCommandName)))
             {
                 throw new GracefulException(
-                    $"Failed to create tool {shellCommandName}, a command with the same name existed");
+                    $"Failed to install tool {shellCommandName}. A command with the same name already exists.");
             }
         }
 
