@@ -37,9 +37,6 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
             var stdOut = ExecuteInShell(shellCommandName);
 
             stdOut.Should().Contain("Hello World");
-
-            // Tear down
-            shellShimMaker.Remove(shellCommandName);
         }
 
         [Fact]
@@ -56,9 +53,6 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
                 .And.Message
                 .Should().Contain(
                     $"Failed to install tool {shellCommandName}. A command with the same name already exists.");
-
-            // Tear down
-            shellShimMaker.Remove(shellCommandName);
         }
 
 
@@ -71,9 +65,6 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
 
             Action a = () => shellShimMaker.EnsureCommandNameUniqueness(shellCommandName);
             a.ShouldNotThrow();
-
-            // Tear down
-            shellShimMaker.Remove(shellCommandName);
         }
 
         private static void MakeNameConflictingCommand(string pathToPlaceShim, string shellCommandName)
