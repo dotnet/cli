@@ -55,13 +55,13 @@ namespace Microsoft.DotNet.ShellShimMaker
                     .Contains(_packageExecutablePath))
                 {
                     _reporter.WriteLine(
-                        $"You need reopen shell to be able to run new installed command.");
+                        "Since you just installed the .NET Core SDK, you will need to reopen the Command Prompt window before running the tool you installed.");
                 }
                 else
                 {
                     _reporter.WriteLine(
-                        $"Cannot find tools executable path in environment PATH. Please ensure {_packageExecutablePath} is added to your PATH.{Environment.NewLine}" +
-                        $"If you are using bash, you can add it by running following command:{Environment.NewLine}{Environment.NewLine}" +
+                        $"Cannot find the tools executable path. Please ensure {_packageExecutablePath} is added to your PATH.{Environment.NewLine}" +
+                        $"You can do this by running the following command:{Environment.NewLine}{Environment.NewLine}" +
                         $"setx PATH \\\"%PATH%;{_packageExecutablePath}\"{Environment.NewLine}");
                 }
             }

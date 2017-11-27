@@ -59,16 +59,16 @@ namespace Microsoft.DotNet.ShellShimMaker
             {
                 if (_fileSystem.Exists(_profiledDotnetCliToolsPath))
                 {
-                    _reporter.WriteLine("You need logout to be able to run new installed command from shell");
+                    _reporter.WriteLine("Since you just installed the .NET Core SDK, you will need to logout or restart your session before running the tool you installed");
                 }
                 else
                 {
                     // similar to https://code.visualstudio.com/docs/setup/mac
                     _reporter.WriteLine(
-                        $"Cannot find tools executable path in environment PATH. Please ensure {_packageExecutablePath} is added to your PATH.{Environment.NewLine}" +
-                        $"If you are using bash, you can add it by running following command:{Environment.NewLine}{Environment.NewLine}" +
+                        $"Cannot find the tools executable path. Please ensure {_packageExecutablePath} is added to your PATH.{Environment.NewLine}" +
+                        $"If you are using bash, You can do this by running the following command:{Environment.NewLine}{Environment.NewLine}" +
                         $"cat << EOF >> ~/.bash_profile{Environment.NewLine}" +
-                        $"# Add dotnet-sdk tools{Environment.NewLine}" +
+                        $"# Add .NET Core SDK tools{Environment.NewLine}" +
                         $"export PATH=\"$PATH:{_packageExecutablePath}\"{Environment.NewLine}" +
                         $"EOF");
                 }
