@@ -36,17 +36,8 @@ namespace Microsoft.DotNet.ShellShimMaker
                 script.AppendLine($"dotnet {packageExecutable.ToQuotedString()} \"$@\"");
             }
 
-            var scriptPath = GetScriptPath(shellCommandName);
-            try
-            {
-                File.WriteAllText(scriptPath.Value, script.ToString());
-            }
-            catch (UnauthorizedAccessException e)
-            {
-                throw new GracefulException(
-                    string.Format("Install failed, try run the install command as an administrator, if you have the access. {0}",
-                        e.Message));
-            }
+            FilePath scriptPath = GetScriptPath(shellCommandName);
+            File.WriteAllText(scriptPath.Value, script.ToString());
 
             SetUserExecutionPermissionToShimFile(scriptPath);
         }
@@ -55,7 +46,8 @@ namespace Microsoft.DotNet.ShellShimMaker
         {
             if (File.Exists(Path.Combine(_pathToPlaceShim, shellCommandName)))
             {
-                throw new GracefulException($"Failed to create tool {shellCommandName}, a command with the same name existed");
+                throw new GracefulException(
+                    $"Failed to create tool {shellCommandName}, a command with the same name existed");
             }
         }
 
@@ -79,7 +71,7 @@ namespace Microsoft.DotNet.ShellShimMaker
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
 
-            var result = new CommandFactory()
+            CommandResult result = new CommandFactory()
                 .Create("chmod", new[] {"u+x", scriptPath.Value})
                 .CaptureStdOut()
                 .CaptureStdErr()
