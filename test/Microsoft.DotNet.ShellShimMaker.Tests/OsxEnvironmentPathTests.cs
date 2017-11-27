@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
         public void GivenenvironmentAndReporterItCanPrintOutInstructionToAddPath()
         {
             var fakeReporter = new FakeReporter();
-            var osxEnvironmentPath = new OsxEnvironmentPath(
+            var osxEnvironmentPath = new OSXEnvironmentPath(
                 @"~/executable/path",
                 @"/Users/name/executable/path",
                 fakeReporter,
@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
         public void GivenenvironmentAndReporterItPrintsNothingWhenenvironmentExists(string existingPath)
         {
             var fakeReporter = new FakeReporter();
-            var osxEnvironmentPath = new OsxEnvironmentPath(
+            var osxEnvironmentPath = new OSXEnvironmentPath(
                 @"~/executable/path",
                 @"/Users/name/executable/path",
                 fakeReporter,
@@ -68,7 +68,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
         {
             // arrange
             var fakeReporter = new FakeReporter();
-            var osxEnvironmentPath = new OsxEnvironmentPath(
+            var osxEnvironmentPath = new OSXEnvironmentPath(
                 @"~/executable/path",
                 @"/Users/name/executable/path",
                 fakeReporter,

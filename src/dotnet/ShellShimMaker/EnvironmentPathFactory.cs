@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.ShellShimMaker
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && hasSuperUserAccess)
             {
-                environmentPath = new OsxEnvironmentPath(
+                environmentPath = new OSXEnvironmentPath(
                     packageExecutablePathWIthTilde: cliFolderPathCalculator.ExecutablePackagesPathOnMacEnvPath,
                     fullPackageExecutablePath: cliFolderPathCalculator.ExecutablePackagesPath,
                     reporter: Reporter.Output,

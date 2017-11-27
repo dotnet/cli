@@ -71,7 +71,7 @@ namespace Microsoft.DotNet.Configurer
                     _pathAdder.AddPackageExecutablePathToUserPath();
                 }
             }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            else
             {
                 // Invoke during installer, otherwise, _pathAdder will be no op object that this point
                 _pathAdder.AddPackageExecutablePathToUserPath();

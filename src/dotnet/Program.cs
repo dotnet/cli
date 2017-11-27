@@ -226,8 +226,7 @@ namespace Microsoft.DotNet.Cli
                     environmentProvider,
                     Reporter.Output,
                     cliFolderPathCalculator.CliFallbackFolderPath,
-                    environmentPath
-                    );
+                    environmentPath);
 
                 dotnetConfigurer.Configure();
             }

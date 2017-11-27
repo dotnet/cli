@@ -8,7 +8,7 @@ using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.ShellShimMaker
 {
-    internal class OsxEnvironmentPath : IEnvironmentPath
+    internal class OSXEnvironmentPath : IEnvironmentPath
     {
         private const string PathName = "PATH";
         private readonly string _packageExecutablePathWIthTilde;
@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.ShellShimMaker
             = Environment.GetEnvironmentVariable("DOTNET_CLI_TEST_OSX_PATHSD_PATH")
               ?? @"/etc/paths.d/dotnet-cli-tools";
 
-        public OsxEnvironmentPath(
+        public OSXEnvironmentPath(
             string packageExecutablePathWIthTilde,
             string fullPackageExecutablePath,
             IReporter reporter,
