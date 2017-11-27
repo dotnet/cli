@@ -87,21 +87,29 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
             string stdOut;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                ExecuteAndCaptureOutputWithAssert(new ProcessStartInfo
+                var processStartInfo = new ProcessStartInfo
                 {
                     FileName = "CMD.exe",
                     Arguments = $"/C {shellCommandName}",
                     UseShellExecute = false
-                }, out stdOut);
+                };
+
+                processStartInfo.EnvironmentVariables["PATH"] = Path.GetDirectoryName(new Muxer().MuxerPath);
+
+                ExecuteAndCaptureOutputWithAssert(processStartInfo, out stdOut);
             }
             else
             {
-                ExecuteAndCaptureOutputWithAssert(new ProcessStartInfo
+                var processStartInfo = new ProcessStartInfo
                 {
                     FileName = "sh",
                     Arguments = $"-c {shellCommandName}",
                     UseShellExecute = false
-                }, out stdOut);
+                };
+
+                processStartInfo.EnvironmentVariables["PATH"] = Path.GetDirectoryName(new Muxer().MuxerPath);
+
+                ExecuteAndCaptureOutputWithAssert(processStartInfo, out stdOut);
             }
 
             return stdOut ?? "";
@@ -113,7 +121,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
             const string emptySpaceToTestSpaceInPath = " ";
             TestAssetInstance testInstance = TestAssets.Get(testAppName)
                 .CreateInstance(testAppName + emptySpaceToTestSpaceInPath)
-                .WithSourceFiles()
+                .UseCurrentRuntimeFrameworkVersion()
                 .WithRestoreFiles()
                 .WithBuildFiles();
 
