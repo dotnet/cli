@@ -4,10 +4,12 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
 
@@ -107,17 +109,20 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
 
         private static FileInfo MakeHelloWorldExecutableDll()
         {
-            const string target = "netcoreapp2.1";
             const string testAppName = "TestAppSimple";
             const string emptySpaceToTestSpaceInPath = " ";
-            var testInstance = TestAssets.Get(testAppName)
-                .CreateInstance(testAppName + emptySpaceToTestSpaceInPath + target.Replace('.', '_'))
-                .WithSourceFiles().WithRestoreFiles().WithBuildFiles();
+            TestAssetInstance testInstance = TestAssets.Get(testAppName)
+                .CreateInstance(testAppName + emptySpaceToTestSpaceInPath)
+                .WithSourceFiles()
+                .WithRestoreFiles()
+                .WithBuildFiles();
 
             var configuration = Environment.GetEnvironmentVariable("CONFIGURATION") ?? "Debug";
 
-            var outputDll = testInstance.Root.GetDirectory("bin", configuration, target)
+            FileInfo outputDll = testInstance.Root.GetDirectory("bin", configuration)
+                .GetDirectories().Single()
                 .GetFile($"{testAppName}.dll");
+
             return outputDll;
         }
 
