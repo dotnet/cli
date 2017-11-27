@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
     public class LinuxEnvironmentPathTests
     {
         [Fact]
-        public void GivenenvironmentAndReporterItCanPrintOutInstructionToAddPath()
+        public void GivenEnvironmentAndReporterItCanPrintOutInstructionToAddPath()
         {
             var fakeReporter = new FakeReporter();
             var linuxEnvironmentPath = new LinuxEnvironmentPath(
@@ -41,7 +41,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
         }
 
         [Fact]
-        public void GivenenvironmentAndReporterItPrintsNothingWhenenvironmentExists()
+        public void GivenEnvironmentAndReporterItPrintsNothingWhenenvironmentExists()
         {
             var fakeReporter = new FakeReporter();
             var linuxEnvironmentPath = new LinuxEnvironmentPath(
@@ -62,7 +62,6 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
         [Fact]
         public void GivenAddPackageExecutablePathToUserPathJustRunItPrintsInstructionToLogout()
         {
-            // arrange
             var fakeReporter = new FakeReporter();
             var linuxEnvironmentPath = new LinuxEnvironmentPath(
                 @"executable\path",
@@ -75,10 +74,8 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
                 FakeFile.Empty);
             linuxEnvironmentPath.AddPackageExecutablePathToUserPath();
 
-            // act
             linuxEnvironmentPath.PrintAddPathInstructionIfPathDoesNotExist();
 
-            // asset
             fakeReporter.Message.Should().Be("You need logout to be able to run new installed command from shell");
         }
     }

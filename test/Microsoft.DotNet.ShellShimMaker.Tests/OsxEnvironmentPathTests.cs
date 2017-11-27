@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
     public class OsxEnvironmentPathTests
     {
         [Fact]
-        public void GivenenvironmentAndReporterItCanPrintOutInstructionToAddPath()
+        public void GivenEnvironmentAndReporterItCanPrintOutInstructionToAddPath()
         {
             var fakeReporter = new FakeReporter();
             var osxEnvironmentPath = new OSXEnvironmentPath(
@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
         [Theory]
         [InlineData("/Users/name/executable/path")]
         [InlineData("~/executable/path")]
-        public void GivenenvironmentAndReporterItPrintsNothingWhenenvironmentExists(string existingPath)
+        public void GivenEnvironmentAndReporterItPrintsNothingWhenenvironmentExists(string existingPath)
         {
             var fakeReporter = new FakeReporter();
             var osxEnvironmentPath = new OSXEnvironmentPath(
@@ -66,7 +66,6 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
         [Fact]
         public void GivenAddPackageExecutablePathToUserPathJustRunItPrintsInstructionToLogout()
         {
-            // arrange
             var fakeReporter = new FakeReporter();
             var osxEnvironmentPath = new OSXEnvironmentPath(
                 @"~/executable/path",
@@ -80,10 +79,8 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
                 FakeFile.Empty);
             osxEnvironmentPath.AddPackageExecutablePathToUserPath();
 
-            // act
             osxEnvironmentPath.PrintAddPathInstructionIfPathDoesNotExist();
 
-            // asset
             fakeReporter.Message.Should().Be(
                 $"You need reopen to be able to run new installed command from shell{Environment.NewLine}" +
                 $"If you are using different a shell that is not sh or bash, you need to ensure /Users/name/executable/path is in your path");
