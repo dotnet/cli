@@ -24,6 +24,8 @@
         <CombinedFrameworkSdkHostInstallerFile>$(InstallerOutputDirectory)/$(ArtifactNameWithVersionCombinedHostHostFxrFrameworkSdk)$(BundleExtension)</CombinedFrameworkSdkHostInstallerFile>
         <SdkInstallerNuspecFile>$(RepoRoot)/packaging/windows/clisdk/VS.Redist.Common.Net.Core.SDK.$(Architecture).nuspec</SdkInstallerNuspecFile>
         <SdkInstallerNupkgFile>$(InstallerOutputDirectory)/VS.Redist.Common.Net.Core.SDK.$(Architecture).$(FullNugetVersion).nupkg</SdkInstallerNupkgFile>
+        <SdkInstallerNuspecV1File>$(RepoRoot)/packaging/windows/clisdk/VS.Redist.Common.Net.Core.SDK.$(Architecture).v1.nuspec</SdkInstallerNuspecV1File>
+        <SdkInstallerNupkgV1File>$(InstallerOutputDirectory)/VS.Redist.Common.Net.Core.SDK.$(Architecture).v1.$(FullNugetVersion).nupkg</SdkInstallerNupkgV1File>
       </PropertyGroup>
 
       <!-- Generate SDK MSI Inputs -->
@@ -129,14 +131,22 @@
             Condition=" '$(OS)' == 'Windows_NT'"
             Inputs="$(CombinedFrameworkSdkHostInstallerFile);
                     $(SdkInstallerNuspecFile);
+                    $(SdkInstallerNuspecV1File);
                     $(SdkGenerateNupkgPowershellScript)"
-            Outputs="$(SdkInstallerNupkgFile)">
+            Outputs="$(SdkInstallerNupkgFile);
+                     $(SdkInstallerNupkgV1File)">
 
       <Exec Command="powershell -NoProfile -NoLogo $(SdkGenerateNupkgPowershellScript)
                       '$(CombinedFrameworkSdkHostInstallerFile)'
                       '$(FullNugetVersion)'
                       '$(SdkInstallerNuspecFile)'
                       '$(SdkInstallerNupkgFile)'" />
+
+      <Exec Command="powershell -NoProfile -NoLogo $(SdkGenerateNupkgPowershellScript)
+                      '$(CombinedFrameworkSdkHostInstallerFile)'
+                      '$(FullNugetVersion)'
+                      '$(SdkInstallerNuspecV1File)'
+                      '$(SdkInstallerNupkgV1File)'" />
     </Target>
 
     <Target Name="TestSdkMsi"
