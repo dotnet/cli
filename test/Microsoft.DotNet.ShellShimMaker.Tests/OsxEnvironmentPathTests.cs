@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
     public class OsxEnvironmentPathTests
     {
         [Fact]
-        public void GivenEnvironementAndReporterItCanPrintOutInstructionToAddPath()
+        public void GivenenvironmentAndReporterItCanPrintOutInstructionToAddPath()
         {
             var fakeReporter = new FakeReporter();
             var osxEnvironmentPath = new OsxEnvironmentPath(
@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
 
             // similar to https://code.visualstudio.com/docs/setup/mac
             fakeReporter.Message.Should().Be(
-                $"Cannot find tools executable path in environement PATH. Please ensure /Users/name/executable/path is added to your PATH.{Environment.NewLine}" +
+                $"Cannot find tools executable path in environment PATH. Please ensure /Users/name/executable/path is added to your PATH.{Environment.NewLine}" +
                 $"If you are using bash, you can add it by running following command:{Environment.NewLine}{Environment.NewLine}" +
                 $"cat << EOF >> ~/.bash_profile{Environment.NewLine}" +
                 $"# Add dotnet-sdk tools{Environment.NewLine}" +
@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
         [Theory]
         [InlineData("/Users/name/executable/path")]
         [InlineData("~/executable/path")]
-        public void GivenEnvironementAndReporterItPrintsNothingWhenEnvironementExists(string existingPath)
+        public void GivenenvironmentAndReporterItPrintsNothingWhenenvironmentExists(string existingPath)
         {
             var fakeReporter = new FakeReporter();
             var osxEnvironmentPath = new OsxEnvironmentPath(

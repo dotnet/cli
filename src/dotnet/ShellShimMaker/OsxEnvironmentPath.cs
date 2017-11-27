@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.ShellShimMaker
                 {
                     // similar to https://code.visualstudio.com/docs/setup/mac
                     _reporter.WriteLine(
-                        $"Cannot find tools executable path in environement PATH. Please ensure {_fullPackageExecutablePath} is added to your PATH.{Environment.NewLine}" +
+                        $"Cannot find tools executable path in environment PATH. Please ensure {_fullPackageExecutablePath} is added to your PATH.{Environment.NewLine}" +
                         $"If you are using bash, you can add it by running following command:{Environment.NewLine}{Environment.NewLine}" +
                         $"cat << EOF >> ~/.bash_profile{Environment.NewLine}" +
                         $"# Add dotnet-sdk tools{Environment.NewLine}" +

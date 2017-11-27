@@ -15,10 +15,10 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
     public class LinuxEnvironmentPathTests
     {
         [Fact]
-        public void GivenEnvironementAndReporterItCanPrintOutInstructionToAddPath()
+        public void GivenenvironmentAndReporterItCanPrintOutInstructionToAddPath()
         {
             var fakeReporter = new FakeReporter();
-            var linuxEnvironementPath = new LinuxEnvironmentPath(
+            var linuxEnvironmentPath = new LinuxEnvironmentPath(
                 @"executable\path",
                 fakeReporter,
                 new FakeEnvironmentProvider(
@@ -28,11 +28,11 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
                     }),
                 FakeFile.Empty);
 
-            linuxEnvironementPath.PrintAddPathInstructionIfPathDoesNotExist();
+            linuxEnvironmentPath.PrintAddPathInstructionIfPathDoesNotExist();
 
             // similar to https://code.visualstudio.com/docs/setup/mac
             fakeReporter.Message.Should().Be(
-                $"Cannot find tools executable path in environement PATH. Please ensure executable\\path is added to your PATH.{Environment.NewLine}" +
+                $"Cannot find tools executable path in environment PATH. Please ensure executable\\path is added to your PATH.{Environment.NewLine}" +
                 $"If you are using bash, you can add it by running following command:{Environment.NewLine}{Environment.NewLine}" +
                 $"cat << EOF >> ~/.bash_profile{Environment.NewLine}" +
                 $"# Add dotnet-sdk tools{Environment.NewLine}" +
@@ -41,10 +41,10 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
         }
 
         [Fact]
-        public void GivenEnvironementAndReporterItPrintsNothingWhenEnvironementExists()
+        public void GivenenvironmentAndReporterItPrintsNothingWhenenvironmentExists()
         {
             var fakeReporter = new FakeReporter();
-            var linuxEnvironementPath = new LinuxEnvironmentPath(
+            var linuxEnvironmentPath = new LinuxEnvironmentPath(
                 @"executable\path",
                 fakeReporter,
                 new FakeEnvironmentProvider(
@@ -54,7 +54,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
                     }),
                 FakeFile.Empty);
 
-            linuxEnvironementPath.PrintAddPathInstructionIfPathDoesNotExist();
+            linuxEnvironmentPath.PrintAddPathInstructionIfPathDoesNotExist();
 
             fakeReporter.Message.Should().BeEmpty();
         }
@@ -64,7 +64,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
         {
             // arrange
             var fakeReporter = new FakeReporter();
-            var linuxEnvironementPath = new LinuxEnvironmentPath(
+            var linuxEnvironmentPath = new LinuxEnvironmentPath(
                 @"executable\path",
                 fakeReporter,
                 new FakeEnvironmentProvider(
@@ -73,10 +73,10 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
                         {"PATH", @""}
                     }),
                 FakeFile.Empty);
-            linuxEnvironementPath.AddPackageExecutablePathToUserPath();
+            linuxEnvironmentPath.AddPackageExecutablePathToUserPath();
 
             // act
-            linuxEnvironementPath.PrintAddPathInstructionIfPathDoesNotExist();
+            linuxEnvironmentPath.PrintAddPathInstructionIfPathDoesNotExist();
 
             // asset
             fakeReporter.Message.Should().Be("You need logout to be able to run new installed command from shell");
