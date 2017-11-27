@@ -77,13 +77,12 @@ namespace Microsoft.DotNet.ShellShimMaker
                 .CaptureStdErr()
                 .Execute();
 
-
             if (result.ExitCode != 0)
             {
                 throw new GracefulException(
-                    "Failed to change permission" +
-                    $"{Environment.NewLine}error: " + result.StdErr +
-                    $"{Environment.NewLine}output: " + result.StdOut);
+                    "Failed to change permission:" +
+                    $"{Environment.NewLine}Error: " + result.StdErr +
+                    $"{Environment.NewLine}Output: " + result.StdOut);
             }
         }
     }

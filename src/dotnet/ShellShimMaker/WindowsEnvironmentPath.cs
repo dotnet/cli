@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.ShellShimMaker
             string packageExecutablePath, IReporter reporter,
             IEnvironmentProvider environmentProvider)
         {
-            _packageExecutablePath 
+            _packageExecutablePath
                 = packageExecutablePath ?? throw new ArgumentNullException(nameof(packageExecutablePath));
             _environmentProvider
                 = environmentProvider ?? throw new ArgumentNullException(nameof(environmentProvider));
@@ -29,7 +29,10 @@ namespace Microsoft.DotNet.ShellShimMaker
 
         public void AddPackageExecutablePathToUserPath()
         {
-            if (PackageExecutablePathExists()) return;
+            if (PackageExecutablePathExists())
+            {
+                return;
+            }
 
             var existingUserEnvPath = Environment.GetEnvironmentVariable(PathName, EnvironmentVariableTarget.User);
 
@@ -48,7 +51,8 @@ namespace Microsoft.DotNet.ShellShimMaker
         {
             if (!PackageExecutablePathExists())
             {
-                if (Environment.GetEnvironmentVariable(PathName, EnvironmentVariableTarget.User).Split(';').Contains(_packageExecutablePath))
+                if (Environment.GetEnvironmentVariable(PathName, EnvironmentVariableTarget.User).Split(';')
+                    .Contains(_packageExecutablePath))
                 {
                     _reporter.WriteLine(
                         $"You need reopen shell to be able to run new installed command.");
