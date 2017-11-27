@@ -136,6 +136,29 @@ namespace Microsoft.DotNet.ToolPackageObtainer.Tests
         }
 
         [Fact]
+        public void GivenAllButNoPackageVersionAndInvokeTwiceItShouldNotThrow()
+        {
+            var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
+            var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
+
+            var packageObtainer =
+                ConstructDefaultPackageObtainer(toolsPath);
+
+            packageObtainer.ObtainAndReturnExecutablePath(
+                packageId: TestPackageId,
+                nugetconfig: nugetConfigPath,
+                targetframework: _testTargetframework);
+
+            Action secondCall = () => packageObtainer.ObtainAndReturnExecutablePath(
+                packageId: TestPackageId,
+                nugetconfig: nugetConfigPath,
+                targetframework: _testTargetframework);
+
+            secondCall.ShouldNotThrow();
+        }
+
+
+        [Fact]
         public void GivenAllButNoTargetFrameworkItCanDownloadThePackage()
         {
             var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();

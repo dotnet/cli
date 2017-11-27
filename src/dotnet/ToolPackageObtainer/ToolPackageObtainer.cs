@@ -75,7 +75,8 @@ namespace Microsoft.DotNet.ToolPackageObtainer
                             individualToolVersion.WithSubDirectories(packageId).Value).Single()).Name;
                 DirectoryPath concreteVersionIndividualToolVersion =
                     individualToolVersion.GetParentPath().WithSubDirectories(concreteVersion);
-                Directory.Move(individualToolVersion.Value, concreteVersionIndividualToolVersion.Value);
+
+                MoveToConcreteWithOverride(concreteVersionIndividualToolVersion, individualToolVersion);
 
                 individualToolVersion = concreteVersionIndividualToolVersion;
                 packageVersion = concreteVersion;
@@ -90,6 +91,18 @@ namespace Microsoft.DotNet.ToolPackageObtainer
                     packageVersion,
                     "tools",
                     targetframework));
+        }
+
+        private static void MoveToConcreteWithOverride(
+            DirectoryPath concreteVersionIndividualToolVersion,
+            DirectoryPath individualToolVersion)
+        {
+            if (Directory.Exists(concreteVersionIndividualToolVersion.Value))
+            {
+                Directory.Delete(concreteVersionIndividualToolVersion.Value, recursive: true);
+            }
+
+            Directory.Move(individualToolVersion.Value, concreteVersionIndividualToolVersion.Value);
         }
 
         private static ToolConfiguration GetConfiguration(
@@ -135,6 +148,7 @@ namespace Microsoft.DotNet.ToolPackageObtainer
                     new XElement("PropertyGroup",
                         new XElement("TargetFramework", targetframework),
                         new XElement("RestorePackagesPath", individualToolVersion.Value),
+                        new XElement("RestoreSolutionDirectory", Directory.GetCurrentDirectory()), // https://github.com/NuGet/Home/issues/6199
                         new XElement("DisableImplicitFrameworkReferences", "true")
                     ),
                     packageVersion.IsConcreteValue
