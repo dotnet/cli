@@ -15,7 +15,8 @@ namespace Microsoft.DotNet.Configurer
         private const string ToolsFolderName = "tools";
         private const string DotnetProfileDirectoryName = ".dotnet";
 
-        public string CliFallbackFolderPath => GetExecutableBaseDirectory("NuGetFallbackFolder");
+        public string CliFallbackFolderPath => Environment.GetEnvironmentVariable("DOTNET_CLI_TEST_FALLBACKFOLDER") ??
+                                               Path.Combine(new DirectoryInfo(AppContext.BaseDirectory).Parent.FullName, "NuGetFallbackFolder");
         
         public string ExecutablePackagesPath => Path.Combine(DotnetUserProfileFolderPath, ToolsFolderName) ;
         public readonly string ExecutablePackagesPathOnMacEnvPath = $"~/{DotnetProfileDirectoryName}/{ToolsFolderName}";
@@ -33,11 +34,5 @@ namespace Microsoft.DotNet.Configurer
 
         public string NuGetUserSettingsDirectory =>
             NuGetEnvironment.GetFolderPath(NuGetFolderPath.UserSettingsDirectory);
-
-        private static string GetExecutableBaseDirectory(string nugetfallbackfolder)
-        {
-            return Environment.GetEnvironmentVariable("DOTNET_CLI_TEST_FALLBACKFOLDER") ??
-                   Path.Combine(new DirectoryInfo(AppContext.BaseDirectory).Parent.FullName, nugetfallbackfolder);
-        }
     }
 }
