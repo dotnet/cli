@@ -32,10 +32,10 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
 
             // similar to https://code.visualstudio.com/docs/setup/mac
             fakeReporter.Message.Should().Be(
-                $"Cannot find tools executable path in environment PATH. Please ensure executable\\path is added to your PATH.{Environment.NewLine}" +
-                $"If you are using bash, you can add it by running following command:{Environment.NewLine}{Environment.NewLine}" +
+                $"Cannot find the tools executable path. Please ensure executable\\path is added to your PATH.{Environment.NewLine}" +
+                $"If you are using bash. You can do this by running the following command:{Environment.NewLine}{Environment.NewLine}" +
                 $"cat << EOF >> ~/.bash_profile{Environment.NewLine}" +
-                $"# Add dotnet-sdk tools{Environment.NewLine}" +
+                $"# Add .NET Core SDK tools{Environment.NewLine}" +
                 $"export PATH=\"$PATH:executable\\path\"{Environment.NewLine}" +
                 $"EOF");
         }
@@ -76,7 +76,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
 
             linuxEnvironmentPath.PrintAddPathInstructionIfPathDoesNotExist();
 
-            fakeReporter.Message.Should().Be("You need logout to be able to run new installed command from shell");
+            fakeReporter.Message.Should().Be("Since you just installed the .NET Core SDK, you will need to logout or restart your session before running the tool you installed.");
         }
     }
 }

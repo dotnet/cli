@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.TestFramework;
@@ -55,7 +54,8 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
             Action a = () => shellShimMaker.EnsureCommandNameUniqueness(shellCommandName);
             a.ShouldThrow<GracefulException>()
                 .And.Message
-                .Should().Contain($"Failed to create tool {shellCommandName}, a command with the same name existed");
+                .Should().Contain(
+                    $"Failed to install tool {shellCommandName}. A command with the same name already exists.");
 
             // Tear down
             shellShimMaker.Remove(shellCommandName);
@@ -83,33 +83,32 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
 
         private string ExecuteInShell(string shellCommandName)
         {
-            string stdOut;
+            ProcessStartInfo processStartInfo;
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                var processStartInfo = new ProcessStartInfo
+                processStartInfo = new ProcessStartInfo
                 {
                     FileName = "CMD.exe",
                     Arguments = $"/C {shellCommandName}",
                     UseShellExecute = false
                 };
-
-                processStartInfo.EnvironmentVariables["PATH"] = Path.GetDirectoryName(new Muxer().MuxerPath);
-
-                ExecuteAndCaptureOutputWithAssert(processStartInfo, out stdOut);
             }
             else
             {
-                var processStartInfo = new ProcessStartInfo
+                processStartInfo = new ProcessStartInfo
                 {
                     FileName = "sh",
                     Arguments = shellCommandName,
                     UseShellExecute = false
                 };
-
-                processStartInfo.EnvironmentVariables["PATH"] = Path.GetDirectoryName(new Muxer().MuxerPath);
-
-                ExecuteAndCaptureOutputWithAssert(processStartInfo, out stdOut);
             }
+            processStartInfo.WorkingDirectory = _pathToPlaceShim;
+            processStartInfo.EnvironmentVariables["PATH"] = Path.GetDirectoryName(new Muxer().MuxerPath);
+
+            processStartInfo.ExecuteAndCaptureOutput(out var stdOut, out var stdErr);
+
+            stdErr.Should().BeEmpty();
 
             return stdOut ?? "";
         }
@@ -131,40 +130,6 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
                 .GetFile($"{testAppName}.dll");
 
             return outputDll;
-        }
-
-        private void ExecuteAndCaptureOutputWithAssert(ProcessStartInfo startInfo, out string stdOut)
-        {
-            StreamForwarder outStream = new StreamForwarder().Capture();
-            StreamForwarder errStream = new StreamForwarder().Capture();
-
-            startInfo.RedirectStandardOutput = true;
-            startInfo.RedirectStandardError = true;
-
-            startInfo.WorkingDirectory = _pathToPlaceShim;
-
-            var process = new Process
-            {
-                StartInfo = startInfo,
-            };
-
-            process.EnableRaisingEvents = true;
-
-            process.Start();
-
-            Task taskOut = outStream.BeginRead(process.StandardOutput);
-            Task taskErr = errStream.BeginRead(process.StandardError);
-
-            process.WaitForExit();
-
-            taskOut.Wait();
-            taskErr.Wait();
-
-            stdOut = outStream.CapturedOutput;
-            var stdErr = errStream.CapturedOutput;
-
-            stdErr.Should().BeEmpty("Arguments: " + startInfo.Arguments + " WorkingDirectory: "+ startInfo.WorkingDirectory);
-            process.ExitCode.Should().Be(0);
         }
     }
 }
