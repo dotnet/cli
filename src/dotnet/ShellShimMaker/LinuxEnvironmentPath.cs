@@ -15,6 +15,7 @@ namespace Microsoft.DotNet.ShellShimMaker
         private readonly IReporter _reporter;
         private const string PathName = "PATH";
         private readonly string _packageExecutablePath;
+
         private readonly string _profiledDotnetCliToolsPath
             = Environment.GetEnvironmentVariable("DOTNET_CLI_TEST_LINUX_PROFILED_PATH")
               ?? @"/etc/profile.d/dotnet-cli-tools-bin-path.sh";
@@ -36,7 +37,10 @@ namespace Microsoft.DotNet.ShellShimMaker
 
         public void AddPackageExecutablePathToUserPath()
         {
-            if (PackageExecutablePathExists()) return;
+            if (PackageExecutablePathExists())
+            {
+                return;
+            }
 
             var script = $"export PATH=\"$PATH:{_packageExecutablePath}\"";
             _fileSystem.WriteAllText(_profiledDotnetCliToolsPath, script);
