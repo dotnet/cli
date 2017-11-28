@@ -8,7 +8,9 @@ using Microsoft.DotNet.Tools.Test.Utilities;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Tools.Install.Tool;
+using Microsoft.DotNet.Tests.InstallToolCommandTests;
 using Xunit;
+using System.Collections.Generic;
 
 namespace Microsoft.DotNet.ToolPackage.Tests
 {
@@ -22,22 +24,30 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
             var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath);
-            ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory = packageObtainer.ObtainAndReturnExecutablePath(
+            var packageObtainerSimulator = new ToolPackageObtainerSimulator();
+
+            foreach (IToolPackageObtainer p in new List<IToolPackageObtainer>() { packageObtainerSimulator, packageObtainer })
+            {
+                ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory
+                    = p.ObtainAndReturnExecutablePath(
                 packageId: TestPackageId,
                 packageVersion: TestPackageVersion,
                 nugetconfig: nugetConfigPath,
                 targetframework: _testTargetframework);
 
-            var executable = toolConfigurationAndExecutableDirectory
-                .ExecutableDirectory
-                .WithFile(
-                    toolConfigurationAndExecutableDirectory
-                        .Configuration
-                        .ToolAssemblyEntryPoint);
+                FilePath executable = toolConfigurationAndExecutableDirectory
+                    .ExecutableDirectory
+                    .WithFile(
+                        toolConfigurationAndExecutableDirectory
+                            .Configuration
+                            .ToolAssemblyEntryPoint);
 
-            File.Exists(executable.Value)
-                .Should()
-                .BeTrue(executable + " should have the executable");
+                File.Exists(executable.Value)
+                    .Should()
+                    .BeTrue(executable + " should have the executable");
+
+                File.Delete(executable.Value);
+            }
         }
 
         [Fact]
@@ -48,25 +58,32 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
             var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath);
-            ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory =
-                packageObtainer.ObtainAndReturnExecutablePath(
+            var packageObtainerSimulator = new ToolPackageObtainerSimulator();
+
+            foreach (IToolPackageObtainer p in new List<IToolPackageObtainer>() { packageObtainerSimulator, packageObtainer })
+            {
+                ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory =
+                    p.ObtainAndReturnExecutablePath(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
                     nugetconfig: nugetConfigPath,
                     targetframework: _testTargetframework);
 
-            var assetJsonPath = toolConfigurationAndExecutableDirectory
-                .ExecutableDirectory
-                .GetParentPath()
-                .GetParentPath()
-                .GetParentPath()
-                .GetParentPath()
-                .GetParentPath()
-                .WithFile("project.assets.json").Value;
+                var assetJsonPath = toolConfigurationAndExecutableDirectory
+                    .ExecutableDirectory
+                    .GetParentPath()
+                    .GetParentPath()
+                    .GetParentPath()
+                    .GetParentPath()
+                    .GetParentPath()
+                    .WithFile("project.assets.json").Value;
 
-            File.Exists(assetJsonPath)
-                .Should()
-                .BeTrue(assetJsonPath + " should be created");
+                File.Exists(assetJsonPath)
+                    .Should()
+                    .BeTrue(assetJsonPath + " should be created");
+
+                File.Delete(assetJsonPath);
+            }
         }
 
         [Fact]
@@ -92,21 +109,28 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                     new Lazy<string>(),
                     new PackageToProjectFileAdder(),
                     new ProjectRestorer());
-            ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory = packageObtainer.ObtainAndReturnExecutablePath(
+            var packageObtainerSimulator = new ToolPackageObtainerSimulator();
+
+            foreach (IToolPackageObtainer p in new List<IToolPackageObtainer>() { packageObtainerSimulator, packageObtainer })
+            {
+                ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory = p.ObtainAndReturnExecutablePath(
                 packageId: TestPackageId,
                 packageVersion: TestPackageVersion,
                 targetframework: _testTargetframework);
 
-            var executable = toolConfigurationAndExecutableDirectory
-                .ExecutableDirectory
-                .WithFile(
-                    toolConfigurationAndExecutableDirectory
-                        .Configuration
-                        .ToolAssemblyEntryPoint);
+                var executable = toolConfigurationAndExecutableDirectory
+                    .ExecutableDirectory
+                    .WithFile(
+                        toolConfigurationAndExecutableDirectory
+                            .Configuration
+                            .ToolAssemblyEntryPoint);
 
-            File.Exists(executable.Value)
-                .Should()
-                .BeTrue(executable + " should have the executable");
+                File.Exists(executable.Value)
+                    .Should()
+                    .BeTrue(executable + " should have the executable");
+
+                File.Delete(executable.Value);
+            }
         }
 
         [Fact]
@@ -117,21 +141,28 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
             var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath);
-            ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory = packageObtainer.ObtainAndReturnExecutablePath(
+            var packageObtainerSimulator = new ToolPackageObtainerSimulator();
+
+            foreach (IToolPackageObtainer p in new List<IToolPackageObtainer> { packageObtainerSimulator, packageObtainer })
+            {
+                ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory = p.ObtainAndReturnExecutablePath(
                 packageId: TestPackageId,
                 nugetconfig: nugetConfigPath,
                 targetframework: _testTargetframework);
 
-            var executable = toolConfigurationAndExecutableDirectory
-                .ExecutableDirectory
-                .WithFile(
-                    toolConfigurationAndExecutableDirectory
-                        .Configuration
-                        .ToolAssemblyEntryPoint);
+                var executable = toolConfigurationAndExecutableDirectory
+                    .ExecutableDirectory
+                    .WithFile(
+                        toolConfigurationAndExecutableDirectory
+                            .Configuration
+                            .ToolAssemblyEntryPoint);
 
-            File.Exists(executable.Value)
-                .Should()
-                .BeTrue(executable + " should have the executable");
+                File.Exists(executable.Value)
+                    .Should()
+                    .BeTrue(executable + " should have the executable");
+
+                File.Delete(executable.Value);
+            }
         }
 
         [Fact]
@@ -142,18 +173,22 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
             var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath);
+            var packageObtainerSimulator = new ToolPackageObtainerSimulator();
 
-            packageObtainer.ObtainAndReturnExecutablePath(
+            foreach (IToolPackageObtainer p in new List<IToolPackageObtainer>() { packageObtainerSimulator, packageObtainer })
+            {
+                p.ObtainAndReturnExecutablePath(
                 packageId: TestPackageId,
                 nugetconfig: nugetConfigPath,
                 targetframework: _testTargetframework);
 
-            Action secondCall = () => packageObtainer.ObtainAndReturnExecutablePath(
-                packageId: TestPackageId,
-                nugetconfig: nugetConfigPath,
-                targetframework: _testTargetframework);
+                Action secondCall = () => p.ObtainAndReturnExecutablePath(
+                    packageId: TestPackageId,
+                    nugetconfig: nugetConfigPath,
+                    targetframework: _testTargetframework);
 
-            secondCall.ShouldNotThrow();
+                secondCall.ShouldNotThrow();
+            }
         }
 
 
@@ -170,22 +205,29 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                     new Lazy<string>(() => BundledTargetFramework.GetTargetFrameworkMoniker()),
                     new PackageToProjectFileAdder(),
                     new ProjectRestorer());
-            ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory =
-                packageObtainer.ObtainAndReturnExecutablePath(
+            var packageObtainerSimulator = new ToolPackageObtainerSimulator();
+
+            foreach (IToolPackageObtainer p in new List<IToolPackageObtainer>() { packageObtainerSimulator, packageObtainer })
+            {
+                ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory =
+                    p.ObtainAndReturnExecutablePath(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
                     nugetconfig: nugetConfigPath);
 
-            var executable = toolConfigurationAndExecutableDirectory
-                .ExecutableDirectory
-                .WithFile(
-                    toolConfigurationAndExecutableDirectory
-                        .Configuration
-                        .ToolAssemblyEntryPoint);
+                var executable = toolConfigurationAndExecutableDirectory
+                    .ExecutableDirectory
+                    .WithFile(
+                        toolConfigurationAndExecutableDirectory
+                            .Configuration
+                            .ToolAssemblyEntryPoint);
 
-            File.Exists(executable.Value)
-                .Should()
-                .BeTrue(executable + " should have the executable");
+                File.Exists(executable.Value)
+                    .Should()
+                    .BeTrue(executable + " should have the executable");
+
+                File.Delete(executable.Value);
+            }
         }
 
         [Fact]

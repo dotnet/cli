@@ -7,7 +7,7 @@ using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.ToolPackage
 {
-    internal class ToolPackageObtainer
+    internal class ToolPackageObtainer : IToolPackageObtainer
     {
         private readonly Lazy<string> _bundledTargetFrameworkMoniker;
         private readonly Func<FilePath> _getTempProjectPath;

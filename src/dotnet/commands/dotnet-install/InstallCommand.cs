@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
-using Microsoft.DotNet.Tools.Add;
 using Microsoft.DotNet.Tools.Install.Tool;
 
 namespace Microsoft.DotNet.Tools.Install
