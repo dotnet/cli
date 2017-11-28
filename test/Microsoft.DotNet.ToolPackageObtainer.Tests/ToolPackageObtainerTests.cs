@@ -210,7 +210,7 @@ namespace Microsoft.DotNet.ToolPackageObtainer.Tests
 
         private static FilePath WriteNugetConfigFileToPointToTheFeed()
         {
-            var nugetConfigName = Path.GetRandomFileName() + ".config";
+            var nugetConfigNameHasSpaceInMiddle = Path.GetRandomFileName() + " " + Path.GetRandomFileName() + ".config";
             var executeDirectory =
                 Path.GetDirectoryName(
                     System.Reflection
@@ -219,9 +219,9 @@ namespace Microsoft.DotNet.ToolPackageObtainer.Tests
                         .Location);
             NuGetConfig.Write(
                 directory: executeDirectory,
-                configname: nugetConfigName,
+                configname: nugetConfigNameHasSpaceInMiddle,
                 localFeedPath: Path.Combine(executeDirectory, "TestAssetLocalNugetFeed"));
-            return new FilePath(Path.GetFullPath(nugetConfigName));
+            return new FilePath(Path.GetFullPath(nugetConfigNameHasSpaceInMiddle));
         }
 
         private readonly string _testTargetframework = BundledTargetFramework.GetTargetFrameworkMoniker();
