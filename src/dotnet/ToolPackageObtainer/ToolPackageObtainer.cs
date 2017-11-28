@@ -93,13 +93,15 @@ namespace Microsoft.DotNet.ToolPackageObtainer
                     targetframework));
         }
 
-        private static void MoveToConcreteWithOverride(DirectoryPath concreteVersionIndividualToolVersion,
+        private static void MoveToConcreteWithOverride(
+            DirectoryPath concreteVersionIndividualToolVersion,
             DirectoryPath individualToolVersion)
         {
             if (Directory.Exists(concreteVersionIndividualToolVersion.Value))
             {
-                Directory.Delete(concreteVersionIndividualToolVersion.Value);
+                Directory.Delete(concreteVersionIndividualToolVersion.Value, recursive: true);
             }
+
             Directory.Move(individualToolVersion.Value, concreteVersionIndividualToolVersion.Value);
         }
 
