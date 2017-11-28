@@ -10,26 +10,32 @@ using Microsoft.Extensions.EnvironmentAbstractions;
 using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Tools.Install.Tool;
 using Xunit;
+using Microsoft.DotNet.Tools.Tests.ComponentMocks;
 
 namespace Microsoft.DotNet.ToolPackage.Tests
 {
     public class ToolPackageObtainerTests : TestBase
     {
-        [Fact]
-        public void GivenNugetConfigAndPackageNameAndVersionAndTargetFrameworkWhenCallItCanDownloadThePackage()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void GivenNugetConfigAndPackageNameAndVersionAndTargetFrameworkWhenCallItCanDownloadThePackage(
+            bool testMockBehaviorIsInSync)
         {
             FilePath nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
             var packageObtainer =
-                ConstructDefaultPackageObtainer(toolsPath);
-            ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory = packageObtainer.ObtainAndReturnExecutablePath(
-                packageId: TestPackageId,
-                packageVersion: TestPackageVersion,
-                nugetconfig: nugetConfigPath,
-                targetframework: _testTargetframework);
+                ConstructDefaultPackageObtainer(toolsPath, testMockBehaviorIsInSync);
 
-            var executable = toolConfigurationAndExecutableDirectory
+            ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory
+                = packageObtainer.ObtainAndReturnExecutablePath(
+                    packageId: TestPackageId,
+                    packageVersion: TestPackageVersion,
+                    nugetconfig: nugetConfigPath,
+                    targetframework: _testTargetframework);
+
+            FilePath executable = toolConfigurationAndExecutableDirectory
                 .ExecutableDirectory
                 .WithFile(
                     toolConfigurationAndExecutableDirectory
@@ -39,16 +45,22 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             File.Exists(executable.Value)
                 .Should()
                 .BeTrue(executable + " should have the executable");
+
+            File.Delete(executable.Value);
         }
 
-        [Fact]
-        public void GivenNugetConfigAndPackageNameAndVersionAndTargetFrameworkWhenCallItCreateAssetFile()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void GivenNugetConfigAndPackageNameAndVersionAndTargetFrameworkWhenCallItCreateAssetFile(
+            bool testMockBehaviorIsInSync)
         {
             var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
             var packageObtainer =
-                ConstructDefaultPackageObtainer(toolsPath);
+                ConstructDefaultPackageObtainer(toolsPath, testMockBehaviorIsInSync);
+
             ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory =
                 packageObtainer.ObtainAndReturnExecutablePath(
                     packageId: TestPackageId,
@@ -68,10 +80,14 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             File.Exists(assetJsonPath)
                 .Should()
                 .BeTrue(assetJsonPath + " should be created");
+
+            File.Delete(assetJsonPath);
         }
 
-        [Fact]
-        public void GivenAllButNoNugetConfigFilePathItCanDownloadThePackage()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void GivenAllButNoNugetConfigFilePathItCanDownloadThePackage(bool testMockBehaviorIsInSync)
         {
             var uniqueTempProjectPath = GetUniqueTempProjectPathEachTest();
             var tempProjectDirectory = uniqueTempProjectPath.GetDirectoryPath();
@@ -86,17 +102,26 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
             Directory.SetCurrentDirectory(nugetConfigPath.GetDirectoryPath().Value);
 
-            var packageObtainer =
-                new ToolPackageObtainer(
+            IToolPackageObtainer packageObtainer;
+            if (testMockBehaviorIsInSync)
+            {
+                packageObtainer = new ToolPackageObtainerMock();
+            }
+            else
+            {
+                packageObtainer = new ToolPackageObtainer(
                     new DirectoryPath(toolsPath),
-                    () => uniqueTempProjectPath,
+                    GetUniqueTempProjectPathEachTest,
                     new Lazy<string>(),
                     new PackageToProjectFileAdder(),
                     new ProjectRestorer());
-            ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory = packageObtainer.ObtainAndReturnExecutablePath(
-                packageId: TestPackageId,
-                packageVersion: TestPackageVersion,
-                targetframework: _testTargetframework);
+            }
+
+            ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory =
+                packageObtainer.ObtainAndReturnExecutablePath(
+                    packageId: TestPackageId,
+                    packageVersion: TestPackageVersion,
+                    targetframework: _testTargetframework);
 
             var executable = toolConfigurationAndExecutableDirectory
                 .ExecutableDirectory
@@ -108,20 +133,26 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             File.Exists(executable.Value)
                 .Should()
                 .BeTrue(executable + " should have the executable");
+
+            File.Delete(executable.Value);
         }
 
-        [Fact]
-        public void GivenAllButNoPackageVersionItCanDownloadThePackage()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void GivenAllButNoPackageVersionItCanDownloadThePackage(bool testMockBehaviorIsInSync)
         {
             var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
             var packageObtainer =
-                ConstructDefaultPackageObtainer(toolsPath);
-            ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory = packageObtainer.ObtainAndReturnExecutablePath(
-                packageId: TestPackageId,
-                nugetconfig: nugetConfigPath,
-                targetframework: _testTargetframework);
+                ConstructDefaultPackageObtainer(toolsPath, testMockBehaviorIsInSync);
+
+            ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory =
+                packageObtainer.ObtainAndReturnExecutablePath(
+                    packageId: TestPackageId,
+                    nugetconfig: nugetConfigPath,
+                    targetframework: _testTargetframework);
 
             var executable = toolConfigurationAndExecutableDirectory
                 .ExecutableDirectory
@@ -133,16 +164,20 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             File.Exists(executable.Value)
                 .Should()
                 .BeTrue(executable + " should have the executable");
+
+            File.Delete(executable.Value);
         }
 
-        [Fact]
-        public void GivenAllButNoPackageVersionAndInvokeTwiceItShouldNotThrow()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void GivenAllButNoPackageVersionAndInvokeTwiceItShouldNotThrow(bool testMockBehaviorIsInSync)
         {
             var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
             var packageObtainer =
-                ConstructDefaultPackageObtainer(toolsPath);
+                ConstructDefaultPackageObtainer(toolsPath, testMockBehaviorIsInSync);
 
             packageObtainer.ObtainAndReturnExecutablePath(
                 packageId: TestPackageId,
@@ -157,20 +192,29 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             secondCall.ShouldNotThrow();
         }
 
-
-        [Fact]
-        public void GivenAllButNoTargetFrameworkItCanDownloadThePackage()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void GivenAllButNoTargetFrameworkItCanDownloadThePackage(bool testMockBehaviorIsInSync)
         {
             var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
-            var packageObtainer =
-                new ToolPackageObtainer(
+            IToolPackageObtainer packageObtainer;
+            if (testMockBehaviorIsInSync)
+            {
+                packageObtainer = new ToolPackageObtainerMock();
+            }
+            else
+            {
+                packageObtainer = new ToolPackageObtainer(
                     new DirectoryPath(toolsPath),
                     GetUniqueTempProjectPathEachTest,
                     new Lazy<string>(() => BundledTargetFramework.GetTargetFrameworkMoniker()),
                     new PackageToProjectFileAdder(),
                     new ProjectRestorer());
+            }
+
             ToolConfigurationAndExecutableDirectory toolConfigurationAndExecutableDirectory =
                 packageObtainer.ObtainAndReturnExecutablePath(
                     packageId: TestPackageId,
@@ -187,6 +231,8 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             File.Exists(executable.Value)
                 .Should()
                 .BeTrue(executable + " should have the executable");
+
+            File.Delete(executable.Value);
         }
 
         [Fact]
@@ -196,6 +242,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
             var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath);
+
             Action a = () => packageObtainer.ObtainAndReturnExecutablePath(
                 packageId: TestPackageId,
                 packageVersion: TestPackageVersion,
@@ -205,7 +252,6 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             a.ShouldThrow<PackageObtainException>()
                 .And
                 .Message.Should().Contain("does not exist");
-
         }
 
         [Fact]
@@ -243,8 +289,14 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             return tempProjectPath;
         };
 
-        private static ToolPackageObtainer ConstructDefaultPackageObtainer(string toolsPath)
+        private static IToolPackageObtainer ConstructDefaultPackageObtainer(string toolsPath,
+            bool testMockBehaviorIsInSync = false)
         {
+            if (testMockBehaviorIsInSync)
+            {
+                return new ToolPackageObtainerMock();
+            }
+
             return new ToolPackageObtainer(
                 new DirectoryPath(toolsPath),
                 GetUniqueTempProjectPathEachTest,
@@ -260,7 +312,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
             var tempPathForNugetConfigWithWhiteSpace =
                 Path.Combine(Path.GetTempPath(),
-                Path.GetRandomFileName() + " " + Path.GetRandomFileName());
+                    Path.GetRandomFileName() + " " + Path.GetRandomFileName());
             Directory.CreateDirectory(tempPathForNugetConfigWithWhiteSpace);
 
             NuGetConfig.Write(
