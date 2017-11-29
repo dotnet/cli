@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using FluentAssertions;
+using Microsoft.DotNet.Configurer;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Microsoft.Extensions.DependencyModel.Tests;
 using Xunit;
@@ -19,8 +20,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
         {
             var fakeReporter = new FakeReporter();
             var osxEnvironmentPath = new OSXEnvironmentPath(
-                @"~/executable/path",
-                @"/Users/name/executable/path",
+                new BashPathUnderHomeDirectory("myhome", "executable/path"),
                 fakeReporter,
                 new FakeEnvironmentProvider(
                     new Dictionary<string, string>
@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
                 $"If you are using bash, You can do this by running the following command:{Environment.NewLine}{Environment.NewLine}" +
                 $"cat << EOF >> ~/.bash_profile{Environment.NewLine}" +
                 $"# Add .NET Core SDK tools{Environment.NewLine}" +
-                $"export PATH=\"$PATH:/Users/name/executable/path\"{Environment.NewLine}" +
+                $"export PATH=\"$PATH:/myhome/executable/path\"{Environment.NewLine}" +
                 $"EOF");
         }
 
@@ -48,8 +48,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
         {
             var fakeReporter = new FakeReporter();
             var osxEnvironmentPath = new OSXEnvironmentPath(
-                @"~/executable/path",
-                @"/Users/name/executable/path",
+                new BashPathUnderHomeDirectory("myhome", "executable/path"),
                 fakeReporter,
                 new FakeEnvironmentProvider(
                     new Dictionary<string, string>
@@ -68,8 +67,7 @@ namespace Microsoft.DotNet.ShellShimMaker.Tests
         {
             var fakeReporter = new FakeReporter();
             var osxEnvironmentPath = new OSXEnvironmentPath(
-                @"~/executable/path",
-                @"/Users/name/executable/path",
+                new BashPathUnderHomeDirectory("myhome", "executable/path"),
                 fakeReporter,
                 new FakeEnvironmentProvider(
                     new Dictionary<string, string>
