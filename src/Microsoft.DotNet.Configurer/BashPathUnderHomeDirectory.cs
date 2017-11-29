@@ -18,6 +18,6 @@ namespace Microsoft.DotNet.Configurer
 
         public string PathWithDollar => $"$HOME/{_pathRelativeToHome}";
 
-        public string Path => System.IO.Path.Combine(_fullHomeDirectoryPath, _pathRelativeToHome);
+        public string Path => $"{_fullHomeDirectoryPath}/{_pathRelativeToHome}";
     }
 }
