@@ -144,6 +144,10 @@ namespace Microsoft.DotNet.Cli
             {
                 Command = ParseCommand.Run
             },
+            ["install"] = new BuiltInCommandMetadata
+            {
+                Command = InstallCommand.Run
+            },
             ["internal-reportinstallsuccess"] = new BuiltInCommandMetadata
             {
                 Command = InternalReportinstallsuccess.Run

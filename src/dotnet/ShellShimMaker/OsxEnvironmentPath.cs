@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.Configurer;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.ShellShimMaker
@@ -11,8 +12,7 @@ namespace Microsoft.DotNet.ShellShimMaker
     internal class OSXEnvironmentPath : IEnvironmentPath
     {
         private const string PathName = "PATH";
-        private readonly string _packageExecutablePathWithTilde;
-        private readonly string _fullPackageExecutablePath;
+        private readonly BashPathUnderHomeDirectory _packageExecutablePath;
         private readonly IFile _fileSystem;
         private readonly IEnvironmentProvider _environmentProvider;
         private readonly IReporter _reporter;
@@ -22,17 +22,13 @@ namespace Microsoft.DotNet.ShellShimMaker
               ?? @"/etc/paths.d/dotnet-cli-tools";
 
         public OSXEnvironmentPath(
-            string packageExecutablePathWithTilde,
-            string fullPackageExecutablePath,
+            BashPathUnderHomeDirectory executablePath,
             IReporter reporter,
             IEnvironmentProvider environmentProvider,
             IFile fileSystem
         )
         {
-            _fullPackageExecutablePath = fullPackageExecutablePath ??
-                                         throw new ArgumentNullException(nameof(fullPackageExecutablePath));
-            _packageExecutablePathWithTilde = packageExecutablePathWithTilde ??
-                                              throw new ArgumentNullException(nameof(packageExecutablePathWithTilde));
+            _packageExecutablePath = executablePath ?? throw new ArgumentNullException(nameof(executablePath));
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
             _environmentProvider
                 = environmentProvider ?? throw new ArgumentNullException(nameof(environmentProvider));
@@ -47,16 +43,16 @@ namespace Microsoft.DotNet.ShellShimMaker
                 return;
             }
 
-            var script = $"{_packageExecutablePathWithTilde}";
+            var script = $"{_packageExecutablePath.PathWithTilde}";
             _fileSystem.WriteAllText(PathDDotnetCliToolsPath, script);
         }
 
         private bool PackageExecutablePathExists()
         {
             return _environmentProvider.GetEnvironmentVariable(PathName).Split(':')
-                       .Contains(_packageExecutablePathWithTilde) ||
+                       .Contains(_packageExecutablePath.PathWithTilde) ||
                    _environmentProvider.GetEnvironmentVariable(PathName).Split(':')
-                       .Contains(_fullPackageExecutablePath);
+                       .Contains(_packageExecutablePath.Path);
         }
 
         public void PrintAddPathInstructionIfPathDoesNotExist()
@@ -72,11 +68,11 @@ namespace Microsoft.DotNet.ShellShimMaker
                 {
                     // similar to https://code.visualstudio.com/docs/setup/mac
                     _reporter.WriteLine(
-                        $"Cannot find the tools executable path. Please ensure {_fullPackageExecutablePath} is added to your PATH.{Environment.NewLine}" +
+                        $"Cannot find the tools executable path. Please ensure {_packageExecutablePath.Path} is added to your PATH.{Environment.NewLine}" +
                         $"If you are using bash, You can do this by running the following command:{Environment.NewLine}{Environment.NewLine}" +
                         $"cat << EOF >> ~/.bash_profile{Environment.NewLine}" +
                         $"# Add .NET Core SDK tools{Environment.NewLine}" +
-                        $"export PATH=\"$PATH:{_fullPackageExecutablePath}\"{Environment.NewLine}" +
+                        $"export PATH=\"$PATH:{_packageExecutablePath.PathWithDollar}\"{Environment.NewLine}" +
                         $"EOF");
                 }
             }

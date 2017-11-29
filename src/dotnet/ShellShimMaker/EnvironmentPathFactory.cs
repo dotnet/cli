@@ -39,15 +39,14 @@ namespace Microsoft.DotNet.ShellShimMaker
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && hasSuperUserAccess)
             {
                 environmentPath = new LinuxEnvironmentPath(
-                    cliFolderPathCalculator.ExecutablePackagesPath,
+                    cliFolderPathCalculator.ExecutablePackagesPathInUnix,
                     Reporter.Output,
                     environmentProvider, new FileWrapper());
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && hasSuperUserAccess)
             {
                 environmentPath = new OSXEnvironmentPath(
-                    packageExecutablePathWithTilde: cliFolderPathCalculator.ExecutablePackagesPathOnMacEnvPath,
-                    fullPackageExecutablePath: cliFolderPathCalculator.ExecutablePackagesPath,
+                    executablePath: cliFolderPathCalculator.ExecutablePackagesPathInUnix,
                     reporter: Reporter.Output,
                     environmentProvider: environmentProvider,
                     fileSystem: new FileWrapper());

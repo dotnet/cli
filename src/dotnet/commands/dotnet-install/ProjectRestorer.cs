@@ -18,11 +18,11 @@ namespace Microsoft.DotNet.Cli
         {
             var argsToPassToRestore = new List<string>();
 
-            argsToPassToRestore.Add(projectPath.ToQuotedString());
+            argsToPassToRestore.Add(projectPath.Value);
             if (nugetconfig != null)
             {
                 argsToPassToRestore.Add("--configfile");
-                argsToPassToRestore.Add(nugetconfig.Value.ToQuotedString());
+                argsToPassToRestore.Add(nugetconfig.Value.Value);
             }
 
             argsToPassToRestore.AddRange(new List<string>

@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.Configurer;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.ShellShimMaker
@@ -14,14 +15,14 @@ namespace Microsoft.DotNet.ShellShimMaker
         private readonly IEnvironmentProvider _environmentProvider;
         private readonly IReporter _reporter;
         private const string PathName = "PATH";
-        private readonly string _packageExecutablePath;
+        private readonly BashPathUnderHomeDirectory _packageExecutablePath;
 
         private readonly string _profiledDotnetCliToolsPath
             = Environment.GetEnvironmentVariable("DOTNET_CLI_TEST_LINUX_PROFILED_PATH")
               ?? @"/etc/profile.d/dotnet-cli-tools-bin-path.sh";
 
         internal LinuxEnvironmentPath(
-            string packageExecutablePath,
+            BashPathUnderHomeDirectory packageExecutablePath,
             IReporter reporter,
             IEnvironmentProvider environmentProvider,
             IFile fileSystem)
@@ -42,7 +43,7 @@ namespace Microsoft.DotNet.ShellShimMaker
                 return;
             }
 
-            var script = $"export PATH=\"$PATH:{_packageExecutablePath}\"";
+            var script = $"export PATH=\"$PATH:{_packageExecutablePath.PathWithTilde}\"";
             _fileSystem.WriteAllText(_profiledDotnetCliToolsPath, script);
         }
 
@@ -50,7 +51,7 @@ namespace Microsoft.DotNet.ShellShimMaker
         {
             return _environmentProvider
                 .GetEnvironmentVariable(PathName)
-                .Split(':').Contains(_packageExecutablePath);
+                .Split(':').Contains(_packageExecutablePath.Path);
         }
 
         public void PrintAddPathInstructionIfPathDoesNotExist()
@@ -59,17 +60,18 @@ namespace Microsoft.DotNet.ShellShimMaker
             {
                 if (_fileSystem.Exists(_profiledDotnetCliToolsPath))
                 {
-                    _reporter.WriteLine("Since you just installed the .NET Core SDK, you will need to logout or restart your session before running the tool you installed.");
+                    _reporter.WriteLine(
+                        "Since you just installed the .NET Core SDK, you will need to logout or restart your session before running the tool you installed.");
                 }
                 else
                 {
                     // similar to https://code.visualstudio.com/docs/setup/mac
                     _reporter.WriteLine(
-                        $"Cannot find the tools executable path. Please ensure {_packageExecutablePath} is added to your PATH.{Environment.NewLine}" +
+                        $"Cannot find the tools executable path. Please ensure {_packageExecutablePath.Path} is added to your PATH.{Environment.NewLine}" +
                         $"If you are using bash. You can do this by running the following command:{Environment.NewLine}{Environment.NewLine}" +
                         $"cat << EOF >> ~/.bash_profile{Environment.NewLine}" +
                         $"# Add .NET Core SDK tools{Environment.NewLine}" +
-                        $"export PATH=\"$PATH:{_packageExecutablePath}\"{Environment.NewLine}" +
+                        $"export PATH=\"$PATH:{_packageExecutablePath.PathWithDollar}\"{Environment.NewLine}" +
                         $"EOF");
                 }
             }

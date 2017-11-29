@@ -136,6 +136,29 @@ namespace Microsoft.DotNet.ToolPackageObtainer.Tests
         }
 
         [Fact]
+        public void GivenAllButNoPackageVersionAndInvokeTwiceItShouldNotThrow()
+        {
+            var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
+            var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
+
+            var packageObtainer =
+                ConstructDefaultPackageObtainer(toolsPath);
+
+            packageObtainer.ObtainAndReturnExecutablePath(
+                packageId: TestPackageId,
+                nugetconfig: nugetConfigPath,
+                targetframework: _testTargetframework);
+
+            Action secondCall = () => packageObtainer.ObtainAndReturnExecutablePath(
+                packageId: TestPackageId,
+                nugetconfig: nugetConfigPath,
+                targetframework: _testTargetframework);
+
+            secondCall.ShouldNotThrow();
+        }
+
+
+        [Fact]
         public void GivenAllButNoTargetFrameworkItCanDownloadThePackage()
         {
             var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
@@ -187,7 +210,7 @@ namespace Microsoft.DotNet.ToolPackageObtainer.Tests
 
         private static FilePath WriteNugetConfigFileToPointToTheFeed()
         {
-            var nugetConfigName = Path.GetRandomFileName() + ".config";
+            var nugetConfigNameHasSpaceInMiddle = Path.GetRandomFileName() + " " + Path.GetRandomFileName() + ".config";
             var executeDirectory =
                 Path.GetDirectoryName(
                     System.Reflection
@@ -196,9 +219,9 @@ namespace Microsoft.DotNet.ToolPackageObtainer.Tests
                         .Location);
             NuGetConfig.Write(
                 directory: executeDirectory,
-                configname: nugetConfigName,
+                configname: nugetConfigNameHasSpaceInMiddle,
                 localFeedPath: Path.Combine(executeDirectory, "TestAssetLocalNugetFeed"));
-            return new FilePath(Path.GetFullPath(nugetConfigName));
+            return new FilePath(Path.GetFullPath(nugetConfigNameHasSpaceInMiddle));
         }
 
         private readonly string _testTargetframework = BundledTargetFramework.GetTargetFrameworkMoniker();
