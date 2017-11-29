@@ -78,13 +78,10 @@ namespace Microsoft.DotNet.ToolPackageObtainer.Tests
             Directory.CreateDirectory(tempProjectDirectory.Value);
 
             /*
-             * No nuget config means you don't need nuget config passed in during call
-             * NuGet needs a way to find the package, in production, it will keep look up folders for Nuget.Config 
-             * and use the feed there.
-             * In test, we don't want NuGet to keep look up, so we just copy paste beside the project.
+             * In test, we don't want NuGet to keep look up, so we point current directory to nugetconfig.
              */
-            File.Copy(nugetConfigPath.Value,
-                tempProjectDirectory.WithFile("nuget.config").Value);
+
+            Directory.SetCurrentDirectory(nugetConfigPath.GetDirectoryPath().Value);
 
             var packageObtainer =
                 new ToolPackageObtainer(
@@ -210,18 +207,24 @@ namespace Microsoft.DotNet.ToolPackageObtainer.Tests
 
         private static FilePath WriteNugetConfigFileToPointToTheFeed()
         {
-            var nugetConfigNameHasSpaceInMiddle = Path.GetRandomFileName() + " " + Path.GetRandomFileName() + ".config";
+            var nugetConfigName = "nuget.config";
             var executeDirectory =
                 Path.GetDirectoryName(
                     System.Reflection
                         .Assembly
                         .GetExecutingAssembly()
                         .Location);
+
+            var tempPathForNugetConfigWithWhiteSpace =
+                Path.Combine(Path.GetTempPath(),
+                Path.GetRandomFileName() + " " + Path.GetRandomFileName());
+            Directory.CreateDirectory(tempPathForNugetConfigWithWhiteSpace);
+
             NuGetConfig.Write(
-                directory: executeDirectory,
-                configname: nugetConfigNameHasSpaceInMiddle,
+                directory: tempPathForNugetConfigWithWhiteSpace,
+                configname: nugetConfigName,
                 localFeedPath: Path.Combine(executeDirectory, "TestAssetLocalNugetFeed"));
-            return new FilePath(Path.GetFullPath(nugetConfigNameHasSpaceInMiddle));
+            return new FilePath(Path.GetFullPath(Path.Combine(tempPathForNugetConfigWithWhiteSpace, nugetConfigName)));
         }
 
         private readonly string _testTargetframework = BundledTargetFramework.GetTargetFrameworkMoniker();
