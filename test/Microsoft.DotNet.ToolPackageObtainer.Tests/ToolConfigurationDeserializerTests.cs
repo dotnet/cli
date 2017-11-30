@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.ToolPackageObtainer.Tests
             Action a = () => ToolConfigurationDeserializer.Deserialize("DotnetToolSettingsMalformed.xml");
             a.ShouldThrow<ToolConfigurationException>()
                 .And.Message.Should()
-                .Contain("Failed to retrive tool configuration exception, configuration is malformed xml");
+                .Contain("The tool's settings file is invalid xml");
         }
 
         [Fact]
@@ -37,16 +37,16 @@ namespace Microsoft.DotNet.ToolPackageObtainer.Tests
             Action a = () => ToolConfigurationDeserializer.Deserialize("DotnetToolSettingsMissing.xml");
             a.ShouldThrow<ToolConfigurationException>()
                 .And.Message.Should()
-                .Contain("Configuration content error");
+                .Contain("The tool's settings file contains error");
         }
 
         [Fact]
         public void GivenInvalidCharAsFileNameItThrows()
         {
-            Action a = () => new ToolConfiguration("na***me", "my.dll");
+            Action a = () => new ToolConfiguration("na\0me", "my.dll");
             a.ShouldThrow<ArgumentException>()
                 .And.Message.Should()
-                .Contain("Cannot contain following character");
+                .Contain("Contains one or more invalid characters");
         }
     }
 }

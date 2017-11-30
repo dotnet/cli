@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.IO;
 
 namespace Microsoft.DotNet.ToolPackageObtainer
 {
@@ -29,13 +30,12 @@ namespace Microsoft.DotNet.ToolPackageObtainer
 
         private void EnsureNoInvalidFilenameCharacters(string commandName, string nameOfParam)
         {
-            // https://stackoverflow.com/questions/1976007/what-characters-are-forbidden-in-windows-and-linux-directory-names
-            char[] invalidCharactors = {'/', '<', '>', ':', '"', '/', '\\', '|', '?', '*'};
+            char[] invalidCharactors = Path.GetInvalidFileNameChars();
             if (commandName.IndexOfAny(invalidCharactors) != -1)
             {
                 throw new ArgumentException(
                     paramName: nameof(nameOfParam),
-                    message: "Cannot contain following character " + new string(invalidCharactors));
+                    message: "Contains one or more invalid characters: " + new string(invalidCharactors));
             }
         }
 

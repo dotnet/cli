@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.ToolPackageObtainer
                 catch (InvalidOperationException e) when (e.InnerException is XmlException)
                 {
                     throw new ToolConfigurationException(
-                        "Failed to retrive tool configuration exception, configuration is malformed xml. " +
+                        $"The tool's settings file is invalid xml. {Environment.NewLine}" +
                         e.InnerException.Message);
                 }
             }
@@ -36,13 +36,13 @@ namespace Microsoft.DotNet.ToolPackageObtainer
             if (dotNetCliTool.Commands.Length != 1)
             {
                 throw new ToolConfigurationException(
-                    "Failed to retrive tool configuration exception, one and only one command is supported.");
+                    "The tool's settings file has more than one command defined.");
             }
 
             if (dotNetCliTool.Commands[0].Runner != "dotnet")
             {
                 throw new ToolConfigurationException(
-                    "Failed to retrive tool configuration exception, only dotnet as runner is supported.");
+                    "The tool's settings file has non \"dotnet\" as runner.");
             }
 
             var commandName = dotNetCliTool.Commands[0].Name;
@@ -54,7 +54,7 @@ namespace Microsoft.DotNet.ToolPackageObtainer
             }
             catch (ArgumentException e)
             {
-                throw new ToolConfigurationException("Configuration content error. " + e.Message);
+                throw new ToolConfigurationException($"The tool's settings file contains error {Environment.NewLine}" + e.Message);
             }
         }
     }
