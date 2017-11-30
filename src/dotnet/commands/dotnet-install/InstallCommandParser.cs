@@ -23,15 +23,15 @@ namespace Microsoft.DotNet.Cli
                         description: "Package Id in NuGet"),
                 Create.Option(
                     "--version",
-                    "Package version of the package in NuGet",
+                    "Version of the package in NuGet",
                     Accept.ExactlyOneArgument()),
                 Create.Option(
                     "--configfile",
-                    "NuGet config file",
+                    "NuGet configuration file",
                     Accept.ExactlyOneArgument()),
                 Create.Option(
                     "-f|--framework",
-                    "Target Framework Moniker of tools",
+                    "Target Framework Moniker (TFM) for the tools to install",
                     Accept.ExactlyOneArgument()),
                 CommonOptions.HelpOption());
         }

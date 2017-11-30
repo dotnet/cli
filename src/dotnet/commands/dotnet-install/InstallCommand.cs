@@ -103,14 +103,20 @@ namespace Microsoft.DotNet.Cli
             {
                 throw new GracefulException(
                     message:
-                    $"Install failed. Failed to download package:{Environment.NewLine}{ex.Message}",
+                    $"Install failed. Failed to download package:{Environment.NewLine}" +
+                    $"NuGet returned:{Environment.NewLine}" +
+                    $"{Environment.NewLine}" +
+                    $"{ex.Message}",
                     innerException: ex);
             }
             catch (ToolConfigurationException ex)
             {
                 throw new GracefulException(
                     message:
-                    $"Install failed. Failed to apply the configuration of the tool:{Environment.NewLine}{ex.Message}",
+                    $"Install failed. The settings file in the tool's NuGet package is not valid. Please contact the owner of the NuGet package.{Environment.NewLine}" +
+                    $"The error was:{Environment.NewLine}" +
+                    $"{Environment.NewLine}" +
+                    $"{ex.Message}",
                     innerException: ex);
             }
         }
