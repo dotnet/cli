@@ -24,13 +24,13 @@
     <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="DotnetToolsConfigMissing.xml">
+    <None Update="DotnetToolSettingsMissing.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DotnetToolsConfigMalformed.xml">
+    <None Update="DotnetToolSettingsMalformed.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DotnetToolsConfigGolden.xml">
+    <None Update="DotnetToolSettingsGolden.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="TestAssetLocalNugetFeed/*.*">
@@ -47,7 +47,7 @@
     <PropertyGroup>
       <testAssetSourceRoot>$(BaseOutputPath)/TestAsset/SampleGlobalTool</testAssetSourceRoot>
     </PropertyGroup>
-    <Copy SourceFiles="SampleGlobalTool/DotnetToolsConfig.xml" DestinationFolder="$(testAssetSourceRoot)" />
+    <Copy SourceFiles="SampleGlobalTool/DotnetToolSettings.xml" DestinationFolder="$(testAssetSourceRoot)" />
     <MSBuild BuildInParallel="False" Projects="SampleGlobalTool/consoledemo.csproj" Targets="Restore;Build;Publish" Properties="Configuration=Release;BaseOutputPath=$(testAssetSourceRoot)/bin/">
     </MSBuild>
     <MSBuild BuildInParallel="False" Projects="SampleGlobalTool/consoledemo.csproj" Targets="pack" Properties="Configuration=Release;NuspecFile=includepublish.nuspec;NuspecBasePath=$(testAssetSourceRoot);PackageOutputPath=$(OutputPath)/TestAssetLocalNugetFeed">

@@ -60,6 +60,7 @@ namespace Microsoft.DotNet.ToolPackageObtainer.Tests
                 .GetParentPath()
                 .GetParentPath()
                 .GetParentPath()
+                .GetParentPath()
                 .WithFile("project.assets.json").Value;
 
             File.Exists(assetJsonPath)

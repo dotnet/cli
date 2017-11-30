@@ -90,7 +90,8 @@ namespace Microsoft.DotNet.ToolPackageObtainer
                     packageId,
                     packageVersion,
                     "tools",
-                    targetframework));
+                    targetframework,
+                    "any"));
         }
 
         private static void MoveToConcreteWithOverride(
@@ -113,7 +114,7 @@ namespace Microsoft.DotNet.ToolPackageObtainer
             FilePath toolConfigurationPath =
                 individualToolVersion
                     .WithSubDirectories(packageId, packageVersion, "tools")
-                    .WithFile("DotnetToolsConfig.xml");
+                    .WithFile("DotnetToolSettings.xml");
 
             ToolConfiguration toolConfiguration =
                 ToolConfigurationDeserializer.Deserialize(toolConfigurationPath.Value);

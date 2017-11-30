@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.ToolPackageObtainer.Tests
         [Fact]
         public void GivenXmlPathItShouldGetToolConfiguration()
         {
-            ToolConfiguration toolConfiguration = ToolConfigurationDeserializer.Deserialize("DotnetToolsConfigGolden.xml");
+            ToolConfiguration toolConfiguration = ToolConfigurationDeserializer.Deserialize("DotnetToolSettingsGolden.xml");
 
             toolConfiguration.CommandName.Should().Be("sayhello");
             toolConfiguration.ToolAssemblyEntryPoint.Should().Be("console.dll");
@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.ToolPackageObtainer.Tests
         [Fact]
         public void GivenMalformedPathItThrows()
         {
-            Action a = () => ToolConfigurationDeserializer.Deserialize("DotnetToolsConfigMalformed.xml");
+            Action a = () => ToolConfigurationDeserializer.Deserialize("DotnetToolSettingsMalformed.xml");
             a.ShouldThrow<ToolConfigurationException>()
                 .And.Message.Should()
                 .Contain("Failed to retrive tool configuration exception, configuration is malformed xml");
@@ -34,7 +34,7 @@ namespace Microsoft.DotNet.ToolPackageObtainer.Tests
         [Fact]
         public void GivenMissingContentItThrows()
         {
-            Action a = () => ToolConfigurationDeserializer.Deserialize("DotnetToolsConfigMissing.xml");
+            Action a = () => ToolConfigurationDeserializer.Deserialize("DotnetToolSettingsMissing.xml");
             a.ShouldThrow<ToolConfigurationException>()
                 .And.Message.Should()
                 .Contain("Configuration content error");
