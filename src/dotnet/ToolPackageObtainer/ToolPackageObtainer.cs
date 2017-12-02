@@ -76,7 +76,7 @@ namespace Microsoft.DotNet.ToolPackageObtainer
                 DirectoryPath concreteVersionIndividualToolVersion =
                     individualToolVersion.GetParentPath().WithSubDirectories(concreteVersion);
 
-                MoveToConcreteWithOverride(concreteVersionIndividualToolVersion, individualToolVersion);
+                MoveToVersionedDirectory(concreteVersionIndividualToolVersion, individualToolVersion);
 
                 individualToolVersion = concreteVersionIndividualToolVersion;
                 packageVersion = concreteVersion;
@@ -94,16 +94,16 @@ namespace Microsoft.DotNet.ToolPackageObtainer
                     "any"));
         }
 
-        private static void MoveToConcreteWithOverride(
-            DirectoryPath concreteVersionIndividualToolVersion,
-            DirectoryPath individualToolVersion)
+        private static void MoveToVersionedDirectory(
+            DirectoryPath versioned,
+            DirectoryPath temporary)
         {
-            if (Directory.Exists(concreteVersionIndividualToolVersion.Value))
+            if (Directory.Exists(versioned.Value))
             {
-                Directory.Delete(concreteVersionIndividualToolVersion.Value, recursive: true);
+                Directory.Delete(versioned.Value, recursive: true);
             }
 
-            Directory.Move(individualToolVersion.Value, concreteVersionIndividualToolVersion.Value);
+            Directory.Move(temporary.Value, versioned.Value);
         }
 
         private static ToolConfiguration GetConfiguration(
