@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -39,6 +40,14 @@ namespace Microsoft.DotNet.ToolPackageObtainer
             if (packageId == null)
             {
                 throw new ArgumentNullException(nameof(packageId));
+            }
+
+            if (nugetconfig != null)
+            {
+                if (!File.Exists(nugetconfig.Value.Value))
+                {
+                    throw new PackageObtainException($"NuGet configuration file {Path.GetFullPath(nugetconfig.Value.Value)} does not exist.");
+                }
             }
 
             if (targetframework == null)

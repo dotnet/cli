@@ -187,6 +187,25 @@ namespace Microsoft.DotNet.ToolPackageObtainer.Tests
                 .BeTrue(executable + " should have the executable");
         }
 
+        [Fact]
+        public void GivenNonExistentNugetConfigFileItThrows()
+        {
+            var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
+
+            var packageObtainer =
+                ConstructDefaultPackageObtainer(toolsPath);
+            Action a = () => packageObtainer.ObtainAndReturnExecutablePath(
+                packageId: TestPackageId,
+                packageVersion: TestPackageVersion,
+                nugetconfig: new FilePath("NonExistent.file"),
+                targetframework: _testTargetframework);
+
+            a.ShouldThrow<PackageObtainException>()
+                .And
+                .Message.Should().Contain("does not exist");
+
+        }
+
         private static readonly Func<FilePath> GetUniqueTempProjectPathEachTest = () =>
         {
             var tempProjectDirectory =
