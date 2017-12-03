@@ -68,7 +68,6 @@
     <PackageReference Include="Microsoft.TemplateEngine.Utils" Version="$(TemplateEngineVersion)" />
     <PackageReference Include="Microsoft.DotNet.Archive" Version="$(DotNetCliArchiverVersion)" />
     <PackageReference Include="XliffTasks" Version="$(XliffTasksVersion)" PrivateAssets="All" />
-    <PackageReference Include="NuGet.Build.Tasks" Version="$(CLI_NuGet_Version)" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="commands\dotnet-migrate\xlf" />
