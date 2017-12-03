@@ -7,6 +7,7 @@ using FluentAssertions;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using Microsoft.DotNet.Cli;
+using Microsoft.DotNet.Tools.Install.Tool;
 using Xunit;
 
 namespace Microsoft.DotNet.ToolPackageObtainer.Tests

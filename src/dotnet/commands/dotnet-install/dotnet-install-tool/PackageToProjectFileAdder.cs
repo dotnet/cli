@@ -3,12 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.ToolPackageObtainer;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
-namespace Microsoft.DotNet.Cli
+namespace Microsoft.DotNet.Tools.Install.Tool
 {
-
     internal class PackageToProjectFileAdder : IPackageToProjectFileAdder
     {
         public void Add(FilePath projectPath, string packageId)

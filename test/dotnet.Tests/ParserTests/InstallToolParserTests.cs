@@ -1,13 +1,10 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.IO;
 using System.Linq;
 using FluentAssertions;
 using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.CommandLine;
-using Microsoft.DotNet.Tools.Common;
 using Xunit;
 using Xunit.Abstractions;
 using Parser = Microsoft.DotNet.Cli.Parser;
@@ -27,14 +24,14 @@ namespace Microsoft.DotNet.Tests.ParserTests
         public void InstallGlobaltoolParserCanGetPackageIdAndPackageVersion()
         {
             var command = Parser.Instance;
-            var result = command.Parse("dotnet install tool console.wul.test.app.1 --version 1.0.1");
+            var result = command.Parse("dotnet install tool console.test.app --version 1.0.1");
 
             var parseResult = result["dotnet"]["install"]["tool"];
 
             var packageId = parseResult.Arguments.Single();
             var packageVersion = parseResult.ValueOrDefault<string>("version");
 
-            packageId.Should().Be("console.wul.test.app.1");
+            packageId.Should().Be("console.test.app");
             packageVersion.Should().Be("1.0.1");
         }
 
@@ -42,19 +39,14 @@ namespace Microsoft.DotNet.Tests.ParserTests
         public void InstallGlobaltoolParserCanGetFollowingArguments()
         {
             var command = Parser.Instance;
-            var result = command.Parse(@"dotnet install tool console.wul.test.app.1 --version 1.0.1 --framework netcoreapp2.0 --configfile C:\TestAssetLocalNugetFeed");
-
+            var result =
+                command.Parse(
+                    @"dotnet install tool console.test.app --version 1.0.1 --framework netcoreapp2.0 --configfile C:\TestAssetLocalNugetFeed");
 
             var parseResult = result["dotnet"]["install"]["tool"];
 
-            var packageId = parseResult.Arguments.Single();
-            var packageVersion = parseResult.ValueOrDefault<string>("version");
-
-            var configFilePath = parseResult.ValueOrDefault<string>("configfile").Should().Be(@"C:\TestAssetLocalNugetFeed");
-
-            var framework = parseResult.ValueOrDefault<string>("framework").Should().Be("netcoreapp2.0");
-
+            parseResult.ValueOrDefault<string>("configfile").Should().Be(@"C:\TestAssetLocalNugetFeed");
+            parseResult.ValueOrDefault<string>("framework").Should().Be("netcoreapp2.0");
         }
-
     }
 }

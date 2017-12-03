@@ -3,11 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.ToolPackageObtainer;
 using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
-namespace Microsoft.DotNet.Cli
+namespace Microsoft.DotNet.Tools.Install.Tool
 {
     internal class ProjectRestorer : IProjectRestorer
     {
