@@ -4,7 +4,7 @@
 using System;
 using Microsoft.DotNet.Cli.Utils;
 
-namespace Microsoft.DotNet.ShellShimMaker.Tests
+namespace Microsoft.DotNet.ShellShim.Tests
 {
     internal class FakeReporter : IReporter
     {

@@ -8,7 +8,7 @@ using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Configurer;
-using Microsoft.DotNet.ShellShimMaker;
+using Microsoft.DotNet.ShellShim;
 using Microsoft.DotNet.ToolPackageObtainer;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
@@ -62,7 +62,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                         .Configuration
                         .ToolAssemblyEntryPoint);
 
-            var shellShimMaker = new ShellShimMaker.ShellShimMaker(executablePackagePath.Value);
+            var shellShimMaker = new ShellShimMaker(executablePackagePath.Value);
             var commandName = toolConfigurationAndExecutableDirectory.Configuration.CommandName;
             shellShimMaker.EnsureCommandNameUniqueness(commandName);
 

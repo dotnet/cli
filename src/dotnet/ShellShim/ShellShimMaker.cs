@@ -8,7 +8,7 @@ using System.Text;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
-namespace Microsoft.DotNet.ShellShimMaker
+namespace Microsoft.DotNet.ShellShim
 {
     public class ShellShimMaker
     {

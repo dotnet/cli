@@ -12,7 +12,7 @@ using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
 
-namespace Microsoft.DotNet.ShellShimMaker.Tests
+namespace Microsoft.DotNet.ShellShim.Tests
 {
     public class ShellShimMakerTests : TestBase
     {

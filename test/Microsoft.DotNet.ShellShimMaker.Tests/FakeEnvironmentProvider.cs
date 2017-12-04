@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.DotNet.Cli.Utils;
 
-namespace Microsoft.DotNet.ShellShimMaker.Tests
+namespace Microsoft.DotNet.ShellShim.Tests
 {
     internal class FakeEnvironmentProvider : IEnvironmentProvider
     {

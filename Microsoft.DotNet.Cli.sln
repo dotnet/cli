@@ -232,7 +232,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Msbuild.Tests.Utilities", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.ToolPackageObtainer.Tests", "test\Microsoft.DotNet.ToolPackageObtainer.Tests\Microsoft.DotNet.ToolPackageObtainer.Tests.csproj", "{F0D50831-9468-4ACB-8FD8-E9883DD553FB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.ShellShimMaker.Tests", "test\Microsoft.DotNet.ShellShimMaker.Tests\Microsoft.DotNet.ShellShimMaker.Tests.csproj", "{20376E28-68EB-4BE5-81A5-51500F1235E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.ShellShim.Tests", "test\Microsoft.DotNet.ShellShimMaker.Tests\Microsoft.DotNet.ShellShim.Tests.csproj", "{20376E28-68EB-4BE5-81A5-51500F1235E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

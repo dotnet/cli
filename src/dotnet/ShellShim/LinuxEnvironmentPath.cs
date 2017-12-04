@@ -7,33 +7,32 @@ using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Configurer;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
-namespace Microsoft.DotNet.ShellShimMaker
+namespace Microsoft.DotNet.ShellShim
 {
-    internal class OSXEnvironmentPath : IEnvironmentPath
+    internal class LinuxEnvironmentPath : IEnvironmentPath
     {
-        private const string PathName = "PATH";
-        private readonly BashPathUnderHomeDirectory _packageExecutablePath;
         private readonly IFile _fileSystem;
         private readonly IEnvironmentProvider _environmentProvider;
         private readonly IReporter _reporter;
+        private const string PathName = "PATH";
+        private readonly BashPathUnderHomeDirectory _packageExecutablePath;
 
-        private static readonly string PathDDotnetCliToolsPath
-            = Environment.GetEnvironmentVariable("DOTNET_CLI_TEST_OSX_PATHSD_PATH")
-              ?? @"/etc/paths.d/dotnet-cli-tools";
+        private readonly string _profiledDotnetCliToolsPath
+            = Environment.GetEnvironmentVariable("DOTNET_CLI_TEST_LINUX_PROFILED_PATH")
+              ?? @"/etc/profile.d/dotnet-cli-tools-bin-path.sh";
 
-        public OSXEnvironmentPath(
-            BashPathUnderHomeDirectory executablePath,
+        internal LinuxEnvironmentPath(
+            BashPathUnderHomeDirectory packageExecutablePath,
             IReporter reporter,
             IEnvironmentProvider environmentProvider,
-            IFile fileSystem
-        )
+            IFile fileSystem)
         {
-            _packageExecutablePath = executablePath;
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
             _environmentProvider
                 = environmentProvider ?? throw new ArgumentNullException(nameof(environmentProvider));
             _reporter
                 = reporter ?? throw new ArgumentNullException(nameof(reporter));
+            _packageExecutablePath = packageExecutablePath;
         }
 
         public void AddPackageExecutablePathToUserPath()
@@ -43,33 +42,32 @@ namespace Microsoft.DotNet.ShellShimMaker
                 return;
             }
 
-            var script = $"{_packageExecutablePath.PathWithTilde}";
-            _fileSystem.WriteAllText(PathDDotnetCliToolsPath, script);
+            var script = $"export PATH=\"$PATH:{_packageExecutablePath.PathWithDollar}\"";
+            _fileSystem.WriteAllText(_profiledDotnetCliToolsPath, script);
         }
 
         private bool PackageExecutablePathExists()
         {
-            return _environmentProvider.GetEnvironmentVariable(PathName).Split(':')
-                       .Contains(_packageExecutablePath.PathWithTilde) ||
-                   _environmentProvider.GetEnvironmentVariable(PathName).Split(':')
-                       .Contains(_packageExecutablePath.Path);
+            return _environmentProvider
+                .GetEnvironmentVariable(PathName)
+                .Split(':').Contains(_packageExecutablePath.Path);
         }
 
         public void PrintAddPathInstructionIfPathDoesNotExist()
         {
             if (!PackageExecutablePathExists())
             {
-                if (_fileSystem.Exists(PathDDotnetCliToolsPath))
+                if (_fileSystem.Exists(_profiledDotnetCliToolsPath))
                 {
                     _reporter.WriteLine(
-                        "Since you just installed the .NET Core SDK, you will need to reopen terminal before running the tool you installed.");
+                        "Since you just installed the .NET Core SDK, you will need to logout or restart your session before running the tool you installed.");
                 }
                 else
                 {
                     // similar to https://code.visualstudio.com/docs/setup/mac
                     _reporter.WriteLine(
                         $"Cannot find the tools executable path. Please ensure {_packageExecutablePath.Path} is added to your PATH.{Environment.NewLine}" +
-                        $"If you are using bash, You can do this by running the following command:{Environment.NewLine}{Environment.NewLine}" +
+                        $"If you are using bash. You can do this by running the following command:{Environment.NewLine}{Environment.NewLine}" +
                         $"cat << EOF >> ~/.bash_profile{Environment.NewLine}" +
                         $"# Add .NET Core SDK tools{Environment.NewLine}" +
                         $"export PATH=\"$PATH:{_packageExecutablePath.Path}\"{Environment.NewLine}" +

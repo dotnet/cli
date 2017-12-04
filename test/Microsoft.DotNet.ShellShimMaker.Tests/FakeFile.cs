@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
-namespace Microsoft.DotNet.ShellShimMaker.Tests
+namespace Microsoft.DotNet.ShellShim.Tests
 {
     internal class FakeFile : IFile
     {

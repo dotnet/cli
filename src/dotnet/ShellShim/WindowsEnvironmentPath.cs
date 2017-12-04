@@ -6,7 +6,7 @@ using System.Linq;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
-namespace Microsoft.DotNet.ShellShimMaker
+namespace Microsoft.DotNet.ShellShim
 {
     internal class WindowsEnvironmentPath : IEnvironmentPath
     {

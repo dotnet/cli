@@ -11,7 +11,7 @@ using Microsoft.DotNet.Tools.Test.Utilities;
 using Microsoft.Extensions.DependencyModel.Tests;
 using Xunit;
 
-namespace Microsoft.DotNet.ShellShimMaker.Tests
+namespace Microsoft.DotNet.ShellShim.Tests
 {
     public class OsxEnvironmentPathTests
     {

@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.DotNet.Cli.Utils;
 
-namespace Microsoft.DotNet.ShellShimMaker
+namespace Microsoft.DotNet.ShellShim
 {
     public class DoNothingEnvironmentPath : IEnvironmentPath
     {

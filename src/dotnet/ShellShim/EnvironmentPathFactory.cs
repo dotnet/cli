@@ -9,7 +9,7 @@ using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Configurer;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
-namespace Microsoft.DotNet.ShellShimMaker
+namespace Microsoft.DotNet.ShellShim
 {
     internal static class EnvironmentPathFactory
     {
