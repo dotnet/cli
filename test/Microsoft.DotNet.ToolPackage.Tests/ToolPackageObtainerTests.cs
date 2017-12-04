@@ -10,7 +10,7 @@ using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Tools.Install.Tool;
 using Xunit;
 
-namespace Microsoft.DotNet.ToolPackageObtainer.Tests
+namespace Microsoft.DotNet.ToolPackage.Tests
 {
     public class ToolPackageObtainerTests : TestBase
     {

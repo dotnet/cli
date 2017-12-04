@@ -5,9 +5,9 @@ using System;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using Microsoft.DotNet.ToolPackageObtainer.ToolConfigurationDeserialization;
+using Microsoft.DotNet.ToolPackage.ToolConfigurationDeserialization;
 
-namespace Microsoft.DotNet.ToolPackageObtainer
+namespace Microsoft.DotNet.ToolPackage
 {
     internal static class ToolConfigurationDeserializer
     {

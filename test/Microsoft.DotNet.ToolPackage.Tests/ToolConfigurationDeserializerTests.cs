@@ -9,7 +9,7 @@ using FluentAssertions;
 using NuGet.Protocol.Core.Types;
 using Xunit;
 
-namespace Microsoft.DotNet.ToolPackageObtainer.Tests
+namespace Microsoft.DotNet.ToolPackage.Tests
 {
     public class ToolConfigurationDeserializerTests
     {

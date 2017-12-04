@@ -3,7 +3,7 @@
 
 using Microsoft.Extensions.EnvironmentAbstractions;
 
-namespace Microsoft.DotNet.ToolPackageObtainer
+namespace Microsoft.DotNet.ToolPackage
 {
     internal class ToolConfigurationAndExecutableDirectory
     {

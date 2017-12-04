@@ -5,7 +5,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
-namespace Microsoft.DotNet.ToolPackageObtainer
+namespace Microsoft.DotNet.ToolPackage
 {
     internal class ToolPackageObtainer
     {

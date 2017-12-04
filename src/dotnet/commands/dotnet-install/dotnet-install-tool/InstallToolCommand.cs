@@ -9,7 +9,7 @@ using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Configurer;
 using Microsoft.DotNet.ShellShim;
-using Microsoft.DotNet.ToolPackageObtainer;
+using Microsoft.DotNet.ToolPackage;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.Tools.Install.Tool
@@ -90,7 +90,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             try
             {
                 var toolPackageObtainer =
-                    new ToolPackageObtainer.ToolPackageObtainer(
+                    new ToolPackageObtainer(
                         executablePackagePath,
                         () => new DirectoryPath(Path.GetTempPath())
                             .WithSubDirectories(Path.GetRandomFileName())

@@ -3,13 +3,10 @@
 
 using Microsoft.Extensions.EnvironmentAbstractions;
 
-namespace Microsoft.DotNet.ToolPackageObtainer
+namespace Microsoft.DotNet.ToolPackage
 {
-    internal interface IProjectRestorer
+    internal interface IPackageToProjectFileAdder
     {
-        void Restore(
-            FilePath projectPath,
-            DirectoryPath assetJsonOutput, 
-            FilePath? nugetconfig);
+        void Add(FilePath projectPath, string packageId);
     }
 }

@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Microsoft.DotNet.ToolPackageObtainer
+namespace Microsoft.DotNet.ToolPackage
 {
     internal class PackageObtainException : Exception
     {
