@@ -57,14 +57,14 @@ namespace Microsoft.DotNet.ToolPackage
 
             var packageVersionOrPlaceHolder = new PackageVersion(packageVersion);
 
-            DirectoryPath individualToolVersion =
+            DirectoryPath toolDirectory =
                 CreateIndividualToolVersionDirectory(packageId, packageVersionOrPlaceHolder);
 
             FilePath tempProjectPath = CreateTempProject(
                 packageId,
                 packageVersionOrPlaceHolder,
                 targetframework,
-                individualToolVersion);
+                toolDirectory);
 
             if (packageVersionOrPlaceHolder.IsPlaceholder)
             {
@@ -74,28 +74,28 @@ namespace Microsoft.DotNet.ToolPackage
                     packageId);
             }
 
-            InvokeRestore(nugetconfig, tempProjectPath, individualToolVersion);
+            InvokeRestore(nugetconfig: nugetconfig, tempProjectPath: tempProjectPath, individualToolVersion: toolDirectory);
 
             if (packageVersionOrPlaceHolder.IsPlaceholder)
             {
                 var concreteVersion =
                     new DirectoryInfo(
                         Directory.GetDirectories(
-                            individualToolVersion.WithSubDirectories(packageId).Value).Single()).Name;
-                DirectoryPath concreteVersionIndividualToolVersion =
-                    individualToolVersion.GetParentPath().WithSubDirectories(concreteVersion);
+                            toolDirectory.WithSubDirectories(packageId).Value).Single()).Name;
+                DirectoryPath versioned =
+                    toolDirectory.GetParentPath().WithSubDirectories(concreteVersion);
 
-                MoveToVersionedDirectory(concreteVersionIndividualToolVersion, individualToolVersion);
+                MoveToVersionedDirectory(versioned, toolDirectory);
 
-                individualToolVersion = concreteVersionIndividualToolVersion;
+                toolDirectory = versioned;
                 packageVersion = concreteVersion;
             }
 
-            ToolConfiguration toolConfiguration = GetConfiguration(packageId, packageVersion, individualToolVersion);
+            ToolConfiguration toolConfiguration = GetConfiguration(packageId: packageId, packageVersion: packageVersion, individualToolVersion: toolDirectory);
 
             return new ToolConfigurationAndExecutableDirectory(
                 toolConfiguration,
-                individualToolVersion.WithSubDirectories(
+                toolDirectory.WithSubDirectories(
                     packageId,
                     packageVersion,
                     "tools",
