@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.Cli
                     Accept.ExactlyOneArgument()),
                 Create.Option(
                     "-f|--framework",
-                    "Target Framework Moniker (TFM) for the tools to install",
+                    "Target framework to publish for. The target framework has to be specified in the project file.",
                     Accept.ExactlyOneArgument()),
                 CommonOptions.HelpOption());
         }
