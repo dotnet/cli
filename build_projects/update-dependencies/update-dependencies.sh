@@ -32,7 +32,7 @@ fi
 
 # Install a stage 0
 echo "Installing .NET Core CLI Stage 0"
-$REPO_ROOT/scripts/obtain/dotnet-install.sh -Channel master -Architecture x64
+$REPO_ROOT/scripts/obtain/dotnet-install.sh -Channel release/2.0.0 -Architecture x64
 
 if [ $? -ne 0 ]; then
     echo "Failed to install stage 0"
