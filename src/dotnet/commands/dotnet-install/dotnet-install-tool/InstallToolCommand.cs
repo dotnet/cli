@@ -16,15 +16,16 @@ namespace Microsoft.DotNet.Tools.Install.Tool
 {
     internal class InstallToolCommand : CommandBase
     {
-        private static IToolPackageObtainer _toolPackageObtainer;
+        private readonly IToolPackageObtainer _toolPackageObtainer;
         private readonly DirectoryPath _executablePackagePath;
         private readonly IEnvironmentPathInstruction _environmentPathInstruction;
         private readonly IShellShimMaker _shellShimMaker;
-        private static string _packageId;
-        private static string _packageVersion;
-        private static string _configFilePath;
-        private static string _framework;
-        private IReporter _reporter;
+        private readonly IReporter _reporter;
+
+        private readonly string _packageId;
+        private readonly string _packageVersion;
+        private readonly string _configFilePath;
+        private readonly string _framework;
 
         public InstallToolCommand(
             AppliedOption appliedCommand,
@@ -103,7 +104,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             return 0;
         }
 
-        private static ToolConfigurationAndExecutableDirectory ObtainPackage(
+        private ToolConfigurationAndExecutableDirectory ObtainPackage(
             string packageId,
             string packageVersion,
             FilePath? configFile,
