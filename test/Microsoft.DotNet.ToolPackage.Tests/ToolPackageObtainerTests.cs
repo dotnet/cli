@@ -59,9 +59,6 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 .ExecutableDirectory
                 .GetParentPath()
                 .GetParentPath()
-                .GetParentPath()
-                .GetParentPath()
-                .GetParentPath()
                 .WithFile("project.assets.json").Value;
 
             File.Exists(assetJsonPath)

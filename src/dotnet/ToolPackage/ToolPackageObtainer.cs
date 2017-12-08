@@ -97,10 +97,7 @@ namespace Microsoft.DotNet.ToolPackage
                 toolConfiguration,
                 toolDirectory.WithSubDirectories(
                     packageId,
-                    packageVersion,
-                    "tools",
-                    targetframework,
-                    "any"));
+                    packageVersion));
         }
 
         private static void MoveToVersionedDirectory(
