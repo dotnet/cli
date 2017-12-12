@@ -151,6 +151,9 @@ export VSTEST_TRACE_BUILD=1
 # Don't resolve shared frameworks from user or global locations
 export DOTNET_MULTILEVEL_LOOKUP=0
 
+# Testing theory that https://github.com/dotnet/roslyn/issues/23736 is responsible for failing Roslyn insertion
+export UseRoslynAnalyzers=false
+
 # Install a stage 0
 if [ "$STAGE0_SOURCE_DIR" == "" ]; then
     (set -x ; "$REPOROOT/scripts/obtain/dotnet-install.sh" --version "2.1.0-preview1-007172" --install-dir "$DOTNET_INSTALL_DIR" --architecture "$ARCHITECTURE" $LINUX_PORTABLE_INSTALL_ARGS)
