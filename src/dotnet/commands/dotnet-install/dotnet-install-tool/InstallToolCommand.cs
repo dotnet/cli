@@ -14,16 +14,26 @@ using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.Tools.Install.Tool
 {
-    public class InstallToolCommand : CommandBase
+    internal class InstallToolCommand : CommandBase
     {
-        private static string _packageId;
-        private static string _packageVersion;
-        private static string _configFilePath;
-        private static string _framework;
+        private readonly IToolPackageObtainer _toolPackageObtainer;
+        private readonly DirectoryPath _executablePackagePath;
+        private readonly IEnvironmentPathInstruction _environmentPathInstruction;
+        private readonly IShellShimMaker _shellShimMaker;
+        private readonly IReporter _reporter;
+
+        private readonly string _packageId;
+        private readonly string _packageVersion;
+        private readonly string _configFilePath;
+        private readonly string _framework;
 
         public InstallToolCommand(
             AppliedOption appliedCommand,
-            ParseResult parseResult)
+            ParseResult parseResult,
+            IToolPackageObtainer toolPackageObtainer = null,
+            IShellShimMaker shellShimMaker = null,
+            IEnvironmentPathInstruction environmentPathInstruction = null,
+            IReporter reporter = null)
             : base(parseResult)
         {
             if (appliedCommand == null)
@@ -35,6 +45,24 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             _packageVersion = appliedCommand.ValueOrDefault<string>("version");
             _configFilePath = appliedCommand.ValueOrDefault<string>("configfile");
             _framework = appliedCommand.ValueOrDefault<string>("framework");
+            _executablePackagePath = new DirectoryPath(new CliFolderPathCalculator().ExecutablePackagesPath);
+
+            _toolPackageObtainer = toolPackageObtainer ?? new ToolPackageObtainer(
+                                       _executablePackagePath,
+                                       () => new DirectoryPath(Path.GetTempPath())
+                                           .WithSubDirectories(Path.GetRandomFileName())
+                                           .WithFile(Path.GetRandomFileName() + ".csproj"),
+                                       new Lazy<string>(BundledTargetFramework.GetTargetFrameworkMoniker),
+                                       new PackageToProjectFileAdder(),
+                                       new ProjectRestorer());
+
+            _environmentPathInstruction = environmentPathInstruction
+                                          ?? EnvironmentPathFactory
+                                              .CreateEnvironmentPathInstruction();
+
+            _shellShimMaker = shellShimMaker ?? new ShellShimMaker(_executablePackagePath.Value);
+
+            _reporter = reporter ?? Reporter.Output;
         }
 
         public override int Execute()
@@ -46,14 +74,12 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                 configFile = new FilePath(_configFilePath);
             }
 
-            var executablePackagePath = new DirectoryPath(new CliFolderPathCalculator().ExecutablePackagesPath);
-
             var toolConfigurationAndExecutableDirectory = ObtainPackage(
                 _packageId,
                 _packageVersion,
                 configFile,
                 _framework,
-                executablePackagePath);
+                _executablePackagePath);
 
             DirectoryPath executable = toolConfigurationAndExecutableDirectory
                 .ExecutableDirectory
@@ -62,25 +88,23 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                         .Configuration
                         .ToolAssemblyEntryPoint);
 
-            var shellShimMaker = new ShellShimMaker(executablePackagePath.Value);
             var commandName = toolConfigurationAndExecutableDirectory.Configuration.CommandName;
-            shellShimMaker.EnsureCommandNameUniqueness(commandName);
+            _shellShimMaker.EnsureCommandNameUniqueness(commandName);
 
-            shellShimMaker.CreateShim(
+            _shellShimMaker.CreateShim(
                 executable.Value,
                 commandName);
 
-            EnvironmentPathFactory
-                .CreateEnvironmentPathInstruction()
+            _environmentPathInstruction
                 .PrintAddPathInstructionIfPathDoesNotExist();
 
-            Reporter.Output.WriteLine(
+            _reporter.WriteLine(
                 $"{Environment.NewLine}The installation succeeded. If there is no other instruction. You can type the following command in shell directly to invoke: {commandName}");
 
             return 0;
         }
 
-        private static ToolConfigurationAndExecutableDirectory ObtainPackage(
+        private ToolConfigurationAndExecutableDirectory ObtainPackage(
             string packageId,
             string packageVersion,
             FilePath? configFile,
@@ -89,17 +113,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
         {
             try
             {
-                var toolPackageObtainer =
-                    new ToolPackageObtainer(
-                        executablePackagePath,
-                        () => new DirectoryPath(Path.GetTempPath())
-                            .WithSubDirectories(Path.GetRandomFileName())
-                            .WithFile(Path.GetRandomFileName() + ".csproj"),
-                        new Lazy<string>(BundledTargetFramework.GetTargetFrameworkMoniker),
-                        new PackageToProjectFileAdder(),
-                        new ProjectRestorer());
-
-                return toolPackageObtainer.ObtainAndReturnExecutablePath(
+                return _toolPackageObtainer.ObtainAndReturnExecutablePath(
                     packageId: packageId,
                     packageVersion: packageVersion,
                     nugetconfig: configFile,
