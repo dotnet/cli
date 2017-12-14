@@ -39,5 +39,21 @@ namespace Microsoft.DotNet.Cli.Clean.Tests
 
             outputFolder.Should().BeEmpty();
         }
+
+        [Fact]
+        public void ItSkipsEmittingAssetLogMessages()
+        {
+            var testInstance = TestAssets.Get("AppWithNugetWarning")
+                .CreateInstance()
+                .WithSourceFiles();
+
+            new CleanCommand()
+                .WithWorkingDirectory(testInstance.Root.FullName)
+                .Execute()
+                .Should()
+                .Pass()
+                .And
+                .NotHaveStdOutContaining("warning");
+        }
     }
 }

@@ -19,19 +19,19 @@ namespace Microsoft.DotNet.Tools.Clean
 
         public static CleanCommand FromArgs(string[] args, string msbuildPath = null)
         {
-            var msbuildArgs = new List<string>();
-
-            var parser = Parser.Instance;
-
-            var result = parser.ParseFrom("dotnet clean", args);
+            var result = Parser.Instance.ParseFrom("dotnet clean", args);
 
             result.ShowHelpOrErrorIfAppropriate();
 
             var parsedClean = result["dotnet"]["clean"];
 
+            var msbuildArgs = new List<string>();
+
             msbuildArgs.AddRange(parsedClean.Arguments);
                 
             msbuildArgs.Add("/t:Clean");
+
+            msbuildArgs.Add("/p:EmitAssetsLogMessages=false");
 
             msbuildArgs.AddRange(parsedClean.OptionValuesToBeForwarded());
 
