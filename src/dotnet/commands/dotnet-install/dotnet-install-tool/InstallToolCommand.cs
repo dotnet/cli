@@ -43,21 +43,14 @@ namespace Microsoft.DotNet.Tools.Install.Tool
         {
             var executablePackagePath = new DirectoryPath(new CliFolderPathCalculator().ExecutablePackagesPath);
 
-            var toolConfigurationAndExecutableDirectory = ObtainPackage(executablePackagePath);
-
-            DirectoryPath executable = toolConfigurationAndExecutableDirectory
-                .ExecutableDirectory
-                .WithSubDirectories(
-                    toolConfigurationAndExecutableDirectory
-                        .Configuration
-                        .ToolAssemblyEntryPoint);
+            var toolConfigurationAndExecutablePath = ObtainPackage(executablePackagePath);
 
             var shellShimMaker = new ShellShimMaker(executablePackagePath.Value);
-            var commandName = toolConfigurationAndExecutableDirectory.Configuration.CommandName;
+            var commandName = toolConfigurationAndExecutablePath.Configuration.CommandName;
             shellShimMaker.EnsureCommandNameUniqueness(commandName);
 
             shellShimMaker.CreateShim(
-                executable.Value,
+                toolConfigurationAndExecutablePath.Executable.Value,
                 commandName);
 
             EnvironmentPathFactory
@@ -70,7 +63,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             return 0;
         }
 
-        private static ToolConfigurationAndExecutableDirectory ObtainPackage(DirectoryPath executablePackagePath)
+        private static ToolConfigurationAndExecutablePath ObtainPackage(DirectoryPath executablePackagePath)
         {
             try
             {

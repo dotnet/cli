@@ -131,6 +131,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     <BundledNETCoreAppPackageVersion>$(_NETCoreAppPackageVersion)</BundledNETCoreAppPackageVersion>
     <BundledNETStandardTargetFrameworkVersion>$(_NETStandardTargetFrameworkVersion)</BundledNETStandardTargetFrameworkVersion>
     <BundledNETStandardPackageVersion>$(_NETStandardPackageVersion)</BundledNETStandardPackageVersion>
+    <NETCorePlatformsImplicitPackageVersion>$(MicrosoftNETCoreAppPackageVersion)</NETCorePlatformsImplicitPackageVersion>
   </PropertyGroup>
 </Project>
 ]]>

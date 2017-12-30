@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.DotNet.Tools;
+using Microsoft.DotNet.Cli.Utils;
 using Microsoft.Extensions.EnvironmentAbstractions;
+using NuGet.ProjectModel;
 
 namespace Microsoft.DotNet.ToolPackage
 {
@@ -32,7 +33,7 @@ namespace Microsoft.DotNet.ToolPackage
             _toolsPath = toolsPath;
         }
 
-        public ToolConfigurationAndExecutableDirectory ObtainAndReturnExecutablePath(
+        public ToolConfigurationAndExecutablePath ObtainAndReturnExecutablePath(
             string packageId,
             string packageVersion = null,
             FilePath? nugetconfig = null,
@@ -95,16 +96,47 @@ namespace Microsoft.DotNet.ToolPackage
                 packageVersion = concreteVersion;
             }
 
-            ToolConfiguration toolConfiguration = GetConfiguration(packageId: packageId, packageVersion: packageVersion, individualToolVersion: toolDirectory);
+            LockFile lockFile = new LockFileFormat()
+                .ReadWithLock(toolDirectory.WithFile("project.assets.json").Value)
+                .Result;
 
-            return new ToolConfigurationAndExecutableDirectory(
+            LockFileItem dotnetToolSettings = FindAssetInLockFile(lockFile, "DotnetToolSettings.xml", packageId);
+
+            if (dotnetToolSettings == null)
+            {
+                throw new PackageObtainException("Cannot find DotnetToolSettings");
+            }
+
+            FilePath toolConfigurationPath =
+                toolDirectory
+                    .WithSubDirectories(packageId, packageVersion)
+                    .WithFile(dotnetToolSettings.Path);
+
+            ToolConfiguration toolConfiguration =
+                ToolConfigurationDeserializer.Deserialize(toolConfigurationPath.Value);
+
+            var entryPointFromLockFile = FindAssetInLockFile(lockFile, toolConfiguration.ToolAssemblyEntryPoint, packageId);
+
+            if (entryPointFromLockFile == null)
+            {
+                throw new PackageObtainException("Cannot find tool entry point the package");
+            }
+
+            return new ToolConfigurationAndExecutablePath(
                 toolConfiguration,
                 toolDirectory.WithSubDirectories(
                     packageId,
-                    packageVersion,
-                    "tools",
-                    targetframework,
-                    "any"));
+                    packageVersion)
+                .WithFile(entryPointFromLockFile.Path));
+        }
+
+        private static LockFileItem FindAssetInLockFile(LockFile lockFile, string toolConfigurationToolAssemblyEntryPoint, string packageId)
+        {
+            return lockFile
+                .Targets?.SingleOrDefault(t => t.RuntimeIdentifier != null)
+                ?.Libraries?.SingleOrDefault(l => l.Name == packageId)
+                ?.ToolsAssemblies
+                ?.SingleOrDefault(t => LockFileMatcher.MatchesFile(t.Path, toolConfigurationToolAssemblyEntryPoint));
         }
 
         private static void MoveToVersionedDirectory(
@@ -117,22 +149,6 @@ namespace Microsoft.DotNet.ToolPackage
             }
 
             Directory.Move(temporary.Value, versioned.Value);
-        }
-
-        private static ToolConfiguration GetConfiguration(
-            string packageId,
-            string packageVersion,
-            DirectoryPath individualToolVersion)
-        {
-            FilePath toolConfigurationPath =
-                individualToolVersion
-                    .WithSubDirectories(packageId, packageVersion, "tools")
-                    .WithFile("DotnetToolSettings.xml");
-
-            ToolConfiguration toolConfiguration =
-                ToolConfigurationDeserializer.Deserialize(toolConfigurationPath.Value);
-
-            return toolConfiguration;
         }
 
         private FilePath CreateTempProject(
@@ -154,7 +170,8 @@ namespace Microsoft.DotNet.ToolPackage
                     new XElement("PropertyGroup",
                         new XElement("TargetFramework", targetframework),
                         new XElement("RestorePackagesPath", individualToolVersion.Value),
-                        new XElement("RestoreSolutionDirectory", Directory.GetCurrentDirectory()), // https://github.com/NuGet/Home/issues/6199
+                        new XElement("RestoreProjectStyle", "DotnetToolReference"),
+                        new XElement("RestoreRootConfigDirectory", Directory.GetCurrentDirectory()),
                         new XElement("DisableImplicitFrameworkReferences", "true")
                     ),
                     packageVersion.IsConcreteValue
