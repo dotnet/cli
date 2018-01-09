@@ -8,6 +8,7 @@
     <ItemGroup>
       <FilesToCopy Include="$(SymbolsBaseDirectory)/*.pdb" />
       <FilesToCopy Include="$(SymbolsBaseDirectory)/*.dll" />
+      <FilesToCopy Include="$(SymbolsBaseDirectory)/*.exe" />
     </ItemGroup>
 
     <Copy SourceFiles="@(FilesToCopy)"
