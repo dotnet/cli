@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Layout" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <SymbolsBaseDirectory>$(SrcDirectory)/dotnet/bin/$(Configuration)/$(CliTargetFramework)</SymbolsBaseDirectory>
+  </PropertyGroup>
+  
+  <Target Name="CopySymbolsToSymStore" DependsOnTargets="MakeSymStoreDirectoryDir">
+    <ItemGroup>
+      <FilesToCopy Include="$(SymbolsBaseDirectory)/*.pdb" />
+      <FilesToCopy Include="$(SymbolsBaseDirectory)/*.dll" />
+      <FilesToCopy Include="$(SymbolsBaseDirectory)/*.exe" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(FilesToCopy)"
+          DestinationFiles="@(FilesToCopy->'$(SymStoreDirectory)/%(Filename)%(Extension)')" />
+  </Target>
+
+  <Target Name="MakeSymStoreDirectoryDir">
+    <MakeDir Directories="$(SymStoreDirectory)" />
+  </Target>
+
+</Project>
