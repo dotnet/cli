@@ -5,7 +5,8 @@
       <Stage2WithBackwardsCompatibleRuntimesOutputDirectory>$(BaseOutputDirectory)/stage2WithBackwardsCompatibleRuntimes</Stage2WithBackwardsCompatibleRuntimesOutputDirectory>
       <SdkOutputDirectory>$(OutputDirectory)/sdk/$(SdkVersion)</SdkOutputDirectory>
       <SymbolsDirectory>$(BaseOutputDirectory)/stage2symbols</SymbolsDirectory>
-      <RoslynDirectory>$(SdkOutputDirectory)/Roslyn</RoslynDirectory>
+      <SymStoreDirectory>$(BaseOutputDirectory)/SymStore</SymStoreDirectory>
+    <RoslynDirectory>$(SdkOutputDirectory)/Roslyn</RoslynDirectory>
       <FSharpDirectory>$(SdkOutputDirectory)/FSharp</FSharpDirectory>
       <CompilationDirectory>$(BaseOutputDirectory)/stage2compilation</CompilationDirectory>
       <IntermediateDirectory>$(BaseOutputDirectory)/intermediate</IntermediateDirectory>
