@@ -19,7 +19,9 @@ namespace Microsoft.DotNet.Tools.MSBuild
         {
             // Only forward telemetry events
             if (eventSource is IEventSource2 eventSource2)
+            {
                 eventSource2.TelemetryLogged += (sender, args) => BuildEventRedirector.ForwardEvent(args);
+            }
         }
 
         public void Initialize(IEventSource eventSource, int nodeCount)
