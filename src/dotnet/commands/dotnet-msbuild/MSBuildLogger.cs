@@ -93,7 +93,7 @@ namespace Microsoft.DotNet.Tools.MSBuild
             }
         }
 
-        public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Minimal;
+        public LoggerVerbosity Verbosity { get; set; }
 
         public string Parameters { get; set; }
     }
