@@ -6,21 +6,73 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Xml.Linq;
 using FluentAssertions;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Microsoft.DotNet.ShellShim.Tests
 {
     public class ShellShimMakerTests : TestBase
     {
-        private readonly string _pathToPlaceShim;
+        private readonly ITestOutputHelper _output;
 
-        public ShellShimMakerTests()
+        public ShellShimMakerTests(ITestOutputHelper output)
         {
-            _pathToPlaceShim = Path.GetTempPath();
+            _output = output;
+        }
+
+        [Theory]
+        [InlineData("my_native_app.exe", null)]
+        [InlineData("./my_native_app.js", "nodejs")]
+        [InlineData(@"C:\tools\my_native_app.dll", "dotnet")]
+        public void GivenAnRunnerOrEntryPointItCanCreateConfig(string entryPoint, string runner)
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return;
+
+            var shellShimMaker = new ShellShimMaker(TempRoot.Root);
+
+            var tmpFile = Path.Combine(TempRoot.Root, Path.GetRandomFileName());
+
+            shellShimMaker.CreateConfigFile(tmpFile, entryPoint, runner);
+
+            new FileInfo(tmpFile).Should().Exist();
+
+            var generated = XDocument.Load(tmpFile);
+
+            generated.Descendants("appSettings")
+                .Descendants("add")
+                .Should()
+                .Contain(e => e.Attribute("key").Value == "runner" && e.Attribute("value").Value == (runner ?? string.Empty))
+                .And
+                .Contain(e => e.Attribute("key").Value == "entryPoint" && e.Attribute("value").Value == entryPoint);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("  ")]
+        [InlineData("\t")]
+        [InlineData("\n")]
+        [InlineData("\0")]
+        public void GivenInvalidFileNameForEntryPointCreateConfigShouldFail(string entryPoint)
+        {
+            var shellShimMaker = new ShellShimMaker(TempRoot.Root);
+
+            Action create = () => shellShimMaker.CreateConfigFile(null, entryPoint, null);
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                create.ShouldThrow<GracefulException>();
+            }
+            else
+            {
+                create.ShouldThrow<PlatformNotSupportedException>();
+            }
         }
 
         [Fact]
@@ -28,7 +80,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
         {
             var outputDll = MakeHelloWorldExecutableDll();
 
-            var shellShimMaker = new ShellShimMaker(_pathToPlaceShim);
+            var shellShimMaker = new ShellShimMaker(TempRoot.Root);
             var shellCommandName = nameof(ShellShimMakerTests) + Path.GetRandomFileName();
 
             shellShimMaker.CreateShim(
@@ -44,9 +96,9 @@ namespace Microsoft.DotNet.ShellShim.Tests
         {
             var shellCommandName = nameof(ShellShimMakerTests) + Path.GetRandomFileName();
 
-            MakeNameConflictingCommand(_pathToPlaceShim, shellCommandName);
+            MakeNameConflictingCommand(TempRoot.Root, shellCommandName);
 
-            var shellShimMaker = new ShellShimMaker(_pathToPlaceShim);
+            var shellShimMaker = new ShellShimMaker(TempRoot.Root);
 
             Action a = () => shellShimMaker.EnsureCommandNameUniqueness(shellCommandName);
             a.ShouldThrow<GracefulException>()
@@ -61,7 +113,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
         {
             var shellCommandName = nameof(ShellShimMakerTests) + Path.GetRandomFileName();
 
-            var shellShimMaker = new ShellShimMaker(_pathToPlaceShim);
+            var shellShimMaker = new ShellShimMaker(TempRoot.Root);
 
             Action a = () => shellShimMaker.EnsureCommandNameUniqueness(shellCommandName);
             a.ShouldNotThrow();
@@ -78,10 +130,11 @@ namespace Microsoft.DotNet.ShellShim.Tests
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
+                var file = Path.Combine(TempRoot.Root, shellCommandName + ".exe");
+                _output.WriteLine("Launching " + file);
                 processStartInfo = new ProcessStartInfo
                 {
-                    FileName = "CMD.exe",
-                    Arguments = $"/C {shellCommandName}",
+                    FileName = file,
                     UseShellExecute = false
                 };
             }
@@ -94,7 +147,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
                     UseShellExecute = false
                 };
             }
-            processStartInfo.WorkingDirectory = _pathToPlaceShim;
+            processStartInfo.WorkingDirectory = TempRoot.Root;
             processStartInfo.EnvironmentVariables["PATH"] = Path.GetDirectoryName(new Muxer().MuxerPath);
 
             processStartInfo.ExecuteAndCaptureOutput(out var stdOut, out var stdErr);

@@ -3,8 +3,10 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Xml.Linq;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
@@ -13,6 +15,8 @@ namespace Microsoft.DotNet.ShellShim
     public class ShellShimMaker
     {
         private readonly string _pathToPlaceShim;
+        private const string LauncherExeResourceName = "Microsoft.DotNet.Tools.Launcher.Executable";
+        private const string LauncherConfigResourceName = "Microsoft.DotNet.Tools.Launcher.Config";
 
         public ShellShimMaker(string pathToPlaceShim)
         {
@@ -22,24 +26,29 @@ namespace Microsoft.DotNet.ShellShim
 
         public void CreateShim(string packageExecutablePath, string shellCommandName)
         {
-            var packageExecutable = new FilePath(packageExecutablePath);
+            FilePath shimPath = GetShimPath(shellCommandName);
 
-            var script = new StringBuilder();
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                script.AppendLine("@echo off");
-                script.AppendLine($"dotnet {packageExecutable.ToQuotedString()} %*");
+                CreateConfigFile(shimPath.Value + ".config", entryPoint: packageExecutablePath, runner: "dotnet");
+                using (var shim = File.Create(shimPath.Value))
+                using (var exe = typeof(ShellShimMaker).Assembly.GetManifestResourceStream(LauncherExeResourceName))
+                {
+                    exe.CopyTo(shim);
+                }
             }
             else
             {
+                var packageExecutable = new FilePath(packageExecutablePath);
+
+                var script = new StringBuilder();
                 script.AppendLine("#!/bin/sh");
                 script.AppendLine($"dotnet {packageExecutable.ToQuotedString()} \"$@\"");
+
+                File.WriteAllText(shimPath.Value, script.ToString());
+
+                SetUserExecutionPermissionToShimFile(shimPath);
             }
-
-            FilePath scriptPath = GetScriptPath(shellCommandName);
-            File.WriteAllText(scriptPath.Value, script.ToString());
-
-            SetUserExecutionPermissionToShimFile(scriptPath);
         }
 
         public void EnsureCommandNameUniqueness(string shellCommandName)
@@ -51,17 +60,42 @@ namespace Microsoft.DotNet.ShellShim
             }
         }
 
-        public void Remove(string shellCommandName)
+        internal void CreateConfigFile(string outputPath, string entryPoint, string runner)
         {
-            File.Delete(GetScriptPath(shellCommandName).Value);
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("Creating a .NET Framework app config is not supported on this platform");
+            }
+
+            if (string.IsNullOrWhiteSpace(entryPoint) 
+                || entryPoint.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
+            {
+                throw new GracefulException("The entry point setting for this tool is invalid. A file path must be specified.");
+            }
+
+            XDocument config;
+            using (var resource = typeof(ShellShimMaker).Assembly.GetManifestResourceStream(LauncherConfigResourceName))
+            {
+                config = XDocument.Load(resource);
+            }
+
+            var appSettings = config.Descendants("appSettings").First();
+            appSettings.Add(new XElement("add", new XAttribute("key", "entryPoint"), new XAttribute("value", entryPoint)));
+            appSettings.Add(new XElement("add", new XAttribute("key", "runner"), new XAttribute("value", runner ?? string.Empty)));
+            config.Save(outputPath);
         }
 
-        private FilePath GetScriptPath(string shellCommandName)
+        public void Remove(string shellCommandName)
+        {
+            File.Delete(GetShimPath(shellCommandName).Value);
+        }
+
+        private FilePath GetShimPath(string shellCommandName)
         {
             var scriptPath = Path.Combine(_pathToPlaceShim, shellCommandName);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                scriptPath += ".cmd";
+                scriptPath += ".exe";
             }
 
             return new FilePath(scriptPath);
