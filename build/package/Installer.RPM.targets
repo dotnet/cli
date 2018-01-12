@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <Target Name="GenerateRpms"
-          DependsOnTargets="TestFPMTool;BuildRpms;TestSdkRpm"
+          DependsOnTargets="BuildRpms;TestSdkRpm"
           Condition=" '$(BuildRpmPackage)' == 'True' "
           Outputs="@(GeneratedInstallers)"/>
 
@@ -186,28 +186,9 @@
     </PropertyGroup>
   </Target>
 
-  <Target Name="TestFPMTool">
-
-    <!-- run FPM  -->
-    <Exec Command="fpm --help > /dev/null" ContinueOnError="True">
-      <Output TaskParameter="ExitCode" PropertyName="FPMExitCode"/>
-    </Exec>
-
-    <!-- Check if it returned 0 -->
-    <PropertyGroup>
-      <FPMPresent>false</FPMPresent>
-      <FPMPresent Condition=" '$(FPMExitCode)' == '0' ">True</FPMPresent>
-    </PropertyGroup>
-
-    <!-- Workaround for Jenkins machines that don't have the necessary packages https://github.com/dotnet/core-setup/issues/2260 -->
-    <Message Condition=" '$(FPMPresent)' != 'True' "
-             Text="FPM tool Not found, RPM packages will not be built."
-             Importance="High"/>
-  </Target>
-
   <Target Name="TestSdkRpm"
           DependsOnTargets="RestoreTests"
-          Condition=" '$(IsRPMBasedDistro)' == 'True' and '$(FPMPresent)' == 'True' "
+          Condition=" '$(IsRPMBasedDistro)' == 'True' "
           Inputs="$(DownloadedSharedHostInstallerFile);
               $(DownloadedHostFxrInstallerFile);
               $(DownloadedSharedFrameworkInstallerFile);
