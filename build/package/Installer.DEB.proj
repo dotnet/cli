@@ -7,7 +7,6 @@
 
   <Target Name="GenerateDebs"
           DependsOnTargets="SetupDebProps;
-                            TestDebuild;
                             BuildSdkDeb;
                             TestSdkDeb;"
           Condition=" '$(IsDebianBaseDistro)' == 'True' "
@@ -21,7 +20,7 @@
   </Target>
 
   <Target Name="BuildSdkDeb"
-      Condition=" '$(IsDebianBaseDistro)' == 'True' AND '$(DebuildPresent)'  == 'true' "
+      Condition=" '$(IsDebianBaseDistro)' == 'True' "
       DependsOnTargets="PrepareDotnetDebDirectories;
                         PrepareDotnetDebTool;
                         GetAspNetSharedFxInstallArgs;"
@@ -171,23 +170,4 @@
                    WorkingDirectory="$(DotnetDebToolDir)" />
   </Target>
 
-  <Target Name="TestDebuild">
-      <Message Text="Don't remove this" />
-
-      <!-- run Debuild -->
-      <Exec Command="/usr/bin/env debuild -h" ContinueOnError="true">
-          <Output TaskParameter="ExitCode" PropertyName="DebuildExitCode" />
-      </Exec>
-
-      <!-- Check if it returned 0 -->
-      <PropertyGroup>
-        <DebuildPresent>false</DebuildPresent>
-        <DebuildPresent Condition=" '$(DebuildExitCode)' == '0' ">true</DebuildPresent>
-      </PropertyGroup>
-
-      <!-- Workaround for Ubuntu16 Jenkins https://github.com/dotnet/core-setup/issues/167 -->
-      <Message Condition=" '$(DebuildPresent)'  != 'true' "
-               Text="Debuild Not found, Debian packages will not be built."
-               Importance="High" />
-  </Target>
 </Project>
