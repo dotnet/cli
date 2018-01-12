@@ -3,20 +3,19 @@
 
 using System;
 using System.IO;
-using System.Text;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ShellShim;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using Newtonsoft.Json;
 
-namespace Microsoft.DotNet.Tests.InstallToolCommandTests
+namespace Microsoft.DotNet.Tools.Test.Utilities.Mock
 {
-    internal class ShellShimMakerSimulator : IShellShimMaker
+    internal class ShellShimMakerMock : IShellShimMaker
     {
         private static IFileSystem _fileSystem;
         private readonly string _pathToPlaceShim;
 
-        public ShellShimMakerSimulator(string pathToPlaceShim, IFileSystem fileSystem = null)
+        public ShellShimMakerMock(string pathToPlaceShim, IFileSystem fileSystem = null)
         {
             _pathToPlaceShim =
                 pathToPlaceShim ?? throw new ArgumentNullException(nameof(pathToPlaceShim));
@@ -34,7 +33,7 @@ namespace Microsoft.DotNet.Tests.InstallToolCommandTests
                 Runner = "dotnet",
                 executablePath = packageExecutable.Value
             };
-            var script = JsonConvert.SerializeObject(fakeshim);
+            var script = JsonConvert.SerializeObject((object) fakeshim);
 
             FilePath scriptPath = new FilePath(Path.Combine(_pathToPlaceShim, shellCommandName));
             _fileSystem.File.WriteAllText(scriptPath.Value, script.ToString());

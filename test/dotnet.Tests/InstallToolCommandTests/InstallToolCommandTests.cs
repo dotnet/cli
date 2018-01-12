@@ -9,7 +9,6 @@ using FluentAssertions;
 using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
-using Microsoft.DotNet.Tests.InstallToolCommandTests;
 using Microsoft.DotNet.ToolPackage;
 using Microsoft.DotNet.Tools.Install.Tool;
 using Microsoft.DotNet.Tools.Test.Utilities.Mock;
@@ -17,7 +16,6 @@ using Microsoft.Extensions.DependencyModel.Tests;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using Newtonsoft.Json;
 using Xunit;
-using Xunit.Abstractions;
 using Parser = Microsoft.DotNet.Cli.Parser;
 
 namespace Microsoft.DotNet.Tests.ParserTests
@@ -25,9 +23,9 @@ namespace Microsoft.DotNet.Tests.ParserTests
     public class InstallToolCommandTests
     {
         private readonly IFileSystem _fileSystemWrapper;
-        private readonly ToolPackageObtainerSimulator _toolPackageObtainerSimulator;
-        private readonly ShellShimMakerSimulator _shellShimMakerSimulator;
-        private readonly EnvironmentPathInstructionSimulator _environmentPathInstructionSimulator;
+        private readonly ToolPackageObtainerMock _toolPackageObtainerMock;
+        private readonly ShellShimMakerMock _shellShimMakerMock;
+        private readonly EnvironmentPathInstructionMock _environmentPathInstructionMock;
         private readonly AppliedOption _appliedCommand;
         private readonly ParseResult _parseResult;
         private readonly FakeReporter _fakeReporter;
@@ -36,11 +34,11 @@ namespace Microsoft.DotNet.Tests.ParserTests
         public InstallToolCommandTests()
         {
             _fileSystemWrapper = new FileSystemMockBuilder().Build();
-            _toolPackageObtainerSimulator = new ToolPackageObtainerSimulator(_fileSystemWrapper);
-            _shellShimMakerSimulator = new ShellShimMakerSimulator(PathToPlaceShim, _fileSystemWrapper);
+            _toolPackageObtainerMock = new ToolPackageObtainerMock(_fileSystemWrapper);
+            _shellShimMakerMock = new ShellShimMakerMock(PathToPlaceShim, _fileSystemWrapper);
             _fakeReporter = new FakeReporter();
-            _environmentPathInstructionSimulator =
-                new EnvironmentPathInstructionSimulator(_fakeReporter, PathToPlaceShim);
+            _environmentPathInstructionMock =
+                new EnvironmentPathInstructionMock(_fakeReporter, PathToPlaceShim);
 
             ParseResult result = Parser.Instance.Parse("dotnet install tool console.test.app");
             _appliedCommand = result["dotnet"]["install"]["tool"];
@@ -53,19 +51,19 @@ namespace Microsoft.DotNet.Tests.ParserTests
         {
             var installToolCommand = new InstallToolCommand(_appliedCommand,
                 _parseResult,
-                _toolPackageObtainerSimulator,
-                _shellShimMakerSimulator,
-                _environmentPathInstructionSimulator);
+                _toolPackageObtainerMock,
+                _shellShimMakerMock,
+                _environmentPathInstructionMock);
 
             installToolCommand.Execute();
 
             // It is hard to simulate shell behavior. Only Assert shim can point to executable dll
-            _fileSystemWrapper.File.Exists(Path.Combine("pathToPlace", ToolPackageObtainerSimulator.FakeCommandName))
+            _fileSystemWrapper.File.Exists(Path.Combine("pathToPlace", ToolPackageObtainerMock.FakeCommandName))
                 .Should().BeTrue();
-            var deserializedFakeShim = JsonConvert.DeserializeObject<ShellShimMakerSimulator.FakeShim>(
+            var deserializedFakeShim = JsonConvert.DeserializeObject<ShellShimMakerMock.FakeShim>(
                 _fileSystemWrapper.File.ReadAllText(
                     Path.Combine("pathToPlace",
-                        ToolPackageObtainerSimulator.FakeCommandName)));
+                        ToolPackageObtainerMock.FakeCommandName)));
             _fileSystemWrapper.File.Exists(deserializedFakeShim.executablePath).Should().BeTrue();
         }
 
@@ -74,9 +72,9 @@ namespace Microsoft.DotNet.Tests.ParserTests
         {
             var installToolCommand = new InstallToolCommand(_appliedCommand,
                 _parseResult,
-                _toolPackageObtainerSimulator,
-                _shellShimMakerSimulator,
-                _environmentPathInstructionSimulator);
+                _toolPackageObtainerMock,
+                _shellShimMakerMock,
+                _environmentPathInstructionMock);
 
             installToolCommand.Execute();
 
@@ -87,15 +85,15 @@ namespace Microsoft.DotNet.Tests.ParserTests
         public void GivenFailedPackageObtainWhenRunWithPackageIdItShouldThrow()
         {
             var toolPackageObtainerSimulatorThatThrows
-                = new ToolPackageObtainerSimulator(
+                = new ToolPackageObtainerMock(
                     _fileSystemWrapper,
                     () => throw new PackageObtainException("Simulated error"));
             var installToolCommand = new InstallToolCommand(
                 _appliedCommand,
                 _parseResult,
                 toolPackageObtainerSimulatorThatThrows,
-                _shellShimMakerSimulator,
-                _environmentPathInstructionSimulator,
+                _shellShimMakerMock,
+                _environmentPathInstructionMock,
                 _fakeReporter);
 
             Action a = () => installToolCommand.Execute();
@@ -112,15 +110,15 @@ namespace Microsoft.DotNet.Tests.ParserTests
         public void GivenInCorrectToolConfigurationWhenRunWithPackageIdItShouldThrow()
         {
             var toolPackageObtainerSimulatorThatThrows
-                = new ToolPackageObtainerSimulator(
+                = new ToolPackageObtainerMock(
                     _fileSystemWrapper,
                     () => throw new ToolConfigurationException("Simulated error"));
             var installToolCommand = new InstallToolCommand(
                 _appliedCommand,
                 _parseResult,
                 toolPackageObtainerSimulatorThatThrows,
-                _shellShimMakerSimulator,
-                _environmentPathInstructionSimulator,
+                _shellShimMakerMock,
+                _environmentPathInstructionMock,
                 _fakeReporter);
 
             Action a = () => installToolCommand.Execute();
@@ -138,9 +136,9 @@ namespace Microsoft.DotNet.Tests.ParserTests
             var installToolCommand = new InstallToolCommand(
                 _appliedCommand,
                 _parseResult,
-                _toolPackageObtainerSimulator,
-                _shellShimMakerSimulator,
-                new EnvironmentPathInstructionSimulator(_fakeReporter, PathToPlaceShim, true),
+                _toolPackageObtainerMock,
+                _shellShimMakerMock,
+                new EnvironmentPathInstructionMock(_fakeReporter, PathToPlaceShim, true),
                 _fakeReporter);
 
             installToolCommand.Execute();

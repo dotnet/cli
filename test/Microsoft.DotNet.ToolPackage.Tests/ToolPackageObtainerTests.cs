@@ -8,9 +8,9 @@ using Microsoft.DotNet.Tools.Test.Utilities;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Tools.Install.Tool;
-using Microsoft.DotNet.Tests.InstallToolCommandTests;
 using Xunit;
 using System.Collections.Generic;
+using Microsoft.DotNet.Tools.Test.Utilities.Mock;
 
 namespace Microsoft.DotNet.ToolPackage.Tests
 {
@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
             var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath);
-            var packageObtainerSimulator = new ToolPackageObtainerSimulator();
+            var packageObtainerSimulator = new ToolPackageObtainerMock();
 
             foreach (IToolPackageObtainer p in new List<IToolPackageObtainer>() { packageObtainerSimulator, packageObtainer })
             {
@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
             var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath);
-            var packageObtainerSimulator = new ToolPackageObtainerSimulator();
+            var packageObtainerSimulator = new ToolPackageObtainerMock();
 
             foreach (IToolPackageObtainer p in new List<IToolPackageObtainer>() { packageObtainerSimulator, packageObtainer })
             {
@@ -109,7 +109,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                     new Lazy<string>(),
                     new PackageToProjectFileAdder(),
                     new ProjectRestorer());
-            var packageObtainerSimulator = new ToolPackageObtainerSimulator();
+            var packageObtainerSimulator = new ToolPackageObtainerMock();
 
             foreach (IToolPackageObtainer p in new List<IToolPackageObtainer>() { packageObtainerSimulator, packageObtainer })
             {
@@ -141,7 +141,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
             var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath);
-            var packageObtainerSimulator = new ToolPackageObtainerSimulator();
+            var packageObtainerSimulator = new ToolPackageObtainerMock();
 
             foreach (IToolPackageObtainer p in new List<IToolPackageObtainer> { packageObtainerSimulator, packageObtainer })
             {
@@ -173,7 +173,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
             var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath);
-            var packageObtainerSimulator = new ToolPackageObtainerSimulator();
+            var packageObtainerSimulator = new ToolPackageObtainerMock();
 
             foreach (IToolPackageObtainer p in new List<IToolPackageObtainer>() { packageObtainerSimulator, packageObtainer })
             {
@@ -205,7 +205,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                     new Lazy<string>(() => BundledTargetFramework.GetTargetFrameworkMoniker()),
                     new PackageToProjectFileAdder(),
                     new ProjectRestorer());
-            var packageObtainerSimulator = new ToolPackageObtainerSimulator();
+            var packageObtainerSimulator = new ToolPackageObtainerMock();
 
             foreach (IToolPackageObtainer p in new List<IToolPackageObtainer>() { packageObtainerSimulator, packageObtainer })
             {

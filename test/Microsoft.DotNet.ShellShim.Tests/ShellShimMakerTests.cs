@@ -10,7 +10,6 @@ using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.TestFramework;
-using Microsoft.DotNet.Tests.InstallToolCommandTests;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
 
@@ -51,7 +50,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             MakeNameConflictingCommand(_pathToPlaceShim, shellCommandName);
 
             var shellShimMaker = new ShellShimMaker(_pathToPlaceShim);
-            var shellShimSimulator = new ShellShimMakerSimulator(_pathToPlaceShim);
+            var shellShimSimulator = new ShellShimMakerMock(_pathToPlaceShim);
 
             foreach (IShellShimMaker s in new List<IShellShimMaker>
             {
@@ -73,7 +72,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             var shellCommandName = nameof(ShellShimMakerTests) + Path.GetRandomFileName();
 
             var shellShimMaker = new ShellShimMaker(_pathToPlaceShim);
-            var shellShimSimulator = new ShellShimMakerSimulator(_pathToPlaceShim);
+            var shellShimSimulator = new ShellShimMakerMock(_pathToPlaceShim);
 
             foreach (IShellShimMaker s in new List<IShellShimMaker>
             {

@@ -6,9 +6,9 @@ using System.IO;
 using Microsoft.DotNet.ToolPackage;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
-namespace Microsoft.DotNet.Tests.InstallToolCommandTests
+namespace Microsoft.DotNet.Tools.Test.Utilities.Mock
 {
-    internal class ToolPackageObtainerSimulator : IToolPackageObtainer
+    internal class ToolPackageObtainerMock : IToolPackageObtainer
     {
         private readonly Action _beforeRunObtain;
         public const string FakeEntrypointName = "SimulatorEntryPoint.dll";
@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.Tests.InstallToolCommandTests
         private static IFileSystem _fileSystem;
         private string _fakeExecutableDirectory;
 
-        public ToolPackageObtainerSimulator(IFileSystem fileSystemWrapper = null, Action beforeRunObtain = null)
+        public ToolPackageObtainerMock(IFileSystem fileSystemWrapper = null, Action beforeRunObtain = null)
         {
             _beforeRunObtain = beforeRunObtain ?? (() => { });
             _fileSystem = fileSystemWrapper ?? new FileSystemWrapper();

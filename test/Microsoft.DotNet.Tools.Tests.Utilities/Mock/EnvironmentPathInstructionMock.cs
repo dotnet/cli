@@ -2,18 +2,17 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Linq;
 using Microsoft.DotNet.Cli.Utils;
 
-namespace Microsoft.DotNet.Tests.InstallToolCommandTests
+namespace Microsoft.DotNet.Tools.Test.Utilities.Mock
 {
-    internal class EnvironmentPathInstructionSimulator : IEnvironmentPathInstruction
+    internal class EnvironmentPathInstructionMock : IEnvironmentPathInstruction
     {
         private readonly string _packageExecutablePath;
         private readonly bool _packageExecutablePathExists;
         private readonly IReporter _reporter;
 
-        public EnvironmentPathInstructionSimulator(
+        public EnvironmentPathInstructionMock(
             IReporter reporter,
             string packageExecutablePath,
             bool packageExecutablePathExists = false)
