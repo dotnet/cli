@@ -10,7 +10,7 @@ using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.ShellShim
 {
-    public class ShellShimMaker
+    public class ShellShimMaker : IShellShimMaker
     {
         private readonly string _pathToPlaceShim;
 

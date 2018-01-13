@@ -10,6 +10,7 @@ using FluentAssertions;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
+using Microsoft.DotNet.Tools.Test.Utilities.Mock;
 using Xunit;
 
 namespace Microsoft.DotNet.ShellShim.Tests
@@ -39,14 +40,24 @@ namespace Microsoft.DotNet.ShellShim.Tests
             stdOut.Should().Contain("Hello World");
         }
 
-        [Fact]
-        public void GivenAnExecutablePathWithExistingSameNameShimItThrows()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void GivenAnExecutablePathWithExistingSameNameShimItThrows(bool testMockBehaviorIsInSync)
         {
             var shellCommandName = nameof(ShellShimMakerTests) + Path.GetRandomFileName();
 
             MakeNameConflictingCommand(_pathToPlaceShim, shellCommandName);
 
-            var shellShimMaker = new ShellShimMaker(_pathToPlaceShim);
+            IShellShimMaker shellShimMaker;
+            if (testMockBehaviorIsInSync)
+            {
+                shellShimMaker = new ShellShimMakerMock(_pathToPlaceShim);
+            }
+            else
+            {
+                shellShimMaker = new ShellShimMaker(_pathToPlaceShim);
+            }
 
             Action a = () => shellShimMaker.EnsureCommandNameUniqueness(shellCommandName);
             a.ShouldThrow<GracefulException>()
@@ -55,13 +66,22 @@ namespace Microsoft.DotNet.ShellShim.Tests
                     $"Failed to install tool {shellCommandName}. A command with the same name already exists.");
         }
 
-
-        [Fact]
-        public void GivenAnExecutablePathWithoutExistingSameNameShimItShouldNotThrow()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void GivenAnExecutablePathWithoutExistingSameNameShimItShouldNotThrow(bool testMockBehaviorIsInSync)
         {
             var shellCommandName = nameof(ShellShimMakerTests) + Path.GetRandomFileName();
 
-            var shellShimMaker = new ShellShimMaker(_pathToPlaceShim);
+            IShellShimMaker shellShimMaker;
+            if (testMockBehaviorIsInSync)
+            {
+                shellShimMaker = new ShellShimMakerMock(_pathToPlaceShim);
+            }
+            else
+            {
+                shellShimMaker = new ShellShimMaker(_pathToPlaceShim);
+            }
 
             Action a = () => shellShimMaker.EnsureCommandNameUniqueness(shellCommandName);
             a.ShouldNotThrow();
