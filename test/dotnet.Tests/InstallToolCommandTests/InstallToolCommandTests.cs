@@ -11,13 +11,13 @@ using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ToolPackage;
 using Microsoft.DotNet.Tools.Install.Tool;
-using Microsoft.DotNet.Tools.Test.Utilities.Mock;
 using Microsoft.DotNet.Tools.Tests.ComponentMocks;
 using Microsoft.Extensions.DependencyModel.Tests;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using Newtonsoft.Json;
 using Xunit;
 using Parser = Microsoft.DotNet.Cli.Parser;
+using LocalizableStrings = Microsoft.DotNet.Tools.Install.LocalizableStrings;
 
 namespace Microsoft.DotNet.Tests.ParserTests
 {
@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.Tests.ParserTests
                 _fileSystemWrapper.File.ReadAllText(
                     Path.Combine("pathToPlace",
                         ToolPackageObtainerMock.FakeCommandName)));
-            _fileSystemWrapper.File.Exists(deserializedFakeShim.executablePath).Should().BeTrue();
+            _fileSystemWrapper.File.Exists(deserializedFakeShim.ExecutablePath).Should().BeTrue();
         }
 
         [Fact]
@@ -101,10 +101,7 @@ namespace Microsoft.DotNet.Tests.ParserTests
 
             a.ShouldThrow<GracefulException>()
                 .And.Message.Should()
-                .Contain($"Install failed. Failed to download package:" +
-                         $"{Environment.NewLine}NuGet returned:" +
-                         $"{Environment.NewLine}" +
-                         $"{Environment.NewLine}Simulated error");
+                .Contain(LocalizableStrings.InstallFailedNuget);
         }
 
         [Fact]
@@ -125,10 +122,7 @@ namespace Microsoft.DotNet.Tests.ParserTests
             Action a = () => installToolCommand.Execute();
             a.ShouldThrow<GracefulException>()
                 .And.Message.Should()
-                .Contain($"Install failed. The settings file in the tool's NuGet package is not valid. Please contact the owner of the NuGet package." +
-                         $"{Environment.NewLine}The error was:" +
-                         $"{Environment.NewLine}" +
-                         $"{Environment.NewLine}Simulated error");
+                .Contain(LocalizableStrings.InstallFailedNuget);
         }
 
         [Fact]
@@ -147,8 +141,7 @@ namespace Microsoft.DotNet.Tests.ParserTests
             _fakeReporter
                 .Message
                 .Single().Should()
-                .Contain(
-                    "The installation succeeded. If there is no other instruction. You can type the following command in shell directly to invoke:");
+                .Contain(LocalizableStrings.InstallationSucceeded);
         }
 
         internal class FakeReporter : IReporter

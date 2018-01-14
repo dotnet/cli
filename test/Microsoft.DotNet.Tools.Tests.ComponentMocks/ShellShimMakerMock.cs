@@ -31,12 +31,12 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             var fakeshim = new FakeShim
             {
                 Runner = "dotnet",
-                executablePath = packageExecutable.Value
+                ExecutablePath = packageExecutable.Value
             };
-            var script = JsonConvert.SerializeObject((object) fakeshim);
+            var script = JsonConvert.SerializeObject(fakeshim);
 
             FilePath scriptPath = new FilePath(Path.Combine(_pathToPlaceShim, shellCommandName));
-            _fileSystem.File.WriteAllText(scriptPath.Value, script.ToString());
+            _fileSystem.File.WriteAllText(scriptPath.Value, script);
         }
 
         public void EnsureCommandNameUniqueness(string shellCommandName)
@@ -44,14 +44,15 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             if (_fileSystem.File.Exists(Path.Combine(_pathToPlaceShim, shellCommandName)))
             {
                 throw new GracefulException(
-                    $"Failed to install tool {shellCommandName}. A command with the same name already exists.");
+                    string.Format(CommonLocalizableStrings.FailInstallToolSameName,
+                        shellCommandName));
             }
         }
 
         public class FakeShim
         {
             public string Runner { get; set; }
-            public string executablePath { get; set; }
+            public string ExecutablePath { get; set; }
         }
     }
 }
