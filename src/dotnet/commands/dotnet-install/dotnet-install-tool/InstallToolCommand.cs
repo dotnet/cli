@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
         private readonly string _packageVersion;
         private readonly string _configFilePath;
         private readonly string _framework;
-        private static string _source;
+        private readonly string _source;
 
         public InstallToolCommand(
             AppliedOption appliedCommand,
@@ -95,7 +95,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             return 0;
         }
 
-        private static ToolConfigurationAndExecutableDirectory ObtainPackage(DirectoryPath executablePackagePath)
+        private ToolConfigurationAndExecutableDirectory ObtainPackage(DirectoryPath executablePackagePath)
         {
             try
             {
