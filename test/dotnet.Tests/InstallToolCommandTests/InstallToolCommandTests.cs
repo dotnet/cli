@@ -19,7 +19,7 @@ using Xunit;
 using Parser = Microsoft.DotNet.Cli.Parser;
 using LocalizableStrings = Microsoft.DotNet.Tools.Install.LocalizableStrings;
 
-namespace Microsoft.DotNet.Tests.ParserTests
+namespace Microsoft.DotNet.Tests.InstallToolCommandTests
 {
     public class InstallToolCommandTests
     {
