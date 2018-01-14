@@ -101,7 +101,7 @@ namespace Microsoft.DotNet.Tests.InstallToolCommandTests
 
             a.ShouldThrow<GracefulException>()
                 .And.Message.Should()
-                .Contain(LocalizableStrings.InstallFailedNuget);
+                .Contain(string.Format(LocalizableStrings.InstallFailedNuget, "Simulated error"));
         }
 
         [Fact]
@@ -122,7 +122,7 @@ namespace Microsoft.DotNet.Tests.InstallToolCommandTests
             Action a = () => installToolCommand.Execute();
             a.ShouldThrow<GracefulException>()
                 .And.Message.Should()
-                .Contain(LocalizableStrings.InstallFailedNuget);
+                .Contain(string.Format(LocalizableStrings.InstallFailedPackage, "Simulated error"));
         }
 
         [Fact]
@@ -141,7 +141,7 @@ namespace Microsoft.DotNet.Tests.InstallToolCommandTests
             _fakeReporter
                 .Message
                 .Single().Should()
-                .Contain(LocalizableStrings.InstallationSucceeded);
+                .Contain(string.Format(LocalizableStrings.InstallationSucceeded, "SimulatorCommand"));
         }
 
         internal class FakeReporter : IReporter
