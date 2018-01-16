@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.ToolPackage
                 {
                     throw new PackageObtainException(
                         string.Format(CommonLocalizableStrings.NuGetConfigurationFileDoesNotExist,
-                        Path.GetFullPath(nugetconfig.Value.Value)));
+                            Path.GetFullPath(nugetconfig.Value.Value)));
                 }
             }
 
@@ -115,7 +115,8 @@ namespace Microsoft.DotNet.ToolPackage
             ToolConfiguration toolConfiguration =
                 ToolConfigurationDeserializer.Deserialize(toolConfigurationPath.Value);
 
-            var entryPointFromLockFile = FindAssetInLockFile(lockFile, toolConfiguration.ToolAssemblyEntryPoint, packageId);
+            var entryPointFromLockFile =
+                FindAssetInLockFile(lockFile, toolConfiguration.ToolAssemblyEntryPoint, packageId);
 
             if (entryPointFromLockFile == null)
             {
@@ -125,12 +126,13 @@ namespace Microsoft.DotNet.ToolPackage
             return new ToolConfigurationAndExecutablePath(
                 toolConfiguration,
                 toolDirectory.WithSubDirectories(
-                    packageId,
-                    packageVersion)
-                .WithFile(entryPointFromLockFile.Path));
+                        packageId,
+                        packageVersion)
+                    .WithFile(entryPointFromLockFile.Path));
         }
 
-        private static LockFileItem FindAssetInLockFile(LockFile lockFile, string toolConfigurationToolAssemblyEntryPoint, string packageId)
+        private static LockFileItem FindAssetInLockFile(LockFile lockFile,
+            string toolConfigurationToolAssemblyEntryPoint, string packageId)
         {
             return lockFile
                 .Targets?.SingleOrDefault(t => t.RuntimeIdentifier != null)
@@ -172,7 +174,11 @@ namespace Microsoft.DotNet.ToolPackage
                         new XElement("RestorePackagesPath", individualToolVersion.Value),
                         new XElement("RestoreProjectStyle", "DotnetToolReference"),
                         new XElement("RestoreRootConfigDirectory", Directory.GetCurrentDirectory()),
-                        new XElement("DisableImplicitFrameworkReferences", "true")
+                        new XElement("DisableImplicitFrameworkReferences", "true"),
+                        new XElement("RestoreFallbackFolders", "clear"),
+                        new XElement("RestoreAdditionalProjectSources", string.Empty),
+                        new XElement("RestoreAdditionalProjectFallbackFolders", string.Empty),
+                        new XElement("RestoreAdditionalProjectFallbackFoldersExcludes", string.Empty)
                     ),
                     packageVersion.IsConcreteValue
                         ? new XElement("ItemGroup",
