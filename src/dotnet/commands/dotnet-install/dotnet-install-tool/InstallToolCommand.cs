@@ -41,9 +41,11 @@ namespace Microsoft.DotNet.Tools.Install.Tool
 
         public override int Execute()
         {
-            var executablePackagePath = new DirectoryPath(new CliFolderPathCalculator().ExecutablePackagesPath);
+            var cliFolderPathCalculator = new CliFolderPathCalculator();
+            var executablePackagePath = new DirectoryPath(cliFolderPathCalculator.ExecutablePackagesPath);
+            var offlineFeedPath = new DirectoryPath(cliFolderPathCalculator.CliFallbackFolderPath);
 
-            var toolConfigurationAndExecutablePath = ObtainPackage(executablePackagePath);
+            var toolConfigurationAndExecutablePath = ObtainPackage(executablePackagePath, offlineFeedPath);
 
             var shellShimMaker = new ShellShimMaker(executablePackagePath.Value);
             var commandName = toolConfigurationAndExecutablePath.Configuration.CommandName;
@@ -63,7 +65,9 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             return 0;
         }
 
-        private static ToolConfigurationAndExecutablePath ObtainPackage(DirectoryPath executablePackagePath)
+        private static ToolConfigurationAndExecutablePath ObtainPackage(
+            DirectoryPath executablePackagePath,
+            DirectoryPath offlineFeedPath)
         {
             try
             {
@@ -76,6 +80,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                 var toolPackageObtainer =
                     new ToolPackageObtainer(
                         executablePackagePath,
+                        offlineFeedPath,
                         () => new DirectoryPath(Path.GetTempPath())
                             .WithSubDirectories(Path.GetRandomFileName())
                             .WithFile(Path.GetRandomFileName() + ".csproj"),

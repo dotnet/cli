@@ -4,6 +4,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Microsoft.DotNet.Tools;
 using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.Configurer;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using NuGet.ProjectModel;
 
@@ -16,9 +17,11 @@ namespace Microsoft.DotNet.ToolPackage
         private readonly IPackageToProjectFileAdder _packageToProjectFileAdder;
         private readonly IProjectRestorer _projectRestorer;
         private readonly DirectoryPath _toolsPath;
+        private readonly DirectoryPath _offlineFeedPath;
 
         public ToolPackageObtainer(
             DirectoryPath toolsPath,
+            DirectoryPath offlineFeedPath,
             Func<FilePath> getTempProjectPath,
             Lazy<string> bundledTargetFrameworkMoniker,
             IPackageToProjectFileAdder packageToProjectFileAdder,
@@ -31,6 +34,7 @@ namespace Microsoft.DotNet.ToolPackage
             _packageToProjectFileAdder = packageToProjectFileAdder ??
                                          throw new ArgumentNullException(nameof(packageToProjectFileAdder));
             _toolsPath = toolsPath;
+            _offlineFeedPath = offlineFeedPath;
         }
 
         public ToolConfigurationAndExecutablePath ObtainAndReturnExecutablePath(
@@ -176,9 +180,11 @@ namespace Microsoft.DotNet.ToolPackage
                         new XElement("RestoreRootConfigDirectory", Directory.GetCurrentDirectory()),
                         new XElement("DisableImplicitFrameworkReferences", "true"),
                         new XElement("RestoreFallbackFolders", "clear"),
-                        new XElement("RestoreAdditionalProjectSources", string.Empty),
+                        new XElement("RestoreAdditionalProjectSources",
+                            Directory.Exists(_offlineFeedPath.Value) ? _offlineFeedPath.Value : string.Empty),
                         new XElement("RestoreAdditionalProjectFallbackFolders", string.Empty),
-                        new XElement("RestoreAdditionalProjectFallbackFoldersExcludes", string.Empty)
+                        new XElement("RestoreAdditionalProjectFallbackFoldersExcludes", string.Empty
+                        )
                     ),
                     packageVersion.IsConcreteValue
                         ? new XElement("ItemGroup",
