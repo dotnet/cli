@@ -123,4 +123,10 @@
   <data name="CommandDescription" xml:space="preserve">
     <value>Installs an item into the development environment.</value>
   </data>
+  <data name="GlobalOptionDescription" xml:space="preserve">
+    <value>Install user wide.</value>
+  </data>
+  <data name="InstallToolCommandOnlySupportGlobal" xml:space="preserve">
+    <value>Install tool only support install user wide (-g).</value>
+  </data>
 </root>

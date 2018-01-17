@@ -21,6 +21,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
         private static string _configFilePath;
         private static string _framework;
         private static string _source;
+        private static bool _global;
 
         public InstallToolCommand(
             AppliedOption appliedCommand,
@@ -37,10 +38,16 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             _configFilePath = appliedCommand.ValueOrDefault<string>("configfile");
             _framework = appliedCommand.ValueOrDefault<string>("framework");
             _source = appliedCommand.ValueOrDefault<string>("source");
+            _global = appliedCommand.ValueOrDefault<bool>("global");
         }
 
         public override int Execute()
         {
+            if (!_global)
+            {
+                throw new GracefulException(LocalizableStrings.InstallToolCommandOnlySupportGlobal);
+            }
+
             var cliFolderPathCalculator = new CliFolderPathCalculator();
             var executablePackagePath = new DirectoryPath(cliFolderPathCalculator.ExecutablePackagesPath);
             var offlineFeedPath = new DirectoryPath(cliFolderPathCalculator.CliFallbackFolderPath);
@@ -95,6 +102,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                     targetframework: _framework,
                     source: _source);
             }
+
             catch (PackageObtainException ex)
             {
                 throw new GracefulException(

@@ -12,6 +12,16 @@
         <target state="new">Installs an item into the development environment.</target>
         <note />
       </trans-unit>
+      <trans-unit id="GlobalOptionDescription">
+        <source>Install user wide.</source>
+        <target state="new">Install user wide.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InstallToolCommandOnlySupportGlobal">
+        <source>Install tool only support install user wide (-g).</source>
+        <target state="new">Install tool only support install user wide (-g).</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>
