@@ -11,6 +11,11 @@
       SkipGetTargetFrameworkProperties="true"
       SetTargetFramework="TargetFramework=net45"
       PrivateAssets="All" />
+    <ProjectReference Include="..\tool_launcher\tool_launcher.csproj"
+      ReferenceOutputAssembly="false"
+      SkipGetTargetFrameworkProperties="true"
+      SetTargetFramework="TargetFramework=net35"
+      PrivateAssets="All" />
   </ItemGroup>
 
   <Target Name="EmbedDotnetLauncher" BeforeTargets="PrepareForBuild">
