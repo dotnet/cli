@@ -6,58 +6,52 @@ using NuGet.ProjectModel;
 
 namespace Microsoft.DotNet.ToolPackage
 {
-    internal class LockFileMatchChecker
+    internal class LockFileMatcher
     {
-        private readonly string[] _pathInLockFilePathInArray;
-        private readonly string[] _entryPointPathInArray;
-
         /// <summary>
         /// Check if LockFileItem matches the targetRelativeFilePath.
-        /// The path in LockFileItem is in pattern tools/TFM/RID/my/tool.dll, tools/TFM/RID is selected by NuGet.
+        /// The path in LockFileItem is in pattern tools/TFM/RID/my/tool.dll. Tools/TFM/RID is selected by NuGet.
         /// And there will be only one TFM/RID combination.
         /// When "my/tools.dll" part matches excatly with the targetRelativeFilePath, return true. 
         /// </summary>
         /// <param name="lockFileItem">LockFileItem from asset.json restored from temp project</param>
         /// <param name="targetRelativeFilePath">file path relative to tools/TFM/RID</param>
-        public LockFileMatchChecker(LockFileItem lockFileItem, string targetRelativeFilePath)
+        internal static bool MatchesFile(LockFileItem lockFileItem, string targetRelativeFilePath)
         {
-            _pathInLockFilePathInArray = SplitPathByDirectorySeparator(lockFileItem.Path);
-            _entryPointPathInArray = SplitPathByDirectorySeparator(targetRelativeFilePath);
-        }
+            string[] pathInLockFilePathInArray = SplitPathByDirectorySeparator(lockFileItem.Path);
+            string[] entryPointPathInArray = SplitPathByDirectorySeparator(targetRelativeFilePath);
 
-        internal bool Matches()
-        {
-            return (_entryPointPathInArray.Length >= 1)
+            return entryPointPathInArray.Length >= 1
                    && PathInLockFileDirectoriesStartWithToolsAndFollowsTwoSubFolder()
                    && SubPathMatchesTargetFilePath();
-        }
 
-        private bool SubPathMatchesTargetFilePath()
-        {
-            string[] pathAfterToolsTfmRid = _pathInLockFilePathInArray.Skip(3).ToArray();
-            return !pathAfterToolsTfmRid
-                .Where((directoryOnEveryLevel, i) => directoryOnEveryLevel != _entryPointPathInArray[i])
-                .Any();
-        }
-
-        private bool PathInLockFileDirectoriesStartWithToolsAndFollowsTwoSubFolder()
-        {
-            if (_pathInLockFilePathInArray.Length - _entryPointPathInArray.Length != 3)
+            bool SubPathMatchesTargetFilePath()
             {
-                return false;
+                string[] pathAfterToolsTfmRid = pathInLockFilePathInArray.Skip(3).ToArray();
+                return !pathAfterToolsTfmRid
+                    .Where((directoryOnEveryLevel, i) => directoryOnEveryLevel != entryPointPathInArray[i])
+                    .Any();
             }
 
-            if (_pathInLockFilePathInArray[0] != "tools")
+            bool PathInLockFileDirectoriesStartWithToolsAndFollowsTwoSubFolder()
             {
-                return false;
+                if (pathInLockFilePathInArray.Length - entryPointPathInArray.Length != 3)
+                {
+                    return false;
+                }
+
+                if (pathInLockFilePathInArray[0] != "tools")
+                {
+                    return false;
+                }
+
+                return true;
             }
 
-            return true;
-        }
-
-        private static string[] SplitPathByDirectorySeparator(string path)
-        {
-            return path.Split('\\', '/');
+            string[] SplitPathByDirectorySeparator(string path)
+            {
+                return path.Split('\\', '/');
+            }
         }
     }
 }

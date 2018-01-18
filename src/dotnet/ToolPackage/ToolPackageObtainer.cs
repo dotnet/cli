@@ -145,7 +145,7 @@ namespace Microsoft.DotNet.ToolPackage
                 .Targets?.SingleOrDefault(t => t.RuntimeIdentifier != null)
                 ?.Libraries?.SingleOrDefault(l => l.Name == packageId)
                 ?.ToolsAssemblies
-                ?.SingleOrDefault(t => new LockFileMatchChecker(t, targetRelativeFilePath).Matches());
+                ?.SingleOrDefault(t => LockFileMatcher.MatchesFile(t, targetRelativeFilePath));
         }
 
         private static void MoveToVersionedDirectory(

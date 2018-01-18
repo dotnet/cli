@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         [InlineData("tools/netcoreapp1.1/any/subDirectory/tool.dll", "subDirectory/subDirectory/subDirectory/subDirectory/subDirectory/tool.dll", false)]
         public void MatchesEntryPointTests(string pathInLockFileItem, string targetRelativeFilePath, bool shouldMatch)
         {
-            new LockFileMatchChecker(new LockFileItem(pathInLockFileItem), targetRelativeFilePath).Matches()
+            LockFileMatcher.MatchesFile(new LockFileItem(pathInLockFileItem), targetRelativeFilePath)
                 .Should().Be(shouldMatch);
         }
     }
