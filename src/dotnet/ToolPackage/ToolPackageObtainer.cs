@@ -108,7 +108,8 @@ namespace Microsoft.DotNet.ToolPackage
 
             if (dotnetToolSettings == null)
             {
-                throw new PackageObtainException("Cannot find DotnetToolSettings");
+                throw new PackageObtainException(
+                    string.Format(CommonLocalizableStrings.ToolPackageMissingSettingsFile, packageId));
             }
 
             FilePath toolConfigurationPath =
@@ -124,7 +125,8 @@ namespace Microsoft.DotNet.ToolPackage
 
             if (entryPointFromLockFile == null)
             {
-                throw new PackageObtainException("Cannot find tool entry point the package");
+                throw new PackageObtainException(string.Format(CommonLocalizableStrings.ToolPackageMissingEntryPointFile,
+                    packageId, toolConfiguration.ToolAssemblyEntryPoint));
             }
 
             return new ToolConfigurationAndExecutablePath(

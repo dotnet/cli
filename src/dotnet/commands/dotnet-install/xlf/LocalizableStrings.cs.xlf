@@ -18,8 +18,8 @@
         <note />
       </trans-unit>
       <trans-unit id="InstallToolCommandOnlySupportGlobal">
-        <source>Install tool only support install user wide (-g).</source>
-        <target state="new">Install tool only support install user wide (-g).</target>
+        <source>The --global switch (-g) is currently required because only user wide tools are supported.</source>
+        <target state="new">The --global switch (-g) is currently required because only user wide tools are supported.</target>
         <note />
       </trans-unit>
     </body>
