@@ -204,7 +204,7 @@
       </trans-unit>
       <trans-unit id="SDKListRuntimesCommandDefinition">
         <source>Display the installed runtimes.</source>
-        <target state="translated">Exiba os tempos de execução instalados.</target>
+        <target state="translated">Exiba os runtimes instalados.</target>
         <note />
       </trans-unit>
       <trans-unit id="SDKDiagnosticsCommandDefinition">
