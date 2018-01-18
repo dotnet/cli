@@ -9,6 +9,7 @@
     <ProjectReference Include="..\tool_launcher\tool_launcher.csproj"
       ReferenceOutputAssembly="false"
       SkipGetTargetFrameworkProperties="true"
+      SetTargetFramework="TargetFramework=net45"
       PrivateAssets="All" />
   </ItemGroup>
 
