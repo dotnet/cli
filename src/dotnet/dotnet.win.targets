@@ -13,12 +13,17 @@
   </ItemGroup>
 
   <Target Name="EmbedDotnetLauncher" BeforeTargets="PrepareForBuild">
-    <MSBuild Projects="..\tool_launcher\tool_launcher.csproj" Targets="GetTargetPath">
-      <Output TaskParameter="TargetOutputs" PropertyName="DotnetLauncherFullPath" />
+    <MSBuild Projects="..\tool_launcher\tool_launcher.csproj" Targets="GetTargetPath" Properties="TargetFramework=net45">
+      <Output TaskParameter="TargetOutputs" PropertyName="DotnetLauncherNet45FullPath" />
+    </MSBuild>
+    <MSBuild Projects="..\tool_launcher\tool_launcher.csproj" Targets="GetTargetPath" Properties="TargetFramework=net35">
+      <Output TaskParameter="TargetOutputs" PropertyName="DotnetLauncherNet35FullPath" />
     </MSBuild>
     <ItemGroup>
-      <EmbeddedResource Include="$(DotnetLauncherFullPath)" LogicalName="Microsoft.DotNet.Tools.Launcher.Executable" />
-      <EmbeddedResource Include="$(DotnetLauncherFullPath).config" LogicalName="Microsoft.DotNet.Tools.Launcher.Config" />
+      <EmbeddedResource Include="$(DotnetLauncherNet45FullPath)" LogicalName="Microsoft.DotNet.Tools.Launcher.Executable.Net45" />
+      <EmbeddedResource Include="$(DotnetLauncherNet45FullPath).config" LogicalName="Microsoft.DotNet.Tools.Launcher.Config.Net45" />
+      <EmbeddedResource Include="$(DotnetLauncherNet35FullPath)" LogicalName="Microsoft.DotNet.Tools.Launcher.Executable.Net35" />
+      <EmbeddedResource Include="$(DotnetLauncherNet35FullPath).config" LogicalName="Microsoft.DotNet.Tools.Launcher.Config.Net35" />
     </ItemGroup>
   </Target>
 

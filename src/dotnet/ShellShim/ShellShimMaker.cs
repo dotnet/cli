@@ -14,14 +14,30 @@ namespace Microsoft.DotNet.ShellShim
 {
     public class ShellShimMaker
     {
+        private const string LauncherExeNet45ResourceName = "Microsoft.DotNet.Tools.Launcher.Executable.Net45";
+        private const string LauncherExeNet35ResourceName = "Microsoft.DotNet.Tools.Launcher.Executable.Net35";
+        private const string LauncherConfigNet45ResourceName = "Microsoft.DotNet.Tools.Launcher.Config.Net45";
+        private const string LauncherConfigNet35ResourceName = "Microsoft.DotNet.Tools.Launcher.Config.Net35";
+
+        private readonly string _launcherExeResourceName;
+        private readonly string _launcherConfigResourceName;
         private readonly string _pathToPlaceShim;
-        private const string LauncherExeResourceName = "Microsoft.DotNet.Tools.Launcher.Executable";
-        private const string LauncherConfigResourceName = "Microsoft.DotNet.Tools.Launcher.Config";
 
         public ShellShimMaker(string pathToPlaceShim)
         {
             _pathToPlaceShim =
                 pathToPlaceShim ?? throw new ArgumentNullException(nameof(pathToPlaceShim));
+
+            if (OSVersionUtil.IsWindows8OrNewer())
+            {
+                _launcherExeResourceName = LauncherExeNet45ResourceName;
+                _launcherConfigResourceName = LauncherConfigNet45ResourceName;
+            }
+            else
+            {
+                _launcherExeResourceName = LauncherExeNet35ResourceName;
+                _launcherConfigResourceName = LauncherConfigNet35ResourceName;
+            }
         }
 
         public void CreateShim(string packageExecutablePath, string shellCommandName)
@@ -32,7 +48,7 @@ namespace Microsoft.DotNet.ShellShim
             {
                 CreateConfigFile(shimPath.Value + ".config", entryPoint: packageExecutablePath, runner: "dotnet");
                 using (var shim = File.Create(shimPath.Value))
-                using (var exe = typeof(ShellShimMaker).Assembly.GetManifestResourceStream(LauncherExeResourceName))
+                using (var exe = typeof(ShellShimMaker).Assembly.GetManifestResourceStream(_launcherExeResourceName))
                 {
                     exe.CopyTo(shim);
                 }
@@ -63,7 +79,7 @@ namespace Microsoft.DotNet.ShellShim
         internal void CreateConfigFile(string outputPath, string entryPoint, string runner)
         {
             XDocument config;
-            using (var resource = typeof(ShellShimMaker).Assembly.GetManifestResourceStream(LauncherConfigResourceName))
+            using (var resource = typeof(ShellShimMaker).Assembly.GetManifestResourceStream(_launcherConfigResourceName))
             {
                 config = XDocument.Load(resource);
             }
@@ -92,10 +108,11 @@ namespace Microsoft.DotNet.ShellShim
 
         private static void SetUserExecutionPermissionToShimFile(FilePath scriptPath)
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return;
 
             CommandResult result = new CommandFactory()
-                .Create("chmod", new[] {"u+x", scriptPath.Value})
+                .Create("chmod", new[] { "u+x", scriptPath.Value })
                 .CaptureStdOut()
                 .CaptureStdErr()
                 .Execute();
