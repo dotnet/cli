@@ -33,19 +33,14 @@
     <None Update="DotnetToolSettingsGolden.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="TestAssetLocalNugetFeed/*.*">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
 
     <Compile Remove="SampleGlobalTool/**" />
     <Content Remove="SampleGlobalTool/**" />
     <EmbeddedResource Remove="SampleGlobalTool/**" />
     <None Remove="SampleGlobalTool/**" />
-
-    <Content Include="TestAssetLocalNugetFeed/**" >
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
+
+  <UsingTask TaskName="DownloadFile" AssemblyFile="$(CLIBuildDll)" />
 
   <Target Name="CreateNupkgFromSource" BeforeTargets="Build">
     <PropertyGroup>
@@ -56,5 +51,19 @@
     </MSBuild>
     <MSBuild BuildInParallel="False" Projects="SampleGlobalTool/consoledemo.csproj" Targets="pack" Properties="Configuration=Release;NuspecFile=includepublish.nuspec;NuspecBasePath=$(testAssetSourceRoot);PackageOutputPath=$(OutputPath)/TestAssetLocalNugetFeed">
     </MSBuild>
+
+    <DownloadFile Uri="https://www.nuget.org/api/v2/package/Microsoft.NETCore.Platforms/2.0.1"
+                    DestinationPath="$(OutputPath)/TestAssetLocalNugetFeed/microsoft.netcore.platforms.2.0.1.nupkg" />
   </Target>
+
+  <Target Name="DownloadTestAssetPackages" BeforeTargets="Build">
+    <PropertyGroup>
+      <PlatformsNupkgFileName>microsoft.netcore.platforms.2.0.1.nupkg</PlatformsNupkgFileName>
+      <PlatformsNupkgUri>https://www.nuget.org/api/v2/package/Microsoft.NETCore.Platforms/2.0.1</PlatformsNupkgUri>
+    </PropertyGroup>
+
+    <DownloadFile Uri="$(PlatformsNupkgUri)"
+                  DestinationPath="$(OutputPath)/TestAssetLocalNugetFeed/$(PlatformsNupkgFileName)" />
+  </Target>
+
 </Project>
