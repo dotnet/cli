@@ -14,10 +14,10 @@
   </ItemGroup>
 
   <Target Name="EmbedDotnetLauncher" BeforeTargets="PrepareForBuild">
-    <MSBuild Projects="..\tool_launcher\tool_launcher.csproj" Targets="GetTargetPath" Properties="TargetFramework=net45">
+    <MSBuild Projects="..\tool_launcher\tool_launcher.csproj" Targets="GetTargetPath" Properties="TargetFramework=net45;Configuration=$(Configuration)">
       <Output TaskParameter="TargetOutputs" PropertyName="DotnetLauncherNet45FullPath" />
     </MSBuild>
-    <MSBuild Projects="..\tool_launcher\tool_launcher.csproj" Targets="GetTargetPath" Properties="TargetFramework=net35">
+    <MSBuild Projects="..\tool_launcher\tool_launcher.csproj" Targets="GetTargetPath" Properties="TargetFramework=net35;Configuration=$(Configuration)">
       <Output TaskParameter="TargetOutputs" PropertyName="DotnetLauncherNet35FullPath" />
     </MSBuild>
     <ItemGroup>
