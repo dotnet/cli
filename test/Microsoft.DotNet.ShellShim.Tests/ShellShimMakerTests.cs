@@ -70,7 +70,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
 
         [Theory]
         [InlineData("arg1 arg2", new[] { "arg1", "arg2" })]
-        [InlineData("'arg1 with space' arg2", new[] { "arg1 with space", "arg2" })]
+        [InlineData(" \"arg1 with space\" arg2", new[] { "arg1 with space", "arg2" })]
         [InlineData(" \"arg with ' quote\" ", new[] { "arg with ' quote" })]
         public void GivenAShimItPassesThroughArguments(string arguments, string[] expectedPassThru)
         {
