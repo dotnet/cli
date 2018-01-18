@@ -99,6 +99,13 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 nugetconfig: nugetConfigPath,
                 targetframework: _testTargetframework);
 
+            /*
+              From mytool.dll to project.assets.json
+               .dotnet/.tools/packageid/version/packageid/version/mytool.dll
+                      /dependency1 package id/
+                      /dependency2 package id/
+                      /project.assets.json
+             */
             var assetJsonPath = toolConfigurationAndExecutablePath
                 .Executable
                 .GetDirectoryPath()

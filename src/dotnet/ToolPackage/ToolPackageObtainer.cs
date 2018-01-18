@@ -178,15 +178,15 @@ namespace Microsoft.DotNet.ToolPackage
                     new XAttribute("Sdk", "Microsoft.NET.Sdk"),
                     new XElement("PropertyGroup",
                         new XElement("TargetFramework", targetframework),
-                        new XElement("RestorePackagesPath", individualToolVersion.Value),
-                        new XElement("RestoreProjectStyle", "DotnetToolReference"),
-                        new XElement("RestoreRootConfigDirectory", Directory.GetCurrentDirectory()),
-                        new XElement("DisableImplicitFrameworkReferences", "true"),
-                        new XElement("RestoreFallbackFolders", "clear"),
-                        new XElement("RestoreAdditionalProjectSources",
+                        new XElement("RestorePackagesPath", individualToolVersion.Value), // tool package will restore to tool folder
+                        new XElement("RestoreProjectStyle", "DotnetToolReference"), // without it, project cannot reference tool package
+                        new XElement("RestoreRootConfigDirectory", Directory.GetCurrentDirectory()), // config file probing start directory
+                        new XElement("DisableImplicitFrameworkReferences", "true"), // no Microsoft.NETCore.App in tool folder
+                        new XElement("RestoreFallbackFolders", "clear"), // do not use fallbackfolder, tool package need to be copied to tool folder
+                        new XElement("RestoreAdditionalProjectSources", // use fallbackfolder as feed to enable offline
                             Directory.Exists(_offlineFeedPath.Value) ? _offlineFeedPath.Value : string.Empty),
-                        new XElement("RestoreAdditionalProjectFallbackFolders", string.Empty),
-                        new XElement("RestoreAdditionalProjectFallbackFoldersExcludes", string.Empty
+                        new XElement("RestoreAdditionalProjectFallbackFolders", string.Empty), // block other
+                        new XElement("RestoreAdditionalProjectFallbackFoldersExcludes", string.Empty // block other
                         )
                     ),
                     packageVersion.IsConcreteValue

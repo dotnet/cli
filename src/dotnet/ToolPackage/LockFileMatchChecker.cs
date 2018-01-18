@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.ToolPackage
         /// Check if LockFileItem matches the targetRelativeFilePath.
         /// The path in LockFileItem is in pattern tools/TFM/RID/my/tool.dll. Tools/TFM/RID is selected by NuGet.
         /// And there will be only one TFM/RID combination.
-        /// When "my/tools.dll" part matches excatly with the targetRelativeFilePath, return true. 
+        /// When "my/tools.dll" part matches exactly with the targetRelativeFilePath, return true.
         /// </summary>
         /// <param name="lockFileItem">LockFileItem from asset.json restored from temp project</param>
         /// <param name="targetRelativeFilePath">file path relative to tools/TFM/RID</param>
