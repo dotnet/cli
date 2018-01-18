@@ -210,7 +210,7 @@ DocProject/Help/html
 # except build/, which is used as an MSBuild target.
 !**/packages/build/
 # except test asset package
-!test/Microsoft.DotNet.ToolPackage.Tests/ExtraTestFeedPackages/*
+!test/Microsoft.DotNet.ToolPackage.Tests/TestAssetLocalNugetFeed/*
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/packages/repositories.config
 

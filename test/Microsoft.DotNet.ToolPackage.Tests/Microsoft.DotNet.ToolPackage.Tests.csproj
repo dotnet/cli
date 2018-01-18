@@ -42,10 +42,9 @@
     <EmbeddedResource Remove="SampleGlobalTool/**" />
     <None Remove="SampleGlobalTool/**" />
 
-    <Compile Remove="ExtraTestFeedPackages/**" />
-    <Content Remove="ExtraTestFeedPackages/**" />
-    <EmbeddedResource Remove="ExtraTestFeedPackages/**" />
-    <None Remove="ExtraTestFeedPackages/**" />
+    <Content Include="TestAssetLocalNugetFeed/**" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <Target Name="CreateNupkgFromSource" BeforeTargets="Build">
@@ -57,7 +56,5 @@
     </MSBuild>
     <MSBuild BuildInParallel="False" Projects="SampleGlobalTool/consoledemo.csproj" Targets="pack" Properties="Configuration=Release;NuspecFile=includepublish.nuspec;NuspecBasePath=$(testAssetSourceRoot);PackageOutputPath=$(OutputPath)/TestAssetLocalNugetFeed">
     </MSBuild>
-    <Copy SourceFiles="ExtraTestFeedPackages/microsoft.netcore.platforms.2.0.1.nupkg" DestinationFolder="$(OutputPath)/TestAssetLocalNugetFeed" />
-
   </Target>
 </Project>
