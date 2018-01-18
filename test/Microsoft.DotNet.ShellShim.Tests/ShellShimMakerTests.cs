@@ -52,29 +52,6 @@ namespace Microsoft.DotNet.ShellShim.Tests
                 .Contain(e => e.Attribute("key").Value == "entryPoint" && e.Attribute("value").Value == entryPoint);
         }
 
-        [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData("  ")]
-        [InlineData("\t")]
-        [InlineData("\n")]
-        [InlineData("\0")]
-        public void GivenInvalidFileNameForEntryPointCreateConfigShouldFail(string entryPoint)
-        {
-            var shellShimMaker = new ShellShimMaker(TempRoot.Root);
-
-            Action create = () => shellShimMaker.CreateConfigFile(null, entryPoint, null);
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                create.ShouldThrow<GracefulException>();
-            }
-            else
-            {
-                create.ShouldThrow<PlatformNotSupportedException>();
-            }
-        }
-
         [Fact]
         public void GivenAnExecutablePathItCanGenerateShimFile()
         {
@@ -89,6 +66,29 @@ namespace Microsoft.DotNet.ShellShim.Tests
             var stdOut = ExecuteInShell(shellCommandName);
 
             stdOut.Should().Contain("Hello World");
+        }
+
+        [Theory]
+        [InlineData("arg1 arg2", new[] { "arg1", "arg2" })]
+        [InlineData("'arg1 with space' arg2", new[] { "arg1 with space", "arg2" })]
+        [InlineData(" \"arg with ' quote\" ", new[] { "arg with ' quote" })]
+        public void GivenAShimItPassesThroughArguments(string arguments, string[] expectedPassThru)
+        {
+            var outputDll = MakeHelloWorldExecutableDll();
+
+            var shellShimMaker = new ShellShimMaker(TempRoot.Root);
+            var shellCommandName = nameof(ShellShimMakerTests) + Path.GetRandomFileName();
+
+            shellShimMaker.CreateShim(
+                outputDll.FullName,
+                shellCommandName);
+
+            var stdOut = ExecuteInShell(shellCommandName, arguments);
+
+            for (int i = 0; i < expectedPassThru.Length; i++)
+            {
+                stdOut.Should().Contain($"{i} = {expectedPassThru[i]}");
+            }
         }
 
         [Fact]
@@ -124,18 +124,18 @@ namespace Microsoft.DotNet.ShellShim.Tests
             File.WriteAllText(Path.Combine(pathToPlaceShim, shellCommandName), string.Empty);
         }
 
-        private string ExecuteInShell(string shellCommandName)
+        private string ExecuteInShell(string shellCommandName, string arguments = "")
         {
             ProcessStartInfo processStartInfo;
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 var file = Path.Combine(TempRoot.Root, shellCommandName + ".exe");
-                _output.WriteLine("Launching " + file);
                 processStartInfo = new ProcessStartInfo
                 {
                     FileName = file,
-                    UseShellExecute = false
+                    UseShellExecute = false,
+                    Arguments = arguments,
                 };
             }
             else
@@ -143,10 +143,12 @@ namespace Microsoft.DotNet.ShellShim.Tests
                 processStartInfo = new ProcessStartInfo
                 {
                     FileName = "sh",
-                    Arguments = shellCommandName,
+                    Arguments = shellCommandName + " " + arguments,
                     UseShellExecute = false
                 };
             }
+
+            _output.WriteLine($"Launching '{processStartInfo.FileName} {processStartInfo.Arguments}'");
             processStartInfo.WorkingDirectory = TempRoot.Root;
             processStartInfo.EnvironmentVariables["PATH"] = Path.GetDirectoryName(new Muxer().MuxerPath);
 

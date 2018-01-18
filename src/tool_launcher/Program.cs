@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
 using Microsoft.DotNet.Cli.Utils;
@@ -18,6 +19,7 @@ namespace Microsoft.DotNet.Tools.Launcher
     class Program
     {
         private const string TRACE = "DOTNET_LAUNCHER_TRACE";
+        private const int ERR_FAILED = -1;
         private static bool _trace;
 
         public static int Main(string[] argsToForward)
@@ -32,7 +34,7 @@ namespace Microsoft.DotNet.Tools.Launcher
                 if (string.IsNullOrEmpty(entryPoint))
                 {
                     LogError("The launcher must specify a non-empty appSetting value for 'entryPoint'.");
-                    return -1;
+                    return ERR_FAILED;
                 }
 
                 var exePath = entryPoint;
@@ -66,7 +68,17 @@ namespace Microsoft.DotNet.Tools.Launcher
                     LogTrace("args = " + process.StartInfo.Arguments);
                     LogTrace("cwd = " + process.StartInfo.WorkingDirectory);
 
-                    process.Start();
+                    try
+                    {
+                        process.Start();
+                    }
+                    catch (Win32Exception ex)
+                    {
+                        LogTrace(ex.ToString());
+                        LogError($"Failed to start '{process.StartInfo.FileName}'. " + ex.Message);
+                        return ERR_FAILED;
+                    }
+
                     process.WaitForExit();
 
                     LogTrace("Exited code " + process.ExitCode);
@@ -78,22 +90,25 @@ namespace Microsoft.DotNet.Tools.Launcher
             {
                 LogError("Unexpected error launching a new process. Run with the environment variable " + TRACE + "='true' for details.");
                 LogTrace(ex.ToString());
-                return -1;
+                return ERR_FAILED;
             }
         }
 
         private static void LogError(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
+            Console.BackgroundColor = ConsoleColor.Black;
             Console.Error.WriteLine("ERROR: " + message);
             Console.ResetColor();
         }
 
         private static void LogTrace(string message)
         {
-            if (!_trace) return;
+            if (!_trace)
+                return;
 
             Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.BackgroundColor = ConsoleColor.Black;
             Console.WriteLine("[dotnet-launcher] " + message);
             Console.ResetColor();
         }

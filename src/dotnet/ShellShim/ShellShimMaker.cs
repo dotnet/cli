@@ -62,17 +62,6 @@ namespace Microsoft.DotNet.ShellShim
 
         internal void CreateConfigFile(string outputPath, string entryPoint, string runner)
         {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                throw new PlatformNotSupportedException("Creating a .NET Framework app config is not supported on this platform");
-            }
-
-            if (string.IsNullOrWhiteSpace(entryPoint) 
-                || entryPoint.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
-            {
-                throw new GracefulException("The entry point setting for this tool is invalid. A file path must be specified.");
-            }
-
             XDocument config;
             using (var resource = typeof(ShellShimMaker).Assembly.GetManifestResourceStream(LauncherConfigResourceName))
             {
