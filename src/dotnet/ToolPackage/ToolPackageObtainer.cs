@@ -135,14 +135,15 @@ namespace Microsoft.DotNet.ToolPackage
                     .WithFile(entryPointFromLockFile.Path));
         }
 
-        private static LockFileItem FindAssetInLockFile(LockFile lockFile,
-            string toolConfigurationToolAssemblyEntryPoint, string packageId)
+        private static LockFileItem FindAssetInLockFile(
+            LockFile lockFile,
+            string targetRelativeFilePath, string packageId)
         {
             return lockFile
                 .Targets?.SingleOrDefault(t => t.RuntimeIdentifier != null)
                 ?.Libraries?.SingleOrDefault(l => l.Name == packageId)
                 ?.ToolsAssemblies
-                ?.SingleOrDefault(t => LockFileMatcher.MatchesFile(t.Path, toolConfigurationToolAssemblyEntryPoint));
+                ?.SingleOrDefault(t => new LockFileMatchChecker(t, targetRelativeFilePath).Matches());
         }
 
         private static void MoveToVersionedDirectory(
