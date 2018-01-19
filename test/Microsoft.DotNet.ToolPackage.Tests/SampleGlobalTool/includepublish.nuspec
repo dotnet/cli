@@ -9,7 +9,7 @@
           <packageType name="DotnetTool" />
         </packageTypes>
       <dependencies>
-        <dependency id="Microsoft.NETCore.Platforms" version="2.0.1" />
+        <dependency id="Microsoft.NETCore.Platforms" version="2.1.0-preview1-26115-04" />
       </dependencies>
     </metadata>
     <files>
