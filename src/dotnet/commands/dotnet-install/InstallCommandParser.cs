@@ -4,7 +4,6 @@
 using Microsoft.DotNet.Cli.CommandLine;
 using LocalizableStrings = Microsoft.DotNet.Tools.Install.LocalizableStrings;
 
-
 namespace Microsoft.DotNet.Cli
 {
     internal static class InstallCommandParser
