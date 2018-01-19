@@ -186,8 +186,8 @@ namespace Microsoft.DotNet.ToolPackage
                         new XElement("RestoreAdditionalProjectSources", // use fallbackfolder as feed to enable offline
                             Directory.Exists(_offlineFeedPath.Value) ? _offlineFeedPath.Value : string.Empty),
                         new XElement("RestoreAdditionalProjectFallbackFolders", string.Empty), // block other
-                        new XElement("RestoreAdditionalProjectFallbackFoldersExcludes", string.Empty // block other
-                        )
+                        new XElement("RestoreAdditionalProjectFallbackFoldersExcludes", string.Empty),  // block other
+                        new XElement("DisableImplicitNuGetFallbackFolder","true")  // disable SDK side implicit NuGetFallbackFolder
                     ),
                     packageVersion.IsConcreteValue
                         ? new XElement("ItemGroup",
