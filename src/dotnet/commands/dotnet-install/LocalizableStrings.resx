@@ -123,10 +123,4 @@
   <data name="CommandDescription" xml:space="preserve">
     <value>Installs an item into the development environment.</value>
   </data>
-  <data name="GlobalOptionDescription" xml:space="preserve">
-    <value>Install user wide.</value>
-  </data>
-  <data name="InstallToolCommandOnlySupportGlobal" xml:space="preserve">
-    <value>The --global switch (-g) is currently required because only user wide tools are supported.</value>
-  </data>
 </root>

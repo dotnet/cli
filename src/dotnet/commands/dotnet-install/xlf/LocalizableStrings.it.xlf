@@ -12,16 +12,6 @@
         <target state="new">Installs an item into the development environment.</target>
         <note />
       </trans-unit>
-      <trans-unit id="GlobalOptionDescription">
-        <source>Install user wide.</source>
-        <target state="new">Install user wide.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InstallToolCommandOnlySupportGlobal">
-        <source>The --global switch (-g) is currently required because only user wide tools are supported.</source>
-        <target state="new">The --global switch (-g) is currently required because only user wide tools are supported.</target>
-        <note />
-      </trans-unit>
     </body>
   </file>
 </xliff>
