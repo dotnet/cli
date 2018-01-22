@@ -48,13 +48,13 @@
     <!-- Begin Workaround lack of a stable package version for depedencies; copy into simulated stable version folders -->
  
     <PropertyGroup>
-        <StableSharedFrameworkDirectory>$(StageDirectory)/shared/Microsoft.NETCore.App/$(SharedFrameworkStableVersion)</StableSharedFrameworkDirectory>
-        <StableAdditionalSharedFrameworkDirectory>$(StageDirectory)/shared/Microsoft.NETCore.App/$(AdditionalSharedFrameworkStableVersion)</StableAdditionalSharedFrameworkDirectory>
+        <StableSharedFrameworkDirectory>$(Stage2Directory)/shared/Microsoft.NETCore.App/$(SharedFrameworkStableVersion)</StableSharedFrameworkDirectory>
+        <StableAdditionalSharedFrameworkDirectory>$(Stage2Directory)/shared/Microsoft.NETCore.App/$(AdditionalSharedFrameworkStableVersion)</StableAdditionalSharedFrameworkDirectory>
     </PropertyGroup>
 
     <ItemGroup>  
-        <Stabilize_SourceFiles_1_1 Include="$(StageDirectory)/shared/Microsoft.NETCore.App/$(CLI_SharedFrameworkVersion)/*.*"/>  
-        <Stabilize_SourceFiles_1_0 Include="$(StageDirectory)/shared/Microsoft.NETCore.App/$(CLI_SharedFrameworkVersion_1_0)/*.*"/>  
+        <Stabilize_SourceFiles_1_1 Include="$(Stage2Directory)/shared/Microsoft.NETCore.App/$(CLI_SharedFrameworkVersion)/*.*"/>  
+        <Stabilize_SourceFiles_1_0 Include="$(Stage2Directory)/shared/Microsoft.NETCore.App/$(CLI_SharedFrameworkVersion_1_0)/*.*"/>  
         <SimulatedStableSharedFrameworkDirectories Condition=" '$(IsSharedFrameworkPreReleaseVersion)' == 'True' "
                                           Include="$(StableSharedFrameworkDirectory)" />
         <SimulatedStableSharedFrameworkDirectories Condition=" '$(IsAdditionalSharedFrameworkPreReleaseVersion)' == 'True' "
