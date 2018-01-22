@@ -252,6 +252,11 @@
         <target state="translated">Przechowuje określone zestawy w magazynie środowiska uruchomieniowego.</target>
         <note />
       </trans-unit>
+      <trans-unit id="InstallDefinition">
+        <source>Installs an item into the development environment.</source>
+        <target state="new">Installs an item into the development environment.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

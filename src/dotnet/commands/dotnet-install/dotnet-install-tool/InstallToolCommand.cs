@@ -20,6 +20,8 @@ namespace Microsoft.DotNet.Tools.Install.Tool
         private static string _packageVersion;
         private static string _configFilePath;
         private static string _framework;
+        private static string _source;
+        private static bool _global;
 
         public InstallToolCommand(
             AppliedOption appliedCommand,
@@ -35,39 +37,29 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             _packageVersion = appliedCommand.ValueOrDefault<string>("version");
             _configFilePath = appliedCommand.ValueOrDefault<string>("configfile");
             _framework = appliedCommand.ValueOrDefault<string>("framework");
+            _source = appliedCommand.ValueOrDefault<string>("source");
+            _global = appliedCommand.ValueOrDefault<bool>("global");
         }
 
         public override int Execute()
         {
-            FilePath? configFile = null;
-
-            if (_configFilePath != null)
+            if (!_global)
             {
-                configFile = new FilePath(_configFilePath);
+                throw new GracefulException(LocalizableStrings.InstallToolCommandOnlySupportGlobal);
             }
 
-            var executablePackagePath = new DirectoryPath(new CliFolderPathCalculator().ExecutablePackagesPath);
+            var cliFolderPathCalculator = new CliFolderPathCalculator();
+            var executablePackagePath = new DirectoryPath(cliFolderPathCalculator.ExecutablePackagesPath);
+            var offlineFeedPath = new DirectoryPath(cliFolderPathCalculator.CliFallbackFolderPath);
 
-            var toolConfigurationAndExecutableDirectory = ObtainPackage(
-                _packageId,
-                _packageVersion,
-                configFile,
-                _framework,
-                executablePackagePath);
-
-            DirectoryPath executable = toolConfigurationAndExecutableDirectory
-                .ExecutableDirectory
-                .WithSubDirectories(
-                    toolConfigurationAndExecutableDirectory
-                        .Configuration
-                        .ToolAssemblyEntryPoint);
+            var toolConfigurationAndExecutablePath = ObtainPackage(executablePackagePath, offlineFeedPath);
 
             var shellShimMaker = new ShellShimMaker(executablePackagePath.Value);
-            var commandName = toolConfigurationAndExecutableDirectory.Configuration.CommandName;
+            var commandName = toolConfigurationAndExecutablePath.Configuration.CommandName;
             shellShimMaker.EnsureCommandNameUniqueness(commandName);
 
             shellShimMaker.CreateShim(
-                executable.Value,
+                toolConfigurationAndExecutablePath.Executable.Value,
                 commandName);
 
             EnvironmentPathFactory
@@ -75,23 +67,27 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                 .PrintAddPathInstructionIfPathDoesNotExist();
 
             Reporter.Output.WriteLine(
-                $"{Environment.NewLine}The installation succeeded. If there is no other instruction. You can type the following command in shell directly to invoke: {commandName}");
+                string.Format(LocalizableStrings.InstallationSucceeded, commandName));
 
             return 0;
         }
 
-        private static ToolConfigurationAndExecutableDirectory ObtainPackage(
-            string packageId,
-            string packageVersion,
-            FilePath? configFile,
-            string framework,
-            DirectoryPath executablePackagePath)
+        private static ToolConfigurationAndExecutablePath ObtainPackage(
+            DirectoryPath executablePackagePath,
+            DirectoryPath offlineFeedPath)
         {
             try
             {
+                FilePath? configFile = null;
+                if (_configFilePath != null)
+                {
+                    configFile = new FilePath(_configFilePath);
+                }
+
                 var toolPackageObtainer =
                     new ToolPackageObtainer(
                         executablePackagePath,
+                        offlineFeedPath,
                         () => new DirectoryPath(Path.GetTempPath())
                             .WithSubDirectories(Path.GetRandomFileName())
                             .WithFile(Path.GetRandomFileName() + ".csproj"),
@@ -100,29 +96,28 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                         new ProjectRestorer());
 
                 return toolPackageObtainer.ObtainAndReturnExecutablePath(
-                    packageId: packageId,
-                    packageVersion: packageVersion,
+                    packageId: _packageId,
+                    packageVersion: _packageVersion,
                     nugetconfig: configFile,
-                    targetframework: framework);
+                    targetframework: _framework,
+                    source: _source);
             }
+
             catch (PackageObtainException ex)
             {
                 throw new GracefulException(
                     message:
-                    $"Install failed. Failed to download package:{Environment.NewLine}" +
-                    $"NuGet returned:{Environment.NewLine}" +
-                    $"{Environment.NewLine}" +
-                    $"{ex.Message}",
+                    string.Format(LocalizableStrings.InstallFailedNuget,
+                        ex.Message),
                     innerException: ex);
             }
             catch (ToolConfigurationException ex)
             {
                 throw new GracefulException(
                     message:
-                    $"Install failed. The settings file in the tool's NuGet package is not valid. Please contact the owner of the NuGet package.{Environment.NewLine}" +
-                    $"The error was:{Environment.NewLine}" +
-                    $"{Environment.NewLine}" +
-                    $"{ex.Message}",
+                    string.Format(
+                        LocalizableStrings.InstallFailedPackage,
+                        ex.Message),
                     innerException: ex);
             }
         }

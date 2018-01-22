@@ -13,20 +13,27 @@
           Condition=" '$(IsDebianBaseDistro)' == 'True' "
           Outputs="@(GeneratedInstallers)"/>
 
+  <Target Name="GetAspNetSharedFxInstallArgs" DependsOnTargets="EvaluateRuntimeCoherence">
+    <PropertyGroup>
+      <!-- Ignored because versions of aspnetcore-runtime may be in incoherent with the version of dotnet-runtime we want to use. -->
+      <InstallAspNetCoreSharedFxArgs>--ignore-depends=dotnet-runtime-$(AspNetCoreSharedFxBaseRuntimeVersion)</InstallAspNetCoreSharedFxArgs>
+    </PropertyGroup>
+  </Target>
+
   <Target Name="BuildSdkDeb"
       Condition=" '$(IsDebianBaseDistro)' == 'True' AND '$(DebuildPresent)'  == 'true' "
       DependsOnTargets="PrepareDotnetDebDirectories;
                         PrepareDotnetDebTool;
-                        DownloadAspNetCoreRuntimeDebInstaller;"
+                        GetAspNetSharedFxInstallArgs;"
       Inputs="@(CLISdkFiles)"
       Outputs="$(SdkInstallerFile)" >
-
       <!-- Install Shared Framework Packages -->
+
       <Exec Command="sudo dpkg -i $(DownloadedRuntimeDepsInstallerFile)" />
       <Exec Command="sudo dpkg -i $(DownloadedSharedHostInstallerFile)" />
       <Exec Command="sudo dpkg -i $(DownloadedHostFxrInstallerFile)" />
       <Exec Command="sudo dpkg -i $(DownloadedSharedFrameworkInstallerFile)" />
-      <Exec Command="sudo dpkg -i $(DownloadedSharedAspNetCoreRuntime)" />
+      <Exec Command="sudo dpkg $(InstallAspNetCoreSharedFxArgs) -i $(DownloadedAspNetCoreSharedFxInstallerFile)" />
 
       <!-- Create layout: Binaries -->
       <Copy
@@ -88,7 +95,7 @@
 
       <!-- Remove Shared Framework and Debian Packages -->
       <Exec Command="sudo dpkg -r $(SdkDebianPackageName)" />
-      <Exec Command="sudo dpkg -r $(AspNetCoreRuntimePackageName)" />
+      <Exec Command="sudo dpkg -r $(AspNetCoreSharedFxDebianPackageName)" />
       <Exec Command="sudo dpkg -r $(SharedFxDebianPackageName)" />
       <Exec Command="sudo dpkg -r $(HostFxrDebianPackageName)" />
       <Exec Command="sudo dpkg -r $(HostDebianPackageName)" />
@@ -96,8 +103,8 @@
   </Target>
 
   <Target Name="TestSdkDeb"
-      Condition=" '$(IsDebianBaseDistro)' == 'True' and '$(DebuildPresent)'  == 'true' "
-      DependsOnTargets="RestoreTests"
+      Condition=" '$(CLIBUILD_SKIP_TESTS)' != 'true' and '$(IsDebianBaseDistro)' == 'True' and '$(DebuildPresent)'  == 'true' "
+      DependsOnTargets="RestoreTests;GetAspNetSharedFxInstallArgs"
       Inputs="$(DownloadedSharedHostInstallerFile);
               $(DownloadedHostFxrInstallerFile);
               $(DownloadedSharedFrameworkInstallerFile);
@@ -109,7 +116,7 @@
       <Exec Command="sudo dpkg -i $(DownloadedSharedHostInstallerFile)" />
       <Exec Command="sudo dpkg -i $(DownloadedHostFxrInstallerFile)" />
       <Exec Command="sudo dpkg -i $(DownloadedSharedFrameworkInstallerFile)" />
-      <Exec Command="sudo dpkg -i $(DownloadedSharedAspNetCoreRuntime)" />
+      <Exec Command="sudo dpkg $(InstallAspNetCoreSharedFxArgs) -i $(DownloadedAspNetCoreSharedFxInstallerFile)" />
 
       <Exec Command="sudo dpkg -i $(SdkInstallerFile)" />
 
@@ -123,7 +130,7 @@
 
       <!-- Clean up Packages -->
       <Exec Command="sudo dpkg -r $(SdkDebianPackageName)" />
-      <Exec Command="sudo dpkg -r $(AspNetCoreRuntimePackageName)" />
+      <Exec Command="sudo dpkg -r $(AspNetCoreSharedFxDebianPackageName)" />
       <Exec Command="sudo dpkg -r $(SharedFxDebianPackageName)" />
       <Exec Command="sudo dpkg -r $(HostFxrDebianPackageName)" />
       <Exec Command="sudo dpkg -r $(HostDebianPackageName)" />

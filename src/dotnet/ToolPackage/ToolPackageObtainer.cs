@@ -1,9 +1,12 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.DotNet.Tools;
+using Microsoft.DotNet.Cli.Utils;
+using Microsoft.DotNet.Configurer;
 using Microsoft.Extensions.EnvironmentAbstractions;
+using NuGet.ProjectModel;
 
 namespace Microsoft.DotNet.ToolPackage
 {
@@ -14,9 +17,11 @@ namespace Microsoft.DotNet.ToolPackage
         private readonly IPackageToProjectFileAdder _packageToProjectFileAdder;
         private readonly IProjectRestorer _projectRestorer;
         private readonly DirectoryPath _toolsPath;
+        private readonly DirectoryPath _offlineFeedPath;
 
         public ToolPackageObtainer(
             DirectoryPath toolsPath,
+            DirectoryPath offlineFeedPath,
             Func<FilePath> getTempProjectPath,
             Lazy<string> bundledTargetFrameworkMoniker,
             IPackageToProjectFileAdder packageToProjectFileAdder,
@@ -29,13 +34,15 @@ namespace Microsoft.DotNet.ToolPackage
             _packageToProjectFileAdder = packageToProjectFileAdder ??
                                          throw new ArgumentNullException(nameof(packageToProjectFileAdder));
             _toolsPath = toolsPath;
+            _offlineFeedPath = offlineFeedPath;
         }
 
-        public ToolConfigurationAndExecutableDirectory ObtainAndReturnExecutablePath(
+        public ToolConfigurationAndExecutablePath ObtainAndReturnExecutablePath(
             string packageId,
             string packageVersion = null,
             FilePath? nugetconfig = null,
-            string targetframework = null)
+            string targetframework = null,
+            string source = null)
         {
             if (packageId == null)
             {
@@ -46,7 +53,9 @@ namespace Microsoft.DotNet.ToolPackage
             {
                 if (!File.Exists(nugetconfig.Value.Value))
                 {
-                    throw new PackageObtainException($"NuGet configuration file {Path.GetFullPath(nugetconfig.Value.Value)} does not exist.");
+                    throw new PackageObtainException(
+                        string.Format(CommonLocalizableStrings.NuGetConfigurationFileDoesNotExist,
+                            Path.GetFullPath(nugetconfig.Value.Value)));
                 }
             }
 
@@ -74,7 +83,7 @@ namespace Microsoft.DotNet.ToolPackage
                     packageId);
             }
 
-            InvokeRestore(nugetconfig: nugetconfig, tempProjectPath: tempProjectPath, individualToolVersion: toolDirectory);
+            _projectRestorer.Restore(tempProjectPath, toolDirectory, nugetconfig, source);
 
             if (packageVersionOrPlaceHolder.IsPlaceholder)
             {
@@ -91,16 +100,52 @@ namespace Microsoft.DotNet.ToolPackage
                 packageVersion = concreteVersion;
             }
 
-            ToolConfiguration toolConfiguration = GetConfiguration(packageId: packageId, packageVersion: packageVersion, individualToolVersion: toolDirectory);
+            LockFile lockFile = new LockFileFormat()
+                .ReadWithLock(toolDirectory.WithFile("project.assets.json").Value)
+                .Result;
 
-            return new ToolConfigurationAndExecutableDirectory(
+            LockFileItem dotnetToolSettings = FindAssetInLockFile(lockFile, "DotnetToolSettings.xml", packageId);
+
+            if (dotnetToolSettings == null)
+            {
+                throw new PackageObtainException(
+                    string.Format(CommonLocalizableStrings.ToolPackageMissingSettingsFile, packageId));
+            }
+
+            FilePath toolConfigurationPath =
+                toolDirectory
+                    .WithSubDirectories(packageId, packageVersion)
+                    .WithFile(dotnetToolSettings.Path);
+
+            ToolConfiguration toolConfiguration =
+                ToolConfigurationDeserializer.Deserialize(toolConfigurationPath.Value);
+
+            var entryPointFromLockFile =
+                FindAssetInLockFile(lockFile, toolConfiguration.ToolAssemblyEntryPoint, packageId);
+
+            if (entryPointFromLockFile == null)
+            {
+                throw new PackageObtainException(string.Format(CommonLocalizableStrings.ToolPackageMissingEntryPointFile,
+                    packageId, toolConfiguration.ToolAssemblyEntryPoint));
+            }
+
+            return new ToolConfigurationAndExecutablePath(
                 toolConfiguration,
                 toolDirectory.WithSubDirectories(
-                    packageId,
-                    packageVersion,
-                    "tools",
-                    targetframework,
-                    "any"));
+                        packageId,
+                        packageVersion)
+                    .WithFile(entryPointFromLockFile.Path));
+        }
+
+        private static LockFileItem FindAssetInLockFile(
+            LockFile lockFile,
+            string targetRelativeFilePath, string packageId)
+        {
+            return lockFile
+                .Targets?.SingleOrDefault(t => t.RuntimeIdentifier != null)
+                ?.Libraries?.SingleOrDefault(l => l.Name == packageId)
+                ?.ToolsAssemblies
+                ?.SingleOrDefault(t => LockFileMatcher.MatchesFile(t, targetRelativeFilePath));
         }
 
         private static void MoveToVersionedDirectory(
@@ -113,30 +158,6 @@ namespace Microsoft.DotNet.ToolPackage
             }
 
             Directory.Move(temporary.Value, versioned.Value);
-        }
-
-        private static ToolConfiguration GetConfiguration(
-            string packageId,
-            string packageVersion,
-            DirectoryPath individualToolVersion)
-        {
-            FilePath toolConfigurationPath =
-                individualToolVersion
-                    .WithSubDirectories(packageId, packageVersion, "tools")
-                    .WithFile("DotnetToolSettings.xml");
-
-            ToolConfiguration toolConfiguration =
-                ToolConfigurationDeserializer.Deserialize(toolConfigurationPath.Value);
-
-            return toolConfiguration;
-        }
-
-        private void InvokeRestore(
-            FilePath? nugetconfig,
-            FilePath tempProjectPath,
-            DirectoryPath individualToolVersion)
-        {
-            _projectRestorer.Restore(tempProjectPath, individualToolVersion, nugetconfig);
         }
 
         private FilePath CreateTempProject(
@@ -157,9 +178,16 @@ namespace Microsoft.DotNet.ToolPackage
                     new XAttribute("Sdk", "Microsoft.NET.Sdk"),
                     new XElement("PropertyGroup",
                         new XElement("TargetFramework", targetframework),
-                        new XElement("RestorePackagesPath", individualToolVersion.Value),
-                        new XElement("RestoreSolutionDirectory", Directory.GetCurrentDirectory()), // https://github.com/NuGet/Home/issues/6199
-                        new XElement("DisableImplicitFrameworkReferences", "true")
+                        new XElement("RestorePackagesPath", individualToolVersion.Value), // tool package will restore to tool folder
+                        new XElement("RestoreProjectStyle", "DotnetToolReference"), // without it, project cannot reference tool package
+                        new XElement("RestoreRootConfigDirectory", Directory.GetCurrentDirectory()), // config file probing start directory
+                        new XElement("DisableImplicitFrameworkReferences", "true"), // no Microsoft.NETCore.App in tool folder
+                        new XElement("RestoreFallbackFolders", "clear"), // do not use fallbackfolder, tool package need to be copied to tool folder
+                        new XElement("RestoreAdditionalProjectSources", // use fallbackfolder as feed to enable offline
+                            Directory.Exists(_offlineFeedPath.Value) ? _offlineFeedPath.Value : string.Empty),
+                        new XElement("RestoreAdditionalProjectFallbackFolders", string.Empty), // block other
+                        new XElement("RestoreAdditionalProjectFallbackFoldersExcludes", string.Empty),  // block other
+                        new XElement("DisableImplicitNuGetFallbackFolder","true")  // disable SDK side implicit NuGetFallbackFolder
                     ),
                     packageVersion.IsConcreteValue
                         ? new XElement("ItemGroup",
