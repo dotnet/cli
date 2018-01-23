@@ -44,6 +44,10 @@
       <ForPublishing Include="@(GeneratedInstallers)" />
       <ForPublishing Include="%(GenerateArchivesInputsOutputs.Outputs)" />
       <ForPublishing Include="$(PackagesDirectory)/Microsoft*.nupkg" Condition=" '$(PUBLISH_NUPKG_TO_AZURE_BLOB)' != '' " />
+      <ForPublishing Include="$(PackagesDirectory)/VS.Redist.Common.Net.Core.SDK.$(Architecture).*.nupkg"
+                     Condition=" '$(OS)' == 'Windows_NT' "/>
+      <ForPublishing Include="$(PackagesDirectory)/VS.Redist.Common.Net.Core.SDK.MSBuildExtensions.*.nupkg"
+                     Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' "/>
     </ItemGroup>
 
     <ItemGroup>
