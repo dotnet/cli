@@ -1,6 +1,6 @@
 <Project ToolsVersion="15.0">
   <Target Name="WriteNugetConfigFile"
-          Condition=" !Exists('$(GeneratedNuGetConfig)') ">
+          Condition=" !Exists('$(GeneratedNuGetConfig)') OR Exists('$(OrchestratedPackageVersionsProps)') ">
 
     <ItemGroup>
       <NugetConfigPrivateFeeds Include="$(ExternalRestoreSources.Split(';'))" />
