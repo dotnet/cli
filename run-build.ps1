@@ -36,7 +36,7 @@ if ($ExtraParameters)
     {
         if(($param.StartsWith("/t")) -or ($param.StartsWith("/T")))
         {
-            $ExtraParametersNoTargets.Remove("$param")
+            $remove = $ExtraParametersNoTargets.Remove("$param")
         }
     }
 }
