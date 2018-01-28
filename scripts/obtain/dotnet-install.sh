@@ -161,9 +161,12 @@ get_current_os_name() {
             echo "linux"
             return 0
         fi
+    elif [[ $uname == MINGW* ]]; then
+        echo "win"
+        return 0
     fi
 
-    say_err "OS name could not be detected: $ID.$VERSION_ID"
+    say_err "OS name could not be detected: $uname"
     return 1
 }
 
@@ -177,6 +180,9 @@ get_legacy_os_name() {
     elif [ -n "$runtime_id" ]; then
         echo $(get_legacy_os_name_from_platform "${runtime_id%-*}" || echo "${runtime_id%-*}")
         return 0
+    elif [[ $uname == MINGW* ]]; then
+        echo "win"
+        return 0
     else
         if [ -e /etc/os-release ]; then
             . /etc/os-release
@@ -188,7 +194,7 @@ get_legacy_os_name() {
         fi
     fi
 
-    say_verbose "Distribution specific OS name and version could not be detected: $ID.$VERSION_ID"
+    say_verbose "Distribution specific OS name and version could not be detected: $uname"
     return 1
 }
 
@@ -456,11 +462,19 @@ construct_download_link() {
     local osname
     osname="$(get_current_os_name)" || return 1
 
+    local ext
+    ext="tar.gz"
+    case $osname in
+     win)
+       ext="zip"
+       ;;
+    esac
+
     local download_link=null
     if [ ! -z "$runtime" ]; then
-        download_link="$azure_feed/Runtime/$specific_version/$runtime-runtime-$specific_version-$osname-$normalized_architecture.tar.gz"
+        download_link="$azure_feed/Runtime/$specific_version/$runtime-runtime-$specific_version-$osname-$normalized_architecture.$ext"
     else
-        download_link="$azure_feed/Sdk/$specific_version/dotnet-sdk-$specific_version-$osname-$normalized_architecture.tar.gz"
+        download_link="$azure_feed/Sdk/$specific_version/dotnet-sdk-$specific_version-$osname-$normalized_architecture.$ext"
     fi
 
     echo "$download_link"
@@ -483,11 +497,19 @@ construct_legacy_download_link() {
     local distro_specific_osname
     distro_specific_osname="$(get_legacy_os_name)" || return 1
 
+    local ext
+    ext="tar.gz"
+    case $distro_specific_osname in
+     win)
+       ext="zip"
+       ;;
+    esac
+
     local legacy_download_link=null
     if [[ "$runtime" == "dotnet" ]]; then
-        legacy_download_link="$azure_feed/Runtime/$specific_version/dotnet-$distro_specific_osname-$normalized_architecture.$specific_version.tar.gz"
+        legacy_download_link="$azure_feed/Runtime/$specific_version/dotnet-$distro_specific_osname-$normalized_architecture.$specific_version.$ext"
     elif [ -z "$runtime" ]; then
-        legacy_download_link="$azure_feed/Sdk/$specific_version/dotnet-dev-$distro_specific_osname-$normalized_architecture.$specific_version.tar.gz"
+        legacy_download_link="$azure_feed/Sdk/$specific_version/dotnet-dev-$distro_specific_osname-$normalized_architecture.$specific_version.$ext"
     else
         return 1
     fi
@@ -581,13 +603,25 @@ copy_files_or_dirs_from_list() {
 extract_dotnet_package() {
     eval $invocation
 
-    local zip_path="$1"
-    local out_path="$2"
+    local download_link="$1"
+    local zip_path="$2"
+    local out_path="$3"
 
     local temp_out_path="$(mktemp -d "$temporary_file_template")"
 
     local failed=false
-    tar -xzf "$zip_path" -C "$temp_out_path" > /dev/null || failed=true
+    case $download_link in
+      *.zip)
+         unzip "$zip_path" -d "$temp_out_path" || failed=true
+         ;;
+      *.tar.gz)
+         tar -xzf "$zip_path" -C "$temp_out_path" > /dev/null || failed=true
+         ;;
+      *)
+         say_err "Unknown file type '$zip_path' - Extraction failed"
+         failed=true
+         ;;
+    esac
 
     local folders_with_version_regex='^.*/[0-9]+\.[0-9]+[^/]+/'
     find "$temp_out_path" -type f | grep -Eo "$folders_with_version_regex" | copy_files_or_dirs_from_list "$temp_out_path" "$out_path" false
@@ -748,7 +782,7 @@ install_dotnet() {
     fi
 
     say "Extracting zip from $download_link"
-    extract_dotnet_package "$zip_path" "$install_root"
+    extract_dotnet_package "$download_link" "$zip_path" "$install_root"
 
     return 0
 }
