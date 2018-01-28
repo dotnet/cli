@@ -612,7 +612,16 @@ extract_dotnet_package() {
     local failed=false
     case $download_link in
       *.zip)
-         unzip "$zip_path" -d "$temp_out_path" || failed=true
+         local exitCode=0
+         unzip -q "$zip_path" -d "$temp_out_path" || exitCode=$?
+         if [ $exitCode -eq 1 ]; then
+            say_warning "unzip encountered warnings"
+         elif [ $exitCode -eq 0 ]; then
+            say_verbose "unzip finished"
+         else
+            say_err "unzip failed"
+            failed=true
+         fi
          ;;
       *.tar.gz)
          tar -xzf "$zip_path" -C "$temp_out_path" > /dev/null || failed=true
