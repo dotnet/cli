@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Transactions;
 using Microsoft.DotNet.ToolPackage;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
@@ -154,6 +155,26 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                 return p.PackageId == packageId;
             }
             return p.PackageId == packageId && p.Version == packageVersion;
+        }
+
+        public void Commit(Enlistment enlistment)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void InDoubt(Enlistment enlistment)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Prepare(PreparingEnlistment preparingEnlistment)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Rollback(Enlistment enlistment)
+        {
+            throw new NotImplementedException();
         }
     }
 }
