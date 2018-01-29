@@ -6,7 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Transactions;
 using System.Xml.Linq;
+using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools;
 using Microsoft.Extensions.EnvironmentAbstractions;
@@ -23,10 +25,37 @@ namespace Microsoft.DotNet.ShellShim
         public ShellShimMaker(string pathToPlaceShim)
         {
             _pathToPlaceShim =
-                pathToPlaceShim ?? throw new ArgumentNullException(nameof(pathToPlaceShim));
+                pathToPlaceShim ??
+                throw new ArgumentNullException(nameof(pathToPlaceShim));
         }
 
         public void CreateShim(FilePath packageExecutable, string shellCommandName)
+        {
+            var resourceManager = new TransactionResourceManager(
+                commit: () => { PlaceShim(packageExecutable, shellCommandName); },
+                prepare: preparingEnlistment =>
+                {
+                    EnsureCommandNameUniqueness(shellCommandName);
+
+                    preparingEnlistment.Prepared();
+                });
+
+            if (Transaction.Current != null)
+            {
+                Transaction.Current.EnlistVolatile(resourceManager, EnlistmentOptions.None);
+            }
+            else
+            {
+                using (var transactionScope = new TransactionScope())
+                {
+                    Transaction.Current.EnlistVolatile(resourceManager, EnlistmentOptions.None);
+
+                    transactionScope.Complete();
+                }
+            }
+        }
+
+        private void PlaceShim(FilePath packageExecutable, string shellCommandName)
         {
             FilePath shimPath = GetShimPath(shellCommandName);
 
@@ -37,7 +66,10 @@ namespace Microsoft.DotNet.ShellShim
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                CreateConfigFile(shimPath.Value + ".config", entryPoint: packageExecutable, runner: "dotnet");
+                CreateConfigFile(
+                    GetWindowsConfigPath(shellCommandName),
+                    entryPoint: packageExecutable,
+                    runner: "dotnet");
                 using (var shim = File.Create(shimPath.Value))
                 using (var exe = typeof(ShellShimMaker).Assembly.GetManifestResourceStream(LauncherExeResourceName))
                 {
@@ -58,7 +90,7 @@ namespace Microsoft.DotNet.ShellShim
 
         public void EnsureCommandNameUniqueness(string shellCommandName)
         {
-            if (File.Exists(Path.Combine(_pathToPlaceShim, shellCommandName)))
+            if (File.Exists(GetShimPath(shellCommandName).Value))
             {
                 throw new GracefulException(
                     string.Format(CommonLocalizableStrings.FailInstallToolSameName,
@@ -66,10 +98,10 @@ namespace Microsoft.DotNet.ShellShim
             }
         }
 
-        internal void CreateConfigFile(string outputPath, FilePath entryPoint, string runner)
+        internal void CreateConfigFile(FilePath outputPath, FilePath entryPoint, string runner)
         {
             XDocument config;
-            using (var resource = typeof(ShellShimMaker).Assembly.GetManifestResourceStream(LauncherConfigResourceName))
+            using(var resource = typeof(ShellShimMaker).Assembly.GetManifestResourceStream(LauncherConfigResourceName))
             {
                 config = XDocument.Load(resource);
             }
@@ -77,11 +109,16 @@ namespace Microsoft.DotNet.ShellShim
             var appSettings = config.Descendants("appSettings").First();
             appSettings.Add(new XElement("add", new XAttribute("key", "entryPoint"), new XAttribute("value", entryPoint.Value)));
             appSettings.Add(new XElement("add", new XAttribute("key", "runner"), new XAttribute("value", runner ?? string.Empty)));
-            config.Save(outputPath);
+            config.Save(outputPath.Value);
         }
 
         public void Remove(string shellCommandName)
         {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                File.Delete(GetWindowsConfigPath(shellCommandName).Value);
+            }
+
             File.Delete(GetShimPath(shellCommandName).Value);
         }
 
@@ -94,6 +131,11 @@ namespace Microsoft.DotNet.ShellShim
             }
 
             return new FilePath(scriptPath);
+        }
+
+        private FilePath GetWindowsConfigPath(string shellCommandName)
+        {
+            return new FilePath(GetShimPath(shellCommandName).Value + ".config");
         }
 
         private static void SetUserExecutionPermissionToShimFile(FilePath scriptPath)

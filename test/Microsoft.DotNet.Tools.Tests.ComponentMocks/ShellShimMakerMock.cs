@@ -3,6 +3,9 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Transactions;
+using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ShellShim;
 using Microsoft.Extensions.EnvironmentAbstractions;
@@ -18,12 +21,53 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
         public ShellShimMakerMock(string pathToPlaceShim, IFileSystem fileSystem = null)
         {
             _pathToPlaceShim =
-                pathToPlaceShim ?? throw new ArgumentNullException(nameof(pathToPlaceShim));
+                pathToPlaceShim ??
+                throw new ArgumentNullException(nameof(pathToPlaceShim));
 
             _fileSystem = fileSystem ?? new FileSystemWrapper();
         }
 
+        public void EnsureCommandNameUniqueness(string shellCommandName)
+        {
+            if (_fileSystem.File.Exists(GetShimPath(shellCommandName).Value))
+            {
+                throw new GracefulException(
+                    string.Format(CommonLocalizableStrings.FailInstallToolSameName,
+                        shellCommandName));
+            }
+        }
+
         public void CreateShim(FilePath packageExecutable, string shellCommandName)
+        {
+            var resourceManager = new TransactionResourceManager(
+                commit: () => { PlaceShim(packageExecutable, shellCommandName); },
+                prepare: preparingEnlistment =>
+                {
+                    EnsureCommandNameUniqueness(shellCommandName);
+                    preparingEnlistment.Prepared();
+                });
+
+            if (Transaction.Current != null)
+            {
+                Transaction.Current.EnlistVolatile(resourceManager, EnlistmentOptions.None);
+            }
+            else
+            {
+                using (var transactionScope = new TransactionScope())
+                {
+                    Transaction.Current.EnlistVolatile(resourceManager, EnlistmentOptions.None);
+
+                    transactionScope.Complete();
+                }
+            }
+        }
+
+        public void Remove(string shellCommandName)
+        {
+            File.Delete(GetShimPath(shellCommandName).Value);
+        }
+
+        private void PlaceShim(FilePath packageExecutable, string shellCommandName)
         {
             var fakeshim = new FakeShim
             {
@@ -32,18 +76,19 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             };
             var script = JsonConvert.SerializeObject(fakeshim);
 
-            FilePath scriptPath = new FilePath(Path.Combine(_pathToPlaceShim, shellCommandName));
+            FilePath scriptPath = GetShimPath(shellCommandName);
             _fileSystem.File.WriteAllText(scriptPath.Value, script);
         }
 
-        public void EnsureCommandNameUniqueness(string shellCommandName)
+        private FilePath GetShimPath(string shellCommandName)
         {
-            if (_fileSystem.File.Exists(Path.Combine(_pathToPlaceShim, shellCommandName)))
+            var scriptPath = Path.Combine(_pathToPlaceShim, shellCommandName);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                throw new GracefulException(
-                    string.Format(CommonLocalizableStrings.FailInstallToolSameName,
-                        shellCommandName));
+                scriptPath += ".exe";
             }
+
+            return new FilePath(scriptPath);
         }
 
         public class FakeShim

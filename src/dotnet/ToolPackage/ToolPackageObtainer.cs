@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Transactions;
 using System.Xml.Linq;
-using Microsoft.DotNet.Tools;
+using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.Utils;
-using Microsoft.DotNet.Configurer;
+using Microsoft.DotNet.Tools;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using NuGet.ProjectModel;
 
@@ -43,6 +42,79 @@ namespace Microsoft.DotNet.ToolPackage
             string source = null,
             string verbosity = null)
         {
+            var stageDirectory = _toolsPath.WithSubDirectories(".stage", Path.GetRandomFileName());
+
+            var resourceManager = new TransactionResourceManager(
+                commit: () =>
+                {
+                    Directory.Move(
+                        stageDirectory.WithSubDirectories(packageId).Value,
+                        _toolsPath.WithSubDirectories(packageId).Value);
+
+                    Directory.Delete(stageDirectory.Value, true);
+                },
+                prepare: preparingEnlistment =>
+                {
+                    if (Directory.Exists(_toolsPath.WithSubDirectories(packageId).Value))
+                    {
+                        preparingEnlistment.ForceRollback();
+                        throw new PackageObtainException(
+                            string.Format(CommonLocalizableStrings.ToolPackageConflictPackageId, packageId));
+                    }
+
+                    preparingEnlistment.Prepared();
+                },
+                rollback: () =>
+                {
+                    if (Directory.Exists(stageDirectory.Value))
+                    {
+                        Directory.Delete(stageDirectory.Value, recursive: true);
+                    }
+                }
+            );
+
+            if (Transaction.Current != null)
+            {
+                Transaction.Current.EnlistVolatile(resourceManager, EnlistmentOptions.None);
+
+                return ObtainAndReturnExecutablePathInStageFolder(
+                    packageId,
+                    stageDirectory,
+                    packageVersion,
+                    nugetconfig,
+                    targetframework,
+                    source,
+                    verbosity);
+            }
+            else
+            {
+                using (var transactionScope = new TransactionScope())
+                {
+                    Transaction.Current.EnlistVolatile(resourceManager, EnlistmentOptions.None);
+                    var toolConfigurationAndExecutablePath =  ObtainAndReturnExecutablePathInStageFolder(
+                        packageId,
+                        stageDirectory,
+                        packageVersion,
+                        nugetconfig,
+                        targetframework,
+                        source,
+                        verbosity);
+
+                    transactionScope.Complete();
+                    return toolConfigurationAndExecutablePath;
+                }
+            }
+        }
+
+        private ToolConfigurationAndExecutablePath ObtainAndReturnExecutablePathInStageFolder(
+            string packageId,
+            DirectoryPath stageDirectory,
+            string packageVersion = null,
+            FilePath? nugetconfig = null,
+            string targetframework = null,
+            string source = null,
+            string verbosity = null)
+        {
             if (packageId == null)
             {
                 throw new ArgumentNullException(nameof(packageId));
@@ -66,7 +138,7 @@ namespace Microsoft.DotNet.ToolPackage
             var packageVersionOrPlaceHolder = new PackageVersion(packageVersion);
 
             DirectoryPath toolDirectory =
-                CreateIndividualToolVersionDirectory(packageId, packageVersionOrPlaceHolder);
+                CreateIndividualToolVersionDirectory(packageId, packageVersionOrPlaceHolder, stageDirectory);
 
             FilePath tempProjectPath = CreateTempProject(
                 packageId,
@@ -122,7 +194,9 @@ namespace Microsoft.DotNet.ToolPackage
 
             return new ToolConfigurationAndExecutablePath(
                 toolConfiguration,
-                toolDirectory.WithSubDirectories(
+                _toolsPath.WithSubDirectories(
+                        packageId,
+                        packageVersion,
                         packageId,
                         packageVersion)
                     .WithFile(entryPointFromLockFile.Path));
@@ -179,12 +253,13 @@ namespace Microsoft.DotNet.ToolPackage
                         new XElement("RestoreAdditionalProjectFallbackFolders", string.Empty), // block other
                         new XElement("RestoreAdditionalProjectFallbackFoldersExcludes", string.Empty),  // block other
                         new XElement("DisableImplicitNuGetFallbackFolder", "true")),  // disable SDK side implicit NuGetFallbackFolder
-                     new XElement("ItemGroup",
+                    new XElement("ItemGroup",
                         new XElement("PackageReference",
                             new XAttribute("Include", packageId),
                             new XAttribute("Version", packageVersion.IsConcreteValue ? packageVersion.Value : "*") // nuget will restore * for latest
-                            ))
-                        ));
+                        ))
+                ));
+
 
             File.WriteAllText(tempProjectPath.Value,
                 tempProjectContent.ToString());
@@ -194,9 +269,11 @@ namespace Microsoft.DotNet.ToolPackage
 
         private DirectoryPath CreateIndividualToolVersionDirectory(
             string packageId,
-            PackageVersion packageVersion)
+            PackageVersion packageVersion,
+            DirectoryPath stageDirectory
+        )
         {
-            DirectoryPath individualTool = _toolsPath.WithSubDirectories(packageId);
+            DirectoryPath individualTool = stageDirectory.WithSubDirectories(packageId);
             DirectoryPath individualToolVersion = individualTool.WithSubDirectories(packageVersion.Value);
             EnsureDirectoryExists(individualToolVersion);
             return individualToolVersion;
