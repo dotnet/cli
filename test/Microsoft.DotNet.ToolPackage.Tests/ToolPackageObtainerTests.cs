@@ -13,6 +13,7 @@ using Microsoft.DotNet.Tools;
 using Microsoft.DotNet.Tools.Install.Tool;
 using Xunit;
 using Microsoft.DotNet.Tools.Tests.ComponentMocks;
+using System.Net;
 
 namespace Microsoft.DotNet.ToolPackage.Tests
 {
@@ -324,6 +325,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         [InlineData(true)]
         public void GivenASourceItCanObtainThePackageFromThatSource(bool testMockBehaviorIsInSync)
         {
+            DownloadPlatformsPackage();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
             var packageObtainer = ConstructDefaultPackageObtainer(toolsPath);
@@ -345,6 +347,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         [Fact]
         public void GivenFailuredRestoreItCanRollBack()
         {
+            DownloadPlatformsPackage();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
             ToolPackageObtainer packageObtainer =
@@ -458,10 +461,35 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             return new FilePath(Path.GetFullPath(Path.Combine(tempPathForNugetConfigWithWhiteSpace, nugetConfigName)));
         }
 
+        private static void DownloadPlatformsPackage()
+        {
+            if (File.Exists(Path.Combine(GetTestLocalFeedPath(), PlatformsNupkgFileName)))
+            {
+
+                return;
+            }
+
+            void download()
+            {
+                new WebClient().DownloadFile(PlatformsNupkgUri, Path.Combine(GetTestLocalFeedPath(), PlatformsNupkgFileName));
+            }
+
+            try
+            {
+                download();
+            }
+            catch (WebException)
+            {
+                download(); // naive retry once more
+            }
+        }
+
         private static string GetTestLocalFeedPath() => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TestAssetLocalNugetFeed");
 
         private readonly string _testTargetframework = BundledTargetFramework.GetTargetFrameworkMoniker();
         private const string TestPackageVersion = "1.0.4";
         private const string TestPackageId = "global.tool.console.demo";
+        private const string PlatformsNupkgFileName = "microsoft.netcore.platforms.2.1.0-preview1-26115-04.nupkg";
+        private const string PlatformsNupkgUri = "https://dotnet.myget.org/F/dotnet-core/api/v2/package/Microsoft.NETCore.Platforms/2.1.0-preview1-26115-04";
     }
 }
