@@ -7,6 +7,7 @@ using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Configurer;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using NuGet.ProjectModel;
+using System.Transactions;
 
 namespace Microsoft.DotNet.ToolPackage
 {
@@ -205,6 +206,26 @@ namespace Microsoft.DotNet.ToolPackage
             {
                 Directory.CreateDirectory(path.Value);
             }
+        }
+
+        public void Commit(Enlistment enlistment)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void InDoubt(Enlistment enlistment)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Prepare(PreparingEnlistment preparingEnlistment)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Rollback(Enlistment enlistment)
+        {
+            throw new NotImplementedException();
         }
     }
 }
