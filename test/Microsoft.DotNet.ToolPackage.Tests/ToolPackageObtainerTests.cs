@@ -342,6 +342,35 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             File.Delete(executable.Value);
         }
 
+        [Fact]
+        public void GivenFailuredRestoreItCanRollBack()
+        {
+            var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
+
+            ToolPackageObtainer packageObtainer =
+                new ToolPackageObtainer(
+                new DirectoryPath(toolsPath),
+                new DirectoryPath("no such path"),
+                GetUniqueTempProjectPathEachTest,
+                new Lazy<string>(),
+                new ProjectRestorer());
+
+            try
+            {
+                packageObtainer.ObtainAndReturnExecutablePath(
+                    packageId: TestPackageId,
+                    packageVersion: TestPackageVersion,
+                    targetframework: _testTargetframework);
+
+            }
+            catch (PackageObtainException)
+            {
+
+            }
+
+            Directory.GetFiles(toolsPath).Should().BeEmpty();
+        }
+
         private static readonly Func<FilePath> GetUniqueTempProjectPathEachTest = () =>
         {
             var tempProjectDirectory =
