@@ -34,9 +34,9 @@ if ($ExtraParameters)
     $ExtraParametersNoTargets = $ExtraParameters.GetRange(0,$ExtraParameters.Count)
     foreach ($param in $ExtraParameters)
     {
-        if(($param.StartsWith("/t")) -or ($param.StartsWith("/T")))
+        if(($param.StartsWith("/t:", [StringComparison]::OrdinalIgnoreCase)) -or ($param.StartsWith("/target:", [StringComparison]::OrdinalIgnoreCase)))
         {
-            $remove = $ExtraParametersNoTargets.Remove("$param")
+            $ExtraParametersNoTargets.Remove("$param") | Out-Null
         }
     }
 }
@@ -101,6 +101,6 @@ if ($NoBuild)
 else
 {
     dotnet msbuild build.proj /p:Architecture=$Architecture /p:GeneratePropsFile=true /t:WriteDynamicPropsToStaticPropsFiles $ExtraParametersNoTargets
-    dotnet msbuild build.proj /m /v:normal /fl /flp:v=diag /p:Architecture=$Architecture $ExtraParameters
+
     if($LASTEXITCODE -ne 0) { throw "Failed to build" } 
 }

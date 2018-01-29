@@ -130,7 +130,7 @@ done
 argsnotargets=( )
 for arg in ${args[@]} 
 do  
-  if [[ $arg != '/t'* ]] && [[ $arg != '/T'* ]]; then    
+  if [[ tolower($arg) != '/t:'* ]] && [[ tolower($arg) != '/target:'* ]]; then
     argsnotargets+=($arg)  
   fi
 done
