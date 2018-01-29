@@ -130,8 +130,8 @@ done
 argsnotargets=( )
 for arg in ${args[@]} 
 do  
-  if [[ tolower($arg) != '/t:'* ]] && [[ tolower($arg) != '/target:'* ]]; then
-    argsnotargets+=($arg)  
+  if [[ ${arg,,} != '/t:'* ]] && [[ ${arg,,} != '/target:'* ]]; then
+    argsnotargets+=($arg)
   fi
 done
 
@@ -179,7 +179,7 @@ export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 
 if [ $BUILD -eq 1 ]; then
     dotnet msbuild build.proj /p:Architecture=$ARCHITECTURE $CUSTOM_BUILD_ARGS /p:GeneratePropsFile=true /t:WriteDynamicPropsToStaticPropsFiles $argsnotargets
-    dotnet msbuild build.proj /m /v:normal /fl /flp:v=diag /p:Architecture=$ARCHITECTURE $CUSTOM_BUILD_ARGS $args
+
 else
     echo "Not building due to --nobuild"
     echo "Command that would be run is: 'dotnet msbuild build.proj /m /p:Architecture=$ARCHITECTURE $CUSTOM_BUILD_ARGS $args'"
