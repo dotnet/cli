@@ -47,6 +47,19 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             _fileSystem = fileSystem;
             _mockFeeds = mockFeeds;
 
+            MockFeedPackage package = _mockFeeds
+              .SelectMany(f => f.Packages)
+              .Where(p => MatchPackageVersion(p, packageId, packageVersion)).OrderByDescending(p => p.Version)
+              .FirstOrDefault();
+
+            if (package == null)
+            {
+                throw new PackageObtainException("simulated cannot find package");
+            }
+
+            packageVersion = package.Version;
+            targetframework = targetframework ?? "targetframework";
+
             packageIdVersionDirectory = Path.Combine("toolPath", packageId, packageVersion);
 
             _fakeExecutableDirectory = Path.Combine(packageIdVersionDirectory,
@@ -66,19 +79,6 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
 
             PickFeedByNugetConfig(nugetconfig);
             PickFeedBySource(source);
-
-            MockFeedPackage package = _mockFeeds
-                .SelectMany(f => f.Packages)
-                .Where(p => MatchPackageVersion(p, packageId, packageVersion)).OrderByDescending(p => p.Version)
-                .FirstOrDefault();
-
-            if (package == null)
-            {
-                throw new PackageObtainException("simulated cannot find package");
-            }
-
-            packageVersion = package.Version;
-            targetframework = targetframework ?? "targetframework";
 
             var stageDirectory = Path.Combine("toolPath", ".stage");
             if (!_fileSystem.Directory.Exists(stageDirectory))
@@ -160,6 +160,8 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
 
         public void Commit(Enlistment enlistment)
         {
+            _fileSystem.File.Delete(Path.Combine("toolPath", ".stage", "stagedfile"));
+
             if (!_fileSystem.Directory.Exists(_fakeExecutableDirectory))
             {
                 _fileSystem.Directory.CreateDirectory(_fakeExecutableDirectory);
