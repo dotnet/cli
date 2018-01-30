@@ -365,7 +365,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             AssertRollBack(toolsPath);
         }
 
-        [Fact]
+        [Fact] // todo so simulator
         public void GiveSucessRestoreButFailedOnNextStepItCanRollBack()
         {
             FilePath nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
@@ -520,7 +520,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             }
         }
 
-        private static ToolConfigurationAndExecutablePath RunInTransaction(ObtainTransaction obtainTransaction)
+        private static ToolConfigurationAndExecutablePath RunInTransaction(IObtainTransaction obtainTransaction)
         {
             using (var t = new TransactionScope())
             {

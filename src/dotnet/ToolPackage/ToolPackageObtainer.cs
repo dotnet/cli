@@ -1,13 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using System.Xml.Linq;
-using Microsoft.DotNet.Tools;
-using Microsoft.DotNet.Cli.Utils;
-using Microsoft.DotNet.Configurer;
 using Microsoft.Extensions.EnvironmentAbstractions;
-using NuGet.ProjectModel;
-using System.Transactions;
 
 namespace Microsoft.DotNet.ToolPackage
 {
@@ -34,7 +26,7 @@ namespace Microsoft.DotNet.ToolPackage
             _offlineFeedPath = offlineFeedPath;
         }
 
-        public ObtainTransaction CreateObtainTransaction(
+        public IObtainTransaction CreateObtainTransaction(
             string packageId,
             string packageVersion = null,
             FilePath? nugetconfig = null,

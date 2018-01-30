@@ -8,7 +8,7 @@ namespace Microsoft.DotNet.ToolPackage
 {
     internal interface IToolPackageObtainer
     {
-        ObtainTransaction CreateObtainTransaction(
+        IObtainTransaction CreateObtainTransaction(
             string packageId,
             string packageVersion = null,
             FilePath? nugetconfig = null,

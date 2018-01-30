@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Transactions;
 using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
@@ -34,8 +35,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             IToolPackageObtainer toolPackageObtainer = null,
             IShellShimMaker shellShimMaker = null,
             IEnvironmentPathInstruction environmentPathInstruction = null,
-            IReporter reporter = null)
-            : base(parseResult)
+            IReporter reporter = null) : base(parseResult)
         {
             if (appliedCommand == null)
             {
@@ -77,26 +77,6 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                 throw new GracefulException(LocalizableStrings.InstallToolCommandOnlySupportGlobal);
             }
 
-            var toolConfigurationAndExecutablePath = ObtainPackage();
-
-            var commandName = toolConfigurationAndExecutablePath.Configuration.CommandName;
-            _shellShimMaker.EnsureCommandNameUniqueness(commandName);
-
-            _shellShimMaker.CreateShim(
-                toolConfigurationAndExecutablePath.Executable,
-                commandName);
-
-            _environmentPathInstruction
-                .PrintAddPathInstructionIfPathDoesNotExist();
-
-            _reporter.WriteLine(
-                string.Format(LocalizableStrings.InstallationSucceeded, commandName));
-
-            return 0;
-        }
-
-        private ToolConfigurationAndExecutablePath ObtainPackage()
-        {
             try
             {
                 FilePath? configFile = null;
@@ -105,14 +85,33 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                     configFile = new FilePath(_configFilePath);
                 }
 
-                return _toolPackageObtainer.ObtainAndReturnExecutablePath(
+                var obtainTransaction = _toolPackageObtainer.CreateObtainTransaction(
                     packageId: _packageId,
                     packageVersion: _packageVersion,
                     nugetconfig: configFile,
                     targetframework: _framework,
                     source: _source);
-            }
 
+                using (var t = new TransactionScope())
+                {
+                    Transaction.Current.EnlistVolatile(obtainTransaction, EnlistmentOptions.None);
+                    var toolConfigurationAndExecutablePath = obtainTransaction.ObtainAndReturnExecutablePath();
+
+                    var commandName = toolConfigurationAndExecutablePath.Configuration.CommandName;
+                    _shellShimMaker.EnsureCommandNameUniqueness(commandName);
+
+                    _shellShimMaker.CreateShim(
+                        toolConfigurationAndExecutablePath.Executable,
+                        commandName);
+
+                    _environmentPathInstruction
+                        .PrintAddPathInstructionIfPathDoesNotExist();
+
+                    _reporter.WriteLine(
+                        string.Format(LocalizableStrings.InstallationSucceeded, commandName));
+                    t.Complete();
+                }
+            }
             catch (PackageObtainException ex)
             {
                 throw new GracefulException(
@@ -130,6 +129,8 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                         ex.Message),
                     innerException: ex);
             }
+
+            return 0;
         }
     }
 }

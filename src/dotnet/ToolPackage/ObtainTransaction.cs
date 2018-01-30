@@ -10,7 +10,7 @@ using System.Transactions;
 
 namespace Microsoft.DotNet.ToolPackage
 {
-    internal class ObtainTransaction: IEnlistmentNotification
+    internal class ObtainTransaction : IObtainTransaction
     {
         private string _packageId;
         private string _packageVersion;
