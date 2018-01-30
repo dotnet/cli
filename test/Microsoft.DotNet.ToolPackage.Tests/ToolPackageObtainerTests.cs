@@ -14,11 +14,14 @@ using Microsoft.DotNet.Tools.Install.Tool;
 using Xunit;
 using Microsoft.DotNet.Tools.Tests.ComponentMocks;
 using System.Net;
+using System.Transactions;
+using Microsoft.DotNet.Cli.Utils;
 
 namespace Microsoft.DotNet.ToolPackage.Tests
 {
     public class ToolPackageObtainerTests : TestBase
     {
+
         [Fact]
         public void GivenNoFeedItThrows()
         {
@@ -345,33 +348,77 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         }
 
         [Fact]
-        public void GivenFailuredRestoreItCanRollBack()
+        public void GivenFailedRestoreItCanRollBack()
         {
-            DownloadPlatformsPackage();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
-            ToolPackageObtainer packageObtainer =
-                new ToolPackageObtainer(
-                new DirectoryPath(toolsPath),
-                new DirectoryPath("no such path"),
-                GetUniqueTempProjectPathEachTest,
-                new Lazy<string>(),
-                new ProjectRestorer());
+            var packageObtainer = ConstructDefaultPackageObtainer(toolsPath);
+
+            var obtainAndReturnExecutablePathtransactional = packageObtainer.ObtainAndReturnExecutablePathtransactional(
+                    packageId: "non exist package id",
+                    packageVersion: TestPackageVersion,
+                    targetframework: _testTargetframework);
 
             try
             {
-                packageObtainer.ObtainAndReturnExecutablePath(
+                using (var t = new TransactionScope())
+                {
+                    Transaction.Current.EnlistVolatile(obtainAndReturnExecutablePathtransactional, EnlistmentOptions.None);
+                    obtainAndReturnExecutablePathtransactional.Obtain();
+                    t.Complete();
+                }
+            }
+            catch (PackageObtainException)
+            {
+                // catch the intent error
+            }
+
+            AssertRollBack(toolsPath);
+        }
+
+        [Fact]
+        public void GiveSucessRestoreButFailedOnNextStepItCanRollBack()
+        {
+            FilePath nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
+            var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
+
+            var packageObtainer = ConstructDefaultPackageObtainer(toolsPath);
+
+            var obtainAndReturnExecutablePathtransactional = packageObtainer.ObtainAndReturnExecutablePathtransactional(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
                     targetframework: _testTargetframework);
 
-            }
-            catch (PackageObtainException)
+            void failedStepAfterSuccessRestore() => throw new GracefulException("simulated error");
+
+            try
             {
+                using (var t = new TransactionScope())
+                {
+                    Transaction.Current.EnlistVolatile(obtainAndReturnExecutablePathtransactional, EnlistmentOptions.None);
+                    obtainAndReturnExecutablePathtransactional.Obtain();
 
+                    failedStepAfterSuccessRestore();
+                    t.Complete();
+                }
+            }
+            catch (GracefulException)
+            {
+                // catch the simulated error
             }
 
+            AssertRollBack(toolsPath);
+        }
+
+        private static void AssertRollBack(string toolsPath)
+        {
             Directory.GetFiles(toolsPath).Should().BeEmpty();
+            Directory.GetDirectories(toolsPath)
+                .Should().NotContain(d => !new DirectoryInfo(d).Name.Equals(".stage"),
+                "no broken folder, exclude stage folder");
+
+            Directory.GetDirectories(Path.Combine(toolsPath, ".stage"))
+                .Should().BeEmpty("nothing in stage folder");
         }
 
         private static readonly Func<FilePath> GetUniqueTempProjectPathEachTest = () =>

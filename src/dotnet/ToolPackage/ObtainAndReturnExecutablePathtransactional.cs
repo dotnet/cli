@@ -11,35 +11,49 @@ using System.Transactions;
 
 namespace Microsoft.DotNet.ToolPackage
 {
-    internal class ToolPackageObtainer: IToolPackageObtainer
+    internal class ObtainAndReturnExecutablePathtransactional: IEnlistmentNotification
     {
-        private readonly Lazy<string> _bundledTargetFrameworkMoniker;
-        private readonly Func<FilePath> _getTempProjectPath;
-        private readonly IProjectRestorer _projectRestorer;
-        private readonly DirectoryPath _toolsPath;
-        private readonly DirectoryPath _offlineFeedPath;
+        private string packageId;
+        private string packageVersion;
+        private FilePath? nugetconfig;
+        private string targetframework;
+        private string source;
+        private Lazy<string> _bundledTargetFrameworkMoniker;
+        private Func<FilePath> _getTempProjectPath;
+        private IProjectRestorer _projectRestorer;
+        private DirectoryPath _toolsPath;
+        private DirectoryPath _offlineFeedPath;
+        private DirectoryPath _stageDirectory;
 
-        public ToolPackageObtainer(
-            DirectoryPath toolsPath,
-            DirectoryPath offlineFeedPath,
-            Func<FilePath> getTempProjectPath,
+        public ObtainAndReturnExecutablePathtransactional(
+            string packageId,
+            string packageVersion,
+            FilePath? nugetconfig,
+            string targetframework,
+            string source,
             Lazy<string> bundledTargetFrameworkMoniker,
-            IProjectRestorer projectRestorer
-        )
+            Func<FilePath> getTempProjectPath,
+            IProjectRestorer projectRestorer,
+            DirectoryPath toolsPath,
+            DirectoryPath offlineFeedPath)
         {
-            _getTempProjectPath = getTempProjectPath;
+            this.packageId = packageId;
+            this.packageVersion = packageVersion;
+            this.nugetconfig = nugetconfig;
+            this.targetframework = targetframework;
+            this.source = source;
+
             _bundledTargetFrameworkMoniker = bundledTargetFrameworkMoniker;
-            _projectRestorer = projectRestorer ?? throw new ArgumentNullException(nameof(projectRestorer));
+            _getTempProjectPath = getTempProjectPath;
+            _projectRestorer = projectRestorer;
             _toolsPath = toolsPath;
             _offlineFeedPath = offlineFeedPath;
+            _stageDirectory = _toolsPath.WithSubDirectories(".stage", Path.GetRandomFileName());
         }
 
-        public ToolConfigurationAndExecutablePath ObtainAndReturnExecutablePath(
-            string packageId,
-            string packageVersion = null,
-            FilePath? nugetconfig = null,
-            string targetframework = null,
-            string source = null)
+        private DirectoryPath StageDirectory => _toolsPath.WithSubDirectories(".stage", Path.GetRandomFileName());
+
+        public ToolConfigurationAndExecutablePath Obtain()
         {
             if (packageId == null)
             {
@@ -126,28 +140,19 @@ namespace Microsoft.DotNet.ToolPackage
                     .WithFile(entryPointFromLockFile.Path));
         }
 
-        public ObtainAndReturnExecutablePathtransactional ObtainAndReturnExecutablePathtransactional(
+        private DirectoryPath CreateIndividualToolVersionDirectory(
             string packageId,
-            string packageVersion = null,
-            FilePath? nugetconfig = null,
-            string targetframework = null,
-            string source = null)
+            PackageVersion packageVersion)
         {
-            return new ObtainAndReturnExecutablePathtransactional(packageId, 
-                packageVersion, 
-                nugetconfig, 
-                targetframework,
-                source,
-                _bundledTargetFrameworkMoniker,
-                _getTempProjectPath,
-                _projectRestorer,
-                _toolsPath,
-                _offlineFeedPath);
+            DirectoryPath individualTool = _stageDirectory.WithSubDirectories(packageId);
+            DirectoryPath individualToolVersion = individualTool.WithSubDirectories(packageVersion.Value);
+            EnsureDirectoryExists(individualToolVersion);
+            return individualToolVersion;
         }
 
         private static LockFileItem FindAssetInLockFile(
-            LockFile lockFile,
-            string targetRelativeFilePath, string packageId)
+         LockFile lockFile,
+         string targetRelativeFilePath, string packageId)
         {
             return lockFile
                 .Targets?.SingleOrDefault(t => t.RuntimeIdentifier != null)
@@ -209,22 +214,47 @@ namespace Microsoft.DotNet.ToolPackage
             return tempProjectPath;
         }
 
-        private DirectoryPath CreateIndividualToolVersionDirectory(
-            string packageId,
-            PackageVersion packageVersion)
-        {
-            DirectoryPath individualTool = _toolsPath.WithSubDirectories(packageId);
-            DirectoryPath individualToolVersion = individualTool.WithSubDirectories(packageVersion.Value);
-            EnsureDirectoryExists(individualToolVersion);
-            return individualToolVersion;
-        }
-
         private static void EnsureDirectoryExists(DirectoryPath path)
         {
             if (!Directory.Exists(path.Value))
             {
                 Directory.CreateDirectory(path.Value);
             }
+        }
+
+        public void Commit(Enlistment enlistment)
+        {
+            Directory.Move(
+                _stageDirectory.WithSubDirectories(packageId).Value,
+                _toolsPath.WithSubDirectories(packageId).Value);
+
+            Directory.Delete(_stageDirectory.Value, true);
+        }
+
+        public void InDoubt(Enlistment enlistment)
+        {
+            Rollback(enlistment);
+        }
+
+        public void Prepare(PreparingEnlistment preparingEnlistment)
+        {
+            if (Directory.Exists(_toolsPath.WithSubDirectories(packageId).Value))
+            {
+                preparingEnlistment.ForceRollback();
+                throw new PackageObtainException("A tool with the same name existed."); // TODO loc no checkin
+            }
+
+            preparingEnlistment.Prepared();
+        }
+
+        public void Rollback(Enlistment enlistment)
+        {
+            if (Directory.Exists(_stageDirectory.Value))
+            {
+                Directory.Delete(_stageDirectory.Value, recursive: true);
+            }
+
+            enlistment.Done();
         }
     }
 }

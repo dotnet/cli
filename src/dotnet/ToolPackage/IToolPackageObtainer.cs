@@ -6,12 +6,19 @@ using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.ToolPackage
 {
-    internal interface IToolPackageObtainer: IEnlistmentNotification
+    internal interface IToolPackageObtainer
     {
         ToolConfigurationAndExecutablePath ObtainAndReturnExecutablePath(
             string packageId, 
             string packageVersion = null, 
             FilePath? nugetconfig = null, 
+            string targetframework = null,
+            string source = null);
+
+        ObtainAndReturnExecutablePathtransactional ObtainAndReturnExecutablePathtransactional(
+            string packageId,
+            string packageVersion = null,
+            FilePath? nugetconfig = null,
             string targetframework = null,
             string source = null);
     }

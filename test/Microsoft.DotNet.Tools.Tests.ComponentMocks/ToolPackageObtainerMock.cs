@@ -176,5 +176,10 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
         {
             throw new NotImplementedException();
         }
+
+        public ObtainAndReturnExecutablePathtransactional ObtainAndReturnExecutablePathtransactional(string packageId, string packageVersion = null, FilePath? nugetconfig = null, string targetframework = null, string source = null)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
