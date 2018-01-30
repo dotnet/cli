@@ -4,7 +4,6 @@ using System.Linq;
 using System.Xml.Linq;
 using Microsoft.DotNet.Tools;
 using Microsoft.DotNet.Cli.Utils;
-using Microsoft.DotNet.Configurer;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using NuGet.ProjectModel;
 using System.Transactions;
@@ -26,7 +25,7 @@ namespace Microsoft.DotNet.ToolPackage
         private DirectoryPath _offlineFeedPath;
         private DirectoryPath _stageDirectory;
 
-        public ObtainTransaction(
+        internal ObtainTransaction(
             string packageId,
             string packageVersion,
             FilePath? nugetconfig,
@@ -52,7 +51,7 @@ namespace Microsoft.DotNet.ToolPackage
             _stageDirectory = _toolsPath.WithSubDirectories(".stage", Path.GetRandomFileName());
         }
 
-        public ToolConfigurationAndExecutablePath Obtain()
+        public ToolConfigurationAndExecutablePath ObtainAndReturnExecutablePath()
         {
             if (_packageId == null)
             {
@@ -137,6 +136,41 @@ namespace Microsoft.DotNet.ToolPackage
                     .WithFile(entryPointFromLockFile.Path));
         }
 
+        public void Commit(Enlistment enlistment)
+        {
+            Directory.Move(
+                _stageDirectory.WithSubDirectories(_packageId).Value,
+                _toolsPath.WithSubDirectories(_packageId).Value);
+
+            Directory.Delete(_stageDirectory.Value, true);
+        }
+
+        public void InDoubt(Enlistment enlistment)
+        {
+            Rollback(enlistment);
+        }
+
+        public void Prepare(PreparingEnlistment preparingEnlistment)
+        {
+            if (Directory.Exists(_toolsPath.WithSubDirectories(_packageId).Value))
+            {
+                preparingEnlistment.ForceRollback();
+                throw new PackageObtainException($"A tool with the same PackageId {_packageId} existed."); // TODO loc no checkin
+            }
+
+            preparingEnlistment.Prepared();
+        }
+
+        public void Rollback(Enlistment enlistment)
+        {
+            if (Directory.Exists(_stageDirectory.Value))
+            {
+                Directory.Delete(_stageDirectory.Value, recursive: true);
+            }
+
+            enlistment.Done();
+        }
+
         private DirectoryPath CreateIndividualToolVersionDirectory(
             PackageVersion packageVersion)
         {
@@ -214,41 +248,6 @@ namespace Microsoft.DotNet.ToolPackage
             {
                 Directory.CreateDirectory(path.Value);
             }
-        }
-
-        public void Commit(Enlistment enlistment)
-        {
-            Directory.Move(
-                _stageDirectory.WithSubDirectories(_packageId).Value,
-                _toolsPath.WithSubDirectories(_packageId).Value);
-
-            Directory.Delete(_stageDirectory.Value, true);
-        }
-
-        public void InDoubt(Enlistment enlistment)
-        {
-            Rollback(enlistment);
-        }
-
-        public void Prepare(PreparingEnlistment preparingEnlistment)
-        {
-            if (Directory.Exists(_toolsPath.WithSubDirectories(_packageId).Value))
-            {
-                preparingEnlistment.ForceRollback();
-                throw new PackageObtainException("A tool with the same name existed."); // TODO loc no checkin
-            }
-
-            preparingEnlistment.Prepared();
-        }
-
-        public void Rollback(Enlistment enlistment)
-        {
-            if (Directory.Exists(_stageDirectory.Value))
-            {
-                Directory.Delete(_stageDirectory.Value, recursive: true);
-            }
-
-            enlistment.Done();
         }
     }
 }

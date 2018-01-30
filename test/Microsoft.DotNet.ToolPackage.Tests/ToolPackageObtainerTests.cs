@@ -35,10 +35,10 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 new Lazy<string>(),
                 new ProjectRestorer());
 
-            Action a = () => packageObtainer.ObtainAndReturnExecutablePath(
+            Action a = () => packageObtainer.CreateObtainTransaction(
                 packageId: TestPackageId,
                 packageVersion: TestPackageVersion,
-                targetframework: _testTargetframework);
+                targetframework: _testTargetframework).ObtainAndReturnExecutablePath();
 
             a.ShouldThrow<PackageObtainException>();
         }
@@ -56,11 +56,13 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                     bundledTargetFrameworkMoniker: new Lazy<string>(),
                     projectRestorer: new ProjectRestorer());
 
-            ToolConfigurationAndExecutablePath toolConfigurationAndExecutablePath =
-                packageObtainer.ObtainAndReturnExecutablePath(
+            var obtainTransaction =
+                packageObtainer.CreateObtainTransaction(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
                     targetframework: _testTargetframework);
+
+            var toolConfigurationAndExecutablePath = RunInTransaction(obtainTransaction);
 
             var executable = toolConfigurationAndExecutablePath
                 .Executable;
@@ -87,12 +89,14 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath, testMockBehaviorIsInSync, nugetConfigPath.Value);
 
-            ToolConfigurationAndExecutablePath toolConfigurationAndExecutablePath
-                = packageObtainer.ObtainAndReturnExecutablePath(
+            var obtainTransaction
+                = packageObtainer.CreateObtainTransaction(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
                     nugetconfig: nugetConfigPath,
                     targetframework: _testTargetframework);
+
+            var toolConfigurationAndExecutablePath = RunInTransaction(obtainTransaction);
 
             FilePath executable = toolConfigurationAndExecutablePath.Executable;
             File.Exists(executable.Value)
@@ -114,12 +118,14 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath, testMockBehaviorIsInSync, nugetConfigPath.Value);
 
-            ToolConfigurationAndExecutablePath toolConfigurationAndExecutableDirectory =
-                packageObtainer.ObtainAndReturnExecutablePath(
+            var obtainTransaction =
+                packageObtainer.CreateObtainTransaction(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
                     nugetconfig: nugetConfigPath,
                     targetframework: _testTargetframework);
+
+            var toolConfigurationAndExecutablePath = RunInTransaction(obtainTransaction);
 
             /*
               From mytool.dll to project.assets.json
@@ -128,7 +134,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                       /dependency2 package id/
                       /project.assets.json
              */
-            var assetJsonPath = toolConfigurationAndExecutableDirectory
+            var assetJsonPath = toolConfigurationAndExecutablePath
                 .Executable
                 .GetDirectoryPath()
                 .GetParentPath()
@@ -178,11 +184,12 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                     new ProjectRestorer());
             }
 
-            ToolConfigurationAndExecutablePath toolConfigurationAndExecutablePath =
-                packageObtainer.ObtainAndReturnExecutablePath(
+            var obtainTransaction =
+                packageObtainer.CreateObtainTransaction(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
                     targetframework: _testTargetframework);
+            var toolConfigurationAndExecutablePath = RunInTransaction(obtainTransaction);
 
             var executable = toolConfigurationAndExecutablePath.Executable;
 
@@ -204,11 +211,12 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath, testMockBehaviorIsInSync, nugetConfigPath.Value);
 
-            ToolConfigurationAndExecutablePath toolConfigurationAndExecutablePath =
-                packageObtainer.ObtainAndReturnExecutablePath(
+            var obtainTransaction =
+                packageObtainer.CreateObtainTransaction(
                     packageId: TestPackageId,
                     nugetconfig: nugetConfigPath,
                     targetframework: _testTargetframework);
+            var toolConfigurationAndExecutablePath = RunInTransaction(obtainTransaction);
 
             var executable = toolConfigurationAndExecutablePath.Executable;
 
@@ -217,30 +225,6 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 .BeTrue(executable + " should have the executable");
 
             File.Delete(executable.Value);
-        }
-
-        [Theory]
-        [InlineData(false)]
-        [InlineData(true)]
-        public void GivenAllButNoPackageVersionAndInvokeTwiceItShouldNotThrow(bool testMockBehaviorIsInSync)
-        {
-            var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
-            var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
-
-            var packageObtainer =
-                ConstructDefaultPackageObtainer(toolsPath, testMockBehaviorIsInSync, nugetConfigPath.Value);
-
-            packageObtainer.ObtainAndReturnExecutablePath(
-                packageId: TestPackageId,
-                nugetconfig: nugetConfigPath,
-                targetframework: _testTargetframework);
-
-            Action secondCall = () => packageObtainer.ObtainAndReturnExecutablePath(
-                packageId: TestPackageId,
-                nugetconfig: nugetConfigPath,
-                targetframework: _testTargetframework);
-
-            secondCall.ShouldNotThrow();
         }
 
         [Theory]
@@ -281,11 +265,12 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                     new Lazy<string>(() => BundledTargetFramework.GetTargetFrameworkMoniker()),
                     new ProjectRestorer());
             }
-            ToolConfigurationAndExecutablePath toolConfigurationAndExecutablePath =
-                packageObtainer.ObtainAndReturnExecutablePath(
+            var obtainTransaction =
+                packageObtainer.CreateObtainTransaction(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
                     nugetconfig: nugetConfigPath);
+            var toolConfigurationAndExecutablePath = RunInTransaction(obtainTransaction);
 
             var executable = toolConfigurationAndExecutablePath.Executable;
 
@@ -309,11 +294,13 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             var nonExistNugetConfigFile = new FilePath("NonExistent.file");
             Action a = () =>
             {
-                packageObtainer.ObtainAndReturnExecutablePath(
+                var obtainTransaction =
+                packageObtainer.CreateObtainTransaction(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
                     nugetconfig: nonExistNugetConfigFile,
                     targetframework: _testTargetframework);
+                var toolConfigurationAndExecutablePath = RunInTransaction(obtainTransaction);
             };
 
             a.ShouldThrow<PackageObtainException>()
@@ -332,13 +319,15 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
             var packageObtainer = ConstructDefaultPackageObtainer(toolsPath);
-            var toolConfigurationAndExecutableDirectory = packageObtainer.ObtainAndReturnExecutablePath(
+            var obtainTransaction =
+                packageObtainer.CreateObtainTransaction(
                 packageId: TestPackageId,
                 packageVersion: TestPackageVersion,
                 targetframework: _testTargetframework,
                 source:GetTestLocalFeedPath());
+            var toolConfigurationAndExecutablePath = RunInTransaction(obtainTransaction);
 
-            var executable = toolConfigurationAndExecutableDirectory.Executable;
+            var executable = toolConfigurationAndExecutablePath.Executable;
 
             File.Exists(executable.Value)
                 .Should()
@@ -354,7 +343,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
             var packageObtainer = ConstructDefaultPackageObtainer(toolsPath);
 
-            var obtainAndReturnExecutablePathtransactional = packageObtainer.ObtainAndReturnExecutablePathtransactional(
+            var obtainAndReturnExecutablePathtransactional = packageObtainer.CreateObtainTransaction(
                     packageId: "non exist package id",
                     packageVersion: TestPackageVersion,
                     targetframework: _testTargetframework);
@@ -364,7 +353,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 using (var t = new TransactionScope())
                 {
                     Transaction.Current.EnlistVolatile(obtainAndReturnExecutablePathtransactional, EnlistmentOptions.None);
-                    obtainAndReturnExecutablePathtransactional.Obtain();
+                    obtainAndReturnExecutablePathtransactional.ObtainAndReturnExecutablePath();
                     t.Complete();
                 }
             }
@@ -384,7 +373,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
             var packageObtainer = ConstructDefaultPackageObtainer(toolsPath);
 
-            var obtainAndReturnExecutablePathtransactional = packageObtainer.ObtainAndReturnExecutablePathtransactional(
+            var obtainAndReturnExecutablePathtransactional = packageObtainer.CreateObtainTransaction(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
                     targetframework: _testTargetframework);
@@ -396,7 +385,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 using (var t = new TransactionScope())
                 {
                     Transaction.Current.EnlistVolatile(obtainAndReturnExecutablePathtransactional, EnlistmentOptions.None);
-                    obtainAndReturnExecutablePathtransactional.Obtain();
+                    obtainAndReturnExecutablePathtransactional.ObtainAndReturnExecutablePath();
 
                     failedStepAfterSuccessRestore();
                     t.Complete();
@@ -528,6 +517,18 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             catch (WebException)
             {
                 download(); // naive retry once more
+            }
+        }
+
+        private static ToolConfigurationAndExecutablePath RunInTransaction(ObtainTransaction obtainTransaction)
+        {
+            using (var t = new TransactionScope())
+            {
+                Transaction.Current.EnlistVolatile(obtainTransaction, EnlistmentOptions.None);
+                var toolConfigurationAndExecutablePath = obtainTransaction.ObtainAndReturnExecutablePath();
+
+                t.Complete();
+                return toolConfigurationAndExecutablePath;
             }
         }
 

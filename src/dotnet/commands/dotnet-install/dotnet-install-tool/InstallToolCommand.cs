@@ -92,7 +92,6 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             _reporter.WriteLine(
                 string.Format(LocalizableStrings.InstallationSucceeded, commandName));
 
-            
             return 0;
         }
 

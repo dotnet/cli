@@ -8,14 +8,7 @@ namespace Microsoft.DotNet.ToolPackage
 {
     internal interface IToolPackageObtainer
     {
-        ToolConfigurationAndExecutablePath ObtainAndReturnExecutablePath(
-            string packageId, 
-            string packageVersion = null, 
-            FilePath? nugetconfig = null, 
-            string targetframework = null,
-            string source = null);
-
-        ObtainTransaction ObtainAndReturnExecutablePathtransactional(
+        ObtainTransaction CreateObtainTransaction(
             string packageId,
             string packageVersion = null,
             FilePath? nugetconfig = null,
