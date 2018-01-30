@@ -80,12 +80,13 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             packageVersion = package.Version;
             targetframework = targetframework ?? "targetframework";
 
-            if (!_fileSystem.Directory.Exists(_fakeExecutableDirectory))
+            var stageDirectory = Path.Combine("toolPath", ".stage");
+            if (!_fileSystem.Directory.Exists(stageDirectory))
             {
-                _fileSystem.Directory.CreateDirectory(_fakeExecutableDirectory);
+                _fileSystem.Directory.CreateDirectory(stageDirectory);
             }
 
-            _fileSystem.File.CreateEmptyFile(Path.Combine("toolPath", ".stage","stagedfile"));
+            _fileSystem.File.CreateEmptyFile(Path.Combine(stageDirectory, "stagedfile"));
 
             return new ToolConfigurationAndExecutablePath(
                 toolConfiguration: new ToolConfiguration(FakeCommandName, FakeEntrypointName),
@@ -159,6 +160,11 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
 
         public void Commit(Enlistment enlistment)
         {
+            if (!_fileSystem.Directory.Exists(_fakeExecutableDirectory))
+            {
+                _fileSystem.Directory.CreateDirectory(_fakeExecutableDirectory);
+            }
+
             _fileSystem.File.CreateEmptyFile(Path.Combine(packageIdVersionDirectory, "project.assets.json"));
             _fileSystem.File.CreateEmptyFile(fakeExecutable);
         }

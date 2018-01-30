@@ -130,7 +130,9 @@ namespace Microsoft.DotNet.ToolPackage
 
             return new ToolConfigurationAndExecutablePath(
                 toolConfiguration,
-                toolDirectory.WithSubDirectories(
+                _toolsPath.WithSubDirectories(
+                        _packageId,
+                        _packageVersion,
                         _packageId,
                         _packageVersion)
                     .WithFile(entryPointFromLockFile.Path));
