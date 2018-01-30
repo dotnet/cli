@@ -18,7 +18,9 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
         public const string FakeCommandName = "SimulatorCommand";
         private static IFileSystem _fileSystem;
         private string _fakeExecutableDirectory;
+        private readonly string fakeExecutable;
         private List<MockFeed> _mockFeeds;
+        private readonly string packageIdVersionDirectory;
         private string packageId;
         private string packageVersion;
         private FilePath? nugetconfig;
@@ -33,7 +35,6 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             string source,
             Action beforeRunObtain,
             IFileSystem fileSystem,
-            string fakeExecutableDirectory,
             List<MockFeed> mockFeeds)
         {
             this.packageId = packageId;
@@ -44,8 +45,14 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
 
             _beforeRunObtain = beforeRunObtain;
             _fileSystem = fileSystem;
-            _fakeExecutableDirectory = fakeExecutableDirectory;
             _mockFeeds = mockFeeds;
+
+            packageIdVersionDirectory = Path.Combine("toolPath", packageId, packageVersion);
+
+            _fakeExecutableDirectory = Path.Combine(packageIdVersionDirectory,
+                packageId, packageVersion, "morefolders", "tools",
+                targetframework);
+            fakeExecutable = Path.Combine(_fakeExecutableDirectory, FakeEntrypointName);
         }
 
         public ToolConfigurationAndExecutablePath ObtainAndReturnExecutablePath(
@@ -73,20 +80,12 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             packageVersion = package.Version;
             targetframework = targetframework ?? "targetframework";
 
-            var packageIdVersionDirectory = Path.Combine("toolPath", packageId, packageVersion);
-
-            _fakeExecutableDirectory = Path.Combine(packageIdVersionDirectory,
-                packageId, packageVersion, "morefolders", "tools",
-                targetframework);
-            var fakeExecutable = Path.Combine(_fakeExecutableDirectory, FakeEntrypointName);
-
             if (!_fileSystem.Directory.Exists(_fakeExecutableDirectory))
             {
                 _fileSystem.Directory.CreateDirectory(_fakeExecutableDirectory);
             }
 
-            _fileSystem.File.CreateEmptyFile(Path.Combine(packageIdVersionDirectory, "project.assets.json"));
-            _fileSystem.File.CreateEmptyFile(fakeExecutable);
+            _fileSystem.File.CreateEmptyFile(Path.Combine("toolPath", ".stage","stagedfile"));
 
             return new ToolConfigurationAndExecutablePath(
                 toolConfiguration: new ToolConfiguration(FakeCommandName, FakeEntrypointName),
@@ -160,7 +159,8 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
 
         public void Commit(Enlistment enlistment)
         {
-            throw new NotImplementedException();
+            _fileSystem.File.CreateEmptyFile(Path.Combine(packageIdVersionDirectory, "project.assets.json"));
+            _fileSystem.File.CreateEmptyFile(fakeExecutable);
         }
 
         public void InDoubt(Enlistment enlistment)
@@ -170,12 +170,18 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
 
         public void Prepare(PreparingEnlistment preparingEnlistment)
         {
-            throw new NotImplementedException();
+            if (Directory.Exists(Path.Combine("toolPath", ".stage", packageId)))
+            {
+                preparingEnlistment.ForceRollback();
+                throw new PackageObtainException($"A tool with the same PackageId {packageId} existed."); // TODO loc no checkin
+            }
+
+            preparingEnlistment.Prepared();
         }
 
         public void Rollback(Enlistment enlistment)
         {
-            throw new NotImplementedException();
+            _fileSystem.File.Delete(Path.Combine("toolPath", ".stage", "stagedfile"));
         }
     }
 }

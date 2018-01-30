@@ -12,7 +12,6 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
     {
         private readonly Action _beforeRunObtain;
         private static IFileSystem _fileSystem;
-        private string _fakeExecutableDirectory;
         private List<MockFeed> _mockFeeds;
 
         public ToolPackageObtainerMock(
@@ -61,7 +60,6 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                 source,
                 _beforeRunObtain,
                 _fileSystem,
-                _fakeExecutableDirectory,
                 _mockFeeds);
         }
     }
