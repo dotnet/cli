@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.ToolPackage
             string targetframework = null,
             string source = null);
 
-        ObtainAndReturnExecutablePathtransactional ObtainAndReturnExecutablePathtransactional(
+        ObtainTransaction ObtainAndReturnExecutablePathtransactional(
             string packageId,
             string packageVersion = null,
             FilePath? nugetconfig = null,

@@ -126,14 +126,14 @@ namespace Microsoft.DotNet.ToolPackage
                     .WithFile(entryPointFromLockFile.Path));
         }
 
-        public ObtainAndReturnExecutablePathtransactional ObtainAndReturnExecutablePathtransactional(
+        public ObtainTransaction ObtainAndReturnExecutablePathtransactional(
             string packageId,
             string packageVersion = null,
             FilePath? nugetconfig = null,
             string targetframework = null,
             string source = null)
         {
-            return new ObtainAndReturnExecutablePathtransactional(packageId, 
+            return new ObtainTransaction(packageId, 
                 packageVersion, 
                 nugetconfig, 
                 targetframework,

@@ -11,13 +11,14 @@ using System.Transactions;
 
 namespace Microsoft.DotNet.ToolPackage
 {
-    internal class ObtainAndReturnExecutablePathtransactional: IEnlistmentNotification
+    internal class ObtainTransaction: IEnlistmentNotification
     {
-        private string packageId;
-        private string packageVersion;
-        private FilePath? nugetconfig;
-        private string targetframework;
-        private string source;
+        private string _packageId;
+        private string _packageVersion;
+        private FilePath? _nugetconfig;
+        private string _targetframework;
+        private string _source;
+
         private Lazy<string> _bundledTargetFrameworkMoniker;
         private Func<FilePath> _getTempProjectPath;
         private IProjectRestorer _projectRestorer;
@@ -25,7 +26,7 @@ namespace Microsoft.DotNet.ToolPackage
         private DirectoryPath _offlineFeedPath;
         private DirectoryPath _stageDirectory;
 
-        public ObtainAndReturnExecutablePathtransactional(
+        public ObtainTransaction(
             string packageId,
             string packageVersion,
             FilePath? nugetconfig,
@@ -37,11 +38,11 @@ namespace Microsoft.DotNet.ToolPackage
             DirectoryPath toolsPath,
             DirectoryPath offlineFeedPath)
         {
-            this.packageId = packageId;
-            this.packageVersion = packageVersion;
-            this.nugetconfig = nugetconfig;
-            this.targetframework = targetframework;
-            this.source = source;
+            _packageId = packageId;
+            _packageVersion = packageVersion;
+            _nugetconfig = nugetconfig;
+            _targetframework = targetframework;
+            _source = source;
 
             _bundledTargetFrameworkMoniker = bundledTargetFrameworkMoniker;
             _getTempProjectPath = getTempProjectPath;
@@ -51,112 +52,107 @@ namespace Microsoft.DotNet.ToolPackage
             _stageDirectory = _toolsPath.WithSubDirectories(".stage", Path.GetRandomFileName());
         }
 
-        private DirectoryPath StageDirectory => _toolsPath.WithSubDirectories(".stage", Path.GetRandomFileName());
-
         public ToolConfigurationAndExecutablePath Obtain()
         {
-            if (packageId == null)
+            if (_packageId == null)
             {
-                throw new ArgumentNullException(nameof(packageId));
+                throw new ArgumentNullException(nameof(_packageId));
             }
 
-            if (nugetconfig != null)
+            if (_nugetconfig != null)
             {
-                if (!File.Exists(nugetconfig.Value.Value))
+                if (!File.Exists(_nugetconfig.Value.Value))
                 {
                     throw new PackageObtainException(
                         string.Format(CommonLocalizableStrings.NuGetConfigurationFileDoesNotExist,
-                            Path.GetFullPath(nugetconfig.Value.Value)));
+                            Path.GetFullPath(_nugetconfig.Value.Value)));
                 }
             }
 
-            if (targetframework == null)
+            if (_targetframework == null)
             {
-                targetframework = _bundledTargetFrameworkMoniker.Value;
+                _targetframework = _bundledTargetFrameworkMoniker.Value;
             }
 
-            var packageVersionOrPlaceHolder = new PackageVersion(packageVersion);
+            var packageVersionOrPlaceHolder = new PackageVersion(_packageVersion);
 
             DirectoryPath toolDirectory =
-                CreateIndividualToolVersionDirectory(packageId, packageVersionOrPlaceHolder);
+                CreateIndividualToolVersionDirectory(packageVersionOrPlaceHolder);
 
             FilePath tempProjectPath = CreateTempProject(
-                packageId,
                 packageVersionOrPlaceHolder,
-                targetframework,
                 toolDirectory);
 
-            _projectRestorer.Restore(tempProjectPath, toolDirectory, nugetconfig, source);
+            _projectRestorer.Restore(tempProjectPath, toolDirectory, _nugetconfig, _source);
 
             if (packageVersionOrPlaceHolder.IsPlaceholder)
             {
                 var concreteVersion =
                     new DirectoryInfo(
                         Directory.GetDirectories(
-                            toolDirectory.WithSubDirectories(packageId).Value).Single()).Name;
+                            toolDirectory.WithSubDirectories(_packageId).Value).Single()).Name;
                 DirectoryPath versioned =
                     toolDirectory.GetParentPath().WithSubDirectories(concreteVersion);
 
                 MoveToVersionedDirectory(versioned, toolDirectory);
 
                 toolDirectory = versioned;
-                packageVersion = concreteVersion;
+                _packageVersion = concreteVersion;
             }
 
             LockFile lockFile = new LockFileFormat()
                 .ReadWithLock(toolDirectory.WithFile("project.assets.json").Value)
                 .Result;
 
-            LockFileItem dotnetToolSettings = FindAssetInLockFile(lockFile, "DotnetToolSettings.xml", packageId);
+            LockFileItem dotnetToolSettings = FindAssetInLockFile(lockFile, "DotnetToolSettings.xml");
 
             if (dotnetToolSettings == null)
             {
                 throw new PackageObtainException(
-                    string.Format(CommonLocalizableStrings.ToolPackageMissingSettingsFile, packageId));
+                    string.Format(CommonLocalizableStrings.ToolPackageMissingSettingsFile, _packageId));
             }
 
             FilePath toolConfigurationPath =
                 toolDirectory
-                    .WithSubDirectories(packageId, packageVersion)
+                    .WithSubDirectories(_packageId, _packageVersion)
                     .WithFile(dotnetToolSettings.Path);
 
             ToolConfiguration toolConfiguration =
                 ToolConfigurationDeserializer.Deserialize(toolConfigurationPath.Value);
 
             var entryPointFromLockFile =
-                FindAssetInLockFile(lockFile, toolConfiguration.ToolAssemblyEntryPoint, packageId);
+                FindAssetInLockFile(lockFile, toolConfiguration.ToolAssemblyEntryPoint);
 
             if (entryPointFromLockFile == null)
             {
                 throw new PackageObtainException(string.Format(CommonLocalizableStrings.ToolPackageMissingEntryPointFile,
-                    packageId, toolConfiguration.ToolAssemblyEntryPoint));
+                    _packageId, toolConfiguration.ToolAssemblyEntryPoint));
             }
 
             return new ToolConfigurationAndExecutablePath(
                 toolConfiguration,
                 toolDirectory.WithSubDirectories(
-                        packageId,
-                        packageVersion)
+                        _packageId,
+                        _packageVersion)
                     .WithFile(entryPointFromLockFile.Path));
         }
 
         private DirectoryPath CreateIndividualToolVersionDirectory(
-            string packageId,
             PackageVersion packageVersion)
         {
-            DirectoryPath individualTool = _stageDirectory.WithSubDirectories(packageId);
+            DirectoryPath individualTool = _stageDirectory.WithSubDirectories(_packageId);
             DirectoryPath individualToolVersion = individualTool.WithSubDirectories(packageVersion.Value);
             EnsureDirectoryExists(individualToolVersion);
             return individualToolVersion;
         }
 
-        private static LockFileItem FindAssetInLockFile(
+        private LockFileItem FindAssetInLockFile(
          LockFile lockFile,
-         string targetRelativeFilePath, string packageId)
+         string targetRelativeFilePath)
         {
             return lockFile
                 .Targets?.SingleOrDefault(t => t.RuntimeIdentifier != null)
-                ?.Libraries?.SingleOrDefault(l => l.Name == packageId)
+                ?.Libraries?.SingleOrDefault(l => l.Name == _packageId)
                 ?.ToolsAssemblies
                 ?.SingleOrDefault(t => LockFileMatcher.MatchesFile(t, targetRelativeFilePath));
         }
@@ -174,9 +170,7 @@ namespace Microsoft.DotNet.ToolPackage
         }
 
         private FilePath CreateTempProject(
-            string packageId,
             PackageVersion packageVersion,
-            string targetframework,
             DirectoryPath individualToolVersion)
         {
             FilePath tempProjectPath = _getTempProjectPath();
@@ -190,7 +184,7 @@ namespace Microsoft.DotNet.ToolPackage
                 new XElement("Project",
                     new XAttribute("Sdk", "Microsoft.NET.Sdk"),
                     new XElement("PropertyGroup",
-                        new XElement("TargetFramework", targetframework),
+                        new XElement("TargetFramework", _targetframework),
                         new XElement("RestorePackagesPath", individualToolVersion.Value), // tool package will restore to tool folder
                         new XElement("RestoreProjectStyle", "DotnetToolReference"), // without it, project cannot reference tool package
                         new XElement("RestoreRootConfigDirectory", Directory.GetCurrentDirectory()), // config file probing start directory
@@ -203,7 +197,7 @@ namespace Microsoft.DotNet.ToolPackage
                         new XElement("DisableImplicitNuGetFallbackFolder", "true")),  // disable SDK side implicit NuGetFallbackFolder
                      new XElement("ItemGroup",
                         new XElement("PackageReference",
-                            new XAttribute("Include", packageId),
+                            new XAttribute("Include", _packageId),
                             new XAttribute("Version", packageVersion.IsConcreteValue ? packageVersion.Value : "*") // nuget will restore * for latest
                             ))
                         ));
@@ -225,8 +219,8 @@ namespace Microsoft.DotNet.ToolPackage
         public void Commit(Enlistment enlistment)
         {
             Directory.Move(
-                _stageDirectory.WithSubDirectories(packageId).Value,
-                _toolsPath.WithSubDirectories(packageId).Value);
+                _stageDirectory.WithSubDirectories(_packageId).Value,
+                _toolsPath.WithSubDirectories(_packageId).Value);
 
             Directory.Delete(_stageDirectory.Value, true);
         }
@@ -238,7 +232,7 @@ namespace Microsoft.DotNet.ToolPackage
 
         public void Prepare(PreparingEnlistment preparingEnlistment)
         {
-            if (Directory.Exists(_toolsPath.WithSubDirectories(packageId).Value))
+            if (Directory.Exists(_toolsPath.WithSubDirectories(_packageId).Value))
             {
                 preparingEnlistment.ForceRollback();
                 throw new PackageObtainException("A tool with the same name existed."); // TODO loc no checkin
