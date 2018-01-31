@@ -110,25 +110,5 @@ namespace Microsoft.DotNet.ShellShim
                         result.StdOut));
             }
         }
-
-        public void Commit(Enlistment enlistment)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void InDoubt(Enlistment enlistment)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Prepare(PreparingEnlistment preparingEnlistment)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Rollback(Enlistment enlistment)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

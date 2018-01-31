@@ -3,7 +3,7 @@ using System.Transactions;
 
 namespace Microsoft.DotNet.ToolPackage
 {
-    internal class ObtainTransaction : IObtainTransaction
+    internal class ObtainTransaction : IEnlistmentNotification
     {
         private readonly Func<ToolConfigurationAndExecutablePath> _obtainAndReturnExecutablePath;
         private readonly Action _commit;

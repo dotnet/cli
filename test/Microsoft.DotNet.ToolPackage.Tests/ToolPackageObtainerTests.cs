@@ -535,7 +535,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             }
         }
 
-        private static ToolConfigurationAndExecutablePath RunInTransaction(IObtainTransaction obtainTransaction)
+        private static ToolConfigurationAndExecutablePath RunInTransaction(ObtainTransaction obtainTransaction)
         {
             using (var t = new TransactionScope())
             {

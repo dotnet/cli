@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.ToolPackage
             _stageDirectory = _toolsPath.WithSubDirectories(".stage", Path.GetRandomFileName());
         }
 
-        public IObtainTransaction CreateObtainTransaction(
+        public ObtainTransaction CreateObtainTransaction(
             string packageId,
             string packageVersion = null,
             FilePath? nugetconfig = null,

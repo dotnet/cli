@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             _stagedFile = Path.Combine(_toolsPath, ".stage", "stagedfile");
         }
 
-        public IObtainTransaction CreateObtainTransaction(
+        public ObtainTransaction CreateObtainTransaction(
             string packageId,
             string packageVersion = null,
             FilePath? nugetconfig = null,
