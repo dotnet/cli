@@ -406,6 +406,11 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
         private static void AssertRollBack(string toolsPath)
         {
+            if (!Directory.Exists(toolsPath))
+            {
+                return; // nothing at all
+            }
+
             Directory.GetFiles(toolsPath).Should().BeEmpty();
             Directory.GetDirectories(toolsPath)
                 .Should().NotContain(d => !new DirectoryInfo(d).Name.Equals(".stage"),

@@ -20,6 +20,7 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
         private string _fakeExecutableDirectory;
         private List<MockFeed> _mockFeeds;
         private string _packageIdVersionDirectory;
+        private readonly string _stagedFile;
 
         public ToolPackageObtainerMock(
             IFileSystem fileSystemWrapper = null,
@@ -53,25 +54,27 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             {
                 _mockFeeds.AddRange(additionalFeeds);
             }
+
+            _stagedFile = Path.Combine(_toolsPath, ".stage", "stagedfile");
         }
-        
+
         public IObtainTransaction CreateObtainTransaction(
-            string packageId, 
-            string packageVersion = null, 
+            string packageId,
+            string packageVersion = null,
             FilePath? nugetconfig = null,
-            string targetframework = null, 
+            string targetframework = null,
             string source = null)
         {
             return new ObtainTransaction(
                 obtainAndReturnExecutablePath: () => ObtainAndReturnExecutablePath(
-                    packageId, 
+                    packageId,
                     packageVersion,
                     nugetconfig,
-                    targetframework, 
-                    source), 
+                    targetframework,
+                    source),
                 commit: () =>
                 {
-                    _fileSystem.File.Delete(Path.Combine(_toolsPath, ".stage", "stagedfile"));
+                    _fileSystem.File.Delete(_stagedFile);
 
                     if (!_fileSystem.Directory.Exists(_fakeExecutableDirectory))
                     {
@@ -95,7 +98,10 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                 },
                 rollback: () =>
                 {
-                    _fileSystem.File.Delete(Path.Combine(_toolsPath, ".stage", "stagedfile"));
+                    if (_fileSystem.File.Exists(_stagedFile))
+                    {
+                        _fileSystem.File.Delete(_stagedFile);
+                    }
                 }
             );
         }
