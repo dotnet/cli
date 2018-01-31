@@ -44,13 +44,13 @@ namespace Microsoft.DotNet.ToolPackage
             string source = null)
         {
             return new ObtainTransaction(
-                ObtainAndReturnExecutablePath: () => ObtainAndReturnExecutablePath(
+                obtainAndReturnExecutablePath: () => ObtainAndReturnExecutablePath(
                     packageId,
                     packageVersion,
                     nugetconfig,
                     targetframework,
                     source),
-                Commit: () =>
+                commit: () =>
                 {
                     Directory.Move(
                         _stageDirectory.WithSubDirectories(packageId).Value,
@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.ToolPackage
 
                     Directory.Delete(_stageDirectory.Value, true);
                 },
-                Prepare: preparingEnlistment =>
+                prepare: preparingEnlistment =>
                 {
                     if (Directory.Exists(_toolsPath.WithSubDirectories(packageId).Value))
                     {
@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.ToolPackage
 
                     preparingEnlistment.Prepared();
                 },
-                Rollback: () =>
+                rollback: () =>
                 {
                     if (Directory.Exists(_stageDirectory.Value))
                     {

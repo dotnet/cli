@@ -5,22 +5,22 @@ namespace Microsoft.DotNet.ToolPackage
 {
     internal class ObtainTransaction : IObtainTransaction
     {
-        private readonly Action _rollback;
-        private readonly Action<PreparingEnlistment> _prepare;
-        private readonly Action _commit;
         private readonly Func<ToolConfigurationAndExecutablePath> _obtainAndReturnExecutablePath;
+        private readonly Action _commit;
+        private readonly Action<PreparingEnlistment> _prepare;
+        private readonly Action _rollback;
 
         internal ObtainTransaction(
-            Func<ToolConfigurationAndExecutablePath> ObtainAndReturnExecutablePath,
-            Action Commit,
-            Action<PreparingEnlistment> Prepare,
-            Action Rollback)
+            Func<ToolConfigurationAndExecutablePath> obtainAndReturnExecutablePath,
+            Action commit,
+            Action<PreparingEnlistment> prepare,
+            Action rollback)
         {
-            _obtainAndReturnExecutablePath = ObtainAndReturnExecutablePath ??
-                                             throw new ArgumentNullException(nameof(ObtainAndReturnExecutablePath));
-            _commit = Commit ?? throw new ArgumentNullException(nameof(Commit));
-            _prepare = Prepare ?? throw new ArgumentNullException(nameof(Prepare));
-            _rollback = Rollback ?? throw new ArgumentNullException(nameof(Rollback));
+            _obtainAndReturnExecutablePath = obtainAndReturnExecutablePath ??
+                                             throw new ArgumentNullException(nameof(obtainAndReturnExecutablePath));
+            _commit = commit ?? throw new ArgumentNullException(nameof(commit));
+            _prepare = prepare ?? throw new ArgumentNullException(nameof(prepare));
+            _rollback = rollback ?? throw new ArgumentNullException(nameof(rollback));
         }
 
         public ToolConfigurationAndExecutablePath ObtainAndReturnExecutablePath()
