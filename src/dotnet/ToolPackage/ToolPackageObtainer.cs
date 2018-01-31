@@ -159,14 +159,15 @@ namespace Microsoft.DotNet.ToolPackage
 
             if (entryPointFromLockFile == null)
             {
-                throw new PackageObtainException(string.Format(
-                    CommonLocalizableStrings.ToolPackageMissingEntryPointFile,
+                throw new PackageObtainException(string.Format(CommonLocalizableStrings.ToolPackageMissingEntryPointFile,
                     packageId, toolConfiguration.ToolAssemblyEntryPoint));
             }
 
             return new ToolConfigurationAndExecutablePath(
                 toolConfiguration,
-                toolDirectory.WithSubDirectories(
+                _toolsPath.WithSubDirectories(
+                        packageId,
+                        packageVersion,
                         packageId,
                         packageVersion)
                     .WithFile(entryPointFromLockFile.Path));
@@ -213,31 +214,23 @@ namespace Microsoft.DotNet.ToolPackage
                     new XAttribute("Sdk", "Microsoft.NET.Sdk"),
                     new XElement("PropertyGroup",
                         new XElement("TargetFramework", targetframework),
-                        new XElement("RestorePackagesPath",
-                            individualToolVersion.Value), // tool package will restore to tool folder
-                        new XElement("RestoreProjectStyle",
-                            "DotnetToolReference"), // without it, project cannot reference tool package
-                        new XElement("RestoreRootConfigDirectory",
-                            Directory.GetCurrentDirectory()), // config file probing start directory
-                        new XElement("DisableImplicitFrameworkReferences",
-                            "true"), // no Microsoft.NETCore.App in tool folder
-                        new XElement("RestoreFallbackFolders",
-                            "clear"), // do not use fallbackfolder, tool package need to be copied to tool folder
+                        new XElement("RestorePackagesPath", individualToolVersion.Value), // tool package will restore to tool folder
+                        new XElement("RestoreProjectStyle", "DotnetToolReference"), // without it, project cannot reference tool package
+                        new XElement("RestoreRootConfigDirectory", Directory.GetCurrentDirectory()), // config file probing start directory
+                        new XElement("DisableImplicitFrameworkReferences", "true"), // no Microsoft.NETCore.App in tool folder
+                        new XElement("RestoreFallbackFolders", "clear"), // do not use fallbackfolder, tool package need to be copied to tool folder
                         new XElement("RestoreAdditionalProjectSources", // use fallbackfolder as feed to enable offline
                             Directory.Exists(_offlineFeedPath.Value) ? _offlineFeedPath.Value : string.Empty),
                         new XElement("RestoreAdditionalProjectFallbackFolders", string.Empty), // block other
-                        new XElement("RestoreAdditionalProjectFallbackFoldersExcludes", string.Empty), // block other
-                        new XElement("DisableImplicitNuGetFallbackFolder",
-                            "true")), // disable SDK side implicit NuGetFallbackFolder
+                        new XElement("RestoreAdditionalProjectFallbackFoldersExcludes", string.Empty),  // block other
+                        new XElement("DisableImplicitNuGetFallbackFolder", "true")),  // disable SDK side implicit NuGetFallbackFolder
                     new XElement("ItemGroup",
                         new XElement("PackageReference",
                             new XAttribute("Include", packageId),
-                            new XAttribute("Version",
-                                packageVersion.IsConcreteValue
-                                    ? packageVersion.Value
-                                    : "*") // nuget will restore * for latest
+                            new XAttribute("Version", packageVersion.IsConcreteValue ? packageVersion.Value : "*") // nuget will restore * for latest
                         ))
                 ));
+
 
             File.WriteAllText(tempProjectPath.Value,
                 tempProjectContent.ToString());
