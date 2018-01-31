@@ -319,13 +319,17 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             DownloadPlatformsPackage();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
-            var packageObtainer = ConstructDefaultPackageObtainer(toolsPath, testMockBehaviorIsInSync);
+            var packageObtainer = ConstructDefaultPackageObtainer(
+                toolsPath,
+                testMockBehaviorIsInSync,
+                addSourceFeedWithFilePath: GetTestLocalFeedPath());
             var obtainTransaction =
                 packageObtainer.CreateObtainTransaction(
-                packageId: TestPackageId,
-                packageVersion: TestPackageVersion,
-                targetframework: _testTargetframework,
-                source:GetTestLocalFeedPath());
+                    packageId: TestPackageId,
+                    packageVersion: TestPackageVersion,
+                    targetframework: _testTargetframework,
+                    source: GetTestLocalFeedPath());
+
             var toolConfigurationAndExecutablePath = RunInTransaction(obtainTransaction);
 
             var executable = toolConfigurationAndExecutablePath.Executable;
@@ -465,7 +469,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                         {
                             new MockFeed
                             {
-                                Type = MockFeedType.ExplicitNugetConfig,
+                                Type = MockFeedType.Source,
                                 Uri = addSourceFeedWithFilePath,
                                 Packages = new List<MockFeedPackage>
                                 {
