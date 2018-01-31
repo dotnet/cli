@@ -172,7 +172,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             IToolPackageObtainer packageObtainer;
             if (testMockBehaviorIsInSync)
             {
-                packageObtainer = new ToolPackageObtainerMock();
+                packageObtainer = new ToolPackageObtainerMock(toolsPath: toolsPath);
             }
             else
             {
@@ -254,7 +254,8 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                                 }
                             }
                         }
-                    });
+                    }, 
+                    toolsPath: toolsPath);
             }
             else
             {
@@ -445,7 +446,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                                     }
                                 }
                             }
-                        });
+                        }, toolsPath: toolsPath);
                 }
 
                 if (addSourceFeedWithFilePath != null)
@@ -466,10 +467,11 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                                     }
                                 }
                             }
-                        });
+                        },
+                        toolsPath: toolsPath);
                 }
 
-                return new ToolPackageObtainerMock();
+                return new ToolPackageObtainerMock(toolsPath: toolsPath);
             }
 
             return new ToolPackageObtainer(

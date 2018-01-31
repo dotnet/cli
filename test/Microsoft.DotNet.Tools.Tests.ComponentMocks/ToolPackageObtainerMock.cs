@@ -12,6 +12,7 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
 {
     internal class ToolPackageObtainerMock : IToolPackageObtainer
     {
+        private readonly string _toolsPath;
         public const string FakeEntrypointName = "SimulatorEntryPoint.dll";
         public const string FakeCommandName = "SimulatorCommand";
         private readonly Action _beforeRunObtain;
@@ -24,8 +25,10 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             IFileSystem fileSystemWrapper = null,
             bool useDefaultFeed = true,
             IEnumerable<MockFeed> additionalFeeds = null,
-            Action beforeRunObtain = null)
+            Action beforeRunObtain = null,
+            string toolsPath = null)
         {
+            _toolsPath = toolsPath ?? "toolsPath";
             _beforeRunObtain = beforeRunObtain ?? (() => { });
             _fileSystem = fileSystemWrapper ?? new FileSystemWrapper();
             _mockFeeds = new List<MockFeed>();
@@ -68,7 +71,7 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                     source), 
                 commit: () =>
                 {
-                    _fileSystem.File.Delete(Path.Combine("toolPath", ".stage", "stagedfile"));
+                    _fileSystem.File.Delete(Path.Combine(_toolsPath, ".stage", "stagedfile"));
 
                     if (!_fileSystem.Directory.Exists(_fakeExecutableDirectory))
                     {
@@ -81,18 +84,18 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                 },
                 prepare: preparingEnlistment =>
                 {
-                    if (Directory.Exists(Path.Combine("toolPath", packageId)))
+                    if (Directory.Exists(Path.Combine(_toolsPath, packageId)))
                     {
                         preparingEnlistment.ForceRollback();
                         throw new PackageObtainException(
-                            $"A tool with the same PackageId {packageId} {Path.GetFullPath(Path.Combine("toolPath", packageId))} existed."); // TODO loc no checkin
+                            $"A tool with the same PackageId {packageId} {Path.GetFullPath(Path.Combine(_toolsPath, packageId))} existed."); // TODO loc no checkin
                     }
 
                     preparingEnlistment.Prepared();
                 },
                 rollback: () =>
                 {
-                    _fileSystem.File.Delete(Path.Combine("toolPath", ".stage", "stagedfile"));
+                    _fileSystem.File.Delete(Path.Combine(_toolsPath, ".stage", "stagedfile"));
                 }
             );
         }
@@ -122,7 +125,7 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             packageVersion = package.Version;
             targetframework = targetframework ?? "targetframework";
 
-            _packageIdVersionDirectory = Path.Combine("toolPath", packageId, packageVersion);
+            _packageIdVersionDirectory = Path.Combine(_toolsPath, packageId, packageVersion);
 
             _fakeExecutableDirectory = Path.Combine(_packageIdVersionDirectory,
                 packageId, packageVersion, "morefolders", "tools",
@@ -137,9 +140,9 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                 executable: new FilePath(fakeExecutable));
         }
 
-        private static void SimulateStageFile()
+        private void SimulateStageFile()
         {
-            var stageDirectory = Path.Combine("toolPath", ".stage");
+            var stageDirectory = Path.Combine(_toolsPath, ".stage");
             if (!_fileSystem.Directory.Exists(stageDirectory))
             {
                 _fileSystem.Directory.CreateDirectory(stageDirectory);
