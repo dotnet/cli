@@ -68,12 +68,7 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             fakeExecutable = Path.Combine(_fakeExecutableDirectory, FakeEntrypointName);
         }
 
-        public ToolConfigurationAndExecutablePath ObtainAndReturnExecutablePath(
-            string packageId,
-            string packageVersion = null,
-            FilePath? nugetconfig = null,
-            string targetframework = null,
-            string source = null)
+        public ToolConfigurationAndExecutablePath ObtainAndReturnExecutablePath()
         {
             _beforeRunObtain();
 
@@ -151,11 +146,6 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                 return p.PackageId == packageId;
             }
             return p.PackageId == packageId && p.Version == packageVersion;
-        }
-
-        public ToolConfigurationAndExecutablePath ObtainAndReturnExecutablePath()
-        {
-            throw new NotImplementedException();
         }
 
         public void Commit(Enlistment enlistment)
