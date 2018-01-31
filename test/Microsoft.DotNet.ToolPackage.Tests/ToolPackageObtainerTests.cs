@@ -319,7 +319,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             DownloadPlatformsPackage();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
-            var packageObtainer = ConstructDefaultPackageObtainer(toolsPath);
+            var packageObtainer = ConstructDefaultPackageObtainer(toolsPath, testMockBehaviorIsInSync);
             var obtainTransaction =
                 packageObtainer.CreateObtainTransaction(
                 packageId: TestPackageId,
@@ -337,12 +337,14 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             File.Delete(executable.Value);
         }
 
-        [Fact]
-        public void GivenFailedRestoreItCanRollBack()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void GivenFailedRestoreItCanRollBack(bool testMockBehaviorIsInSync)
         {
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
-            var packageObtainer = ConstructDefaultPackageObtainer(toolsPath);
+            var packageObtainer = ConstructDefaultPackageObtainer(toolsPath, testMockBehaviorIsInSync);
 
             var obtainAndReturnExecutablePathtransactional = packageObtainer.CreateObtainTransaction(
                     packageId: "non exist package id",
@@ -366,20 +368,22 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             AssertRollBack(toolsPath);
         }
 
-        [Fact] // todo so simulator
-        public void GiveSucessRestoreButFailedOnNextStepItCanRollBack()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void GiveSucessRestoreButFailedOnNextStepItCanRollBack(bool testMockBehaviorIsInSync)
         {
             FilePath nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
-            var packageObtainer = ConstructDefaultPackageObtainer(toolsPath);
+            var packageObtainer = ConstructDefaultPackageObtainer(toolsPath, testMockBehaviorIsInSync);
 
             var obtainAndReturnExecutablePathtransactional = packageObtainer.CreateObtainTransaction(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
                     targetframework: _testTargetframework);
 
-            void failedStepAfterSuccessRestore() => throw new GracefulException("simulated error");
+            void FailedStepAfterSuccessRestore() => throw new GracefulException("simulated error");
 
             try
             {
@@ -388,7 +392,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                     Transaction.Current.EnlistVolatile(obtainAndReturnExecutablePathtransactional, EnlistmentOptions.None);
                     obtainAndReturnExecutablePathtransactional.ObtainAndReturnExecutablePath();
 
-                    failedStepAfterSuccessRestore();
+                    FailedStepAfterSuccessRestore();
                     t.Complete();
                 }
             }
