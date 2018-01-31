@@ -60,15 +60,12 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             string source = null)
         {
             return new ObtainTransaction(
-                obtainAndReturnExecutablePath: () =>
-                {
-                    return ObtainAndReturnExecutablePath(
-                        packageId, 
-                        packageVersion,
-                        nugetconfig,
-                        targetframework, 
-                        source);
-                }, 
+                obtainAndReturnExecutablePath: () => ObtainAndReturnExecutablePath(
+                    packageId, 
+                    packageVersion,
+                    nugetconfig,
+                    targetframework, 
+                    source), 
                 commit: () =>
                 {
                     _fileSystem.File.Delete(Path.Combine("toolPath", ".stage", "stagedfile"));
@@ -88,7 +85,7 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                     {
                         preparingEnlistment.ForceRollback();
                         throw new PackageObtainException(
-                            $"A tool with the same PackageId {packageId} existed."); // TODO loc no checkin
+                            $"A tool with the same PackageId {packageId} {Path.GetFullPath(Path.Combine("toolPath", packageId))} existed."); // TODO loc no checkin
                     }
 
                     preparingEnlistment.Prepared();
@@ -131,13 +128,9 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                 packageId, packageVersion, "morefolders", "tools",
                 targetframework);
 
-            var fakeExecutable = Path.Combine(_fakeExecutableDirectory, FakeEntrypointName);
-
-
-            _fileSystem.File.CreateEmptyFile(Path.Combine(_packageIdVersionDirectory, "project.assets.json"));
-            _fileSystem.File.CreateEmptyFile(fakeExecutable);
-
             SimulateStageFile();
+
+            var fakeExecutable = Path.Combine(_fakeExecutableDirectory, FakeEntrypointName);
 
             return new ToolConfigurationAndExecutablePath(
                 toolConfiguration: new ToolConfiguration(FakeCommandName, FakeEntrypointName),
