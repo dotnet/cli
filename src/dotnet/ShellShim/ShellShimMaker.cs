@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Transactions;
 using System.Xml.Linq;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools;
@@ -113,6 +114,26 @@ namespace Microsoft.DotNet.ShellShim
                     string.Format(CommonLocalizableStrings.FailInstallToolPermission, result.StdErr,
                         result.StdOut));
             }
+        }
+
+        public void Commit(Enlistment enlistment)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void InDoubt(Enlistment enlistment)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Prepare(PreparingEnlistment preparingEnlistment)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Rollback(Enlistment enlistment)
+        {
+            throw new NotImplementedException();
         }
     }
 }

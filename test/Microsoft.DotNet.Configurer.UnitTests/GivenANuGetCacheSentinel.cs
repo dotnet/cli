@@ -256,6 +256,11 @@ namespace Microsoft.DotNet.Configurer.UnitTests
             {
                 throw new NotImplementedException();
             }
+
+            public void Delete(string path)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         private class MockStream : MemoryStream

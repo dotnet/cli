@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Transactions;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ShellShim;
 using Microsoft.Extensions.EnvironmentAbstractions;
@@ -21,6 +22,11 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                 pathToPlaceShim ?? throw new ArgumentNullException(nameof(pathToPlaceShim));
 
             _fileSystem = fileSystem ?? new FileSystemWrapper();
+        }
+
+        public void Commit(Enlistment enlistment)
+        {
+            throw new NotImplementedException();
         }
 
         public void CreateShim(FilePath packageExecutable, string shellCommandName)
@@ -44,6 +50,21 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                     string.Format(CommonLocalizableStrings.FailInstallToolSameName,
                         shellCommandName));
             }
+        }
+
+        public void InDoubt(Enlistment enlistment)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Prepare(PreparingEnlistment preparingEnlistment)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Rollback(Enlistment enlistment)
+        {
+            throw new NotImplementedException();
         }
 
         public class FakeShim
