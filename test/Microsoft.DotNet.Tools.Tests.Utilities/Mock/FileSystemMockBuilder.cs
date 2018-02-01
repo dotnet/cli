@@ -106,6 +106,16 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             {
                 _files[path] = content;
             }
+
+            public void Delete(string path)
+            {
+                if (!Exists(path))
+                {
+                    return;
+                }
+
+                _files.Remove(path);
+            }
         }
 
         private class DirectoryMock : IDirectory
