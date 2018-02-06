@@ -2,13 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Transactions;
 using System.Xml.Linq;
-using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools;
 using Microsoft.Extensions.EnvironmentAbstractions;
@@ -24,38 +24,38 @@ namespace Microsoft.DotNet.ShellShim
 
         public ShellShimMaker(string pathToPlaceShim)
         {
-            _pathToPlaceShim =
-                pathToPlaceShim ??
-                throw new ArgumentNullException(nameof(pathToPlaceShim));
+            _pathToPlaceShim = pathToPlaceShim ?? throw new ArgumentNullException(nameof(pathToPlaceShim));
         }
 
         public void CreateShim(FilePath packageExecutable, string shellCommandName)
         {
-            var resourceManager = new TransactionResourceManager(
-                commit: () => { PlaceShim(packageExecutable, shellCommandName); },
-                prepare: preparingEnlistment =>
+            var createShimTransaction = new CreateShimTransaction(
+                createShim: locationOfShimDuringTransaction =>
                 {
                     EnsureCommandNameUniqueness(shellCommandName);
-
-                    preparingEnlistment.Prepared();
+                    PlaceShim(packageExecutable, shellCommandName, locationOfShimDuringTransaction);
+                },
+                rollback: locationOfShimDuringTransaction =>
+                {
+                    foreach (FilePath f in locationOfShimDuringTransaction)
+                    {
+                        if (File.Exists(f.Value))
+                        {
+                            File.Delete(f.Value);
+                        }
+                    }
                 });
 
-            if (Transaction.Current != null)
+            using (var transactionScope = new TransactionScope())
             {
-                Transaction.Current.EnlistVolatile(resourceManager, EnlistmentOptions.None);
-            }
-            else
-            {
-                using (var transactionScope = new TransactionScope())
-                {
-                    Transaction.Current.EnlistVolatile(resourceManager, EnlistmentOptions.None);
+                Transaction.Current.EnlistVolatile(createShimTransaction, EnlistmentOptions.None);
+                createShimTransaction.CreateShim();
 
-                    transactionScope.Complete();
-                }
+                transactionScope.Complete();
             }
         }
 
-        private void PlaceShim(FilePath packageExecutable, string shellCommandName)
+        private void PlaceShim(FilePath packageExecutable, string shellCommandName, List<FilePath> locationOfShimDuringTransaction)
         {
             FilePath shimPath = GetShimPath(shellCommandName);
 
@@ -66,15 +66,20 @@ namespace Microsoft.DotNet.ShellShim
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
+                FilePath windowsConfig = GetWindowsConfigPath(shellCommandName);
                 CreateConfigFile(
-                    GetWindowsConfigPath(shellCommandName),
+                    windowsConfig,
                     entryPoint: packageExecutable,
                     runner: "dotnet");
+
+                locationOfShimDuringTransaction.Add(windowsConfig);
+
                 using (var shim = File.Create(shimPath.Value))
                 using (var exe = typeof(ShellShimMaker).Assembly.GetManifestResourceStream(LauncherExeResourceName))
                 {
                     exe.CopyTo(shim);
                 }
+                locationOfShimDuringTransaction.Add(shimPath);
             }
             else
             {
@@ -83,6 +88,7 @@ namespace Microsoft.DotNet.ShellShim
                 script.AppendLine($"dotnet {packageExecutable.ToQuotedString()} \"$@\"");
 
                 File.WriteAllText(shimPath.Value, script.ToString());
+                locationOfShimDuringTransaction.Add(shimPath);
 
                 SetUserExecutionPermissionToShimFile(shimPath);
             }

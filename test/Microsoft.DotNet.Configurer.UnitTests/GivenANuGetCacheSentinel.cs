@@ -197,6 +197,11 @@ namespace Microsoft.DotNet.Configurer.UnitTests
             {
                 throw new UnauthorizedAccessException();
             }
+
+            public void Delete(string path, bool recursive)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         private class FileMock : IFile

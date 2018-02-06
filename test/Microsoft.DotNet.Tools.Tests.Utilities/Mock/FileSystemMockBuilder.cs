@@ -153,6 +153,22 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             {
                 _files.Add(path, path);
             }
+
+            public void Delete(string path, bool recursive)
+            {
+                if (!recursive && Exists(path) == true)
+                {
+                    if (_files.Keys.Where(k => k.StartsWith(path)).Count() > 1)
+                    {
+                        throw new IOException("The directory is not empty");
+                    }
+                }
+
+                foreach (var k in _files.Keys.Where(k => k.StartsWith(path)).ToList())
+                {
+                    _files.Remove(k);
+                }
+            }
         }
 
         private class TemporaryDirectoryMock : ITemporaryDirectoryMock

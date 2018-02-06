@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Transactions;
@@ -39,26 +40,29 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
 
         public void CreateShim(FilePath packageExecutable, string shellCommandName)
         {
-            var resourceManager = new TransactionResourceManager(
-                commit: () => { PlaceShim(packageExecutable, shellCommandName); },
-                prepare: preparingEnlistment =>
+            var createShimTransaction = new CreateShimTransaction(
+                createShim: locationOfShimDuringTransaction =>
                 {
                     EnsureCommandNameUniqueness(shellCommandName);
-                    preparingEnlistment.Prepared();
+                    PlaceShim(packageExecutable, shellCommandName, locationOfShimDuringTransaction);
+                },
+                rollback: locationOfShimDuringTransaction =>
+                {
+                    foreach (FilePath f in locationOfShimDuringTransaction)
+                    {
+                        if (File.Exists(f.Value))
+                        {
+                            File.Delete(f.Value);
+                        }
+                    }
                 });
 
-            if (Transaction.Current != null)
+            using (var transactionScope = new TransactionScope())
             {
-                Transaction.Current.EnlistVolatile(resourceManager, EnlistmentOptions.None);
-            }
-            else
-            {
-                using (var transactionScope = new TransactionScope())
-                {
-                    Transaction.Current.EnlistVolatile(resourceManager, EnlistmentOptions.None);
+                Transaction.Current.EnlistVolatile(createShimTransaction, EnlistmentOptions.None);
+                createShimTransaction.CreateShim();
 
-                    transactionScope.Complete();
-                }
+                transactionScope.Complete();
             }
         }
 
@@ -67,7 +71,7 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             File.Delete(GetShimPath(shellCommandName).Value);
         }
 
-        private void PlaceShim(FilePath packageExecutable, string shellCommandName)
+        private void PlaceShim(FilePath packageExecutable, string shellCommandName, List<FilePath> locationOfShimDuringTransaction)
         {
             var fakeshim = new FakeShim
             {
@@ -78,6 +82,7 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
 
             FilePath scriptPath = GetShimPath(shellCommandName);
             _fileSystem.File.WriteAllText(scriptPath.Value, script);
+            locationOfShimDuringTransaction.Add(scriptPath);
         }
 
         private FilePath GetShimPath(string shellCommandName)

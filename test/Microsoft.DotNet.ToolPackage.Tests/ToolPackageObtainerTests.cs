@@ -20,7 +20,6 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 {
     public class ToolPackageObtainerTests : TestBase
     {
-
         [Fact]
         public void GivenNoFeedItThrows()
         {
@@ -60,7 +59,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                     bundledTargetFrameworkMoniker: new Lazy<string>(),
                     projectRestorer: new ProjectRestorer(reporter));
 
-            var toolConfigurationAndExecutablePath = packageObtainer.ObtainAndReturnExecutablePath(
+            ToolConfigurationAndExecutablePath toolConfigurationAndExecutablePath = packageObtainer.ObtainAndReturnExecutablePath(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
                     targetframework: _testTargetframework);
@@ -93,7 +92,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath, reporter, testMockBehaviorIsInSync, nugetConfigPath.Value);
 
-            var toolConfigurationAndExecutablePath
+            ToolConfigurationAndExecutablePath toolConfigurationAndExecutablePath
                 = packageObtainer.ObtainAndReturnExecutablePath(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
@@ -160,7 +159,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath, reporter, testMockBehaviorIsInSync, nugetConfigPath.Value);
 
-            var toolConfigurationAndExecutablePath =
+            ToolConfigurationAndExecutablePath toolConfigurationAndExecutablePath =
                 packageObtainer.ObtainAndReturnExecutablePath(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
@@ -227,7 +226,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                     new ProjectRestorer(reporter));
             }
 
-            var toolConfigurationAndExecutablePath =
+            ToolConfigurationAndExecutablePath toolConfigurationAndExecutablePath =
                 packageObtainer.ObtainAndReturnExecutablePath(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
@@ -250,13 +249,13 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         public void GivenAllButNoPackageVersionItCanDownloadThePackage(bool testMockBehaviorIsInSync)
         {
             var reporter = new BufferedReporter();
-            var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
+            FilePath nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
             var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
 
             var packageObtainer =
                 ConstructDefaultPackageObtainer(toolsPath, reporter, testMockBehaviorIsInSync, nugetConfigPath.Value);
 
-            var toolConfigurationAndExecutablePath =
+            ToolConfigurationAndExecutablePath toolConfigurationAndExecutablePath =
                 packageObtainer.ObtainAndReturnExecutablePath(
                     packageId: TestPackageId,
                     nugetconfig: nugetConfigPath,
@@ -313,7 +312,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                     new Lazy<string>(() => BundledTargetFramework.GetTargetFrameworkMoniker()),
                     new ProjectRestorer(reporter));
             }
-            var toolConfigurationAndExecutablePath =
+            ToolConfigurationAndExecutablePath toolConfigurationAndExecutablePath =
                 packageObtainer.ObtainAndReturnExecutablePath(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
@@ -344,7 +343,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             var nonExistNugetConfigFile = new FilePath("NonExistent.file");
             Action a = () =>
             {
-                var toolConfigurationAndExecutablePath =
+                ToolConfigurationAndExecutablePath toolConfigurationAndExecutablePath =
                 packageObtainer.ObtainAndReturnExecutablePath(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
@@ -374,7 +373,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 reporter,
                 testMockBehaviorIsInSync: testMockBehaviorIsInSync,
                 addSourceFeedWithFilePath: GetTestLocalFeedPath());
-            var toolConfigurationAndExecutablePath =
+            ToolConfigurationAndExecutablePath toolConfigurationAndExecutablePath =
                 packageObtainer.ObtainAndReturnExecutablePath(
                     packageId: TestPackageId,
                     packageVersion: TestPackageVersion,
@@ -438,10 +437,11 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             {
                 using (var t = new TransactionScope())
                 {
-                    var obtainAndReturnExecutablePathtransactional = packageObtainer.ObtainAndReturnExecutablePath(
-                        packageId: TestPackageId,
-                        packageVersion: TestPackageVersion,
-                        targetframework: _testTargetframework);
+                    ToolConfigurationAndExecutablePath obtainAndReturnExecutablePathtransactional
+                        = packageObtainer.ObtainAndReturnExecutablePath(
+                            packageId: TestPackageId,
+                            packageVersion: TestPackageVersion,
+                            targetframework: _testTargetframework);
 
                     FailedStepAfterSuccessRestore();
                     t.Complete();
@@ -453,6 +453,78 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             }
 
             AssertRollBack(toolsPath);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void GivenAllButNoPackageVersionAndInvokeTwiceItShouldNotThrow(bool testMockBehaviorIsInSync)
+        {
+            var reporter = new BufferedReporter();
+            var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
+            var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
+
+            var packageObtainer =
+                ConstructDefaultPackageObtainer(toolsPath, reporter, testMockBehaviorIsInSync, nugetConfigPath.Value);
+
+            try
+            {
+                using (var t = new TransactionScope())
+                {
+                    packageObtainer.ObtainAndReturnExecutablePath(
+                        packageId: TestPackageId,
+                        packageVersion: TestPackageVersion,
+                        targetframework: _testTargetframework);
+
+                    packageObtainer.ObtainAndReturnExecutablePath(
+                        packageId: TestPackageId,
+                        packageVersion: TestPackageVersion,
+                        targetframework: _testTargetframework);
+
+                    t.Complete();
+                }
+            }
+            catch (PackageObtainException)
+            {
+                // catch the simulated error
+            }
+
+            AssertRollBack(toolsPath);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void GivenAllButNoPackageVersionAndInvokeTwiceInTransactionItShouldRollback(bool testMockBehaviorIsInSync)
+        {
+            var reporter = new BufferedReporter();
+            var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
+            var toolsPath = Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName());
+
+            var packageObtainer =
+                ConstructDefaultPackageObtainer(toolsPath, reporter, testMockBehaviorIsInSync, nugetConfigPath.Value);
+
+            packageObtainer.ObtainAndReturnExecutablePath(
+                packageId: TestPackageId,
+                nugetconfig: nugetConfigPath,
+                targetframework: _testTargetframework);
+
+            reporter.Lines.Should().BeEmpty();
+
+            Action secondCall = () => packageObtainer.ObtainAndReturnExecutablePath(
+                packageId: TestPackageId,
+                nugetconfig: nugetConfigPath,
+                targetframework: _testTargetframework);
+
+            reporter.Lines.Should().BeEmpty();
+
+            secondCall.ShouldThrow<PackageObtainException>();
+
+            Directory.Exists(Path.Combine(toolsPath, TestPackageId))
+                .Should().BeTrue("The result of first one is still here");
+
+            Directory.GetDirectories(Path.Combine(toolsPath, ".stage"))
+                .Should().BeEmpty("nothing in stage folder, already rolled back");
         }
 
         private static void AssertRollBack(string toolsPath)
