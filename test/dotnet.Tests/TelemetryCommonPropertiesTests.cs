@@ -66,6 +66,20 @@ namespace Microsoft.DotNet.Tests
             var assignedMachineId = unitUnderTest.GetTelemetryCommonProperties()["Installation Type"].Should().BeEmpty();
         }
 
+        [WindowsOnlyFact]
+        public void TelemetryCommonPropertiesShouldContainWindowsProductType()
+        {
+            var unitUnderTest = new TelemetryCommonProperties(getMACAddress: () => null, userLevelCacheWriter: new NothingCache());
+            var assignedMachineId = Convert.ToUInt32(unitUnderTest.GetTelemetryCommonProperties()["Product Type"]).Should().NotBe(0);
+        }
+
+        [UnixOnlyFact]
+        public void TelemetryCommonPropertiesShouldContainEmptyWindowsProductType()
+        {
+            var unitUnderTest = new TelemetryCommonProperties(getMACAddress: () => null, userLevelCacheWriter: new NothingCache());
+            var assignedMachineId = unitUnderTest.GetTelemetryCommonProperties()["Product Type"].Should().Be(uint.MaxValue.ToString("D"));
+        }
+
         private class NothingCache : IUserLevelCacheWriter
         {
             public string RunWithCache(string cacheKey, Func<string> getValueToCache)

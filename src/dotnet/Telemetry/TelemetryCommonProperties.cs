@@ -12,6 +12,7 @@ using Microsoft.Win32;
 using System.Linq;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 using RuntimeInformation = System.Runtime.InteropServices.RuntimeInformation;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.DotNet.Cli.Telemetry
 {
@@ -46,6 +47,7 @@ namespace Microsoft.DotNet.Cli.Telemetry
         private const string DockerContainer = "Docker Container";
         private const string KernelVersion = "Kernel Version";
         private const string InstallationType = "Installation Type";
+        private const string ProductType = "Product Type";
 
         private const string TelemetryProfileEnvironmentVariable = "DOTNET_CLI_TELEMETRY_PROFILE";
         private const string CannotFindMacAddress = "Unknown";
@@ -66,7 +68,8 @@ namespace Microsoft.DotNet.Cli.Telemetry
                 {CurrentPathHash, _hasher(_getCurrentDirectory())},
                 {MachineId, _userLevelCacheWriter.RunWithCache(MachineIdCacheKey, GetMachineId)},
                 {KernelVersion, GetKernelVersion()},
-                {InstallationType, GetInstallationType()}
+                {InstallationType, GetInstallationType()},
+                {ProductType, GetProductType()}
             };
         }
 
@@ -141,6 +144,30 @@ namespace Microsoft.DotNet.Cli.Telemetry
             {
                 return "";
             }
+        }
+
+        [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = false)]
+        private static extern bool GetProductInfo(uint dwOSMajorVersion, uint dwOSMinorVersion, uint dwSpMajorVersion, uint dwSpMinorVersion, out uint pdwReturnedProductType);
+
+        /// <summary>
+        /// For Windows, returns the product type, loosely the SKU, as encoded by GetProductInfo().
+        /// For example, Enterprise is "4" (0x4) and Professional is "48" (0x30)
+        /// See https://msdn.microsoft.com/en-us/library/windows/desktop/ms724358(v=vs.85).aspx for the full list.
+        /// We're not attempting to decode the value on the client side as new Windows releases may add new values.
+        /// For Unix, currently returns "4294967295" (uint.MaxValue).
+        /// </summary>
+        /// <returns></returns>
+        private static string GetProductType()
+        {
+            if (RuntimeEnvironment.OperatingSystemPlatform != Platform.Windows)
+                return "0";
+
+            if (!GetProductInfo((uint)Environment.OSVersion.Version.Major, (uint)Environment.OSVersion.Version.Minor, 0, 0, out uint productType))
+            {
+                return uint.MaxValue.ToString("D"); // Error
+            }
+
+            return productType.ToString("D");
         }
     }
 }
