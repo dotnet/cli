@@ -80,6 +80,25 @@ namespace Microsoft.DotNet.Tests
             var assignedMachineId = unitUnderTest.GetTelemetryCommonProperties()["Product Type"].Should().Be(uint.MaxValue.ToString("D"));
         }
 
+        [WindowsOnlyFact]
+        public void TelemetryCommonPropertiesShouldContainEmptyLibcReleaseAndVersion()
+        {
+            var unitUnderTest = new TelemetryCommonProperties(getMACAddress: () => null, userLevelCacheWriter: new NothingCache());
+            unitUnderTest.GetTelemetryCommonProperties()["Libc Release"].Should().BeEmpty();
+            unitUnderTest.GetTelemetryCommonProperties()["Libc Version"].Should().BeEmpty();
+        }
+
+        [UnixOnlyFact]
+        public void TelemetryCommonPropertiesShouldContainLibcReleaseAndVersion()
+        {
+            if (!RuntimeEnvironment.OperatingSystem.Contains("Alpine", StringComparison.OrdinalIgnoreCase))
+            {
+                var unitUnderTest = new TelemetryCommonProperties(getMACAddress: () => null, userLevelCacheWriter: new NothingCache());
+                unitUnderTest.GetTelemetryCommonProperties()["Libc Release"].Should().NotBeEmpty();
+                unitUnderTest.GetTelemetryCommonProperties()["Libc Version"].Should().NotBeEmpty();
+            }
+        }
+
         private class NothingCache : IUserLevelCacheWriter
         {
             public string RunWithCache(string cacheKey, Func<string> getValueToCache)

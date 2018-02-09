@@ -48,6 +48,8 @@ namespace Microsoft.DotNet.Cli.Telemetry
         private const string KernelVersion = "Kernel Version";
         private const string InstallationType = "Installation Type";
         private const string ProductType = "Product Type";
+        private const string LibcRelease = "Libc Release";
+        private const string LibcVersion = "Libc Version";
 
         private const string TelemetryProfileEnvironmentVariable = "DOTNET_CLI_TELEMETRY_PROFILE";
         private const string CannotFindMacAddress = "Unknown";
@@ -69,7 +71,9 @@ namespace Microsoft.DotNet.Cli.Telemetry
                 {MachineId, _userLevelCacheWriter.RunWithCache(MachineIdCacheKey, GetMachineId)},
                 {KernelVersion, GetKernelVersion()},
                 {InstallationType, GetInstallationType()},
-                {ProductType, GetProductType()}
+                {ProductType, GetProductType()},
+                {LibcRelease, GetLibcRelease()},
+                {LibcVersion, GetLibcVersion()}
             };
         }
 
@@ -168,6 +172,52 @@ namespace Microsoft.DotNet.Cli.Telemetry
             }
 
             return productType.ToString("D");
+        }
+
+        [DllImport("libc", ExactSpelling = true, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr gnu_get_libc_release();
+
+        [DllImport("libc", ExactSpelling = true, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr gnu_get_libc_version();
+
+        /// <summary>
+        /// If gnulibc is available, returns the release, such as "stable".
+        /// If the libc is musl, currently returns empty string.
+        /// Otherwise returns empty string.
+        /// </summary>
+        private static string GetLibcRelease()
+        {
+            if (RuntimeEnvironment.OperatingSystemPlatform == Platform.Windows)
+                return "";
+
+            try
+            {
+                return Marshal.PtrToStringUTF8(gnu_get_libc_release());
+            }
+            catch (Exception e) when (e is DllNotFoundException | e is EntryPointNotFoundException)
+            {
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// If gnulibc is available, returns the version, such as "2.22".
+        /// If the libc is musl, currently returns empty string. (In future could run "ldd -version".)
+        /// Otherwise returns empty string.
+        /// </summary>
+        private static string GetLibcVersion()
+        {
+            if (RuntimeEnvironment.OperatingSystemPlatform == Platform.Windows)
+                return "";
+
+            try
+            {
+                return Marshal.PtrToStringUTF8(gnu_get_libc_version());
+            }
+            catch (Exception e) when (e is DllNotFoundException | e is EntryPointNotFoundException)
+            {
+                return "";
+            }
         }
     }
 }
