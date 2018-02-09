@@ -88,7 +88,15 @@ namespace Microsoft.DotNet.Tests
             unitUnderTest.GetTelemetryCommonProperties()["Libc Version"].Should().BeEmpty();
         }
 
-        [UnixOnlyFact]
+        [MacOsOnlyFact]
+        public void TelemetryCommonPropertiesShouldContainEmptyLibcReleaseAndVersion2()
+        {
+            var unitUnderTest = new TelemetryCommonProperties(getMACAddress: () => null, userLevelCacheWriter: new NothingCache());
+            unitUnderTest.GetTelemetryCommonProperties()["Libc Release"].Should().BeEmpty();
+            unitUnderTest.GetTelemetryCommonProperties()["Libc Version"].Should().BeEmpty();
+        }
+
+        [LinuxOnlyFact]
         public void TelemetryCommonPropertiesShouldContainLibcReleaseAndVersion()
         {
             if (!RuntimeEnvironment.OperatingSystem.Contains("Alpine", StringComparison.OrdinalIgnoreCase))
