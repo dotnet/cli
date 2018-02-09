@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.Tests
         public void TelemetryCommonPropertiesShouldContainKernelVersion()
         {
             var unitUnderTest = new TelemetryCommonProperties(getMACAddress: () => null, userLevelCacheWriter: new NothingCache());
-            var assignedMachineId = unitUnderTest.GetTelemetryCommonProperties()["Kernel Version"].Should().Be(RuntimeInformation.OSDescription);
+            unitUnderTest.GetTelemetryCommonProperties()["Kernel Version"].Should().Be(RuntimeInformation.OSDescription);
         }
 
         private class NothingCache : IUserLevelCacheWriter
