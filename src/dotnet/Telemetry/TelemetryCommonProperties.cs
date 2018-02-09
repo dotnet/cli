@@ -13,6 +13,7 @@ using System.Linq;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 using RuntimeInformation = System.Runtime.InteropServices.RuntimeInformation;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace Microsoft.DotNet.Cli.Telemetry
 {
@@ -144,8 +145,10 @@ namespace Microsoft.DotNet.Cli.Telemetry
             {
                 return (string)Registry.GetValue(Key, ValueName, defaultValue: "");
             }
-            catch (Exception e) when (e is ArgumentException || e is SecurityException || e is InvalidCastException)
+            // Catch everything: this is for telemetry only.
+            catch (Exception e) 
             {
+                Debug.Assert(e is ArgumentException | e is SecurityException | e is InvalidCastException);
                 return "";
             }
         }
@@ -166,12 +169,20 @@ namespace Microsoft.DotNet.Cli.Telemetry
             if (RuntimeEnvironment.OperatingSystemPlatform != Platform.Windows)
                 return "0";
 
-            if (!GetProductInfo((uint)Environment.OSVersion.Version.Major, (uint)Environment.OSVersion.Version.Minor, 0, 0, out uint productType))
+            try
             {
-                return uint.MaxValue.ToString("D"); // Error
+                if (GetProductInfo((uint)Environment.OSVersion.Version.Major, (uint)Environment.OSVersion.Version.Minor, 0, 0, out uint productType))
+                {
+                    return productType.ToString("D");
+                }
+            }
+            // Catch everything: this is for telemetry only
+            catch(Exception e)
+            {
+                Debug.Assert(false, $"Unexpected exception from GetProductInfo: ${e.GetType().Name}: ${e.Message}");
             }
 
-            return productType.ToString("D");
+            return uint.MaxValue.ToString("D"); // Error
         }
 
         [DllImport("libc", ExactSpelling = true, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -194,8 +205,10 @@ namespace Microsoft.DotNet.Cli.Telemetry
             {
                 return Marshal.PtrToStringUTF8(gnu_get_libc_release());
             }
-            catch (Exception e) when (e is DllNotFoundException | e is EntryPointNotFoundException)
+            // Catch everything: this is for telemetry only
+            catch (Exception e)
             {
+                Debug.Assert(e is DllNotFoundException || e is EntryPointNotFoundException);
                 return "";
             }
         }
@@ -214,8 +227,10 @@ namespace Microsoft.DotNet.Cli.Telemetry
             {
                 return Marshal.PtrToStringUTF8(gnu_get_libc_version());
             }
-            catch (Exception e) when (e is DllNotFoundException | e is EntryPointNotFoundException)
+            // Catch everything: this is for telemetry only
+            catch (Exception e)
             {
+                Debug.Assert(e is DllNotFoundException || e is EntryPointNotFoundException);
                 return "";
             }
         }
