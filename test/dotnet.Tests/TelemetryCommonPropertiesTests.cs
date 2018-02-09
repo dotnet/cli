@@ -77,7 +77,7 @@ namespace Microsoft.DotNet.Tests
         public void TelemetryCommonPropertiesShouldContainEmptyWindowsProductType()
         {
             var unitUnderTest = new TelemetryCommonProperties(getMACAddress: () => null, userLevelCacheWriter: new NothingCache());
-            var assignedMachineId = unitUnderTest.GetTelemetryCommonProperties()["Product Type"].Should().Be(uint.MaxValue.ToString("D"));
+            var assignedMachineId = Convert.ToUInt32(unitUnderTest.GetTelemetryCommonProperties()["Product Type"]).Should().Be(0);
         }
 
         [WindowsOnlyFact]
