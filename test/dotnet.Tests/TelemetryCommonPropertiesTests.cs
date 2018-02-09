@@ -52,6 +52,20 @@ namespace Microsoft.DotNet.Tests
             unitUnderTest.GetTelemetryCommonProperties()["Kernel Version"].Should().Be(RuntimeInformation.OSDescription);
         }
 
+        [WindowsOnlyFact]
+        public void TelemetryCommonPropertiesShouldContainWindowsInstallType()
+        {
+            var unitUnderTest = new TelemetryCommonProperties(getMACAddress: () => null, userLevelCacheWriter: new NothingCache());
+            var assignedMachineId = unitUnderTest.GetTelemetryCommonProperties()["Installation Type"].Should().NotBeEmpty();
+        }
+
+        [UnixOnlyFact]
+        public void TelemetryCommonPropertiesShouldContainEmptyWindowsInstallType()
+        {
+            var unitUnderTest = new TelemetryCommonProperties(getMACAddress: () => null, userLevelCacheWriter: new NothingCache());
+            var assignedMachineId = unitUnderTest.GetTelemetryCommonProperties()["Installation Type"].Should().BeEmpty();
+        }
+
         private class NothingCache : IUserLevelCacheWriter
         {
             public string RunWithCache(string cacheKey, Func<string> getValueToCache)

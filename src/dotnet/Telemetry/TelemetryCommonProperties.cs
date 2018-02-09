@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.PlatformAbstractions;
 using System.IO;
+using System.Security;
 using Microsoft.DotNet.Configurer;
+using Microsoft.Win32;
 using System.Linq;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 using RuntimeInformation = System.Runtime.InteropServices.RuntimeInformation;
@@ -43,6 +45,7 @@ namespace Microsoft.DotNet.Cli.Telemetry
         private const string MachineId = "Machine ID";
         private const string DockerContainer = "Docker Container";
         private const string KernelVersion = "Kernel Version";
+        private const string InstallationType = "Installation Type";
 
         private const string TelemetryProfileEnvironmentVariable = "DOTNET_CLI_TELEMETRY_PROFILE";
         private const string CannotFindMacAddress = "Unknown";
@@ -62,7 +65,8 @@ namespace Microsoft.DotNet.Cli.Telemetry
                 {DockerContainer, _userLevelCacheWriter.RunWithCache(IsDockerContainerCacheKey, () => _dockerContainerDetector.IsDockerContainer().ToString("G") )},
                 {CurrentPathHash, _hasher(_getCurrentDirectory())},
                 {MachineId, _userLevelCacheWriter.RunWithCache(MachineIdCacheKey, GetMachineId)},
-                {KernelVersion, GetKernelVersion()}
+                {KernelVersion, GetKernelVersion()},
+                {InstallationType, GetInstallationType()}
             };
         }
 
@@ -116,6 +120,27 @@ namespace Microsoft.DotNet.Cli.Telemetry
         private static string GetKernelVersion()
         {
             return RuntimeInformation.OSDescription;
+        }
+
+        /// For Windows, returns the OS installation type, eg. "Nano Server", "Server Core", "Server", or "Client".
+        /// For Unix, currently returns empty string.
+        /// </summary>
+        private static string GetInstallationType()
+        {
+            if (RuntimeEnvironment.OperatingSystemPlatform != Platform.Windows)
+                return "";
+
+            const string Key = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion";
+            const string ValueName = @"InstallationType";
+
+            try
+            {
+                return (string)Registry.GetValue(Key, ValueName, defaultValue: "");
+            }
+            catch (Exception e) when (e is ArgumentException || e is SecurityException || e is InvalidCastException)
+            {
+                return "";
+            }
         }
     }
 }
