@@ -1,0 +1,31 @@
+<Project ToolsVersion="15.0" DefaultTargets="ExtractDotnetToolsToOutput">
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\dir.props" />
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.tasks))\dir.tasks" />
+
+  <Target Name="ExtractDotnetToolsToOutput"
+          DependsOnTargets="EnsureDotnetToolsRestored"
+          Inputs="@(DotnetToolsContent)"
+          Outputs="@(DotnetToolsContent->'$(DotnetToolsLayoutDirectory)/%(RecursiveDir)%(FileName)%(Extension)')">
+    <Copy SourceFiles="@(DotnetToolsContent)"
+          DestinationFiles="@(DotnetToolsContent->'$(DotnetToolsLayoutDirectory)/%(RecursiveDir)%(FileName)%(Extension)')" />
+
+    <Message Text="Restore DotnetTools $(DotnetToolsPackageName) from $(DotnetToolsNuPkgPath) to $(DotnetToolsLayoutDirectory)."
+             Importance="High" />
+  </Target>
+
+  <Target Name="EnsureDotnetToolsRestored"
+          Condition="!Exists('$(DotnetToolsNuPkgPath)/$(DotnetToolsPackageName.ToLower())')">
+
+    <PropertyGroup>
+      <DotnetToolsRestoreAdditionalParameters>/p:TargetFramework=$(CliTargetFramework)</DotnetToolsRestoreAdditionalParameters>
+      <DotnetToolsRestoreAdditionalParameters>$(DotnetToolsRestoreAdditionalParameters) /p:DotnetToolsPackageName=$(DotnetToolsPackageName)</DotnetToolsRestoreAdditionalParameters>
+      <DotnetToolsRestoreAdditionalParameters>$(DotnetToolsRestoreAdditionalParameters) /p:DotnetToolsPackageVersion=$(DotnetToolsPackageVersion)</DotnetToolsRestoreAdditionalParameters>
+      <DotnetToolsRestoreAdditionalParameters>$(DotnetToolsRestoreAdditionalParameters) /p:RestorePackagesPath=$(DotnetToolsLayoutDirectory)</DotnetToolsRestoreAdditionalParameters>
+      <DotnetToolsRestoreAdditionalParameters Condition=" $(DotnetToolsRestoreProjectStyle) != '' " >$(DotnetToolsRestoreAdditionalParameters) /p:RestoreProjectStyle=$(DotnetToolsRestoreProjectStyle)</DotnetToolsRestoreAdditionalParameters>
+    </PropertyGroup>
+
+    <DotNetRestore ToolPath="$(PreviousStageDirectory)"
+                   ProjectPath="$(MSBuildThisFileDirectory)/templates/templates.csproj"
+                   AdditionalParameters="$(DotnetToolsRestoreAdditionalParameters)" />
+  </Target>
+</Project>

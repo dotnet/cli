@@ -25,7 +25,7 @@
           Condition="!Exists('$(TemplateNuPkgPath)/$(TemplatePackageName.ToLower()).nuspec')">
     <DotNetRestore ToolPath="$(PreviousStageDirectory)"
                    ProjectPath="$(MSBuildThisFileDirectory)/templates/templates.csproj"
-                   AdditionalParameters="/p:TemplatePackageName=$(TemplatePackageName) /p:TemplatePackageVersion=$(TemplatePackageVersion)" />
+                   AdditionalParameters="/p:TargetFramework=netcoreapp1.0 /p:TemplatePackageName=$(TemplatePackageName) /p:TemplatePackageVersion=$(TemplatePackageVersion)" />
   </Target>
 
   <Target Name="PrepareBundledTemplateProps">

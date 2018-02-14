@@ -206,6 +206,25 @@
     </MSBuild>
   </Target>
 
+  <Target Name="PublishDotnetTools"
+          AfterTargets="Publish">
+    <ItemGroup>
+      <DotnetToolsToBundle Include="$(RepoRoot)/build/BundledDotnetTools.proj">
+        <Properties>
+          DotnetToolsLayoutDirectory=$(SdkOutputDirectory)/DotnetTools;
+          DotnetToolsPackageName=%(BundledDotnetTools.Identity);
+          DotnetToolsPackageVersion=%(BundledDotnetTools.Version);
+          PreviousStageDirectory=$(PreviousStageDirectory)
+        </Properties>
+      </DotnetToolsToBundle>
+    </ItemGroup>
+
+    <MSBuild
+      BuildInParallel="False"
+      Projects="@(DotnetToolsToBundle)">
+    </MSBuild>
+  </Target>
+
   <Target Name="PublishLzmaArchive"
           Condition="'$(CLIBUILD_SKIP_LZMA)' != 'true'"
           DependsOnTargets="GetNuGetPackagesArchive"

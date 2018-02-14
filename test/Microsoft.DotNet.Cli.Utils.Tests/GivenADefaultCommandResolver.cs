@@ -24,6 +24,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 .ContainInOrder(
                     new []{
                         typeof(MuxerCommandResolver),
+                        typeof(DotnetToolsCommandResolver),
                         typeof(RootedCommandResolver),
                         typeof(ProjectToolsCommandResolver),
                         typeof(AppBaseDllCommandResolver),
