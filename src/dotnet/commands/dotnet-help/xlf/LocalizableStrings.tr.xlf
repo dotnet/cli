@@ -199,12 +199,12 @@
       </trans-unit>
       <trans-unit id="SDKListSdksCommandDefinition">
         <source>Display the installed SDKs.</source>
-        <target state="new">Display the installed SDKs.</target>
+        <target state="translated">Yüklü SDK’ları görüntüleyin.</target>
         <note />
       </trans-unit>
       <trans-unit id="SDKListRuntimesCommandDefinition">
         <source>Display the installed runtimes.</source>
-        <target state="new">Display the installed runtimes.</target>
+        <target state="translated">Yüklü çalışma zamanlarını görüntüleyin.</target>
         <note />
       </trans-unit>
       <trans-unit id="SDKDiagnosticsCommandDefinition">
@@ -250,6 +250,11 @@
       <trans-unit id="StoreDefinition">
         <source>Stores the specified assemblies in the runtime store.</source>
         <target state="translated">Belirtilen bütünleştirilmiş kodları çalışma zamanı deposunda depolar.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InstallDefinition">
+        <source>Installs an item into the development environment.</source>
+        <target state="translated">Bir öğeyi geliştirme ortamına yükler.</target>
         <note />
       </trans-unit>
     </body>

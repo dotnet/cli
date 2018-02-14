@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.DotNet.Configurer;
+using Microsoft.DotNet.Tools;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Microsoft.Extensions.DependencyModel.Tests;
 using Xunit;
@@ -18,10 +19,10 @@ namespace Microsoft.DotNet.ShellShim.Tests
         [Fact]
         public void GivenEnvironmentAndReporterItCanPrintOutInstructionToAddPath()
         {
-            var fakeReporter = new FakeReporter();
+            var reporter = new BufferedReporter();
             var osxEnvironmentPath = new OSXEnvironmentPath(
                 new BashPathUnderHomeDirectory("/myhome", "executable/path"),
-                fakeReporter,
+                reporter,
                 new FakeEnvironmentProvider(
                     new Dictionary<string, string>
                     {
@@ -32,13 +33,10 @@ namespace Microsoft.DotNet.ShellShim.Tests
             osxEnvironmentPath.PrintAddPathInstructionIfPathDoesNotExist();
 
             // similar to https://code.visualstudio.com/docs/setup/mac
-            fakeReporter.Message.Should().Be(
-                $"Cannot find the tools executable path. Please ensure /myhome/executable/path is added to your PATH.{Environment.NewLine}" +
-                $"If you are using bash, You can do this by running the following command:{Environment.NewLine}{Environment.NewLine}" +
-                $"cat << EOF >> ~/.bash_profile{Environment.NewLine}" +
-                $"# Add .NET Core SDK tools{Environment.NewLine}" +
-                $"export PATH=\"$PATH:/myhome/executable/path\"{Environment.NewLine}" +
-                $"EOF");
+            reporter.Lines.Should().Equal(
+                string.Format(
+                    CommonLocalizableStrings.EnvironmentPathOSXManualInstruction,
+                    "/myhome/executable/path", "/myhome/executable/path"));
         }
 
         [Theory]
@@ -46,10 +44,10 @@ namespace Microsoft.DotNet.ShellShim.Tests
         [InlineData("~/executable/path")]
         public void GivenEnvironmentAndReporterItPrintsNothingWhenenvironmentExists(string existingPath)
         {
-            var fakeReporter = new FakeReporter();
+            var reporter = new BufferedReporter();
             var osxEnvironmentPath = new OSXEnvironmentPath(
                 new BashPathUnderHomeDirectory("/myhome", "executable/path"),
-                fakeReporter,
+                reporter,
                 new FakeEnvironmentProvider(
                     new Dictionary<string, string>
                     {
@@ -59,16 +57,16 @@ namespace Microsoft.DotNet.ShellShim.Tests
 
             osxEnvironmentPath.PrintAddPathInstructionIfPathDoesNotExist();
 
-            fakeReporter.Message.Should().BeEmpty();
+            reporter.Lines.Should().BeEmpty();
         }
 
         [Fact]
         public void GivenAddPackageExecutablePathToUserPathJustRunItPrintsInstructionToLogout()
         {
-            var fakeReporter = new FakeReporter();
+            var reporter = new BufferedReporter();
             var osxEnvironmentPath = new OSXEnvironmentPath(
                 new BashPathUnderHomeDirectory("/myhome", "executable/path"),
-                fakeReporter,
+                reporter,
                 new FakeEnvironmentProvider(
                     new Dictionary<string, string>
                     {
@@ -79,8 +77,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
 
             osxEnvironmentPath.PrintAddPathInstructionIfPathDoesNotExist();
 
-            fakeReporter.Message.Should().Be(
-                "Since you just installed the .NET Core SDK, you will need to reopen terminal before running the tool you installed.");
+            reporter.Lines.Should().Equal(CommonLocalizableStrings.EnvironmentPathOSXNeedReopen);
         }
     }
 }

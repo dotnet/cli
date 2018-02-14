@@ -199,12 +199,12 @@
       </trans-unit>
       <trans-unit id="SDKListSdksCommandDefinition">
         <source>Display the installed SDKs.</source>
-        <target state="new">Display the installed SDKs.</target>
+        <target state="translated">Отображение установленных пакетов SDK.</target>
         <note />
       </trans-unit>
       <trans-unit id="SDKListRuntimesCommandDefinition">
         <source>Display the installed runtimes.</source>
-        <target state="new">Display the installed runtimes.</target>
+        <target state="translated">Отображение установленных сред выполнения.</target>
         <note />
       </trans-unit>
       <trans-unit id="SDKDiagnosticsCommandDefinition">
@@ -250,6 +250,11 @@
       <trans-unit id="StoreDefinition">
         <source>Stores the specified assemblies in the runtime store.</source>
         <target state="translated">Он сохраняет указанные сборки в хранилище среды выполнения.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InstallDefinition">
+        <source>Installs an item into the development environment.</source>
+        <target state="translated">Устанавливает элемент в среде разработки.</target>
         <note />
       </trans-unit>
     </body>

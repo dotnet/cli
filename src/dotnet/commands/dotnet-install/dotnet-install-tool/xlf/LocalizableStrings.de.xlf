@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en" target-language="de" original="../LocalizableStrings.resx">
+    <body>
+      <trans-unit id="SourceOptionDescription">
+        <source>Specifies a NuGet package source to use during installation.</source>
+        <target state="translated">Gibt eine NuGet-Paketquelle für die Installation an.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="SourceOptionName">
+        <source>SOURCE</source>
+        <target state="translated">SOURCE</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InstallationSucceeded">
+        <source>
+The installation succeeded. If there are no further instructions, you can type the following command in shell directly to invoke: {0}</source>
+        <target state="translated">
+Die Installation war erfolgreich. Sofern keine weiteren Anweisungen vorliegen, können Sie für den Aufruf den folgenden Befehl direkt in der Shell eingeben: {0}</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="FailedToAddPackage">
+        <source>Failed to add package.
+WorkingDirectory: {0}
+Arguments: {1}
+Output: {2}{3}</source>
+        <target state="translated">Fehler beim Hinzufügen des Pakets.
+WorkingDirectory: {0}
+Argumente: {1}
+Ausgabe: {2}{3}</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PackageIdArgumentDescription">
+        <source>NuGet Package Id of the tool to install.</source>
+        <target state="translated">NuGet-Paket-ID des zu installierenden Tools.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="CommandDescription">
+        <source>Installs a tool for use on the command line.</source>
+        <target state="translated">Installiert ein Tool zur Verwendung über die Befehlszeile.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ConfigFileOptionDescription">
+        <source>The NuGet configuration file to use.</source>
+        <target state="translated">Die zu verwendende NuGet-Konfigurationsdatei.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="FrameworkOptionDescription">
+        <source>The target framework to install the tool for.</source>
+        <target state="translated">Das Zielframework, für das das Tool installiert wird.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VersionOptionDescription">
+        <source>Version of the tool package in NuGet.</source>
+        <target state="translated">Die Version des Toolpakets in NuGet.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PackageIdArgumentName">
+        <source>PACKAGE_ID</source>
+        <target state="translated">PACKAGE_ID</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="SpecifyExactlyOnePackageId">
+        <source>Please specify one tool Package Id to install.</source>
+        <target state="translated">Geben Sie eine Toolpaket-ID für die Installation an.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="GlobalOptionDescription">
+        <source>Install user wide.</source>
+        <target state="translated">Benutzerweite Installation.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InstallFullCommandNameLocalized">
+        <source>.NET Install Command</source>
+        <target state="translated">.NET-Installationsbefehl</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InstallToolCommandOnlySupportGlobal">
+        <source>The --global switch (-g) is currently required because only user wide tools are supported.</source>
+        <target state="translated">Die Option --global (-g) ist aktuell erforderlich, weil nur benutzerweite Tools unterstützt werden.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InvalidToolConfiguration">
+        <source>The settings file in the tool's NuGet package is invalid: {0}</source>
+        <target state="new">The settings file in the tool's NuGet package is invalid: {0}</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ToolInstallationFailed">
+        <source>Tool '{0}' failed to install.</source>
+        <target state="new">Tool '{0}' failed to install.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ToolInstallationFailedContactAuthor">
+        <source>Tool '{0}' failed to install. Please contact the tool author for assistance.</source>
+        <target state="new">Tool '{0}' failed to install. Please contact the tool author for assistance.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ToolInstallationRestoreFailed">
+        <source>The tool package could not be restored.</source>
+        <target state="new">The tool package could not be restored.</target>
+        <note />
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

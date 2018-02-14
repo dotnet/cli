@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
+using Microsoft.DotNet.Tools;
 using NuGet.Protocol.Core.Types;
 using Xunit;
 
@@ -28,7 +29,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             Action a = () => ToolConfigurationDeserializer.Deserialize("DotnetToolSettingsMalformed.xml");
             a.ShouldThrow<ToolConfigurationException>()
                 .And.Message.Should()
-                .Contain("The tool's settings file is invalid xml");
+                .Contain(string.Format(CommonLocalizableStrings.ToolSettingsInvalidXml, string.Empty));
         }
 
         [Fact]
@@ -37,16 +38,21 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             Action a = () => ToolConfigurationDeserializer.Deserialize("DotnetToolSettingsMissing.xml");
             a.ShouldThrow<ToolConfigurationException>()
                 .And.Message.Should()
-                .Contain("The tool's settings file contains error");
+                .Contain(CommonLocalizableStrings.ToolSettingsMissingCommandName);
         }
 
         [Fact]
         public void GivenInvalidCharAsFileNameItThrows()
         {
-            Action a = () => new ToolConfiguration("na\0me", "my.dll");
+            var invalidCommandName = "na\0me";
+            Action a = () => new ToolConfiguration(invalidCommandName, "my.dll");
             a.ShouldThrow<ArgumentException>()
                 .And.Message.Should()
-                .Contain("Contains one or more invalid characters");
+                .Contain(
+                    string.Format(
+                        CommonLocalizableStrings.ToolSettingsInvalidCommandName,
+                        invalidCommandName,
+                        string.Join(", ", Path.GetInvalidFileNameChars().Select(c => $"'{c}'"))));
         }
     }
 }

@@ -6,6 +6,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.DotNet.ToolPackage.ToolConfigurationDeserialization;
+using Microsoft.DotNet.Tools;
 
 namespace Microsoft.DotNet.ToolPackage
 {
@@ -28,34 +29,29 @@ namespace Microsoft.DotNet.ToolPackage
                 catch (InvalidOperationException e) when (e.InnerException is XmlException)
                 {
                     throw new ToolConfigurationException(
-                        $"The tool's settings file is invalid xml. {Environment.NewLine}" +
-                        e.InnerException.Message);
+                        string.Format(
+                            CommonLocalizableStrings.ToolSettingsInvalidXml,
+                            e.InnerException.Message));
                 }
             }
 
             if (dotNetCliTool.Commands.Length != 1)
             {
-                throw new ToolConfigurationException(
-                    "The tool's settings file has more than one command defined.");
+                throw new ToolConfigurationException(CommonLocalizableStrings.ToolSettingsMoreThanOneCommand);
             }
 
             if (dotNetCliTool.Commands[0].Runner != "dotnet")
             {
                 throw new ToolConfigurationException(
-                    "The tool's settings file has non \"dotnet\" as runner.");
+                    string.Format(
+                        CommonLocalizableStrings.ToolSettingsUnsupportedRunner,
+                        dotNetCliTool.Commands[0].Name,
+                        dotNetCliTool.Commands[0].Runner));
             }
 
-            var commandName = dotNetCliTool.Commands[0].Name;
-            var toolAssemblyEntryPoint = dotNetCliTool.Commands[0].EntryPoint;
-
-            try
-            {
-                return new ToolConfiguration(commandName, toolAssemblyEntryPoint);
-            }
-            catch (ArgumentException e)
-            {
-                throw new ToolConfigurationException($"The tool's settings file contains error {Environment.NewLine}" + e.Message);
-            }
+            return new ToolConfiguration(
+                dotNetCliTool.Commands[0].Name,
+                dotNetCliTool.Commands[0].EntryPoint);
         }
     }
 }

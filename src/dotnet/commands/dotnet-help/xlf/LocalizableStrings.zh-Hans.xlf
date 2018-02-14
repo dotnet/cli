@@ -199,12 +199,12 @@
       </trans-unit>
       <trans-unit id="SDKListSdksCommandDefinition">
         <source>Display the installed SDKs.</source>
-        <target state="new">Display the installed SDKs.</target>
+        <target state="translated">显示安装的 SDK。</target>
         <note />
       </trans-unit>
       <trans-unit id="SDKListRuntimesCommandDefinition">
         <source>Display the installed runtimes.</source>
-        <target state="new">Display the installed runtimes.</target>
+        <target state="translated">显示安装的运行时。</target>
         <note />
       </trans-unit>
       <trans-unit id="SDKDiagnosticsCommandDefinition">
@@ -250,6 +250,11 @@
       <trans-unit id="StoreDefinition">
         <source>Stores the specified assemblies in the runtime store.</source>
         <target state="translated">在运行时存储中存储指定的程序集。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InstallDefinition">
+        <source>Installs an item into the development environment.</source>
+        <target state="translated">将项目安装到开发环境中。</target>
         <note />
       </trans-unit>
     </body>

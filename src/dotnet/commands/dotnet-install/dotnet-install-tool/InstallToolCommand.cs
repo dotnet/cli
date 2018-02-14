@@ -2,8 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Transactions;
 using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
@@ -14,16 +16,29 @@ using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.Tools.Install.Tool
 {
-    public class InstallToolCommand : CommandBase
+    internal class InstallToolCommand : CommandBase
     {
-        private static string _packageId;
-        private static string _packageVersion;
-        private static string _configFilePath;
-        private static string _framework;
+        private readonly IToolPackageObtainer _toolPackageObtainer;
+        private readonly IEnvironmentPathInstruction _environmentPathInstruction;
+        private readonly IShellShimMaker _shellShimMaker;
+        private readonly IReporter _reporter;
+        private readonly IReporter _errorReporter;
+
+        private readonly string _packageId;
+        private readonly string _packageVersion;
+        private readonly string _configFilePath;
+        private readonly string _framework;
+        private readonly string _source;
+        private readonly bool _global;
+        private readonly string _verbosity;
 
         public InstallToolCommand(
             AppliedOption appliedCommand,
-            ParseResult parseResult)
+            ParseResult parseResult,
+            IToolPackageObtainer toolPackageObtainer = null,
+            IShellShimMaker shellShimMaker = null,
+            IEnvironmentPathInstruction environmentPathInstruction = null,
+            IReporter reporter = null)
             : base(parseResult)
         {
             if (appliedCommand == null)
@@ -35,96 +50,87 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             _packageVersion = appliedCommand.ValueOrDefault<string>("version");
             _configFilePath = appliedCommand.ValueOrDefault<string>("configfile");
             _framework = appliedCommand.ValueOrDefault<string>("framework");
+            _source = appliedCommand.ValueOrDefault<string>("source");
+            _global = appliedCommand.ValueOrDefault<bool>("global");
+            _verbosity = appliedCommand.SingleArgumentOrDefault("verbosity");
+
+            var cliFolderPathCalculator = new CliFolderPathCalculator();
+            var offlineFeedPath = new DirectoryPath(cliFolderPathCalculator.CliFallbackFolderPath);
+            _toolPackageObtainer = toolPackageObtainer ?? new ToolPackageObtainer(
+                                       new DirectoryPath(cliFolderPathCalculator.ToolsPackagePath),
+                                       offlineFeedPath,
+                                       () => new DirectoryPath(Path.GetTempPath())
+                                           .WithSubDirectories(Path.GetRandomFileName())
+                                           .WithFile(Path.GetRandomFileName() + ".csproj"),
+                                       new Lazy<string>(BundledTargetFramework.GetTargetFrameworkMoniker),
+                                       new ProjectRestorer(reporter));
+
+            _environmentPathInstruction = environmentPathInstruction
+                                          ?? EnvironmentPathFactory
+                                              .CreateEnvironmentPathInstruction();
+
+            _shellShimMaker = shellShimMaker ?? new ShellShimMaker(cliFolderPathCalculator.ToolsShimPath);
+
+            _reporter = (reporter ?? Reporter.Output);
+            _errorReporter = (reporter ?? Reporter.Error);
         }
 
         public override int Execute()
         {
-            FilePath? configFile = null;
-
-            if (_configFilePath != null)
+            if (!_global)
             {
-                configFile = new FilePath(_configFilePath);
+                throw new GracefulException(LocalizableStrings.InstallToolCommandOnlySupportGlobal);
             }
 
-            var executablePackagePath = new DirectoryPath(new CliFolderPathCalculator().ExecutablePackagesPath);
-
-            var toolConfigurationAndExecutableDirectory = ObtainPackage(
-                _packageId,
-                _packageVersion,
-                configFile,
-                _framework,
-                executablePackagePath);
-
-            DirectoryPath executable = toolConfigurationAndExecutableDirectory
-                .ExecutableDirectory
-                .WithSubDirectories(
-                    toolConfigurationAndExecutableDirectory
-                        .Configuration
-                        .ToolAssemblyEntryPoint);
-
-            var shellShimMaker = new ShellShimMaker(executablePackagePath.Value);
-            var commandName = toolConfigurationAndExecutableDirectory.Configuration.CommandName;
-            shellShimMaker.EnsureCommandNameUniqueness(commandName);
-
-            shellShimMaker.CreateShim(
-                executable.Value,
-                commandName);
-
-            EnvironmentPathFactory
-                .CreateEnvironmentPathInstruction()
-                .PrintAddPathInstructionIfPathDoesNotExist();
-
-            Reporter.Output.WriteLine(
-                $"{Environment.NewLine}The installation succeeded. If there is no other instruction. You can type the following command in shell directly to invoke: {commandName}");
-
-            return 0;
-        }
-
-        private static ToolConfigurationAndExecutableDirectory ObtainPackage(
-            string packageId,
-            string packageVersion,
-            FilePath? configFile,
-            string framework,
-            DirectoryPath executablePackagePath)
-        {
             try
             {
-                var toolPackageObtainer =
-                    new ToolPackageObtainer(
-                        executablePackagePath,
-                        () => new DirectoryPath(Path.GetTempPath())
-                            .WithSubDirectories(Path.GetRandomFileName())
-                            .WithFile(Path.GetRandomFileName() + ".csproj"),
-                        new Lazy<string>(BundledTargetFramework.GetTargetFrameworkMoniker),
-                        new PackageToProjectFileAdder(),
-                        new ProjectRestorer());
+                FilePath? configFile = null;
+                if (_configFilePath != null)
+                {
+                    configFile = new FilePath(_configFilePath);
+                }
 
-                return toolPackageObtainer.ObtainAndReturnExecutablePath(
-                    packageId: packageId,
-                    packageVersion: packageVersion,
-                    nugetconfig: configFile,
-                    targetframework: framework);
+                using (var transactionScope = new TransactionScope())
+                {
+                    var toolConfigurationAndExecutablePath = _toolPackageObtainer.ObtainAndReturnExecutablePath(
+                        packageId: _packageId,
+                        packageVersion: _packageVersion,
+                        nugetconfig: configFile,
+                        targetframework: _framework,
+                        source: _source,
+                        verbosity: _verbosity);
+
+                    var commandName = toolConfigurationAndExecutablePath.Configuration.CommandName;
+
+                    _shellShimMaker.CreateShim(
+                        toolConfigurationAndExecutablePath.Executable,
+                        commandName);
+
+                    _environmentPathInstruction
+                        .PrintAddPathInstructionIfPathDoesNotExist();
+
+                    _reporter.WriteLine(
+                        string.Format(LocalizableStrings.InstallationSucceeded, commandName));
+                    transactionScope.Complete();
+                }
             }
             catch (PackageObtainException ex)
             {
-                throw new GracefulException(
-                    message:
-                    $"Install failed. Failed to download package:{Environment.NewLine}" +
-                    $"NuGet returned:{Environment.NewLine}" +
-                    $"{Environment.NewLine}" +
-                    $"{ex.Message}",
-                    innerException: ex);
+                _errorReporter.WriteLine(ex.Message.Red());
+                _errorReporter.WriteLine(string.Format(LocalizableStrings.ToolInstallationFailed, _packageId).Red());
+                return 1;
             }
             catch (ToolConfigurationException ex)
             {
-                throw new GracefulException(
-                    message:
-                    $"Install failed. The settings file in the tool's NuGet package is not valid. Please contact the owner of the NuGet package.{Environment.NewLine}" +
-                    $"The error was:{Environment.NewLine}" +
-                    $"{Environment.NewLine}" +
-                    $"{ex.Message}",
-                    innerException: ex);
+                _errorReporter.WriteLine(
+                    string.Format(
+                        LocalizableStrings.InvalidToolConfiguration,
+                        ex.Message).Red());
+                _errorReporter.WriteLine(string.Format(LocalizableStrings.ToolInstallationFailedContactAuthor, _packageId).Red());
+                return 1;
             }
+
+            return 0;
         }
     }
 }
