@@ -32,6 +32,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
         private readonly string _source;
         private readonly bool _global;
         private readonly string _verbosity;
+        private readonly string _binPath;
 
         public InstallToolCommand(
             AppliedOption appliedCommand,
@@ -55,6 +56,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             _source = appliedCommand.ValueOrDefault<string>("source");
             _global = appliedCommand.ValueOrDefault<bool>("global");
             _verbosity = appliedCommand.SingleArgumentOrDefault("verbosity");
+            _binPath = appliedCommand.SingleArgumentOrDefault("bin-path");
 
             var cliFolderPathCalculator = new CliFolderPathCalculator();
 
@@ -78,45 +80,32 @@ namespace Microsoft.DotNet.Tools.Install.Tool
 
         public override int Execute()
         {
-            if (!_global)
+            var validateReturnCode = Validate();
+            if (validateReturnCode != 0)
             {
-                throw new GracefulException(LocalizableStrings.InstallToolCommandOnlySupportGlobal);
+                return validateReturnCode;
             }
 
-            if (_configFilePath != null && !File.Exists(_configFilePath))
-            {
-                throw new GracefulException(
-                    string.Format(
-                        LocalizableStrings.NuGetConfigurationFileDoesNotExist,
-                        Path.GetFullPath(_configFilePath)));
-            }
-
-            // Prevent installation if any version of the package is installed
-            if (_toolPackageStore.GetInstalledPackages(_packageId).FirstOrDefault() != null)
-            {
-                _errorReporter.WriteLine(string.Format(LocalizableStrings.ToolAlreadyInstalled, _packageId).Red());
-                return 1;
-            }
-
-            FilePath? configFile = null;
-            if (_configFilePath != null)
-            {
-                configFile = new FilePath(_configFilePath);
-            }
-
-            try
+            return HandleExceptionToUserFacingMessage(() =>
             {
                 IToolPackage package = null;
                 using (var scope = new TransactionScope(
                     TransactionScopeOption.Required,
                     TimeSpan.Zero))
                 {
+                    FilePath? configFile = null;
+                    if (_configFilePath != null)
+                    {
+                        configFile = new FilePath(_configFilePath);
+                    }
+
                     package = _toolPackageInstaller.InstallPackage(
-                        packageId: _packageId,
-                        packageVersion: _packageVersion,
+                        new NuGetPackageLocation(
+                            packageId: _packageId,
+                            packageVersion: _packageVersion,
+                            nugetConfig: configFile,
+                            source: _source),
                         targetFramework: _framework,
-                        nugetConfig: configFile,
-                        source: _source,
                         verbosity: _verbosity);
 
                     foreach (var command in package.Commands)
@@ -135,6 +124,14 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                         string.Join(", ", package.Commands.Select(c => c.Name)),
                         package.PackageId,
                         package.PackageVersion).Green());
+            });
+        }
+
+        private int HandleExceptionToUserFacingMessage(Action action)
+        {
+            try
+            {
+                action();
                 return 0;
             }
             catch (ToolPackageException ex)
@@ -159,7 +156,8 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                     string.Format(
                         LocalizableStrings.InvalidToolConfiguration,
                         ex.Message).Red());
-                _errorReporter.WriteLine(string.Format(LocalizableStrings.ToolInstallationFailedContactAuthor, _packageId).Red());
+                _errorReporter.WriteLine(
+                    string.Format(LocalizableStrings.ToolInstallationFailedContactAuthor, _packageId).Red());
                 return 1;
             }
             catch (ShellShimException ex)
@@ -177,6 +175,36 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                 _errorReporter.WriteLine(string.Format(LocalizableStrings.ToolInstallationFailed, _packageId).Red());
                 return 1;
             }
+        }
+
+        private int Validate()
+        {
+            if (!_global)
+            {
+                throw new GracefulException(LocalizableStrings.InstallToolCommandOnlySupportGlobal);
+            }
+
+            if (_binPath != null)
+            {
+                throw new GracefulException("Cannot have global and bin-path as opinion at the same time.");
+            }
+
+            if (_configFilePath != null && !File.Exists(_configFilePath))
+            {
+                throw new GracefulException(
+                    string.Format(
+                        LocalizableStrings.NuGetConfigurationFileDoesNotExist,
+                        Path.GetFullPath(_configFilePath)));
+            }
+
+            // Prevent installation if any version of the package is installed
+            if (_toolPackageStore.GetInstalledPackages(_packageId).FirstOrDefault() != null)
+            {
+                _errorReporter.WriteLine(string.Format(LocalizableStrings.ToolAlreadyInstalled, _packageId).Red());
+                return 1;
+            }
+
+            return 0;
         }
     }
 }

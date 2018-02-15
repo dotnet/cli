@@ -60,7 +60,8 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             DirectoryPath assetJsonOutput,
             FilePath? nugetConfig = null,
             string source = null,
-            string verbosity = null)
+            string verbosity = null,
+            DirectoryPath? nugetCacheLocation = null)
         {
             string packageId;
             string packageVersion;

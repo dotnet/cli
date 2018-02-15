@@ -9,12 +9,14 @@ namespace Microsoft.DotNet.ToolPackage
 {
     internal interface IToolPackageInstaller
     {
-        IToolPackage InstallPackage(
-            string packageId,
-            string packageVersion = null,
+        IToolPackage InstallPackage(NuGetPackageLocation nuGetPackageLocation,
             string targetFramework = null,
-            FilePath? nugetConfig = null,
-            string source = null,
             string verbosity = null);
+
+        IReadOnlyList<CommandSettings> 
+            InstallPackageToNuGetCache(NuGetPackageLocation nuGetPackageLocation,
+                string targetFramework = null,
+                string verbosity = null,
+                DirectoryPath? nugetCacheLocation = null);
     }
 }

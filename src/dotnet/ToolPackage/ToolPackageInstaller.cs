@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -32,19 +33,16 @@ namespace Microsoft.DotNet.ToolPackage
         }
 
         public IToolPackage InstallPackage(
-            string packageId,
-            string packageVersion = null,
+            NuGetPackageLocation nuGetPackageLocation,
             string targetFramework = null,
-            FilePath? nugetConfig = null,
-            string source = null,
             string verbosity = null)
         {
-            if (packageId == null)
+            if (nuGetPackageLocation.PackageId == null)
             {
-                throw new ArgumentNullException(nameof(packageId));
+                throw new ArgumentNullException(nameof(nuGetPackageLocation.PackageId));
             }
 
-            var packageRootDirectory = _store.Root.WithSubDirectories(packageId);
+            var packageRootDirectory = _store.Root.WithSubDirectories(nuGetPackageLocation.PackageId);
             string rollbackDirectory = null;
 
             return TransactionalAction.Run<IToolPackage>(
@@ -56,38 +54,20 @@ namespace Microsoft.DotNet.ToolPackage
                         Directory.CreateDirectory(stageDirectory.Value);
                         rollbackDirectory = stageDirectory.Value;
 
-                        var tempProject = CreateTempProject(
-                            packageId: packageId,
-                            packageVersion: packageVersion,
-                            targetFramework: targetFramework ?? BundledTargetFramework.GetTargetFrameworkMoniker(),
-                            restoreDirectory: stageDirectory);
+                        ObtainPackage(nuGetPackageLocation, targetFramework, verbosity, stageDirectory, stageDirectory);
 
-                        try
-                        {
-                            _projectRestorer.Restore(
-                                tempProject,
-                                stageDirectory,
-                                nugetConfig,
-                                source,
-                                verbosity);
-                        }
-                        finally
-                        {
-                            File.Delete(tempProject.Value);
-                        }
-
-                        packageVersion = Path.GetFileName(
+                        nuGetPackageLocation.PackageVersion = Path.GetFileName(
                             Directory.EnumerateDirectories(
-                                stageDirectory.WithSubDirectories(packageId).Value).Single());
+                                stageDirectory.WithSubDirectories(nuGetPackageLocation.PackageId).Value).Single());
 
-                        var packageDirectory = packageRootDirectory.WithSubDirectories(packageVersion);
+                        var packageDirectory = packageRootDirectory.WithSubDirectories(nuGetPackageLocation.PackageVersion);
                         if (Directory.Exists(packageDirectory.Value))
                         {
                             throw new ToolPackageException(
                                 string.Format(
                                     CommonLocalizableStrings.ToolPackageConflictPackageId,
-                                    packageId,
-                                    packageVersion));
+                                    nuGetPackageLocation.PackageId,
+                                    nuGetPackageLocation.PackageVersion));
                         }
 
                         Directory.CreateDirectory(packageRootDirectory.Value);
@@ -96,8 +76,8 @@ namespace Microsoft.DotNet.ToolPackage
 
                         return new ToolPackageInstance(
                             _store,
-                            packageId,
-                            packageVersion,
+                            nuGetPackageLocation.PackageId,
+                            nuGetPackageLocation.PackageVersion,
                             packageDirectory);
                     }
                     catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
@@ -105,7 +85,7 @@ namespace Microsoft.DotNet.ToolPackage
                         throw new ToolPackageException(
                             string.Format(
                                 CommonLocalizableStrings.FailedToInstallToolPackage,
-                                packageId,
+                                nuGetPackageLocation.PackageId,
                                 ex.Message),
                             ex);
                     }
@@ -125,11 +105,55 @@ namespace Microsoft.DotNet.ToolPackage
                 });
         }
 
+        public IReadOnlyList<CommandSettings> InstallPackageToNuGetCache(
+            NuGetPackageLocation nuGetPackageLocation,
+            string targetFramework = null,
+            string verbosity = null,
+            DirectoryPath? nugetCacheLocation = null)
+        {
+            var assetJsonOutput = new DirectoryPath(Path.GetTempPath());
+            Directory.CreateDirectory(assetJsonOutput.Value);
+
+            ObtainPackage(nuGetPackageLocation, targetFramework, verbosity, assetJsonOutput, nugetCacheLocation);
+            return CommandSettingsRetriver.GetCommands(nuGetPackageLocation.PackageId, assetJsonOutput, true);
+        }
+
+        private void ObtainPackage(
+            NuGetPackageLocation nuGetPackageLocation,
+            string targetFramework,
+            string verbosity,
+            DirectoryPath assetJsonOutput,
+            DirectoryPath? outputDirectory = null,
+            DirectoryPath? nugetCacheLocation = null
+            )
+        {
+            var tempProject = CreateTempProject(
+                packageId: nuGetPackageLocation.PackageId,
+                packageVersion: nuGetPackageLocation.PackageVersion,
+                targetFramework: targetFramework ?? BundledTargetFramework.GetTargetFrameworkMoniker(),
+                restoreDirectory: outputDirectory);
+
+            try
+            {
+                _projectRestorer.Restore(
+                    tempProject,
+                    assetJsonOutput,
+                    nuGetPackageLocation.NugetConfig,
+                    nuGetPackageLocation.Source,
+                    verbosity,
+                    nugetCacheLocation);
+            }
+            finally
+            {
+                File.Delete(tempProject.Value);
+            }
+        }
+
         private FilePath CreateTempProject(
             string packageId,
             string packageVersion,
             string targetFramework,
-            DirectoryPath restoreDirectory)
+            DirectoryPath? restoreDirectory)
         {
             var tempProject = _tempProject ?? new DirectoryPath(Path.GetTempPath())
                 .WithSubDirectories(Path.GetRandomFileName())
@@ -147,7 +171,7 @@ namespace Microsoft.DotNet.ToolPackage
                     new XAttribute("Sdk", "Microsoft.NET.Sdk"),
                     new XElement("PropertyGroup",
                         new XElement("TargetFramework", targetFramework),
-                        new XElement("RestorePackagesPath", restoreDirectory.Value),
+                        restoreDirectory.HasValue ? new XElement("RestorePackagesPath", restoreDirectory.Value.Value) : null,
                         new XElement("RestoreProjectStyle", "DotnetToolReference"), // without it, project cannot reference tool package
                         new XElement("RestoreRootConfigDirectory", Directory.GetCurrentDirectory()), // config file probing start directory
                         new XElement("DisableImplicitFrameworkReferences", "true"), // no Microsoft.NETCore.App in tool folder
