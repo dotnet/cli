@@ -1,4 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import >
+
   <PropertyGroup>
     <TargetFramework>$(CliTargetFramework)</TargetFramework>
     <RuntimeFrameworkVersion>$(MicrosoftNETCoreAppPackageVersion)</RuntimeFrameworkVersion>
@@ -52,7 +54,7 @@
         <Properties>
           DotnetToolsLayoutDirectory=$(SdkOutputDirectory)/DotnetTools;
           TemplateFillInPackageName=dotnet-watch;
-          TemplateFillInPackageVersion=$(MicrosoftAspNetCoreAllPackageVersion);
+          TemplateFillInPackageVersion=$(AspNetCoreVersion);
           PreviousStageDirectory=$(PreviousStageDirectory);
           DotnetToolsLayoutDirectory=$(testAssetSourceRoot);
           DotnetToolsRestoreProjectStyle=DotnetToolReference
