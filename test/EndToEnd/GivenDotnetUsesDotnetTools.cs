@@ -11,8 +11,7 @@ namespace EndToEnd
         {
             new DotnetCommand()
                 .ExecuteWithCapturedOutput("dev-certs --help")
-                    .Should().Pass()
-                         .And.HaveStdOutContaining("dotnet-dev-certs");
+                    .Should().Pass();
         }
     }
 }
