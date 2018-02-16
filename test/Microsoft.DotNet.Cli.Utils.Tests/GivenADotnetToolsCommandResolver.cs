@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.Tests
         }
 
         [Fact]
-        public void ItReturnsACommandSpecWithArgsContainingCommandPathWhenInvokingAToolReferencedWithADifferentCasing()
+        public void ItReturnsACommandSpec()
         {
             var commandResolverArguments = new CommandResolverArguments()
             {

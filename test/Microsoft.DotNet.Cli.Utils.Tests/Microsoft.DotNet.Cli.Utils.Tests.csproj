@@ -51,8 +51,8 @@
       <TestDotnetTools Include="$(RepoRoot)/build/BundledDotnetTools.proj">
         <Properties>
           DotnetToolsLayoutDirectory=$(SdkOutputDirectory)/DotnetTools;
-          DotnetToolsPackageName=dotnet-watch;
-          DotnetToolsPackageVersion=$(MicrosoftAspNetCoreAllPackageVersion);
+          TemplateFillInPackageName=dotnet-watch;
+          TemplateFillInPackageVersion=$(MicrosoftAspNetCoreAllPackageVersion);
           PreviousStageDirectory=$(PreviousStageDirectory);
           DotnetToolsLayoutDirectory=$(testAssetSourceRoot);
           DotnetToolsRestoreProjectStyle=DotnetToolReference

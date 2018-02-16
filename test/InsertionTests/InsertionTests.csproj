@@ -27,8 +27,8 @@
       <TestDotnetTools Include="$(RepoRoot)/build/BundledDotnetTools.proj">
         <Properties>
           DotnetToolsLayoutDirectory=$(SdkOutputDirectory)/DotnetTools;
-          DotnetToolsPackageName=%(BundledDotnetTools.Identity);
-          DotnetToolsPackageVersion=%(BundledDotnetTools.Version);
+          TemplateFillInPackageName=%(BundledDotnetTools.Identity);
+          TemplateFillInPackageVersion=%(BundledDotnetTools.Version);
           PreviousStageDirectory=$(PreviousStageDirectory);
           DotnetToolsLayoutDirectory=$(testAssetSourceRoot);
           DotnetToolsRestoreProjectStyle=DotnetToolReference

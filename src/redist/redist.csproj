@@ -193,8 +193,8 @@
       <TemplatesToBundle Include="$(RepoRoot)/build/BundledTemplates.proj">
         <Properties>
           TemplateLayoutDirectory=$(SdkOutputDirectory)/Templates;
-          TemplatePackageName=%(BundledTemplate.Identity);
-          TemplatePackageVersion=%(BundledTemplate.Version);
+          TemplateFillInPackageName=%(BundledTemplate.Identity);
+          TemplateFillInPackageVersion=%(BundledTemplate.Version);
           PreviousStageDirectory=$(PreviousStageDirectory)
         </Properties>
       </TemplatesToBundle>
@@ -212,8 +212,8 @@
       <DotnetToolsToBundle Include="$(RepoRoot)/build/BundledDotnetTools.proj">
         <Properties>
           DotnetToolsLayoutDirectory=$(SdkOutputDirectory)/DotnetTools;
-          DotnetToolsPackageName=%(BundledDotnetTools.Identity);
-          DotnetToolsPackageVersion=%(BundledDotnetTools.Version);
+          TemplateFillInPackageName=%(BundledDotnetTools.Identity);
+          TemplateFillInPackageVersion=%(BundledDotnetTools.Version);
           PreviousStageDirectory=$(PreviousStageDirectory)
         </Properties>
       </DotnetToolsToBundle>
