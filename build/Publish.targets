@@ -35,6 +35,7 @@
                              UploadArtifactsToAzure;
                              UploadChecksumsToAzure;
                              PublishNupkgToBlobFeed;
+                             PublishNonShipNupkgToBlobFeed;
                              PublishCliVersionBadge" />
 
   <Target Name="GatherItemsForPattern">
