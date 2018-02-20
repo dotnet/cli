@@ -34,7 +34,6 @@
                              GenerateChecksums;
                              UploadArtifactsToAzure;
                              UploadChecksumsToAzure;
-                             PublishNupkgToBlobFeed;
                              PublishNonShipNupkgToBlobFeed;
                              PublishCliVersionBadge" />
 

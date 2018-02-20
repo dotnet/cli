@@ -7,36 +7,15 @@
 
     <ItemGroup>
       <NupkgsForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.Cli.Utils.*.nupkg" />
+      <NupkgsForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.MSBuildSdkResolver.*.nupkg">
+        <ManifestArtifactData>NonShipping=true</ManifestArtifactData>
+      </NupkgsForPublishing>
     </ItemGroup>
 
     <Message Text="Publish NuPkgs to Blob feed started: $(BlobFeedExpectedURL)" />
     <PushToBlobFeed ExpectedFeedUrl="$(BlobFeedExpectedURL)"
                     AccountKey="$(BlobFeedCloudDropAccessToken)"
                     ItemsToPush="@(NupkgsForPublishing)"
-                    ManifestBranch="$(BranchName)"
-                    ManifestBuildId="$(FullNugetVersion)"
-                    ManifestCommit="$(CommitHash)"
-                    ManifestName="$(BuildName)"
-                    ManifestBuildData="ProductVersion=$(FullNugetVersion)"
-                    Overwrite="true"
-                    PublishFlatContainer="false"
-                    SkipCreateManifest="$(IsNotOrchestratedPublish)" />
-  </Target>
-
-  <Target Name="PublishNonShipNupkgToBlobFeed" Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' " >
-    <Error Condition="'$(BlobFeedCloudDropAccessToken)' == ''" Text="Missing property BlobFeedCloudDropAccessToken." />
-    <Error Condition="'$(BlobFeedExpectedURL)' == ''" Text="Missing property BlobFeedExpectedURL." />
-
-    <ItemGroup>
-      <NonShipNupkgsForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.MSBuildSdkResolver.*.nupkg">
-        <ManifestArtifactData>NonShipping=true</ManifestArtifactData>
-      </NonShipNupkgsForPublishing>
-    </ItemGroup>
-
-    <Message Text="Publish Non-Shipping NuPkgs to Blob feed started: $(BlobFeedExpectedURL)" />
-    <PushToBlobFeed ExpectedFeedUrl="$(BlobFeedExpectedURL)"
-                    AccountKey="$(BlobFeedCloudDropAccessToken)"
-                    ItemsToPush="@(NonShipNupkgsForPublishing)"
                     ManifestBranch="$(BranchName)"
                     ManifestBuildId="$(FullNugetVersion)"
                     ManifestCommit="$(CommitHash)"
