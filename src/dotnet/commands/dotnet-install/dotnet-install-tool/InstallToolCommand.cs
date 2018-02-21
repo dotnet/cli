@@ -112,10 +112,13 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                             nuGetPackageLocation,
                             targetFramework: _framework,
                             verbosity: _verbosity);
-                        
+
                         foreach (var command in commands)
                         {
-                            _shellShimRepository.CreateShimInNonGlobalLocation(command.Executable, command.Name, _binPath);
+                            _shellShimRepository.CreateShim(
+                                command.Executable,
+                                command.Name,
+                                new DirectoryPath(_binPath));
                         }
                     }
                     else
@@ -126,7 +129,6 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                             verbosity: _verbosity);
 
                         commands = package.Commands;
-                        
                         
                         foreach (var command in commands)
                         {

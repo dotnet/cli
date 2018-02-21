@@ -6,8 +6,7 @@ namespace Microsoft.DotNet.ShellShim
 {
     internal interface IShellShimRepository
     {
-        void CreateShim(FilePath targetExecutablePath, string commandName);
-
+        void CreateShim(FilePath targetExecutablePath, string commandName, DirectoryPath? nonGlobalLocation = null);
         void RemoveShim(string commandName);
     }
 }

@@ -20,14 +20,14 @@ namespace Microsoft.DotNet.ShellShim
         private const string LauncherExeResourceName = "Microsoft.DotNet.Tools.Launcher.Executable";
         private const string LauncherConfigResourceName = "Microsoft.DotNet.Tools.Launcher.Config";
 
-        private readonly DirectoryPath _shimsDirectory;
+        private readonly DirectoryPath _globalShimsDirectory;
 
-        public ShellShimRepository(DirectoryPath shimsDirectory)
+        public ShellShimRepository(DirectoryPath globalShimsDirectory)
         {
-            _shimsDirectory = shimsDirectory;
+            _globalShimsDirectory = globalShimsDirectory;
         }
 
-        public void CreateShim(FilePath targetExecutablePath, string commandName)
+        public void CreateShim(FilePath targetExecutablePath, string commandName, DirectoryPath? nonGlobalLocation = null)
         {
             if (string.IsNullOrEmpty(targetExecutablePath.Value))
             {
@@ -50,9 +50,9 @@ namespace Microsoft.DotNet.ShellShim
                 action: () => {
                     try
                     {
-                        if (!Directory.Exists(_shimsDirectory.Value))
+                        if (!Directory.Exists(_globalShimsDirectory.Value))
                         {
-                            Directory.CreateDirectory(_shimsDirectory.Value);
+                            Directory.CreateDirectory(_globalShimsDirectory.Value);
                         }
 
                         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -74,7 +74,7 @@ namespace Microsoft.DotNet.ShellShim
                             script.AppendLine("#!/bin/sh");
                             script.AppendLine($"dotnet {targetExecutablePath.ToQuotedString()} \"$@\"");
 
-                            var shimPath = GetPosixShimPath(commandName);
+                            var shimPath = GetPosixShimPath(commandName, _globalShimsDirectory);
                             File.WriteAllText(shimPath.Value, script.ToString());
 
                             SetUserExecutionPermission(shimPath);
@@ -171,18 +171,18 @@ namespace Microsoft.DotNet.ShellShim
             }
             else
             {
-                yield return GetPosixShimPath(commandName);
+                yield return GetPosixShimPath(commandName, _globalShimsDirectory);
             }
         }
 
-        private FilePath GetPosixShimPath(string commandName)
+        private FilePath GetPosixShimPath(string commandName, DirectoryPath shimsDirectory)
         {
-            return _shimsDirectory.WithFile(commandName);
+            return shimsDirectory.WithFile(commandName);
         }
 
         private FilePath GetWindowsShimPath(string commandName)
         {
-            return new FilePath(_shimsDirectory.WithFile(commandName).Value + ".exe");
+            return new FilePath(_globalShimsDirectory.WithFile(commandName).Value + ".exe");
         }
 
         private FilePath GetWindowsConfigPath(string commandName)
