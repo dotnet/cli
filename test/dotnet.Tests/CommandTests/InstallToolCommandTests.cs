@@ -287,12 +287,38 @@ namespace Microsoft.DotNet.Tests.Commands
 
             installToolCommand.Execute().Should().Be(0);
 
-            // It is hard to simulate shell behavior. Only Assert shim can point to executable dll
-            _fileSystem.File.Exists(ExpectedCommandPath()).Should().BeTrue();
+            _fileSystem.File.Exists(Path.Combine("/tmp/folder", ExpectedFileName())).Should().BeTrue();
+
             var deserializedFakeShim = JsonConvert.DeserializeObject<ShellShimRepositoryMock.FakeShim>(
-                _fileSystem.File.ReadAllText(ExpectedCommandPath()));
+                _fileSystem.File.ReadAllText(Path.Combine("/tmp/folder", ExpectedFileName())));
 
             _fileSystem.File.Exists(deserializedFakeShim.ExecutablePath).Should().BeTrue();
+        }
+
+        [Fact]
+        public void WhenRunWithPackageIdAndBinPathItShouldNotBeInGlobalLocation()
+        {
+            var result = Parser.Instance.Parse($"dotnet install tool --bin-path /tmp/folder {PackageId}");
+            var appliedCommand = result["dotnet"]["install"]["tool"];
+            var parser = Parser.Instance;
+            var parseResult = parser.ParseFrom("dotnet install", new[] {"tool", PackageId});
+            
+            var installToolCommand = new InstallToolCommand(appliedCommand,
+                parseResult,
+                _toolPackageStore,
+                CreateToolPackageInstaller(),
+                _shellShimRepositoryMock,
+                _environmentPathInstructionMock,
+                _reporter);
+
+            installToolCommand.Execute().Should().Be(0);
+
+            var deserializedFakeShim = JsonConvert.DeserializeObject<ShellShimRepositoryMock.FakeShim>(
+                _fileSystem.File.ReadAllText(Path.Combine("/tmp/folder", ExpectedFileName())));
+
+            deserializedFakeShim.ExecutablePath.Should().NotContain(
+                PathToPlacePackages,
+                "Package should not be in global location");
         }
 
         [Fact]
@@ -332,10 +358,15 @@ namespace Microsoft.DotNet.Tests.Commands
 
         private static string ExpectedCommandPath()
         {
-            var extension = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : string.Empty;
             return Path.Combine(
                 "pathToPlace",
-                ProjectRestorerMock.FakeCommandName + extension);
+                ExpectedFileName());
+        }
+
+        private static string ExpectedFileName()
+        {
+            var extension = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : string.Empty;
+            return ProjectRestorerMock.FakeCommandName + extension;
         }
     }
 }

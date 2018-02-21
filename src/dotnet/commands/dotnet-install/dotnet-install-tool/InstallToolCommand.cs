@@ -99,31 +99,56 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                         configFile = new FilePath(_configFilePath);
                     }
 
-                    package = _toolPackageInstaller.InstallPackage(
-                        new NuGetPackageLocation(
-                            packageId: _packageId,
-                            packageVersion: _packageVersion,
-                            nugetConfig: configFile,
-                            source: _source),
-                        targetFramework: _framework,
-                        verbosity: _verbosity);
+                    var nuGetPackageLocation = new NuGetPackageLocation(
+                        packageId: _packageId,
+                        packageVersion: _packageVersion,
+                        nugetConfig: configFile,
+                        source: _source);
 
-                    foreach (var command in package.Commands)
+                    IReadOnlyList<CommandSettings> commands;
+                    if (_binPath != null)
                     {
-                        _shellShimRepository.CreateShim(command.Executable, command.Name);
+                        commands = _toolPackageInstaller.InstallPackageToNuGetCache(
+                            nuGetPackageLocation,
+                            targetFramework: _framework,
+                            verbosity: _verbosity);
+                        
+                        foreach (var command in commands)
+                        {
+                            _shellShimRepository.CreateShimInNonGlobalLocation(command.Executable, command.Name, _binPath);
+                        }
                     }
+                    else
+                    {
+                        package = _toolPackageInstaller.InstallPackage(
+                            nuGetPackageLocation,
+                            targetFramework: _framework,
+                            verbosity: _verbosity);
+
+                        commands = package.Commands;
+                        
+                        
+                        foreach (var command in commands)
+                        {
+                            _shellShimRepository.CreateShim(command.Executable, command.Name);
+                        }
+                    }
+                    
 
                     scope.Complete();
                 }
 
-                _environmentPathInstruction.PrintAddPathInstructionIfPathDoesNotExist();
+                if (_binPath == null)
+                {
+                    _environmentPathInstruction.PrintAddPathInstructionIfPathDoesNotExist();
 
-                _reporter.WriteLine(
-                    string.Format(
-                        LocalizableStrings.InstallationSucceeded,
-                        string.Join(", ", package.Commands.Select(c => c.Name)),
-                        package.PackageId,
-                        package.PackageVersion).Green());
+                    _reporter.WriteLine(
+                        string.Format(
+                            LocalizableStrings.InstallationSucceeded,
+                            string.Join(", ", package.Commands.Select(c => c.Name)),
+                            package.PackageId,
+                            package.PackageVersion).Green());
+                }
             });
         }
 
@@ -179,12 +204,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
 
         private int Validate()
         {
-            if (!_global)
-            {
-                throw new GracefulException(LocalizableStrings.InstallToolCommandOnlySupportGlobal);
-            }
-
-            if (_binPath != null)
+            if (_binPath != null && _global)
             {
                 throw new GracefulException("Cannot have global and bin-path as opinion at the same time.");
             }
