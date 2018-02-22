@@ -119,7 +119,7 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             _fileSystem.Directory.CreateDirectory(packageDirectory.Value);
             var executable = packageDirectory.WithFile("exe");
             _fileSystem.File.CreateEmptyFile(executable.Value);
-            return new List<CommandSettings> {new CommandSettings("name", "runnner", executable)};
+            return new List<CommandSettings> {new CommandSettings(ProjectRestorerMock.FakeCommandName, "runnner", executable)};
         }
     }
 }

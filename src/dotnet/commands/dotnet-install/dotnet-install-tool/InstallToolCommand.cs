@@ -135,7 +135,6 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                             _shellShimRepository.CreateShim(command.Executable, command.Name);
                         }
                     }
-                    
 
                     scope.Complete();
                 }
