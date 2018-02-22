@@ -37,7 +37,9 @@ namespace Microsoft.DotNet.ShellShim
                 throw new ShellShimException(CommonLocalizableStrings.CannotCreateShimForEmptyCommand);
             }
 
-            var shellShimPath = new ShellShimPath(_globalShimsDirectory);
+            var shimsDirectory = nonGlobalLocation ?? _globalShimsDirectory;
+
+            var shellShimPath = new ShellShimPath(shimsDirectory);
             if (shellShimPath.GetShimFiles(commandName).Any(p => File.Exists(p.Value)))
             {
                 throw new ShellShimException(
@@ -51,9 +53,9 @@ namespace Microsoft.DotNet.ShellShim
                     try
                     {
                         
-                        if (!Directory.Exists(_globalShimsDirectory.Value))
+                        if (!Directory.Exists(shimsDirectory.Value))
                         {
-                            Directory.CreateDirectory(_globalShimsDirectory.Value);
+                            Directory.CreateDirectory(shimsDirectory.Value);
                         }
 
                         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
