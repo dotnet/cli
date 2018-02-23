@@ -47,6 +47,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             {
                 "--runtime",
                 GetRuntimeIdentifierWithMacOsHighSierraFallback(),
+                "--ignore-failed-sources", //or it will throw when a feed cannot be reached
                 $"/p:BaseIntermediateOutputPath={assetJsonOutput.ToQuotedString()}"
             });
 
