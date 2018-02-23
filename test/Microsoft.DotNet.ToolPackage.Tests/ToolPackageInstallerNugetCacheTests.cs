@@ -34,7 +34,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
             var nugetCacheLocation =
                 new DirectoryPath(Path.GetTempPath()).WithSubDirectories(Path.GetRandomFileName());
-            
+
             IReadOnlyList<CommandSettings> commands = installer.InstallPackageToNuGetCache(
                 new NuGetPackageLocation(packageId: TestPackageId, packageVersion: TestPackageVersion,
                     nugetConfig: nugetConfigPath), targetFramework: _testTargetframework, nugetCacheLocation: nugetCacheLocation);
@@ -131,7 +131,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
             return (store, installer, reporter, fileSystem);
         }
-        
+
         private static FilePath WriteNugetConfigFileToPointToTheFeed()
         {
             var nugetConfigName = "nuget.config";

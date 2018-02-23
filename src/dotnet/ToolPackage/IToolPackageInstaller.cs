@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.ToolPackage
             string targetFramework = null,
             string verbosity = null);
 
-        IReadOnlyList<CommandSettings> 
+        IReadOnlyList<CommandSettings>
             InstallPackageToNuGetCache(NuGetPackageLocation nuGetPackageLocation,
                 string targetFramework = null,
                 string verbosity = null,
