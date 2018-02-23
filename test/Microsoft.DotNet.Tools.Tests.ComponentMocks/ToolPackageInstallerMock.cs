@@ -110,10 +110,7 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             string verbosity = null,
             DirectoryPath? nugetCacheLocation = null)
         {
-            if (nugetCacheLocation == null)
-            {
-                nugetCacheLocation = new DirectoryPath("anypath");
-            }
+            nugetCacheLocation = nugetCacheLocation ?? new DirectoryPath("anypath");
 
             var packageDirectory = nugetCacheLocation.Value.WithSubDirectories(nuGetPackageLocation.PackageId);
             _fileSystem.Directory.CreateDirectory(packageDirectory.Value);

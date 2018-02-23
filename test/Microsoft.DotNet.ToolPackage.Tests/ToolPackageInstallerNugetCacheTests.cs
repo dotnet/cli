@@ -62,7 +62,8 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 targetFramework: _testTargetframework,
                 nugetCacheLocation: nugetCacheLocation);
 
-            Directory.Exists(nugetCacheLocation.WithSubDirectories(TestPackageId).Value).Should().BeTrue();
+            var expectedDirectory = nugetCacheLocation.WithSubDirectories(TestPackageId).Value;
+            fileSystem.Directory.Exists(expectedDirectory).Should().BeTrue(expectedDirectory + " should exist");
         }
 
         private static FilePath GetUniqueTempProjectPathEachTest()
