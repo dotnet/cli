@@ -20,6 +20,10 @@ namespace Microsoft.DotNet.Cli
                     LocalizableStrings.GlobalOptionDescription,
                     Accept.NoArguments()),
                 Create.Option(
+                    "--bin-path",
+                    "Location of tool shim that is unique for each session",
+                    Accept.ExactlyOneArgument()),
+                Create.Option(
                     "--version",
                     LocalizableStrings.VersionOptionDescription,
                     Accept.ExactlyOneArgument()),

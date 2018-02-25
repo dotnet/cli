@@ -13,6 +13,7 @@ namespace Microsoft.DotNet.ToolPackage
             DirectoryPath assetJsonOutput,
             FilePath? nugetConfig = null,
             string source = null,
-            string verbosity = null);
+            string verbosity = null,
+            DirectoryPath? nugetCacheLocation = null);
     }
 }

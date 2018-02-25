@@ -89,6 +89,36 @@ namespace Microsoft.DotNet.ShellShim.Tests
 
             stdOut.Should().Contain("Hello World");
         }
+        
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void GivenAnExecutablePathItCanGenerateShimFileInNonGlobalLocation(bool testMockBehaviorIsInSync)
+        {
+            var outputDll = MakeHelloWorldExecutableDll();
+            var pathToShim = GetNewCleanFolderUnderTempRoot();
+            IShellShimRepository shellShimRepository;
+            if (testMockBehaviorIsInSync)
+            {
+                shellShimRepository = new ShellShimRepositoryMock(new DirectoryPath(pathToShim));
+            }
+            else
+            {
+                shellShimRepository = new ShellShimRepository(new DirectoryPath(pathToShim));
+            }
+ 
+            var shellCommandName = nameof(ShellShimRepositoryTests) + Path.GetRandomFileName();
+
+            var nonGlobalLocation = GetNewCleanFolderUnderTempRoot();
+            shellShimRepository.CreateShim(outputDll, shellCommandName, new DirectoryPath(nonGlobalLocation));
+            
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                shellCommandName = shellCommandName + ".exe";
+            }
+
+            File.Exists(Path.Combine(nonGlobalLocation, shellCommandName)).Should().BeTrue();
+        }
 
         [Fact]
         public void GivenAnExecutablePathDirectoryThatDoesNotExistItCanGenerateShimFile()

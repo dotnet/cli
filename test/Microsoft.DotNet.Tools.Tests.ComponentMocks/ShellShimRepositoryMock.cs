@@ -16,17 +16,18 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
     internal class ShellShimRepositoryMock : IShellShimRepository
     {
         private static IFileSystem _fileSystem;
-        private readonly DirectoryPath _pathToPlaceShim;
+        private readonly DirectoryPath _globalPathToPlaceShim;
 
-        public ShellShimRepositoryMock(DirectoryPath pathToPlaceShim, IFileSystem fileSystem = null)
+        public ShellShimRepositoryMock(DirectoryPath globalPathToPlaceShim, IFileSystem fileSystem = null)
         {
-            _pathToPlaceShim = pathToPlaceShim;
+            _globalPathToPlaceShim = globalPathToPlaceShim;
             _fileSystem = fileSystem ?? new FileSystemWrapper();
         }
 
-        public void CreateShim(FilePath targetExecutablePath, string commandName)
+        public void CreateShim(FilePath targetExecutablePath, string commandName, DirectoryPath? nonGlobalLocation = null)
         {
-            if (ShimExists(commandName))
+            var pathToPlaceShim = nonGlobalLocation ?? _globalPathToPlaceShim;
+            if (ShimExists(commandName, pathToPlaceShim))
             {
                 throw new ShellShimException(
                     string.Format(CommonLocalizableStrings.ShellShimConflict,
@@ -42,17 +43,17 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                     };
 
                     _fileSystem.File.WriteAllText(
-                        GetShimPath(commandName).Value,
+                        GetShimPath(commandName, pathToPlaceShim).Value,
                         JsonConvert.SerializeObject(shim));
                 },
                 rollback: () => {
-                    _fileSystem.File.Delete(GetShimPath(commandName).Value);
+                    _fileSystem.File.Delete(GetShimPath(commandName, pathToPlaceShim).Value);
                 });
         }
 
         public void RemoveShim(string commandName)
         {
-            var originalShimPath = GetShimPath(commandName);
+            var originalShimPath = GetShimPath(commandName, _globalPathToPlaceShim);
             if (!_fileSystem.File.Exists(originalShimPath.Value))
             {
                 return;
@@ -79,14 +80,14 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                 });
         }
 
-        private bool ShimExists(string commandName)
+        private bool ShimExists(string commandName, DirectoryPath pathToPlaceShim)
         {
-            return _fileSystem.File.Exists(GetShimPath(commandName).Value);
+            return _fileSystem.File.Exists(GetShimPath(commandName, pathToPlaceShim).Value);
         }
 
-        private FilePath GetShimPath(string shellCommandName)
+        private FilePath GetShimPath(string shellCommandName, DirectoryPath pathToPlaceShim)
         {
-            var shimPath = Path.Combine(_pathToPlaceShim.Value, shellCommandName);
+            var shimPath = Path.Combine(pathToPlaceShim.Value, shellCommandName);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 shimPath += ".exe";

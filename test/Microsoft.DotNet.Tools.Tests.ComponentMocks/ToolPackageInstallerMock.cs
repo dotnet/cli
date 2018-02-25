@@ -34,15 +34,11 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             _installCallback = installCallback;
         }
 
-        public IToolPackage InstallPackage(
-            string packageId,
-            string packageVersion = null,
+        public IToolPackage InstallPackage(NuGetPackageLocation nuGetPackageLocation,
             string targetFramework = null,
-            FilePath? nugetConfig = null,
-            string source = null,
             string verbosity = null)
         {
-            var packageRootDirectory = _store.Root.WithSubDirectories(packageId);
+            var packageRootDirectory = _store.Root.WithSubDirectories(nuGetPackageLocation.PackageId);
             string rollbackDirectory = null;
 
             return TransactionalAction.Run<IToolPackage>(
@@ -56,14 +52,14 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                     // Write a fake project with the requested package id, version, and framework
                     _fileSystem.File.WriteAllText(
                         tempProject.Value,
-                        $"{packageId}:{packageVersion}:{targetFramework}");
+                        $"{nuGetPackageLocation.PackageId}:{nuGetPackageLocation.PackageVersion}:{targetFramework}");
 
                     // Perform a restore on the fake project
                     _projectRestorer.Restore(
                         tempProject,
                         stageDirectory,
-                        nugetConfig,
-                        source,
+                        nuGetPackageLocation.NugetConfig,
+                        nuGetPackageLocation.Source,
                         verbosity);
 
                     if (_installCallback != null)
@@ -71,18 +67,18 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                         _installCallback();
                     }
 
-                    packageVersion = Path.GetFileName(
+                    nuGetPackageLocation.PackageVersion = Path.GetFileName(
                         _fileSystem.Directory.EnumerateFileSystemEntries(
-                            stageDirectory.WithSubDirectories(packageId).Value).Single());
+                            stageDirectory.WithSubDirectories(nuGetPackageLocation.PackageId).Value).Single());
 
-                    var packageDirectory = packageRootDirectory.WithSubDirectories(packageVersion);
+                    var packageDirectory = packageRootDirectory.WithSubDirectories(nuGetPackageLocation.PackageVersion);
                     if (_fileSystem.Directory.Exists(packageDirectory.Value))
                     {
                         throw new ToolPackageException(
                             string.Format(
                                 CommonLocalizableStrings.ToolPackageConflictPackageId,
-                                packageId,
-                                packageVersion));
+                                nuGetPackageLocation.PackageId,
+                                nuGetPackageLocation.PackageVersion));
                     }
 
                     _fileSystem.Directory.CreateDirectory(packageRootDirectory.Value);
@@ -91,8 +87,8 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
 
                     return new ToolPackageMock(
                         _fileSystem,
-                        packageId,
-                        packageVersion,
+                        nuGetPackageLocation.PackageId,
+                        nuGetPackageLocation.PackageVersion,
                         packageDirectory);
                 },
                 rollback: () => {
@@ -106,6 +102,21 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                         _fileSystem.Directory.Delete(packageRootDirectory.Value, false);
                     }
                 });
+        }
+
+        public IReadOnlyList<CommandSettings> InstallPackageToNuGetCache(
+            NuGetPackageLocation nuGetPackageLocation,
+            string targetFramework = null,
+            string verbosity = null,
+            DirectoryPath? nugetCacheLocation = null)
+        {
+            nugetCacheLocation = nugetCacheLocation ?? new DirectoryPath("anypath");
+
+            var packageDirectory = nugetCacheLocation.Value.WithSubDirectories(nuGetPackageLocation.PackageId);
+            _fileSystem.Directory.CreateDirectory(packageDirectory.Value);
+            var executable = packageDirectory.WithFile("exe");
+            _fileSystem.File.CreateEmptyFile(executable.Value);
+            return new List<CommandSettings> {new CommandSettings(ProjectRestorerMock.FakeCommandName, "runnner", executable)};
         }
     }
 }

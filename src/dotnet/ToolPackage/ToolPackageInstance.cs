@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Tools;
 using Microsoft.Extensions.EnvironmentAbstractions;
-using NuGet.ProjectModel;
 
 namespace Microsoft.DotNet.ToolPackage
 {
@@ -25,7 +24,7 @@ namespace Microsoft.DotNet.ToolPackage
             PackageId = packageId ?? throw new ArgumentNullException(nameof(packageId));
             PackageVersion = packageVersion ?? throw new ArgumentNullException(nameof(packageVersion));
             PackageDirectory = packageDirectory;
-            _commands = new Lazy<IReadOnlyList<CommandSettings>>(GetCommands);
+            _commands = new Lazy<IReadOnlyList<CommandSettings>>(() => CommandSettingsRetriver.GetCommands(PackageId, PackageDirectory, false));
         }
 
         public string PackageId { get; private set; }
@@ -93,82 +92,6 @@ namespace Microsoft.DotNet.ToolPackage
                         Directory.Move(tempPackageDirectory, PackageDirectory.Value);
                     }
                 });
-        }
-
-        private IReadOnlyList<CommandSettings> GetCommands()
-        {
-            const string AssetsFileName = "project.assets.json";
-            const string ToolSettingsFileName = "DotnetToolSettings.xml";
-
-            try
-            {
-                var commands = new List<CommandSettings>();
-                var lockFile = new LockFileFormat().Read(PackageDirectory.WithFile(AssetsFileName).Value);
-
-                var library = FindLibraryInLockFile(lockFile);
-                var dotnetToolSettings = FindItemInTargetLibrary(library, ToolSettingsFileName);
-                if (dotnetToolSettings == null)
-                {
-                    throw new ToolPackageException(
-                        string.Format(
-                            CommonLocalizableStrings.ToolPackageMissingSettingsFile,
-                            PackageId));
-                }
-
-                var toolConfigurationPath =
-                    PackageDirectory
-                        .WithSubDirectories(
-                            PackageId,
-                            library.Version.ToNormalizedString())
-                        .WithFile(dotnetToolSettings.Path);
-
-                var configuration = ToolConfigurationDeserializer.Deserialize(toolConfigurationPath.Value);
-
-                var entryPointFromLockFile = FindItemInTargetLibrary(library, configuration.ToolAssemblyEntryPoint);
-                if (entryPointFromLockFile == null)
-                {
-                    throw new ToolPackageException(
-                        string.Format(
-                            CommonLocalizableStrings.ToolPackageMissingEntryPointFile,
-                            PackageId,
-                            configuration.ToolAssemblyEntryPoint));
-                }
-
-                // Currently only "dotnet" commands are supported
-                commands.Add(new CommandSettings(
-                    configuration.CommandName,
-                    "dotnet",
-                    PackageDirectory
-                        .WithSubDirectories(
-                            PackageId,
-                            library.Version.ToNormalizedString())
-                        .WithFile(entryPointFromLockFile.Path)));
-
-                return commands;
-            }
-            catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
-            {
-                throw new ToolPackageException(
-                    string.Format(
-                        CommonLocalizableStrings.FailedToRetrieveToolConfiguration,
-                        PackageId,
-                        ex.Message),
-                    ex);
-            }
-        }
-
-        private LockFileTargetLibrary FindLibraryInLockFile(LockFile lockFile)
-        {
-            return lockFile
-                ?.Targets?.SingleOrDefault(t => t.RuntimeIdentifier != null)
-                ?.Libraries?.SingleOrDefault(l => l.Name == PackageId);
-        }
-
-        private static LockFileItem FindItemInTargetLibrary(LockFileTargetLibrary library, string targetRelativeFilePath)
-        {
-            return library
-                ?.ToolsAssemblies
-                ?.SingleOrDefault(t => LockFileMatcher.MatchesFile(t, targetRelativeFilePath));
         }
     }
 }

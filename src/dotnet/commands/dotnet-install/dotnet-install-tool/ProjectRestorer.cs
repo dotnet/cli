@@ -26,7 +26,8 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             DirectoryPath assetJsonOutput,
             FilePath? nugetConfig = null,
             string source = null,
-            string verbosity = null)
+            string verbosity = null,
+            DirectoryPath? nugetCacheLocation = null)
         {
             var argsToPassToRestore = new List<string>();
 
@@ -47,7 +48,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             {
                 "--runtime",
                 GetRuntimeIdentifierWithMacOsHighSierraFallback(),
-                $"/p:BaseIntermediateOutputPath={assetJsonOutput.ToQuotedString()}"
+                $"/p:BaseIntermediateOutputPath={assetJsonOutput.ToXmlEncodeString()}"
             });
 
             argsToPassToRestore.Add($"/verbosity:{verbosity ?? "quiet"}");
@@ -60,6 +61,11 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                 command = command
                     .OnOutputLine((line) => _reporter.WriteLine(line))
                     .OnErrorLine((line) => _reporter.WriteLine(line));
+            }
+
+            if (nugetCacheLocation.HasValue)
+            {
+                command = command.EnvironmentVariable("NUGET_PACKAGES ", nugetCacheLocation.Value.Value);
             }
 
             var result = command.Execute();
