@@ -72,10 +72,10 @@ namespace Microsoft.DotNet.Cli.Telemetry
             return "";
         }
 
-        [DllImport("libc", ExactSpelling = true, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("libc", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr gnu_get_libc_release();
 
-        [DllImport("libc", ExactSpelling = true, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("libc", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr gnu_get_libc_version();
 
         /// <summary>
