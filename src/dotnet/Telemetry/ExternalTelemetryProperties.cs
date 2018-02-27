@@ -17,6 +17,7 @@ namespace Microsoft.DotNet.Cli.Telemetry
     // public API
     internal static class ExternalTelemetryProperties
     {
+        /// <summary>
         /// For Windows, returns the OS installation type, eg. "Nano Server", "Server Core", "Server", or "Client".
         /// For Unix, or on error, currently returns empty string.
         /// </summary>
@@ -50,7 +51,6 @@ namespace Microsoft.DotNet.Cli.Telemetry
         /// We're not attempting to decode the value on the client side as new Windows releases may add new values.
         /// For Unix, or on error, returns an empty string.
         /// </summary>
-        /// <returns></returns>
         internal static string GetProductType()
         {
             if (RuntimeEnvironment.OperatingSystemPlatform != Platform.Windows)
