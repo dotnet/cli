@@ -64,7 +64,7 @@ namespace Microsoft.DotNet.Cli.Telemetry
                 }
             }
             // Catch everything: this is for telemetry only
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debug.Assert(false, $"Unexpected exception from GetProductInfo: ${e.GetType().Name}: ${e.Message}");
             }
