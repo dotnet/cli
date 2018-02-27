@@ -70,14 +70,14 @@ namespace Microsoft.DotNet.Tests
         public void TelemetryCommonPropertiesShouldContainWindowsProductType()
         {
             var unitUnderTest = new TelemetryCommonProperties(getMACAddress: () => null, userLevelCacheWriter: new NothingCache());
-            Convert.ToUInt32(unitUnderTest.GetTelemetryCommonProperties()["Product Type"]).Should().NotBe(0);
+            unitUnderTest.GetTelemetryCommonProperties()["Product Type"].Should().NotBeEmpty();
         }
 
         [UnixOnlyFact]
         public void TelemetryCommonPropertiesShouldContainEmptyWindowsProductType()
         {
             var unitUnderTest = new TelemetryCommonProperties(getMACAddress: () => null, userLevelCacheWriter: new NothingCache());
-            Convert.ToUInt32(unitUnderTest.GetTelemetryCommonProperties()["Product Type"]).Should().Be(0);
+            unitUnderTest.GetTelemetryCommonProperties()["Product Type"].Should().BeEmpty();
         }
 
         [WindowsOnlyFact]
