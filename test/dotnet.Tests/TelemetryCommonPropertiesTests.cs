@@ -56,28 +56,28 @@ namespace Microsoft.DotNet.Tests
         public void TelemetryCommonPropertiesShouldContainWindowsInstallType()
         {
             var unitUnderTest = new TelemetryCommonProperties(getMACAddress: () => null, userLevelCacheWriter: new NothingCache());
-            var assignedMachineId = unitUnderTest.GetTelemetryCommonProperties()["Installation Type"].Should().NotBeEmpty();
+            unitUnderTest.GetTelemetryCommonProperties()["Installation Type"].Should().NotBeEmpty();
         }
 
         [UnixOnlyFact]
         public void TelemetryCommonPropertiesShouldContainEmptyWindowsInstallType()
         {
             var unitUnderTest = new TelemetryCommonProperties(getMACAddress: () => null, userLevelCacheWriter: new NothingCache());
-            var assignedMachineId = unitUnderTest.GetTelemetryCommonProperties()["Installation Type"].Should().BeEmpty();
+            unitUnderTest.GetTelemetryCommonProperties()["Installation Type"].Should().BeEmpty();
         }
 
         [WindowsOnlyFact]
         public void TelemetryCommonPropertiesShouldContainWindowsProductType()
         {
             var unitUnderTest = new TelemetryCommonProperties(getMACAddress: () => null, userLevelCacheWriter: new NothingCache());
-            var assignedMachineId = Convert.ToUInt32(unitUnderTest.GetTelemetryCommonProperties()["Product Type"]).Should().NotBe(0);
+            Convert.ToUInt32(unitUnderTest.GetTelemetryCommonProperties()["Product Type"]).Should().NotBe(0);
         }
 
         [UnixOnlyFact]
         public void TelemetryCommonPropertiesShouldContainEmptyWindowsProductType()
         {
             var unitUnderTest = new TelemetryCommonProperties(getMACAddress: () => null, userLevelCacheWriter: new NothingCache());
-            var assignedMachineId = Convert.ToUInt32(unitUnderTest.GetTelemetryCommonProperties()["Product Type"]).Should().Be(0);
+            Convert.ToUInt32(unitUnderTest.GetTelemetryCommonProperties()["Product Type"]).Should().Be(0);
         }
 
         [WindowsOnlyFact]
