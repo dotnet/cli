@@ -76,6 +76,12 @@ namespace Microsoft.DotNet.ToolPackage
                             File.Delete(tempProject.Value);
                         }
 
+                        Console.WriteLine($"####packageId='{packageId}'");
+                        Console.WriteLine($"####stageDirectory='{stageDirectory}'");
+                        Console.WriteLine($"####stageDirectory.WithSubDirectories(packageId).Value='{stageDirectory.WithSubDirectories(packageId).Value}'");
+                        Console.WriteLine($"####Directory.GetDirectories(stageDirectory.WithSubDirectories(packageId).Value).Count()='{Directory.GetDirectories(stageDirectory.WithSubDirectories(packageId).Value).Count()}'");
+                        Console.WriteLine($"####Directory.EnumerateDirectories(stageDirectory.WithSubDirectories(packageId).Value).Count()='{Directory.EnumerateDirectories(stageDirectory.WithSubDirectories(packageId).Value).Count()}'");
+
                         packageVersion = Path.GetFileName(
                             Directory.EnumerateDirectories(
                                 stageDirectory.WithSubDirectories(packageId).Value).Single());
