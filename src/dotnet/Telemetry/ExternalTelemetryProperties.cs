@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Security;
 using Microsoft.DotNet.PlatformAbstractions;
@@ -24,7 +25,9 @@ namespace Microsoft.DotNet.Cli.Telemetry
         internal static string GetInstallationType()
         {
             if (RuntimeEnvironment.OperatingSystemPlatform != Platform.Windows)
+            {
                 return "";
+            }
 
             const string Key = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion";
             const string ValueName = @"InstallationType";
@@ -54,13 +57,15 @@ namespace Microsoft.DotNet.Cli.Telemetry
         internal static string GetProductType()
         {
             if (RuntimeEnvironment.OperatingSystemPlatform != Platform.Windows)
+            {
                 return "";
+            }
 
             try
             {
                 if (GetProductInfo((uint)Environment.OSVersion.Version.Major, (uint)Environment.OSVersion.Version.Minor, 0, 0, out uint productType))
                 {
-                    return productType.ToString("D");
+                    return productType.ToString("D", CultureInfo.InvariantCulture);
                 }
             }
             // Catch everything: this is for telemetry only
@@ -86,7 +91,9 @@ namespace Microsoft.DotNet.Cli.Telemetry
         internal static string GetLibcRelease()
         {
             if (RuntimeEnvironment.OperatingSystemPlatform == Platform.Windows)
+            {
                 return "";
+            }
 
             try
             {
@@ -108,7 +115,9 @@ namespace Microsoft.DotNet.Cli.Telemetry
         internal static string GetLibcVersion()
         {
             if (RuntimeEnvironment.OperatingSystemPlatform == Platform.Windows)
+            {
                 return "";
+            }
 
             try
             {
