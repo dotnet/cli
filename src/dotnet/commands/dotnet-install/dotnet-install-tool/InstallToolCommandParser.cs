@@ -20,6 +20,10 @@ namespace Microsoft.DotNet.Cli
                     LocalizableStrings.GlobalOptionDescription,
                     Accept.NoArguments()),
                 Create.Option(
+                    "--tool-path",
+                    "Location of shim to access tool", // TODO wul nocheckin loc
+                    Accept.ExactlyOneArgument()),
+                Create.Option(
                     "--version",
                     LocalizableStrings.VersionOptionDescription,
                     Accept.ExactlyOneArgument()),

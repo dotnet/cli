@@ -19,6 +19,10 @@ namespace Microsoft.DotNet.Cli
                     "-g|--global",
                     LocalizableStrings.GlobalOptionDescription,
                     Accept.NoArguments()),
+                Create.Option(
+                    "--tool-path",
+                    "Location of shim to access tool", // TODO wul nocheckin loc
+                    Accept.ExactlyOneArgument()),
                 CommonOptions.HelpOption());
         }
     }

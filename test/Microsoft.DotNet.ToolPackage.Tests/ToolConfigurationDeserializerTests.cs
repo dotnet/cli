@@ -54,5 +54,15 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                         invalidCommandName,
                         string.Join(", ", Path.GetInvalidFileNameChars().Select(c => $"'{c}'"))));
         }
+
+        [Fact]
+        public void GivenALeadingDotAsFileNameItThrows()
+        {
+            var invalidCommandName = ".mytool";
+            Action a = () => new ToolConfiguration(invalidCommandName, "my.dll");
+            a.ShouldThrow<ToolConfigurationException>()
+                .And.Message.Should()
+                .Contain("Command Name cannot have a leading dot");  // TODO wul no checkin loc
+        }
     }
 }
