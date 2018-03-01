@@ -18,8 +18,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
 {
     internal class InstallToolCommand : CommandBase
     {
-        private readonly IToolPackageStore _toolPackageStore;
-        private readonly IToolPackageInstaller _toolPackageInstaller;
+        private readonly IToolPackageFactory _toolPackageFactory;
         private readonly IShellShimRepository _shellShimRepository;
         private readonly IEnvironmentPathInstruction _environmentPathInstruction;
         private readonly IReporter _reporter;
@@ -37,8 +36,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
         public InstallToolCommand(
             AppliedOption appliedCommand,
             ParseResult parseResult,
-            IToolPackageStore toolPackageStore = null,
-            IToolPackageInstaller toolPackageInstaller = null,
+            IToolPackageFactory toolPackageFactory = null,
             IShellShimRepository shellShimRepository = null,
             IEnvironmentPathInstruction environmentPathInstruction = null,
             IReporter reporter = null)
@@ -48,7 +46,6 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             {
                 throw new ArgumentNullException(nameof(appliedCommand));
             }
-
             _packageId = appliedCommand.Arguments.Single();
             _packageVersion = appliedCommand.ValueOrDefault<string>("version");
             _configFilePath = appliedCommand.ValueOrDefault<string>("configfile");
@@ -60,13 +57,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
 
             var cliFolderPathCalculator = new CliFolderPathCalculator();
 
-            _toolPackageStore = toolPackageStore
-                ?? new ToolPackageStore(new DirectoryPath(cliFolderPathCalculator.ToolsPackagePath));
-
-            _toolPackageInstaller = toolPackageInstaller
-                ?? new ToolPackageInstaller(
-                    _toolPackageStore,
-                    new ProjectRestorer(_reporter));
+            _toolPackageFactory = toolPackageFactory ?? new ToolPackageFactory();
 
             _environmentPathInstruction = environmentPathInstruction
                 ?? EnvironmentPathFactory.CreateEnvironmentPathInstruction();
@@ -93,8 +84,17 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                         Path.GetFullPath(_configFilePath)));
             }
 
+            DirectoryPath? toolPath = null;
+            if (_toolPath != null)
+            {
+                toolPath = new DirectoryPath(_toolPath);
+            }
+            
+            (var toolPackageStore, var toolPackageInstaller) =
+                _toolPackageFactory.CreateToolPackageStoreAndInstaller(toolPath); 
+            
             // Prevent installation if any version of the package is installed
-            if (_toolPackageStore.GetInstalledPackages(_packageId).FirstOrDefault() != null)
+            if (toolPackageStore.GetInstalledPackages(_packageId).FirstOrDefault() != null)
             {
                 _errorReporter.WriteLine(string.Format(LocalizableStrings.ToolAlreadyInstalled, _packageId).Red());
                 return 1;
@@ -105,7 +105,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             {
                 configFile = new FilePath(_configFilePath);
             }
-
+            
             try
             {
                 IToolPackage package = null;
@@ -113,7 +113,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                     TransactionScopeOption.Required,
                     TimeSpan.Zero))
                 {
-                    package = _toolPackageInstaller.InstallPackage(
+                    package = toolPackageInstaller.InstallPackage(
                         packageId: _packageId,
                         packageVersion: _packageVersion,
                         targetFramework: _framework,
