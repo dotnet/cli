@@ -82,7 +82,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
         {
             if (_toolPath != null && _global)
             {
-                throw new GracefulException("Cannot have global and tool-path as opinion at the same time.");
+                throw new GracefulException("Cannot have global and tool-path as opinion at the same time."); // TODO wul no checkin loc
             }
 
             if (_configFilePath != null && !File.Exists(_configFilePath))
