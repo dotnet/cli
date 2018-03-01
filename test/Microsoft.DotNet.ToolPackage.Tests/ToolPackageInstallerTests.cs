@@ -590,7 +590,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             FilePath? tempProject = null,
             DirectoryPath? offlineFeed = null)
         {
-            var root = new DirectoryPath(Path.Combine(Directory.GetCurrentDirectory(), Path.GetRandomFileName()));
+            var root = new DirectoryPath(Path.Combine(TempRoot.Root, "testpkgroot", Path.GetRandomFileName()));
             var reporter = new BufferedReporter();
 
             IFileSystem fileSystem;
