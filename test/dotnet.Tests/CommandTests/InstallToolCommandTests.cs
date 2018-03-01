@@ -246,6 +246,50 @@ namespace Microsoft.DotNet.Tests.Commands
                     PackageVersion));
         }
 
+        [Fact]
+        public void WhenRunWithBothGlobalAndToolPathShowErrorMessage()
+        {
+            var result = Parser.Instance.Parse($"dotnet install tool -g --tool-path /tmp/folder {PackageId}");
+            var appliedCommand = result["dotnet"]["install"]["tool"];
+            var parser = Parser.Instance;
+            var parseResult = parser.ParseFrom("dotnet install", new[] {"tool", PackageId});
+
+            var installToolCommand = new InstallToolCommand(
+                appliedCommand,
+                parseResult,
+                _toolPackageStore,
+                CreateToolPackageInstaller(),
+                _shellShimRepositoryMock,
+                new EnvironmentPathInstructionMock(_reporter, PathToPlaceShim, true),
+                _reporter);
+
+            Action a = () => installToolCommand.Execute();
+
+            a.ShouldThrow<GracefulException>().And.Message
+                .Should().Contain("Cannot have global and tool-path as opinion at the same time.");
+        }
+
+        [Fact]
+        public void WhenRunWithPackageIdAndBinPathItShouldNoteHaveEnvironmentPathInstruction()
+        {
+            var result = Parser.Instance.Parse($"dotnet install tool --tool-path /tmp/folder {PackageId}");
+            var appliedCommand = result["dotnet"]["install"]["tool"];
+            var parser = Parser.Instance;
+            var parseResult = parser.ParseFrom("dotnet install", new[] {"tool", PackageId});
+
+            var installToolCommand = new InstallToolCommand(appliedCommand,
+                parseResult,
+                _toolPackageStore,
+                CreateToolPackageInstaller(),
+                _shellShimRepositoryMock,
+                new EnvironmentPathInstructionMock(_reporter, PathToPlaceShim, true),
+                _reporter);
+
+            installToolCommand.Execute().Should().Be(0);
+
+            _reporter.Lines.Should().HaveCount(0);
+        }
+
         private IToolPackageInstaller CreateToolPackageInstaller(
             IEnumerable<MockFeed> feeds = null,
             Action installCallback = null)
