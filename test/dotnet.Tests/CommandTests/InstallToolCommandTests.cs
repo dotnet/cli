@@ -130,7 +130,7 @@ namespace Microsoft.DotNet.Tests.Commands
 
             installToolCommand.Execute().Should().Be(0);
 
-            _reporter.Lines.First().Should().Be("INSTRUCTION");
+            _reporter.Lines.First().Should().Be(EnvironmentPathInstructionMock.MockIstructionText);
         }
 
         [Fact]
@@ -282,12 +282,12 @@ namespace Microsoft.DotNet.Tests.Commands
                 _toolPackageStore,
                 CreateToolPackageInstaller(),
                 _shellShimRepositoryMock,
-                new EnvironmentPathInstructionMock(_reporter, PathToPlaceShim, true),
+                new EnvironmentPathInstructionMock(_reporter, PathToPlaceShim),
                 _reporter);
 
             installToolCommand.Execute().Should().Be(0);
 
-            _reporter.Lines.Should().HaveCount(0);
+            _reporter.Lines.Should().NotContain(l => l.Contains(EnvironmentPathInstructionMock.MockIstructionText));
         }
 
         private IToolPackageInstaller CreateToolPackageInstaller(

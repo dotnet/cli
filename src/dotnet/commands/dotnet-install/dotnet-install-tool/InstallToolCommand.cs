@@ -32,6 +32,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
         private readonly string _source;
         private readonly bool _global;
         private readonly string _verbosity;
+        private readonly string _toolPath;
 
         public InstallToolCommand(
             AppliedOption appliedCommand,
@@ -55,6 +56,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             _source = appliedCommand.ValueOrDefault<string>("source");
             _global = appliedCommand.ValueOrDefault<bool>("global");
             _verbosity = appliedCommand.SingleArgumentOrDefault("verbosity");
+            _toolPath = appliedCommand.SingleArgumentOrDefault("tool-path");
 
             var cliFolderPathCalculator = new CliFolderPathCalculator();
 
@@ -78,9 +80,9 @@ namespace Microsoft.DotNet.Tools.Install.Tool
 
         public override int Execute()
         {
-            if (!_global)
+            if (_toolPath != null && _global)
             {
-                throw new GracefulException(LocalizableStrings.InstallToolCommandOnlySupportGlobal);
+                throw new GracefulException("Cannot have global and tool-path as opinion at the same time.");
             }
 
             if (_configFilePath != null && !File.Exists(_configFilePath))
@@ -127,7 +129,10 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                     scope.Complete();
                 }
 
-                _environmentPathInstruction.PrintAddPathInstructionIfPathDoesNotExist();
+                if (_global)
+                {
+                    _environmentPathInstruction.PrintAddPathInstructionIfPathDoesNotExist();
+                }
 
                 _reporter.WriteLine(
                     string.Format(
