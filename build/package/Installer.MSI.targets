@@ -25,6 +25,10 @@
       <SdkMSBuildExtensionsNuspecFile>$(RepoRoot)/packaging/windows/clisdk/VS.Redist.Common.Net.Core.SDK.MSBuildExtensions.nuspec</SdkMSBuildExtensionsNuspecFile>
       <SdkMSBuildExtensionsNupkgFile>$(InstallerOutputDirectory)/VS.Redist.Common.Net.Core.SDK.MSBuildExtensions.$(FullNugetVersion).nupkg</SdkMSBuildExtensionsNupkgFile>
       <SdkMSBuildExtensionsSwrFile>$(InstallerOutputDirectory)/VS.Redist.Common.Net.Core.SDK.MSBuildExtensions.swr</SdkMSBuildExtensionsSwrFile>
+
+      <SdkSymbolsNuspecFile>$(RepoRoot)/packaging/windows/clisdk/Microsoft.DotNet.SDK.Symbols.nuspec</SdkSymbolsNuspecFile>
+      <SdkSymbolsInterimNupkgFile>$(InstallerOutputDirectory)/Microsoft.DotNet.SDK.Symbols.$(FullNugetVersion).nupkg</SdkSymbolsInterimNupkgFile>
+      <SdkSymbolsNupkgFile>$(InstallerOutputDirectory)/Microsoft.DotNet.SDK.Symbols.$(FullNugetVersion).symbols.nupkg</SdkSymbolsNupkgFile>
     </PropertyGroup>
 
     <!-- Test Sdk MSI Properties -->
@@ -188,7 +192,23 @@
       
       <GenerateMSBuildExtensionsSWR MSBuildExtensionsLayoutDirectory="$(MSBuildExtensionsLayoutDirectory)"
                                     OutputFile="$(SdkMSBuildExtensionsSwrFile)"/>
+    </Target>
+
+    <Target Name="GenerateSdkSymbolsNupkg"
+            DependsOnTargets="Init;Layout"
+            Condition=" '$(OS)' == 'Windows_NT' And '$(SeparateSymbolsArchive)' != 'false' "
+            Inputs="$(SymbolsDirectory)/**/*;
+                    $(SdkSymbolsNuspecFile);
+                    $(SdkGenerateNupkgPowershellScript)"
+            Outputs="$(SdkSymbolsNupkgFile)">
+
+      <Exec Command="powershell -NoProfile -NoLogo $(SdkGenerateNupkgPowershellScript)
+                        '$(SymbolsDirectory)'
+                        '$(FullNugetVersion)'
+                        '$(SdkSymbolsNuspecFile)'
+                        '$(SdkSymbolsInterimNupkgFile)'" />
       
+      <Move SourceFiles="$(SdkSymbolsInterimNupkgFile)" DestinationFiles="$(SdkSymbolsNupkgFile)" />
     </Target>
 
     <Target Name="TestSdkMsi"
@@ -219,6 +239,7 @@
                             GenerateSdkBundle;
                             GenerateSdkNupkg;
                             GenerateSdkMSBuildExtensionsNupkg;
+                            GenerateSdkSymbolsNupkg;
                             TestSdkMsi"
           Condition=" '$(OS)' == 'Windows_NT'" />
 

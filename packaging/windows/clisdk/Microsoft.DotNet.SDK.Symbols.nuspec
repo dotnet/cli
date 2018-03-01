@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>Microsoft.DotNet.SDK.Symbols</id>
+        <version>[VERSION]</version>
+        <authors>dotnet</authors>
+        <owners>dotnet</owners>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Package Description</description>
+    </metadata>
+    <files>
+        <file src="[DOTNET_BUNDLE]\**\*" />
+    </files>
+</package>

@@ -10,10 +10,13 @@
       <ProjectsToPack Include="$(SrcDirectory)/Microsoft.DotNet.Cli.Utils" >
         <ProjectName>Microsoft.DotNet.Cli.Utils</ProjectName>
         <Version>$(SdkNugetVersion)</Version>
+        <IncludeSymbols>False</IncludeSymbols>
       </ProjectsToPack>
       <ProjectsToPack Include="$(SrcDirectory)/Microsoft.DotNet.MSBuildSdkResolver" >
         <ProjectName>Microsoft.DotNet.MSBuildSdkResolver</ProjectName>
         <Version>$(SdkNugetVersion)</Version>
+        <IncludeSymbols>False</IncludeSymbols>
+        <IncludeSymbols Condition="'$(SeparateSymbolsArchive)' != 'false'">True</IncludeSymbols>
       </ProjectsToPack>
     </ItemGroup>
   </Target>
@@ -22,6 +25,7 @@
           DependsOnTargets="Init; SetupProjectsToPack">
 
     <DotNetPack NoBuild="True"
+                IncludeSymbols="%(ProjectsToPack.IncludeSymbols)"
                 Output="$(PackagesDirectory)"
                 ProjectPath="%(ProjectsToPack.Identity)/%(ProjectsToPack.ProjectName).csproj"
                 ToolPath="$(PreviousStageDirectory)"

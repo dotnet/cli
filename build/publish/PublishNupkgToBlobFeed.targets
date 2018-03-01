@@ -3,9 +3,12 @@
 
   <ItemGroup>
     <NupkgsForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.Cli.Utils.*.nupkg" />
-    <NupkgsForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.MSBuildSdkResolver.*.nupkg">
+    <NupkgsForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.MSBuildSdkResolver.*.nupkg"
+                         Exclude="$(PackagesDirectory)/Microsoft.DotNet.MSBuildSdkResolver.*.symbols.nupkg" >
       <ManifestArtifactData>NonShipping=true</ManifestArtifactData>
     </NupkgsForPublishing>
+    <NupkgsForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.MSBuildSdkResolver.*.symbols.nupkg" />
+    <NupkgsForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.SDK.Symbols.*.symbols.nupkg" />
   </ItemGroup>
 
   <Target Name="PublishNupkgToBlobFeed" Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' " >
