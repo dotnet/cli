@@ -19,7 +19,6 @@ using Microsoft.Extensions.EnvironmentAbstractions;
 using Newtonsoft.Json;
 using Xunit;
 using Parser = Microsoft.DotNet.Cli.Parser;
-using LocalizableStrings = Microsoft.DotNet.Tools.Install.Tool.LocalizableStrings;
 using System.Runtime.InteropServices;
 
 namespace Microsoft.DotNet.Tests.Commands
@@ -33,7 +32,7 @@ namespace Microsoft.DotNet.Tests.Commands
         private readonly AppliedOption _appliedCommand;
         private readonly ParseResult _parseResult;
         private readonly BufferedReporter _reporter;
-        private TestToolPackageFactory _toolPackageFactory;
+        private PassThroughToolPackageFactory _toolPackageFactory;
         private const string PathToPlaceShim = "pathToPlace";
         private const string PathToPlacePackages = PathToPlaceShim + "pkg";
         private const string PackageId = "global.tool.console.demo";
@@ -52,7 +51,7 @@ namespace Microsoft.DotNet.Tests.Commands
             _appliedCommand = result["dotnet"]["install"]["tool"];
             var parser = Parser.Instance;
             _parseResult = parser.ParseFrom("dotnet install", new[] {"tool", PackageId});
-            _toolPackageFactory = new TestToolPackageFactory(_toolPackageStore, CreateToolPackageInstaller());
+            _toolPackageFactory = new PassThroughToolPackageFactory(_toolPackageStore, CreateToolPackageInstaller());
         }
 
         [Fact]
@@ -84,7 +83,7 @@ namespace Microsoft.DotNet.Tests.Commands
             ParseResult parseResult =
                 Parser.Instance.ParseFrom("dotnet install", new[] { "tool", PackageId, "--source", sourcePath });
             
-            var toolPackageFactory = new TestToolPackageFactory(_toolPackageStore, CreateToolPackageInstaller(
+            var toolPackageFactory = new PassThroughToolPackageFactory(_toolPackageStore, CreateToolPackageInstaller(
                 feeds: new MockFeed[] {
                     new MockFeed
                     {
@@ -137,7 +136,7 @@ namespace Microsoft.DotNet.Tests.Commands
         [Fact]
         public void GivenFailedPackageInstallWhenRunWithPackageIdItShouldFail()
         {
-            var toolPackageFactory = new TestToolPackageFactory(
+            var toolPackageFactory = new PassThroughToolPackageFactory(
                 _toolPackageStore,
                 CreateToolPackageInstaller(
                     installCallback: () => throw new ToolPackageException("Simulated error")));
@@ -197,7 +196,7 @@ namespace Microsoft.DotNet.Tests.Commands
         [Fact]
         public void GivenInCorrectToolConfigurationWhenRunWithPackageIdItShouldFail()
         {
-            var toolPackageFactory = new TestToolPackageFactory(
+            var toolPackageFactory = new PassThroughToolPackageFactory(
                 _toolPackageStore,
                 CreateToolPackageInstaller(
                     installCallback: () => throw new ToolPackageException("Simulated error")));
@@ -314,25 +313,6 @@ namespace Microsoft.DotNet.Tests.Commands
             return Path.Combine(
                 "pathToPlace",
                 ProjectRestorerMock.FakeCommandName + extension);
-        }
-
-        private class TestToolPackageFactory : IToolPackageFactory
-        {
-            private readonly IToolPackageStore _toolPackageStore;
-            private readonly IToolPackageInstaller _toolPackageInstaller;
-
-            public TestToolPackageFactory(IToolPackageStore toolPackageStore, 
-                IToolPackageInstaller toolPackageInstaller)
-            {
-                _toolPackageStore = toolPackageStore;
-                _toolPackageInstaller = toolPackageInstaller;
-            }
-
-            public (IToolPackageStore, IToolPackageInstaller) 
-                CreateToolPackageStoreAndInstaller(DirectoryPath? nonGlobalLocation = null)
-            {
-                return (_toolPackageStore, _toolPackageInstaller);
-            }
         }
     }
 }

@@ -170,16 +170,18 @@ namespace Microsoft.DotNet.Tests.Commands
             ParseResult result = Parser.Instance.Parse("dotnet install tool " + options);
 
             var store = new ToolPackageStoreMock(new DirectoryPath(ToolsDirectory), _fileSystem);
+
+            var testToolPackageFactory = new PassThroughToolPackageFactory(store, new ToolPackageInstallerMock(
+                _fileSystem,
+                store,
+                new ProjectRestorerMock(
+                    _fileSystem,
+                    _reporter)));
+
             return new InstallToolCommand(
                 result["dotnet"]["install"]["tool"],
                 result,
-                store,
-                new ToolPackageInstallerMock(
-                    _fileSystem,
-                    store,
-                    new ProjectRestorerMock(
-                        _fileSystem,
-                        _reporter)),
+                testToolPackageFactory,
                 _shellShimRepositoryMock,
                 _environmentPathInstructionMock,
                 _reporter);
