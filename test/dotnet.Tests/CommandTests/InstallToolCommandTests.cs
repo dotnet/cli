@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using Xunit;
 using Parser = Microsoft.DotNet.Cli.Parser;
 using System.Runtime.InteropServices;
+using LocalizableStrings = Microsoft.DotNet.Tools.Install.Tool.LocalizableStrings;
 
 namespace Microsoft.DotNet.Tests.Commands
 {
