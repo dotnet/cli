@@ -89,10 +89,10 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             {
                 toolPath = new DirectoryPath(_toolPath);
             }
-            
-            (var toolPackageStore, var toolPackageInstaller) =
-                _toolPackageFactory.CreateToolPackageStoreAndInstaller(toolPath); 
-            
+
+            (IToolPackageStore toolPackageStore, IToolPackageInstaller toolPackageInstaller) =
+                _toolPackageFactory.CreateToolPackageStoreAndInstaller(toolPath);
+
             // Prevent installation if any version of the package is installed
             if (toolPackageStore.GetInstalledPackages(_packageId).FirstOrDefault() != null)
             {
@@ -105,7 +105,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             {
                 configFile = new FilePath(_configFilePath);
             }
-            
+
             try
             {
                 IToolPackage package = null;

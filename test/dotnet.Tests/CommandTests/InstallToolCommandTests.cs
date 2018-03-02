@@ -83,7 +83,7 @@ namespace Microsoft.DotNet.Tests.Commands
             AppliedOption appliedCommand = result["dotnet"]["install"]["tool"];
             ParseResult parseResult =
                 Parser.Instance.ParseFrom("dotnet install", new[] { "tool", PackageId, "--source", sourcePath });
-            
+
             var toolPackageFactory = new PassThroughToolPackageFactory(_toolPackageStore, CreateToolPackageInstaller(
                 feeds: new MockFeed[] {
                     new MockFeed
@@ -100,7 +100,7 @@ namespace Microsoft.DotNet.Tests.Commands
                         }
                     }
                 }));
-            
+
             var installToolCommand = new InstallToolCommand(appliedCommand,
                 parseResult,
                 toolPackageFactory,
@@ -141,12 +141,11 @@ namespace Microsoft.DotNet.Tests.Commands
                 _toolPackageStore,
                 CreateToolPackageInstaller(
                     installCallback: () => throw new ToolPackageException("Simulated error")));
-            
+
             var installToolCommand = new InstallToolCommand(
                 _appliedCommand,
                 _parseResult,
                 toolPackageFactory,
-                
                 _shellShimRepositoryMock,
                 _environmentPathInstructionMock,
                 _reporter);
@@ -201,7 +200,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 _toolPackageStore,
                 CreateToolPackageInstaller(
                     installCallback: () => throw new ToolPackageException("Simulated error")));
-            
+
             var installToolCommand = new InstallToolCommand(
                 _appliedCommand,
                 _parseResult,
