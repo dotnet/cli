@@ -199,7 +199,7 @@ namespace Microsoft.DotNet.Tests.Commands
             var toolPackageFactory = new PassThroughToolPackageFactory(
                 _toolPackageStore,
                 CreateToolPackageInstaller(
-                    installCallback: () => throw new ToolPackageException("Simulated error")));
+                    installCallback: () => throw new ToolConfigurationException("Simulated error")));
 
             var installToolCommand = new InstallToolCommand(
                 _appliedCommand,
