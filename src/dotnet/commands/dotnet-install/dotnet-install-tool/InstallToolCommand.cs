@@ -18,8 +18,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
 {
     internal class InstallToolCommand : CommandBase
     {
-        private readonly IToolPackageStore _toolPackageStore;
-        private readonly IToolPackageInstaller _toolPackageInstaller;
+        private readonly IToolPackageFactory _toolPackageFactory;
         private readonly IShellShimRepository _shellShimRepository;
         private readonly IEnvironmentPathInstruction _environmentPathInstruction;
         private readonly IReporter _reporter;
@@ -32,12 +31,12 @@ namespace Microsoft.DotNet.Tools.Install.Tool
         private readonly string _source;
         private readonly bool _global;
         private readonly string _verbosity;
+        private readonly string _toolPath;
 
         public InstallToolCommand(
             AppliedOption appliedCommand,
             ParseResult parseResult,
-            IToolPackageStore toolPackageStore = null,
-            IToolPackageInstaller toolPackageInstaller = null,
+            IToolPackageFactory toolPackageFactory = null,
             IShellShimRepository shellShimRepository = null,
             IEnvironmentPathInstruction environmentPathInstruction = null,
             IReporter reporter = null)
@@ -47,7 +46,6 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             {
                 throw new ArgumentNullException(nameof(appliedCommand));
             }
-
             _packageId = appliedCommand.Arguments.Single();
             _packageVersion = appliedCommand.ValueOrDefault<string>("version");
             _configFilePath = appliedCommand.ValueOrDefault<string>("configfile");
@@ -55,16 +53,11 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             _source = appliedCommand.ValueOrDefault<string>("source");
             _global = appliedCommand.ValueOrDefault<bool>("global");
             _verbosity = appliedCommand.SingleArgumentOrDefault("verbosity");
+            _toolPath = appliedCommand.SingleArgumentOrDefault("tool-path");
 
             var cliFolderPathCalculator = new CliFolderPathCalculator();
 
-            _toolPackageStore = toolPackageStore
-                ?? new ToolPackageStore(new DirectoryPath(cliFolderPathCalculator.ToolsPackagePath));
-
-            _toolPackageInstaller = toolPackageInstaller
-                ?? new ToolPackageInstaller(
-                    _toolPackageStore,
-                    new ProjectRestorer(_reporter));
+            _toolPackageFactory = toolPackageFactory ?? new ToolPackageFactory();
 
             _environmentPathInstruction = environmentPathInstruction
                 ?? EnvironmentPathFactory.CreateEnvironmentPathInstruction();
@@ -78,9 +71,9 @@ namespace Microsoft.DotNet.Tools.Install.Tool
 
         public override int Execute()
         {
-            if (!_global)
+            if (_toolPath != null && _global)
             {
-                throw new GracefulException(LocalizableStrings.InstallToolCommandOnlySupportGlobal);
+                throw new GracefulException("Cannot have global and tool-path as opinion at the same time."); // TODO wul no checkin loc
             }
 
             if (_configFilePath != null && !File.Exists(_configFilePath))
@@ -91,8 +84,17 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                         Path.GetFullPath(_configFilePath)));
             }
 
+            DirectoryPath? toolPath = null;
+            if (_toolPath != null)
+            {
+                toolPath = new DirectoryPath(_toolPath);
+            }
+
+            (IToolPackageStore toolPackageStore, IToolPackageInstaller toolPackageInstaller) =
+                _toolPackageFactory.CreateToolPackageStoreAndInstaller(toolPath);
+
             // Prevent installation if any version of the package is installed
-            if (_toolPackageStore.GetInstalledPackages(_packageId).FirstOrDefault() != null)
+            if (toolPackageStore.GetInstalledPackages(_packageId).FirstOrDefault() != null)
             {
                 _errorReporter.WriteLine(string.Format(LocalizableStrings.ToolAlreadyInstalled, _packageId).Red());
                 return 1;
@@ -111,7 +113,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                     TransactionScopeOption.Required,
                     TimeSpan.Zero))
                 {
-                    package = _toolPackageInstaller.InstallPackage(
+                    package = toolPackageInstaller.InstallPackage(
                         packageId: _packageId,
                         packageVersion: _packageVersion,
                         targetFramework: _framework,
@@ -127,7 +129,10 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                     scope.Complete();
                 }
 
-                _environmentPathInstruction.PrintAddPathInstructionIfPathDoesNotExist();
+                if (_global)
+                {
+                    _environmentPathInstruction.PrintAddPathInstructionIfPathDoesNotExist();
+                }
 
                 _reporter.WriteLine(
                     string.Format(
