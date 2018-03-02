@@ -40,8 +40,8 @@ function GenerateNupkg
     $SdkBundlePath = [System.IO.Path]::GetFullPath($SdkBundlePath)
     $NuspecFileName = [System.IO.Path]::GetFileName($NuspecFile)
     $TempNuspecFile = [System.IO.Path]::Combine($OutputDirectory, $NuspecFileName)
-    (Get-Content $NuspecFile -Raw).Replace('[DOTNET_BUNDLE]',$SdkBundlePath).Replace('[VERSION]',$NugetVersion) | Set-Content $TempNuspecFile
-    & $NuGetExe pack $TempNuspecFile -OutputDirectory $OutputDirectory
+    (Get-Content $NuspecFile) -replace '\[DOTNET_BUNDLE\]', $SdkBundlePath | Set-Content $TempNuspecFile
+    & $NuGetExe pack $TempNuspecFile -Version $NugetVersion -OutputDirectory $OutputDirectory
 }
 
 
