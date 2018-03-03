@@ -52,8 +52,9 @@ namespace Microsoft.DotNet.ToolPackage
             if (commandName.StartsWith(".", StringComparison.OrdinalIgnoreCase))
             {
                 throw new ToolConfigurationException(
-                    "Command Name cannot have a leading dot" // TODO wul no checkin loc
-                    );
+                    string.Format(
+                        CommonLocalizableStrings.ToolSettingsInvalidLeadingDotCommandName,
+                        commandName));
             }
         }
 

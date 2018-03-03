@@ -391,7 +391,7 @@ namespace Microsoft.DotNet.Tests.Commands
             Action a = () => installToolCommand.Execute();
 
             a.ShouldThrow<GracefulException>().And.Message
-                .Should().Contain("Cannot have global and tool-path as opinion at the same time.");
+                .Should().Contain(LocalizableStrings.InstallToolCommandInvalidGlobalAndToolPath);
         }
 
         [Fact]
@@ -413,7 +413,7 @@ namespace Microsoft.DotNet.Tests.Commands
             Action a = () => installToolCommand.Execute();
 
             a.ShouldThrow<GracefulException>().And.Message
-                .Should().Contain("Need either global or tool-path provided.");
+                .Should().Contain(LocalizableStrings.InstallToolCommandNeedGlobalOrToolPath);
         }
 
         [Fact]

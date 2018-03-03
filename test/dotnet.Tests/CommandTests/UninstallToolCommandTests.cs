@@ -155,7 +155,7 @@ namespace Microsoft.DotNet.Tests.Commands
             Action a = () => uninstallCommand.Execute();
 
             a.ShouldThrow<GracefulException>().And.Message
-                .Should().Contain("Cannot have global and tool-path as opinion at the same time."); // TODO wul no checkin loc
+                .Should().Contain(LocalizableStrings.UninstallToolCommandInvalidGlobalAndToolPath);
         }
 
         [Fact]
@@ -166,7 +166,7 @@ namespace Microsoft.DotNet.Tests.Commands
             Action a = () => uninstallCommand.Execute();
 
             a.ShouldThrow<GracefulException>().And.Message
-                .Should().Contain("Need either global or tool-path provided."); // TODO wul no checkin loc
+                .Should().Contain(LocalizableStrings.UninstallToolCommandNeedGlobalOrToolPath);
         }
 
         private InstallToolCommand CreateInstallCommand(string options)

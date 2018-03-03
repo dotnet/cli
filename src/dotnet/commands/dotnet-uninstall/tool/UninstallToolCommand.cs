@@ -50,12 +50,12 @@ namespace Microsoft.DotNet.Tools.Uninstall.Tool
 
             if (string.IsNullOrWhiteSpace(toolPath) && !global)
             {
-                throw new GracefulException("Need either global or tool-path provided."); // TODO wul no checkin loc
+                throw new GracefulException(LocalizableStrings.UninstallToolCommandNeedGlobalOrToolPath);
             }
 
             if (!string.IsNullOrWhiteSpace(toolPath) && global)
             {
-                throw new GracefulException("Cannot have global and tool-path as opinion at the same time."); // TODO wul no checkin loc
+                throw new GracefulException(LocalizableStrings.UninstallToolCommandInvalidGlobalAndToolPath);
             }
 
             var packageId = new PackageId(_options.Arguments.Single());

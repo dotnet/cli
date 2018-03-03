@@ -76,12 +76,12 @@ namespace Microsoft.DotNet.Tools.Install.Tool
         {
             if (string.IsNullOrWhiteSpace(_toolPath) && !_global)
             {
-                throw new GracefulException("Need either global or tool-path provided."); // TODO wul no checkin loc
+                throw new GracefulException(LocalizableStrings.InstallToolCommandNeedGlobalOrToolPath);
             }
 
             if (!string.IsNullOrWhiteSpace(_toolPath) && _global)
             {
-                throw new GracefulException("Cannot have global and tool-path as opinion at the same time."); // TODO wul no checkin loc
+                throw new GracefulException(LocalizableStrings.InstallToolCommandInvalidGlobalAndToolPath);
             }
 
             if (_configFilePath != null && !File.Exists(_configFilePath))

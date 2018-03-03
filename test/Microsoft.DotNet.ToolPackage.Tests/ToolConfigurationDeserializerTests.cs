@@ -62,7 +62,9 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             Action a = () => new ToolConfiguration(invalidCommandName, "my.dll");
             a.ShouldThrow<ToolConfigurationException>()
                 .And.Message.Should()
-                .Contain("Command Name cannot have a leading dot");  // TODO wul no checkin loc
+                .Contain(string.Format(
+                        CommonLocalizableStrings.ToolSettingsInvalidLeadingDotCommandName,
+                        invalidCommandName));
         }
     }
 }
