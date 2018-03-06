@@ -8,9 +8,9 @@ namespace Microsoft.DotNet.Configurer
     public static class ToolPackageFolderPathCalculator
     {
         private const string NestedToolPackageFolderName = ".store";
-        public static string GetToolPackageFolderPath(string ToolsShimPath)
+        public static string GetToolPackageFolderPath(string toolsShimPath)
         {
-            return Path.Combine(ToolsShimPath, NestedToolPackageFolderName);
+            return Path.Combine(toolsShimPath, NestedToolPackageFolderName);
         }
     }
 }
