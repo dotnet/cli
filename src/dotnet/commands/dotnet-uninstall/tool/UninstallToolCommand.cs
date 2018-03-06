@@ -58,14 +58,6 @@ namespace Microsoft.DotNet.Tools.Uninstall.Tool
                 throw new GracefulException(LocalizableStrings.UninstallToolCommandInvalidGlobalAndToolPath);
             }
 
-            var packageId = new PackageId(_options.Arguments.Single());
-            IToolPackage package = null;
-<<<<<<< HEAD
-            try
-            {
-                package = _toolPackageStore.EnumeratePackageVersions(packageId).SingleOrDefault();
-=======
-
             DirectoryPath? toolDirectoryPath = null;
             if (!string.IsNullOrWhiteSpace(toolPath))
             {
@@ -75,10 +67,11 @@ namespace Microsoft.DotNet.Tools.Uninstall.Tool
             IToolPackageStore toolPackageStore = _createToolPackageStoreAndInstaller(toolDirectoryPath);
             IShellShimRepository shellShimRepository = _createShellShimRepository(toolDirectoryPath);
 
+            var packageId = new PackageId(_options.Arguments.Single());
+            IToolPackage package = null;
             try
             {
-                package = toolPackageStore.GetInstalledPackages(packageId).SingleOrDefault();
->>>>>>> tool-path option -- "Session tool"
+                package = toolPackageStore.EnumeratePackageVersions(packageId).SingleOrDefault();
                 if (package == null)
                 {
                     _errorReporter.WriteLine(
