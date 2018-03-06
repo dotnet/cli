@@ -48,6 +48,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
             {
                 "--runtime",
                 AnyRid,
+                "--ignore-failed-sources", //nuget by default will throw when a feed cannot be reached
                 $"/p:BaseIntermediateOutputPath={assetJsonOutput.ToQuotedString()}"
             });
 
