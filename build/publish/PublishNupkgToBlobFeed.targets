@@ -2,16 +2,19 @@
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <ItemGroup>
-    <NupkgsForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.Cli.Utils.*.nupkg" />
+    <NupkgsForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.Cli.Utils.*.nupkg"
+                         Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' " />
     <NupkgsForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.MSBuildSdkResolver.*.nupkg"
-                         Exclude="$(PackagesDirectory)/Microsoft.DotNet.MSBuildSdkResolver.*.symbols.nupkg" >
+                         Exclude="$(PackagesDirectory)/Microsoft.DotNet.MSBuildSdkResolver.*.symbols.nupkg"
+                         Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' " >
       <ManifestArtifactData>NonShipping=true</ManifestArtifactData>
     </NupkgsForPublishing>
-    <NupkgsForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.MSBuildSdkResolver.*.symbols.nupkg" />
-    <NupkgsForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.SDK.Symbols.*.symbols.nupkg" />
+    <NupkgsForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.MSBuildSdkResolver.*.symbols.nupkg"
+                         Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' " />
+    <NupkgsForPublishing Include="$(PackagesDirectory)/sdk.*.Microsoft.DotNet.SDK.*.symbols.nupkg" />
   </ItemGroup>
 
-  <Target Name="PublishNupkgToBlobFeed" Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' " >
+  <Target Name="PublishNupkgToBlobFeed">
     <Error Condition="'$(BlobFeedCloudDropAccessToken)' == ''" Text="Missing property BlobFeedCloudDropAccessToken." />
     <Error Condition="'$(BlobFeedExpectedURL)' == ''" Text="Missing property BlobFeedExpectedURL." />
 
