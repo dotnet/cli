@@ -6,7 +6,7 @@
     <EnableDefaultItems>false</EnableDefaultItems>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-<!-- supress the creation of the directory structure output dirs -->
+
     <PackageId>$(SymbolsNupkgPackageId)</PackageId>
     <PackageVersion>$(SdkVersion)</PackageVersion>
   </PropertyGroup>
