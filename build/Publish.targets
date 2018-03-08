@@ -47,7 +47,7 @@
                      Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' " />
       <ForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.MSBuildSdkResolver.*.nupkg"
                      Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' " />
-      <ForPublishing Include="$(PackagesDirectory)/sdk.*.Microsoft.DotNet.SDK.*.symbols.nupkg" />
+      <ForPublishing Include="$(PackagesDirectory)/runtime.*.Microsoft.DotNet.SDK.*.symbols.nupkg" />
       <ForPublishing Include="$(PackagesDirectory)/VS.Redist.Common.Net.Core.SDK.$(Architecture).*.nupkg"
                      Condition=" '$(OS)' == 'Windows_NT' "/>
       <ForPublishing Include="$(PackagesDirectory)/VS.Redist.Common.Net.Core.SDK.MSBuildExtensions.*.nupkg"

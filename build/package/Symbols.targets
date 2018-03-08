@@ -2,15 +2,10 @@
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <SymbolsProjectFileName>$(MSBuildThisFileDirectory)/Symbols.csproj</SymbolsProjectFileName>
-    <SymbolsNupkgPackageId>sdk.$(ProductMonikerRid).Microsoft.DotNet.SDK</SymbolsNupkgPackageId>
+    <SymbolsNupkgPackageId>runtime.$(ProductMonikerRid).Microsoft.DotNet.SDK</SymbolsNupkgPackageId>
   </PropertyGroup>
 
-  <Target Name="GenerateSymbolsNugetPackages"
-          DependsOnTargets="RestoreSymbolsProject;GenerateSymbolsNuget">
-  </Target>
-
-  <Target Name="GenerateSymbolsNuget"
-          DependsOnTargets="RestoreSymbolsProject">
+  <Target Name="GenerateSymbolsNugetPackages" >
     <DotNetPack NoBuild="True"
                 IncludeSymbols="False"
                 Output="$(PackagesDirectory)"
@@ -19,11 +14,4 @@
 
     <Move SourceFiles="$(PackagesDirectory)\$(SymbolsNupkgPackageId).$(SdkVersion).nupkg" DestinationFiles="$(PackagesDirectory)\$(SymbolsNupkgPackageId).$(SdkVersion).symbols.nupkg" />
   </Target>
-
-  <Target Name="RestoreSymbolsProject"
-          DependsOnTargets="Init; SetupProjectsToPack">
-    <DotNetRestore ProjectPath="&quot;$(SymbolsProjectFileName)&quot;"
-                   ToolPath="$(PreviousStageDirectory)" />
-  </Target>
-  
 </Project>

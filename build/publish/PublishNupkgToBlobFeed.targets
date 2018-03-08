@@ -11,7 +11,7 @@
     </NupkgsForPublishing>
     <NupkgsForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.MSBuildSdkResolver.*.symbols.nupkg"
                          Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' " />
-    <NupkgsForPublishing Include="$(PackagesDirectory)/sdk.*.Microsoft.DotNet.SDK.*.symbols.nupkg" />
+    <NupkgsForPublishing Include="$(PackagesDirectory)/runtime.*.Microsoft.DotNet.SDK.*.symbols.nupkg" />
   </ItemGroup>
 
   <Target Name="PublishNupkgToBlobFeed">
