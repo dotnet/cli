@@ -188,6 +188,7 @@
       
       <GenerateMSBuildExtensionsSWR MSBuildExtensionsLayoutDirectory="$(MSBuildExtensionsLayoutDirectory)"
                                     OutputFile="$(SdkMSBuildExtensionsSwrFile)"/>
+
     </Target>
 
     <Target Name="TestSdkMsi"
