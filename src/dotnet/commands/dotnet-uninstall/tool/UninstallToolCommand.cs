@@ -119,27 +119,32 @@ namespace Microsoft.DotNet.Tools.Uninstall.Tool
                         package.Version.ToNormalizedString()).Green());
                 return 0;
             }
-            catch (ToolPackageException ex)
+            catch (Exception ex) when (ex is ToolPackageException
+                                       || ex is ToolConfigurationException
+                                       || ex is ShellShimException)
             {
-                throw new GracefulException(
-                    messages: new[]
+                string[] userFacingMessages = null;
+                if (ex is ToolPackageException)
+                {
+                    userFacingMessages = new[]
                     {
-                      ex.Message
-                    },
-                    verboseMessages: new[] { ex.ToString() },
-                    isUserError: false);
-            }
-            catch (Exception ex) when (ex is ToolConfigurationException || ex is ShellShimException)
-            {
-                throw new GracefulException(
-                    messages: new[]
+                        ex.Message
+                    };
+                }
+                else if (ex is ToolConfigurationException || ex is ShellShimException)
+                {
+                    userFacingMessages = new[]
                     {
-                      string.Format(
-                        LocalizableStrings.FailedToUninstallTool,
-                        packageId,
-                        ex.Message)
-                    },
-                    verboseMessages: new[] { ex.ToString() },
+                        string.Format(
+                            LocalizableStrings.FailedToUninstallTool,
+                            packageId,
+                            ex.Message)
+                    };
+                }
+
+                throw new GracefulException(
+                    messages: userFacingMessages,
+                    verboseMessages: new[] {ex.ToString()},
                     isUserError: false);
             }
         }
