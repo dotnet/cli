@@ -24,7 +24,7 @@ Build Status
 ------------
 
 |Windows x64|Windows x86|macOS|Linux x64 Archive|Linux arm Archive|Linux Native Installers|RHEL 6 Archive|Alpine 3.6 Archive|
-|:------:|:------:|:------:|:------:|:------:|:------:|:------:|
+|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|
 |[![][win-x64-build-badge]][win-x64-build]|[![][win-x86-build-badge]][win-x86-build]|[![][osx-build-badge]][osx-build]|[![][linux-build-badge]][linux-build]|[![][linux-arm-build-badge]][linux-arm-build]|[![][linuxnative-build-badge]][linuxnative-build]|[![][rhel6-build-badge]][rhel6-build]|[![][alpine3.6-build-badge]][alpine3.6-build]|
 
 [win-x64-build-badge]: https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/6902/badge
