@@ -96,7 +96,7 @@ while [[ $# > 0 ]]; do
             ;;
         --linux-portable)
             LINUX_PORTABLE_INSTALL_ARGS="--runtime-id linux-x64"
-            CUSTOM_BUILD_ARGS="/p:Rid=\"linux-x64\" /p:OSName=\"linux\" /p:IslinuxPortable=\"true\""
+            CUSTOM_BUILD_ARGS="/p:OSName=\"linux\" /p:IslinuxPortable=\"true\""
             ;;
         --stage0)
             STAGE0_SOURCE_DIR=$2
