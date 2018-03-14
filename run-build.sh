@@ -154,7 +154,7 @@ export DOTNET_MULTILEVEL_LOOKUP=0
 # Install a stage 0
 INSTALL_ARCHITECTURE=$ARCHITECTURE
 archlower="$(echo $ARCHITECTURE | awk '{print tolower($0)}')"
-if [[ $archlower != 'arm'* ]]; then
+if [[ $archlower == 'arm'* ]]; then
     INSTALL_ARCHITECTURE="x64"
 fi
 
