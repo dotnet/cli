@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.Tools.Update.Tool
 
         public override int Execute()
         {
-            ValidateArgument();
+            ValidateArguments();
 
             DirectoryPath? toolPath = null;
             if (_toolPath != null)
@@ -153,7 +153,7 @@ namespace Microsoft.DotNet.Tools.Update.Tool
             return 0;
         }
 
-        private void ValidateArgument()
+        private void ValidateArguments()
         {
             if (string.IsNullOrWhiteSpace(_toolPath) && !_global)
             {
