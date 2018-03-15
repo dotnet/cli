@@ -156,9 +156,6 @@
   <data name="UpdateFullCommandNameLocalized" xml:space="preserve">
     <value>.NET update Command</value>
   </data>
-  <data name="ToolAlreadyInstalled" xml:space="preserve">
-    <value>Tool '{0}' is already installed.</value>
-  </data>
   <data name="UpdateToolCommandNeedGlobalOrToolPath" xml:space="preserve">
     <value>Please specify either the global option (--global) or the tool path option (--tool-path).</value>
   </data>
@@ -166,16 +163,16 @@
     <value>(--global) conflicts with the tool path option (--tool-path). Please specify only one of the options.</value>
   </data>
   <data name="ToolPathDescription" xml:space="preserve">
-    <value>Location of shim to access tool</value>
+    <value>Location where the tool will be installed.</value>
   </data>
   <data name="ToolHasMultipleVersionsInstalled" xml:space="preserve">
-    <value>Tool '{0}' has multiple versions installed and cannot be uninstalled.</value>
+    <value>Tool '{0}' has multiple versions installed and cannot be updated.</value>
   </data>
   <data name="ToolNotInstalled" xml:space="preserve">
     <value>Tool '{0}' is not currently installed.</value>
   </data>
   <data name="UpdateSucceededVersionNoChange" xml:space="preserve">
-    <value>Tool '{0}' was successfully updated with no version change.</value>
+    <value>Tool '{0}' was reinstalled with the latest stable version (version '{1}').</value>
   </data>
   <data name="UpdateToolFailed" xml:space="preserve">
     <value>Tool '{0}' failed to update. Due to the following.</value>

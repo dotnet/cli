@@ -116,7 +116,7 @@ namespace Microsoft.DotNet.Tests.Commands
 
             _reporter.Lines.First().Should().Contain(string.Format(
                 LocalizableStrings.UpdateSucceededVersionNoChange,
-                _packageId));
+                _packageId, HigherPackageVersion));
         }
 
         [Fact]

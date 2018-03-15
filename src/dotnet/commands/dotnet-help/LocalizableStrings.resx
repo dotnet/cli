@@ -268,7 +268,7 @@
     <value>Path to additional deps.json file.</value>
   </data>
   <data name="InstallDefinition" xml:space="preserve">
-    <value>Installs an item into the development environment.</value>
+    <value>Installs an item in the development environment.</value>
   </data>
   <data name="UninstallDefinition" xml:space="preserve">
     <value>Uninstalls an item from the development environment.</value>

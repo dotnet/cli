@@ -239,7 +239,7 @@ namespace Microsoft.DotNet.Tools.Update.Tool
                 _reporter.WriteLine(
                     string.Format(
                         LocalizableStrings.UpdateSucceededVersionNoChange,
-                        newInstalledPackage.Id).Green());
+                        newInstalledPackage.Id, newInstalledPackage.Version).Green());
             }
         }
     }
