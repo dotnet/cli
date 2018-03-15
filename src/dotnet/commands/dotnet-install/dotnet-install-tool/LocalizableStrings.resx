@@ -185,6 +185,6 @@ Tool '{1}' (version '{2}') was successfully installed.</value>
     <value>(--global) conflicts with the tool path option (--tool-path). Please specify only one of the options.</value>
   </data>
   <data name="ToolPathDescription" xml:space="preserve">
-    <value>LLocation where the tool will be installed.</value>
+    <value>Location where the tool will be installed.</value>
   </data>
 </root>

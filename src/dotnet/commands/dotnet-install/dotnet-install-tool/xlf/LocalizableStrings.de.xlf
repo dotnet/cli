@@ -115,8 +115,8 @@ Die Installation war erfolgreich. Sofern keine weiteren Anweisungen vorliegen, k
         <note />
       </trans-unit>
       <trans-unit id="ToolPathDescription">
-        <source>LLocation where the tool will be installed.</source>
-        <target state="new">LLocation where the tool will be installed.</target>
+        <source>Location where the tool will be installed.</source>
+        <target state="new">Location where the tool will be installed.</target>
         <note />
       </trans-unit>
     </body>

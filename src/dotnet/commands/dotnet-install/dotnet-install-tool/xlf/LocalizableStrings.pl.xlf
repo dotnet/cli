@@ -115,8 +115,8 @@ Instalacja powiodła się. Jeśli nie ma dodatkowych instrukcji, możesz wpisać
         <note />
       </trans-unit>
       <trans-unit id="ToolPathDescription">
-        <source>LLocation where the tool will be installed.</source>
-        <target state="new">LLocation where the tool will be installed.</target>
+        <source>Location where the tool will be installed.</source>
+        <target state="new">Location where the tool will be installed.</target>
         <note />
       </trans-unit>
     </body>
