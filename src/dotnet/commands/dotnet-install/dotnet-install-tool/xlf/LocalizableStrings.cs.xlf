@@ -13,7 +13,7 @@
         <note />
       </trans-unit>
       <trans-unit id="InstallationSucceeded">
-        <source>If there were no additional instructions, you can type the following command to invoke the tool: {0}
+        <source>You can invoke the tool using the following command: {0}
 Tool '{1}' (version '{2}') was successfully installed.</source>
         <target state="needs-review-translation">
 Instalace byla úspěšná. Pokud nejsou další pokyny, můžete přímo do jádra napsat následující příkaz k vyvolání: {0}</target>
