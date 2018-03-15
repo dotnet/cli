@@ -136,7 +136,7 @@
     <value>SOURCE</value>
   </data>
   <data name="CommandDescription" xml:space="preserve">
-    <value>Updates a tool for use on the command line.</value>
+    <value>Updates a tool to the latest stable version for use.</value>
   </data>
   <data name="ConfigFileOptionDescription" xml:space="preserve">
     <value>The NuGet configuration file to use.</value>
@@ -175,6 +175,6 @@
     <value>Tool '{0}' was reinstalled with the latest stable version (version '{1}').</value>
   </data>
   <data name="UpdateToolFailed" xml:space="preserve">
-    <value>Tool '{0}' failed to update. Due to the following.</value>
+    <value>Tool '{0}' failed to update due to the following:</value>
   </data>
 </root>
