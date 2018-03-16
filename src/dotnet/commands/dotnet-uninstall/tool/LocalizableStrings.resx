@@ -148,7 +148,7 @@
     <value>Please specify either the global option (--global) or the tool path option (--tool-path).</value>
   </data>
   <data name="ToolPathDescription" xml:space="preserve">
-    <value>Location where the tool will be installed.</value>
+    <value>Location where the tool was previously installed.</value>
   </data>
   <data name="UninstallToolCommandInvalidGlobalAndToolPath" xml:space="preserve">
     <value>(--global) conflicts with the tool path option (--tool-path). Please specify only one of the options.</value>

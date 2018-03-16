@@ -53,8 +53,8 @@
         <note />
       </trans-unit>
       <trans-unit id="ToolPathDescription">
-        <source>Location where the tool will be installed.</source>
-        <target state="new">Location where the tool will be installed.</target>
+        <source>Location where the tool was previously installed.</source>
+        <target state="new">Location where the tool was previously installed.</target>
         <note />
       </trans-unit>
       <trans-unit id="UninstallToolCommandInvalidGlobalAndToolPath">
