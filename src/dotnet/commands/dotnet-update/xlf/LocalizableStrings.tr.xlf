@@ -8,8 +8,8 @@
         <note />
       </trans-unit>
       <trans-unit id="CommandDescription">
-        <source>Updates an item into the development environment.</source>
-        <target state="new">Updates an item into the development environment.</target>
+        <source>Updates an item in the development environment.</source>
+        <target state="new">Updates an item in the development environment.</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateArgumentDescription">

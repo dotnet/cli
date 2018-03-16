@@ -253,8 +253,8 @@
         <note />
       </trans-unit>
       <trans-unit id="InstallDefinition">
-        <source>Installs an item into the development environment.</source>
-        <target state="translated">Instaluje element w środowisku deweloperskim.</target>
+        <source>Installs an item in the development environment.</source>
+        <target state="needs-review-translation">Instaluje element w środowisku deweloperskim.</target>
         <note />
       </trans-unit>
       <trans-unit id="UninstallDefinition">
