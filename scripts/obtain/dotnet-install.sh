@@ -139,7 +139,7 @@ get_linux_platform_name() {
         fi
     fi
 
-    say_verbose "Linux specific platform name and version could not be detected: $ID.$VERSION_ID"
+    say_verbose "Linux specific platform name and version could not be detected: UName = $uname"
     return 1
 }
 
@@ -163,7 +163,7 @@ get_current_os_name() {
         fi
     fi
 
-    say_err "OS name could not be detected: $ID.$VERSION_ID"
+    say_err "OS name could not be detected: UName = $uname"
     return 1
 }
 
@@ -188,7 +188,7 @@ get_legacy_os_name() {
         fi
     fi
 
-    say_verbose "Distribution specific OS name and version could not be detected: $ID.$VERSION_ID"
+    say_verbose "Distribution specific OS name and version could not be detected: UName = $uname"
     return 1
 }
 
@@ -570,7 +570,7 @@ copy_files_or_dirs_from_list() {
     local root_path="$(remove_trailing_slash "$1")"
     local out_path="$(remove_trailing_slash "$2")"
     local override="$3"
-    local override_switch=$(if [ "$override" = false ]; then printf -- "-n"; fi)
+    local override_switch=$(if [ "$override" = false ] && [[ $linux_platform_name != 'alpine'* ]]; then printf -- "-n"; fi)
 
     cat | uniq | while read -r file_path; do
         local path="$(remove_beginning_slash "${file_path#$root_path}")"
@@ -878,7 +878,7 @@ do
             echo "          Possible values:"
             echo "          - dotnet     - the Microsoft.NETCore.App shared runtime"
             echo "          - aspnetcore - the Microsoft.AspNetCore.App shared runtime"
-            echo "  --skip-non-versioned-files         Skips non-versioned files if they already exist, such as the dotnet executable."
+            echo "  --skip-non-versioned-files         Skips non-versioned files if they already exist, such as the dotnet executable. (not supported for Alpine)"
             echo "      -SkipNonVersionedFiles"
             echo "  --dry-run,-DryRun                  Do not perform installation. Display download link."
             echo "  --no-path, -NoPath                 Do not set PATH for the current process."
