@@ -885,7 +885,7 @@ do
             echo "          Possible values:"
             echo "          - dotnet     - the Microsoft.NETCore.App shared runtime"
             echo "          - aspnetcore - the Microsoft.AspNetCore.App shared runtime"
-            echo "  --skip-non-versioned-files         Skips non-versioned files if they already exist, such as the dotnet executable. (not supported for Alpine)"
+            echo "  --skip-non-versioned-files         Skips non-versioned files if they already exist, such as the dotnet executable."
             echo "      -SkipNonVersionedFiles"
             echo "  --dry-run,-DryRun                  Do not perform installation. Display download link."
             echo "  --no-path, -NoPath                 Do not set PATH for the current process."
