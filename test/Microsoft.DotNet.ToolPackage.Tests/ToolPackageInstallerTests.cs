@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         [Theory]
         [InlineData(false)]
         [InlineData(true)]
-        public void GivenOfflineFeedInstallSuceeds(bool testMockBehaviorIsInSync)
+        public void GivenOfflineFeedInstallSucceeds(bool testMockBehaviorIsInSync)
         {
             var (store, installer, reporter, fileSystem) = Setup(
                 useMock: testMockBehaviorIsInSync,
@@ -57,6 +57,30 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 packageId: TestPackageId,
                 versionRange: VersionRange.Parse(TestPackageVersion),
                 targetFramework: _testTargetframework);
+
+            AssertPackageInstall(reporter, fileSystem, package, store);
+
+            package.Uninstall();
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void GivenAEmptySourceAndOfflineFeedInstallSucceeds(bool testMockBehaviorIsInSync)
+        {
+            var emptySource = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            Directory.CreateDirectory(emptySource);
+
+            var (store, installer, reporter, fileSystem) = Setup(
+                useMock: testMockBehaviorIsInSync,
+                offlineFeed: new DirectoryPath(GetTestLocalFeedPath()),
+                feeds: GetOfflineMockFeed());
+
+            var package = installer.InstallPackage(
+                packageId: TestPackageId,
+                versionRange: VersionRange.Parse(TestPackageVersion),
+                targetFramework: _testTargetframework,
+                source: emptySource);
 
             AssertPackageInstall(reporter, fileSystem, package, store);
 
@@ -229,6 +253,31 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 versionRange: VersionRange.Parse(TestPackageVersion),
                 targetFramework: _testTargetframework,
                 source: source);
+
+            AssertPackageInstall(reporter, fileSystem, package, store);
+
+            package.Uninstall();
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void GivenAEmptySourceAndNugetConfigInstallSucceeds(bool testMockBehaviorIsInSync)
+        {
+            var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
+            var emptySource = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            Directory.CreateDirectory(emptySource);
+
+            var (store, installer, reporter, fileSystem) = Setup(
+                useMock: testMockBehaviorIsInSync,
+                feeds: GetMockFeedsForSource(emptySource));
+
+            var package = installer.InstallPackage(
+                packageId: TestPackageId,
+                versionRange: VersionRange.Parse(TestPackageVersion),
+                targetFramework: _testTargetframework,
+                source: emptySource,
+                nugetConfig: nugetConfigPath);
 
             AssertPackageInstall(reporter, fileSystem, package, store);
 

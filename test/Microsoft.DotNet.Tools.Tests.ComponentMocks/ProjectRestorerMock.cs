@@ -56,23 +56,21 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             }
         }
 
-        public void Restore(
-            FilePath project,
+        public void Restore(FilePath project,
             DirectoryPath assetJsonOutput,
             FilePath? nugetConfig = null,
-            string source = null,
             string verbosity = null)
         {
             string packageId;
             VersionRange versionRange;
             string targetFramework;
-
+            string source = null;
             try
             {
                 // The mock installer wrote a mock project file containing id:version:framework
                 var contents = _fileSystem.File.ReadAllText(project.Value);
                 var tokens = contents.Split(':');
-                if (tokens.Length != 3)
+                if (tokens.Length != 4)
                 {
                     throw new ToolPackageException(LocalizableStrings.ToolInstallationRestoreFailed);
                 }
@@ -80,6 +78,7 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                 packageId = tokens[0];
                 versionRange = VersionRange.Parse(tokens[1]);
                 targetFramework = tokens[2];
+                source = string.IsNullOrWhiteSpace(tokens[3]) ? null : tokens[3];
             }
             catch (IOException)
             {
@@ -142,25 +141,11 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
 
             if (package == null)
             {
-                if (_reporter != null)
-                {
-                    _reporter.WriteLine($"Error: failed to restore package {packageId}.");
-                }
+                _reporter?.WriteLine($"Error: failed to restore package {packageId}.");
                 throw new ToolPackageException(LocalizableStrings.ToolInstallationRestoreFailed);
             }
 
             return package;
-        }
-
-        private static bool MatchPackage(MockFeedPackage p, string packageId, VersionRange versionRange)
-        {
-            if (string.Compare(p.PackageId, packageId, StringComparison.CurrentCultureIgnoreCase) != 0)
-            {
-                return false;
-            }
-
-            return versionRange == null ||
-                   versionRange.FindBestMatch(new[] { NuGetVersion.Parse(p.Version) }) != null;
         }
     }
 }
