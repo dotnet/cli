@@ -137,7 +137,7 @@ namespace Microsoft.DotNet.Tools.Install.Tool
                         versionRange: versionRange,
                         targetFramework: _framework,
                         nugetConfig: configFile,
-                        source: _source,
+                        additionalFeeds: _source,
                         verbosity: _verbosity);
 
                     foreach (var command in package.Commands)

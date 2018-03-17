@@ -80,7 +80,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 packageId: TestPackageId,
                 versionRange: VersionRange.Parse(TestPackageVersion),
                 targetFramework: _testTargetframework,
-                source: new[] {emptySource});
+                additionalFeeds: new[] {emptySource});
 
             AssertPackageInstall(reporter, fileSystem, package, store);
 
@@ -252,7 +252,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 packageId: TestPackageId,
                 versionRange: VersionRange.Parse(TestPackageVersion),
                 targetFramework: _testTargetframework,
-                source: new[] {source});
+                additionalFeeds: new[] {source});
 
             AssertPackageInstall(reporter, fileSystem, package, store);
 
@@ -276,7 +276,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 packageId: TestPackageId,
                 versionRange: VersionRange.Parse(TestPackageVersion),
                 targetFramework: _testTargetframework,
-                nugetConfig: nugetConfigPath, source: new[] {emptySource});
+                nugetConfig: nugetConfigPath, additionalFeeds: new[] {emptySource});
 
             AssertPackageInstall(reporter, fileSystem, package, store);
 
@@ -329,7 +329,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                         packageId: TestPackageId,
                         versionRange: VersionRange.Parse(TestPackageVersion),
                         targetFramework: _testTargetframework,
-                        source: new[] {source});
+                        additionalFeeds: new[] {source});
 
                     FailedStepAfterSuccessRestore();
                     t.Complete();
@@ -361,7 +361,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                         packageId: TestPackageId,
                         versionRange: VersionRange.Parse(TestPackageVersion),
                         targetFramework: _testTargetframework,
-                        source: new[] {source});
+                        additionalFeeds: new[] {source});
 
                     first.ShouldNotThrow();
 
@@ -369,7 +369,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                         packageId: TestPackageId,
                         versionRange: VersionRange.Parse(TestPackageVersion),
                         targetFramework: _testTargetframework,
-                        source: new[] {source});
+                        additionalFeeds: new[] {source});
 
                     t.Complete();
                 }
@@ -400,7 +400,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 packageId: TestPackageId,
                 versionRange: VersionRange.Parse(TestPackageVersion),
                 targetFramework: _testTargetframework,
-                source: new[] {source});
+                additionalFeeds: new[] {source});
 
             AssertPackageInstall(reporter, fileSystem, package, store);
 
@@ -408,7 +408,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 packageId: TestPackageId,
                 versionRange: VersionRange.Parse(TestPackageVersion),
                 targetFramework: _testTargetframework,
-                source: new[] {source});
+                additionalFeeds: new[] {source});
 
             reporter.Lines.Should().BeEmpty();
 
@@ -449,7 +449,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 packageId: TestPackageId,
                 versionRange: VersionRange.Parse(TestPackageVersion),
                 targetFramework: _testTargetframework,
-                source: new[] {source});
+                additionalFeeds: new[] {source});
 
             AssertPackageInstall(reporter, fileSystem, package, store);
 
@@ -473,7 +473,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 packageId: TestPackageId,
                 versionRange: VersionRange.Parse(TestPackageVersion),
                 targetFramework: _testTargetframework,
-                source: new[] {source});
+                additionalFeeds: new[] {source});
 
             AssertPackageInstall(reporter, fileSystem, package, store);
 
@@ -506,7 +506,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 packageId: TestPackageId,
                 versionRange: VersionRange.Parse(TestPackageVersion),
                 targetFramework: _testTargetframework,
-                source: new[] {source});
+                additionalFeeds: new[] {source});
 
             AssertPackageInstall(reporter, fileSystem, package, store);
 

@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             string targetFramework = null,
             FilePath? nugetConfig = null,
             DirectoryPath? rootConfigDirectory = null,
-            string[] source = null,
+            string[] additionalFeeds = null,
             string verbosity = null)
         {
             var packageRootDirectory = _store.GetRootPackageDirectory(packageId);
