@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.ToolPackage
 {
     internal class ToolPackageInstaller : IToolPackageInstaller
     {
-        private readonly IToolPackageStore _store;
+        private readonly IToolPackageStore _additionalFeed;
         private readonly IProjectRestorer _projectRestorer;
         private readonly FilePath? _tempProject;
         private readonly DirectoryPath _offlineFeed;
@@ -24,29 +24,28 @@ namespace Microsoft.DotNet.ToolPackage
             FilePath? tempProject = null,
             DirectoryPath? offlineFeed = null)
         {
-            _store = store ?? throw new ArgumentNullException(nameof(store));
+            _additionalFeed = store ?? throw new ArgumentNullException(nameof(store));
             _projectRestorer = projectRestorer ?? throw new ArgumentNullException(nameof(projectRestorer));
             _tempProject = tempProject;
             _offlineFeed = offlineFeed ?? new DirectoryPath(new CliFolderPathCalculator().CliFallbackFolderPath);
         }
 
-        public IToolPackage InstallPackage(
-            PackageId packageId,
+        public IToolPackage InstallPackage(PackageId packageId,
             VersionRange versionRange = null,
             string targetFramework = null,
             FilePath? nugetConfig = null,
             DirectoryPath? rootConfigDirectory = null,
-            string source = null,
+            string[] additionalFeeds = null,
             string verbosity = null)
         {
-            var packageRootDirectory = _store.GetRootPackageDirectory(packageId);
+            var packageRootDirectory = _additionalFeed.GetRootPackageDirectory(packageId);
             string rollbackDirectory = null;
 
             return TransactionalAction.Run<IToolPackage>(
                 action: () => {
                     try
                     {
-                        var stageDirectory = _store.GetRandomStagingDirectory();
+                        var stageDirectory = _additionalFeed.GetRandomStagingDirectory();
                         Directory.CreateDirectory(stageDirectory.Value);
                         rollbackDirectory = stageDirectory.Value;
 
@@ -55,24 +54,23 @@ namespace Microsoft.DotNet.ToolPackage
                             versionRange: versionRange,
                             targetFramework: targetFramework ?? BundledTargetFramework.GetTargetFrameworkMoniker(),
                             restoreDirectory: stageDirectory,
-                            rootConfigDirectory: rootConfigDirectory);
+                            rootConfigDirectory: rootConfigDirectory,
+                            additionalFeeds: additionalFeeds);
 
                         try
                         {
                             _projectRestorer.Restore(
                                 tempProject,
                                 stageDirectory,
-                                nugetConfig,
-                                source,
-                                verbosity);
+                                nugetConfig);
                         }
                         finally
                         {
                             File.Delete(tempProject.Value);
                         }
 
-                        var version = _store.GetStagedPackageVersion(stageDirectory, packageId);
-                        var packageDirectory = _store.GetPackageDirectory(packageId, version);
+                        var version = _additionalFeed.GetStagedPackageVersion(stageDirectory, packageId);
+                        var packageDirectory = _additionalFeed.GetPackageDirectory(packageId, version);
                         if (Directory.Exists(packageDirectory.Value))
                         {
                             throw new ToolPackageException(
@@ -86,7 +84,7 @@ namespace Microsoft.DotNet.ToolPackage
                         Directory.Move(stageDirectory.Value, packageDirectory.Value);
                         rollbackDirectory = packageDirectory.Value;
 
-                        return new ToolPackageInstance(_store, packageId, version, packageDirectory);
+                        return new ToolPackageInstance(_additionalFeed, packageId, version, packageDirectory);
                     }
                     catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
                     {
@@ -113,12 +111,12 @@ namespace Microsoft.DotNet.ToolPackage
                 });
         }
 
-        private FilePath CreateTempProject(
-            PackageId packageId,
+        private FilePath CreateTempProject(PackageId packageId,
             VersionRange versionRange,
             string targetFramework,
             DirectoryPath restoreDirectory,
-            DirectoryPath? rootConfigDirectory)
+            DirectoryPath? rootConfigDirectory,
+            string[] additionalFeeds)
         {
             var tempProject = _tempProject ?? new DirectoryPath(Path.GetTempPath())
                 .WithSubDirectories(Path.GetRandomFileName())
@@ -141,8 +139,7 @@ namespace Microsoft.DotNet.ToolPackage
                         new XElement("RestoreRootConfigDirectory", rootConfigDirectory?.Value ?? Directory.GetCurrentDirectory()), // config file probing start directory
                         new XElement("DisableImplicitFrameworkReferences", "true"), // no Microsoft.NETCore.App in tool folder
                         new XElement("RestoreFallbackFolders", "clear"), // do not use fallbackfolder, tool package need to be copied to tool folder
-                        new XElement("RestoreAdditionalProjectSources", // use fallbackfolder as feed to enable offline
-                            Directory.Exists(_offlineFeed.Value) ? _offlineFeed.Value : string.Empty),
+                        new XElement("RestoreAdditionalProjectSources", JoinSourceAndOfflineCache(additionalFeeds)),
                         new XElement("RestoreAdditionalProjectFallbackFolders", string.Empty), // block other
                         new XElement("RestoreAdditionalProjectFallbackFoldersExcludes", string.Empty),  // block other
                         new XElement("DisableImplicitNuGetFallbackFolder", "true")),  // disable SDK side implicit NuGetFallbackFolder
@@ -156,6 +153,23 @@ namespace Microsoft.DotNet.ToolPackage
 
             File.WriteAllText(tempProject.Value, tempProjectContent.ToString());
             return tempProject;
+        }
+
+        private string JoinSourceAndOfflineCache(string[] additionalFeeds)
+        {
+            var feeds = new List<string>();
+            if (additionalFeeds != null)
+            {
+                feeds.AddRange(additionalFeeds);
+            }
+
+            // use fallbackfolder as feed to enable offline
+            if (Directory.Exists(_offlineFeed.Value))
+            {
+                feeds.Add(_offlineFeed.ToXmlEncodeString());
+            }
+
+            return string.Join(";", feeds);
         }
     }
 }
