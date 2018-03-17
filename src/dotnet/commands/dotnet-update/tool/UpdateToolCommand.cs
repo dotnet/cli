@@ -32,7 +32,7 @@ namespace Microsoft.DotNet.Tools.Update.Tool
         private readonly PackageId _packageId;
         private readonly string _configFilePath;
         private readonly string _framework;
-        private readonly string _source;
+        private readonly string[] _source;
         private readonly bool _global;
         private readonly string _verbosity;
         private readonly string _toolPath;
@@ -52,7 +52,7 @@ namespace Microsoft.DotNet.Tools.Update.Tool
             _packageId = new PackageId(appliedCommand.Arguments.Single());
             _configFilePath = appliedCommand.ValueOrDefault<string>("configfile");
             _framework = appliedCommand.ValueOrDefault<string>("framework");
-            _source = appliedCommand.ValueOrDefault<string>("source");
+            _source = appliedCommand.ValueOrDefault<string[]>("source-feed");
             _global = appliedCommand.ValueOrDefault<bool>("global");
             _verbosity = appliedCommand.SingleArgumentOrDefault("verbosity");
             _toolPath = appliedCommand.SingleArgumentOrDefault("tool-path");

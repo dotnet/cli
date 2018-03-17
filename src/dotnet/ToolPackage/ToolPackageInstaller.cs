@@ -30,13 +30,12 @@ namespace Microsoft.DotNet.ToolPackage
             _offlineFeed = offlineFeed ?? new DirectoryPath(new CliFolderPathCalculator().CliFallbackFolderPath);
         }
 
-        public IToolPackage InstallPackage(
-            PackageId packageId,
+        public IToolPackage InstallPackage(PackageId packageId,
             VersionRange versionRange = null,
             string targetFramework = null,
             FilePath? nugetConfig = null,
             DirectoryPath? rootConfigDirectory = null,
-            string source = null,
+            string[] source = null,
             string verbosity = null)
         {
             var packageRootDirectory = _store.GetRootPackageDirectory(packageId);
@@ -117,7 +116,7 @@ namespace Microsoft.DotNet.ToolPackage
             string targetFramework,
             DirectoryPath restoreDirectory,
             DirectoryPath? rootConfigDirectory,
-            string source)
+            string[] source)
         {
             var tempProject = _tempProject ?? new DirectoryPath(Path.GetTempPath())
                 .WithSubDirectories(Path.GetRandomFileName())
@@ -156,12 +155,12 @@ namespace Microsoft.DotNet.ToolPackage
             return tempProject;
         }
 
-        private string JoinSourceAndOfflineCache(string source)
+        private string JoinSourceAndOfflineCache(string[] source)
         {
             var feeds = new List<string>();
-            if (!string.IsNullOrEmpty(source))
+            if (source != null)
             {
-                feeds.Add(source);
+                feeds.AddRange(source);
             }
 
             // use fallbackfolder as feed to enable offline
