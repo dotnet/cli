@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                     // Write a fake project with the requested package id, version, and framework
                     _fileSystem.File.WriteAllText(
                         tempProject.Value,
-                        $"{packageId}:{versionRange?.ToString("S", new VersionRangeFormatter()) ?? "*"}:{targetFramework}:{source ?? string.Empty}");
+                        $"{packageId}:{versionRange?.ToString("S", new VersionRangeFormatter()) ?? "*"}:{targetFramework}");
 
                     // Perform a restore on the fake project
                     _projectRestorer.Restore(

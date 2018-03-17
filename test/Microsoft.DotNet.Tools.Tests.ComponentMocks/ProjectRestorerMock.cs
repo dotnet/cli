@@ -64,13 +64,12 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             string packageId;
             VersionRange versionRange;
             string targetFramework;
-            string source = null;
             try
             {
                 // The mock installer wrote a mock project file containing id:version:framework
                 var contents = _fileSystem.File.ReadAllText(project.Value);
                 var tokens = contents.Split(':');
-                if (tokens.Length != 4)
+                if (tokens.Length != 3)
                 {
                     throw new ToolPackageException(LocalizableStrings.ToolInstallationRestoreFailed);
                 }
@@ -78,7 +77,6 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
                 packageId = tokens[0];
                 versionRange = VersionRange.Parse(tokens[1]);
                 targetFramework = tokens[2];
-                source = string.IsNullOrWhiteSpace(tokens[3]) ? null : tokens[3];
             }
             catch (IOException)
             {
@@ -93,8 +91,7 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             var feedPackage = GetPackage(
                 packageId,
                 versionRange,
-                nugetConfig,
-                source);
+                nugetConfig);
 
             var packageVersion = feedPackage.Version;
             targetFramework = string.IsNullOrEmpty(targetFramework) ? "targetFramework" : targetFramework;
@@ -117,25 +114,22 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
         private MockFeedPackage GetPackage(
             string packageId,
             VersionRange versionRange = null,
-            FilePath? nugetConfig = null,
-            string source = null)
+            FilePath? nugetConfig = null)
         {
-            var allPackages =  _feeds
-                .Where(f => {
+            var allPackages = _feeds
+                .Where(f =>
+                {
                     if (nugetConfig != null)
                     {
-                        return f.Type == MockFeedType.ExplicitNugetConfig && f.Uri == nugetConfig.Value.Value;
+                        return ExcludeOtherFeeds(nugetConfig, f);
                     }
-                    if (source != null)
-                    {
-                        return f.Type == MockFeedType.Source && f.Uri == source;
-                    }
+
                     return true;
                 })
                 .SelectMany(f => f.Packages)
                 .Where(f => f.PackageId == packageId);
 
-            var bestVersion  = versionRange.FindBestMatch(allPackages.Select(p => NuGetVersion.Parse(p.Version)));
+            var bestVersion = versionRange.FindBestMatch(allPackages.Select(p => NuGetVersion.Parse(p.Version)));
 
             var package = allPackages.Where(p => NuGetVersion.Parse(p.Version).Equals(bestVersion)).FirstOrDefault();
 
@@ -146,6 +140,12 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             }
 
             return package;
+        }
+
+        private static bool ExcludeOtherFeeds(FilePath? nugetConfig, MockFeed f)
+        {
+            return f.Type == MockFeedType.ImplicitAdditionalFeed
+                   || (f.Type == MockFeedType.ExplicitNugetConfig && f.Uri == nugetConfig.Value.Value);
         }
     }
 }

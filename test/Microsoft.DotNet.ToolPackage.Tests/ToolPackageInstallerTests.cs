@@ -646,7 +646,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             {
                 new MockFeed
                 {
-                    Type = MockFeedType.Source,
+                    Type = MockFeedType.ImplicitAdditionalFeed,
                     Uri = source,
                     Packages = new List<MockFeedPackage>
                     {
@@ -666,7 +666,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             {
                 new MockFeed
                 {
-                    Type = MockFeedType.OfflineFeed,
+                    Type = MockFeedType.ImplicitAdditionalFeed,
                     Uri = GetTestLocalFeedPath(),
                     Packages = new List<MockFeedPackage>
                     {
