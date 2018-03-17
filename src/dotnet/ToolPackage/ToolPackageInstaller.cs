@@ -161,7 +161,7 @@ namespace Microsoft.DotNet.ToolPackage
             var feeds = new List<string>();
             if (!string.IsNullOrEmpty(source))
             {
-                feeds.Add(new DirectoryPath(source).ToXmlEncodeString());
+                feeds.Add(source);
             }
 
             // use fallbackfolder as feed to enable offline
