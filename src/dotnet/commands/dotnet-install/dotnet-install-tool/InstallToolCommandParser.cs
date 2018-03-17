@@ -32,10 +32,10 @@ namespace Microsoft.DotNet.Cli
                     LocalizableStrings.ConfigFileOptionDescription,
                     Accept.ExactlyOneArgument()),
                 Create.Option(
-                    "--source",
+                    "--source-feed",
                     LocalizableStrings.SourceOptionDescription,
-                    Accept.ExactlyOneArgument()
-                        .With(name: LocalizableStrings.SourceOptionName)),
+                    Accept.OneOrMoreArguments()
+                        .With(name: LocalizableStrings.SourceOptionName)), // TODO wul no check in change description
                 Create.Option(
                     "-f|--framework",
                     LocalizableStrings.FrameworkOptionDescription,
