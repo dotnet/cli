@@ -91,7 +91,7 @@ namespace Microsoft.DotNet.Tests.Commands
             feeds: new MockFeed[] {
                     new MockFeed
                     {
-                        Type = MockFeedType.Source,
+                        Type = MockFeedType.ImplicitAdditionalFeed,
                         Uri = sourcePath,
                         Packages = new List<MockFeedPackage>
                         {
