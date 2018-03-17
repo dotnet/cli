@@ -33,9 +33,9 @@ namespace Microsoft.DotNet.Cli
                     Accept.ExactlyOneArgument()),
                 Create.Option(
                     "--source-feed",
-                    LocalizableStrings.SourceOptionDescription,
+                    LocalizableStrings.SourceFeedOptionDescription,
                     Accept.OneOrMoreArguments()
-                        .With(name: LocalizableStrings.SourceOptionName)), // TODO wul no check in change description
+                        .With(name: LocalizableStrings.SourceFeedOptionName)),
                 Create.Option(
                     "-f|--framework",
                     LocalizableStrings.FrameworkOptionDescription,
