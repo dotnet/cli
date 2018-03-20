@@ -222,6 +222,7 @@
     <Exec Command="sudo yum -y install $(DownloadedSharedHostInstallerFile)" />
     <Exec Command="sudo yum -y install $(DownloadedHostFxrInstallerFile)" />
     <Exec Command="sudo yum -y install $(DownloadedSharedFrameworkInstallerFile)" />
+
     <!-- Ignore dependencies, which may have an incoherent dependency on dotnet-runtime -->
     <Exec Command="sudo rpm --install --nodeps $(DownloadedAspNetCoreSharedFxInstallerFile)" />
 
