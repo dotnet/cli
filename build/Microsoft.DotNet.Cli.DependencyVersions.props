@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <CLI_SharedFrameworkVersion>1.1.6</CLI_SharedFrameworkVersion>
-    <CLI_CoreCLRVersion>1.1.6</CLI_CoreCLRVersion>
-    <CLI_JitVersion>1.1.6</CLI_JitVersion>
+    <CLI_SharedFrameworkVersion>1.1.7</CLI_SharedFrameworkVersion>
+    <CLI_CoreCLRVersion>1.1.7</CLI_CoreCLRVersion>
+    <CLI_JitVersion>1.1.7</CLI_JitVersion>
     <CLI_SharedHostVersion>1.1.0</CLI_SharedHostVersion>
     <CLI_HostFxrContainerVersion>1.1.0</CLI_HostFxrContainerVersion>
     <CLI_HostFxrVersion Condition="'$(OS)' != 'Windows_NT'">1.1.0</CLI_HostFxrVersion>
     <CLI_HostFxrVersion Condition="'$(OS)' == 'Windows_NT'">1.1.2</CLI_HostFxrVersion>
 
-    <CLI_SharedFrameworkVersion_1_0>1.0.9</CLI_SharedFrameworkVersion_1_0>
+    <CLI_SharedFrameworkVersion_1_0>1.0.10</CLI_SharedFrameworkVersion_1_0>
     <CLI_SharedHostVersion_1_0>1.0.1</CLI_SharedHostVersion_1_0>
     <CLI_HostFxrContainerVersion_1_0>1.0.1</CLI_HostFxrContainerVersion_1_0>
     <CLI_HostFxrVersion_1_0 Condition="'$(OS)' != 'Windows_NT'">1.0.1</CLI_HostFxrVersion_1_0>
@@ -23,7 +23,7 @@
     <CLI_WEBSDK_Version>1.0.0-alpha-20170516-2-509</CLI_WEBSDK_Version>
     <CLI_TestPlatform_Version>15.0.0</CLI_TestPlatform_Version>
     <TemplateEngineVersion>1.0.0-beta2-20170629-269</TemplateEngineVersion>
-    <AspnetTemplateVersion>1.1.5-rtm-10693</AspnetTemplateVersion>
+    <AspnetTemplateVersion>1.1.5-rtm-10863</AspnetTemplateVersion>
     <TemplateEngineTemplateVersion>1.0.0-beta2-20170907-306</TemplateEngineTemplateVersion>
     <PlatformAbstractionsVersion>1.0.3</PlatformAbstractionsVersion>
     <DependencyModelVersion>1.0.3</DependencyModelVersion>

@@ -2,11 +2,11 @@
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <SdkBrandName>.NET Core SDK 1.1.8</SdkBrandName>
-    <SharedFrameworkBrandName>Microsoft .NET Core 1.1.6 - Runtime</SharedFrameworkBrandName>
+    <SharedFrameworkBrandName>Microsoft .NET Core 1.1.7 - Runtime</SharedFrameworkBrandName>
     <SharedHostBrandName>Microsoft .NET Core 1.1.0 - Host</SharedHostBrandName>
     <HostFxrBrandName>Microsoft .NET Core 1.1.0 - Host FX Resolver</HostFxrBrandName>
     
-    <AdditionalSharedFrameworkBrandName>Microsoft .NET Core 1.0.9 - Runtime</AdditionalSharedFrameworkBrandName>
+    <AdditionalSharedFrameworkBrandName>Microsoft .NET Core 1.0.10 - Runtime</AdditionalSharedFrameworkBrandName>
     <AdditionalSharedHostBrandName>Microsoft .NET Core 1.0.1 - Host</AdditionalSharedHostBrandName>
     <AdditionalHostFxrBrandName>Microsoft .NET Core 1.0.1 - Host FX Resolver</AdditionalHostFxrBrandName>
 
