@@ -13,6 +13,9 @@ namespace Microsoft.DotNet.ToolPackage
     // This is named "ToolPackageInstance" because "ToolPackage" would conflict with the namespace
     internal class ToolPackageInstance : IToolPackage
     {
+        private const string AssetsFileName = "project.assets.json";
+        private const string ToolSettingsFileName = "DotnetToolSettings.xml";
+
         private IToolPackageStore _store;
         private Lazy<IReadOnlyList<CommandSettings>> _commands;
 
@@ -95,30 +98,13 @@ namespace Microsoft.DotNet.ToolPackage
 
         private IReadOnlyList<CommandSettings> GetCommands()
         {
-            const string AssetsFileName = "project.assets.json";
-            const string ToolSettingsFileName = "DotnetToolSettings.xml";
-
             try
             {
                 var commands = new List<CommandSettings>();
                 var lockFile = new LockFileFormat().Read(PackageDirectory.WithFile(AssetsFileName).Value);
 
                 var library = FindLibraryInLockFile(lockFile);
-                var dotnetToolSettings = FindItemInTargetLibrary(library, ToolSettingsFileName);
-                if (dotnetToolSettings == null)
-                {
-                    throw new ToolConfigurationException(
-                        CommonLocalizableStrings.MissingToolSettingsFile);
-                }
-
-                var toolConfigurationPath =
-                    PackageDirectory
-                        .WithSubDirectories(
-                            Id.ToString(),
-                            library.Version.ToNormalizedString())
-                        .WithFile(dotnetToolSettings.Path);
-
-                var configuration = ToolConfigurationDeserializer.Deserialize(toolConfigurationPath.Value);
+                ToolConfiguration configuration = DeserializeToolConfiguration(ToolSettingsFileName, library);
 
                 var entryPointFromLockFile = FindItemInTargetLibrary(library, configuration.ToolAssemblyEntryPoint);
                 if (entryPointFromLockFile == null)
@@ -152,6 +138,26 @@ namespace Microsoft.DotNet.ToolPackage
             }
         }
 
+        private ToolConfiguration DeserializeToolConfiguration(string ToolSettingsFileName, LockFileTargetLibrary library)
+        {
+            var dotnetToolSettings = FindItemInTargetLibrary(library, ToolSettingsFileName);
+            if (dotnetToolSettings == null)
+            {
+                throw new ToolConfigurationException(
+                    CommonLocalizableStrings.MissingToolSettingsFile);
+            }
+
+            var toolConfigurationPath =
+                PackageDirectory
+                    .WithSubDirectories(
+                        Id.ToString(),
+                        library.Version.ToNormalizedString())
+                    .WithFile(dotnetToolSettings.Path);
+
+            var configuration = ToolConfigurationDeserializer.Deserialize(toolConfigurationPath.Value);
+            return configuration;
+        }
+
         private LockFileTargetLibrary FindLibraryInLockFile(LockFile lockFile)
         {
             return lockFile
@@ -165,6 +171,29 @@ namespace Microsoft.DotNet.ToolPackage
             return library
                 ?.ToolsAssemblies
                 ?.SingleOrDefault(t => LockFileMatcher.MatchesFile(t, targetRelativeFilePath));
+        }
+
+        public IEnumerable<string> Warnings
+        {
+            get
+            {
+                try
+                {
+                    var lockFile = new LockFileFormat().Read(PackageDirectory.WithFile(AssetsFileName).Value);
+                    var library = FindLibraryInLockFile(lockFile);
+                    ToolConfiguration configuration = DeserializeToolConfiguration(ToolSettingsFileName, library);
+
+                    return configuration.Warnings;
+                }
+                catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
+                {
+                    throw new ToolConfigurationException(
+                        string.Format(
+                            CommonLocalizableStrings.FailedToRetrieveToolConfiguration,
+                            ex.Message),
+                        ex);
+                }
+            }
         }
     }
 }
