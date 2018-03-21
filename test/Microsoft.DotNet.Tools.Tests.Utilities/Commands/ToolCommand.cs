@@ -5,16 +5,16 @@ using Microsoft.DotNet.Cli.Utils;
 
 namespace Microsoft.DotNet.Tools.Test.Utilities
 {
-    public sealed class InstallCommand : DotnetCommand
+    public sealed class ToolCommand : DotnetCommand
     {
         public override CommandResult Execute(string args = "")
         {
-            return base.Execute($"install {args}");
+            return base.Execute($"tool {args}");
         }
 
         public override CommandResult ExecuteWithCapturedOutput(string args = "")
         {
-            return base.ExecuteWithCapturedOutput($"install {args}");
+            return base.ExecuteWithCapturedOutput($"tool {args}");
         }
     }
 }
