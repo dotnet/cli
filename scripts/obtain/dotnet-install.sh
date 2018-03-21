@@ -84,12 +84,20 @@ get_current_os_name() {
                     echo "fedora.24"
                     return 0
                     ;;
+                "fedora.27")
+                    echo "fedora.27"
+                    return 0
+                    ;;
                 "opensuse.13.2")
                     echo "opensuse.13.2"
                     return 0
                     ;;
                 "opensuse.42.1")
                     echo "opensuse.42.1"
+                    return 0
+                    ;;
+                "opensuse.42.3")
+                    echo "opensuse.42.3"
                     return 0
                     ;;
                 "rhel.7"*)
@@ -106,6 +114,10 @@ get_current_os_name() {
                     ;;
                 "ubuntu.16.10")
                     echo "ubuntu.16.10"
+                    return 0
+                    ;;
+                "ubuntu.18.04")
+                    echo "ubuntu.18.04"
                     return 0
                     ;;
                 "alpine.3.4.3")
