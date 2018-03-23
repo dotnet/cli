@@ -13,7 +13,8 @@ namespace Microsoft.DotNet.ToolPackage
 {
     internal static class ToolConfigurationDeserializer
     {
-        // match the number on SDK when the package format change is handled
+        // The supported tool configuration schema version.
+        // This should match the schema version in the GenerateToolsSettingsFile task from the SDK.
         private const int SupportedVersion = 1;
 
         public static ToolConfiguration Deserialize(string pathToXml)
