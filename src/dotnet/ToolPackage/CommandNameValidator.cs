@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using Microsoft.DotNet.Tools;
 
 namespace Microsoft.DotNet.ToolPackage
 {
@@ -36,7 +37,7 @@ namespace Microsoft.DotNet.ToolPackage
                 if (commandName.IndexOf(_agaist, StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     return new[] {
-                        string.Format("command name '{0}' contains reserved string '{1}'.", commandName, _agaist)
+                        string.Format(CommonLocalizableStrings.CommandNameContainsReservedString, commandName, _agaist)
                     };
                 }
             }
@@ -46,7 +47,7 @@ namespace Microsoft.DotNet.ToolPackage
                     commandName.Equals(_agaist, StringComparison.OrdinalIgnoreCase))
                 {
                     return new[] {
-                        string.Format("command name '{0}' starts with reserved word '{1}'.", commandName, _agaist)
+                        string.Format(CommonLocalizableStrings.CommandNameStartsWithReservedString, commandName, _agaist)
                     };
                 }
             }
@@ -55,7 +56,7 @@ namespace Microsoft.DotNet.ToolPackage
                 if (commandName.Equals(_agaist, StringComparison.OrdinalIgnoreCase))
                 {
                     return new[] {
-                        string.Format("command name '{0}' matches reserved string '{1}'.", commandName, _agaist)
+                        string.Format(CommonLocalizableStrings.CommandNameMatchesReservedString, commandName, _agaist)
                     };
                 }
             }

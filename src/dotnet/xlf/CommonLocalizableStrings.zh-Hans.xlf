@@ -863,6 +863,21 @@ setx PATH "%PATH%;{0}"
         <target state="needs-review-translation">命令“{0}”有一个前导点。</target>
         <note />
       </trans-unit>
+      <trans-unit id="CommandNameContainsReservedString">
+        <source>Command name '{0}' contains reserved string '{1}'.</source>
+        <target state="new">Command name '{0}' contains reserved string '{1}'.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="CommandNameMatchesReservedString">
+        <source>Command name '{0}' matches reserved string '{1}'.</source>
+        <target state="new">Command name '{0}' matches reserved string '{1}'.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="CommandNameStartsWithReservedString">
+        <source>Command name '{0}' starts with reserved word '{1}'.</source>
+        <target state="new">Command name '{0}' starts with reserved word '{1}'.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

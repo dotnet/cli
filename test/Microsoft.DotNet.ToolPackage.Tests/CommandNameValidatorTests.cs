@@ -3,6 +3,7 @@
 
 using System.Linq;
 using FluentAssertions;
+using Microsoft.DotNet.Tools;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
 
@@ -15,7 +16,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         {
             var commandValidator = new CommandNameValidator(true, false, false, "build");
             var errors = commandValidator.GenerateError("myBuildtool");
-            errors.Single().Should().Be("command name 'myBuildtool' contains reserved string 'build'.");
+            errors.Single().Should().Be(string.Format(CommonLocalizableStrings.CommandNameContainsReservedString, "myBuildtool", "build"));
         }
 
         [Fact]
@@ -23,7 +24,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         {
             var commandValidator = new CommandNameValidator(false, true, false, "build");
             var errors = commandValidator.GenerateError("Build-tool");
-            errors.Single().Should().Be("command name 'Build-tool' starts with reserved word 'build'.");
+            errors.Single().Should().Be(string.Format(CommonLocalizableStrings.CommandNameStartsWithReservedString, "Build-tool", "build"));
         }
 
         [Fact]
@@ -31,7 +32,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         {
             var commandValidator = new CommandNameValidator(false, true, false, "build");
             var errors = commandValidator.GenerateError("Build");
-            errors.Single().Should().Be("command name 'Build' starts with reserved word 'build'.");
+            errors.Single().Should().Be(string.Format(CommonLocalizableStrings.CommandNameStartsWithReservedString, "Build", "build"));
         }
 
         [Fact]
@@ -39,7 +40,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         {
             var commandValidator = new CommandNameValidator(false, false, true, "build");
             var errors = commandValidator.GenerateError("Build");
-            errors.Single().Should().Be("command name 'Build' matches reserved string 'build'.");
+            errors.Single().Should().Be(string.Format(CommonLocalizableStrings.CommandNameMatchesReservedString, "Build", "build"));
         }
 
         [Fact]
@@ -47,7 +48,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         {
             var commandValidator = new CommandNameValidator(true, false, true, "build");
             var errors = commandValidator.GenerateError("Build");
-            errors.Single().Should().Be("command name 'Build' contains reserved string 'build'.");
+            errors.Single().Should().Be(string.Format(CommonLocalizableStrings.CommandNameContainsReservedString, "Build", "build"));
         }
 
         [Fact]
@@ -55,7 +56,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         {
             var commandValidator = new CommandNameValidator(true, true, false, "build");
             var errors = commandValidator.GenerateError("Buildtool");
-            errors.Single().Should().Be("command name 'Buildtool' contains reserved string 'build'.");
+            errors.Single().Should().Be(string.Format(CommonLocalizableStrings.CommandNameContainsReservedString, "Buildtool", "build"));
         }
 
         [Fact]

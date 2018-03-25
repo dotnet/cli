@@ -74,8 +74,8 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             Action a = () => new ToolConfiguration(invalidCommandName, "my.dll");
             a.ShouldThrow<ToolConfigurationException>()
                 .And.Message.Should()
-                .Contain("command name 'refeRence-Dotnet' contains reserved string 'dotnet'.")
-                .And.Contain("command name 'refeRence-Dotnet' starts with reserved word 'reference'.");
+                .Contain(string.Format(CommonLocalizableStrings.CommandNameContainsReservedString, invalidCommandName, "dotnet"))
+                .And.Contain(string.Format(CommonLocalizableStrings.CommandNameStartsWithReservedString, invalidCommandName, "reference"));
         }
 
         [Fact]
@@ -85,7 +85,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             Action a = () => new ToolConfiguration(invalidCommandName, "my.dll");
             a.ShouldThrow<ToolConfigurationException>()
                 .And.Message.Should()
-                .Contain("command name '0-tool' starts with reserved word '0'.");
+                .Contain(string.Format(CommonLocalizableStrings.CommandNameStartsWithReservedString, invalidCommandName, "0"));
         }
     }
 }
