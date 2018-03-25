@@ -29,6 +29,7 @@ namespace Microsoft.DotNet.ToolPackage
 
             EnsureNoLeadingDot(commandName);
             EnsureNoInvalidFilenameCharacters(commandName);
+            EnsureNoReservedWords(commandName);
 
             CommandName = commandName;
             ToolAssemblyEntryPoint = toolAssemblyEntryPoint;
@@ -55,6 +56,16 @@ namespace Microsoft.DotNet.ToolPackage
                     string.Format(
                         CommonLocalizableStrings.ToolSettingsInvalidLeadingDotCommandName,
                         commandName));
+            }
+        }
+
+        private void EnsureNoReservedWords(string commandName)
+        {
+            var errors = CommandNameAllReservedValidator.GenerateError(commandName);
+            if (errors.Length != 0)
+            {
+                throw new ToolConfigurationException(
+                    string.Join(Environment.NewLine, errors));
             }
         }
 
