@@ -628,4 +628,13 @@ setx PATH "%PATH%;{0}"
   <data name="ToolSettingsInvalidLeadingDotCommandName" xml:space="preserve">
     <value>The command name '{0}' cannot begin with a leading dot (.).</value>
   </data>
+  <data name="CommandNameContainsReservedString" xml:space="preserve">
+    <value>Command name '{0}' contains reserved string '{1}'.</value>
+  </data>
+  <data name="CommandNameMatchesReservedString" xml:space="preserve">
+    <value>Command name '{0}' matches reserved string '{1}'.</value>
+  </data>
+  <data name="CommandNameStartsWithReservedString" xml:space="preserve">
+    <value>Command name '{0}' starts with reserved word '{1}'.</value>
+  </data>
 </root>

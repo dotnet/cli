@@ -66,5 +66,26 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                         CommonLocalizableStrings.ToolSettingsInvalidLeadingDotCommandName,
                         invalidCommandName));
         }
+
+        [Fact]
+        public void GivenAReservedStringAsFileNameItThrows()
+        {
+            var invalidCommandName = "refeRence-Dotnet";
+            Action a = () => new ToolConfiguration(invalidCommandName, "my.dll");
+            a.ShouldThrow<ToolConfigurationException>()
+                .And.Message.Should()
+                .Contain(string.Format(CommonLocalizableStrings.CommandNameContainsReservedString, invalidCommandName, "dotnet"))
+                .And.Contain(string.Format(CommonLocalizableStrings.CommandNameStartsWithReservedString, invalidCommandName, "reference"));
+        }
+
+        [Fact]
+        public void GivenAReservedStringAsFileNameItThrows2()
+        {
+            var invalidCommandName = "0-tool";
+            Action a = () => new ToolConfiguration(invalidCommandName, "my.dll");
+            a.ShouldThrow<ToolConfigurationException>()
+                .And.Message.Should()
+                .Contain(string.Format(CommonLocalizableStrings.CommandNameStartsWithReservedString, invalidCommandName, "0"));
+        }
     }
 }
