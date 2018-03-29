@@ -33,9 +33,14 @@ namespace Microsoft.DotNet.ShellShim
 
             var existingUserEnvPath = Environment.GetEnvironmentVariable(PathName, EnvironmentVariableTarget.User);
 
+            if (existingUserEnvPath.EndsWith(';'))
+            {
+                existingUserEnvPath = existingUserEnvPath.Substring(0, (existingUserEnvPath.Length - 1));
+            }
+
             Environment.SetEnvironmentVariable(
                 PathName,
-                $"{existingUserEnvPath};{_packageExecutablePath}",
+                $"{existingUserEnvPath};{_packageExecutablePath};",
                 EnvironmentVariableTarget.User);
         }
 
