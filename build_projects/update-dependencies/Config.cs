@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.Scripts
 
         Lazy<Dictionary<string, string>> _versionFragments = new Lazy<Dictionary<string, string>>(() =>
                  System.Environment.GetEnvironmentVariables().Cast<DictionaryEntry>().Where(entry => ((string)entry.Key).EndsWith("_VERSION_FRAGMENT")).ToDictionary<DictionaryEntry, string, string>(entry =>
-                    (string)entry.Key, entry => (string)entry.Value), );
+                    (string)entry.Key, entry => (string)entry.Value, StringComparer.OrdinalIgnoreCase));
         private Config()
         {
         }
