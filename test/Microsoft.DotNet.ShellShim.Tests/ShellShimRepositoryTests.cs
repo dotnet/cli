@@ -345,7 +345,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
                 processStartInfo = new ProcessStartInfo
                 {
                     FileName = file,
-                    Arguments = shellCommandName + " " + arguments,
+                    Arguments = arguments,
                     UseShellExecute = false
                 };
             }
