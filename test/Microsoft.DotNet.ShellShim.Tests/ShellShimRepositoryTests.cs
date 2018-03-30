@@ -355,7 +355,15 @@ namespace Microsoft.DotNet.ShellShim.Tests
 
             var environmentProvider = new EnvironmentProvider();
             processStartInfo.EnvironmentVariables["PATH"] = environmentProvider.GetEnvironmentVariable("PATH");
-            processStartInfo.EnvironmentVariables["DOTNET_ROOT"] = new RepoDirectoriesProvider().DotnetRoot;
+            if (Environment.Is64BitProcess)
+            {
+                processStartInfo.EnvironmentVariables["DOTNET_ROOT"] = new RepoDirectoriesProvider().DotnetRoot;
+            }
+            else
+            {
+                processStartInfo.EnvironmentVariables["DOTNET_ROOT(x86)"] = new RepoDirectoriesProvider().DotnetRoot;
+            }
+
             processStartInfo.ExecuteAndCaptureOutput(out var stdOut, out var stdErr);
 
             stdErr.Should().BeEmpty();
