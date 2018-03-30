@@ -26,6 +26,7 @@ namespace Microsoft.DotNet.Cli.Utils
             if (File.Exists(appHostDestinationFilePath))
             {
                 //We have already done the required modification to apphost.exe
+                return;
             }
 
             if (bytesToWrite.Length > 1024)

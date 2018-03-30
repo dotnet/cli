@@ -371,7 +371,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             return stdOut ?? "";
         }
 
-        private static FileInfo Getstage2DotnetPath()
+        private static FileInfo GetStage2DotnetPath()
         {
             string stage2DotnetPath;
 
@@ -404,7 +404,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
                 stage2DotnetPath = environmentProvider.GetCommandPath("dotnet");
             }
 
-            var stage2Dotnet = Getstage2DotnetPath();
+            var stage2Dotnet = GetStage2DotnetPath();
 
             var stage2AppHostTemplateDirectory =
                 new DirectoryInfo(new RepoDirectoriesProvider().Stage2Sdk)
