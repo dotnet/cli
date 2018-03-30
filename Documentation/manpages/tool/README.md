@@ -4,10 +4,11 @@ Utility to update dotnet-cli documentation from https://github.com/dotnet/docs.
 
 ## Prerequisites
 
-* Unix OS
 * `python` in PATH
-* `pandoc` installed
 * `pandocfilters` package installed
+
+### Unix specific
+* `pandoc` installed
 * `unzip`
 * `wget` or `curl`
 
@@ -40,3 +41,13 @@ rm $pandocVersionedName.deb*
 ```
 
 after that update manpages by calling `update-man-pages.sh` script.
+
+## PowerShell example
+
+```posh
+# python 2.7.9+ has built-in pip (https://stackoverflow.com/a/12476379)
+python -m pip install pandocfilters
+
+git clone https://github.com/dotnet/cli
+./cli/Documentation/manpage/tool/update-man-pages.ps1
+```
