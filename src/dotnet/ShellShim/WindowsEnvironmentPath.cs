@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.ShellShim
 
             Environment.SetEnvironmentVariable(
                 PathName,
-                $"{existingUserEnvPath};{_packageExecutablePath};",
+                $"{existingUserEnvPath};{_packageExecutablePath}",
                 EnvironmentVariableTarget.User);
         }
 
