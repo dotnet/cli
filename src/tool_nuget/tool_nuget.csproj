@@ -10,5 +10,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.App" Version="$(MicrosoftNETCoreAppPackageVersion)" />
     <PackageReference Include="NuGet.CommandLine.XPlat" Version="$(NuGetCommandLineXPlatPackageVersion)" />
+    <PackageReference Include="System.Xml.XDocument" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XDocument" Version="4.3.0" />
   </ItemGroup>
 </Project>
