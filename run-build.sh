@@ -176,10 +176,10 @@ PATH="$DOTNET_INSTALL_DIR:$PATH"
 
 # Increases the file descriptors limit for this bash. It prevents an issue we were hitting during restore
 FILE_DESCRIPTOR_LIMIT=$( ulimit -n )
-if [ $FILE_DESCRIPTOR_LIMIT -lt 1024 ]
+if [ $FILE_DESCRIPTOR_LIMIT -lt 65536 ]
 then
-    echo "Increasing file description limit to 1024"
-    ulimit -n 1024
+    echo "Increasing file description limit to 65536"
+    ulimit -n 65536
 fi
 
 # Disable first run since we want to control all package sources
