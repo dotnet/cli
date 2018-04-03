@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.ShellShim
                             Directory.CreateDirectory(_shimsDirectory.Value);
                         }
 
-                        CreateApphostShimAndConfigFile(
+                        CreateApphostShim(
                                    commandName,
                                    entryPoint: targetExecutablePath);
 
@@ -126,7 +126,7 @@ namespace Microsoft.DotNet.ShellShim
                 });
         }
 
-        private void CreateApphostShimAndConfigFile(string commandName, FilePath entryPoint)
+        private void CreateApphostShim(string commandName, FilePath entryPoint)
         {
             string appHostSourcePath;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -145,17 +145,6 @@ namespace Microsoft.DotNet.ShellShim
                 appHostSourceFilePath: appHostSourcePath,
                 appHostDestinationFilePath: appHostDestinationFilePath,
                 appBinaryFilePath: appBinaryFilePath);
-
-            var config = JsonConvert.SerializeObject(
-                new RootObject
-                {
-                    startupOptions = new StartupOptions
-                    {
-                        appRoot = entryPoint.GetDirectoryPath().Value
-                    }
-                });
-
-            File.WriteAllText(GetConfigPath(commandName).Value, config);
         }
 
         private class StartupOptions
@@ -181,7 +170,6 @@ namespace Microsoft.DotNet.ShellShim
             }
 
             yield return GetShimPath(commandName);
-            yield return GetConfigPath(commandName);
         }
 
         private FilePath GetShimPath(string commandName)
@@ -194,11 +182,6 @@ namespace Microsoft.DotNet.ShellShim
             {
                 return _shimsDirectory.WithFile(commandName);
             }
-        }
-
-        private FilePath GetConfigPath(string commandName)
-        {
-            return _shimsDirectory.WithFile(commandName + ".startupconfig.json");
         }
 
         private static void SetUserExecutionPermission(FilePath path)
