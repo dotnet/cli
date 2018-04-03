@@ -140,7 +140,7 @@ namespace Microsoft.DotNet.ShellShim
             EmbedAppNameInHost.EmbedAndReturnModifiedAppHostPath(
                 appHostSourceFilePath: appHostSourcePath,
                 appHostDestinationFilePath: GetShimPath(commandName).Value,
-                appBinaryName: Path.GetFileName(entryPoint.Value));
+                appBinaryFilePath: Path.GetFileName(entryPoint.Value));
 
             var config = JsonConvert.SerializeObject(
                 new RootObject
