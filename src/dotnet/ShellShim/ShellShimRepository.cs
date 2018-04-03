@@ -10,6 +10,7 @@ using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.DotNet.Tools;
+using Microsoft.DotNet.Tools.Common;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using Newtonsoft.Json;
 
@@ -137,15 +138,13 @@ namespace Microsoft.DotNet.ShellShim
                 appHostSourcePath = Path.Combine(_appHostSourceDirectory, ApphostNameWithoutExtension);
             }
 
-
-            //var appHostDestinationFilePath = GetShimPath(commandName).Value;
-
-            //var relativePathToappBinaryFile
+            var appHostDestinationFilePath = GetShimPath(commandName).Value;
+            var appBinaryFilePath = PathUtility.GetRelativePath(appHostDestinationFilePath, entryPoint.Value);
 
             EmbedAppNameInHost.EmbedAndReturnModifiedAppHostPath(
                 appHostSourceFilePath: appHostSourcePath,
                 appHostDestinationFilePath: appHostDestinationFilePath,
-                appBinaryFilePath: Path.GetFileName(entryPoint.Value));
+                appBinaryFilePath: appBinaryFilePath);
 
             var config = JsonConvert.SerializeObject(
                 new RootObject
