@@ -34,7 +34,7 @@
     <MicrosoftDotNetProjectJsonMigrationPackageVersion>1.2.1-alpha-002133</MicrosoftDotNetProjectJsonMigrationPackageVersion>
     <MicrosoftDotNetToolsMigrateCommandPackageVersion>$(MicrosoftDotNetProjectJsonMigrationPackageVersion)</MicrosoftDotNetToolsMigrateCommandPackageVersion>
     <MicrosoftDotNetArchivePackageVersion>0.2.0-beta-62628-01</MicrosoftDotNetArchivePackageVersion>
-    <NuGetBuildTasksPackageVersion>4.7.0-preview3.5039</NuGetBuildTasksPackageVersion>
+    <NuGetBuildTasksPackageVersion>4.7.0-aprivate.10242</NuGetBuildTasksPackageVersion>
     <NuGetBuildTasksPackPackageVersion>$(NuGetBuildTasksPackageVersion)</NuGetBuildTasksPackPackageVersion>
     <NuGetCommonPackageVersion>$(NuGetBuildTasksPackageVersion)</NuGetCommonPackageVersion>
     <NuGetCommandLineXPlatPackageVersion>$(NuGetBuildTasksPackageVersion)</NuGetCommandLineXPlatPackageVersion>
