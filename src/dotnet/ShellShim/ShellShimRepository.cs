@@ -137,9 +137,14 @@ namespace Microsoft.DotNet.ShellShim
                 appHostSourcePath = Path.Combine(_appHostSourceDirectory, ApphostNameWithoutExtension);
             }
 
+
+            //var appHostDestinationFilePath = GetShimPath(commandName).Value;
+
+            //var relativePathToappBinaryFile
+
             EmbedAppNameInHost.EmbedAndReturnModifiedAppHostPath(
                 appHostSourceFilePath: appHostSourcePath,
-                appHostDestinationFilePath: GetShimPath(commandName).Value,
+                appHostDestinationFilePath: appHostDestinationFilePath,
                 appBinaryFilePath: Path.GetFileName(entryPoint.Value));
 
             var config = JsonConvert.SerializeObject(
