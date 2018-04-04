@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.DotNet.PlatformAbstractions;
@@ -43,6 +44,36 @@ namespace Microsoft.DotNet.Cli.Utils
                 .RuntimeLibraries
                 .FirstOrDefault(l => "netstandard.library".Equals(l.Name, StringComparison.OrdinalIgnoreCase))
                 ?.Version;
+        }
+
+        public bool TryGetMostFitRuntimeIdentifier(IEnumerable<string> runtimeIdentifiers, out string mostFitRuntimeIdentifier)
+        {
+            mostFitRuntimeIdentifier = null;
+
+            IEnumerable<string> supportedRuntimeIdentifiers = runtimeIdentifiers.Distinct().Where(r => IsRuntimeSupported(r));
+
+            if (supportedRuntimeIdentifiers.Any())
+            {
+                mostFitRuntimeIdentifier = supportedRuntimeIdentifiers.Where(r => IsAllOtherNodeOnPathToRoot(r, supportedRuntimeIdentifiers)).First();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private bool IsAllOtherNodeOnPathToRoot(string targetRuntimeIdentifierNode, IEnumerable<string> otherRuntimeIdentifierNodes)
+        {
+            RuntimeFallbacks runtimeFallbacks =
+                DependencyContext.RuntimeGraph.Where(g => g.Runtime == targetRuntimeIdentifierNode).Single();
+
+            var allNodeOnPath = new HashSet<string>(runtimeFallbacks.Fallbacks)
+            {
+                targetRuntimeIdentifierNode
+            };
+
+            return allNodeOnPath.IsSupersetOf(otherRuntimeIdentifierNodes);
         }
 
         private DependencyContext CreateDependencyContext()
