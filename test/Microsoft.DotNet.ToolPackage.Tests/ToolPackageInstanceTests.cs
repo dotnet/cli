@@ -40,9 +40,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 targetFramework: _testTargetframework,
                 additionalFeeds: new[] {source});
 
-            package.PackagedShims.Should().Contain(f => f.Value.Contains("win-x64/demo.exe"));
-            package.PackagedShims.Should().Contain(f => f.Value.Contains("win-x86/demo.exe"));
-            package.PackagedShims.Should().Contain(f => f.Value.Contains("osx-x64/demo"));
+            package.PackagedShims.Should().ContainSingle(f => f.Value.Contains("demo.exe"));
 
             package.Uninstall();
 

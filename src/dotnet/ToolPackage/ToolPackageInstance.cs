@@ -7,6 +7,7 @@ using Microsoft.DotNet.Tools;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using NuGet.ProjectModel;
 using NuGet.Versioning;
+using Microsoft.DotNet.Cli.Utils;
 
 namespace Microsoft.DotNet.ToolPackage
 {
@@ -38,20 +39,30 @@ namespace Microsoft.DotNet.ToolPackage
 
                 LockFileItem dotnetToolSettings = FindItemInTargetLibrary(library, ToolSettingsFileName);
 
+                IEnumerable<LockFileItem> filesUnderShimsDirectory = library
+                ?.ToolsAssemblies
+                ?.Where(t => LockFileMatcher.MatchesDirectoryPath(t, "shims"));
 
-                //var a = 1;
-                //if (a == 1)
-                //{
-                //    var library
-                //    ?.ToolsAssemblies
-                //    ?.SingleOrDefault(t => LockFileMatcher.MatchesFile(t, targetRelativeFilePath));
-                //    throw new Exception();
-                //}
+                if (filesUnderShimsDirectory == null)
+                {
+                    return Array.Empty<FilePath>();
+                }
 
-                //?.ToolsAssemblies
-                //?.SingleOrDefault(t => LockFileMatcher.MatchesFile(t, targetRelativeFilePath));
+                IEnumerable<string> allAvailableShimRuntimeIdentifiers = filesUnderShimsDirectory
+                    .Select(f => f.Path.Split('\\', '/')?[4]) // Example: "tools/netcoreapp2.1/any/shims/osx-x64/demo" osx-x64 is at [4]
+                    .Where(f => !string.IsNullOrEmpty(f));
 
-                return new List<FilePath>();
+                if (new FrameworkDependencyFile().TryGetMostFitRuntimeIdentifier(allAvailableShimRuntimeIdentifiers, out var mostFitRuntimeIdentifier))
+                {
+                    return library
+                        ?.ToolsAssemblies
+                        ?.Where(l => LockFileMatcher.MatchesDirectoryPath(l, $"shims/{mostFitRuntimeIdentifier}"))
+                        .Select(l => LockFileRelativePathToFullFilePath(l.Path, library)).ToArray() ?? Array.Empty<FilePath>();
+                }
+                else
+                {
+                    return Array.Empty<FilePath>();
+                }
             }
         }
 
@@ -134,8 +145,8 @@ namespace Microsoft.DotNet.ToolPackage
             try
             {
                 var commands = new List<CommandSettings>();
-                var lockFile = new LockFileFormat().Read(PackageDirectory.WithFile(AssetsFileName).Value);
-                var library = FindLibraryInLockFile(lockFile);
+                LockFile lockFile = new LockFileFormat().Read(PackageDirectory.WithFile(AssetsFileName).Value);
+                LockFileTargetLibrary library = FindLibraryInLockFile(lockFile);
 
                 ToolConfiguration configuration = _toolConfiguration.Value;
                 var entryPointFromLockFile = FindItemInTargetLibrary(library, configuration.ToolAssemblyEntryPoint);
@@ -152,11 +163,7 @@ namespace Microsoft.DotNet.ToolPackage
                 commands.Add(new CommandSettings(
                     configuration.CommandName,
                     "dotnet",
-                    PackageDirectory
-                        .WithSubDirectories(
-                            Id.ToString(),
-                            library.Version.ToNormalizedString())
-                        .WithFile(entryPointFromLockFile.Path)));
+                    LockFileRelativePathToFullFilePath(entryPointFromLockFile.Path, library)));
 
                 return commands;
             }
@@ -168,6 +175,15 @@ namespace Microsoft.DotNet.ToolPackage
                         ex.Message),
                     ex);
             }
+        }
+
+        private FilePath LockFileRelativePathToFullFilePath(string lockFileRelativePath, LockFileTargetLibrary library)
+        {
+            return PackageDirectory
+                        .WithSubDirectories(
+                            Id.ToString(),
+                            library.Version.ToNormalizedString())
+                        .WithFile(lockFileRelativePath);
         }
 
         private ToolConfiguration GetToolConfiguration()
