@@ -46,34 +46,34 @@ namespace Microsoft.DotNet.Cli.Utils
                 ?.Version;
         }
 
-        public bool TryGetMostFitRuntimeIdentifier(IEnumerable<string> runtimeIdentifiers, out string mostFitRuntimeIdentifier)
+        public bool TryGetMostFitRuntimeIdentifier(IEnumerable<string> candidateRuntimeIdentifiers, out string mostFitRuntimeIdentifier)
         {
             mostFitRuntimeIdentifier = null;
 
-            IEnumerable<string> supportedRuntimeIdentifiers = runtimeIdentifiers.Distinct().Where(r => IsRuntimeSupported(r));
-
-            if (supportedRuntimeIdentifiers.Any())
-            {
-                mostFitRuntimeIdentifier = supportedRuntimeIdentifiers.Where(r => IsAllOtherNodeOnPathToRoot(r, supportedRuntimeIdentifiers)).First();
-                return true;
-            }
-            else
+            if (!SupportsCurrentRuntime())
             {
                 return false;
             }
-        }
 
-        private bool IsAllOtherNodeOnPathToRoot(string targetRuntimeIdentifierNode, IEnumerable<string> otherRuntimeIdentifierNodes)
-        {
-            RuntimeFallbacks runtimeFallbacks =
-                DependencyContext.RuntimeGraph.Where(g => g.Runtime == targetRuntimeIdentifierNode).Single();
+            RuntimeFallbacks runtimeFallbacks
+                = DependencyContext.RuntimeGraph.Where(g => g.Runtime == RuntimeEnvironment.GetRuntimeIdentifier()).Single();
 
-            var allNodeOnPath = new HashSet<string>(runtimeFallbacks.Fallbacks)
+            if (candidateRuntimeIdentifiers.Contains(runtimeFallbacks.Runtime))
             {
-                targetRuntimeIdentifierNode
-            };
+                mostFitRuntimeIdentifier = runtimeFallbacks.Runtime;
+                return true;
+            }
 
-            return allNodeOnPath.IsSupersetOf(otherRuntimeIdentifierNodes);
+            foreach (var r in runtimeFallbacks.Fallbacks)
+            {
+                if (candidateRuntimeIdentifiers.Contains(r))
+                {
+                    mostFitRuntimeIdentifier = r;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private DependencyContext CreateDependencyContext()
