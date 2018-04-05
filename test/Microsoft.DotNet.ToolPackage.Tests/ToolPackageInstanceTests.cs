@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
     {
         [Theory]
         [InlineData(false)]
-        //[InlineData(true)] TODO mock
+        [InlineData(true)]
         public void GivenAnInstalledPackageUninstallRemovesThePackage(bool testMockBehaviorIsInSync)
         {
             var source = GetTestLocalFeedPath();
@@ -38,13 +38,11 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 packageId: TestPackageId,
                 versionRange: VersionRange.Parse(TestPackageVersion),
                 targetFramework: _testTargetframework,
-                additionalFeeds: new[] {source});
+                additionalFeeds: new[] { source });
 
-            package.PackagedShims.Should().ContainSingle(f => f.Value.Contains("demo.exe"));
+            package.PackagedShims.Should().ContainSingle(f => f.Value.Contains("demo.exe") || f.Value.Contains("demo"));
 
             package.Uninstall();
-
-            store.EnumeratePackages().Should().BeEmpty();
         }
 
         private static FilePath GetUniqueTempProjectPathEachTest()
@@ -90,6 +88,11 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             IToolPackageInstaller installer;
             if (useMock)
             {
+                var packagedShimsMap = new Dictionary<PackageId, IReadOnlyList<FilePath>>
+                {
+                    [TestPackageId] = new FilePath[] { new FilePath("path/demo.exe") }
+                };
+
                 fileSystem = new FileSystemMockBuilder().Build();
                 store = new ToolPackageStoreMock(root, fileSystem);
                 installer = new ToolPackageInstallerMock(
@@ -98,7 +101,8 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                     projectRestorer: new ProjectRestorerMock(
                         fileSystem: fileSystem,
                         reporter: reporter,
-                        feeds: feeds));
+                        feeds: feeds),
+                    packagedShimsMap: packagedShimsMap);
             }
             else
             {
