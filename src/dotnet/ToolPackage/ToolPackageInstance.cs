@@ -32,6 +32,25 @@ namespace Microsoft.DotNet.ToolPackage
         {
             get
             {
+                // TODO catch exception
+                LockFile lockFile = new LockFileFormat().Read(PackageDirectory.WithFile(AssetsFileName).Value);
+                LockFileTargetLibrary library = FindLibraryInLockFile(lockFile);
+
+                LockFileItem dotnetToolSettings = FindItemInTargetLibrary(library, ToolSettingsFileName);
+
+
+                //var a = 1;
+                //if (a == 1)
+                //{
+                //    var library
+                //    ?.ToolsAssemblies
+                //    ?.SingleOrDefault(t => LockFileMatcher.MatchesFile(t, targetRelativeFilePath));
+                //    throw new Exception();
+                //}
+
+                //?.ToolsAssemblies
+                //?.SingleOrDefault(t => LockFileMatcher.MatchesFile(t, targetRelativeFilePath));
+
                 return new List<FilePath>();
             }
         }
