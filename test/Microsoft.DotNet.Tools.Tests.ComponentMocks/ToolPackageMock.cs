@@ -52,6 +52,14 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
 
         public IEnumerable<string> Warnings => _warnings;
 
+        public IReadOnlyList<FilePath> PackagedShims
+        {
+            get
+            {
+                return new List<FilePath>();
+            }
+        }
+
         public void Uninstall()
         {
             var rootDirectory = PackageDirectory.GetParentPath();

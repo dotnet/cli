@@ -28,6 +28,14 @@ namespace Microsoft.DotNet.ToolPackage
             }
         }
 
+        public IReadOnlyList<FilePath> PackagedShims
+        {
+            get
+            {
+                return new List<FilePath>();
+            }
+        }
+
         private const string AssetsFileName = "project.assets.json";
         private const string ToolSettingsFileName = "DotnetToolSettings.xml";
 
