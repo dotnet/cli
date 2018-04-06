@@ -21,15 +21,18 @@ namespace Microsoft.DotNet.ShellShim
         private const string ApphostNameWithoutExtension = "apphost";
 
         private readonly DirectoryPath _shimsDirectory;
-        private readonly string _appHostSourceDirectory;
         private readonly IFileSystem _fileSystem;
+        private readonly IAppHostShellShimMaker _appHostShellShimMaker;
 
-        public ShellShimRepository(DirectoryPath shimsDirectory, string appHostSourcePath = null)
+        public ShellShimRepository(
+            DirectoryPath shimsDirectory,
+            string appHostSourceDirectory = null,
+            IFileSystem fileSystem = null,
+            IAppHostShellShimMaker appHostShellShimMaker = null)
         {
             _shimsDirectory = shimsDirectory;
-            _appHostSourceDirectory = appHostSourcePath ?? Path.Combine(ApplicationEnvironment.ApplicationBasePath,
-                    "AppHostTemplate");
-            _fileSystem = new FileSystemWrapper();
+            _fileSystem = fileSystem ?? new FileSystemWrapper();
+            _appHostShellShimMaker = appHostShellShimMaker ?? new AppHostShellShimMaker(appHostSourceDirectory: appHostSourceDirectory);
         }
 
         public void CreateShim(FilePath targetExecutablePath, string commandName, IReadOnlyList<FilePath> packagedShims = null)
@@ -67,9 +70,9 @@ namespace Microsoft.DotNet.ShellShim
                         }
                         else
                         {
-                            CreateApphostShim(
-                                   commandName,
-                                   entryPoint: targetExecutablePath);
+                            _appHostShellShimMaker.CreateApphostShellShim(
+                                   targetExecutablePath,
+                                   GetShimPath(commandName));
                         }
 
                         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -135,26 +138,7 @@ namespace Microsoft.DotNet.ShellShim
                 });
         }
 
-        private void CreateApphostShim(string commandName, FilePath entryPoint)
-        {
-            string appHostSourcePath;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                appHostSourcePath = Path.Combine(_appHostSourceDirectory, ApphostNameWithoutExtension + ".exe");
-            }
-            else
-            {
-                appHostSourcePath = Path.Combine(_appHostSourceDirectory, ApphostNameWithoutExtension);
-            }
-
-            var appHostDestinationFilePath = GetShimPath(commandName).Value;
-            var appBinaryFilePath = PathUtility.GetRelativePath(appHostDestinationFilePath, entryPoint.Value);
-
-            EmbedAppNameInHost.EmbedAndReturnModifiedAppHostPath(
-                appHostSourceFilePath: appHostSourcePath,
-                appHostDestinationFilePath: appHostDestinationFilePath,
-                appBinaryFilePath: appBinaryFilePath);
-        }
+       
 
         private class StartupOptions
         {
