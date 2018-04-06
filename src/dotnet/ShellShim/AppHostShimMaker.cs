@@ -39,6 +39,8 @@ namespace Microsoft.DotNet.ShellShim
                 appHostSourceFilePath: appHostSourcePath,
                 appHostDestinationFilePath: appHostDestinationFilePath,
                 appBinaryFilePath: appBinaryFilePath);
+
+            FilePermissionSetter.SetUserExecutionPermission(appHostDestinationFilePath);
         }
     }
 }

@@ -67,6 +67,7 @@ namespace Microsoft.DotNet.ShellShim
                         if (TryGetPackagedShim(packagedShims, commandName, out FilePath? packagedShim))
                         {
                             _fileSystem.File.Copy(packagedShim.Value.Value, GetShimPath(commandName).Value);
+                            FilePermissionSetter.SetUserExecutionPermission(GetShimPath(commandName).Value);
                         }
                         else
                         {
@@ -74,11 +75,11 @@ namespace Microsoft.DotNet.ShellShim
                                    targetExecutablePath,
                                    GetShimPath(commandName));
                         }
-
-                        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                        {
-                            SetUserExecutionPermission(GetShimPath(commandName));
-                        }
+                    }
+                    catch (FilePermissionSettingException ex)
+                    {
+                        throw new ShellShimException(
+                                string.Format(CommonLocalizableStrings.FailedSettingShimPermissions, ex.Message));
                     }
                     catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
                     {
@@ -172,26 +173,6 @@ namespace Microsoft.DotNet.ShellShim
             else
             {
                 return _shimsDirectory.WithFile(commandName);
-            }
-        }
-
-        private static void SetUserExecutionPermission(FilePath path)
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                return;
-            }
-
-            CommandResult result = new CommandFactory()
-                .Create("chmod", new[] { "u+x", path.Value })
-                .CaptureStdOut()
-                .CaptureStdErr()
-                .Execute();
-
-            if (result.ExitCode != 0)
-            {
-                throw new ShellShimException(
-                    string.Format(CommonLocalizableStrings.FailedSettingShimPermissions, result.StdErr));
             }
         }
 
