@@ -46,29 +46,48 @@ namespace Microsoft.DotNet.Cli.Utils
                 ?.Version;
         }
 
-        public bool TryGetMostFitRuntimeIdentifier(IEnumerable<string> candidateRuntimeIdentifiers, out string mostFitRuntimeIdentifier)
+        public bool TryGetMostFitRuntimeIdentifier(
+            IEnumerable<string> candidateRuntimeIdentifiers,
+            out string mostFitRuntimeIdentifier,
+            string alternative = null)
         {
             mostFitRuntimeIdentifier = null;
+            var runtimeIdentifier = RuntimeEnvironment.GetRuntimeIdentifier();
+            var runtimeFallbacksCandidates =
+                DependencyContext.RuntimeGraph
+                    .Where(g => string.Equals(g.Runtime, runtimeIdentifier, StringComparison.OrdinalIgnoreCase))
+                    .ToArray();
 
-            if (!SupportsCurrentRuntime())
+            if (runtimeFallbacksCandidates.Length == 0 || !string.IsNullOrEmpty(alternative))
+            {
+                runtimeFallbacksCandidates =
+                    DependencyContext.RuntimeGraph
+                        .Where(g => string.Equals(alternative, runtimeIdentifier, StringComparison.OrdinalIgnoreCase))
+                        .ToArray();
+            }
+
+            if (runtimeFallbacksCandidates.Length == 0)
             {
                 return false;
             }
 
-            RuntimeFallbacks runtimeFallbacks
-                = DependencyContext.RuntimeGraph.Where(g => g.Runtime == RuntimeEnvironment.GetRuntimeIdentifier()).Single();
+            RuntimeFallbacks runtimeFallbacks = runtimeFallbacksCandidates[0];
 
-            if (candidateRuntimeIdentifiers.Contains(runtimeFallbacks.Runtime))
-            {
-                mostFitRuntimeIdentifier = runtimeFallbacks.Runtime;
-                return true;
-            }
+            var candidateRuntimeIdentifiersArray = candidateRuntimeIdentifiers.ToArray();
 
-            foreach (var r in runtimeFallbacks.Fallbacks)
+            var runtimeFallbacksIncludesRuntime =
+                runtimeFallbacks.Fallbacks.ToList();
+            runtimeFallbacksIncludesRuntime.Insert(0, runtimeFallbacks.Runtime);
+
+            foreach (var fallbackruntime in runtimeFallbacksIncludesRuntime)
             {
-                if (candidateRuntimeIdentifiers.Contains(r))
+                var index = Array.FindIndex(
+                    candidateRuntimeIdentifiersArray,
+                    c => string.Equals(c, fallbackruntime, StringComparison.OrdinalIgnoreCase));
+
+                if (index >= 0)
                 {
-                    mostFitRuntimeIdentifier = r;
+                    mostFitRuntimeIdentifier = candidateRuntimeIdentifiersArray[index];
                     return true;
                 }
             }
