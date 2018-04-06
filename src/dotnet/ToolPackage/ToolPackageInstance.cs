@@ -52,7 +52,7 @@ namespace Microsoft.DotNet.ToolPackage
                     .Select(f => f.Path.Split('\\', '/')?[4]) // Example: "tools/netcoreapp2.1/any/shims/osx-x64/demo" osx-x64 is at [4]
                     .Where(f => !string.IsNullOrEmpty(f));
 
-                if (new FrameworkDependencyFile().TryGetMostFitRuntimeIdentifier(allAvailableShimRuntimeIdentifiers, out var mostFitRuntimeIdentifier))
+                if (new FrameworkDependencyFile().TryGetMostFitRuntimeIdentifier(allAvailableShimRuntimeIdentifiers, out var mostFitRuntimeIdentifier, alternative: Cli.DotnetFiles.VersionFileObject.BuildRid))
                 {
                     return library
                         ?.ToolsAssemblies
