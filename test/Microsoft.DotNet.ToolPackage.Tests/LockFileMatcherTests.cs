@@ -31,7 +31,10 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         [InlineData(@"tools\netcoreapp1.1\any\subDirectory\tool.dll", "subDirectory", true)]
         [InlineData(@"tools\netcoreapp1.1\any\subDirectory\tool.dll", "sub", false)]
         [InlineData("tools/netcoreapp1.1/any/subDirectory/tool.dll", "any/subDirectory", false)]
-        public void MatchesDirectoryPathTests(string pathInLockFileItem, string targetRelativeFilePath, bool shouldMatch)
+        public void MatchesDirectoryPathTests(
+            string pathInLockFileItem,
+            string targetRelativeFilePath,
+            bool shouldMatch)
         {
             LockFileMatcher.MatchesDirectoryPath(new LockFileItem(pathInLockFileItem), targetRelativeFilePath)
                 .Should().Be(shouldMatch);

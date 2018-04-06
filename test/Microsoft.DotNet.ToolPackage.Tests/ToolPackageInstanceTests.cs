@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 packageId: TestPackageId,
                 versionRange: VersionRange.Parse(TestPackageVersion),
                 targetFramework: _testTargetframework,
-                additionalFeeds: new[] { source });
+                additionalFeeds: new[] {source});
 
             package.PackagedShims.Should().ContainSingle(f => f.Value.Contains("demo.exe") || f.Value.Contains("demo"));
 
@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
         private static IEnumerable<MockFeed> GetMockFeedsForSource(string source)
         {
-            return new MockFeed[]
+            return new[]
             {
                 new MockFeed
                 {
@@ -90,7 +90,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             {
                 var packagedShimsMap = new Dictionary<PackageId, IReadOnlyList<FilePath>>
                 {
-                    [TestPackageId] = new FilePath[] { new FilePath("path/demo.exe") }
+                    [TestPackageId] = new FilePath[] {new FilePath("path/demo.exe")}
                 };
 
                 fileSystem = new FileSystemMockBuilder().Build();
@@ -120,7 +120,9 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             return (store, installer, reporter, fileSystem);
         }
 
-        private static string GetTestLocalFeedPath() => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TestAssetLocalNugetFeed");
+        private static string GetTestLocalFeedPath() =>
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TestAssetLocalNugetFeed");
+
         private readonly string _testTargetframework = BundledTargetFramework.GetTargetFrameworkMoniker();
         private const string TestPackageVersion = "1.0.4";
         private static readonly PackageId TestPackageId = new PackageId("global.tool.console.demo.with.shim");
