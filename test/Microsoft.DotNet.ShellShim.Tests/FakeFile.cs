@@ -59,6 +59,11 @@ namespace Microsoft.DotNet.ShellShim.Tests
             throw new NotImplementedException();
         }
 
+        public void Copy(string source, string destination)
+        {
+            throw new NotImplementedException();
+        }
+
         public static FakeFile Empty => new FakeFile(new Dictionary<string, string>());
     }
 }
