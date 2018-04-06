@@ -46,7 +46,10 @@ namespace Microsoft.DotNet.Tests.Commands
             _fileSystem = new FileSystemMockBuilder().Build();
             _toolPackageStore = new ToolPackageStoreMock(new DirectoryPath(PathToPlacePackages), _fileSystem);
             _createShellShimRepository =
-                (nonGlobalLocation) => new ShellShimRepositoryMock(new DirectoryPath(PathToPlaceShim), _fileSystem);
+                (nonGlobalLocation) => new ShellShimRepository(
+                    new DirectoryPath(PathToPlaceShim),
+                    fileSystem: _fileSystem,
+                    appHostShellShimMaker: new AppHostShellShimMakerMock(_fileSystem));
             _environmentPathInstructionMock =
                 new EnvironmentPathInstructionMock(_reporter, PathToPlaceShim);
             _createToolPackageStoreAndInstaller = (_) => (_toolPackageStore, CreateToolPackageInstaller());

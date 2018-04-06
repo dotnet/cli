@@ -119,7 +119,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             IShellShimRepository shellShimRepository;
             if (testMockBehaviorIsInSync)
             {
-                shellShimRepository = new ShellShimRepositoryMock(new DirectoryPath(pathToShim));
+                shellShimRepository = GetMockedShellShimRepository(pathToShim);
             }
             else
             {
@@ -161,7 +161,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             IShellShimRepository shellShimRepository;
             if (testMockBehaviorIsInSync)
             {
-                shellShimRepository = new ShellShimRepositoryMock(new DirectoryPath(pathToShim));
+                shellShimRepository = GetMockedShellShimRepository(pathToShim);
             }
             else
             {
@@ -198,7 +198,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             IShellShimRepository shellShimRepository;
             if (testMockBehaviorIsInSync)
             {
-                shellShimRepository = new ShellShimRepositoryMock(new DirectoryPath(pathToShim));
+                shellShimRepository = GetMockedShellShimRepository(pathToShim);
             }
             else
             {
@@ -223,7 +223,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             IShellShimRepository shellShimRepository;
             if (testMockBehaviorIsInSync)
             {
-                shellShimRepository = new ShellShimRepositoryMock(new DirectoryPath(pathToShim));
+                shellShimRepository = GetMockedShellShimRepository(pathToShim);
             }
             else
             {
@@ -252,7 +252,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             IShellShimRepository shellShimRepository;
             if (testMockBehaviorIsInSync)
             {
-                shellShimRepository = new ShellShimRepositoryMock(new DirectoryPath(pathToShim));
+                shellShimRepository = GetMockedShellShimRepository(pathToShim);
             }
             else
             {
@@ -288,7 +288,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             IShellShimRepository shellShimRepository;
             if (testMockBehaviorIsInSync)
             {
-                shellShimRepository = new ShellShimRepositoryMock(new DirectoryPath(pathToShim));
+                shellShimRepository = GetMockedShellShimRepository(pathToShim);
             }
             else
             {
@@ -338,7 +338,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             IShellShimRepository shellShimRepository;
             if (testMockBehaviorIsInSync)
             {
-                shellShimRepository = new ShellShimRepositoryMock(new DirectoryPath(pathToShim));
+                shellShimRepository = GetMockedShellShimRepository(pathToShim);
             }
             else
             {
@@ -478,6 +478,13 @@ namespace Microsoft.DotNet.ShellShim.Tests
             CleanFolderUnderTempRoot.Create();
 
             return CleanFolderUnderTempRoot.FullName;
+        }
+
+        private ShellShimRepository GetMockedShellShimRepository(string pathToShim)
+        {
+            return new ShellShimRepository(
+                    new DirectoryPath(pathToShim),
+                    appHostShellShimMaker: new AppHostShellShimMakerMock());
         }
     }
 }
