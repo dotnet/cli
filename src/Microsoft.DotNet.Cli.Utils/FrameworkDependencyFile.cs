@@ -78,7 +78,7 @@ namespace Microsoft.DotNet.Cli.Utils
             }
             else
             {
-                runtimeFallbacksCandidates = new RuntimeFallbacks[0];
+                runtimeFallbacksCandidates = Array.Empty<RuntimeFallbacks>();
             }
 
             if (runtimeFallbacksCandidates.Length == 0 && !string.IsNullOrEmpty(alternativeCurrentRuntimeIdentifier))
@@ -96,9 +96,10 @@ namespace Microsoft.DotNet.Cli.Utils
 
             RuntimeFallbacks runtimeFallbacks = runtimeFallbacksCandidates[0];
 
-            var runtimeFallbacksIncludesRuntime =
-                runtimeFallbacks.Fallbacks.ToList();
-            runtimeFallbacksIncludesRuntime.Insert(0, runtimeFallbacks.Runtime);
+            var runtimeFallbacksIncludesRuntime = new List<string>();
+            runtimeFallbacksIncludesRuntime.Add(runtimeFallbacks.Runtime);
+            runtimeFallbacksIncludesRuntime.AddRange(runtimeFallbacks.Fallbacks);
+
 
             var candidateMap = candidateRuntimeIdentifiers
                 .Distinct(comparer: StringComparer.OrdinalIgnoreCase)
