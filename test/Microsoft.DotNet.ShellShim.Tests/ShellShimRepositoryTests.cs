@@ -119,7 +119,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             IShellShimRepository shellShimRepository;
             if (testMockBehaviorIsInSync)
             {
-                shellShimRepository = GetMockedShellShimRepository(pathToShim);
+                shellShimRepository = GetShellShimRepositoryWithMockMaker(pathToShim);
             }
             else
             {
@@ -161,7 +161,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             IShellShimRepository shellShimRepository;
             if (testMockBehaviorIsInSync)
             {
-                shellShimRepository = GetMockedShellShimRepository(pathToShim);
+                shellShimRepository = GetShellShimRepositoryWithMockMaker(pathToShim);
             }
             else
             {
@@ -198,7 +198,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             IShellShimRepository shellShimRepository;
             if (testMockBehaviorIsInSync)
             {
-                shellShimRepository = GetMockedShellShimRepository(pathToShim);
+                shellShimRepository = GetShellShimRepositoryWithMockMaker(pathToShim);
             }
             else
             {
@@ -223,7 +223,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             IShellShimRepository shellShimRepository;
             if (testMockBehaviorIsInSync)
             {
-                shellShimRepository = GetMockedShellShimRepository(pathToShim);
+                shellShimRepository = GetShellShimRepositoryWithMockMaker(pathToShim);
             }
             else
             {
@@ -252,7 +252,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             IShellShimRepository shellShimRepository;
             if (testMockBehaviorIsInSync)
             {
-                shellShimRepository = GetMockedShellShimRepository(pathToShim);
+                shellShimRepository = GetShellShimRepositoryWithMockMaker(pathToShim);
             }
             else
             {
@@ -288,7 +288,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             IShellShimRepository shellShimRepository;
             if (testMockBehaviorIsInSync)
             {
-                shellShimRepository = GetMockedShellShimRepository(pathToShim);
+                shellShimRepository = GetShellShimRepositoryWithMockMaker(pathToShim);
             }
             else
             {
@@ -316,10 +316,8 @@ namespace Microsoft.DotNet.ShellShim.Tests
         }
 
 
-        [Theory]
-        [InlineData(false)]
-        [InlineData(true)]
-        public void WhenPackagedShimProvidedItCopies(bool testMockBehaviorIsInSync)
+        [Fact]
+        public void WhenPackagedShimProvidedItCopies()
         {
             const string tokenToIdentifiyCopiedShim = "packagedShim";
 
@@ -335,15 +333,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
 
             File.WriteAllText(dummyShimPath, tokenToIdentifiyCopiedShim);
 
-            IShellShimRepository shellShimRepository;
-            if (testMockBehaviorIsInSync)
-            {
-                shellShimRepository = GetMockedShellShimRepository(pathToShim);
-            }
-            else
-            {
-                shellShimRepository = ConfigBasicTestDependecyShellShimRepository(pathToShim);
-            }
+            ShellShimRepository shellShimRepository = GetShellShimRepositoryWithMockMaker(pathToShim);
 
             shellShimRepository.CreateShim(
                 new FilePath("dummy.dll"),
@@ -352,6 +342,32 @@ namespace Microsoft.DotNet.ShellShim.Tests
 
             var createdShim = Directory.EnumerateFileSystemEntries(pathToShim).Single();
             File.ReadAllText(createdShim).Should().Contain(tokenToIdentifiyCopiedShim);
+        }
+
+        [Fact]
+        public void WhenMutipleSameNamePackagedShimProvidedItThrows()
+        {
+            const string tokenToIdentifiyCopiedShim = "packagedShim";
+
+            var shellCommandName = nameof(ShellShimRepositoryTests) + Path.GetRandomFileName();
+            var pathToShim = GetNewCleanFolderUnderTempRoot();
+            var packagedShimFolder = GetNewCleanFolderUnderTempRoot();
+            var dummyShimPath = Path.Combine(packagedShimFolder, shellCommandName);
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                dummyShimPath = dummyShimPath + ".exe";
+            }
+
+            File.WriteAllText(dummyShimPath, tokenToIdentifiyCopiedShim);
+            ShellShimRepository shellShimRepository = GetShellShimRepositoryWithMockMaker(pathToShim);
+
+            Action a = () => shellShimRepository.CreateShim(
+                new FilePath("dummy.dll"),
+                shellCommandName,
+                new[] { new FilePath(dummyShimPath), new FilePath("path" + dummyShimPath) });
+
+            a.ShouldThrow<ShellShimException>().And.Message.Should().Contain("More than 1 packaged shim available");
         }
 
         private static void MakeNameConflictingCommand(string pathToPlaceShim, string shellCommandName)
@@ -480,7 +496,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             return CleanFolderUnderTempRoot.FullName;
         }
 
-        private ShellShimRepository GetMockedShellShimRepository(string pathToShim)
+        private ShellShimRepository GetShellShimRepositoryWithMockMaker(string pathToShim)
         {
             return new ShellShimRepository(
                     new DirectoryPath(pathToShim),
