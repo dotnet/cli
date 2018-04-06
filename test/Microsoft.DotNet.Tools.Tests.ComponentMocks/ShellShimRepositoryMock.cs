@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.Tools.Tests.ComponentMocks
             _fileSystem = fileSystem ?? new FileSystemWrapper();
         }
 
-        public void CreateShim(FilePath targetExecutablePath, string commandName)
+        public void CreateShim(FilePath targetExecutablePath, string commandName, IReadOnlyList<FilePath> packagedShim = null)
         {
             if (ShimExists(commandName))
             {

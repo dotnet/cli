@@ -315,6 +315,45 @@ namespace Microsoft.DotNet.ShellShim.Tests
             Directory.EnumerateFileSystemEntries(pathToShim).Should().BeEmpty();
         }
 
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void WhenPackagedShimProvidedItCopies(bool testMockBehaviorIsInSync)
+        {
+            const string tokenToIdentifiyCopiedShim = "packagedShim";
+
+            var shellCommandName = nameof(ShellShimRepositoryTests) + Path.GetRandomFileName();
+            var pathToShim = GetNewCleanFolderUnderTempRoot();
+            var packagedShimFolder = GetNewCleanFolderUnderTempRoot();
+            var dummyShimPath = Path.Combine(packagedShimFolder, shellCommandName);
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                dummyShimPath = dummyShimPath + ".exe";
+            }
+
+            File.WriteAllText(dummyShimPath, tokenToIdentifiyCopiedShim);
+
+            IShellShimRepository shellShimRepository;
+            if (testMockBehaviorIsInSync)
+            {
+                shellShimRepository = new ShellShimRepositoryMock(new DirectoryPath(pathToShim));
+            }
+            else
+            {
+                shellShimRepository = ConfigBasicTestDependecyShellShimRepository(pathToShim);
+            }
+
+            shellShimRepository.CreateShim(
+                new FilePath("dummy.dll"),
+                shellCommandName,
+                new[] { new FilePath(dummyShimPath) });
+
+            var createdShim = Directory.EnumerateFileSystemEntries(pathToShim).Single();
+            File.ReadAllText(createdShim).Should().Contain(tokenToIdentifiyCopiedShim);
+        }
+
         private static void MakeNameConflictingCommand(string pathToPlaceShim, string shellCommandName)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
