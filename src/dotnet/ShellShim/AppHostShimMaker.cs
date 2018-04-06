@@ -17,9 +17,11 @@ namespace Microsoft.DotNet.ShellShim
 
         public AppHostShellShimMaker(string appHostSourceDirectory = null)
         {
-            _appHostSourceDirectory = appHostSourceDirectory ?? Path.Combine(ApplicationEnvironment.ApplicationBasePath,
-                    "AppHostTemplate");
+            _appHostSourceDirectory =
+                appHostSourceDirectory
+                ?? Path.Combine(ApplicationEnvironment.ApplicationBasePath, "AppHostTemplate");
         }
+
         public void CreateApphostShellShim(FilePath entryPoint, FilePath shimPath)
         {
             string appHostSourcePath;

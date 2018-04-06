@@ -71,8 +71,8 @@ namespace Microsoft.DotNet.ShellShim
                         else
                         {
                             _appHostShellShimMaker.CreateApphostShellShim(
-                                   targetExecutablePath,
-                                   GetShimPath(commandName));
+                                targetExecutablePath,
+                                GetShimPath(commandName));
                         }
 
                         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -195,17 +195,25 @@ namespace Microsoft.DotNet.ShellShim
             }
         }
 
-        private bool TryGetPackagedShim(IReadOnlyList<FilePath> packagedShims, string commandName, out FilePath? packagedShim)
+        private bool TryGetPackagedShim(
+            IReadOnlyList<FilePath> packagedShims,
+            string commandName,
+            out FilePath? packagedShim)
         {
             packagedShim = null;
 
             if (packagedShims != null && packagedShims.Count > 0)
             {
                 IEnumerable<FilePath> candidatepackagedShim =
-                    packagedShims.Where(s => string.Equals(Path.GetFileName(s.Value), Path.GetFileName(GetShimPath(commandName).Value)));
+                    packagedShims
+                        .Where(s => string.Equals(
+                            Path.GetFileName(s.Value),
+                            Path.GetFileName(GetShimPath(commandName).Value)));
+
                 if (candidatepackagedShim.Count() > 1)
                 {
-                    throw new ShellShimException($"More than 1 packaged shim available, they are {string.Join(';', candidatepackagedShim)}");
+                    throw new ShellShimException(
+                        $"More than 1 packaged shim available, they are {string.Join(';', candidatepackagedShim)}");
                 }
 
                 if (candidatepackagedShim.Count() == 1)
