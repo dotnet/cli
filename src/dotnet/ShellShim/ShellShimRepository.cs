@@ -204,19 +204,19 @@ namespace Microsoft.DotNet.ShellShim
 
             if (packagedShims != null && packagedShims.Count > 0)
             {
-                IEnumerable<FilePath> candidatepackagedShim =
+                FilePath[] candidatepackagedShim =
                     packagedShims
                         .Where(s => string.Equals(
                             Path.GetFileName(s.Value),
-                            Path.GetFileName(GetShimPath(commandName).Value)));
+                            Path.GetFileName(GetShimPath(commandName).Value))).ToArray();
 
-                if (candidatepackagedShim.Count() > 1)
+                if (candidatepackagedShim.Length > 1)
                 {
                     throw new ShellShimException(
                         $"More than 1 packaged shim available, they are {string.Join(';', candidatepackagedShim)}");
                 }
 
-                if (candidatepackagedShim.Count() == 1)
+                if (candidatepackagedShim.Length == 1)
                 {
                     packagedShim = candidatepackagedShim.Single();
                     return true;

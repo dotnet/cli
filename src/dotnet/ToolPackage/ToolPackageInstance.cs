@@ -33,15 +33,26 @@ namespace Microsoft.DotNet.ToolPackage
         {
             get
             {
-                // TODO catch exception
-                LockFile lockFile = new LockFileFormat().Read(PackageDirectory.WithFile(AssetsFileName).Value);
-                LockFileTargetLibrary library = FindLibraryInLockFile(lockFile);
-
-                LockFileItem dotnetToolSettings = FindItemInTargetLibrary(library, ToolSettingsFileName);
+                // TODO LOC NO CHECKING wul
+                LockFileTargetLibrary library;
+                try
+                {
+                    LockFile lockFile = new LockFileFormat().Read(PackageDirectory.WithFile(AssetsFileName).Value);
+                    library = FindLibraryInLockFile(lockFile);
+                }
+                catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
+                {
+                    throw new ToolPackageException(
+                        string.Format(
+                            "Failed to read NuGet LockFile for tool package '{0}': {1}",
+                            Id,
+                            ex.Message),
+                        ex);
+                }
 
                 IEnumerable<LockFileItem> filesUnderShimsDirectory = library
-                ?.ToolsAssemblies
-                ?.Where(t => LockFileMatcher.MatchesDirectoryPath(t, "shims"));
+                    ?.ToolsAssemblies
+                    ?.Where(t => LockFileMatcher.MatchesDirectoryPath(t, "shims"));
 
                 if (filesUnderShimsDirectory == null)
                 {
@@ -49,15 +60,20 @@ namespace Microsoft.DotNet.ToolPackage
                 }
 
                 IEnumerable<string> allAvailableShimRuntimeIdentifiers = filesUnderShimsDirectory
-                    .Select(f => f.Path.Split('\\', '/')?[4]) // Example: "tools/netcoreapp2.1/any/shims/osx-x64/demo" osx-x64 is at [4]
+                    .Select(f => f.Path.Split('\\', '/')?[4]) // "tools/netcoreapp2.1/any/shims/osx-x64/demo" osx-x64 is at [4]
                     .Where(f => !string.IsNullOrEmpty(f));
 
-                if (new FrameworkDependencyFile().TryGetMostFitRuntimeIdentifier(allAvailableShimRuntimeIdentifiers, out var mostFitRuntimeIdentifier, alternative: Cli.DotnetFiles.VersionFileObject.BuildRid))
+                if (new FrameworkDependencyFile().TryGetMostFitRuntimeIdentifier(
+                    allAvailableShimRuntimeIdentifiers,
+                    out var mostFitRuntimeIdentifier,
+                    alternative: Cli.DotnetFiles.VersionFileObject.BuildRid))
                 {
                     return library
-                        ?.ToolsAssemblies
-                        ?.Where(l => LockFileMatcher.MatchesDirectoryPath(l, $"shims/{mostFitRuntimeIdentifier}"))
-                        .Select(l => LockFileRelativePathToFullFilePath(l.Path, library)).ToArray() ?? Array.Empty<FilePath>();
+                               ?.ToolsAssemblies
+                               ?.Where(l =>
+                                   LockFileMatcher.MatchesDirectoryPath(l, $"shims/{mostFitRuntimeIdentifier}"))
+                               .Select(l => LockFileRelativePathToFullFilePath(l.Path, library)).ToArray()
+                           ?? Array.Empty<FilePath>();
                 }
                 else
                 {
