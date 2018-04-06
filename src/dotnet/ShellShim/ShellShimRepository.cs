@@ -215,7 +215,7 @@ namespace Microsoft.DotNet.ShellShim
         {
             packagedShim = null;
 
-            if (packagedShims != null && packagedShims.Count > 1)
+            if (packagedShims != null && packagedShims.Count > 0)
             {
                 IEnumerable<FilePath> candidatepackagedShim 
                     = packagedShims.Where(s => string.Equals(Path.GetFileName(s.Value), Path.GetFileName(GetShimPath(commandName).Value)));
