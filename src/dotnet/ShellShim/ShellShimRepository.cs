@@ -22,12 +22,14 @@ namespace Microsoft.DotNet.ShellShim
 
         private readonly DirectoryPath _shimsDirectory;
         private readonly string _appHostSourceDirectory;
+        private readonly IFileSystem _fileSystem;
 
         public ShellShimRepository(DirectoryPath shimsDirectory, string appHostSourcePath = null)
         {
             _shimsDirectory = shimsDirectory;
             _appHostSourceDirectory = appHostSourcePath ?? Path.Combine(ApplicationEnvironment.ApplicationBasePath,
                     "AppHostTemplate");
+            _fileSystem = new FileSystemWrapper();
         }
 
         public void CreateShim(FilePath targetExecutablePath, string commandName, IReadOnlyList<FilePath> packagedShims = null)
@@ -54,14 +56,14 @@ namespace Microsoft.DotNet.ShellShim
                 {
                     try
                     {
-                        if (!Directory.Exists(_shimsDirectory.Value))
+                        if (!_fileSystem.Directory.Exists(_shimsDirectory.Value))
                         {
-                            Directory.CreateDirectory(_shimsDirectory.Value);
+                            _fileSystem.Directory.CreateDirectory(_shimsDirectory.Value);
                         }
 
                         if (TryGetPackagedShim(packagedShims, commandName, out FilePath? packagedShim))
                         {
-                            File.Copy(packagedShim.Value.Value, GetShimPath(commandName).Value);
+                            _fileSystem.File.Copy(packagedShim.Value.Value, GetShimPath(commandName).Value);
                         }
                         else
                         {
@@ -87,7 +89,7 @@ namespace Microsoft.DotNet.ShellShim
                     }
                 },
                 rollback: () => {
-                    foreach (var file in GetShimFiles(commandName).Where(f => File.Exists(f.Value)))
+                    foreach (var file in GetShimFiles(commandName).Where(f => _fileSystem.File.Exists(f.Value)))
                     {
                         File.Delete(file.Value);
                     }
@@ -101,10 +103,10 @@ namespace Microsoft.DotNet.ShellShim
                 action: () => {
                     try
                     {
-                        foreach (var file in GetShimFiles(commandName).Where(f => File.Exists(f.Value)))
+                        foreach (var file in GetShimFiles(commandName).Where(f => _fileSystem.File.Exists(f.Value)))
                         {
                             var tempPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-                            File.Move(file.Value, tempPath);
+                            _fileSystem.File.Move(file.Value, tempPath);
                             files[file.Value] = tempPath;
                         }
                     }
@@ -122,13 +124,13 @@ namespace Microsoft.DotNet.ShellShim
                 commit: () => {
                     foreach (var value in files.Values)
                     {
-                        File.Delete(value);
+                        _fileSystem.File.Delete(value);
                     }
                 },
                 rollback: () => {
                     foreach (var kvp in files)
                     {
-                        File.Move(kvp.Value, kvp.Key);
+                        _fileSystem.File.Move(kvp.Value, kvp.Key);
                     }
                 });
         }
@@ -166,7 +168,7 @@ namespace Microsoft.DotNet.ShellShim
 
         private bool ShimExists(string commandName)
         {
-            return GetShimFiles(commandName).Any(p => File.Exists(p.Value));
+            return GetShimFiles(commandName).Any(p => _fileSystem.File.Exists(p.Value));
         }
 
         private IEnumerable<FilePath> GetShimFiles(string commandName)
