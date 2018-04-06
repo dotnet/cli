@@ -315,7 +315,6 @@ namespace Microsoft.DotNet.ShellShim.Tests
             Directory.EnumerateFileSystemEntries(pathToShim).Should().BeEmpty();
         }
 
-
         [Fact]
         public void WhenPackagedShimProvidedItCopies()
         {
@@ -338,7 +337,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             shellShimRepository.CreateShim(
                 new FilePath("dummy.dll"),
                 shellCommandName,
-                new[] { new FilePath(dummyShimPath) });
+                new[] {new FilePath(dummyShimPath)});
 
             var createdShim = Directory.EnumerateFileSystemEntries(pathToShim).Single();
             File.ReadAllText(createdShim).Should().Contain(tokenToIdentifyCopiedShim);
@@ -365,7 +364,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
             Action a = () => shellShimRepository.CreateShim(
                 new FilePath("dummy.dll"),
                 shellCommandName,
-                new[] { new FilePath(dummyShimPath), new FilePath("path" + dummyShimPath) });
+                new[] {new FilePath(dummyShimPath), new FilePath("path" + dummyShimPath)});
 
             a.ShouldThrow<ShellShimException>().And.Message.Should().Contain("More than 1 packaged shim available");
         }

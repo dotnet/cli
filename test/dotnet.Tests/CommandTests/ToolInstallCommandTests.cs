@@ -462,29 +462,29 @@ namespace Microsoft.DotNet.Tests.Commands
         public void AndPackagedShimIsProvidedWhenRunWithPackageIdItCreateShimUsingPackagedShim()
         {
             var extension = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : string.Empty;
-            var prepackagedShimPath = "packagedShimDirectory/" +ProjectRestorerMock.FakeCommandName + extension;
+            var prepackagedShimPath = "packagedShimDirectory/" + ProjectRestorerMock.FakeCommandName + extension;
             var tokenToIdentifyPackagedShim = "packagedShim";
             _fileSystem.File.WriteAllText(prepackagedShimPath, tokenToIdentifyPackagedShim);
 
             var result = Parser.Instance.Parse($"dotnet tool install --tool-path /tmp/folder {PackageId}");
             var appliedCommand = result["dotnet"]["tool"]["install"];
             var parser = Parser.Instance;
-            var parseResult = parser.ParseFrom("dotnet tool", new[] { "install", "-g", PackageId });
+            var parseResult = parser.ParseFrom("dotnet tool", new[] {"install", "-g", PackageId});
 
             var packagedShimsMap = new Dictionary<PackageId, IReadOnlyList<FilePath>>
             {
-                [new PackageId(PackageId)] = new FilePath[] { new FilePath(prepackagedShimPath) }
+                [new PackageId(PackageId)] = new[] {new FilePath(prepackagedShimPath)}
             };
 
             var installCommand = new ToolInstallCommand(appliedCommand,
                 parseResult,
                 (_) => (_toolPackageStore, new ToolPackageInstallerMock(
-                fileSystem: _fileSystem,
-                store: _toolPackageStore,
-                packagedShimsMap: packagedShimsMap,
-                projectRestorer: new ProjectRestorerMock(
                     fileSystem: _fileSystem,
-                    reporter: _reporter))),
+                    store: _toolPackageStore,
+                    packagedShimsMap: packagedShimsMap,
+                    projectRestorer: new ProjectRestorerMock(
+                        fileSystem: _fileSystem,
+                        reporter: _reporter))),
                 _createShellShimRepository,
                 new EnvironmentPathInstructionMock(_reporter, PathToPlaceShim),
                 _reporter);

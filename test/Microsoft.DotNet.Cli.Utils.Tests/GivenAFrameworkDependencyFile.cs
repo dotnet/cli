@@ -12,23 +12,31 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         public void WhenPassSeveralCompatibleRuntimeIdentifiersItOutMostFitRid()
         {
             var frameworkDependencyFile = new FrameworkDependencyFile();
-            frameworkDependencyFile.TryGetMostFitRuntimeIdentifier(new string[] { "win", "any"}, out string mostFitRid).Should().BeTrue();
+            frameworkDependencyFile.TryGetMostFitRuntimeIdentifier(new[] { "win", "any"}, out string mostFitRid).Should().BeTrue();
             mostFitRid.Should().Be("win");
+        }
+
+        [WindowsOnlyFact]
+        public void WhenPassSeveralCompatibleRuntimeIdentifiersItOutMostFitRidWithCasingPreserved()
+        {
+            var frameworkDependencyFile = new FrameworkDependencyFile();
+            frameworkDependencyFile.TryGetMostFitRuntimeIdentifier(new[] { "Win", "any"}, out string mostFitRid).Should().BeTrue();
+            mostFitRid.Should().Be("Win");
         }
 
         [WindowsOnlyFact]
         public void WhenPassSeveralCompatibleRuntimeIdentifiersWithDuplicationItOutMostFitRid()
         {
             var frameworkDependencyFile = new FrameworkDependencyFile();
-            frameworkDependencyFile.TryGetMostFitRuntimeIdentifier(new string[] { "win", "win", "any" }, out string mostFitRid).Should().BeTrue();
+            frameworkDependencyFile.TryGetMostFitRuntimeIdentifier(new[] { "win", "win", "any" }, out string mostFitRid).Should().BeTrue();
             mostFitRid.Should().Be("win");
         }
-
+        
         [WindowsOnlyFact]
         public void WhenPassSeveralNonCompatibleRuntimeIdentifiersItReturnsFalse()
         {
             var frameworkDependencyFile = new FrameworkDependencyFile();
-            frameworkDependencyFile.TryGetMostFitRuntimeIdentifier(new string[] { "centos", "debian" }, out var _).Should().BeFalse();
+            frameworkDependencyFile.TryGetMostFitRuntimeIdentifier(new[] { "centos", "debian" }, out var _).Should().BeFalse();
         }
     }
 }

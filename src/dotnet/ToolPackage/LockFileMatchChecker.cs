@@ -23,7 +23,9 @@ namespace Microsoft.DotNet.ToolPackage
             string[] entryPointPathInArray = SplitPathByDirectorySeparator(targetRelativeFilePath);
 
             return entryPointPathInArray.Length >= 1
-                   && PathInLockFileDirectoriesStartWithToolsAndFollowsTwoSubFolder(pathInLockFilePathInArray, entryPointPathInArray)
+                   && PathInLockFileDirectoriesStartWithToolsAndFollowsTwoSubFolder(
+                       pathInLockFilePathInArray,
+                       entryPointPathInArray)
                    && SubPathMatchesTargetFilePath(pathInLockFilePathInArray, entryPointPathInArray);
         }
 
@@ -41,6 +43,7 @@ namespace Microsoft.DotNet.ToolPackage
             return pathInLockFilePathInArray[0] == "tools"
                    && SubPathMatchesTargetFilePath(pathInLockFilePathInArray, targetDirectoryPathInArray);
         }
+
         private static bool SubPathMatchesTargetFilePath(string[] pathInLockFilePathInArray, string[] targetInArray)
         {
             string[] pathAfterToolsTfmRid = pathInLockFilePathInArray.Skip(3).ToArray();
@@ -65,6 +68,7 @@ namespace Microsoft.DotNet.ToolPackage
 
             return true;
         }
+
         private static string[] SplitPathByDirectorySeparator(string path)
         {
             if (string.IsNullOrEmpty(path))
