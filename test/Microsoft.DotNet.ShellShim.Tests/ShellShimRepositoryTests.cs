@@ -319,7 +319,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
         [Fact]
         public void WhenPackagedShimProvidedItCopies()
         {
-            const string tokenToIdentifiyCopiedShim = "packagedShim";
+            const string tokenToIdentifyCopiedShim = "packagedShim";
 
             var shellCommandName = nameof(ShellShimRepositoryTests) + Path.GetRandomFileName();
             var pathToShim = GetNewCleanFolderUnderTempRoot();
@@ -331,7 +331,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
                 dummyShimPath = dummyShimPath + ".exe";
             }
 
-            File.WriteAllText(dummyShimPath, tokenToIdentifiyCopiedShim);
+            File.WriteAllText(dummyShimPath, tokenToIdentifyCopiedShim);
 
             ShellShimRepository shellShimRepository = GetShellShimRepositoryWithMockMaker(pathToShim);
 
@@ -341,13 +341,13 @@ namespace Microsoft.DotNet.ShellShim.Tests
                 new[] { new FilePath(dummyShimPath) });
 
             var createdShim = Directory.EnumerateFileSystemEntries(pathToShim).Single();
-            File.ReadAllText(createdShim).Should().Contain(tokenToIdentifiyCopiedShim);
+            File.ReadAllText(createdShim).Should().Contain(tokenToIdentifyCopiedShim);
         }
 
         [Fact]
         public void WhenMutipleSameNamePackagedShimProvidedItThrows()
         {
-            const string tokenToIdentifiyCopiedShim = "packagedShim";
+            const string tokenToIdentifyCopiedShim = "packagedShim";
 
             var shellCommandName = nameof(ShellShimRepositoryTests) + Path.GetRandomFileName();
             var pathToShim = GetNewCleanFolderUnderTempRoot();
@@ -359,7 +359,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
                 dummyShimPath = dummyShimPath + ".exe";
             }
 
-            File.WriteAllText(dummyShimPath, tokenToIdentifiyCopiedShim);
+            File.WriteAllText(dummyShimPath, tokenToIdentifyCopiedShim);
             ShellShimRepository shellShimRepository = GetShellShimRepositoryWithMockMaker(pathToShim);
 
             Action a = () => shellShimRepository.CreateShim(

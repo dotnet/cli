@@ -138,8 +138,6 @@ namespace Microsoft.DotNet.ShellShim
                 });
         }
 
-       
-
         private class StartupOptions
         {
             public string appRoot { get; set; }
@@ -203,8 +201,8 @@ namespace Microsoft.DotNet.ShellShim
 
             if (packagedShims != null && packagedShims.Count > 0)
             {
-                IEnumerable<FilePath> candidatepackagedShim 
-                    = packagedShims.Where(s => string.Equals(Path.GetFileName(s.Value), Path.GetFileName(GetShimPath(commandName).Value)));
+                IEnumerable<FilePath> candidatepackagedShim =
+                    packagedShims.Where(s => string.Equals(Path.GetFileName(s.Value), Path.GetFileName(GetShimPath(commandName).Value)));
                 if (candidatepackagedShim.Count() > 1)
                 {
                     throw new ShellShimException($"More than 1 packaged shim available, they are {string.Join(';', candidatepackagedShim)}");

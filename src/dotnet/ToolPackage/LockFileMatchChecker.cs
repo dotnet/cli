@@ -27,6 +27,12 @@ namespace Microsoft.DotNet.ToolPackage
                    && SubPathMatchesTargetFilePath(pathInLockFilePathInArray, entryPointPathInArray);
         }
 
+        /// <summary>
+        /// Check if LockFileItem is under targetRelativePath directory.
+        /// The path in LockFileItem is in pattern tools/TFM/RID/my/tool.dll. Tools/TFM/RID is selected by NuGet.
+        /// And there will be only one TFM/RID combination.
+        /// When "my/folder/of/tool/tools.dll" part under targetRelativePath "my/folder/of" or "my/folder", return true.
+        /// </summary>
         internal static bool MatchesDirectoryPath(LockFileItem lockFileItem, string targetRelativePath)
         {
             string[] pathInLockFilePathInArray = SplitPathByDirectorySeparator(lockFileItem.Path);
