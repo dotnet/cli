@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
-    internal static class FilePermissionSetter
+    internal class FilePermissionSetter : IFilePermissionSetter
     {
-        public static void SetUserExecutionPermission(string path)
+        public void SetUserExecutionPermission(string path)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {

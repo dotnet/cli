@@ -49,7 +49,8 @@ namespace Microsoft.DotNet.Tests.Commands
                 (nonGlobalLocation) => new ShellShimRepository(
                     new DirectoryPath(PathToPlaceShim),
                     fileSystem: _fileSystem,
-                    appHostShellShimMaker: new AppHostShellShimMakerMock(_fileSystem));
+                    appHostShellShimMaker: new AppHostShellShimMakerMock(_fileSystem),
+                    filePermissionSetter: new NoOpFilePermissionSetter());
             _environmentPathInstructionMock =
                 new EnvironmentPathInstructionMock(_reporter, PathToPlaceShim);
             _createToolPackageStoreAndInstaller = (_) => (_toolPackageStore, CreateToolPackageInstaller());
@@ -514,6 +515,13 @@ namespace Microsoft.DotNet.Tests.Commands
             return Path.Combine(
                 "pathToPlace",
                 ProjectRestorerMock.FakeCommandName + extension);
+        }
+
+        private class NoOpFilePermissionSetter : IFilePermissionSetter
+        {
+            public void SetUserExecutionPermission(string path)
+            {
+            }
         }
     }
 }

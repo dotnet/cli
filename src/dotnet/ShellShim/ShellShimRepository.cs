@@ -23,16 +23,19 @@ namespace Microsoft.DotNet.ShellShim
         private readonly DirectoryPath _shimsDirectory;
         private readonly IFileSystem _fileSystem;
         private readonly IAppHostShellShimMaker _appHostShellShimMaker;
+        private readonly IFilePermissionSetter _filePermissionSetter;
 
         public ShellShimRepository(
             DirectoryPath shimsDirectory,
             string appHostSourceDirectory = null,
             IFileSystem fileSystem = null,
-            IAppHostShellShimMaker appHostShellShimMaker = null)
+            IAppHostShellShimMaker appHostShellShimMaker = null,
+            IFilePermissionSetter filePermissionSetter = null)
         {
             _shimsDirectory = shimsDirectory;
             _fileSystem = fileSystem ?? new FileSystemWrapper();
             _appHostShellShimMaker = appHostShellShimMaker ?? new AppHostShellShimMaker(appHostSourceDirectory: appHostSourceDirectory);
+            _filePermissionSetter = filePermissionSetter ?? new FilePermissionSetter();
         }
 
         public void CreateShim(FilePath targetExecutablePath, string commandName, IReadOnlyList<FilePath> packagedShims = null)
@@ -67,7 +70,7 @@ namespace Microsoft.DotNet.ShellShim
                         if (TryGetPackagedShim(packagedShims, commandName, out FilePath? packagedShim))
                         {
                             _fileSystem.File.Copy(packagedShim.Value.Value, GetShimPath(commandName).Value);
-                            FilePermissionSetter.SetUserExecutionPermission(GetShimPath(commandName).Value);
+                            _filePermissionSetter.SetUserExecutionPermission(GetShimPath(commandName).Value);
                         }
                         else
                         {
