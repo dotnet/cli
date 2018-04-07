@@ -15,5 +15,6 @@
         <file src="dummyshim.exe" target="tools\netcoreapp2.1\any\shims\win-x64\demo.exe" />
         <file src="dummyshim.exe" target="tools\netcoreapp2.1\any\shims\win-x86\demo.exe" />
         <file src="dummyshim" target="tools\netcoreapp2.1\any\shims\osx-x64\demo" />
+        <file src="dummyshim" target="tools\netcoreapp2.1\any\shims\linux\demo" />
     </files>
 </package>
