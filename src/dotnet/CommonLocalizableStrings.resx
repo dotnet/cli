@@ -640,4 +640,7 @@ setx PATH "%PATH%;{0}"
   <data name="FormatVersionIsMissing" xml:space="preserve">
     <value>Format version is missing. This tool may not be supported in this SDK version. Please contact the author of the tool.</value>
   </data>
+  <data name="MoreThanOnePackagedShimAvailable" xml:space="preserve">
+    <value>More than one packaged shim available, they are {0}</value>
+  </data>
 </root>

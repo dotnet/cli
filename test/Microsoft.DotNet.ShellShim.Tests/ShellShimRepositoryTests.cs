@@ -364,9 +364,14 @@ namespace Microsoft.DotNet.ShellShim.Tests
             Action a = () => shellShimRepository.CreateShim(
                 new FilePath("dummy.dll"),
                 shellCommandName,
-                new[] {new FilePath(dummyShimPath), new FilePath("path" + dummyShimPath)});
+                new[] { new FilePath(dummyShimPath), new FilePath("path" + dummyShimPath) });
 
-            a.ShouldThrow<ShellShimException>().And.Message.Should().Contain("More than 1 packaged shim available");
+            a.ShouldThrow<ShellShimException>()
+                .And.Message
+                .Should().Contain(
+                    string.Format(
+                           CommonLocalizableStrings.MoreThanOnePackagedShimAvailable,
+                           string.Join(';', new[] { dummyShimPath, "path" + dummyShimPath })));
         }
 
         private static void MakeNameConflictingCommand(string pathToPlaceShim, string shellCommandName)

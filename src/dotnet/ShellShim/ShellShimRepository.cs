@@ -197,7 +197,9 @@ namespace Microsoft.DotNet.ShellShim
                 if (candidatepackagedShim.Length > 1)
                 {
                     throw new ShellShimException(
-                        $"More than 1 packaged shim available, they are {string.Join(';', candidatepackagedShim)}");
+                        string.Format(
+                            CommonLocalizableStrings.MoreThanOnePackagedShimAvailable,
+                            string.Join(';', candidatepackagedShim)));
                 }
 
                 if (candidatepackagedShim.Length == 1)
