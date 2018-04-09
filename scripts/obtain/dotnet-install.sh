@@ -230,8 +230,6 @@ check_min_reqs() {
 check_pre_reqs() {
     eval $invocation
 
-    local failing=false;
-
     if [ "${DOTNET_INSTALL_SKIP_PREREQS:-}" = "1" ]; then
         return 0
     fi
@@ -247,14 +245,10 @@ check_pre_reqs() {
         local librarypath=${LD_LIBRARY_PATH:-}
         LDCONFIG_COMMAND="$LDCONFIG_COMMAND -NXv ${librarypath//:/ }"
 
-        [ -z "$($LDCONFIG_COMMAND 2>/dev/null | grep libunwind)" ] && say_err "Unable to locate libunwind. Install libunwind to continue" && failing=true
-        [ -z "$($LDCONFIG_COMMAND 2>/dev/null | grep libssl)" ] && say_err "Unable to locate libssl. Install libssl to continue" && failing=true
-        [ -z "$($LDCONFIG_COMMAND 2>/dev/null | grep libicu)" ] && say_err "Unable to locate libicu. Install libicu to continue" && failing=true
-        [ -z "$($LDCONFIG_COMMAND 2>/dev/null | grep -F libcurl.so)" ] && say_err "Unable to locate libcurl. Install libcurl to continue" && failing=true
-    fi
-
-    if [ "$failing" = true ]; then
-       return 1
+        [ -z "$($LDCONFIG_COMMAND 2>/dev/null | grep libunwind)" ] && say_warning "Unable to locate libunwind. Probable prerequisite missing; please install libunwind."
+        [ -z "$($LDCONFIG_COMMAND 2>/dev/null | grep libssl)" ] && say_warning "Unable to locate libssl. Probable prerequisite missing; please install libssl."
+        [ -z "$($LDCONFIG_COMMAND 2>/dev/null | grep libicu)" ] && say_warning "Unable to locate libicu. Probable prerequisite missing; please install libicu."
+        [ -z "$($LDCONFIG_COMMAND 2>/dev/null | grep -F libcurl.so)" ] && say_warning "Unable to locate libcurl. Probable prerequisite missing; please install libcurl."
     fi
 
     return 0
@@ -309,14 +303,6 @@ combine_paths() {
     return 0
 }
 
-get_machine_architecture() {
-    eval $invocation
-
-    # Currently the only one supported
-    echo "x64"
-    return 0
-}
-
 # args:
 # architecture - $1
 get_normalized_architecture_from_architecture() {
@@ -324,17 +310,17 @@ get_normalized_architecture_from_architecture() {
 
     local architecture="$(to_lowercase "$1")"
     case "$architecture" in
-        \<auto\>)
-            echo "$(get_normalized_architecture_from_architecture "$(get_machine_architecture)")"
-            return 0
-            ;;
         amd64|x64)
             echo "x64"
             return 0
             ;;
-        x86)
-            say_err "Architecture \`x86\` currently not supported"
-            return 1
+         arm|arm32)
+            echo "arm"
+            return 0
+            ;;
+         arm64)
+            echo "arm64"
+            return 0
             ;;
     esac
 
@@ -790,7 +776,7 @@ temporary_file_template="${TMPDIR:-/tmp}/dotnet.XXXXXXXXX"
 channel="LTS"
 version="Latest"
 install_dir="<auto>"
-architecture="<auto>"
+architecture="x64"
 dry_run=false
 no_path=false
 azure_feed="https://dotnetcli.azureedge.net/dotnet"
@@ -872,7 +858,7 @@ do
             echo "$script_name is a simple command line interface for obtaining dotnet cli."
             echo ""
             echo "Options:"
-            echo "  -c,--channel <CHANNEL>         Download from the CHANNEL specified, Defaults to \`$channel\`."
+            echo "  -c,--channel <CHANNEL>         Download from the channel specified, Defaults to \`$channel\`."
             echo "      -Channel"
             echo "          Possible values:"
             echo "          - Current - most current release"
@@ -891,8 +877,9 @@ do
             echo "              examples: 2.0.0-preview2-006120; 1.1.0"
             echo "  -i,--install-dir <DIR>             Install under specified location (see Install Location below)"
             echo "      -InstallDir"
-            echo "  --architecture <ARCHITECTURE>      Architecture of .NET Tools. Currently only x64 is supported."
+            echo "  --architecture <ARCHITECTURE>      Architecture of dotnet binaries to be installed, Defaults to \`$architecture\`."
             echo "      --arch,-Architecture,-Arch"
+            echo "          Possible values: x64, arm, and arm64"
             echo "  --runtime <RUNTIME>                Installs a shared runtime only, without the SDK."
             echo "      -Runtime"
             echo "          Possible values:"
