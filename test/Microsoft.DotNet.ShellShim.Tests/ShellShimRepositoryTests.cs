@@ -361,6 +361,8 @@ namespace Microsoft.DotNet.ShellShim.Tests
             File.WriteAllText(dummyShimPath, tokenToIdentifyCopiedShim);
             ShellShimRepository shellShimRepository = GetShellShimRepositoryWithMockMaker(pathToShim);
 
+            FilePath[] filePaths = new[] { new FilePath(dummyShimPath), new FilePath("path" + dummyShimPath) };
+
             Action a = () => shellShimRepository.CreateShim(
                 new FilePath("dummy.dll"),
                 shellCommandName,
@@ -371,7 +373,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
                 .Should().Contain(
                     string.Format(
                            CommonLocalizableStrings.MoreThanOnePackagedShimAvailable,
-                           string.Join(';', new[] { dummyShimPath, "path" + dummyShimPath })));
+                           string.Join(';', filePaths)));
         }
 
         private static void MakeNameConflictingCommand(string pathToPlaceShim, string shellCommandName)

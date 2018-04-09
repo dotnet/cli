@@ -888,6 +888,11 @@ setx PATH "%PATH%;{0}"
         <target state="new">More than one packaged shim available, they are {0}</target>
         <note />
       </trans-unit>
+      <trans-unit id="FailedToReadNuGetLockFile">
+        <source>Failed to read NuGet LockFile for tool package '{0}': {1}.</source>
+        <target state="new">Failed to read NuGet LockFile for tool package '{0}': {1}.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>
