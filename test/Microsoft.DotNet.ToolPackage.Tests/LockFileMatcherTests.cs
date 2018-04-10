@@ -1,82 +1,42 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Collections.Generic;
-using System.Linq;
+using FluentAssertions;
+using Microsoft.DotNet.Tools.Test.Utilities;
 using NuGet.ProjectModel;
+using Xunit;
 
-namespace Microsoft.DotNet.ToolPackage
+namespace Microsoft.DotNet.ToolPackage.Tests
 {
-    internal class LockFileMatcher
+    public class LockFileMatcherTests : TestBase
     {
-        /// <summary>
-        /// Check if LockFileItem matches the targetRelativeFilePath.
-        /// The path in LockFileItem is in pattern tools/TFM/RID/my/tool.dll. Tools/TFM/RID is selected by NuGet.
-        /// And there will be only one TFM/RID combination.
-        /// When "my/tools.dll" part matches exactly with the targetRelativeFilePath, return true.
-        /// </summary>
-        /// <param name="lockFileItem">LockFileItem from asset.json restored from temp project</param>
-        /// <param name="targetRelativeFilePath">file path relative to tools/TFM/RID</param>
-        internal static bool MatchesFile(LockFileItem lockFileItem, string targetRelativeFilePath)
+        [Theory]
+        [InlineData("tools/netcoreapp1.1/any/tool.dll", "tool.dll", true)]
+        [InlineData(@"tools\netcoreapp1.1\any\subDirectory\tool.dll", "subDirectory/tool.dll", true)]
+        [InlineData("tools/netcoreapp1.1/win-x64/tool.dll", "tool.dll", true)]
+        [InlineData("tools/netcoreapp1.1/any/subDirectory/tool.dll", "subDirectory/tool.dll", true)]
+        [InlineData("libs/netcoreapp1.1/any/tool.dll", "tool.dll", false)]
+        [InlineData("tools/netcoreapp1.1/any/subDirectory/tool.dll", "tool.dll", false)]
+        [InlineData("tools/netcoreapp1.1/any/subDirectory/tool.dll", "subDirectory/subDirectory/subDirectory/subDirectory/subDirectory/tool.dll", false)]
+        public void MatchesEntryPointTests(string pathInLockFileItem, string targetRelativeFilePath, bool shouldMatch)
         {
-            string[] pathInLockFilePathInArray = SplitPathByDirectorySeparator(lockFileItem.Path);
-            string[] entryPointPathInArray = SplitPathByDirectorySeparator(targetRelativeFilePath);
-
-            return entryPointPathInArray.Length >= 1
-                   && PathInLockFileDirectoriesStartWithToolsAndFollowsTwoSubFolder(
-                       pathInLockFilePathInArray,
-                       entryPointPathInArray)
-                   && SubPathMatchesTargetFilePath(pathInLockFilePathInArray, entryPointPathInArray);
+            LockFileMatcher.MatchesFile(new LockFileItem(pathInLockFileItem), targetRelativeFilePath)
+                .Should().Be(shouldMatch);
         }
 
-        /// <summary>
-        /// Check if LockFileItem is under targetRelativePath directory.
-        /// The path in LockFileItem is in pattern tools/TFM/RID/my/tool.dll. Tools/TFM/RID is selected by NuGet.
-        /// And there will be only one TFM/RID combination.
-        /// When "my/folder/of/tool/tools.dll" part under targetRelativePath "my/folder/of" or "my/folder", return true.
-        /// </summary>
-        internal static bool MatchesDirectoryPath(LockFileItem lockFileItem, string targetRelativePath)
+
+        [Theory]
+        [InlineData("tools/netcoreapp1.1/any/tool.dll", "", true)]
+        [InlineData(@"tools\netcoreapp1.1\any\subDirectory\tool.dll", "subDirectory", true)]
+        [InlineData(@"tools\netcoreapp1.1\any\subDirectory\tool.dll", "sub", false)]
+        [InlineData("tools/netcoreapp1.1/any/subDirectory/tool.dll", "any/subDirectory", false)]
+        public void MatchesDirectoryPathTests(
+            string pathInLockFileItem,
+            string targetRelativeFilePath,
+            bool shouldMatch)
         {
-            string[] pathInLockFilePathInArray = SplitPathByDirectorySeparator(lockFileItem.Path);
-            string[] targetDirectoryPathInArray = SplitPathByDirectorySeparator(targetRelativePath);
-
-            return pathInLockFilePathInArray[0] == "tools"
-                   && SubPathMatchesTargetFilePath(pathInLockFilePathInArray, targetDirectoryPathInArray);
-        }
-
-        private static bool SubPathMatchesTargetFilePath(string[] pathInLockFilePathInArray, string[] targetInArray)
-        {
-            string[] pathAfterToolsTfmRid = pathInLockFilePathInArray.Skip(3).ToArray();
-            return !targetInArray
-                .Where((directoryOnEveryLevel, i) => directoryOnEveryLevel != pathAfterToolsTfmRid[i])
-                .Any();
-        }
-
-        private static bool PathInLockFileDirectoriesStartWithToolsAndFollowsTwoSubFolder(
-            string[] pathInLockFilePathInArray,
-            string[] targetInArray)
-        {
-            if (pathInLockFilePathInArray.Length - targetInArray.Length != 3)
-            {
-                return false;
-            }
-
-            if (pathInLockFilePathInArray[0] != "tools")
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        private static string[] SplitPathByDirectorySeparator(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                return new string[0];
-            }
-
-            return path.Split('\\', '/');
+            LockFileMatcher.MatchesDirectoryPath(new LockFileItem(pathInLockFileItem), targetRelativeFilePath)
+                .Should().Be(shouldMatch);
         }
     }
 }
