@@ -14,12 +14,17 @@ namespace Microsoft.DotNet.ShellShim
     {
         private const string ApphostNameWithoutExtension = "apphost";
         private readonly string _appHostSourceDirectory;
+        private readonly IFilePermissionSetter _filePermissionSetter;
 
-        public AppHostShellShimMaker(string appHostSourceDirectory = null)
+        public AppHostShellShimMaker(string appHostSourceDirectory = null, IFilePermissionSetter filePermissionSetter = null)
         {
             _appHostSourceDirectory =
                 appHostSourceDirectory
                 ?? Path.Combine(ApplicationEnvironment.ApplicationBasePath, "AppHostTemplate");
+
+            _filePermissionSetter =
+                filePermissionSetter
+                ?? new FilePermissionSetter();
         }
 
         public void CreateApphostShellShim(FilePath entryPoint, FilePath shimPath)
@@ -42,7 +47,7 @@ namespace Microsoft.DotNet.ShellShim
                 appHostDestinationFilePath: appHostDestinationFilePath,
                 appBinaryFilePath: appBinaryFilePath);
 
-            new FilePermissionSetter().SetUserExecutionPermission(appHostDestinationFilePath);
+            _filePermissionSetter.SetUserExecutionPermission(appHostDestinationFilePath);
         }
     }
 }
