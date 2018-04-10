@@ -884,8 +884,8 @@ setx PATH "%PATH%;{0}"
         <note />
       </trans-unit>
       <trans-unit id="MoreThanOnePackagedShimAvailable">
-        <source>More than one packaged shim available, they are {0}</source>
-        <target state="new">More than one packaged shim available, they are {0}</target>
+        <source>More than one packaged shim is available: {0}.</source>
+        <target state="new">More than one packaged shim is available: {0}.</target>
         <note />
       </trans-unit>
       <trans-unit id="FailedToReadNuGetLockFile">
