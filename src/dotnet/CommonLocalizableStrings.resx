@@ -644,6 +644,6 @@ setx PATH "%PATH%;{0}"
     <value>More than one packaged shim is available: {0}.</value>
   </data>
   <data name="FailedToReadNuGetLockFile" xml:space="preserve">
-    <value>Failed to read NuGet LockFile for tool package '{0}': {1}.</value>
+    <value>Failed to read NuGet LockFile for tool package '{0}': {1}</value>
   </data>
 </root>

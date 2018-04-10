@@ -889,8 +889,8 @@ setx PATH "%PATH%;{0}"
         <note />
       </trans-unit>
       <trans-unit id="FailedToReadNuGetLockFile">
-        <source>Failed to read NuGet LockFile for tool package '{0}': {1}.</source>
-        <target state="new">Failed to read NuGet LockFile for tool package '{0}': {1}.</target>
+        <source>Failed to read NuGet LockFile for tool package '{0}': {1}</source>
+        <target state="new">Failed to read NuGet LockFile for tool package '{0}': {1}</target>
         <note />
       </trans-unit>
     </body>
