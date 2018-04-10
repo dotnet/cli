@@ -303,6 +303,28 @@ combine_paths() {
     return 0
 }
 
+get_machine_architecture() {
+    eval $invocation
+
+    if command -v uname > /dev/null; then
+        CPUName=$(uname -m)
+        case $CPUName in
+        armv7l)
+            echo "arm"
+            return 0
+            ;;
+        aarch64)
+            echo "arm64"
+            return 0
+            ;;
+        esac
+    fi
+
+    # Always default to 'x64'
+    echo "x64"
+    return 0
+}
+
 # args:
 # architecture - $1
 get_normalized_architecture_from_architecture() {
@@ -310,15 +332,19 @@ get_normalized_architecture_from_architecture() {
 
     local architecture="$(to_lowercase "$1")"
     case "$architecture" in
+        \<auto\>)
+            echo "$(get_normalized_architecture_from_architecture "$(get_machine_architecture)")"
+            return 0
+            ;;
         amd64|x64)
             echo "x64"
             return 0
             ;;
-         arm|arm32)
+        arm)
             echo "arm"
             return 0
             ;;
-         arm64)
+        arm64)
             echo "arm64"
             return 0
             ;;
@@ -776,7 +802,7 @@ temporary_file_template="${TMPDIR:-/tmp}/dotnet.XXXXXXXXX"
 channel="LTS"
 version="Latest"
 install_dir="<auto>"
-architecture="x64"
+architecture="<auto>"
 dry_run=false
 no_path=false
 azure_feed="https://dotnetcli.azureedge.net/dotnet"
