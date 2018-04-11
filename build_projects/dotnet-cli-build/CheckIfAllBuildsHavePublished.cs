@@ -71,7 +71,7 @@ namespace Microsoft.DotNet.Cli.Build
                 string name = Path.GetFileName(file);
                 foreach (string img in badges.Keys)
                 {
-                    if ((name.StartsWith($"{string.Concat(img, "_")}")) && (name.EndsWith(".svg")))
+                    if ((name.StartsWith($"{img}_")) && (name.EndsWith(".svg")))
                     {
                         badges[img] = true;
                         break;
