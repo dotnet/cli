@@ -21,6 +21,8 @@ namespace Microsoft.DotNet.Cli.Utils
 
         private bool _running = false;
 
+        private static string[] _knownCommandsAvailableAsDotNetTool = new[] { "dotnet-dev-certs", "dotnet-ef", "dotnet-sql-cache", "dotnet-user-secrets", "dotnet-watch" };
+
         private Command(CommandSpec commandSpec)
         {
             var psi = new ProcessStartInfo
@@ -100,7 +102,11 @@ namespace Microsoft.DotNet.Cli.Utils
                 outputPath: outputPath,
                 applicationName: applicationName);
 
-            if (commandSpec == null)
+            if (_knownCommandsAvailableAsDotNetTool.Contains(commandName, StringComparer.InvariantCultureIgnoreCase) && commandSpec == null)
+            {
+                throw new CommandAvailableAsDotNetToolException(commandName);
+            }
+            else if (commandSpec == null)
             {
                 throw new CommandUnknownException(commandName);
             }
