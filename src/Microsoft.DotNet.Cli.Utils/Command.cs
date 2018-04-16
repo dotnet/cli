@@ -102,13 +102,16 @@ namespace Microsoft.DotNet.Cli.Utils
                 outputPath: outputPath,
                 applicationName: applicationName);
 
-            if (_knownCommandsAvailableAsDotNetTool.Contains(commandName, StringComparer.InvariantCultureIgnoreCase) && commandSpec == null)
+            if (commandSpec == null)
             {
-                throw new CommandAvailableAsDotNetToolException(commandName);
-            }
-            else if (commandSpec == null)
-            {
-                throw new CommandUnknownException(commandName);
+                if (_knownCommandsAvailableAsDotNetTool.Contains(commandName, StringComparer.OrdinalIgnoreCase))
+                {
+                    throw new CommandAvailableAsDotNetToolException(commandName);
+                }
+                else
+                {
+                    throw new CommandUnknownException(commandName);
+                }
             }
 
             var command = new Command(commandSpec);
