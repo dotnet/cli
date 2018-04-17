@@ -96,6 +96,7 @@
     </ItemGroup>
   </Target>
 
+  
   <Target Name="SignMsiAndCab" DependsOnTargets="GetSignMsiAndCabFiles;SignFiles" />
 
   <Target Name="GetSignMsiAndCabFiles">
@@ -104,6 +105,10 @@
         <Authenticode>$(InternalCertificateId)</Authenticode>
       </FilesToSign>
       <FilesToSign Include="$(PackagesDirectory)/**/*.cab">
+        <Authenticode>$(InternalCertificateId)</Authenticode>
+      </FilesToSign>
+      <FilesToSign Include="$(PackagesDirectory)/**/*.nupkg"
+                   Exclude="$(PackagesDirectory)/**/*symbols.nupkg">
         <Authenticode>$(InternalCertificateId)</Authenticode>
       </FilesToSign>
     </ItemGroup>
