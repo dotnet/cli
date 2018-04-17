@@ -6,7 +6,7 @@
          property here to avoid importing files we don't need for signing which would cause errors if imported when using MSBuild 14. -->
     <BuildingSigningProject>true</BuildingSigningProject>
     <ExternalCertificateId Condition="'$(ExternalCertificateId)' == ''">135020001</ExternalCertificateId>
-    <InternalCertificateId Condition="'$(InternalCertificateId)' == ''">402</InternalCertificateId>
+    <InternalCertificateId Condition="'$(InternalCertificateId)' == ''">Microsoft402</InternalCertificateId>
     <NugetCertificateId Condition="'$(NugetCertificateId)' == ''">NuGet</NugetCertificateId>
   </PropertyGroup>
   
