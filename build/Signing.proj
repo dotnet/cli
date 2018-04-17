@@ -95,7 +95,7 @@
       </FilesToSign>
     </ItemGroup>
   </Target>
-  
+ 
   <Target Name="SignMsiAndCab" DependsOnTargets="GetSignMsiAndCabFiles;SignFiles" />
 
   <Target Name="GetSignMsiAndCabFiles">
