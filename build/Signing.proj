@@ -5,6 +5,9 @@
     <!-- The signing infrastructure runs using MSBuild 14, which doesn't support some of the new syntax we're using.  So set the BuildingSingingProject
          property here to avoid importing files we don't need for signing which would cause errors if imported when using MSBuild 14. -->
     <BuildingSigningProject>true</BuildingSigningProject>
+    <ExternalCertificateId Condition="'$(ExternalCertificateId)' == ''">135020001</ExternalCertificateId>
+    <InternalCertificateId Condition="'$(InternalCertificateId)' == ''">402</InternalCertificateId>
+    <NugetCertificateId Condition="'$(NugetCertificateId)' == ''">NuGet</NugetCertificateId>
   </PropertyGroup>
   
   <Import Project="..\dir.props" />
@@ -108,7 +111,7 @@
       </FilesToSign>
       <FilesToSign Include="$(PackagesDirectory)/**/*.nupkg"
                    Exclude="$(PackagesDirectory)/**/*symbols.nupkg">
-        <Authenticode>$(InternalCertificateId)</Authenticode>
+        <Authenticode>$(NugetCertificateId)</Authenticode>
       </FilesToSign>
     </ItemGroup>
   </Target>
