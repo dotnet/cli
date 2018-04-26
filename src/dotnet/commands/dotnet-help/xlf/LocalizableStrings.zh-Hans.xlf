@@ -259,7 +259,7 @@
       </trans-unit>
       <trans-unit id="BuildServerDefinition">
         <source>Interact with servers started by a build.</source>
-        <target state="new">Interact with servers started by a build.</target>
+        <target state="translated">与由生成版本启动的服务器进行交互。</target>
         <note />
       </trans-unit>
     </body>

@@ -116,16 +116,16 @@ Pomyślnie zainstalowano narzędzie „{1}” (wersja: „{2}”).</target>
       </trans-unit>
       <trans-unit id="ToolInstallationFailed">
         <source>Tool '{0}' failed to install.</source>
-        <target state="new">Tool '{0}' failed to install.</target>
+        <target state="translated">Zainstalowanie narzędzia „{0}” nie powiodło się.</target>
         <note />
       </trans-unit>
       <trans-unit id="ToolInstallationFailedWithExplicitVersionGuide">
         <source>Tool '{0}' failed to install. You may need to specify the version using
 
    dotnet tool install -g {0} --version &lt;version&gt;</source>
-        <target state="new">Tool '{0}' failed to install. You may need to specify the version using
+        <target state="translated">Zainstalowanie narzędzia „{0}” nie powiodło się. Może być konieczne określenie wersji za pomocą polecenia
 
-   dotnet tool install -g {0} --version &lt;version&gt;</target>
+   dotnet tool install -g {0} --version &lt;wersja&gt;</target>
         <note />
       </trans-unit>
     </body>

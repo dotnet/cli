@@ -116,16 +116,16 @@ Tool '{1}' (version '{2}') was successfully installed.</source>
       </trans-unit>
       <trans-unit id="ToolInstallationFailed">
         <source>Tool '{0}' failed to install.</source>
-        <target state="new">Tool '{0}' failed to install.</target>
+        <target state="translated">'{0}' 도구를 설치하지 못했습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="ToolInstallationFailedWithExplicitVersionGuide">
         <source>Tool '{0}' failed to install. You may need to specify the version using
 
    dotnet tool install -g {0} --version &lt;version&gt;</source>
-        <target state="new">Tool '{0}' failed to install. You may need to specify the version using
+        <target state="translated">'{0}' 도구를 설치하지 못했습니다.
 
-   dotnet tool install -g {0} --version &lt;version&gt;</target>
+   dotnet tool install -g {0} --version &lt;버전&gt;을 사용하여 버전을 지정해야 합니다.</target>
         <note />
       </trans-unit>
     </body>

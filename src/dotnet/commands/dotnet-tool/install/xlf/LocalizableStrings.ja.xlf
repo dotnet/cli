@@ -116,14 +116,14 @@ Tool '{1}' (version '{2}') was successfully installed.</source>
       </trans-unit>
       <trans-unit id="ToolInstallationFailed">
         <source>Tool '{0}' failed to install.</source>
-        <target state="new">Tool '{0}' failed to install.</target>
+        <target state="translated">ツール '{0}' をインストールできませんでした。</target>
         <note />
       </trans-unit>
       <trans-unit id="ToolInstallationFailedWithExplicitVersionGuide">
         <source>Tool '{0}' failed to install. You may need to specify the version using
 
    dotnet tool install -g {0} --version &lt;version&gt;</source>
-        <target state="new">Tool '{0}' failed to install. You may need to specify the version using
+        <target state="translated">ツール '{0}' をインストールできませんでした。次を使用して、バージョンを指定しなければならない可能性があります。
 
    dotnet tool install -g {0} --version &lt;version&gt;</target>
         <note />
