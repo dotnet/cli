@@ -116,14 +116,14 @@ A ferramenta '{1}' (versão '{2}') foi instalada com êxito.</target>
       </trans-unit>
       <trans-unit id="ToolInstallationFailed">
         <source>Tool '{0}' failed to install.</source>
-        <target state="new">Tool '{0}' failed to install.</target>
+        <target state="translated">Não foi possível instalar a ferramenta '{0}'.</target>
         <note />
       </trans-unit>
       <trans-unit id="ToolInstallationFailedWithExplicitVersionGuide">
         <source>Tool '{0}' failed to install. You may need to specify the version using
 
    dotnet tool install -g {0} --version &lt;version&gt;</source>
-        <target state="new">Tool '{0}' failed to install. You may need to specify the version using
+        <target state="translated">A ferramenta '{0}' falhou ao ser instalada. Pode ser necessário especificar a versão usando
 
    dotnet tool install -g {0} --version &lt;version&gt;</target>
         <note />

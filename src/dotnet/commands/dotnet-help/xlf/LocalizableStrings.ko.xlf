@@ -259,7 +259,7 @@
       </trans-unit>
       <trans-unit id="BuildServerDefinition">
         <source>Interact with servers started by a build.</source>
-        <target state="new">Interact with servers started by a build.</target>
+        <target state="translated">빌드에 의해 서버와 상호 작용이 시작되었습니다.</target>
         <note />
       </trans-unit>
     </body>
