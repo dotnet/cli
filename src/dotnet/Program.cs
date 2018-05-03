@@ -37,6 +37,8 @@ namespace Microsoft.DotNet.Cli
                 PerfTrace.Enabled = true;
             }
 
+            InitializeEnvironment();
+
             InitializeProcess();
 
             try
@@ -250,6 +252,27 @@ namespace Microsoft.DotNet.Cli
                     environmentPath);
 
                 dotnetConfigurer.Configure();
+            }
+        }
+
+        internal static void InitializeEnvironment()
+            => InitializeEnvironment(new EnvironmentProvider());
+
+        internal static void InitializeEnvironment(IEnvironmentProvider env)
+        {
+            var dotnetRootEnv = env.Is64BitProcess
+                ? "DOTNET_ROOT"
+                : "DOTNET_ROOT(x86)";
+
+            try
+            {
+                var rootPath = Path.GetDirectoryName(new Muxer().MuxerPath);
+                env.SetEnvironmentVariable(dotnetRootEnv, rootPath, EnvironmentVariableTarget.Process);
+            }
+            catch
+            {
+                // swallow and ignore in the event MuxerPath throws because it cannot find dotnet.exe
+                return;
             }
         }
 

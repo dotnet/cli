@@ -35,6 +35,8 @@ namespace Microsoft.DotNet.Cli.Utils
             }
         }
 
+        public bool Is64BitProcess => Environment.Is64BitProcess;
+
         private IEnumerable<string> SearchPaths
         {
             get
