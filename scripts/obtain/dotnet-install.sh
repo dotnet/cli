@@ -140,7 +140,7 @@ get_linux_platform_name() {
             return 0
         elif [ -e /etc/redhat-release ]; then
             local redhatRelease=$(</etc/redhat-release)
-            if [[ $redhatRelease == "CentOS release 6."* || $redhatRelease == "Red Hat Enterprise Linux Server release 6."* ]]; then
+            if [[ "$redhatRelease" == "CentOS release 6."* || "$redhatRelease" == "Red Hat Enterprise Linux Server release 6."* ]]; then
                 echo "rhel.6"
                 return 0
             fi
@@ -162,10 +162,10 @@ get_current_os_name() {
         local linux_platform_name
         linux_platform_name="$(get_linux_platform_name)" || { echo "linux" && return 0 ; }
 
-        if [[ $linux_platform_name == "rhel.6" ]]; then
+        if [[ "$linux_platform_name" == "rhel.6" ]]; then
             echo $linux_platform_name
             return 0
-        elif [[ $linux_platform_name == alpine* ]]; then
+        elif [[ "$linux_platform_name" == "alpine"* ]]; then
             echo "linux-musl"
             return 0
         else
@@ -400,15 +400,13 @@ is_dotnet_package_installed() {
 # args:
 # azure_feed - $1
 # channel - $2
-# normalized_architecture - $3
-# coherent - $4
+# coherent - $3
 get_latest_version_info() {
     eval $invocation
 
     local azure_feed="$1"
     local channel="$2"
-    local normalized_architecture="$3"
-    local coherent="$4"
+    local coherent="$3"
 
     local version_file_url=null
     if [[ "$runtime" == "dotnet" ]]; then
@@ -434,27 +432,25 @@ get_latest_version_info() {
 # args:
 # azure_feed - $1
 # channel - $2
-# normalized_architecture - $3
-# version - $4
+# version - $3
 get_specific_version_from_version() {
     eval $invocation
 
     local azure_feed="$1"
     local channel="$2"
-    local normalized_architecture="$3"
-    local version="$(to_lowercase "$4")"
+    local version="$(to_lowercase "$3")"
 
     case "$version" in
         latest)
             local version_info
-            version_info="$(get_latest_version_info "$azure_feed" "$channel" "$normalized_architecture" false)" || return 1
+            version_info="$(get_latest_version_info "$azure_feed" "$channel" false)" || return 1
             say_verbose "get_specific_version_from_version: version_info=$version_info"
             echo "$version_info" | get_version_from_version_info
             return 0
             ;;
         coherent)
             local version_info
-            version_info="$(get_latest_version_info "$azure_feed" "$channel" "$normalized_architecture" true)" || return 1
+            version_info="$(get_latest_version_info "$azure_feed" "$channel" true)" || return 1
             say_verbose "get_specific_version_from_version: version_info=$version_info"
             echo "$version_info" | get_version_from_version_info
             return 0
@@ -469,18 +465,21 @@ get_specific_version_from_version() {
 # args:
 # azure_feed - $1
 # channel - $2
-# normalized_architecture - $3
-# specific_version - $4
+# osname - $3
+# normalized_architecture - $4
+# specific_version - $5
 construct_download_link() {
     eval $invocation
 
     local azure_feed="$1"
     local channel="$2"
-    local normalized_architecture="$3"
-    local specific_version="${4//[$'\t\r\n']}"
+    local osname="$3"
+    local normalized_architecture="$4"
+    local specific_version="${5//[$'\t\r\n']}"
 
-    local osname
-    osname="$(get_current_os_name)" || return 1
+    if [ "$osname" = "<auto>" ]; then
+        osname="$(get_current_os_name)" || return 1
+    fi
 
     local download_link=null
     if [[ "$runtime" == "dotnet" ]]; then
@@ -500,24 +499,27 @@ construct_download_link() {
 # args:
 # azure_feed - $1
 # channel - $2
-# normalized_architecture - $3
-# specific_version - $4
+# osname - $3
+# normalized_architecture - $4
+# specific_version - $5
 construct_legacy_download_link() {
     eval $invocation
 
     local azure_feed="$1"
     local channel="$2"
-    local normalized_architecture="$3"
-    local specific_version="${4//[$'\t\r\n']}"
+    local osname="$3"
+    local normalized_architecture="$4"
+    local specific_version="${5//[$'\t\r\n']}"
 
-    local distro_specific_osname
-    distro_specific_osname="$(get_legacy_os_name)" || return 1
+    if [ "$osname" = "<auto>" ]; then
+        osname="$(get_legacy_os_name)" || return 1
+    fi
 
     local legacy_download_link=null
     if [[ "$runtime" == "dotnet" ]]; then
-        legacy_download_link="$azure_feed/Runtime/$specific_version/dotnet-$distro_specific_osname-$normalized_architecture.$specific_version.tar.gz"
+        legacy_download_link="$azure_feed/Runtime/$specific_version/dotnet-$osname-$normalized_architecture.$specific_version.tar.gz"
     elif [ -z "$runtime" ]; then
-        legacy_download_link="$azure_feed/Sdk/$specific_version/dotnet-dev-$distro_specific_osname-$normalized_architecture.$specific_version.tar.gz"
+        legacy_download_link="$azure_feed/Sdk/$specific_version/dotnet-dev-$osname-$normalized_architecture.$specific_version.tar.gz"
     else
         return 1
     fi
@@ -712,17 +714,17 @@ calculate_vars() {
     normalized_architecture="$(get_normalized_architecture_from_architecture "$architecture")"
     say_verbose "normalized_architecture=$normalized_architecture"
 
-    specific_version="$(get_specific_version_from_version "$azure_feed" "$channel" "$normalized_architecture" "$version")"
+    specific_version="$(get_specific_version_from_version "$azure_feed" "$channel" "$version")"
     say_verbose "specific_version=$specific_version"
     if [ -z "$specific_version" ]; then
         say_err "Could not get version information."
         return 1
     fi
 
-    download_link="$(construct_download_link "$azure_feed" "$channel" "$normalized_architecture" "$specific_version")"
+    download_link="$(construct_download_link "$azure_feed" "$channel" "$osname" "$normalized_architecture" "$specific_version")"
     say_verbose "download_link=$download_link"
 
-    legacy_download_link="$(construct_legacy_download_link "$azure_feed" "$channel" "$normalized_architecture" "$specific_version")" || valid_legacy_download_link=false
+    legacy_download_link="$(construct_legacy_download_link "$azure_feed" "$channel" "$osname" "$normalized_architecture" "$specific_version")" || valid_legacy_download_link=false
 
     if [ "$valid_legacy_download_link" = true ]; then
         say_verbose "legacy_download_link=$legacy_download_link"
@@ -801,6 +803,7 @@ temporary_file_template="${TMPDIR:-/tmp}/dotnet.XXXXXXXXX"
 channel="LTS"
 version="Latest"
 install_dir="<auto>"
+osname="<auto>"
 architecture="<auto>"
 dry_run=false
 no_path=false
@@ -831,6 +834,10 @@ do
         --arch|--architecture|-[Aa]rch|-[Aa]rchitecture)
             shift
             architecture="$1"
+            ;;
+        --osname|-[Oo][Ss][Nn]ame)
+            shift
+            osname="$1"
             ;;
         --shared-runtime|-[Ss]hared[Rr]untime)
             say_warning "The --shared-runtime flag is obsolete and may be removed in a future version of this script. The recommended usage is to specify '--runtime dotnet'."
