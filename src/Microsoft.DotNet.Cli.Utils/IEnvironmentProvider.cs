@@ -23,5 +23,7 @@ namespace Microsoft.DotNet.Cli.Utils
         string GetEnvironmentVariable(string variable, EnvironmentVariableTarget target);
 
         void SetEnvironmentVariable(string variable, string value, EnvironmentVariableTarget target);
+
+        bool Is64BitProcess { get; }
     }
 }
