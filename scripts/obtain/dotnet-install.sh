@@ -835,7 +835,7 @@ do
             shift
             architecture="$1"
             ;;
-        --osname|-[Oo][Ss][Nn]ame)
+        --ridosname|-[Rr][Ii][Dd][Oo][Ss][Nn]ame)
             shift
             osname="$1"
             ;;
