@@ -40,19 +40,19 @@ namespace Microsoft.DotNet.Cli
                   Create.Option(
                         "-a|--test-adapter-path",
                         LocalizableStrings.CmdTestAdapterPathDescription,
-                        Accept.ExactlyOneArgument()
+                        Accept.OneOrMoreArguments()
                               .With(name: LocalizableStrings.CmdTestAdapterPath)
-                              .ForwardAsSingle(o => $"-property:VSTestTestAdapterPath={o.Arguments.Single()}")),
+                              .ForwardAsSingle(o => $"/p:VSTestTestAdapterPath=\"{string.Join(";", o.Arguments)}\"")),
                   Create.Option(
                         "-l|--logger",
                         LocalizableStrings.CmdLoggerDescription,
-                        Accept.ExactlyOneArgument()
+                        Accept.OneOrMoreArguments()
                               .With(name: LocalizableStrings.CmdLoggerOption)
                               .ForwardAsSingle(o =>
                                     {
                                           var loggersString = string.Join(";", GetSemiColonEscapedArgs(o.Arguments));
 
-                                          return $"-property:VSTestLogger={loggersString}";
+                                        return $"/p:VSTestLogger=\"{loggersString}\"";
                                     })),
                   CommonOptions.ConfigurationOption(),
                   CommonOptions.FrameworkOption(),
