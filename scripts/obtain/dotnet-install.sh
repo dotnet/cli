@@ -79,12 +79,12 @@ get_legacy_os_name_from_platform() {
             echo "fedora.23"
             return 0
             ;;
-        "fedora.27")
-            echo "fedora.27"
-            return 0
-            ;;
         "fedora.24")
             echo "fedora.24"
+            return 0
+            ;;
+        "fedora.27")
+            echo "fedora.27"
             return 0
             ;;
         "opensuse.13.2")
@@ -825,7 +825,7 @@ do
             ;;
         -v|--version|-[Vv]ersion)
             shift
-            version="$1"
+            version="$(to_lowercase "$1")"
             ;;
         -i|--install-dir|-[Ii]nstall[Dd]ir)
             shift
@@ -833,11 +833,11 @@ do
             ;;
         --arch|--architecture|-[Aa]rch|-[Aa]rchitecture)
             shift
-            architecture="$1"
+            architecture="$(to_lowercase "$1")"
             ;;
         --ridosname|-[Rr][Ii][Dd][Oo][Ss][Nn]ame)
             shift
-            osname="$1"
+            osname="$(to_lowercase "$1")"
             ;;
         --shared-runtime|-[Ss]hared[Rr]untime)
             say_warning "The --shared-runtime flag is obsolete and may be removed in a future version of this script. The recommended usage is to specify '--runtime dotnet'."
@@ -876,7 +876,7 @@ do
             ;;
         --runtime-id|-[Rr]untime[Ii]d)
             shift
-            runtime_id="$1"
+            runtime_id="$(to_lowercase "$1")"
             ;;
         --skip-non-versioned-files|-[Ss]kip[Nn]on[Vv]ersioned[Ff]iles)
             override_non_versioned_files=false
