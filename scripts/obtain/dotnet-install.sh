@@ -835,6 +835,8 @@ do
             shift
             architecture="$(to_lowercase "$1")"
             ;;
+        # RIDOSName is an unsupported parameter - use at your own peril.
+        # Using RIDOSName could cause an unstable mis-matched installation.
         --ridosname|-[Rr][Ii][Dd][Oo][Ss][Nn]ame)
             shift
             osname="$(to_lowercase "$1")"
