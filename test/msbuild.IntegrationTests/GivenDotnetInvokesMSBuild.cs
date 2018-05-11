@@ -86,7 +86,7 @@ namespace Microsoft.DotNet.Cli.MSBuild.IntegrationTests
                 .ExecuteWithCapturedOutput("test");
 
             cmd.Should().Pass();
-            cmd.StdOut.Should().Contain("Message with normal importance");
+            cmd.StdOut.Should().Contain("Message with high importance");
         }
 
         [Fact]
