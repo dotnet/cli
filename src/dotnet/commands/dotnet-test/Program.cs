@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.Tools.Test
             var msbuildArgs = new List<string>()
             {
                 "-target:VSTest",
-                "-verbosity:minimal",
+                "-verbosity:quiet",
                 "-nodereuse:false", // workaround for https://github.com/Microsoft/vstest/issues/1503
                 "-nologo"
             };

@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.Cli.MSBuild.IntegrationTests
         }
 
         [Fact]
-        public void When_dotnet_test_invokes_msbuild_with_no_args_verbosity_is_set_to_mininal()
+        public void When_dotnet_test_invokes_msbuild_with_no_args_verbosity_is_set_to_quiet()
         {
             var testInstance = TestAssets.Get("MSBuildIntegration")
                 .CreateInstance()
@@ -86,7 +86,7 @@ namespace Microsoft.DotNet.Cli.MSBuild.IntegrationTests
                 .ExecuteWithCapturedOutput("test");
 
             cmd.Should().Pass();
-            cmd.StdOut.Should().Contain("Message with high importance");
+            cmd.StdOut.Should().NotContain("Message with high importance");
         }
 
         [Fact]
