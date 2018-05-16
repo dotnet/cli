@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.Cli
                         LocalizableStrings.CmdTestAdapterPathDescription,
                         Accept.OneOrMoreArguments()
                               .With(name: LocalizableStrings.CmdTestAdapterPath)
-                              .ForwardAsSingle(o => $"/p:VSTestTestAdapterPath=\"{string.Join(";", o.Arguments)}\"")),
+                              .ForwardAsSingle(o => $"-property:VSTestTestAdapterPath=\"{string.Join(";", o.Arguments)}\"")),
                   Create.Option(
                         "-l|--logger",
                         LocalizableStrings.CmdLoggerDescription,
@@ -52,7 +52,7 @@ namespace Microsoft.DotNet.Cli
                                     {
                                           var loggersString = string.Join(";", GetSemiColonEscapedArgs(o.Arguments));
 
-                                        return $"/p:VSTestLogger=\"{loggersString}\"";
+                                        return $"-property:VSTestLogger=\"{loggersString}\"";
                                     })),
                   CommonOptions.ConfigurationOption(),
                   CommonOptions.FrameworkOption(),
