@@ -69,7 +69,7 @@
       "allowOverride": true
     },
     "BuildArguments": {
-      "value": "--skip-prereqs --configuration $(BuildConfiguration)  --docker opensuse.13.2 --targets Default /p:BranchName=sandbox",
+      "value": "--skip-prereqs --configuration $(BuildConfiguration)  --docker fedora.24 --targets Default /p:BranchName=sandbox",
       "allowOverride": true
     },
     "CONNECTION_STRING": {
@@ -144,7 +144,7 @@
     "type": "GitHub",
     "name": "dotnet/cli",
     "url": "https://github.com/dotnet/cli.git",
-    "defaultBranch": "rel/1.1.0",
+    "defaultBranch": "rel/1.1.1",
     "clean": "true",
     "checkoutSubmodules": false
   },
@@ -160,7 +160,7 @@
   "path": "\\",
   "type": "build",
   "id": 1,
-  "name": "DotNet-CLI-opensuse13.2-x64",
+  "name": "Dotnet-CLI-Fedora24-x64",
   "project": {
     "id": "0bdbc590-a062-4c3f-b0f6-9383f67865ee",
     "name": "DevDiv",

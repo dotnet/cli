@@ -1,8 +1,12 @@
-FROM fedora:24
+#
+# Copyright (c) .NET Foundation and contributors. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
 
-RUN dnf install -y bash git cmake wget which python clang-3.8.0-1.fc24.x86_64 llvm-devel-3.8.0-1.fc24.x86_64 make libicu-devel lldb-devel.x86_64 \
-                   libunwind-devel.x86_64 lttng-ust-devel.x86_64 uuid-devel libuuid-devel tar glibc-locale-source zlib-devel libcurl-devel \
-                   krb5-devel openssl-devel autoconf libtool hostname
+# Dockerfile that creates a container suitable to build dotnet-cli
+FROM microsoft/dotnet-buildtools-prereqs:fedora-27-82a3800-20180326211504
+
+RUN dnf install -y findutils
 
 RUN dnf upgrade -y nss
 

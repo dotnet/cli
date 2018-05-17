@@ -8,6 +8,7 @@ FROM microsoft/dotnet-buildtools-prereqs:opensuse132_prereqs_v4
 RUN zypper -n install sudo \
     ncurses-utils && \
     zypper clean -a
+
 # Setup User to match Host User, and give superuser permissions
 ARG USER_ID=0
 RUN useradd -m code_executor -u ${USER_ID} -g wheel

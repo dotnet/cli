@@ -406,7 +406,7 @@ namespace Microsoft.DotNet.Migration.Tests
                 "The 'resourceFiles' option is deprecated. Use 'embed' in 'buildOptions' instead.");
         }
 
-        [Fact]
+        [RequiresSpecificFrameworkFact("netcoreapp1.0")]
         public void MigratingDeprecatedResource()
         {
             var projectDirectory = TestAssets
@@ -464,7 +464,7 @@ namespace Microsoft.DotNet.Migration.Tests
                 "The 'resourceBuiltIn' option is deprecated. Use 'embed' in 'buildOptions' instead.");
         }
 
-        [Fact]
+        [RequiresSpecificFrameworkFact("netcoreapp1.0")]
         public void MigratingDeprecatedResourceBuiltIn()
         {
             var projectDirectory = TestAssets
@@ -522,7 +522,7 @@ namespace Microsoft.DotNet.Migration.Tests
                 "The 'resourceExclude' option is deprecated. Use 'embed' in 'buildOptions' instead.");
         }
 
-        [Fact]
+        [RequiresSpecificFrameworkFact("netcoreapp1.0")]
         public void MigratingDeprecatedResourceExclude()
         {
             var projectDirectory = TestAssets

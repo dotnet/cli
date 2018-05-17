@@ -69,7 +69,7 @@
       "allowOverride": true
     },
     "BuildArguments": {
-      "value": "--skip-prereqs --configuration $(BuildConfiguration)  --docker opensuse.13.2 --targets Default /p:BranchName=sandbox",
+      "value": "--skip-prereqs --configuration $(BuildConfiguration) --docker ubuntu.18.04 --targets Default /p:BranchName=sandbox /p:SkipPublishToDebianRepo=true",
       "allowOverride": true
     },
     "CONNECTION_STRING": {
@@ -78,6 +78,18 @@
     "PUBLISH_TO_AZURE_BLOB": {
       "value": "true",
       "allowOverride": true
+    },
+    "REPO_ID": {
+      "value": "562fbfe0b2d7d0e0a43780c4"
+    },
+    "REPO_USER": {
+      "value": "dotnet"
+    },
+    "REPO_PASS": {
+      "value": "PassedViaPipeBuild"
+    },
+    "REPO_SERVER": {
+      "value": "azure-apt-cat.cloudapp.net"
     },
     "GITHUB_PASSWORD": {
       "value": "PassedViaPipeBuild"
@@ -99,10 +111,6 @@
     },
     "CHECKSUM_STORAGE_CONTAINER": {
       "value": "mlorbe"
-    },
-    "CLIBUILD_SKIP_TESTS": {
-      "value": "true",
-      "allowOverride": true
     }
   },
   "demands": [
@@ -144,7 +152,7 @@
     "type": "GitHub",
     "name": "dotnet/cli",
     "url": "https://github.com/dotnet/cli.git",
-    "defaultBranch": "rel/1.1.0",
+    "defaultBranch": "rel/1.1.1",
     "clean": "true",
     "checkoutSubmodules": false
   },
@@ -160,7 +168,7 @@
   "path": "\\",
   "type": "build",
   "id": 1,
-  "name": "DotNet-CLI-opensuse13.2-x64",
+  "name": "Dotnet-CLI-Ubuntu18.04-x64",
   "project": {
     "id": "0bdbc590-a062-4c3f-b0f6-9383f67865ee",
     "name": "DevDiv",

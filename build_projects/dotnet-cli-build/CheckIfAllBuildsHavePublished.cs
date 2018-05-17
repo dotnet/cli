@@ -50,11 +50,15 @@ namespace Microsoft.DotNet.Cli.Build
                 { "Windows_x64", false },
                 { "Ubuntu_x64", false },
                 { "Ubuntu_16_04_x64", false },
+                { "Ubuntu_18_04_x64", false },
                 { "RHEL_x64", false },
                 { "OSX_x64", false },
                 { "Debian_x64", false },
                 { "CentOS_x64", false },
-                { "Fedora_24_x64", false }
+                { "Fedora_24_x64", false },
+                { "Fedora_27_x64", false },
+                { "Fedora_28_x64", false },
+                { "openSUSE_42_3_x64", false }
             };
 
             var versionBadgeName = $"{Monikers.GetBadgeMoniker()}";

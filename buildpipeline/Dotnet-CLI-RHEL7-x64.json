@@ -162,7 +162,7 @@
     "type": "GitHub",
     "name": "dotnet/cli",
     "url": "https://github.com/dotnet/cli.git",
-    "defaultBranch": "rel/1.0.0",
+    "defaultBranch": "rel/1.1.0",
     "clean": "true",
     "checkoutSubmodules": false
   },

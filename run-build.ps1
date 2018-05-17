@@ -48,7 +48,7 @@ cat "$RepoRoot\branchinfo.txt" | ForEach-Object {
     }
 }
 
-# Use a repo-local install directory (but not the artifacts directory because that gets cleaned a lot
+# Create a stage0 PJ install directory
 if (!$env:DOTNET_INSTALL_DIR_PJ)
 {
     $env:DOTNET_INSTALL_DIR_PJ="$RepoRoot\.dotnet_stage0PJ\$Architecture"
@@ -77,40 +77,25 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 $env:VSTEST_BUILD_TRACE=1
 $env:VSTEST_TRACE_BUILD=1
 
-# set the base tools directory
-$toolsLocalPath = Join-Path $PSScriptRoot "build_tools"
-$bootStrapperPath = Join-Path $toolsLocalPath "bootstrap.ps1"
-# if the boot-strapper script doesn't exist then download it
-if ((Test-Path $bootStrapperPath) -eq 0)
-{
-    if ((Test-Path $toolsLocalPath) -eq 0)
-    {
-        mkdir $toolsLocalPath | Out-Null
-    }
+$dotnetInstallPath = Join-Path $RepoRoot "scripts\obtain\dotnet-install.ps1"
 
-    # download boot-strapper script
-    Invoke-WebRequest "https://raw.githubusercontent.com/dotnet/buildtools/master/bootstrap/bootstrap.ps1" -OutFile $bootStrapperPath
-}
-
-# now execute it
-& $bootStrapperPath -RepositoryRoot (Get-Location) -ToolsLocalPath $toolsLocalPath -CliLocalPath $env:DOTNET_INSTALL_DIR_PJ -Architecture $Architecture | Out-File (Join-Path (Get-Location) "bootstrap.log")
+# install the stage0PJ
+Write-Host "$dotnetInstallPath -Version ""1.0.0-preview3-003223""  -InstallDir $env:DOTNET_INSTALL_DIR_PJ -Architecture ""$Architecture"""
+Invoke-Expression "$dotnetInstallPath -Version ""1.0.0-preview3-003223"" -InstallDir $env:DOTNET_INSTALL_DIR_PJ -Architecture ""$Architecture"""
 if ($LastExitCode -ne 0)
 {
-    Write-Output "Boot-strapping failed with exit code $LastExitCode, see bootstrap.log for more information."
+    Write-Output "The .NET CLI stage0PJ installation failed with exit code $LastExitCode"
     exit $LastExitCode
 }
 
 # install the post-PJnistic stage0
-$dotnetInstallPath = Join-Path $toolsLocalPath "dotnet-install.ps1"
-
 Write-Host "$dotnetInstallPath -Version ""1.0.4""  -InstallDir $env:DOTNET_INSTALL_DIR -Architecture ""$Architecture"""
 Invoke-Expression "$dotnetInstallPath -Version ""1.0.4"" -InstallDir $env:DOTNET_INSTALL_DIR -Architecture ""$Architecture"""
 if ($LastExitCode -ne 0)
 {
-    Write-Output "The .NET CLI installation failed with exit code $LastExitCode"
+    Write-Output "The .NET CLI stage0 installation failed with exit code $LastExitCode"
     exit $LastExitCode
 }
-
 
 # Put the stage0 on the path
 $env:PATH = "$env:DOTNET_INSTALL_DIR;$env:PATH"

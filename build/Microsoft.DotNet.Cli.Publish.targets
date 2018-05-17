@@ -7,7 +7,7 @@
 
   <!-- PUBLISH_TO_AZURE_BLOB env variable set by CI -->
   <Target Name="Publish"
-          Condition=" '$(PUBLISH_TO_AZURE_BLOB)' != '' "
+          Condition=" '$(PUBLISH_TO_AZURE_BLOB)' == 'true' "
           DependsOnTargets="Init;
                             Package;
                             PublishArtifacts;
@@ -43,7 +43,8 @@
     <ItemGroup>
       <ForPublishing Include="@(GeneratedInstallers)" />
       <ForPublishing Include="%(GenerateArchivesInputsOutputs.Outputs)" />
-      <ForPublishing Include="$(PackagesDirectory)/Microsoft*.nupkg" Condition=" '$(PUBLISH_NUPKG_TO_AZURE_BLOB)' != '' " />
+      <ForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.Cli.Utils.*.nupkg"
+                     Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' "/>
       <ForPublishing Include="$(PackagesDirectory)/VS.Redist.Common.Net.Core.SDK.$(Architecture).*.nupkg"
                      Condition=" '$(OS)' == 'Windows_NT' "/>
       <ForPublishing Include="$(PackagesDirectory)/VS.Redist.Common.Net.Core.SDK.MSBuildExtensions.*.nupkg"

@@ -3,7 +3,8 @@
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 #
 
-FROM opensuse:42.1
+# Dockerfile that creates a container suitable to build dotnet-cli
+FROM microsoft/dotnet-buildtools-prereqs:opensuse-42.3-d46ee12-20180327014902
 
 # Install the base toolchain we need to build anything (clang, cmake, make and the like)
 # this does not include libraries that we need to compile different projects, we'd like
@@ -18,7 +19,6 @@ RUN zypper -n install binutils \
               curl \
               git \
               sudo && \
-    ln -s /usr/bin/clang++ /usr/bin/clang++-3.5 && \
     zypper clean -a
 
 # Dependencies of CoreCLR and CoreFX.
