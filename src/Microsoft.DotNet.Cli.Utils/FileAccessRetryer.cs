@@ -50,13 +50,14 @@ namespace Microsoft.DotNet.Cli.Utils
         }
 
         /// <summary>
-        /// Run Directory.Move and File.Move in Windows has a chance to get IOException with HResult 0x80070005. But this error is transient.
+        /// Run Directory.Move and File.Move in Windows has a chance to get IOException with
+        /// HResult 0x80070005 due to Indexer. But this error is transient.
         /// </summary>
         internal static void RetryOnMoveAccessFailure(Action action)
         {
             const int ERROR_HRESULT_ACCESS_DENIED = unchecked((int)0x80070005);
-            int nextWaitTime = 1000;
-            int remainRetry = 3;
+            int nextWaitTime = 10;
+            int remainRetry = 10;
 
             while (true)
             {
@@ -68,7 +69,7 @@ namespace Microsoft.DotNet.Cli.Utils
                 catch (IOException e) when (e.HResult == ERROR_HRESULT_ACCESS_DENIED)
                 {
                     Thread.Sleep(nextWaitTime);
-                    nextWaitTime *= 10;
+                    nextWaitTime *= 2;
                     remainRetry--;
                     if (remainRetry == 0)
                     {
