@@ -12,7 +12,6 @@ def isPR = true
 def platformList = [
   'CentOS7.1:x64:Debug',
   'Debian8.2:x64:Debug',
-  'Fedora24:x64:Release',
   'Fedora27:x64:Debug',
   'Fedora28:x64:Release',
   'OpenSUSE42.3:x64:Release',
@@ -44,6 +43,9 @@ platformList.each { platform ->
     if (os == 'Windows_NT') {
         buildCommand = ".\\build.cmd -Configuration ${configuration} -Architecture ${architecture} -Targets Default"
     }
+    else if (os == 'Windows_2016') {
+        buildCommand = ".\\build.cmd -Configuration ${configuration} -Architecture ${architecture} -RunInstallerTestsInDocker -Targets Default"
+-    }
     else if (os == 'OSX') {
         buildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --targets Default"
     }

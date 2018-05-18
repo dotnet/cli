@@ -32,9 +32,9 @@ This project has adopted the code of conduct defined by the [Contributor Covenan
 Build Status
 ------------
 
-|Ubuntu 14.04 |Ubuntu 16.04 |Ubuntu 18.04 |Debian 8.2 |Windows x64 |Windows x86 |Mac OS X |CentOS 7.1 |RHEL 7.2 |OpenSUSE 42.3 |Fedora 24 |Fedora 27 |Fedora 28 |
-|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|
-|[![][ubuntu-14.04-build-badge]][ubuntu-14.04-build]|[![][ubuntu-16.04-build-badge]][ubuntu-16.04-build]|[![][ubuntu-18.04-build-badge]][ubuntu-18.04-build]|[![][debian-8.2-build-badge]][debian-8.2-build]|[![][win-x64-build-badge]][win-x64-build]|[![][win-x86-build-badge]][win-x86-build]|[![][osx-build-badge]][osx-build]|[![][centos-build-badge]][centos-build]|[![][rhel-build-badge]][rhel-build]|[![][opensuse-42.3-build-badge]][opensuse-42.3-build]|[![][fedora-24-build-badge]][fedora-24-build]|[![][fedora-27-build-badge]][fedora-27-build]|[![][fedora-28-build-badge]][fedora-28-build]|
+|Ubuntu 14.04 |Ubuntu 16.04 |Ubuntu 18.04 |Debian 8.2 |Windows x64 |Windows x86 |Mac OS X |CentOS 7.1 |RHEL 7.2 |OpenSUSE 42.3 |Fedora 27 |Fedora 28 |
+|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|
+|[![][ubuntu-14.04-build-badge]][ubuntu-14.04-build]|[![][ubuntu-16.04-build-badge]][ubuntu-16.04-build]|[![][ubuntu-18.04-build-badge]][ubuntu-18.04-build]|[![][debian-8.2-build-badge]][debian-8.2-build]|[![][win-x64-build-badge]][win-x64-build]|[![][win-x86-build-badge]][win-x86-build]|[![][osx-build-badge]][osx-build]|[![][centos-build-badge]][centos-build]|[![][rhel-build-badge]][rhel-build]|[![][opensuse-42.3-build-badge]][opensuse-42.3-build]|[![][fedora-27-build-badge]][fedora-27-build]|[![][fedora-28-build-badge]][fedora-28-build]|
 
 [win-x64-build-badge]: https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/6940/badge
 [win-x64-build]: https://devdiv.visualstudio.com/DevDiv/_build?_a=completed&definitionId=6940
@@ -66,9 +66,6 @@ Build Status
 [opensuse-42.3-build-badge]: https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/9232/badge
 [opensuse-42.3-build]: https://devdiv.visualstudio.com/DevDiv/_build?_a=completed&definitionId=9232
 
-[fedora-24-build-badge]: https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/6924/badge
-[fedora-24-build]: https://devdiv.visualstudio.com/DevDiv/_build?_a=completed&definitionId=6924
-
 [fedora-27-build-badge]: https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/9229/badge
 [fedora-27-build]: https://devdiv.visualstudio.com/DevDiv/_build?_a=completed&definitionId=9229
 
@@ -97,7 +94,6 @@ In order to download just the .NET Core runtime without the SDK, please visit ht
 | **CentOS 7.1** | [tar.gz][centos-targz] - [Checksum][centos-targz-checksum] |
 | **RHEL 7.2** | [tar.gz][rhel-targz] - [Checksum][rhel-targz-checksum] |
 | **OpenSUSE 42.3** | [tar.gz][opensuse-42.3-targz] - [Checksum][opensuse-42.3-targz-checksum] |
-| **Fedora 24** | [tar.gz][fedora-24-targz] - [Checksum][fedora-24-targz-checksum] |
 | **Fedora 27** | [tar.gz][fedora-27-targz] - [Checksum][fedora-27-targz-checksum] |
 | **Fedora 28** | [tar.gz][fedora-28-targz] - [Checksum][fedora-28-targz-checksum] |
 
@@ -148,9 +144,6 @@ In order to download just the .NET Core runtime without the SDK, please visit ht
 
 [opensuse-42.3-targz]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-opensuse.42.3-x64.latest.tar.gz
 [opensuse-42.3-targz-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-opensuse.42.3-x64.latest.tar.gz.sha
-
-[fedora-24-targz]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-fedora.24-x64.latest.tar.gz
-[fedora-24-targz-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-fedora.24-x64.latest.tar.gz.sha
 
 [fedora-27-targz]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-fedora.27-x64.latest.tar.gz
 [fedora-27-targz-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-fedora.27-x64.latest.tar.gz.sha
