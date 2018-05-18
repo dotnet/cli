@@ -154,7 +154,7 @@
       </trans-unit>
       <trans-unit id="ListDefinition">
         <source>List references of a .NET project.</source>
-        <target state="needs-review-translation">Перечисление ссылок на проекты или установленных инструментов.</target>
+        <target state="translated">Вывод списка ссылок для проекта .NET.</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandDoesNotExist">
@@ -264,32 +264,32 @@
       </trans-unit>
       <trans-unit id="DevCertsDefinition">
         <source>Create and manage development certificates.</source>
-        <target state="new">Create and manage development certificates.</target>
+        <target state="translated">Создание сертификатов разработки и управление ими.</target>
         <note />
       </trans-unit>
       <trans-unit id="EfDefinition">
         <source>Entity Framework Core command-line tools.</source>
-        <target state="new">Entity Framework Core command-line tools.</target>
+        <target state="translated">Инструменты командной строки Entity Framework Core.</target>
         <note />
       </trans-unit>
       <trans-unit id="SqlCacheDefinition">
         <source>SQL Server cache command-line tools.</source>
-        <target state="new">SQL Server cache command-line tools.</target>
+        <target state="translated">Инструменты командной строки кэша SQL Server.</target>
         <note />
       </trans-unit>
       <trans-unit id="UserSecretsDefinition">
         <source>Manage development user secrets.</source>
-        <target state="new">Manage development user secrets.</target>
+        <target state="translated">Управление развертыванием секретов пользователей.</target>
         <note />
       </trans-unit>
       <trans-unit id="WatchDefinition">
         <source>Start a file watcher that runs a command when files change.</source>
-        <target state="new">Start a file watcher that runs a command when files change.</target>
+        <target state="translated">Запуск наблюдателя за файлами, который выполняет команду при изменении файлов.</target>
         <note />
       </trans-unit>
       <trans-unit id="AdditionalTools">
         <source>Additional tools ('dotnet [tool-name] --help' for more information):</source>
-        <target state="new">Additional tools ('dotnet [tool-name] --help' for more information):</target>
+        <target state="translated">Дополнительные инструменты (для получения дополнительных сведений выполните команду dotnet [название инструмента] --help):</target>
         <note />
       </trans-unit>
     </body>

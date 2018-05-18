@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="AppFullName">
         <source>Add a project-to-project reference to the project.</source>
-        <target state="needs-review-translation">Commande .NET Ajouter une référence projet à projet</target>
+        <target state="translated">Ajoutez une référence projet à projet au projet.</target>
         <note />
       </trans-unit>
       <trans-unit id="AppDescription">

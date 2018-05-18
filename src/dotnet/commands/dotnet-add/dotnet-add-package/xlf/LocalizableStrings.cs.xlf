@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="AppFullName">
         <source>Add a NuGet package reference to the project.</source>
-        <target state="needs-review-translation">Příkaz rozhraní .NET pro přidání odkazu na balíček</target>
+        <target state="translated">Přidat odkaz na balíček NuGet do projektu</target>
         <note />
       </trans-unit>
       <trans-unit id="AppDescription">

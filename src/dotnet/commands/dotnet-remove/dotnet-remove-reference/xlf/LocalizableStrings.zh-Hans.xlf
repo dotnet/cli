@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="AppFullName">
         <source>Remove a project-to-project reference from the project.</source>
-        <target state="needs-review-translation">.NET“删除项目到项目引用”命令</target>
+        <target state="translated">从项目中删除项目到项目引用。</target>
         <note />
       </trans-unit>
       <trans-unit id="AppDescription">

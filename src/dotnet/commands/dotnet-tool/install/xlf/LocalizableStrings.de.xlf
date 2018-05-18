@@ -126,12 +126,12 @@ Das Tool "{1}" (Version {2}) wurde erfolgreich installiert.</target>
       </trans-unit>
       <trans-unit id="AddSourceOptionDescription">
         <source>Adds an additional NuGet package source to use during installation.</source>
-        <target state="new">Adds an additional NuGet package source to use during installation.</target>
+        <target state="translated">Fügt eine weitere NuGet-Paketquelle zur Verwendung während der Installation hinzu.</target>
         <note />
       </trans-unit>
       <trans-unit id="AddSourceOptionName">
         <source>SOURCE</source>
-        <target state="new">SOURCE</target>
+        <target state="translated">SOURCE</target>
         <note />
       </trans-unit>
     </body>

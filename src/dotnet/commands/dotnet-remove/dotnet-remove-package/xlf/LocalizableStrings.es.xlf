@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="AppFullName">
         <source>Remove a NuGet package reference from the project.</source>
-        <target state="needs-review-translation">Comando de .NET para quitar referencia de paquete.</target>
+        <target state="translated">Quita una referencia de paquete de NuGet del proyecto.</target>
         <note />
       </trans-unit>
       <trans-unit id="AppDescription">

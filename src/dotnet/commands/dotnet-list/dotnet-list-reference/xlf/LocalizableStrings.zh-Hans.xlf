@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="AppFullName">
         <source>List all project-to-project references of the project.</source>
-        <target state="needs-review-translation">.NET Core 项目到项目的依赖项查看器</target>
+        <target state="translated">列出项目的所有项目到项目引用。</target>
         <note />
       </trans-unit>
       <trans-unit id="AppDescription">

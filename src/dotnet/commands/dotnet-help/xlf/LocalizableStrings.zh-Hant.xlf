@@ -154,7 +154,7 @@
       </trans-unit>
       <trans-unit id="ListDefinition">
         <source>List references of a .NET project.</source>
-        <target state="needs-review-translation">列出專案參考或安裝的工具。</target>
+        <target state="translated">列出 .NET 專案的參考。</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandDoesNotExist">
@@ -264,32 +264,32 @@
       </trans-unit>
       <trans-unit id="DevCertsDefinition">
         <source>Create and manage development certificates.</source>
-        <target state="new">Create and manage development certificates.</target>
+        <target state="translated">建立及管理開發憑證。</target>
         <note />
       </trans-unit>
       <trans-unit id="EfDefinition">
         <source>Entity Framework Core command-line tools.</source>
-        <target state="new">Entity Framework Core command-line tools.</target>
+        <target state="translated">Entity Framework Core 命令列工具。</target>
         <note />
       </trans-unit>
       <trans-unit id="SqlCacheDefinition">
         <source>SQL Server cache command-line tools.</source>
-        <target state="new">SQL Server cache command-line tools.</target>
+        <target state="translated">SQL Server 快取命令列工具。</target>
         <note />
       </trans-unit>
       <trans-unit id="UserSecretsDefinition">
         <source>Manage development user secrets.</source>
-        <target state="new">Manage development user secrets.</target>
+        <target state="translated">管理開發使用者祕密。</target>
         <note />
       </trans-unit>
       <trans-unit id="WatchDefinition">
         <source>Start a file watcher that runs a command when files change.</source>
-        <target state="new">Start a file watcher that runs a command when files change.</target>
+        <target state="translated">啟動會在檔案變更時執行命令的檔案監看員。</target>
         <note />
       </trans-unit>
       <trans-unit id="AdditionalTools">
         <source>Additional tools ('dotnet [tool-name] --help' for more information):</source>
-        <target state="new">Additional tools ('dotnet [tool-name] --help' for more information):</target>
+        <target state="translated">其他工具 ('dotnet [tool-name] --help' for more information):</target>
         <note />
       </trans-unit>
     </body>

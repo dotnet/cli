@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="AppFullName">
         <source>Remove a project-to-project reference from the project.</source>
-        <target state="needs-review-translation">.NET 移除專案對專案參考命令</target>
+        <target state="translated">從專案移除專案對專案參考。</target>
         <note />
       </trans-unit>
       <trans-unit id="AppDescription">

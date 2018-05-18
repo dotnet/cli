@@ -126,12 +126,12 @@ Pomyślnie zainstalowano narzędzie „{1}” (wersja: „{2}”).</target>
       </trans-unit>
       <trans-unit id="AddSourceOptionDescription">
         <source>Adds an additional NuGet package source to use during installation.</source>
-        <target state="new">Adds an additional NuGet package source to use during installation.</target>
+        <target state="translated">Adds an additional NuGet package source to use during installation.</target>
         <note />
       </trans-unit>
       <trans-unit id="AddSourceOptionName">
         <source>SOURCE</source>
-        <target state="new">SOURCE</target>
+        <target state="translated">SOURCE</target>
         <note />
       </trans-unit>
     </body>

@@ -154,7 +154,7 @@
       </trans-unit>
       <trans-unit id="ListDefinition">
         <source>List references of a .NET project.</source>
-        <target state="needs-review-translation">Répertoriez des références de projet ou des outils installés.</target>
+        <target state="translated">Listez les références d'un projet .NET.</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandDoesNotExist">
@@ -264,32 +264,32 @@
       </trans-unit>
       <trans-unit id="DevCertsDefinition">
         <source>Create and manage development certificates.</source>
-        <target state="new">Create and manage development certificates.</target>
+        <target state="translated">Créez et gérez des certificats de développement.</target>
         <note />
       </trans-unit>
       <trans-unit id="EfDefinition">
         <source>Entity Framework Core command-line tools.</source>
-        <target state="new">Entity Framework Core command-line tools.</target>
+        <target state="translated">Outils en ligne de commande Entity Framework Core.</target>
         <note />
       </trans-unit>
       <trans-unit id="SqlCacheDefinition">
         <source>SQL Server cache command-line tools.</source>
-        <target state="new">SQL Server cache command-line tools.</target>
+        <target state="translated">Outils en ligne de commande du cache SQL Server.</target>
         <note />
       </trans-unit>
       <trans-unit id="UserSecretsDefinition">
         <source>Manage development user secrets.</source>
-        <target state="new">Manage development user secrets.</target>
+        <target state="translated">Gérez les secrets d'utilisateur de développement.</target>
         <note />
       </trans-unit>
       <trans-unit id="WatchDefinition">
         <source>Start a file watcher that runs a command when files change.</source>
-        <target state="new">Start a file watcher that runs a command when files change.</target>
+        <target state="translated">Démarrez un observateur de fichier qui exécute une commande quand les fichiers changent.</target>
         <note />
       </trans-unit>
       <trans-unit id="AdditionalTools">
         <source>Additional tools ('dotnet [tool-name] --help' for more information):</source>
-        <target state="new">Additional tools ('dotnet [tool-name] --help' for more information):</target>
+        <target state="translated">Outils supplémentaires ('dotnet [nom-outil] --help' pour plus d'informations) :</target>
         <note />
       </trans-unit>
     </body>
