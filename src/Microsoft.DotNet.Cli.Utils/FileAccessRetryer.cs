@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.Cli.Utils
@@ -44,6 +45,35 @@ namespace Microsoft.DotNet.Cli.Utils
                     await Task.Delay(sleepDuration);
 
                     continue;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Run Directory.Move and File.Move in Windows has a chance to get IOException with HResult 0x80070005. But this error is transient.
+        /// </summary>
+        internal static void RetryOnMoveAccessFailure(Action action)
+        {
+            const int ERROR_HRESULT_ACCESS_DENIED = unchecked((int)0x80070005);
+            int nextWaitTime = 1000;
+            int remainRetry = 3;
+
+            while (true)
+            {
+                try
+                {
+                    action();
+                    break;
+                }
+                catch (IOException e) when (e.HResult == ERROR_HRESULT_ACCESS_DENIED)
+                {
+                    Thread.Sleep(nextWaitTime);
+                    nextWaitTime *= 10;
+                    remainRetry--;
+                    if (remainRetry == 0)
+                    {
+                        throw;
+                    }
                 }
             }
         }
