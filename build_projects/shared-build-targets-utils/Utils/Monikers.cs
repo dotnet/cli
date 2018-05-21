@@ -19,14 +19,10 @@ namespace Microsoft.DotNet.Cli.Build
                     return "Ubuntu_16_04_x64";
                 case "ubuntu.18.04-x64":
                     return "Ubuntu_18_04_x64";
-                case "fedora.24-x64":
-                    return "Fedora_24_x64";
                 case "fedora.27-x64":
                     return "Fedora_27_x64";
                 case "fedora.28-x64":
                     return "Fedora_28_x64";
-                case "opensuse.42.1-x64":
-                    return "openSUSE_42_1_x64";
                 case "opensuse.42.3-x64":
                     return "openSUSE_42_3_x64";
                 case "rhel.7.2-x64":

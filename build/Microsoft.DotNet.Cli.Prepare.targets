@@ -98,10 +98,8 @@
 
       <ProductMonikerRid Condition=" '$(Rid)' == 'ubuntu.16.04-x64' Or
                                      '$(Rid)' == 'ubuntu.18.04-x64' Or
-                                     '$(Rid)' == 'fedora.24-x64' Or
                                      '$(Rid)' == 'fedora.27-x64' Or
                                      '$(Rid)' == 'fedora.28-x64' Or
-                                     '$(Rid)' == 'opensuse.42.1-x64' Or
                                      '$(Rid)' == 'opensuse.42.3-x64' ">$(Rid)</ProductMonikerRid>
       <ProductMonikerRid Condition=" '$(ProductMonikerRid)' == '' ">$(OSName)-$(Architecture)</ProductMonikerRid>
 
@@ -136,10 +134,8 @@
 
     <PropertyGroup>
       <HasAdditionalSharedFramework Condition="'$(Rid)' != 'ubuntu.18.04-x64' AND
-                                               '$(Rid)' != 'fedora.24-x64' AND
                                                '$(Rid)' != 'fedora.27-x64' AND
                                                '$(Rid)' != 'fedora.28-x64' AND
-                                               '$(Rid)' != 'opensuse.42.1-x64' AND
                                                '$(Rid)' != 'opensuse.42.3-x64'">true</HasAdditionalSharedFramework>
       <IncludeAdditionalSharedFrameworks Condition=" '$(IncludeAdditionalSharedFrameworks)' == '' AND '$(HasAdditionalSharedFramework)' == 'true' ">true</IncludeAdditionalSharedFrameworks>
       <IncludeAdditionalSharedFrameworks Condition=" '$(IncludeAdditionalSharedFrameworks)' == '' ">false</IncludeAdditionalSharedFrameworks>

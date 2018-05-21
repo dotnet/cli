@@ -32,14 +32,6 @@
           }
         },
         {
-          "Name": "DotNet-CLI-Fedora24-x64",
-          "ReportingParameters": {
-            "OperatingSystem": "Fedora 24",
-            "Type": "build/product/",
-            "Platform": "x64"
-          }
-        },
-        {
           "Name": "DotNet-CLI-Fedora27-x64",
           "ReportingParameters": {
             "OperatingSystem": "Fedora 27",
@@ -51,14 +43,6 @@
           "Name": "DotNet-CLI-Fedora28-x64",
           "ReportingParameters": {
             "OperatingSystem": "Fedora 28",
-            "Type": "build/product/",
-            "Platform": "x64"
-          }
-        },
-        {
-          "Name": "DotNet-CLI-OpenSUSE42.1-x64",
-          "ReportingParameters": {
-            "OperatingSystem": "OpenSUSE 42.1",
             "Type": "build/product/",
             "Platform": "x64"
           }

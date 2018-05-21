@@ -75,10 +75,7 @@ if [ -z "$DOCKERFILE" ]; then
             export DOCKERFILE=scripts/docker/debian
         elif [ "$(cat /etc/*-release | grep -cim1 fedora)" -eq 1 ]; then
             echo "Detected current OS as Fedora, determining fedora version to use..."
-            if [ "$(cat /etc/*-release | grep -cim1 24)" -eq 1 ]; then
-                echo "using 'fedora.24' image"
-                export DOCKERFILE=scripts/docker/fedora.24
-            elif [ "$(cat /etc/*-release | grep -cim1 28)" -eq 1 ]; then
+            if [ "$(cat /etc/*-release | grep -cim1 28)" -eq 1 ]; then
                 echo "using 'fedora.28' image"
                 export DOCKERFILE=scripts/docker/fedora.28
             else
@@ -86,14 +83,8 @@ if [ -z "$DOCKERFILE" ]; then
                 export DOCKERFILE=scripts/docker/fedora.27
             fi
         elif [ "$(cat /etc/*-release | grep -cim1 opensuse)" -eq 1 ]; then
-            echo "Detected current OS as openSUSE, determining openSUSE version to use..."
-            if [ "$(cat /etc/*-release | grep -cim1 42.1)" -eq 1 ]; then
-                echo "using 'openSUSE.42.1' image"
-                export DOCKERFILE=scripts/docker/opensuse.42.1
-            else
-                echo "using 'openSUSE.42.3' image"
-                export DOCKERFILE=scripts/docker/opensuse.42.3
-            fi
+            echo "Detected current OS as openSUSE, using 'openSUSE.42.3' image"
+            export DOCKERFILE=scripts/docker/opensuse.42.3
         else
             echo "Unknown Linux Distro. Using 'ubuntu.16.04' image"
             export DOCKERFILE=scripts/docker/ubuntu.16.04
