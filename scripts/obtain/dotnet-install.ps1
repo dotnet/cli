@@ -564,7 +564,7 @@ Extract-Dotnet-Package -ZipPath $ZipPath -OutPath $InstallRoot
 
 #  Check if the SDK version is now installed; if not, fail the installation.
 $isAssetInstalled = Is-Dotnet-Package-Installed -InstallRoot $InstallRoot -RelativePathToPackage $dotnetPackageRelativePath -SpecificVersion $SpecificVersion
-if ($isAssetInstalled) {
+if (!$isAssetInstalled) {
     throw "$assetName version $SpecificVersion failed to install with an unknown error."
 }
 
