@@ -31,6 +31,8 @@ namespace Microsoft.DotNet.Tools.Run
         public bool NoLaunchProfile { get; private set; }
         private bool UseLaunchProfile => !NoLaunchProfile;
 
+        public string ExecutingRuntime { get; private set; }
+
         public int Start()
         {
             Initialize();
@@ -69,6 +71,7 @@ namespace Microsoft.DotNet.Tools.Run
             string launchProfile,
             bool noLaunchProfile,
             bool noRestore,
+            string executingRuntime,
             IEnumerable<string> restoreArgs,
             IReadOnlyCollection<string> args)
         {
@@ -81,6 +84,7 @@ namespace Microsoft.DotNet.Tools.Run
             Args = args;
             RestoreArgs = restoreArgs;
             NoRestore = noRestore;
+            ExecutingRuntime = executingRuntime;
         }
 
         public RunCommand MakeNewWithReplaced(string configuration = null,
@@ -90,6 +94,7 @@ namespace Microsoft.DotNet.Tools.Run
             string launchProfile = null,
             bool? noLaunchProfile = null,
             bool? noRestore = null,
+            string executingRuntime = null,
             IEnumerable<string> restoreArgs = null,
             IReadOnlyCollection<string> args = null)
         {
@@ -101,6 +106,7 @@ namespace Microsoft.DotNet.Tools.Run
                 launchProfile ?? this.LaunchProfile,
                 noLaunchProfile ?? this.NoLaunchProfile,
                 noRestore ?? this.NoRestore,
+                executingRuntime ?? this.ExecutingRuntime,
                 restoreArgs ?? this.RestoreArgs,
                 args ?? this.Args
             );
@@ -198,6 +204,11 @@ namespace Microsoft.DotNet.Tools.Run
             if (!string.IsNullOrWhiteSpace(Framework))
             {
                 globalProperties.Add("TargetFramework", Framework);
+            }
+
+            if (!string.IsNullOrWhiteSpace(ExecutingRuntime))
+            {
+                globalProperties.Add("ExecutingRuntime", ExecutingRuntime);
             }
 
             var project = new ProjectInstance(Project, globalProperties, null);

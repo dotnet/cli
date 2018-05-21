@@ -144,6 +144,12 @@
   <data name="FrameworkOptionDescription" xml:space="preserve">
     <value>The target framework to run for. The target framework must also be specified in the project file.</value>
   </data>
+  <data name="CommandOptionCLRDescription" xml:space="preserve">
+    <value>The execution runtime to run the .NET application with.</value>
+  </data>
+  <data name="CommandOptionCLRName" xml:space="preserve">
+    <value>RUNTIME</value>
+  </data>
   <data name="RunCommandException" xml:space="preserve">
     <value>The build failed. Please fix the build errors and run again.</value>
   </data>

@@ -28,6 +28,7 @@ namespace Microsoft.DotNet.Cli
                         noLaunchProfile: o.HasOption("--no-launch-profile"),
                         noRestore: o.HasOption("--no-restore") || o.HasOption("--no-build"),
                         restoreArgs: o.OptionValuesToBeForwarded(),
+                        executingRuntime: GetRuntimeName(o.SingleArgumentOrDefault("--clr")),
                         args: o.Arguments
                     )),
                 options: new[]
@@ -52,7 +53,24 @@ namespace Microsoft.DotNet.Cli
                         LocalizableStrings.CommandOptionNoBuildDescription,
                         Accept.NoArguments()),
                     CommonOptions.NoRestoreOption(),
-                    CommonOptions.VerbosityOption()
+                    CommonOptions.VerbosityOption(),
+                    Create.Option(
+                        "--clr",
+                        LocalizableStrings.CommandOptionCLRDescription,
+                        Accept.AnyOneOf("coreclr", "mono").With(name: LocalizableStrings.CommandOptionCLRName))
                 });
+
+        static string GetRuntimeName(string option)
+        {
+            switch (option)
+            {
+                case "mono":
+                    return "mono";
+                case "coreclr":
+                    return "dotnet";
+                default:
+                    return "";
+            }
+        }
     }
 }

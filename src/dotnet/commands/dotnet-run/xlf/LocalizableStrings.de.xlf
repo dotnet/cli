@@ -144,6 +144,14 @@ Ein ausführbares Projekt sollte ein ausführbares TFM (z.B. netcoreapp2.0) verw
       <trans-unit id="FrameworkOptionDescription">
         <source>The target framework to run for. The target framework must also be specified in the project file.</source>
         <target state="new">The target framework to run for. The target framework must also be specified in the project file.</target>
+      <trans-unit id="CommandOptionCLRDescription">
+        <source>The execution runtime to run the .NET application with.</source>
+        <target state="new">The execution runtime to run the .NET application with.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="CommandOptionCLRName">
+        <source>RUNTIME</source>
+        <target state="new">RUNTIME</target>
         <note />
       </trans-unit>
     </body>
