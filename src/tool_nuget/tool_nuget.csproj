@@ -11,5 +11,6 @@
     <PackageReference Include="Microsoft.NETCore.App" Version="$(MicrosoftNETCoreAppPackageVersion)" />
     <PackageReference Include="NuGet.CommandLine.XPlat" Version="$(NuGetCommandLineXPlatPackageVersion)" />
     <PackageReference Include="Microsoft.Build.NuGetSdkResolver" Version="$(MicrosoftBuildNuGetSdkResolverVersion)" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="$(MicrosoftBuildFrameworkVersion)" />
   </ItemGroup>
 </Project>
