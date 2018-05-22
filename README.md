@@ -32,9 +32,9 @@ This project has adopted the code of conduct defined by the [Contributor Covenan
 Build Status
 ------------
 
-|Ubuntu 14.04 / Linux Mint 17 |Ubuntu 16.04 | Debian 8.2 |Windows x64 |Windows x86 |Mac OS X |CentOS 7.1 / Oracle Linux 7.1 |RHEL 7.2 |OpenSUSE 42.1 |Fedora 23|Fedora 24|
-|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|
-|[![][ubuntu-14.04-build-badge]][ubuntu-14.04-build]|[![][ubuntu-16.04-build-badge]][ubuntu-16.04-build]|[![][debian-8.2-build-badge]][debian-8.2-build]|[![][win-x64-build-badge]][win-x64-build]|[![][win-x86-build-badge]][win-x86-build]|[![][osx-build-badge]][osx-build]|[![][centos-build-badge]][centos-build]|[![][rhel-build-badge]][rhel-build]|[![][opensuse-42.1-build-badge]][opensuse-42.1-build]|[![][fedora-23-build-badge]][fedora-23-build]|[![][fedora-24-build-badge]][fedora-24-build]|
+|Ubuntu 14.04 |Ubuntu 16.04 |Ubuntu 18.04 |Debian 8.2 |Windows x64 |Windows x86 |Mac OS X |CentOS 7.1 |RHEL 7.2 |OpenSUSE 42.3 |Fedora 27 |Fedora 28 |
+|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|
+|[![][ubuntu-14.04-build-badge]][ubuntu-14.04-build]|[![][ubuntu-16.04-build-badge]][ubuntu-16.04-build]|[![][ubuntu-18.04-build-badge]][ubuntu-18.04-build]|[![][debian-8.2-build-badge]][debian-8.2-build]|[![][win-x64-build-badge]][win-x64-build]|[![][win-x86-build-badge]][win-x86-build]|[![][osx-build-badge]][osx-build]|[![][centos-build-badge]][centos-build]|[![][rhel-build-badge]][rhel-build]|[![][opensuse-42.3-build-badge]][opensuse-42.3-build]|[![][fedora-27-build-badge]][fedora-27-build]|[![][fedora-28-build-badge]][fedora-28-build]|
 
 [win-x64-build-badge]: https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/6940/badge
 [win-x64-build]: https://devdiv.visualstudio.com/DevDiv/_build?_a=completed&definitionId=6940
@@ -48,6 +48,9 @@ Build Status
 [ubuntu-16.04-build-badge]: https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/6961/badge
 [ubuntu-16.04-build]: https://devdiv.visualstudio.com/DevDiv/_build?_a=completed&definitionId=6961
 
+[ubuntu-18.04-build-badge]: https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/9231/badge
+[ubuntu-18.04-build]: https://devdiv.visualstudio.com/DevDiv/_build?_a=completed&definitionId=9231
+
 [debian-8.2-build-badge]: https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/6920/badge
 [debian-8.2-build]: https://devdiv.visualstudio.com/DevDiv/_build?_a=completed&definitionId=6920
 
@@ -60,14 +63,14 @@ Build Status
 [rhel-build-badge]: https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/6932/badge
 [rhel-build]: https://devdiv.visualstudio.com/DevDiv/_build?_a=completed&definitionId=6932
 
-[opensuse-42.1-build-badge]: https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/6928/badge
-[opensuse-42.1-build]: https://devdiv.visualstudio.com/DevDiv/_build?_a=completed&definitionId=6928
+[opensuse-42.3-build-badge]: https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/9232/badge
+[opensuse-42.3-build]: https://devdiv.visualstudio.com/DevDiv/_build?_a=completed&definitionId=9232
 
-[fedora-23-build-badge]: https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/6922/badge
-[fedora-23-build]: https://devdiv.visualstudio.com/DevDiv/_build?_a=completed&definitionId=6922
+[fedora-27-build-badge]: https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/9229/badge
+[fedora-27-build]: https://devdiv.visualstudio.com/DevDiv/_build?_a=completed&definitionId=9229
 
-[fedora-24-build-badge]: https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/6924/badge
-[fedora-24-build]: https://devdiv.visualstudio.com/DevDiv/_build?_a=completed&definitionId=6924
+[fedora-28-build-badge]: https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/9230/badge
+[fedora-28-build]: https://devdiv.visualstudio.com/DevDiv/_build?_a=completed&definitionId=9230
 
 Installers and Binaries
 -----------------------
@@ -83,16 +86,16 @@ In order to download just the .NET Core runtime without the SDK, please visit ht
 | -------- | :-------------------------------------: |
 | **Windows x64** | [Installer][win-x64-installer] - [Checksum][win-x64-installer-checksum]<br>[zip][win-x64-zip] - [Checksum][win-x64-zip-checksum] |
 | **Windows x86** | [Installer][win-x86-installer] - [Checksum][win-x86-installer-checksum]<br>[zip][win-x86-zip] - [Checksum][win-x86-zip-checksum] |
-| **Ubuntu 14.04 / Linux Mint 17** | [Installer][ubuntu-14.04-installer] - [Checksum][ubuntu-14.04-installer-checksum]<br>*See Installer Note Below<br>[tar.gz][ubuntu-14.04-targz] - [Checksum][ubuntu-14.04-targz-checksum] |
+| **Ubuntu 14.04** | [Installer][ubuntu-14.04-installer] - [Checksum][ubuntu-14.04-installer-checksum]<br>*See Installer Note Below<br>[tar.gz][ubuntu-14.04-targz] - [Checksum][ubuntu-14.04-targz-checksum] |
 | **Ubuntu 16.04** | [Installer][ubuntu-16.04-installer] - [Checksum][ubuntu-16.04-installer-checksum]<br>*See Installer Note Below<br>[tar.gz][ubuntu-16.04-targz] - [Checksum][ubuntu-16.04-targz-checksum] |
+| **Ubuntu 18.04** | [Installer][ubuntu-18.04-installer] - [Checksum][ubuntu-18.04-installer-checksum]<br>*See Installer Note Below<br>[tar.gz][ubuntu-18.04-targz] - [Checksum][ubuntu-18.04-targz-checksum] |
 | **Debian 8.2** | [tar.gz][debian-8.2-targz] - [Checksum][debian-8.2-targz-checksum] |
 | **Mac OS X** | [Installer][osx-installer] - [Checksum][osx-installer-checksum]<br>[tar.gz][osx-targz] - [Checksum][osx-targz-checksum] |
-| **CentOS 7.1 / Oracle Linux 7** | [tar.gz][centos-targz] - [Checksum][centos-targz-checksum] |
+| **CentOS 7.1** | [tar.gz][centos-targz] - [Checksum][centos-targz-checksum] |
 | **RHEL 7.2** | [tar.gz][rhel-targz] - [Checksum][rhel-targz-checksum] |
-| **openSUSE 13.2** | [tar.gz][opensuse-13.2-targz] - [Checksum][opensuse-13.2-targz-checksum] |
-| **openSUSE 42.1** | [tar.gz][opensuse-42.1-targz] - [Checksum][opensuse-42.1-targz-checksum] |
-| **Fedora 23** | [tar.gz][fedora-23-targz] - [Checksum][fedora-23-targz-checksum] |
-| **Fedora 24** | [tar.gz][fedora-24-targz] - [Checksum][fedora-24-targz-checksum] |
+| **OpenSUSE 42.3** | [tar.gz][opensuse-42.3-targz] - [Checksum][opensuse-42.3-targz-checksum] |
+| **Fedora 27** | [tar.gz][fedora-27-targz] - [Checksum][fedora-27-targz-checksum] |
+| **Fedora 28** | [tar.gz][fedora-28-targz] - [Checksum][fedora-28-targz-checksum] |
 
 *Note: Our Debian packages are put together slightly differently than the other OS specific installers. Instead of combining everything, we have separate component packages that depend on each other. If you're installing these directly from the .deb files (via dpkg or similar), then you'll need to install the [corresponding Host, Host FX Resolver, and Shared Framework packages](https://github.com/dotnet/core-setup#daily-builds) before installing the Sdk package.*
 
@@ -120,6 +123,11 @@ In order to download just the .NET Core runtime without the SDK, please visit ht
 [ubuntu-16.04-targz]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-ubuntu.16.04-x64.latest.tar.gz
 [ubuntu-16.04-targz-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-ubuntu.16.04-x64.latest.tar.gz.sha
 
+[ubuntu-18.04-installer]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-sdk-ubuntu.18.04-x64.latest.deb
+[ubuntu-18.04-installer-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-sdk-ubuntu.18.04-x64.latest.deb.sha
+[ubuntu-18.04-targz]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-ubuntu.18.04-x64.latest.tar.gz
+[ubuntu-18.04-targz-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-ubuntu.18.04-x64.latest.tar.gz.sha
+
 [debian-8.2-targz]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-debian-x64.latest.tar.gz
 [debian-8.2-targz-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-debian-x64.latest.tar.gz.sha
 
@@ -134,18 +142,14 @@ In order to download just the .NET Core runtime without the SDK, please visit ht
 [rhel-targz]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-rhel-x64.latest.tar.gz
 [rhel-targz-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-rhel-x64.latest.tar.gz.sha
 
-[opensuse-13.2-targz]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-opensuse.13.2-x64.latest.tar.gz
-[opensuse-13.2-targz-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-opensuse.13.2-x64.latest.tar.gz.sha
+[opensuse-42.3-targz]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-opensuse.42.3-x64.latest.tar.gz
+[opensuse-42.3-targz-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-opensuse.42.3-x64.latest.tar.gz.sha
 
-[opensuse-42.1-targz]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-opensuse.42.1-x64.latest.tar.gz
-[opensuse-42.1-targz-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-opensuse.42.1-x64.latest.tar.gz.sha
+[fedora-27-targz]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-fedora.27-x64.latest.tar.gz
+[fedora-27-targz-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-fedora.27-x64.latest.tar.gz.sha
 
-[fedora-23-targz]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-fedora.23-x64.latest.tar.gz
-[fedora-23-targz-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-fedora.23-x64.latest.tar.gz.sha
-
-[fedora-24-targz]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-fedora.24-x64.latest.tar.gz
-[fedora-24-targz-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-fedora.24-x64.latest.tar.gz.sha
-
+[fedora-28-targz]: https://dotnetcli.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-fedora.28-x64.latest.tar.gz
+[fedora-28-targz-checksum]: https://dotnetclichecksums.blob.core.windows.net/dotnet/Sdk/rel-1.1.0/dotnet-dev-fedora.28-x64.latest.tar.gz.sha
 
 Docker
 ------

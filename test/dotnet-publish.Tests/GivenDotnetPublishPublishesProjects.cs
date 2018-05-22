@@ -41,7 +41,8 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
                          .And.HaveStdOutContaining("Hello World");
         }
 
-        [Fact]
+        [RequiresSpecificFrameworkFact("netcoreapp1.0")]
+        // Issue: https://github.com/dotnet/cli/issues/9310
         public void ItPublishesARunnableSelfContainedApp()
         {
             var testAppName = "MSBuildTestApp";

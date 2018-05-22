@@ -14,7 +14,7 @@
             DependsOnTargets="SetupNuGetPackagesArchiveInputsOutputs;
                               SetupAzureBlobInformation;
                               GenerateNuGetPackagesArchive"
-            Condition=" '$(UploadNuGetPackagesArchiveToAzure)' == 'true' And  '$(PUBLISH_LZMA_TO_AZURE_BLOB)' != '' ">
+            Condition=" '$(UploadNuGetPackagesArchiveToAzure)' == 'true' And  '$(PUBLISH_LZMA_TO_AZURE_BLOB)' == 'true' ">
       <ItemGroup>
         <NuGetPackagesArchiveToUpload Include="$(IntermediateArchive)" />
       </ItemGroup>

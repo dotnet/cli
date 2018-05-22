@@ -13,18 +13,24 @@ namespace Microsoft.DotNet.Cli.Build
         {
             switch (RuntimeEnvironment.GetRuntimeIdentifier())
             {
+                case "ubuntu.14.04-x64":
+                    return "Ubuntu_x64";
                 case "ubuntu.16.04-x64":
                     return "Ubuntu_16_04_x64";
-                case "ubuntu.16.10-x64":
-                    return "Ubuntu_16_10_x64";
-                case "fedora.23-x64":
-                    return "Fedora_23_x64";
-                case "fedora.24-x64":
-                    return "Fedora_24_x64";
-                case "opensuse.13.2-x64":
-                    return "openSUSE_13_2_x64";
-                case "opensuse.42.1-x64":
-                    return "openSUSE_42_1_x64";
+                case "ubuntu.18.04-x64":
+                    return "Ubuntu_18_04_x64";
+                case "fedora.27-x64":
+                    return "Fedora_27_x64";
+                case "fedora.28-x64":
+                    return "Fedora_28_x64";
+                case "opensuse.42.3-x64":
+                    return "openSUSE_42_3_x64";
+                case "rhel.7.2-x64":
+                    return "RHEL_x64";
+                case "centos.7-x64":
+                    return "CentOS_x64";
+                case "debian.8-x64":
+                    return "Debian_x64";
             }
 
             return $"{CurrentPlatform.Current}_{CurrentArchitecture.Current}";

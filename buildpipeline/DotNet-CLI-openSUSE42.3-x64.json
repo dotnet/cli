@@ -69,7 +69,7 @@
       "allowOverride": true
     },
     "BuildArguments": {
-      "value": "--skip-prereqs --configuration $(BuildConfiguration) --targets Default /p:BranchName=sandbox",
+      "value": "--skip-prereqs --configuration $(BuildConfiguration)  --docker opensuse.42.3 --targets Default /p:BranchName=sandbox",
       "allowOverride": true
     },
     "CONNECTION_STRING": {
@@ -103,13 +103,10 @@
     "CLIBUILD_SKIP_TESTS": {
       "value": "true",
       "allowOverride": true
-    },
-    "PUBLISH_LZMA_TO_AZURE_BLOB": {
-      "value": "true"
     }
   },
   "demands": [
-    "Agent.OS -equals darwin"
+    "Agent.OS -equals linux"
   ],
   "retentionRules": [
     {
@@ -127,7 +124,7 @@
       "deleteTestResults": true
     }
   ],
-  "buildNumberFormat": "$(date:yyyyMMdd)$(rev:.r)",
+  "buildNumberFormat": "$(Date:yyyMMdd)$(Rev:.r)",
   "jobAuthorizationScope": "projectCollection",
   "jobTimeoutInMinutes": 90,
   "badgeEnabled": true,
@@ -147,7 +144,7 @@
     "type": "GitHub",
     "name": "dotnet/cli",
     "url": "https://github.com/dotnet/cli.git",
-    "defaultBranch": "rel/1.1.0",
+    "defaultBranch": "rel/1.1.1",
     "clean": "true",
     "checkoutSubmodules": false
   },
@@ -163,7 +160,7 @@
   "path": "\\",
   "type": "build",
   "id": 1,
-  "name": "Dotnet-CLI-OSX-x64",
+  "name": "DotNet-CLI-opensuse42.3-x64",
   "project": {
     "id": "0bdbc590-a062-4c3f-b0f6-9383f67865ee",
     "name": "DevDiv",
