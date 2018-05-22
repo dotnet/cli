@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="AppFullName">
         <source>Add a project-to-project reference to the project.</source>
-        <target state="needs-review-translation">Polecenie dodawania odwołania między projektami dla platformy .NET</target>
+        <target state="translated">Dodaj odwołanie między projektami do projektu.</target>
         <note />
       </trans-unit>
       <trans-unit id="AppDescription">

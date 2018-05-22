@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="AppFullName">
         <source>Add a project-to-project reference to the project.</source>
-        <target state="needs-review-translation">.NET 新增專案對專案參考命令</target>
+        <target state="translated">將專案對專案參考新增至專案。</target>
         <note />
       </trans-unit>
       <trans-unit id="AppDescription">

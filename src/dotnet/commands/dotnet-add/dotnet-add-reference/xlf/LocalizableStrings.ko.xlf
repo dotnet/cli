@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="AppFullName">
         <source>Add a project-to-project reference to the project.</source>
-        <target state="needs-review-translation">.NET 프로젝트 간 참조 추가 명령</target>
+        <target state="translated">프로젝트에 프로젝트 간 참조를 추가합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="AppDescription">

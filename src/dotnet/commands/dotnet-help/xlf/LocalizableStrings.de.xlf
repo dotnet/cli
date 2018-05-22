@@ -155,7 +155,7 @@
       </trans-unit>
       <trans-unit id="ListDefinition">
         <source>List references of a .NET project.</source>
-        <target state="needs-review-translation">Hiermit werden Projektverweise oder installierte Tools aufgelistet.</target>
+        <target state="translated">Hiermit listen Sie die Verweise eines .NET-Projekts auf.</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandDoesNotExist">
@@ -265,32 +265,32 @@
       </trans-unit>
       <trans-unit id="DevCertsDefinition">
         <source>Create and manage development certificates.</source>
-        <target state="new">Create and manage development certificates.</target>
+        <target state="translated">Hiermit erstellen und verwalten Sie Entwicklungszertifikate.</target>
         <note />
       </trans-unit>
       <trans-unit id="EfDefinition">
         <source>Entity Framework Core command-line tools.</source>
-        <target state="new">Entity Framework Core command-line tools.</target>
+        <target state="translated">Entity Framework Core-Befehlszeilentools.</target>
         <note />
       </trans-unit>
       <trans-unit id="SqlCacheDefinition">
         <source>SQL Server cache command-line tools.</source>
-        <target state="new">SQL Server cache command-line tools.</target>
+        <target state="translated">SQL Server-Cache-Befehlszeilentools.</target>
         <note />
       </trans-unit>
       <trans-unit id="UserSecretsDefinition">
         <source>Manage development user secrets.</source>
-        <target state="new">Manage development user secrets.</target>
+        <target state="translated">Hiermit verwalten Sie Benutzergeheimnisse zur Entwicklung.</target>
         <note />
       </trans-unit>
       <trans-unit id="WatchDefinition">
         <source>Start a file watcher that runs a command when files change.</source>
-        <target state="new">Start a file watcher that runs a command when files change.</target>
+        <target state="translated">Hiermit starten Sie einen Datei-Watcher, der einen Befehl ausführt, sobald Dateien geändert werden.</target>
         <note />
       </trans-unit>
       <trans-unit id="AdditionalTools">
         <source>Additional tools ('dotnet [tool-name] --help' for more information):</source>
-        <target state="new">Additional tools ('dotnet [tool-name] --help' for more information):</target>
+        <target state="translated">Zusätzliche Tools (weitere Informationen über "dotnet [tool-name] --help"):</target>
         <note />
       </trans-unit>
     </body>

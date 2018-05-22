@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="AppFullName">
         <source>Remove a project-to-project reference from the project.</source>
-        <target state="needs-review-translation">Comando Rimuovi riferimento P2P (da progetto a progetto) .NET</target>
+        <target state="translated">Rimuove un riferimento P2P (da progetto a progetto) dal progetto.</target>
         <note />
       </trans-unit>
       <trans-unit id="AppDescription">
