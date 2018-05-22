@@ -32,7 +32,7 @@ def static getBuildJobName(def configuration, def os, def architecture) {
 platformList.each { platform ->
     // Calculate names
     def (os, architecture, configuration) = platform.tokenize(':')
-	def osUsedForMachineAffinity = os;
+    def osUsedForMachineAffinity = os;
     def osVersionUsedForMachineAffinity = 'latest-or-auto';
 
     // Calculate job name
@@ -97,7 +97,7 @@ platformList.each { platform ->
     def newJob = job(Utilities.getFullJobName(project, jobName, isPR)) {
         // Set the label.
         steps {
-            if (os == 'Windows_NT') {
+            if (os == 'Windows_NT' || os == 'Windows_2016') {
                 // Batch
                 batchFile(buildCommand)
             }
