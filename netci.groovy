@@ -58,11 +58,6 @@ platformList.each { platform ->
             osUsedForMachineAffinity = 'Ubuntu16.04';
             dockerFlag = "debian"
         }
-        else if (os == 'Fedora24') {
-            osUsedForMachineAffinity = 'Ubuntu16.04';
-            osVersionUsedForMachineAffinity = 'latest-docker'
-            dockerFlag = "fedora.27"
-        }
         else if (os == 'Fedora27') {
             osUsedForMachineAffinity = 'Ubuntu16.04';
             osVersionUsedForMachineAffinity = 'latest-docker'
@@ -71,7 +66,7 @@ platformList.each { platform ->
         else if (os == 'Fedora28') {
             osUsedForMachineAffinity = 'Ubuntu16.04';
             osVersionUsedForMachineAffinity = 'latest-docker'
-            dockerFlag = "fedora.27"
+            dockerFlag = "fedora.28"
         }
         else if (os == 'OpenSUSE42.3') {
             osUsedForMachineAffinity = 'Ubuntu16.04';
