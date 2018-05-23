@@ -45,7 +45,7 @@ platformList.each { platform ->
     }
     else if (os == 'Windows_2016') {
         buildCommand = ".\\build.cmd -Configuration ${configuration} -Architecture ${architecture} -RunInstallerTestsInDocker -Targets Default"
--    }
+    }
     else if (os == 'OSX') {
         buildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --targets Default"
     }
