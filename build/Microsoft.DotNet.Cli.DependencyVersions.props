@@ -27,5 +27,6 @@
     <TemplateEngineTemplateVersion>1.0.0-beta2-20170907-306</TemplateEngineTemplateVersion>
     <PlatformAbstractionsVersion>1.0.3</PlatformAbstractionsVersion>
     <DependencyModelVersion>1.0.3</DependencyModelVersion>
+    <MicroBuildCorePackageVersion>0.2.0</MicroBuildCorePackageVersion>
   </PropertyGroup>
 </Project>
