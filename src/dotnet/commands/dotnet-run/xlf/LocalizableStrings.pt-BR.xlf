@@ -34,7 +34,7 @@
       </trans-unit>
       <trans-unit id="CommandOptionNoBuildDescription">
         <source>Do not build the project before running. Implies --no-restore.</source>
-        <target state="needs-review-translation">Não compile o projeto antes de executar. Implica em --no-restore.</target>
+        <target state="translated">Não compile o projeto antes de executar. Implica em --no-restore.</target>
         <note />
       </trans-unit>
       <trans-unit id="RunCommandExceptionUnableToRunSpecifyFramework">
@@ -134,6 +134,16 @@ O {1} atual é '{2}'.</target>
       <trans-unit id="RunCommandSpecifiecFileIsNotAValidProject">
         <source>'{0}' is not a valid project file.</source>
         <target state="translated">'{0}' não é um arquivo de projeto válido.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ConfigurationOptionDescription">
+        <source>The configuration to run for. The default for most projects is 'Debug'.</source>
+        <target state="new">The configuration to run for. The default for most projects is 'Debug'.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="FrameworkOptionDescription">
+        <source>The target framework to run for. The target framework must also be specified in the project file.</source>
+        <target state="new">The target framework to run for. The target framework must also be specified in the project file.</target>
         <note />
       </trans-unit>
     </body>

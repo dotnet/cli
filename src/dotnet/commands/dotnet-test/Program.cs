@@ -60,11 +60,10 @@ namespace Microsoft.DotNet.Tools.Test
                 msbuildArgs.Add($"-property:VSTestCLIRunSettings=\"{runSettingsArg}\"");
             }
 
-            var verbosityArg = msbuildArgs.LastOrDefault(arg => arg.StartsWith("-verbosity"));
-
-            if (!string.IsNullOrEmpty(verbosityArg))
+            var verbosityArg = parsedTest.ForwardedOptionValues("verbosity").SingleOrDefault();
+            if (verbosityArg != null)
             {
-                var verbosity = verbosityArg.Split(':');
+                var verbosity = verbosityArg.Split(':', 2);
                 if (verbosity.Length == 2)
                 {
                     msbuildArgs.Add($"-property:VSTestVerbosity={verbosity[1]}");
@@ -123,19 +122,6 @@ namespace Microsoft.DotNet.Tools.Test
             }
 
             return arg;
-        }
-
-        private static string[] GetSemiColonEscapedArgs(List<string> args)
-        {
-            int counter = 0;
-            string[] array = new string[args.Count];
-
-            foreach (string arg in args)
-            {
-                array[counter++] = GetSemiColonEscapedString(arg);
-            }
-
-            return array;
         }
 
         private static void UpdateRunSettingsArgumentsText()

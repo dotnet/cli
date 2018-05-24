@@ -14,28 +14,31 @@ namespace Microsoft.DotNet.Cli
                 LocalizableStrings.CommandDescription,
                 Accept.ExactlyOneArgument(errorMessage: o => LocalizableStrings.SpecifyExactlyOnePackageId)
                     .With(name: LocalizableStrings.PackageIdArgumentName,
-                        description: LocalizableStrings.PackageIdArgumentDescription),
+                          description: LocalizableStrings.PackageIdArgumentDescription),
                 Create.Option(
                     "-g|--global",
                     LocalizableStrings.GlobalOptionDescription,
                     Accept.NoArguments()),
                 Create.Option(
                     "--tool-path",
-                    LocalizableStrings.ToolPathDescription,
-                    Accept.ExactlyOneArgument()),
+                    LocalizableStrings.ToolPathOptionDescription,
+                    Accept.ExactlyOneArgument()
+                          .With(name: LocalizableStrings.ToolPathOptionName)),
                 Create.Option(
                     "--configfile",
                     LocalizableStrings.ConfigFileOptionDescription,
-                    Accept.ExactlyOneArgument()),
+                    Accept.ExactlyOneArgument()
+                          .With(name: LocalizableStrings.ConfigFileOptionName)),
                 Create.Option(
-                    "--source-feed",
-                    LocalizableStrings.SourceFeedOptionDescription,
+                    "--add-source",
+                    LocalizableStrings.AddSourceOptionDescription,
                     Accept.OneOrMoreArguments()
-                        .With(name: LocalizableStrings.SourceFeedOptionName)),
+                        .With(name: LocalizableStrings.AddSourceOptionName)),
                 Create.Option(
-                    "-f|--framework",
+                    "--framework",
                     LocalizableStrings.FrameworkOptionDescription,
-                    Accept.ExactlyOneArgument()),
+                    Accept.ExactlyOneArgument()
+                          .With(name: LocalizableStrings.FrameworkOptionName)),
                 CommonOptions.HelpOption(),
                 CommonOptions.VerbosityOption());
         }

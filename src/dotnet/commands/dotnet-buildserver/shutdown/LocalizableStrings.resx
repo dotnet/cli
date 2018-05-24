@@ -121,27 +121,33 @@
     <value>Shuts down build servers that are started from dotnet. By default, all servers are shut down.</value>
   </data>
   <data name="MSBuildOptionDescription" xml:space="preserve">
-    <value>Shuts down the MSBuild build server.</value>
+    <value>Shut down the MSBuild build server.</value>
   </data>
   <data name="VBCSCompilerOptionDescription" xml:space="preserve">
-    <value>Shuts down the VB/C# compiler build server.</value>
+    <value>Shut down the VB/C# compiler build server.</value>
   </data>
   <data name="RazorOptionDescription" xml:space="preserve">
-    <value>Shuts down the Razor build server.</value>
+    <value>Shut down the Razor build server.</value>
   </data>
   <data name="ShuttingDownServer" xml:space="preserve">
     <value>Shutting down {0}...</value>
   </data>
+  <data name="ShuttingDownServerWithPid" xml:space="preserve">
+    <value>Shutting down {0} (process {1})...</value>
+  </data>
   <data name="ShutDownSucceeded" xml:space="preserve">
     <value>{0} shut down successfully.</value>
+  </data>
+  <data name="ShutDownSucceededWithPid" xml:space="preserve">
+    <value>{0} (process {1}) shut down successfully.</value>
   </data>
   <data name="ShutDownFailed" xml:space="preserve">
     <value>{0} failed to shut down: {1}</value>
   </data>
-  <data name="ShutDownSkipped" xml:space="preserve">
-    <value>{0} shut down was skipped: {1}</value>
+  <data name="ShutDownFailedWithPid" xml:space="preserve">
+    <value>{0} (process {1}) failed to shut down: {2}</value>
   </data>
-  <data name="UnsupportedEnumValue" xml:space="preserve">
-    <value>The value '{0}' for enum type '{1}' is not supported.</value>
+  <data name="NoServersToShutdown" xml:space="preserve">
+    <value>No build servers are running.</value>
   </data>
 </root>

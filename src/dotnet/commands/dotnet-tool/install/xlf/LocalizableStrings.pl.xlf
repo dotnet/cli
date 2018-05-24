@@ -10,13 +10,13 @@ Pomyślnie zainstalowano narzędzie „{1}” (wersja: „{2}”).</target>
         <note />
       </trans-unit>
       <trans-unit id="PackageIdArgumentDescription">
-        <source>NuGet Package Id of the tool to install.</source>
-        <target state="translated">Identyfikator pakietu NuGet narzędzia do zainstalowania.</target>
+        <source>The NuGet Package Id of the tool to install.</source>
+        <target state="needs-review-translation">Identyfikator pakietu NuGet narzędzia do zainstalowania.</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandDescription">
-        <source>Installs a tool for use on the command line.</source>
-        <target state="translated">Instaluje narzędzie do użytku w wierszu polecenia.</target>
+        <source>Install a tool for use on the command line.</source>
+        <target state="needs-review-translation">Instaluje narzędzie do użytku w wierszu polecenia.</target>
         <note />
       </trans-unit>
       <trans-unit id="ConfigFileOptionDescription">
@@ -30,8 +30,8 @@ Pomyślnie zainstalowano narzędzie „{1}” (wersja: „{2}”).</target>
         <note />
       </trans-unit>
       <trans-unit id="VersionOptionDescription">
-        <source>Version of the tool package in NuGet.</source>
-        <target state="translated">Wersja pakietu narzędzia w pakiecie NuGet.</target>
+        <source>The version of the tool package to install.</source>
+        <target state="needs-review-translation">Wersja pakietu narzędzia w pakiecie NuGet.</target>
         <note />
       </trans-unit>
       <trans-unit id="PackageIdArgumentName">
@@ -45,8 +45,8 @@ Pomyślnie zainstalowano narzędzie „{1}” (wersja: „{2}”).</target>
         <note />
       </trans-unit>
       <trans-unit id="GlobalOptionDescription">
-        <source>Install user wide.</source>
-        <target state="translated">Zainstaluj dla użytkownika.</target>
+        <source>Install the tool to the current user's tools directory.</source>
+        <target state="needs-review-translation">Zainstaluj dla użytkownika.</target>
         <note />
       </trans-unit>
       <trans-unit id="InstallFullCommandNameLocalized">
@@ -99,33 +99,59 @@ Pomyślnie zainstalowano narzędzie „{1}” (wersja: „{2}”).</target>
         <target state="translated">Opcja (--global) powoduje konflikt z opcją ścieżki narzędzia (--tool-path). Określ tylko jedną z opcji.</target>
         <note />
       </trans-unit>
-      <trans-unit id="ToolPathDescription">
-        <source>Location where the tool will be installed.</source>
-        <target state="translated">Lokalizacja, w której narzędzie zostanie zainstalowane.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="SourceFeedOptionDescription">
-        <source>Adds an additional NuGet package source to use during installation.</source>
-        <target state="translated">Dodaje dodatkowe źródło pakietu NuGet do użycia podczas instalacji.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="SourceFeedOptionName">
-        <source>SOURCE_FEED</source>
-        <target state="translated">SOURCE_FEED</target>
-        <note />
-      </trans-unit>
       <trans-unit id="ToolInstallationFailed">
         <source>Tool '{0}' failed to install.</source>
-        <target state="new">Tool '{0}' failed to install.</target>
+        <target state="translated">Zainstalowanie narzędzia „{0}” nie powiodło się.</target>
         <note />
       </trans-unit>
-      <trans-unit id="ToolInstallationFailedWithExplicitVersionGuide">
-        <source>Tool '{0}' failed to install. You may need to specify the version using
+      <trans-unit id="ToolInstallationFailedWithRestoreGuidance">
+        <source>Tool '{0}' failed to install. This failure may have been caused by:
 
-   dotnet tool install -g {0} --version &lt;version&gt;</source>
-        <target state="new">Tool '{0}' failed to install. You may need to specify the version using
+* You are attempting to install a preview release and did not use the --version option to specify the version.
+* A package by this name was found, but it was not a .NET Core tool.
+* The required NuGet feed cannot be accessed, perhaps because of an Internet connection problem.
+* You mistyped the name of the tool.</source>
+        <target state="translated">Zainstalowanie narzędzia „{0}” nie powiodło się. To niepowodzenie może wynikać z następujących powodów:
 
-   dotnet tool install -g {0} --version &lt;version&gt;</target>
+* Próbujesz zainstalować wersję zapoznawczą bez użycia opcji --version do określenia wersji.
+* Znaleziono pakiet o tej nazwie, ale nie było to narzędzie .NET Core.
+* Nie można uzyskać dostępu do wymaganego kanału informacyjnego NuGet, być może ze względu na problemy z połączeniem z Internetem.
+* Błędnie wpisano nazwę narzędzia.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="AddSourceOptionDescription">
+        <source>Add an additional NuGet package source to use during installation.</source>
+        <target state="new">Add an additional NuGet package source to use during installation.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="AddSourceOptionName">
+        <source>SOURCE</source>
+        <target state="new">SOURCE</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VersionOptionName">
+        <source>VERSION</source>
+        <target state="new">VERSION</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ConfigFileOptionName">
+        <source>FILE</source>
+        <target state="new">FILE</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="FrameworkOptionName">
+        <source>FRAMEWORK</source>
+        <target state="new">FRAMEWORK</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ToolPathOptionName">
+        <source>PATH</source>
+        <target state="new">PATH</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ToolPathOptionDescription">
+        <source>The directory where the tool will be installed. The directory will be created if it does not exist.</source>
+        <target state="new">The directory where the tool will be installed. The directory will be created if it does not exist.</target>
         <note />
       </trans-unit>
     </body>
