@@ -142,25 +142,6 @@ export VSTEST_TRACE_BUILD=1
 
 dotnetInstallPath="$REPOROOT/scripts/obtain/dotnet-install.sh"
 
-################   Remove this section when the stage0 SDK stablizes on 1.1.9* for release/1.1.0   ################
-# Use bootstrap CLI '1.0.4-btstrp' for Fedora 27, Fedora 28, openSUSE 42.3, and Ubuntu 18.04
-stage0CLIVersion="1.0.4"
-
-uname=$(uname)
-if [[ "$uname" != "Darwin" ]]; then
-    . /etc/os-release
-    distro_specific_osname="$ID.$VERSION_ID"
-    echo "OS Name = $distro_specific_osname"
-
-    if [[ "$distro_specific_osname" == "fedora.27" ]] ||
-       [[ "$distro_specific_osname" == "fedora.28" ]] ||
-       [[ "$distro_specific_osname" == "opensuse.42.3" ]] ||
-       [[ "$distro_specific_osname" == "ubuntu.18.04" ]]; then
-            stage0CLIVersion="1.0.4-btstrp"
-    fi
-fi
-################   Remove this section when the stage0 SDK stablizes on 1.1.9* for release/1.1.0   ################
-
 # install the stage0PJ
 echo "installing CLI: $dotnetInstallPath --version \"1.0.0-preview3-003223\" --install-dir $DOTNET_INSTALL_DIR_PJ --architecture \"$ARCHITECTURE\""
 $dotnetInstallPath --version "1.0.0-preview3-003223" --install-dir $DOTNET_INSTALL_DIR_PJ --architecture "$ARCHITECTURE"
@@ -170,8 +151,8 @@ if [ $? != 0 ]; then
 fi
 
 # install the post-PJnistic stage0
-echo "installing CLI: $dotnetInstallPath --version \"$stage0CLIVersion\" --install-dir $DOTNET_INSTALL_DIR --architecture \"$ARCHITECTURE\""
-$dotnetInstallPath --version "$stage0CLIVersion" --install-dir $DOTNET_INSTALL_DIR --architecture "$ARCHITECTURE"
+echo "installing CLI: $dotnetInstallPath --version \"1.1.9-servicing-005253\" --install-dir $DOTNET_INSTALL_DIR --architecture \"$ARCHITECTURE\""
+$dotnetInstallPath --version "1.1.9-servicing-005253" --install-dir $DOTNET_INSTALL_DIR --architecture "$ARCHITECTURE"
 if [ $? != 0 ]; then
     echo "run-build: Error: The .NET CLI stage0 installation failed with exit code $?." >&2
     exit $?
