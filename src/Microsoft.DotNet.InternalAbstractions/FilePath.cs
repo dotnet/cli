@@ -11,6 +11,11 @@ namespace Microsoft.Extensions.EnvironmentAbstractions
 
         public FilePath(string value)
         {
+            if (!Path.IsPathRooted(value))
+            {
+                value = Path.GetFullPath(value);
+            }
+
             Value = value;
         }
 
