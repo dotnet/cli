@@ -19,5 +19,6 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkPackageVersion)" />
     <PackageReference Include="xunit" Version="$(XUnitVersion)" />
     <PackageReference Include="xunit.runner.visualstudio" Version="$(XUnitVersion)" />
+    <PackageReference Include="Microsoft.CodeCoverage" Version="$(MicrosoftNETTestSdkPackageVersion)" />
   </ItemGroup>
 </Project>

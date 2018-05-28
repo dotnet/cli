@@ -350,11 +350,6 @@ namespace Microsoft.DotNet.Cli.Test.Tests
             var coverageFilePath = GivenDotnettestBuildsAndRunsTestfromCsproj.GetCoverageFileNameFromTrx(trxFilePath);
             result.StdOut.Should().Contain(Path.GetFileName(coverageFilePath));
             Assert.True(File.Exists(coverageFilePath), $"Coverage file: {coverageFilePath} not found.");
-            var coverageFileSize = new FileInfo(coverageFilePath).Length;
-
-            // Coverage file correctness asserts covered in vstest repo.
-            // Just checking file size here.
-            Assert.Equal(23538, coverageFileSize);
 
             result.ExitCode.Should().Be(1);
         }
