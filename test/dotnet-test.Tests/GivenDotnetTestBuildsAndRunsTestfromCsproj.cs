@@ -314,6 +314,48 @@ namespace Microsoft.DotNet.Cli.Test.Tests
 
 
         [Fact]
+        public void ItCreatesCoverageFileWhenCodeCoverageEnabledByRunsettings()
+        {
+            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp("12");
+
+            string trxLoggerDirectory = Path.Combine(testProjectDirectory, "RD");
+
+            // Delete trxLoggerDirectory if it exist
+            if (Directory.Exists(trxLoggerDirectory))
+            {
+                Directory.Delete(trxLoggerDirectory, true);
+            }
+
+            var settingsPath =Path.Combine(AppContext.BaseDirectory, "CollectCodeCoverage.runsettings");
+
+            // Call test
+            CommandResult result = new DotnetTestCommand()
+                                        .WithWorkingDirectory(testProjectDirectory)
+                                        .ExecuteWithCapturedOutput(
+                                            "--settings " + settingsPath
+                                            + " --logger \"trx;logfilename=custom.trx\" "
+                                            + "--results-directory " + trxLoggerDirectory);
+
+            // Verify test results
+            if (!DotnetUnderTest.IsLocalized())
+            {
+                result.StdOut.Should().Contain("Total tests: 2. Passed: 1. Failed: 1. Skipped: 0.");
+            }
+
+            // Verify trx file.
+            var trxFilePath = Path.Combine(trxLoggerDirectory, "custom.trx");
+            Assert.True(File.Exists(trxFilePath));
+            result.StdOut.Should().Contain(trxFilePath);
+
+            // Verify coverage file.
+            var coverageFilePath = GivenDotnettestBuildsAndRunsTestfromCsproj.GetCoverageFileNameFromTrx(trxFilePath);
+            result.StdOut.Should().Contain(Path.GetFileName(coverageFilePath));
+            Assert.True(File.Exists(coverageFilePath), $"Coverage file: {coverageFilePath} not found.");
+
+            result.ExitCode.Should().Be(1);
+        }
+
+        [Fact(Skip = "Code coverage with default runsettings failing on jenkins CI, fix tracking https://github.com/Microsoft/vstest/pull/1619")]
         public void ItCreatesCoverageFileInResultsDirectory()
         {
             var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp("11");
@@ -325,7 +367,6 @@ namespace Microsoft.DotNet.Cli.Test.Tests
             {
                 Directory.Delete(trxLoggerDirectory, true);
             }
-
 
             // Call test
             CommandResult result = new DotnetTestCommand()
