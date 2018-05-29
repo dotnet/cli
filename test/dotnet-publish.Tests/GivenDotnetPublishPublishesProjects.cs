@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
         }
 
         [Theory]
-        [InlineData("1.1.9-servicing-001731-00")]
+        [InlineData("1.1.9-servicing-001739-00")]
         public void ItPublishesARunnableSelfContainedAppWithAnExplictRuntime(string runtimeFrameworkVersion)
         {
             var testAppName = "MSBuildTestApp";
@@ -88,12 +88,6 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
             var testProjectDirectory = testInstance.Root;
 
             var rid = DotnetLegacyRuntimeIdentifiers.InferLegacyRestoreRuntimeIdentifier();
-
-            new RestoreCommand()
-                .WithRuntime(rid)
-                .WithWorkingDirectory(testProjectDirectory)
-                .Execute($"/p:SkipInvalidConfigurations=true /p:RuntimeFrameworkVersion={runtimeFrameworkVersion}")
-                .Should().Pass();
 
             new PublishCommand()
                 .WithFramework("netcoreapp1.1")
