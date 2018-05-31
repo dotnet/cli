@@ -2,7 +2,7 @@
 
 The runtime configuration files store the dependencies of an application (formerly stored in the `.deps` file). They also include runtime configuration options, such as the Garbage Collector mode. Optionally they can also include data for runtime compilation (compilation settings used to compile the original application, and reference assemblies used by the application).
 
-**Note:** This document doesn't provide full explanations as to why individual items are needed in this file. That is covered in the [`apphost` spec](corehost.md) and via the `Microsoft.Extensions.DependencyModel` assembly.
+**Note:** This document doesn't provide full explanations as to why individual items are needed in this file. That is covered in the [host spec](corehost.md) and via the `Microsoft.Extensions.DependencyModel` assembly.
 
 ## What produces the files and where are they?
 
@@ -12,7 +12,7 @@ There are two runtime configuration files for a particular application. Given a 
 * `MyApp.exe` - A copy of the `apphost.exe` executable. This is present when the application is self-contained, and in newer functionality (2.1.0+) for framework-dependent applications that wish to support platform-specific (non-portable) executables.
 * `MyApp.runtimeconfig.json` - An **optional** configuration file containing runtime configuration settings. This file is required for framework-dependent applications, but not for self-contained apps.
 * `MyApp.runtimeconfig.dev.json` - An **optional** configuration file containing runtime configuration settings that typically only exists in a non-published output and thus is used for development-time scenarios. This file typically specifies additional probing paths. Depending on the semantics of each setting, the setting is either combined with or overridden by the values from `MyApp.runtimeconfig.json`.
-* `MyApp.deps.json` - A list of dependencies, as well as compilation context data, compilation dependencies and version information used to address assembly conflicts. Not technically required, but required to use the servicing or package cache/shared package install features. If the file is not present, all assemblies in the current folder are used instead.
+* `MyApp.deps.json` - A list of dependencies, compilation dependencies and version information used to address assembly conflicts. Not technically required, but required to use the servicing or package cache/shared package install features, and to assist during roll-forward scenarios to select the newest version of any assembly that exists more than once in the application and framework(s). If the file is not present, all assemblies in the current folder are used instead.
 
 The `MyApp.runtimeconfig.json` is designed to be user-editable (in the case of an app consumer wanting to change various CLR runtime options for an app, much like the `MyApp.exe.config` XML file works in .NET 4.x today). However, the `MyApp.deps.json` file is designed to be processed by automated tools and should not be user-edited. Having the files as separate makes this clearer. We could use a different format for the deps file, but if we're already integrating a JSON parser into the host, it seems most appropriate to re-use that here. Also, there are diagnostic benefits to being able to read the `.deps.json` file in a simple text editor.
 
@@ -128,18 +128,18 @@ This section is created when building a project. Settings include:
   * For example, if `version=1.0.1` and `applyPatches` is `true`, the host would load the shared framework from `1.0.{n}`, where `n >= 1`, but will not load from `1.1.0`, even if present. When `applyPatches` is `false`, the shared framework will be loaded from `1.0.1` strictly.
   * **Note:** This does not apply to `pre-release` versions; it applies only to `production` releases.
   * **Note:** This section should not exist self-contained applications because they do not rely upon a shared framework.
-* `rollForwardOnNoCandidateFx` - Determines roll-forward behavior of major and minor. Only applies to `production` releases. Values: 0(Off), 1 (roll forward on [minor]), Roll forward on [major] and [minor]
+* `rollForwardOnNoCandidateFx` - Determines roll-forward behavior of major and minor. Only applies to `production` releases. Values: 0(Off), 1 (roll forward on [minor]), 2 (Roll forward on [major] and [minor])
  See [roll-forward-on-no-candidate documentation](https://github.com/dotnet/core-setup/blob/master/Documentation/design-docs/roll-forward-on-no-candidate-fx.md) for more information.
 
-These settings are read by `apphost` to determine how to initialize the runtime. All versions of `apphost` **must ignore** settings in this section that they do not understand (thus allowing new settings to be added in later versions).
+These settings are read by host (apphost or dotnet executable) to determine how to initialize the runtime. All versions of the host **must ignore** settings in this section that they do not understand (thus allowing new settings to be added in later versions).
 
 ### `compilationOptions` Section (`.deps.json`)
 
-This section is created during build from the project's settings. The exact settings found here are specific to the compiler that produced the original application binary. Some example settings include: `defines`, `languageVersion` (C#/VB), `allowUnsafe` (C#), etc.
+This section is created during build from the project's settings. The exact settings found here are specific to the compiler that produced the original application binary. Some example settings include: `defines`, `languageVersion` (e.g. the version of C# or VB), `allowUnsafe` (a C# option), etc.
 
 ### `runtimeTarget` Section (`.deps.json`)
 
-This property contains the name of the target from `targets` that should be used by the runtime. This is present to simplify `apphost` so that it does not have to parse or understand target names and the meaning thereof.
+This property contains the name of the target from `targets` that should be used by the runtime. This is present to simplify the host so that it does not have to parse or understand target names and the meaning thereof.
 
 ### `targets` Section (`.deps.json`)
 
@@ -147,7 +147,7 @@ This section contains subsetted data from the input `project.lock.json`.
 
 Each property under `targets` describes a "target", which is a collection of libraries required by the application when run or compiled in a certain framework and platform context. A target **must** specify a Framework name, and **may** specify a Runtime Identifier. Targets without Runtime Identifiers represent the dependencies and assets used for compiling the application for a particular framework. Targets with Runtime Identifiers represent the dependencies and assets used for running the application under a particular framework and on the platform defined by the Runtime Identifier. In the example above, the `.NETStandardApp,Version=v1.5` target lists the dependencies and assets used to compile the application for `dnxcore50`, and the `.NETStandardApp,Version=v1.5/osx.10.10-x64` target lists the dependencies and assets used to run the application on `dnxcore50` on a 64-bit Mac OS X 10.10 machine.
 
-There will always be two targets in the `[appname].runtimeconfig.json` file: A compilation target, and a runtime target. The compilation target will be named with the framework name used for the compilation (`.NETStandardApp,Version=v1.5` in the example above). The runtime target will be named with the framework name and runtime identifier used to execute the application (`.NETStandardApp,Version=v1.5/osx.10.10-x64` in the example above). However, the runtime target will also be identified by name in the `runtimeOptions` section, so that `apphost` need not parse and understand target names.
+There will always be two targets in the `[appname].runtimeconfig.json` file: A compilation target, and a runtime target. The compilation target will be named with the framework name used for the compilation (`.NETStandardApp,Version=v1.5` in the example above). The runtime target will be named with the framework name and runtime identifier used to execute the application (`.NETStandardApp,Version=v1.5/osx.10.10-x64` in the example above). However, the runtime target will also be identified by name in the `runtimeOptions` section, so that the host does not need to parse and understand target names.
 
 The content of each target property in the JSON is a JSON object. Each property of that JSON object represents a single dependency required by the application when compiled for/run on that target. The name of the property contains the ID and Version of the dependency in the form `[Id]/[Version]`. The content of the property is another JSON object containing metadata about the dependency.
 
@@ -161,7 +161,7 @@ The `native` property of a dependency object lists the relative paths to Native 
 
 In compilation targets, the `runtime`, `resources` and `native` properties of a dependency are omitted, because they are not relevant to compilation. Similarly, in runtime targets, the `compile` property is omitted, because it is not relevant to runtime.
 
-Only dependencies with a `type` value of `package` should be considered by `apphost`. There may be other items, used for other purposes (for example, Projects, Reference Assemblies, etc.
+Only dependencies with a `type` value of `package` should be considered by the host. There may be other items, used for other purposes (for example, Projects, Reference Assemblies, etc.
 
 ### `libraries` Section (`.deps.json`)
 
@@ -171,7 +171,7 @@ This section contains a union of all the dependencies found in the various targe
 
 The file is read by two different components:
 
-* `apphost` uses it to determine what to place on the TPA and Native Library Search Path lists, as well as what runtime settings to apply (GC type, etc.). See [the `apphost` spec](corehost.md).
+* The host uses it to determine what to place on the TPA and Native Library Search Path lists, as well as what runtime settings to apply (GC type, etc.). See [the host spec](corehost.md).
 * `Microsoft.Extensions.DependencyModel` uses it to allow a running managed application to query various data about it's dependencies. For example:
   * To find all dependencies that depend on a particular package (used by ASP.NET MVC and other plugin-based systems to identify assemblies that should be searched for possible plugin implementations)
   * To determine the reference assemblies used by the application when it was compiled in order to allow runtime compilation to use the same reference assemblies (used by ASP.NET Razor to compile views)
@@ -183,7 +183,7 @@ Some of the sections in the `.deps.json` file contain data used for runtime comp
 
 ## Framework-dependent Deployment Model
 
-An application can be deployed in a "framework-dependent" deployment model. In this case, the RID-specific assets of packages are published within a folder structure that preserves the RID metadata. However, `apphost` does not use this folder structure, rather it reads data from the `.deps.json` file. Also, during deployment, the `.exe` file (`apphost` renamed) is not deployed by default.
+An application can be deployed in a "framework-dependent" deployment model. In this case, the RID-specific assets of packages are published within a folder structure that preserves the RID metadata. However the host does not use this folder structure, rather it reads data from the `.deps.json` file. Also, during deployment, the `.exe` file (`apphost.exe` renamed) is not deployed by default.
 
 In the framework-dependent deployment model, the `*.runtimeConfig.json` file will contain the `runtimeOptions.framework` section:
 
@@ -234,11 +234,11 @@ The shared framework's deps file will also contain a `runtimes` section defining
 }
 ```
 
-The host will have a RID embedded in it during compilation (for example, `win10-x64` for Windows 64-bit). It will look up the corresponding entry in the `runtimes` section to identify what the fallback list is for `win10-x64`. The fallbacks are identified from most-specific to least-specific. In the case of `win10-x64` and the example above, the fallback list is: `"win10-x64", "win10", "win81-x64", "win81", "win8-x64", "win8", "win7-x64", "win7", "win-x64", "win", "any", "base"` (note that an exact match on the RID itself is the first preference, followed by the first item in the fallback list, then the next item, and so on).
+The host will detect the RID at runtime (for example, `win10-x64` for Windows 64-bit). It will look up the corresponding entry in the `runtimes` section to identify what the fallback list is for `win10-x64`. The fallbacks are identified from most-specific to least-specific. In the case of `win10-x64` and the example above, the fallback list is: `"win10-x64", "win10", "win81-x64", "win81", "win8-x64", "win8", "win7-x64", "win7", "win-x64", "win", "any", "base"` (note that an exact match on the RID itself is the first preference, followed by the first item in the fallback list, then the next item, and so on).
 
-In the app-local deps file for a `framework-dependent` application, the package entries may have an additional `runtimeTargets` section detailing RID-specific assets. The `apphost` application should use this data, along with the current RID and the RID fallback data defined in the `runtimes` section of the shared framework deps file to select one **and only one** RID value out of each package individually. The most specific RID present within the package should always be selected.
+In the app-local deps file for a `framework-dependent` application, the package entries may have an additional `runtimeTargets` section detailing RID-specific assets. The host should use this data, along with the current RID and the RID fallback data defined in the `runtimes` section of the shared framework deps file to select one **and only one** RID value out of each package individually. The most specific RID present within the package should always be selected.
 
-Consider `apphost` built for `ubuntu.14.04-x64` and the following snippet from an app-local deps file (some sections removed for brevity).
+Consider an application built for `ubuntu.14.04-x64` and the following snippet from an app-local deps file (some sections removed for brevity).
 
 ```json
 {
