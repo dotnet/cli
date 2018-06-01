@@ -25,6 +25,7 @@
     <TemplateEngineVersion>1.0.0-beta2-20170629-269</TemplateEngineVersion>
     <AspnetTemplateVersion>1.1.5-rtm-10863</AspnetTemplateVersion>
     <TemplateEngineTemplateVersion>1.0.0-beta2-20170907-306</TemplateEngineTemplateVersion>
+    <AspnetTemplateVersion>1.0.0-beta2-20170907-306</AspnetTemplateVersion>
     <PlatformAbstractionsVersion>1.0.3</PlatformAbstractionsVersion>
     <DependencyModelVersion>1.0.3</DependencyModelVersion>
     <MicroBuildCorePackageVersion>0.2.0</MicroBuildCorePackageVersion>
