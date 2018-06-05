@@ -55,7 +55,7 @@ namespace Microsoft.Extensions.EnvironmentAbstractions
 
         public DirectoryPath GetParentPath()
         {
-            return new DirectoryPath(Path.GetDirectoryName(Path.GetFullPath(Value)));
+            return new DirectoryPath(Path.GetDirectoryName(Value));
         }
     }
 }
