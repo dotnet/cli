@@ -3,14 +3,23 @@
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 #
 
-FROM microsoft/dotnet-buildtools-prereqs:opensuse132_prereqs_v4
+# Dockerfile that creates a container suitable to build dotnet-cli
+FROM microsoft/dotnet-buildtools-prereqs:ubuntu-18.04-f90bc20-20180320154721
 
-RUN zypper -n install sudo \
-    ncurses-utils && \
-    zypper clean -a
+RUN apt-get update && \
+    apt-get -qqy install \
+        debhelper \
+        build-essential \
+        devscripts \
+        git \
+        libcurl4 \
+        sudo && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 # Setup User to match Host User, and give superuser permissions
 ARG USER_ID=0
-RUN useradd -m code_executor -u ${USER_ID} -g wheel
+RUN useradd -m code_executor -u ${USER_ID} -g sudo
 RUN echo 'code_executor ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 # With the User Change, we need to change permissions on these directories

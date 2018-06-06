@@ -128,7 +128,7 @@ while read line; do
     fi
 done < "$REPOROOT/branchinfo.txt"
 
-# Use a repo-local install directory (but not the artifacts directory because that gets cleaned a lot
+# Create a stage0 PJ install directory
 [ -z "$DOTNET_INSTALL_DIR_PJ" ] && export DOTNET_INSTALL_DIR_PJ=$REPOROOT/.dotnet_stage0PJ/$ARCHITECTURE
 [ -d "$DOTNET_INSTALL_DIR_PJ" ] || mkdir -p $DOTNET_INSTALL_DIR_PJ
 
@@ -136,38 +136,25 @@ done < "$REPOROOT/branchinfo.txt"
 [ -z "$DOTNET_INSTALL_DIR" ] && export DOTNET_INSTALL_DIR=$REPOROOT/.dotnet_stage0/$ARCHITECTURE
 [ -d "$DOTNET_INSTALL_DIR" ] || mkdir -p $DOTNET_INSTALL_DIR
 
-# During xplat bootstrapping, disable HTTP parallelism to avoid fatal restore timeouts.
-export __INIT_TOOLS_RESTORE_ARGS="$__INIT_TOOLS_RESTORE_ARGS --disable-parallel"
-
 # Enable verbose VS Test Console logging
 export VSTEST_BUILD_TRACE=1
 export VSTEST_TRACE_BUILD=1
 
-DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
-toolsLocalPath="$REPOROOT/build_tools"
-bootStrapperPath="$toolsLocalPath/bootstrap.sh"
-dotnetInstallPath="$toolsLocalPath/dotnet-install.sh"
-if [ ! -f $bootStrapperPath ]; then
-    if [ ! -d $toolsLocalPath ]; then
-        mkdir $toolsLocalPath
-    fi
-    download "https://raw.githubusercontent.com/dotnet/buildtools/master/bootstrap/bootstrap.sh" "$bootStrapperPath"
-    chmod u+x $bootStrapperPath
-fi
+dotnetInstallPath="$REPOROOT/scripts/obtain/dotnet-install.sh"
 
-echo "installing build_tools: $bootStrapperPath --repositoryRoot \"$REPOROOT\" --toolsLocalPath \"$toolsLocalPath\" --cliInstallPath $DOTNET_INSTALL_DIR_PJ --architecture $ARCHITECTURE"
-$bootStrapperPath --repositoryRoot "$REPOROOT" --toolsLocalPath "$toolsLocalPath" --cliInstallPath $DOTNET_INSTALL_DIR_PJ --architecture $ARCHITECTURE --verbose
-
+# install the stage0PJ
+echo "installing CLI: $dotnetInstallPath --version \"1.0.0-preview3-003223\" --install-dir $DOTNET_INSTALL_DIR_PJ --architecture \"$ARCHITECTURE\""
+$dotnetInstallPath --version "1.0.0-preview3-003223" --install-dir $DOTNET_INSTALL_DIR_PJ --architecture "$ARCHITECTURE"
 if [ $? != 0 ]; then
-    echo "run-build: Error: Boot-strapping failed with exit code $?, see bootstrap.log for more information." >&2
+    echo "run-build: Error: The .NET CLI stage0PJ installation failed with exit code $?." >&2
     exit $?
 fi
 
-# now execute the script
-echo "installing CLI: $dotnetInstallPath --version \"1.0.4\" --install-dir $DOTNET_INSTALL_DIR --architecture \"$ARCHITECTURE\""
-$dotnetInstallPath --version "1.0.4" --install-dir $DOTNET_INSTALL_DIR --architecture "$ARCHITECTURE"
+# install the post-PJnistic stage0
+echo "installing CLI: $dotnetInstallPath --version \"1.1.9-servicing-005253\" --install-dir $DOTNET_INSTALL_DIR --architecture \"$ARCHITECTURE\""
+$dotnetInstallPath --version "1.1.9-servicing-005253" --install-dir $DOTNET_INSTALL_DIR --architecture "$ARCHITECTURE"
 if [ $? != 0 ]; then
-    echo "run-build: Error: Boot-strapping post-PJ stage0 with exit code $?." >&2
+    echo "run-build: Error: The .NET CLI stage0 installation failed with exit code $?." >&2
     exit $?
 fi
 
@@ -184,8 +171,6 @@ fi
 
 # Disable first run since we want to control all package sources
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
-
-echo "${args[@]}"
 
 if [ $BUILD -eq 1 ]; then
     dotnet msbuild build.proj /m /v:diag /p:Architecture=$ARCHITECTURE "${args[@]}"

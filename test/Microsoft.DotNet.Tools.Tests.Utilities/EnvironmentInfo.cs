@@ -15,8 +15,12 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
                 switch (rid)
                 {
                     case "fedora.24-x64":
+                    case "fedora.27-x64":
+                    case "fedora.28-x64":
                     case "opensuse.42.1-x64":
+                    case "opensuse.42.3-x64":
                     case "ubuntu.16.10-x64":
+                    case "ubuntu.18.04-x64":
                         return false;
                 }
             }
