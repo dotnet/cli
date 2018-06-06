@@ -1,4 +1,4 @@
-// Copyright (c) .NET Foundation and contributors. All rights reserved.
+﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -606,6 +606,33 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             reporter.Lines.Should().Contain(l => l.Contains("warning"));
             reporter.Lines.Should().NotContain(l => l.Contains(tempProject.Value));
             reporter.Lines.Clear();
+
+            AssertPackageInstall(reporter, fileSystem, package, store);
+
+            package.Uninstall();
+        }
+
+        [Fact]
+        public void GivenARootWithNonAsciiCharactorInstallSucceeds()
+        {
+            var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
+
+            string nonAscii = "ab Ṱ̺̺̕o 田中さん åä";
+            var root = new DirectoryPath(Path.Combine(TempRoot.Root, nonAscii, Path.GetRandomFileName()));
+            var reporter = new BufferedReporter();
+            var fileSystem = new FileSystemWrapper();
+            var store = new ToolPackageStore(root);
+            var installer = new ToolPackageInstaller(
+                store: store,
+                projectRestorer: new ProjectRestorer(reporter),
+                tempProject: GetUniqueTempProjectPathEachTest(),
+                offlineFeed: new DirectoryPath("does not exist"));
+
+            var package = installer.InstallPackage(
+                packageId: TestPackageId,
+                versionRange: VersionRange.Parse(TestPackageVersion),
+                targetFramework: _testTargetframework,
+                nugetConfig: nugetConfigPath);
 
             AssertPackageInstall(reporter, fileSystem, package, store);
 
