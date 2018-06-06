@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.Migration.Tests
 {
     public class GivenThatIWantToMigrateTestApps : TestBase
     {
-        [Theory]
+        [RequiresSpecificFrameworkTheory("netcoreapp1.0")]
         [InlineData("TestAppWithRuntimeOptions")]
         [InlineData("TestAppWithContents")]
         [InlineData("AppWithAssemblyInfo")]
@@ -83,7 +83,7 @@ namespace Microsoft.DotNet.Migration.Tests
             BuildMSBuild(projectDirectory, projectName, framework: framework);
         }
 
-        [Fact]
+        [RequiresSpecificFrameworkFact("netcoreapp1.0")]
         public void ItMigratesSignedApps()
         {
             var projectDirectory = TestAssets
@@ -113,7 +113,7 @@ namespace Microsoft.DotNet.Migration.Tests
             VerifyAllMSBuildOutputsAreSigned(projectDirectory);
         }
 
-        [Fact]
+        [RequiresSpecificFrameworkFact("netcoreapp1.0")]
         public void ItMigratesDotnetNewConsoleWithIdenticalOutputs()
         {
             var projectDirectory = TestAssets
@@ -417,7 +417,7 @@ namespace Microsoft.DotNet.Migration.Tests
             VerifyMigration(migratedProjects, projectDirectory);
          }
 
-         [Fact]
+         [RequiresSpecificFrameworkFact("netcoreapp1.0")]
          // regression test for https://github.com/dotnet/cli/issues/4269
          public void ItMigratesAndBuildsP2PReferences()
          {
@@ -452,7 +452,7 @@ namespace Microsoft.DotNet.Migration.Tests
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
          }
 
-         [Theory]
+         [RequiresSpecificFrameworkTheory("netcoreapp1.0")]
          [InlineData("src", "H")]
          [InlineData("src with spaces", "J")]
          public void ItMigratesAndBuildsProjectsInGlobalJson(string path, string projectNameSuffix)
@@ -583,7 +583,7 @@ namespace Microsoft.DotNet.Migration.Tests
             VerifyAllMSBuildOutputsRunnable(projectDirectory);
         }
 
-        [Fact]
+        [RequiresSpecificFrameworkFact("netcoreapp1.0")]
         public void ItBuildsAMigratedAppWithAnIndirectDependency()
         {
             const string projectName = "ProjectA";

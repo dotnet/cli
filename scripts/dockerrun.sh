@@ -53,11 +53,14 @@ done
 if [ -z "$DOCKERFILE" ]; then
     if [ -z "$DOCKER_IMAGENAME" ]; then
         if [ "$(uname)" == "Darwin" ]; then
-            echo "Defaulting to 'ubuntu' image for Darwin"
-            export DOCKERFILE=scripts/docker/ubuntu
+            echo "Defaulting to 'ubuntu.16.04' image for Darwin"
+            export DOCKERFILE=scripts/docker/ubuntu.16.04
         elif [ "$(cat /etc/*-release | grep -cim1 ubuntu)" -eq 1 ]; then
             echo "Detected current OS as Ubuntu, determining ubuntu version to use..."
-            if [ "$(cat /etc/*-release | grep -cim1 16.04)" -eq 1 ]; then
+            if [ "$(cat /etc/*-release | grep -cim1 18.04)" -eq 1 ]; then
+                echo "using 'ubuntu.18.04' image"
+                export DOCKERFILE=scripts/docker/ubuntu.18.04
+            elif [ "$(cat /etc/*-release | grep -cim1 16.04)" -eq 1 ]; then
                 echo "using 'ubuntu.16.04' image"
                 export DOCKERFILE=scripts/docker/ubuntu.16.04
             else
@@ -72,19 +75,19 @@ if [ -z "$DOCKERFILE" ]; then
             export DOCKERFILE=scripts/docker/debian
         elif [ "$(cat /etc/*-release | grep -cim1 fedora)" -eq 1 ]; then
             echo "Detected current OS as Fedora, determining fedora version to use..."
-            if [ "$(cat /etc/*-release | grep -cim1 23)" -eq 1 ]; then
-                echo "using 'fedora.23' image"
-                export DOCKERFILE=scripts/docker/fedora.23
+            if [ "$(cat /etc/*-release | grep -cim1 28)" -eq 1 ]; then
+                echo "using 'fedora.28' image"
+                export DOCKERFILE=scripts/docker/fedora.28
+            else
+                echo "using 'fedora.27' image"
+                export DOCKERFILE=scripts/docker/fedora.27
             fi
         elif [ "$(cat /etc/*-release | grep -cim1 opensuse)" -eq 1 ]; then
-            echo "Detected current OS as openSUSE, determining openSUSE version to use..."
-            if [ "$(cat /etc/*-release | grep -cim1 13.2)" -eq 1 ]; then
-                echo "using 'openSUSE.13.2' image"
-                export DOCKERFILE=scripts/docker/opensuse.13.2
-            fi
+            echo "Detected current OS as openSUSE, using 'openSUSE.42.3' image"
+            export DOCKERFILE=scripts/docker/opensuse.42.3
         else
-            echo "Unknown Linux Distro. Using 'ubuntu' image"
-            export DOCKERFILE=scripts/docker/ubuntu
+            echo "Unknown Linux Distro. Using 'ubuntu.16.04' image"
+            export DOCKERFILE=scripts/docker/ubuntu.16.04
         fi
     else
         echo "Using requested image: $DOCKER_IMAGENAME"
@@ -116,20 +119,14 @@ docker run $INTERACTIVE -t --rm --sig-proxy=true \
     --name $DOTNET_BUILD_CONTAINER_NAME \
     -v $DOCKER_HOST_SHARE_DIR:/opt/code \
     -e CHANNEL \
-    -e CONNECTION_STRING \
     -e REPO_ID \
     -e REPO_USER \
-    -e REPO_PASS \
     -e REPO_SERVER \
     -e DOTNET_BUILD_SKIP_CROSSGEN \
     -e PUBLISH_TO_AZURE_BLOB \
     -e NUGET_FEED_URL \
-    -e NUGET_API_KEY \
-    -e GITHUB_PASSWORD \
-    -e ARTIFACT_STORAGE_KEY \
     -e ARTIFACT_STORAGE_ACCOUNT \
     -e ARTIFACT_STORAGE_CONTAINER \
-    -e CHECKSUM_STORAGE_KEY \
     -e CHECKSUM_STORAGE_ACCOUNT \
     -e CHECKSUM_STORAGE_CONTAINER \
     -e CLIBUILD_SKIP_TESTS \
@@ -138,10 +135,7 @@ docker run $INTERACTIVE -t --rm --sig-proxy=true \
     -e RELEASESUFFIX \
     -e COREFXAZURECONTAINER \
     -e AZUREACCOUNTNAME \
-    -e AZUREACCESSTOKEN \
-    -e VSOPASSWORD \
     -e RELEASETOOLSGITURL \
     -e CORESETUPBLOBROOTURL \
-    -e CORESETUPBLOBACCESSTOKEN \
     $DOTNET_BUILD_CONTAINER_TAG \
     $BUILD_COMMAND "$@"
