@@ -84,7 +84,7 @@ namespace Microsoft.DotNet.Cli.Test.Tests
             result.ExitCode.Should().Be(1);
         }
 
-        [WindowsOnlyFact(Skip = "Code coverage with default runsettings failing on jenkins CI, fix tracking https://github.com/Microsoft/vstest/pull/1619")]
+        [WindowsOnlyFact]
         public void ItCreatesTwoCoverageFilesForMultiTargetedProject()
         {
             // Copy XunitMulti project in output directory of project dotnet-test.Tests

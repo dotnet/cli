@@ -313,10 +313,10 @@ namespace Microsoft.DotNet.Cli.Test.Tests
         }
 
 
-        [Fact]
+        [WindowsOnlyFact]
         public void ItCreatesCoverageFileWhenCodeCoverageEnabledByRunsettings()
         {
-            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp("12");
+            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp("11");
 
             string trxLoggerDirectory = Path.Combine(testProjectDirectory, "RD");
 
@@ -355,10 +355,10 @@ namespace Microsoft.DotNet.Cli.Test.Tests
             result.ExitCode.Should().Be(1);
         }
 
-        [Fact(Skip = "Code coverage with default runsettings failing on jenkins CI, fix tracking https://github.com/Microsoft/vstest/pull/1619")]
+        [WindowsOnlyFact]
         public void ItCreatesCoverageFileInResultsDirectory()
         {
-            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp("11");
+            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp("12");
 
             string trxLoggerDirectory = Path.Combine(testProjectDirectory, "RD");
 
