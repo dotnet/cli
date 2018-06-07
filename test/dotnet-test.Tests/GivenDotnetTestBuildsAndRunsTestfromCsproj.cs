@@ -318,12 +318,12 @@ namespace Microsoft.DotNet.Cli.Test.Tests
         {
             var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp("11");
 
-            string trxLoggerDirectory = Path.Combine(testProjectDirectory, "RD");
+            string resultsDirectory = Path.Combine(testProjectDirectory, "RD");
 
-            // Delete trxLoggerDirectory if it exist
-            if (Directory.Exists(trxLoggerDirectory))
+            // Delete resultsDirectory if it exist
+            if (Directory.Exists(resultsDirectory))
             {
-                Directory.Delete(trxLoggerDirectory, true);
+                Directory.Delete(resultsDirectory, true);
             }
 
             var settingsPath =Path.Combine(AppContext.BaseDirectory, "CollectCodeCoverage.runsettings");
@@ -333,8 +333,7 @@ namespace Microsoft.DotNet.Cli.Test.Tests
                                         .WithWorkingDirectory(testProjectDirectory)
                                         .ExecuteWithCapturedOutput(
                                             "--settings " + settingsPath
-                                            + " --logger \"trx;logfilename=custom.trx\" "
-                                            + "--results-directory " + trxLoggerDirectory);
+                                            + " --results-directory " + resultsDirectory);
 
             // Verify test results
             if (!DotnetUnderTest.IsLocalized())
@@ -342,15 +341,10 @@ namespace Microsoft.DotNet.Cli.Test.Tests
                 result.StdOut.Should().Contain("Total tests: 2. Passed: 1. Failed: 1. Skipped: 0.");
             }
 
-            // Verify trx file.
-            var trxFilePath = Path.Combine(trxLoggerDirectory, "custom.trx");
-            Assert.True(File.Exists(trxFilePath));
-            result.StdOut.Should().Contain(trxFilePath);
-
             // Verify coverage file.
-            var coverageFilePath = GivenDotnettestBuildsAndRunsTestfromCsproj.GetCoverageFileNameFromTrx(trxFilePath);
-            result.StdOut.Should().Contain(Path.GetFileName(coverageFilePath));
-            Assert.True(File.Exists(coverageFilePath), $"Coverage file: {coverageFilePath} not found.");
+            DirectoryInfo d = new DirectoryInfo(resultsDirectory);
+            FileInfo[] coverageFileInfos = d.GetFiles("*.coverage", SearchOption.AllDirectories);
+            Assert.Equal(1, coverageFileInfos.Length);
 
             result.ExitCode.Should().Be(1);
         }
@@ -360,12 +354,12 @@ namespace Microsoft.DotNet.Cli.Test.Tests
         {
             var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp("12");
 
-            string trxLoggerDirectory = Path.Combine(testProjectDirectory, "RD");
+            string resultsDirectory = Path.Combine(testProjectDirectory, "RD");
 
-            // Delete trxLoggerDirectory if it exist
-            if (Directory.Exists(trxLoggerDirectory))
+            // Delete resultsDirectory if it exist
+            if (Directory.Exists(resultsDirectory))
             {
-                Directory.Delete(trxLoggerDirectory, true);
+                Directory.Delete(resultsDirectory, true);
             }
 
             // Call test
@@ -373,8 +367,7 @@ namespace Microsoft.DotNet.Cli.Test.Tests
                                         .WithWorkingDirectory(testProjectDirectory)
                                         .ExecuteWithCapturedOutput(
                                             "--collect \"Code Coverage\" "
-                                            + "--logger \"trx;logfilename=custom.trx\" "
-                                            + "--results-directory " + trxLoggerDirectory);
+                                            + "--results-directory " + resultsDirectory);
 
             // Verify test results
             if (!DotnetUnderTest.IsLocalized())
@@ -382,17 +375,35 @@ namespace Microsoft.DotNet.Cli.Test.Tests
                 result.StdOut.Should().Contain("Total tests: 2. Passed: 1. Failed: 1. Skipped: 0.");
             }
 
-            // Verify trx file.
-            var trxFilePath = Path.Combine(trxLoggerDirectory, "custom.trx");
-            Assert.True(File.Exists(trxFilePath));
-            result.StdOut.Should().Contain(trxFilePath);
-
             // Verify coverage file.
-            var coverageFilePath = GivenDotnettestBuildsAndRunsTestfromCsproj.GetCoverageFileNameFromTrx(trxFilePath);
-            result.StdOut.Should().Contain(Path.GetFileName(coverageFilePath));
-            Assert.True(File.Exists(coverageFilePath), $"Coverage file: {coverageFilePath} not found.");
+            DirectoryInfo d = new DirectoryInfo(resultsDirectory);
+            FileInfo[] coverageFileInfos = d.GetFiles("*.coverage", SearchOption.AllDirectories);
+            Assert.Equal(1, coverageFileInfos.Length);
 
             result.ExitCode.Should().Be(1);
+        }
+
+        [UnixOnlyFact]
+        public void ItShouldShowWarningMessageOnCollectCodeCoverage()
+        {
+            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp("13");
+
+            // Call test
+            CommandResult result = new DotnetTestCommand()
+                                        .WithWorkingDirectory(testProjectDirectory)
+                                        .ExecuteWithCapturedOutput(
+                                            "--collect \"Code Coverage\" "
+                                            + "--filter VSTestPassTest");
+
+            // Verify test results
+            if (!DotnetUnderTest.IsLocalized())
+            {
+                result.StdOut.Should().Contain("No code coverage data available. Code coverage is currently supported only on Windows.");
+                result.StdOut.Should().Contain("Total tests: 1. Passed: 1. Failed: 0. Skipped: 0.");
+                result.StdOut.Should().Contain("Test Run Successful.");
+            }
+
+            result.ExitCode.Should().Be(0);
         }
 
         private string CopyAndRestoreVSTestDotNetCoreTestApp([CallerMemberName] string callingMethod = "")
@@ -413,40 +424,6 @@ namespace Microsoft.DotNet.Cli.Test.Tests
                 .Pass();
 
             return testProjectDirectory;
-        }
-
-        private static string GetCoverageFileNameFromTrx(string trxFilePath)
-        {
-            Assert.True(File.Exists(trxFilePath), $"Trx file not found: {trxFilePath}");
-
-            XmlDocument doc = new XmlDocument();
-            using (var trxStream = new FileStream(trxFilePath, FileMode.Open, FileAccess.Read))
-            {
-                doc.Load(trxStream);
-                var deploymentElements = doc.GetElementsByTagName("Deployment");
-                Assert.True(deploymentElements.Count == 1,
-                    $"None or more than one Deployment tags found in trx file:{trxFilePath}");
-
-                var deploymentDir = deploymentElements[0].Attributes.GetNamedItem("runDeploymentRoot")?.Value;
-                Assert.True(string.IsNullOrEmpty(deploymentDir) == false,
-                    $"runDeploymentRoot attatribute not found in trx file:{trxFilePath}");
-                var collectors = doc.GetElementsByTagName("Collector");
-
-                string fileName = string.Empty;
-                for (int i = 0; i < collectors.Count; i++)
-                {
-                    if (string.Equals(collectors[i].Attributes.GetNamedItem("collectorDisplayName").Value,
-                        "Code Coverage", StringComparison.OrdinalIgnoreCase))
-                    {
-                        fileName = collectors[i].FirstChild?.FirstChild?.FirstChild?.Attributes.GetNamedItem("href")
-                            ?.Value;
-                    }
-                }
-
-                Assert.True(string.IsNullOrEmpty(fileName) == false, $"Coverage file name not found in trx file: {trxFilePath}");
-                var resultsDirectory = Path.GetDirectoryName(trxFilePath);
-                return Path.Combine(resultsDirectory, deploymentDir, "In", fileName);
-            }
         }
     }
 }

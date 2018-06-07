@@ -97,7 +97,7 @@ namespace Microsoft.DotNet.Cli.Test.Tests
 
              string resultsDirectory = Path.Combine(testProjectDirectory, "RD");
 
-            // Delete trxLoggerDirectory if it exist
+            // Delete resultsDirectory if it exist
             if (Directory.Exists(resultsDirectory))
             {
                 Directory.Delete(resultsDirectory, true);
