@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <CLI_SharedFrameworkVersion>1.1.9-servicing-001750</CLI_SharedFrameworkVersion>
-    <CLI_CoreCLRVersion>1.1.9-servicing-001750</CLI_CoreCLRVersion>
-    <CLI_JitVersion>1.1.9-servicing-001750</CLI_JitVersion>
+    <CLI_SharedFrameworkVersion>1.1.9-servicing-001750-00</CLI_SharedFrameworkVersion>
+    <CLI_CoreCLRVersion>1.1.9-servicing-001750-00</CLI_CoreCLRVersion>
+    <CLI_JitVersion>1.1.9-servicing-001750-00</CLI_JitVersion>
     <CLI_SharedHostVersion>1.1.9-servicing-001731-00</CLI_SharedHostVersion>
     <CLI_HostFxrContainerVersion>1.1.9-servicing-001731-00</CLI_HostFxrContainerVersion>
     <CLI_HostFxrVersion Condition="'$(OS)' != 'Windows_NT'">1.1.9-servicing-001731-00</CLI_HostFxrVersion>
