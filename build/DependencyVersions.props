@@ -3,9 +3,15 @@
   <PropertyGroup>
     <MicrosoftAspNetCoreAllPackageVersion>2.2.0-preview1-34355</MicrosoftAspNetCoreAllPackageVersion>
     <MicrosoftAspNetCoreAppPackageVersion>$(MicrosoftAspNetCoreAllPackageVersion)</MicrosoftAspNetCoreAppPackageVersion>
+    <MicrosoftAspNetCoreDeveloperCertificatesXPlatPackageVersion>2.1.0</MicrosoftAspNetCoreDeveloperCertificatesXPlatPackageVersion>
+    <DotnetEfPackageVersion>2.1.1-rtm-30818</DotnetEfPackageVersion>
+    <DotnetDevCertsPackageVersion>2.1.0</DotnetDevCertsPackageVersion>
+    <DotnetSqlCachePackageVersion>2.1.0</DotnetSqlCachePackageVersion>
+    <DotnetUserSecretsPackageVersion>2.1.0</DotnetUserSecretsPackageVersion>
+    <DotnetWatchPackageVersion>2.1.0</DotnetWatchPackageVersion>
     <MicrosoftNETCoreAppPackageVersion>2.2.0-preview1-26609-02</MicrosoftNETCoreAppPackageVersion>
     <MicrosoftNETCoreDotNetHostResolverPackageVersion>$(MicrosoftNETCoreAppPackageVersion)</MicrosoftNETCoreDotNetHostResolverPackageVersion>
-    <MicrosoftBuildPackageVersion>15.8.0-preview-000078</MicrosoftBuildPackageVersion>
+    <MicrosoftBuildPackageVersion>15.8.0-preview-000086</MicrosoftBuildPackageVersion>
     <MicrosoftBuildFrameworkPackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildFrameworkPackageVersion>
     <MicrosoftBuildRuntimePackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildRuntimePackageVersion>
     <MicrosoftBuildLocalizationPackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildLocalizationPackageVersion>
@@ -46,7 +52,7 @@
     <NuGetProjectModelPackageVersion>$(NuGetBuildTasksPackageVersion)</NuGetProjectModelPackageVersion>
     <NuGetVersioningPackageVersion>$(NuGetBuildTasksPackageVersion)</NuGetVersioningPackageVersion>
     <NuGetSdkResolverPackageVersion>$(NuGetBuildTasksPackageVersion)</NuGetSdkResolverPackageVersion>
-    <MicrosoftNETTestSdkPackageVersion>15.8.0-preview-20180510-03</MicrosoftNETTestSdkPackageVersion>
+    <MicrosoftNETTestSdkPackageVersion>15.8.0-preview-20180605-02</MicrosoftNETTestSdkPackageVersion>
     <MicrosoftTestPlatformCLIPackageVersion>$(MicrosoftNETTestSdkPackageVersion)</MicrosoftTestPlatformCLIPackageVersion>
     <MicrosoftTestPlatformBuildPackageVersion>$(MicrosoftNETTestSdkPackageVersion)</MicrosoftTestPlatformBuildPackageVersion>
     <XliffTasksPackageVersion>0.2.0-beta-000042</XliffTasksPackageVersion>
