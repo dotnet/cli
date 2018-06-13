@@ -617,7 +617,9 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         {
             var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
 
-            string nonAscii = "ab Ṱ̺̺̕o 田中さん åä";
+            var surrogate = Char.ConvertFromUtf32(Int32.Parse("0301", NumberStyles.HexNumber));
+            string nonAscii = "ab Ṱ̺̺̕o 田中さん åä" + surrogate;
+
             var root = new DirectoryPath(Path.Combine(TempRoot.Root, nonAscii, Path.GetRandomFileName()));
             var reporter = new BufferedReporter();
             var fileSystem = new FileSystemWrapper();
@@ -635,6 +637,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 nugetConfig: nugetConfigPath);
 
             AssertPackageInstall(reporter, fileSystem, package, store);
+            Char.IsSurrogate(surrogate).Should().BeTrue();
 
             package.Uninstall();
         }
