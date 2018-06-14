@@ -74,6 +74,7 @@
     <BuildTasksFeedToolVersion>2.1.0-prerelease-02430-04</BuildTasksFeedToolVersion>
     <VersionToolsVersion>$(BuildTasksFeedToolVersion)</VersionToolsVersion>
     <DotnetDebToolVersion>2.0.0-preview2-25331-01</DotnetDebToolVersion>
+    <MicrosoftAspNetCoreMvcVersion>2.1.1</MicrosoftAspNetCoreMvcVersion>
   </PropertyGroup>
 
 </Project>
