@@ -18,6 +18,8 @@ def platformList = [
   'Linux:arm64:Debug',
   'Linux-musl:x64:Debug',
   'Linux:x64:Release',
+  'Linux_NoSuffix:arm:Release',
+  'Linux_NoSuffix:x64:Release',
   'opensuse.43.2:x64:Debug',
   'OSX10.12:x64:Release',
   'RHEL6:x64:Debug',
@@ -28,6 +30,7 @@ def platformList = [
   'Windows_NT:x64:Release',
   'Windows_NT:x86:Debug',
   'Windows_NT_ES:x64:Debug'
+  'Windows_NT_NoSuffix:x64:Release'
 ]
 
 def static getBuildJobName(def configuration, def os, def architecture) {
@@ -58,6 +61,10 @@ set DOTNET_CLI_UI_LANGUAGE=es
 .\\build.cmd -Configuration ${configuration} -Architecture ${architecture} -Targets Default
 """
     }
+    else if (os == 'Windows_NT_NoSuffix') {
+        osUsedForMachineAffinity = 'Windows_NT'
+        buildCommand = ".\\build.cmd -Configuration ${configuration} -Architecture ${architecture} -Targets Default /p:DropSuffix=true"
+    }
     else if (os == 'Ubuntu') {
         buildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --docker ubuntu.14.04 --targets Default"
     }
@@ -68,6 +75,15 @@ set DOTNET_CLI_UI_LANGUAGE=es
         }
         else {
             buildCommand = "./build.sh --linux-portable --skip-prereqs --configuration ${configuration} --targets Default"
+        }
+    }
+    else if (os == 'Linux_NoSuffix') {
+        osUsedForMachineAffinity = 'Ubuntu16.04';
+        if ((architecture == 'arm') || (architecture == 'arm64')) {
+            buildCommand = "./build.sh --linux-portable --skip-prereqs --architecture ${architecture} --configuration ${configuration} --targets Default /p:CLIBUILD_SKIP_TESTS=true /p:DropSuffix=true"
+        }
+        else {
+            buildCommand = "./build.sh --linux-portable --skip-prereqs --configuration ${configuration} --targets Default /p:DropSuffix=true"
         }
     }
     else if (os == 'RHEL6') {
