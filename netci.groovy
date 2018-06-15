@@ -29,7 +29,7 @@ def platformList = [
   'ubuntu.18.04:x64:Debug',
   'Windows_NT:x64:Release',
   'Windows_NT:x86:Debug',
-  'Windows_NT_ES:x64:Debug'
+  'Windows_NT_ES:x64:Debug',
   'Windows_NT_NoSuffix:x64:Release'
 ]
 
