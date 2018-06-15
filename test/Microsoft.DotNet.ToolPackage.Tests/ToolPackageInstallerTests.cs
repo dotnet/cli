@@ -1,4 +1,4 @@
-// Copyright (c) .NET Foundation and contributors. All rights reserved.
+﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -608,6 +608,36 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             reporter.Lines.Clear();
 
             AssertPackageInstall(reporter, fileSystem, package, store);
+
+            package.Uninstall();
+        }
+
+        [Fact]
+        public void GivenARootWithNonAsciiCharactorInstallSucceeds()
+        {
+            var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
+
+            var surrogate = Char.ConvertFromUtf32(Int32.Parse("0301", NumberStyles.HexNumber));
+            string nonAscii = "ab Ṱ̺̺̕o 田中さん åä" + surrogate;
+
+            var root = new DirectoryPath(Path.Combine(TempRoot.Root, nonAscii, Path.GetRandomFileName()));
+            var reporter = new BufferedReporter();
+            var fileSystem = new FileSystemWrapper();
+            var store = new ToolPackageStore(root);
+            var installer = new ToolPackageInstaller(
+                store: store,
+                projectRestorer: new ProjectRestorer(reporter),
+                tempProject: GetUniqueTempProjectPathEachTest(),
+                offlineFeed: new DirectoryPath("does not exist"));
+
+            var package = installer.InstallPackage(
+                packageId: TestPackageId,
+                versionRange: VersionRange.Parse(TestPackageVersion),
+                targetFramework: _testTargetframework,
+                nugetConfig: nugetConfigPath);
+
+            AssertPackageInstall(reporter, fileSystem, package, store);
+            Char.IsSurrogate(surrogate).Should().BeTrue();
 
             package.Uninstall();
         }
