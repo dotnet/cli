@@ -16,7 +16,7 @@ namespace EndToEnd
     public class GivenSelfContainedAppsRollForward : TestBase
     {
 
-        [Theory(Skip = "Runtime 1.1 support for openSUSE and Fedora 27 needed")]
+        [Theory]
         //  MemberData is used instead of InlineData here so we can access it in another test to
         //  verify that we are covering the latest release of .NET Core
         [MemberData(nameof(SupportedNetCoreAppVersions))]
