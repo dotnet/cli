@@ -132,6 +132,13 @@
       <_NETCoreSdkIsPreview Condition=" '$(DropSuffix)' != 'true' ">true</_NETCoreSdkIsPreview>
     </PropertyGroup>
 
+
+    <GetUseBundledNETCoreAppPackageVersionAsDefaultNetCorePatchVersion
+      BundledNETCoreAppPackageVersion="$(BundledNETCoreAppPackageVersion)">
+      <Output TaskParameter="UseBundledNETCoreAppPackageVersionAsDefaultNetCorePatchVersion"
+              PropertyName="_UseBundledNETCoreAppPackageVersionAsDefaultNetCorePatchVersion" />
+    </GetUseBundledNETCoreAppPackageVersionAsDefaultNetCorePatchVersion>
+
     <ItemGroup>
       <BundledVersionsVariable Include="BundledAspNetCoreAllTargetFrameworkVersion" Value="$(_AspNetCoreAllTargetFrameworkVersion)" />
       <BundledVersionsVariable Include="BundledAspNetCoreAllPackageVersion" Value="$(_AspNetCoreAllPackageVersion)" />
@@ -180,6 +187,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     <!-- Default patch versions for each minor version of ASP.NET Core -->
     <DefaultPatchVersionForAspNetCoreAll2_1>$(_DefaultPatchVersionForAspNetCoreAll2_1)</DefaultPatchVersionForAspNetCoreAll2_1>
     <DefaultPatchVersionForAspNetCoreApp2_1>$(_DefaultPatchVersionForAspNetCoreApp2_1)</DefaultPatchVersionForAspNetCoreApp2_1>
+    <UseBundledNETCoreAppPackageVersionAsDefaultNetCorePatchVersion>$(_UseBundledNETCoreAppPackageVersionAsDefaultNetCorePatchVersion)</UseBundledNETCoreAppPackageVersionAsDefaultNetCorePatchVersion>
 
     <!-- Latest patch versions for each minor version of .NET Core -->
     <LatestPatchVersionForNetCore1_0 Condition="'$(LatestPatchVersionForNetCore1_0)' == ''">1.0.11</LatestPatchVersionForNetCore1_0>
