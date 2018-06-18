@@ -45,63 +45,53 @@ platformList.each { platform ->
 
     // Calculate job name
     def jobName = getBuildJobName(configuration, os, architecture)
-    def buildCommand = '';
+    def baseBatchBuildCommand = ".\\build.cmd -Architecture ${architecture} -Configuration ${configuration} -Targets Default";
+    def baseShellBuildCommand = "./build.sh --architecture ${architecture} --configuration ${configuration} --targets Default --skip-prereqs";
 
     // Calculate the build command
-    if (os == 'Windows_NT') {
-        buildCommand = ".\\build.cmd -Configuration ${configuration} -Architecture ${architecture} -Targets Default"
+    if (os.startsWith("Windows_NT")) {
+        osUsedForMachineAffinity = 'Windows_NT'
+        buildCommand = "${baseBatchBuildCommand}"
+        if (os == 'Windows_NT_ES') {
+            buildCommand = """
+set DOTNET_CLI_UI_LANGUAGE=es
+${buildCommand}
+"""
+        }
+        else if (os == 'Windows_NT_NoSuffix') {
+            buildCommand = "${buildCommand} /p:DropSuffix=true"
+        }
     }
     else if (os == 'Windows_2016') {
-        buildCommand = ".\\build.cmd -Configuration ${configuration} -Architecture ${architecture} -RunInstallerTestsInDocker -Targets Default"
+        buildCommand = "${baseBatchBuildCommand} -RunInstallerTestsInDocker"
     }
-    else if (os == 'Windows_NT_ES') {
-        osUsedForMachineAffinity = 'Windows_NT'
-        buildCommand = """
-set DOTNET_CLI_UI_LANGUAGE=es
-.\\build.cmd -Configuration ${configuration} -Architecture ${architecture} -Targets Default
-"""
-    }
-    else if (os == 'Windows_NT_NoSuffix') {
-        osUsedForMachineAffinity = 'Windows_NT'
-        buildCommand = ".\\build.cmd -Configuration ${configuration} -Architecture ${architecture} -Targets Default /p:DropSuffix=true"
+    else if (os.startsWith("Linux")) {
+        osUsedForMachineAffinity = 'Ubuntu16.04';
+        buildCommand = "${baseShellBuildCommand} --linux-portable"
+        if (os == 'Linux-musl') {
+            buildCommand = "${buildCommand} --runtime-id linux-musl-x64 --docker alpine.3.6"
+        }
+        else if (os == 'Linux_NoSuffix') {
+            buildCommand = "${buildCommand} /p:DropSuffix=true"
+        }
+        if ((architecture == 'arm') || (architecture == 'arm64')) {
+            buildCommand = "${buildCommand} /p:CLIBUILD_SKIP_TESTS=true"
+        }
     }
     else if (os == 'Ubuntu') {
-        buildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --docker ubuntu.14.04 --targets Default"
-    }
-    else if (os == 'Linux') {
-        osUsedForMachineAffinity = 'Ubuntu16.04';
-        if ((architecture == 'arm') || (architecture == 'arm64')) {
-            buildCommand = "./build.sh --linux-portable --skip-prereqs --architecture ${architecture} --configuration ${configuration} --targets Default /p:CLIBUILD_SKIP_TESTS=true"
-        }
-        else {
-            buildCommand = "./build.sh --linux-portable --skip-prereqs --configuration ${configuration} --targets Default"
-        }
-    }
-    else if (os == 'Linux_NoSuffix') {
-        osUsedForMachineAffinity = 'Ubuntu16.04';
-        if ((architecture == 'arm') || (architecture == 'arm64')) {
-            buildCommand = "./build.sh --linux-portable --skip-prereqs --architecture ${architecture} --configuration ${configuration} --targets Default /p:CLIBUILD_SKIP_TESTS=true /p:DropSuffix=true"
-        }
-        else {
-            buildCommand = "./build.sh --linux-portable --skip-prereqs --configuration ${configuration} --targets Default /p:DropSuffix=true"
-        }
+        buildCommand = "${baseShellBuildCommand} --docker ubuntu.14.04"
     }
     else if (os == 'RHEL6') {
         osUsedForMachineAffinity = 'Ubuntu16.04';
-        buildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --runtime-id rhel.6-x64 --docker rhel.6 --targets Default"
-    }
-    else if (os == 'Linux-musl') {
-        osUsedForMachineAffinity = 'Ubuntu16.04';
-        buildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --runtime-id linux-musl-x64 --docker alpine.3.6 --targets Default"
+        buildCommand = "${baseShellBuildCommand} --runtime-id rhel.6-x64 --docker rhel.6 --linux-portable"
     }
     else if (os == 'ubuntu.18.04' || os == 'fedora.27' || os == 'opensuse.43.2') {
         osUsedForMachineAffinity = 'Ubuntu16.04'
         osVersionUsedForMachineAffinity = 'latest-docker'
-        buildCommand = "./build.sh --linux-portable --skip-prereqs --configuration ${configuration} --docker ${os} --targets Default"
+        buildCommand = "${baseShellBuildCommand} --docker ${os} --linux-portable"
     }
     else {
-        // Jenkins non-Ubuntu CI machines don't have docker
-        buildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --targets Default"
+        buildCommand = "${baseShellBuildCommand}"
     }
 
     def newJob = job(Utilities.getFullJobName(project, jobName, isPR)) {
@@ -126,10 +116,10 @@ set DOTNET_CLI_UI_LANGUAGE=es
     }
     Utilities.addGithubPRTriggerForBranch(newJob, branch, "${os} ${architecture} ${configuration} Build")
 
-	def archiveSettings = new ArchivalSettings()
-	archiveSettings.addFiles("test/**/*.trx")
-	archiveSettings.setFailIfNothingArchived()
-	archiveSettings.setArchiveOnFailure()
+    def archiveSettings = new ArchivalSettings()
+    archiveSettings.addFiles("test/**/*.trx")
+    archiveSettings.setFailIfNothingArchived()
+    archiveSettings.setArchiveOnFailure()
     Utilities.addArchival(newJob, archiveSettings)
 }
 
