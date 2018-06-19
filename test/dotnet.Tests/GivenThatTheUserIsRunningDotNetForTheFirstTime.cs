@@ -355,7 +355,7 @@ A command is running to initially populate your local package cache, to improve 
 
             _nugetCacheFolder
                 .GetDirectory("microsoft.aspnetcore.mvc")
-                .Should().HaveDirectories(new string[] { "1.0.6", "1.1.7" });
+                .Should().HaveDirectories(new string[] { "1.0.6", "1.1.8" });
         }
 
         private string GetDotnetVersion()
