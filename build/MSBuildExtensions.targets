@@ -195,7 +195,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     <!-- Latest patch versions for each minor version of .NET Core -->
     <LatestPatchVersionForNetCore1_0 Condition="'%24(LatestPatchVersionForNetCore1_0)' == ''">1.0.11</LatestPatchVersionForNetCore1_0>
     <LatestPatchVersionForNetCore1_1 Condition="'%24(LatestPatchVersionForNetCore1_1)' == ''">1.1.8</LatestPatchVersionForNetCore1_1>
-    <LatestPatchVersionForNetCore2_0 Condition="'%24(LatestPatchVersionForNetCore2_0)' == ''">2.0.7</LatestPatchVersionForNetCore2_0>
+    <LatestPatchVersionForNetCore2_0 Condition="'%24(LatestPatchVersionForNetCore2_0)' == ''">2.0.9</LatestPatchVersionForNetCore2_0>
   </PropertyGroup>
 </Project>
 ]]>
