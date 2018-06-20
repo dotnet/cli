@@ -118,7 +118,7 @@ namespace EndToEnd
                     .Value;
 
                 SupportedNetCoreAppVersions.Versions.Select(v => $"netcoreapp{v[0]}")
-                    .Should().Contain(targetFramework, $"the {nameof(SupportedNetCoreAppVersions)} property should include the default version " +
+                    .Should().Contain(targetFramework, $"the {nameof(SupportedNetCoreAppVersions)}.{nameof(SupportedNetCoreAppVersions.Versions)} property should include the default version " +
                     "of .NET Core created by \"dotnet new\"");
                 
             }

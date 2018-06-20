@@ -12,11 +12,11 @@ using Xunit;
 
 namespace EndToEnd
 {
-    public class GivenPortableApps : TestBase
+    public class GivenFrameworkDependentApps : TestBase
     {
         [Theory]
         [ClassData(typeof(SupportedNetCoreAppVersions))]
-        public void ItDoesNotRollsForwardToTheLatestVersion(string minorVersion)
+        public void ItDoesNotRollForwardToTheLatestVersion(string minorVersion)
         {
             var _testInstance = TestAssets.Get("TestAppSimple")
                 .CreateInstance(identifier: minorVersion)
@@ -36,7 +36,7 @@ namespace EndToEnd
 
             project.Save(projectPath);
 
-            //  Get the version rolled forward to
+            //  Get the resolved version of .NET Core
             new RestoreCommand()
                     .WithWorkingDirectory(projectDirectory)
                     .Execute()
@@ -48,11 +48,11 @@ namespace EndToEnd
             var versionInAssertsJson = GetNetCoreAppVersion(assetsFile);
             versionInAssertsJson.Should().NotBeNull();
 
-            if (versionInAssertsJson.IsPrerelease)
+            if (versionInAssertsJson.IsPrerelease && versionInAssertsJson.Patch == 0)
             {
-                //  If this version of .NET Core is still prerelease, then:
-                //  - There aren't any patches to roll-forward to, so we skip testing this until the version
-                //    leaves prerelease.
+                // if the bundled version is, for example, a prerelease of
+                // .NET Core 2.1.1, that we don't roll forward to that prerelease
+                // version for framework-dependent deployments.
                 return;
             }
 
