@@ -40,7 +40,10 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
 
             if (msbuildSdksDir == null)
             {
-                string netcoreSdkDir = ResolveNetcoreSdkDirectory(context);
+                var resolverResult = ResolveNetcoreSdkDirectory(context);
+                string netcoreSdkDir = resolverResult.ResolvedSdkDirectory;
+                string globalJsonPath = resolverResult.GlobalJsonPath;
+
                 if (netcoreSdkDir == null)
                 {
                     return factory.IndicateFailure(
@@ -156,13 +159,12 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
             return FXVersion.Compare(netCoreSdkFXVersion, minimumFXVersion) < 0;
         }
 
-        private string ResolveNetcoreSdkDirectory(SdkResolverContext context)
+        private NETCoreSdkResolver.Result ResolveNetcoreSdkDirectory(SdkResolverContext context)
         {
-            string exeDir = GetDotnetExeDirectory();
-            string workingDir = context.SolutionFilePath ?? context.ProjectFilePath;
-            string netcoreSdkDir = Interop.hostfxr_resolve_sdk(exeDir, workingDir);
+            string dotnetExeDir = GetDotnetExeDirectory();
+            string globalJsonStartDir = context.SolutionFilePath ?? context.ProjectFilePath;
 
-            return netcoreSdkDir;
+            return NETCoreSdkResolver.ResolveSdk(dotnetExeDir, globalJsonStartDir);
         }
 
         private string GetDotnetExeDirectory()
@@ -176,14 +178,12 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
             var environmentProvider = new EnvironmentProvider(_getEnvironmentVariable);
             var dotnetExe = environmentProvider.GetCommandPath("dotnet");
 
-#if NETSTANDARD2_0
             if (dotnetExe != null && !Interop.RunningOnWindows)
             {
                 // e.g. on Linux the 'dotnet' command from PATH is a symlink so we need to
                 // resolve it to get the actual path to the binary
-                dotnetExe = Interop.realpath(dotnetExe) ?? dotnetExe;
+                dotnetExe = Interop.Unix.realpath(dotnetExe) ?? dotnetExe;
             }
-#endif
 
             return Path.GetDirectoryName(dotnetExe);
         }
