@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
         }
 
         [RequiresSpecificFrameworkFact("netcoreapp1.0")]
-        public void ItPublishesARunnableSelfContainedAppWithAnImplictRuntime()
+        public void ItPublishesARunnableSelfContainedAppWithAnImplicitRuntime()
         {
             var testAppName = "MSBuildTestApp";
 
