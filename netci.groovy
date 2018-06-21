@@ -68,7 +68,7 @@ ${buildCommand}
     else if (os.startsWith("Linux")) {
         osUsedForMachineAffinity = 'Ubuntu16.04';
         if (os == 'Linux-musl') {
-            buildCommand = "${buildCommand} --runtime-id linux-musl-x64 --docker alpine.3.6"
+            buildCommand = "${baseShellBuildCommand} --runtime-id linux-musl-x64 --docker alpine.3.6"
         }
         else
         {
