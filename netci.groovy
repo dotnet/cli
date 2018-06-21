@@ -20,7 +20,7 @@ def platformList = [
   'Linux:x64:Release',
   'Linux_NoSuffix:arm:Release',
   'Linux_NoSuffix:x64:Release',
-  'opensuse.43.2:x64:Debug',
+  'opensuse.42.3:x64:Debug',
   'OSX10.12:x64:Release',
   'RHEL6:x64:Debug',
   'RHEL7.2:x64:Release',
@@ -45,8 +45,8 @@ platformList.each { platform ->
 
     // Calculate job name
     def jobName = getBuildJobName(configuration, os, architecture)
-    def baseBatchBuildCommand = ".\\build.cmd -Architecture ${architecture} -Configuration ${configuration} -Targets Default";
-    def baseShellBuildCommand = "./build.sh --architecture ${architecture} --configuration ${configuration} --targets Default --skip-prereqs";
+    def baseBatchBuildCommand = ".\\build.cmd -Configuration ${configuration} -Architecture ${architecture} -Targets Default";
+    def baseShellBuildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --targets Default";
 
     // Calculate the build command
     if (os.startsWith("Windows_NT")) {
@@ -67,15 +67,18 @@ ${buildCommand}
     }
     else if (os.startsWith("Linux")) {
         osUsedForMachineAffinity = 'Ubuntu16.04';
-        buildCommand = "${baseShellBuildCommand} --linux-portable"
         if (os == 'Linux-musl') {
             buildCommand = "${buildCommand} --runtime-id linux-musl-x64 --docker alpine.3.6"
         }
-        else if (os == 'Linux_NoSuffix') {
-            buildCommand = "${buildCommand} /p:DropSuffix=true"
-        }
-        if ((architecture == 'arm') || (architecture == 'arm64')) {
-            buildCommand = "${buildCommand} /p:CLIBUILD_SKIP_TESTS=true"
+        else
+        {
+            buildCommand = "${baseShellBuildCommand} --linux-portable"
+            if ((architecture == 'arm') || (architecture == 'arm64')) {
+                buildCommand = "${buildCommand} --architecture ${architecture} /p:CLIBUILD_SKIP_TESTS=true"
+            }
+            if (os == 'Linux_NoSuffix') {
+                buildCommand = "${buildCommand} /p:DropSuffix=true"
+            }
         }
     }
     else if (os == 'Ubuntu') {
@@ -83,9 +86,9 @@ ${buildCommand}
     }
     else if (os == 'RHEL6') {
         osUsedForMachineAffinity = 'Ubuntu16.04';
-        buildCommand = "${baseShellBuildCommand} --runtime-id rhel.6-x64 --docker rhel.6 --linux-portable"
+        buildCommand = "${baseShellBuildCommand} --runtime-id rhel.6-x64 --docker rhel.6"
     }
-    else if (os == 'ubuntu.18.04' || os == 'fedora.27' || os == 'opensuse.43.2') {
+    else if (os == 'ubuntu.18.04' || os == 'fedora.27' || os == 'opensuse.42.3') {
         osUsedForMachineAffinity = 'Ubuntu16.04'
         osVersionUsedForMachineAffinity = 'latest-docker'
         buildCommand = "${baseShellBuildCommand} --docker ${os} --linux-portable"
