@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using FluentAssertions;
+using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.DotNet.TestFramework;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using NuGet.ProjectModel;
@@ -20,6 +21,8 @@ namespace EndToEnd
         {
             var _testInstance = TestAssets.Get("TestAppSimple")
                 .CreateInstance(identifier: minorVersion)
+                // scope the feed to only dotnet-core feed to avoid flaky when different feed has a newer / lower version
+                .WithNuGetConfig(new RepoDirectoriesProvider().TestPackages)
                 .WithSourceFiles();
 
             string projectDirectory = _testInstance.Root.FullName;
