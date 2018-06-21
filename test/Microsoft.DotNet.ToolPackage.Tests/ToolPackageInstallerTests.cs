@@ -598,7 +598,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
 
             var package = installer.InstallPackage(
                 packageId: TestPackageId,
-                versionRange: VersionRange.Parse("1.0.*"),
+                versionRange: VersionRange.Parse("1.0.0"),
                 targetFramework: _testTargetframework,
                 nugetConfig: nugetConfigPath);
 
