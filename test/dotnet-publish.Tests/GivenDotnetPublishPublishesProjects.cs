@@ -42,8 +42,7 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
         }
 
         [RequiresSpecificFrameworkFact("netcoreapp1.0")]
-        // Issue: https://github.com/dotnet/cli/issues/9310
-        public void ItPublishesARunnableSelfContainedApp()
+        public void ItPublishesARunnableSelfContainedAppWithAnImplictRuntime()
         {
             var testAppName = "MSBuildTestApp";
 
@@ -60,9 +59,43 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
                 .WithFramework("netcoreapp1.1")
                 .WithRuntime(rid)
                 .WithWorkingDirectory(testProjectDirectory)
-                //Workaround for https://github.com/dotnet/cli/issues/4501
-                .WithEnvironmentVariable("SkipInvalidConfigurations", "true")
                 .Execute("/p:SkipInvalidConfigurations=true")
+                .Should().Pass();
+
+            var configuration = Environment.GetEnvironmentVariable("CONFIGURATION") ?? "Debug";
+
+            var outputProgram = testProjectDirectory
+                .GetDirectory("bin", configuration, "netcoreapp1.1", rid, "publish", $"{testAppName}{Constants.ExeSuffix}")
+                .FullName;
+
+            new TestCommand(outputProgram)
+                .ExecuteWithCapturedOutput()
+                .Should().Pass()
+                     .And.HaveStdOutContaining("Hello World");
+        }
+
+        [Fact]
+        public void ItPublishesARunnableSelfContainedAppWithAnExplictRuntime()
+        {
+            var testAppName = "MSBuildTestApp";
+
+            var testInstance = TestAssets.Get(testAppName)
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles();
+
+            var testProjectDirectory = testInstance.Root;
+
+            var rid = DotnetLegacyRuntimeIdentifiers.InferLegacyRestoreRuntimeIdentifier();
+
+            File.Exists(Path.Combine(AppContext.BaseDirectory, ".runtimeFrameworkVersion")).Should().BeTrue();
+            var runtimeFrameworkVersion = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, ".runtimeFrameworkVersion"));
+
+            new PublishCommand()
+                .WithFramework("netcoreapp1.1")
+                .WithRuntime(rid)
+                .WithWorkingDirectory(testProjectDirectory)
+                .Execute($"/p:SkipInvalidConfigurations=true /p:RuntimeFrameworkVersion={runtimeFrameworkVersion}")
                 .Should().Pass();
 
             var configuration = Environment.GetEnvironmentVariable("CONFIGURATION") ?? "Debug";
