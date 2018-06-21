@@ -14,7 +14,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.DotNet.Tools.Tests.Utilities\Microsoft.DotNet.Tools.Tests.Utilities.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.DotNet.TestFramework\Microsoft.DotNet.TestFramework.csproj">
@@ -55,4 +55,18 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
   </PropertyGroup>
+
+  <Target Name="CreateRuntimeFrameworkVersionFile" BeforeTargets="Build">
+    <ItemGroup>
+      <Line Include="Line1">
+        <Text>$(CLI_SharedFrameworkVersion)</Text>
+      </Line>
+      <Lines Include="%(Line.Text)" />
+    </ItemGroup>
+    <WriteLinesToFile
+       File="$(OutputPath).runtimeFrameworkVersion"
+       Lines="@(Lines)"
+       Overwrite="true"
+     />
+  </Target>
 </Project>
