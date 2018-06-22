@@ -352,12 +352,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 Errors = errors;
             }
 
-            public new bool Success
-            {
-                get => base.Success;
-                private set => base.Success = value;
-            }
-
+            public override bool Success { get; protected set; }
             public override string Version { get; protected set; }
             public override string Path { get; protected set; }
             public IEnumerable<string> Errors { get; }
