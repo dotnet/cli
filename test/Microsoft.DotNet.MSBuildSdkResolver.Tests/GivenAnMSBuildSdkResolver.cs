@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var resolver = environment.CreateResolver();
             var result = (MockResult)resolver.Resolve(
                 new SdkReference("Some.Test.Sdk", null, null),
-                new MockContext { ProjectFilePath = environment.TestDirectory.FullName },
+                new MockContext { ProjectFileDirectory = environment.TestDirectory },
                 new MockFactory());
 
             result.Success.Should().BeTrue();
@@ -68,7 +68,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var resolver = environment.CreateResolver();
             var result = (MockResult)resolver.Resolve(
                 new SdkReference("Some.Test.Sdk", null, "999.99.99"),
-                new MockContext { ProjectFilePath = environment.TestDirectory.FullName },
+                new MockContext { ProjectFileDirectory = environment.TestDirectory },
                 new MockFactory());
 
             result.Success.Should().BeFalse();
@@ -94,7 +94,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 new MockContext
                 {
                     MSBuildVersion = new Version(1, 0),
-                    ProjectFilePath = environment.TestDirectory.FullName
+                    ProjectFileDirectory = environment.TestDirectory
                 },
                 new MockFactory());
 
@@ -118,7 +118,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var resolver = environment.CreateResolver();
             var result = (MockResult)resolver.Resolve(
                 new SdkReference("Some.Test.Sdk", null, "1.0.0"),
-                new MockContext { ProjectFilePath = environment.TestDirectory.FullName },
+                new MockContext { ProjectFileDirectory = environment.TestDirectory },
                 new MockFactory());
 
             result.Success.Should().BeFalse();
@@ -142,7 +142,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var resolver = environment.CreateResolver();
             var result = (MockResult)resolver.Resolve(
                 new SdkReference("Some.Test.Sdk", null, "1.0.0"),
-                new MockContext { ProjectFilePath = environment.TestDirectory.FullName },
+                new MockContext { ProjectFileDirectory = environment.TestDirectory },
                 new MockFactory());
 
             result.Success.Should().BeFalse();
@@ -165,7 +165,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var resolver = environment.CreateResolver();
             var result = (MockResult)resolver.Resolve(
                 new SdkReference("Some.Test.Sdk", null, "99.99.99"),
-                new MockContext { ProjectFilePath = environment.TestDirectory.FullName },
+                new MockContext { ProjectFileDirectory = environment.TestDirectory },
                 new MockFactory());
 
             result.Success.Should().BeTrue();
@@ -186,7 +186,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var resolver = environment.CreateResolver();
             var result = (MockResult)resolver.Resolve(
                 new SdkReference("Some.Test.Sdk", null, "99.99.99"),
-                new MockContext { ProjectFilePath = environment.TestDirectory.FullName },
+                new MockContext { ProjectFileDirectory = environment.TestDirectory },
                 new MockFactory());
 
             result.Success.Should().BeTrue();
@@ -324,6 +324,12 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             public new string ProjectFilePath { get => base.ProjectFilePath; set => base.ProjectFilePath = value; }
             public new string SolutionFilePath { get => base.SolutionFilePath; set => base.SolutionFilePath = value; }
             public new Version MSBuildVersion { get => base.MSBuildVersion; set => base.MSBuildVersion = value; }
+
+            public DirectoryInfo ProjectFileDirectory
+            {
+                get => new DirectoryInfo(Path.GetDirectoryName(ProjectFilePath));
+                set => ProjectFilePath = value.GetFile("test.csproj").FullName;
+            }
 
             public MockContext()
             {

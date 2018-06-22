@@ -162,7 +162,7 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
         private NETCoreSdkResolver.Result ResolveNetcoreSdkDirectory(SdkResolverContext context)
         {
             string dotnetExeDir = GetDotnetExeDirectory();
-            string globalJsonStartDir = context.SolutionFilePath ?? context.ProjectFilePath;
+            string globalJsonStartDir = Path.GetDirectoryName(context.SolutionFilePath ?? context.ProjectFilePath);
 
             return NETCoreSdkResolver.ResolveSdk(dotnetExeDir, globalJsonStartDir);
         }
