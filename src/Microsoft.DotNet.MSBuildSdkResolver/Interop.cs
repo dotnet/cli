@@ -69,6 +69,17 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
                 string working_dir,
                 hostfxr_resolve_sdk2_flags_t flags,
                 hostfxr_resolve_sdk2_result_fn result);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = UTF16)]
+            internal delegate void hostfxr_get_available_sdks_result_fn(
+                int sdk_count,
+                [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)]
+                string[] sdk_dirs);
+
+            [DllImport("hostfxr", CharSet = UTF16, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+            internal static extern int hostfxr_get_available_sdks(
+                string exe_dir,
+                hostfxr_get_available_sdks_result_fn result);
         }
 
         internal static class Unix
@@ -88,6 +99,17 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
                 string working_dir,
                 hostfxr_resolve_sdk2_flags_t flags,
                 hostfxr_resolve_sdk2_result_fn result);
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = UTF8)]
+            internal delegate void hostfxr_get_available_sdks_result_fn(
+                int sdk_count,
+                [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)]
+                string[] sdk_dirs);
+
+            [DllImport("hostfxr", CharSet = UTF8, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+            internal static extern int hostfxr_get_available_sdks(
+                string exe_dir,
+                hostfxr_get_available_sdks_result_fn result);
 
             [DllImport("libc", CharSet = UTF8, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
             private static extern IntPtr realpath(string path, IntPtr buffer);

@@ -73,14 +73,35 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
                 var minimumMSBuildVersion = Version.Parse(minimumMSBuildVersionString);
                 if (context.MSBuildVersion < minimumMSBuildVersion)
                 {
-                    return factory.IndicateFailure(
-                        new[]
+                    if (globalJsonPath == null)
+                    {
+                        string[] availableSdks = NETCoreSdkResolver.GetAvailableSdks(GetDotnetExeDirectory());
+                        for (int i = availableSdks.Length - 1; i >= 0; i--)
                         {
-                            $"Version {netcoreSdkVersion} of the .NET Core SDK requires at least version {minimumMSBuildVersionString}"
-                            + $" of MSBuild. The current available version of MSBuild is {context.MSBuildVersion.ToString()}."
-                            + " Change the .NET Core SDK specified in global.json to an older version that requires the MSBuild"
-                            + " version currently available."
-                        });
+                            netcoreSdkDir = availableSdks[i];
+                            msbuildSdksDir = Path.Combine(netcoreSdkDir, "Sdks");
+                            netcoreSdkVersion = new DirectoryInfo(netcoreSdkDir).Name;
+                            minimumMSBuildVersionString = GetMinimumMSBuildVersion(netcoreSdkDir);
+                            minimumMSBuildVersion = Version.Parse(minimumMSBuildVersionString);
+
+                            if (context.MSBuildVersion >= minimumMSBuildVersion)
+                            {
+                                break;
+                            }
+                        }
+                    }
+
+                    if (context.MSBuildVersion < minimumMSBuildVersion)
+                    {
+                        return factory.IndicateFailure(
+                            new[]
+                            {
+                                $"Version {netcoreSdkVersion} of the .NET Core SDK requires at least version {minimumMSBuildVersionString}"
+                                + $" of MSBuild. The current available version of MSBuild is {context.MSBuildVersion.ToString()}."
+                                + " Change the .NET Core SDK specified in global.json to an older version that requires the MSBuild"
+                                + " version currently available."
+                            });
+                    }
                 }
 
                 string minimumVSDefinedSDKVersion = GetMinimumVSDefinedSDKVersion();                

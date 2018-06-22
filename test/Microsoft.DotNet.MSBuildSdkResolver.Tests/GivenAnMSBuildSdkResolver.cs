@@ -81,7 +81,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         }
 
         [Fact]
-        public void ItReturnsNullWhenTheSDKRequiresAHigherVersionOfMSBuildThanTheOneAvailable()
+        public void ItReturnsNullWhenTheSDKRequiresAHigherVersionOfMSBuildThanAnyOneAvailable()
         {
             var environment = new TestEnvironment();
             var expected =
@@ -105,6 +105,32 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             result.Errors.Should().Contain("Version 99.99.99 of the .NET Core SDK requires at least version 2.0 of MSBuild."
                 + " The current available version of MSBuild is 1.0. Change the .NET Core SDK specified in global.json to an older"
                 + " version that requires the MSBuild version currently available.");
+        }
+
+        [Fact]
+        public void ItReturnsHighestSdkAvailableThatIsCompatibleWithMSBuild()
+        {
+            var environment = new TestEnvironment();
+            var expected = environment.CreateSdkDirectory(ProgramFiles.X64, "Some.Test.Sdk", "99.99.99", new Version(20, 0, 0, 0));
+            var incompatible = environment.CreateSdkDirectory(ProgramFiles.X64, "Some.Test.Sdk", "100.99.99", new Version(21, 0, 0, 0));
+
+            environment.CreateMuxerAndAddToPath(ProgramFiles.X64);
+
+            var resolver = environment.CreateResolver();
+            var result = (MockResult)resolver.Resolve(
+                new SdkReference("Some.Test.Sdk", null, null),
+                new MockContext
+                {
+                    MSBuildVersion = new Version(20, 0, 0, 0),
+                    ProjectFilePath = environment.TestDirectory.FullName
+                },
+                new MockFactory());
+
+            result.Success.Should().BeTrue();
+            result.Path.Should().Be(expected.FullName);
+            result.Version.Should().Be("99.99.99");
+            result.Warnings.Should().BeNullOrEmpty();
+            result.Errors.Should().BeNullOrEmpty();
         }
 
         [Fact]
