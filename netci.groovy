@@ -59,7 +59,10 @@ ${buildCommand}
 """
         }
         else if (os == 'Windows_NT_NoSuffix') {
-            buildCommand = "${buildCommand} /p:DropSuffix=true"
+            buildCommand = """
+set DropSuffix=true
+${buildCommand}
+"""
         }
     }
     else if (os == 'Windows_2016') {
@@ -77,7 +80,10 @@ ${buildCommand}
                 buildCommand = "${buildCommand} --architecture ${architecture} /p:CLIBUILD_SKIP_TESTS=true"
             }
             if (os == 'Linux_NoSuffix') {
-                buildCommand = "${buildCommand} /p:DropSuffix=true"
+                buildCommand = """
+export DropSuffix=true
+${buildCommand}
+"""
             }
         }
     }
