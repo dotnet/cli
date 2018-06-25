@@ -18,16 +18,18 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
         public override int Priority => 5000;
 
         private readonly Func<string, string> _getEnvironmentVariable;
+        private readonly VSSettings _vsSettings;
 
         public DotNetMSBuildSdkResolver() 
-            : this(Environment.GetEnvironmentVariable)
+            : this(Environment.GetEnvironmentVariable, new VSSettings())
         {
         }
 
-        // Test hook to provide environment variables without polluting the test process.
-        internal DotNetMSBuildSdkResolver(Func<string, string> getEnvironmentVariable)
+        // Test constructor
+        internal DotNetMSBuildSdkResolver(Func<string, string> getEnvironmentVariable, VSSettings vsSettings)
         {
             _getEnvironmentVariable = getEnvironmentVariable;
+            _vsSettings = vsSettings;
         }
 
         public override SdkResult Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory)
@@ -185,7 +187,7 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
             string dotnetExeDir = GetDotnetExeDirectory();
             string globalJsonStartDir = Path.GetDirectoryName(context.SolutionFilePath ?? context.ProjectFilePath);
 
-            return NETCoreSdkResolver.ResolveSdk(dotnetExeDir, globalJsonStartDir);
+            return NETCoreSdkResolver.ResolveSdk(dotnetExeDir, globalJsonStartDir, _vsSettings.DisallowPrerelease());
         }
 
         private string GetDotnetExeDirectory()
