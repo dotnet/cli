@@ -2,13 +2,13 @@
   <Target Name="WriteGitCommitInfoProps">
     <Exec Command="git rev-list --count HEAD" 
           ConsoleToMSBuild="true"
-          Condition="'$(GitInfoCommitCount)' == ''">
+          Condition=" '$(GitInfoCommitCount)' == '' ">
       <Output TaskParameter="ConsoleOutput" PropertyName="GitInfoCommitCount" />
     </Exec>
 
     <Exec Command="git rev-parse HEAD" 
           ConsoleToMSBuild="true"
-          Condition="'$(GitInfoCommitHash)' == ''">
+          Condition=" '$(GitInfoCommitHash)' == '' ">
       <Output TaskParameter="ConsoleOutput" PropertyName="GitInfoCommitHash" />
     </Exec>
 
