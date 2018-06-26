@@ -1,12 +1,11 @@
 <Project ToolsVersion="14.0" DefaultTargets="Test">
   <Import Project="test/TestPackageProjects.targets" />
   <Import Project="test/TestProjects.targets" />
-  <Import Project="test/OverlaySdkOnLKG.targets" />
 
   <PropertyGroup>
     <PathListSeparator>:</PathListSeparator>
     <PathListSeparator Condition=" '$(OS)' == 'Windows_NT' ">%3b</PathListSeparator>
-    <ExecPath>$(SdkOutputDirectory)$(PathListSeparator)$(PATH)</ExecPath>
+    <ExecPath>$(OutputDirectory)$(PathListSeparator)$(PATH)</ExecPath>
     <ExecPath Condition=" '$(OS)' == 'Windows_NT' ">$(OutputDirectory)</ExecPath>
     <TestPackagesDir>$(TestOutputDir)/packages/</TestPackagesDir>
     <TestArtifactsDir>$(TestOutputDir)/artifacts/</TestArtifactsDir>
@@ -14,7 +13,7 @@
   </PropertyGroup>
 
   <Target Name="Test"
-          Condition=" '$(CLIBUILD_SKIP_TESTS)' != 'true' "
+          Condition=" '$(CLIBUILD_SKIP_TESTS)' != 'true' And !$(Architecture.StartsWith('arm')) "
           DependsOnTargets="BuildTests;">
 
     <!-- Make ure the test packages directory exists so that it's not an error to have it as a package source -->
@@ -30,7 +29,7 @@
           PreviousStageProps=$(NextStagePropsPath);
           TestProject=%(TestProjects.Identity);
           TestResultXmlDir=$(TestResultXmlDir);
-          ToolPath=$(SdkOutputDirectory);
+          ToolPath=$(OutputDirectory);
           WorkingDirectory=$([System.IO.Directory]::GetParent(%(TestProjects.Identity)))
         </Properties>
       </ProjectsToTest>
@@ -72,6 +71,8 @@
       Projects="@(ProjectsToTest)">
     </MSBuild>
 
+    <Exec Command="$(DotnetInOutputDirectory) exec $(RoslynDirectory)/bincore/VBCSCompiler.dll -shutdown" />
+
     <Message Text="Finished test execution" Importance="High" />
 
     <!-- Begin Workaround lack of a stable package version for depedencies; remove simulated stable version folder. -->
@@ -83,22 +84,22 @@
 
   <Target Name="PrepareTests"
           DependsOnTargets="Init;
-                            SetupTestProjectData;
-                            OverlaySdkOnLKG">
+                            SetupTestProjectData">
     <MakeDir Directories="$(TestPackagesDir)" Condition="!Exists('$(TestPackagesDir)')"/>
   </Target>
 
   <Target Name="RestoreTests"
           DependsOnTargets="PrepareTests;
                             CreateTestAssetPackageNuPkgs;">
-    <DotNetRestore ToolPath="$(SdkOutputDirectory)"
+
+    <DotNetRestore ToolPath="$(OutputDirectory)"
                    ProjectPath="&quot;$(TestDirectory)/Microsoft.DotNet.Cli.Tests.sln&quot;"
                    AdditionalParameters="/p:PreviousStageProps=$(NextStagePropsPath)" />
   </Target>
 
   <Target Name="BuildTests"
           DependsOnTargets="RestoreTests;">
-    <DotNetBuild ToolPath="$(SdkOutputDirectory)"
+    <DotNetBuild ToolPath="$(OutputDirectory)"
                  ProjectPath="&quot;$(TestDirectory)/Microsoft.DotNet.Cli.Tests.sln&quot;"
                  AdditionalParameters="/p:PreviousStageProps=$(NextStagePropsPath)"
                  MaxCpuCount="1" />
@@ -108,7 +109,7 @@
           DependsOnTargets="SetupTestPackageProjectData;"
           Outputs="%(TestPackageProject.Identity)">
 
-    <DotNetRestore ToolPath="$(SdkOutputDirectory)"
+    <DotNetRestore ToolPath="$(OutputDirectory)"
                    WorkingDirectory="$([System.IO.Directory]::GetParent('%(TestPackageProject.ProjectPath)'))"
                    ProjectPath="%(TestPackageProject.ProjectPath)"
                    AdditionalParameters="/p:RestoreAdditionalProjectSources=$(TestOutputDir)/packages /p:PreviousStageProps=$(NextStagePropsPath)"
@@ -117,14 +118,13 @@
     <!-- https://github.com/NuGet/Home/issues/4063 -->
     <DotNetPack Output="$(TestPackagesDir)"
                 ProjectPath="%(TestPackageProject.ProjectPath)"
-                ToolPath="$(SdkOutputDirectory)"
+                ToolPath="$(OutputDirectory)"
                 VersionSuffix="%(TestPackageProject.VersionSuffix)"
                 MsbuildArgs="%(TestPackageProject.MsbuildArgs) /p:SdkNuGetVersion=$(SdkNugetVersion) /p:RestoreAdditionalProjectSources=$(TestOutputDir)/packages /p:PreviousStageProps=$(NextStagePropsPath)" />
-
   </Target>
 
   <Target Name="EnsureStageSeparation">
-    <DotNetMSBuild Arguments="/v:diag $(RepoRoot)/build_projects/Microsoft.DotNet.Cli.Build.SelfTest/InvokeWithStage0.proj /p:OutputDirectory=&quot;$(SdkOutputDirectory)&quot;"
+    <DotNetMSBuild Arguments="/v:diag $(RepoRoot)/build_projects/Microsoft.DotNet.Cli.Build.SelfTest/InvokeWithStage0.proj /p:OutputDirectory=&quot;$(OutputDirectory)&quot;"
                    ToolPath="$(PreviousStageDirectory)" />
   </Target>
 </Project>

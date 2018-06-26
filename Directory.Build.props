@@ -21,12 +21,17 @@ tools\TestAssetsDependencies\TestAssetsDependencies.csproj
     <NuGetPackagesDir>$(NUGET_PACKAGES)</NuGetPackagesDir>
     <NuGetPackagesDir Condition=" '$(NuGetPackagesDir)' == '' ">$(RepoRoot)/.nuget/packages</NuGetPackagesDir>
 
-    <CLIBuildDll>$(RepoRoot)/build_projects/dotnet-cli-build/bin/dotnet-cli-build.dll</CLIBuildDll>
+    <RelativeCLIBuildBinaries>build_projects/dotnet-cli-build/bin</RelativeCLIBuildBinaries>
+    <RelativeCLIBuildDllName>dotnet-cli-build.dll</RelativeCLIBuildDllName>
+    <CLIBuildDll>$(RepoRoot)/$(RelativeCLIBuildBinaries)/$(RelativeCLIBuildDllName)</CLIBuildDll>
+    <BuildTasksFeedDll>$(RepoRoot)/build_projects/dotnet-cli-build/bin/Microsoft.DotNet.Build.Tasks.Feed.dll</BuildTasksFeedDll>
 
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <DisableImplicitPackageTargetFallback>true</DisableImplicitPackageTargetFallback>
 
-    <CliTargetFramework>netcoreapp2.0</CliTargetFramework>
+    <CliTargetFramework>netcoreapp2.2</CliTargetFramework>
+    <!-- We only need this until we get a stage0 with a 2.2 SDK. -->
+    <NETCoreAppMaximumVersion>2.2</NETCoreAppMaximumVersion>
   </PropertyGroup>
 
   <Import Project="build/InitRepo.props" />
@@ -36,11 +41,13 @@ tools\TestAssetsDependencies\TestAssetsDependencies.csproj
 
   <Import Project="build/BranchInfo.props" />
 
+  <Import Project="build/AzureInfo.props" />
+
   <Import Project="build/DependencyVersions.props" />
   <Import Project="build/Version.props" />
+  <Import Project="build/DerivedHostMachineInfo.props" />
   <Import Project="build/Branding.props" />
 
-  <Import Project="build/DerivedHostMachineInfo.props" />
   <Import Project="build/FileExtensions.props" />
   <Import Project="build/InputDirectories.props" />
   <Import Project="build/SetupPreviousStage.props" />
@@ -50,11 +57,9 @@ tools\TestAssetsDependencies\TestAssetsDependencies.csproj
     <!-- These imports aren't required for signing, and some of them have syntax which isn't supported in MSBuild 14,
          which is what the signing build uses -->
     <Import Project="build/BundledTemplates.props" />
-
-    <Import Project="build/AzureInfo.props" />
+    <Import Project="build/BundledDotnetTools.props" />
 
     <Import Project="build/BuildDefaults.props" />
-    <Import Project="build/VersionBadge.props" />
     <Import Project="build/BundledRuntimes.props" />
     <Import Project="build/BundledToolset.props" />
     <Import Project="build/DotnetCoreSdkLKG.props" />

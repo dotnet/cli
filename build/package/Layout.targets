@@ -10,7 +10,12 @@
       <SdkLayoutInput Include="$(OutputDirectory)/sdk/**/*" />
       <CombinedHostHostFxrFrameworkSdkInput Include="$(OutputDirectory)/**/*" />
 
-      <AspNetRuntimeFilesInput Include="$(AspNetRuntimePackageStorePublishDirectory)/**/*" />
+      <AspNetRuntimeFilesInput Include="$(AspNetCoreSharedFxPublishDirectory)/**/*" />
+
+      <MSBuildExtensionsInput Include="$(MSBuildExtensionsLayoutDirectory)/msbuildExtensions/**/*" />
+      <MSBuildExtensionsVerInput Include="$(MSBuildExtensionsLayoutDirectory)/msbuildExtensions-ver/**/*" />
+      <CombinedMSBuildExtensionsInput Include="@(MSBuildExtensionsInput)" />
+      <CombinedMSBuildExtensionsInput Include="@(MSBuildExtensionsVerInput)" />
     </ItemGroup>
 
     <MakeRelative

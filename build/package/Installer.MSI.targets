@@ -2,7 +2,7 @@
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <!-- AcquireWix Properties -->
     <PropertyGroup>
-      <WixVersion>3.10.2</WixVersion>
+      <WixVersion>3.10.4</WixVersion>
       <WixDownloadUrl>https://dotnetcli.azureedge.net/build/wix/wix.$(WixVersion).zip</WixDownloadUrl>
       <WixRoot>$(IntermediateDirectory)/WixTools/$(WixVersion)</WixRoot>
       <WixDestinationPath>$(WixRoot)/WixTools.$(WixVersion).zip</WixDestinationPath>
@@ -145,7 +145,7 @@
 
       <Exec Command="powershell -NoProfile -NoLogo $(SdkGenerateBundlePowershellScript)
                       '$(SdkInstallerFile)'
-                      '$(AspNetCoreRuntimeInstallerWixLibFile)'
+                      '$(DownloadedAspNetCoreSharedFxInstallerFile)'
                       '$(DownloadedSharedFrameworkInstallerFile)'
                       '$(DownloadedHostFxrInstallerFile)'
                       '$(DownloadedSharedHostInstallerFile)'
@@ -156,7 +156,9 @@
                       '$(SimpleVersion)'
                       '$(NugetVersion)'
                       '$(CombinedFrameworkSDKHostInstallerUpgradeCode)'
-                      '$(Architecture)'" />
+                      '$(Architecture)'
+                      '$(MicrosoftNETCoreAppPackageVersion)'
+                      '$(AspNetCoreVersion)'" />
     </Target>
 
     <Target Name="GenerateSdkNupkg"
@@ -176,7 +178,7 @@
 
     <Target Name="GenerateSdkMSBuildExtensionsNupkg"
             DependsOnTargets="Init;Layout;MsiTargetsSetupInputOutputs;GenerateSdkBundle"
-            Condition=" '$(OS)' == 'Windows_NT'"
+            Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' "
             Inputs="$(MSBuildExtensionsLayoutDirectory)/**/*;
                     $(SdkInstallerNuspecFile);
                     $(SdkGenerateNupkgPowershellScript)"
@@ -191,10 +193,11 @@
                       '$(SdkMSBuildExtensionsNupkgFile)'" />
       
       <GenerateMSBuildExtensionsSWR MSBuildExtensionsLayoutDirectory="$(MSBuildExtensionsLayoutDirectory)"
+<<<<<<< HEAD
                                     OutputFile="$(SdkMSBuildExtensionsSwrFile)"/> -->
       
     </Target>
-
+    
     <Target Name="GenerateMsis"
           DependsOnTargets="Init;
                             Layout;

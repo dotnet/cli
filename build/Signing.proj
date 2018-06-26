@@ -5,6 +5,9 @@
     <!-- The signing infrastructure runs using MSBuild 14, which doesn't support some of the new syntax we're using.  So set the BuildingSingingProject
          property here to avoid importing files we don't need for signing which would cause errors if imported when using MSBuild 14. -->
     <BuildingSigningProject>true</BuildingSigningProject>
+    <ExternalCertificateId Condition="'$(ExternalCertificateId)' == ''">135020001</ExternalCertificateId>
+    <InternalCertificateId Condition="'$(InternalCertificateId)' == ''">Microsoft402</InternalCertificateId>
+    <NugetCertificateId Condition="'$(NugetCertificateId)' == ''">NuGet</NugetCertificateId>
   </PropertyGroup>
   
   <Import Project="..\dir.props" />
@@ -19,16 +22,16 @@
   <Target Name="SetSigningProperties">
     <Error Condition="'$(Rid)' == ''" Text="Missing required property 'Rid'." />
     <PropertyGroup>
-      <SdkResolverOutputDirectory>$(BaseOutputDirectory)/intermediate/MSBuildExtensionsLayout/MSBuildSdkResolver</SdkResolverOutputDirectory>
+      <SdkResolverOutputDirectory>$(IntermediateDirectory)/MSBuildExtensionsLayout/MSBuildSdkResolver</SdkResolverOutputDirectory>
 
       <!-- The OutDir and IntermediateOutputPath properties are required by MicroBuild. MicroBuild only
            signs files that are under these paths. -->
       <OutDir Condition="'$(OutDir)' == ''">$(BaseOutputDirectory)</OutDir>
-      <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">$(BaseOutputDirectory)/intermediate</IntermediateOutputPath>
+      <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">$(IntermediateDirectory)</IntermediateOutputPath>
     </PropertyGroup>
   </Target>
 
-  <Target Name="PostCompileSign" DependsOnTargets="GetPostCompileSignFiles;SignFiles" />
+  <Target Name="PostCompileSign" DependsOnTargets="GetPostCompileSignFiles;GetSignSdkResolverContentsFiles;SignFiles" />
 
   <Target Name="GetPostCompileSignFiles">
     <ItemGroup>
@@ -40,6 +43,7 @@
       <!-- Built binaries -->
       <FilesToSign Include="$(OutputDirectory)/sdk/**/csc.exe;
                             $(OutputDirectory)/sdk/**/csc.dll;
+                            $(OutputDirectory)/sdk/**/VBCSCompiler.dll;
                             $(OutputDirectory)/sdk/**/vbc.exe;
                             $(OutputDirectory)/sdk/**/vbc.dll;
                             $(OutputDirectory)/sdk/**/fsc.exe;
@@ -70,18 +74,11 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="SignNuPkgContents" DependsOnTargets="GetSignNuPkgContentsFiles;SignFiles" />
+  <!-- Keeping this target around so as not to break existing build definitions. -->
+  <Target Name="SignNuPkgContents" />
 
-  <Target Name="GetSignNuPkgContentsFiles">
-    <ItemGroup>
-      <!-- NuPkg contents -->
-      <FilesToSign Include="$(BaseOutputDirectory)/bin/Microsoft.DotNet.Cli.Utils/**/Microsoft.DotNet.Cli.Utils.dll">
-        <Authenticode>$(InternalCertificateId)</Authenticode>
-      </FilesToSign>
-    </ItemGroup>
-  </Target>
-
-  <Target Name="SignSdkResolverContents" DependsOnTargets="GetSignSdkResolverContentsFiles;SignFiles" />
+  <!-- Keeping this target around so as not to break existing build definitions. -->
+  <Target Name="SignSdkResolverContents" />
 
   <Target Name="GetSignSdkResolverContentsFiles">
     <ItemGroup>

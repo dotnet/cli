@@ -7,9 +7,9 @@ This repo contains the source code for cross-platform [.NET Core](http://github.
 Looking for V1 of the .NET Core tooling?
 ----------------------------------------
 
-If you are looking for the v1.0.1 release of the .NET Core tools (CLI, MSBuild and the new csproj), see https://dot.net/core.
+If you are looking for the v2.0 release of the .NET Core tools (CLI, MSBuild and the new csproj), head over to https://dot.net/core and download!
 
-> **Note:** the dev/release/2.0.0 branch of the .NET Core SDK repo is based on an upcoming update of the SDK and is considered pre-release. For production-level usage, please use the
+> **Note:** the dev/repo-refactoring branch of the .NET Core SDK repo is based on an upcoming update of the SDK and is considered pre-release. For production-level usage, please use the
 > released version of the tools available at https://dot.net/core
 
 Found an issue?
@@ -32,6 +32,7 @@ To download the .NET Core runtime **without** the SDK, visit https://github.com/
 
 > **Note:** Be aware that the following installers are the **latest bits**. If you
 > want to install the latest released versions, check out the [preceding section](#looking-for-v1-of-the-net-core-tooling).
+> In order to be able to restore these pre-release packages, you may need to add a NuGet feed pointing to https://dotnet.myget.org/F/dotnet-core/api/v3/index.json. Other feeds may also be necessary depending on what kind of project you are working with.
 
 Coming soon.
 

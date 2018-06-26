@@ -7,8 +7,8 @@
   <Target Name="SetupBuildTestProjectInputs">
     <ItemGroup>
       <PreTestProjectsToExclude Condition=" 'Non-test projects in test directory' != 'consider moving elsewhere' "
-                             Include="test/Microsoft.DotNet.Tools.Tests.Utilities/Microsoft.DotNet.Tools.Tests.Utilities.csproj;
-                                      test/Microsoft.DotNet.TestFramework/Microsoft.DotNet.TestFramework.csproj" />
+                                Include="test/Microsoft.DotNet.Tools.Tests.Utilities/Microsoft.DotNet.Tools.Tests.Utilities.csproj;
+                                         test/Microsoft.DotNet.TestFramework/Microsoft.DotNet.TestFramework.csproj" />
 
       <TestProjectsToExclude Include="%(PreTestProjectsToExclude.Fullpath)" />
 
