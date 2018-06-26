@@ -21,9 +21,9 @@
                             PublishToolset;
                             PublishTemplates;
                             PublishLzmaArchive;
+                            CrossgenPublishDir;
                             PublishDotnetTools;
                             PublishVersionFile;
-                            CrossgenPublishDir;
                             PublishAppHostTemplate;
                             RetargetVSTestConsole;
                             GenerateMSBuildExtensions"
@@ -49,14 +49,12 @@
       <Toolset Remove="*" />
       <Toolset Include="$(ToolsetPublishDirectory)/**/*" />
 
-      <RefFilesToRemove Include="$(SdkOutputDirectory)/ref/**/*" />
+      <!-- Workaround for https://github.com/dotnet/toolset/issues/8 -->
+      <Toolset Remove="$(ToolsetPublishDirectory)/ref/**/*"/>
     </ItemGroup>
 
     <Copy SourceFiles="@(Toolset)"
           DestinationFiles="@(Toolset->'$(OutputDirectory)/sdk/$(ToolsetVersion)/%(RecursiveDir)%(Filename)%(Extension)')" />
-
-    <!-- Workaround for https://github.com/dotnet/toolset/issues/8 -->
-    <Delete Files="@(RefFilesToRemove)" />
   </Target>
 
   <Target Name="PublishDotnetTools"
@@ -206,7 +204,7 @@
         DiasymReaderPath="@(DiasymReaderPath)"
         PlatformAssemblyPaths="@(PlatformAssemblies);@(FSharpFolders);$(SharedFrameworkNameVersionPath)" />
 
-    <!--<Crossgen
+    <Crossgen
         SourceAssembly="%(RemainingTargets.FullPath)"
         DestinationPath="%(RemainingTargets.FullPath)"
         JITPath="$(LibCLRJitPath)"
@@ -214,7 +212,7 @@
         ReadyToRun="True"
         CreateSymbols="$(CreateCrossgenSymbols)"
         DiasymReaderPath="@(DiasymReaderPath)"
-        PlatformAssemblyPaths="@(PlatformAssemblies);@(RemainingFolders);$(SharedFrameworkNameVersionPath)" />-->
+        PlatformAssemblyPaths="@(PlatformAssemblies);@(RemainingFolders);$(SharedFrameworkNameVersionPath)" />
   </Target>
 
   <Target Name="ChmodPublishDir"
@@ -224,6 +222,17 @@
     <Exec Command="find $(SdkOutputDirectory) -type d -exec chmod 755 {} \;" />
     <Exec Command="find $(SdkOutputDirectory) -type f -exec chmod 644 {} \;" />
     <Chmod Mode="755" Glob="$(SdkOutputDirectory)/FSharp/RunFsc.sh" />
+  </Target>
+
+  <Target Name="SeparateSymbolsFromPublishDir"
+          AfterTargets="CrossgenPublishDir">
+    <ItemGroup>
+      <PdbsToMove Include="$(PublishDir)/**/*.pdb" />
+      <PdbsToMove Include="$(PublishDir)/**/*.ni.*.map" />
+    </ItemGroup>
+
+    <Move SourceFiles="@(PdbsToMove)"
+          DestinationFiles="@(PdbsToMove->'$(SymbolsDirectory)/sdk/$(SdkVersion)/%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
 
   <Target Name="PublishTemplates">

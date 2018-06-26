@@ -193,7 +193,6 @@
                       '$(SdkMSBuildExtensionsNupkgFile)'" />
       
       <GenerateMSBuildExtensionsSWR MSBuildExtensionsLayoutDirectory="$(MSBuildExtensionsLayoutDirectory)"
-<<<<<<< HEAD
                                     OutputFile="$(SdkMSBuildExtensionsSwrFile)"/> -->
       
     </Target>
