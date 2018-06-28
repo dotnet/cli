@@ -2,7 +2,7 @@
 <Project ToolsVersion="14.0" DefaultTargets="Layout" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildThisFileDirectory)/LinuxDistrosNativeInstaller.props" />
 
-  <Target Name="BuildAndPublishAllLinuxDistrosNativeInstallers" DependsOnTargets="Prepare;Compile;SetBuildingAndPublishingProps;RunAllSandBoxAndPackage;MultiPublish" />
+  <Target Name="BuildAndPublishAllLinuxDistrosNativeInstallers" DependsOnTargets="Prepare;ComposeSdk;SetBuildingAndPublishingProps;RunAllSandBoxAndPackage;MultiPublish" />
 
 
   <Target Name="RunAllSandBoxAndPackage" >
