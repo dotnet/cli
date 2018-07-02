@@ -20,10 +20,17 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
             /// </summary>
             public string GlobalJsonPath;
 
-            public void Initialize(string resolvedSdkDirectory, string globalJsonPath)
+            public void Initialize(Interop.hostfxr_resolve_sdk2_result_key_t key, string value)
             {
-                ResolvedSdkDirectory = resolvedSdkDirectory;
-                GlobalJsonPath = globalJsonPath;
+                switch (key)
+                {
+                    case Interop.hostfxr_resolve_sdk2_result_key_t.resolved_sdk_dir:
+                        ResolvedSdkDirectory = value;
+                        break;
+                    case Interop.hostfxr_resolve_sdk2_result_key_t.global_json_path:
+                        GlobalJsonPath = value;
+                        break;
+                }
             }
         }
 

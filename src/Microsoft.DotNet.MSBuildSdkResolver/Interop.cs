@@ -54,14 +54,20 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
             disallow_prerelease = 0x1,
         }
 
+        internal enum hostfxr_resolve_sdk2_result_key_t : int
+        {
+            resolved_sdk_dir = 0,
+            global_json_path = 1,
+        }
+
         internal static class Windows
         {
             private const CharSet UTF16 = CharSet.Unicode;
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = UTF16)]
             internal delegate void hostfxr_resolve_sdk2_result_fn(
-                string resolved_sdk_dir,
-                string global_json_path);
+                hostfxr_resolve_sdk2_result_key_t key,
+                string value);
 
             [DllImport("hostfxr", CharSet = UTF16, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
             internal static extern int hostfxr_resolve_sdk2(
@@ -90,8 +96,8 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = UTF8)]
             internal delegate void hostfxr_resolve_sdk2_result_fn(
-                string resolved_sdk_dir,
-                string global_json_path);
+                hostfxr_resolve_sdk2_result_key_t key,
+                string value);
 
             [DllImport("hostfxr", CharSet = UTF8, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
             internal static extern int hostfxr_resolve_sdk2(
