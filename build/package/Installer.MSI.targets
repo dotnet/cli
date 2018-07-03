@@ -45,7 +45,10 @@
       <!-- Consumed By Publish -->
       <ItemGroup>
         <GeneratedInstallers Include="$(SdkInstallerFile);$(CombinedFrameworkSdkHostInstallerFile)" />
+        <!-- Disabling this for now because we don't have the MSBuildExtensions available. -->
+        <!--
         <GeneratedInstallers Condition=" '$(Architecture)' == 'x86' " Include="$(MSBuildExtensionsInstallerFile)" />
+        -->
       </ItemGroup>
 
       <GenerateMsiVersion CommitCount="$(CommitCount)"
