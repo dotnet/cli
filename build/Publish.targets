@@ -3,7 +3,6 @@
   <Import Condition=" '$(GeneratePropsFile)' != 'true' " Project="$(NuGetPackagesDir)/microsoft.dotnet.build.tasks.feed/$(BuildTasksFeedToolVersion)/build/Microsoft.DotNet.Build.Tasks.Feed.targets" />
   <Import Project="$(MSBuildThisFileDirectory)/publish/FinishBuild.targets" />
   <Import Project="$(MSBuildThisFileDirectory)/publish/PublishContent.targets" />
-  <Import Project="$(MSBuildThisFileDirectory)/publish/PublishNupkgToBlobFeed.targets" />
   <Import Project="$(MSBuildThisFileDirectory)/publish/Badge.targets" />
   <Import Project="$(MSBuildThisFileDirectory)/publish/Checksum.targets" />
   <Import Project="$(MSBuildThisFileDirectory)/publish/RuntimeCoherence.targets" />
@@ -34,7 +33,6 @@
                              GenerateChecksums;
                              UploadArtifactsToAzure;
                              UploadChecksumsToAzure;
-                             PublishNupkgToBlobFeed;
                              PublishCliVersionBadge" />
 
   <Target Name="GatherItemsForPattern">
@@ -43,10 +41,6 @@
                      Condition=" '$(PublishNativeInstallers)' == 'true' "/>
       <ForPublishing Include="%(GenerateArchivesInputsOutputs.Outputs)"
                      Condition=" '$(PublishArchives)' == 'true' "/>
-      <ForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.Cli.Utils.*.nupkg"
-                     Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' " />
-      <ForPublishing Include="$(PackagesDirectory)/Microsoft.DotNet.MSBuildSdkResolver.*.nupkg"
-                     Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' " />
       <ForPublishing Include="$(PackagesDirectory)/runtime.*.Microsoft.DotNet.SDK.*.symbols.nupkg" />
       <ForPublishing Include="$(PackagesDirectory)/VS.Redist.Common.Net.Core.SDK.$(Architecture).*.nupkg"
                      Condition=" '$(OS)' == 'Windows_NT' "/>

@@ -161,9 +161,8 @@ if [[ $archlower == 'arm'* ]]; then
     INSTALL_ARCHITECTURE="x64"
 fi
 
-# Workaround while the install script is not updated on the website.
 if [ "$STAGE0_SOURCE_DIR" == "" ]; then
-    (set -x ; curl -sSL "https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.sh" | bash /dev/stdin --version "2.2.0-preview1-007799" --install-dir "$DOTNET_INSTALL_DIR" --architecture "$INSTALL_ARCHITECTURE" $LINUX_PORTABLE_INSTALL_ARGS)
+    (set -x ; curl -sSL "https://dot.net/v1/dotnet-install.sh" | bash /dev/stdin --version "2.2.0-preview1-007799" --install-dir "$DOTNET_INSTALL_DIR" --architecture "$INSTALL_ARCHITECTURE" $LINUX_PORTABLE_INSTALL_ARGS)
 else
     echo "Copying bootstrap cli from $STAGE0_SOURCE_DIR"
     cp -r $STAGE0_SOURCE_DIR/* "$DOTNET_INSTALL_DIR"
