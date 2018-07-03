@@ -22,8 +22,6 @@
   <Target Name="SetSigningProperties">
     <Error Condition="'$(Rid)' == ''" Text="Missing required property 'Rid'." />
     <PropertyGroup>
-      <SdkResolverOutputDirectory>$(IntermediateDirectory)/MSBuildExtensionsLayout/MSBuildSdkResolver</SdkResolverOutputDirectory>
-
       <!-- The OutDir and IntermediateOutputPath properties are required by MicroBuild. MicroBuild only
            signs files that are under these paths. -->
       <OutDir Condition="'$(OutDir)' == ''">$(BaseOutputDirectory)</OutDir>
@@ -31,7 +29,7 @@
     </PropertyGroup>
   </Target>
 
-  <Target Name="PostCompileSign" DependsOnTargets="GetPostCompileSignFiles;GetSignSdkResolverContentsFiles;SignFiles" />
+  <Target Name="PostCompileSign" DependsOnTargets="GetPostCompileSignFiles;SignFiles" />
 
   <Target Name="GetPostCompileSignFiles">
     <ItemGroup>
@@ -79,14 +77,6 @@
 
   <!-- Keeping this target around so as not to break existing build definitions. -->
   <Target Name="SignSdkResolverContents" />
-
-  <Target Name="GetSignSdkResolverContentsFiles">
-    <ItemGroup>
-      <FilesToSign Include="$(SdkResolverOutputDirectory)/Microsoft.DotNet.MSBuildSdkResolver.dll">
-        <Authenticode>$(InternalCertificateId)</Authenticode>
-      </FilesToSign>
-    </ItemGroup>
-  </Target>
 
   <Target Name="SignMsiAndCab" DependsOnTargets="GetSignMsiAndCabFiles;SignFiles" />
 

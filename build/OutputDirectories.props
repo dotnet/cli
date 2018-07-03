@@ -28,7 +28,6 @@
       <DotnetInOutputDirectory>$(OutputDirectory)/dotnet$(ExeExtension)</DotnetInOutputDirectory>
       <GeneratedMSBuildExtensionsDirectory>$(IntermediateDirectory)/GeneratedMSBuildExtensions</GeneratedMSBuildExtensionsDirectory>
       <MSBuildExtensionsLayoutDirectory>$(IntermediateDirectory)/MSBuildExtensionsLayout</MSBuildExtensionsLayoutDirectory>
-      <SdkResolverOutputDirectory>$(MSBuildExtensionsLayoutDirectory)/MSBuildSdkResolver</SdkResolverOutputDirectory>
       <NextStagePropsPath>$(BaseOutputDirectory)/PreviousStage.props</NextStagePropsPath>
   </PropertyGroup>
 </Project>
