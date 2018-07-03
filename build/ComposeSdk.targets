@@ -7,7 +7,7 @@
     <PublishDir>$(SdkOutputDirectory)</PublishDir>
   </PropertyGroup>
 
-  <Target Name="ComposeSdk">
+  <Target Name="ComposeSdk" DependsOnTargets="Prepare">
     <MSBuild Projects="$(SrcDirectory)/redist/redist.csproj"
              Targets="Publish" />
   </Target>
