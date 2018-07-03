@@ -44,10 +44,13 @@
       <ForPublishing Include="$(PackagesDirectory)/runtime.*.Microsoft.DotNet.SDK.*.symbols.nupkg" />
       <ForPublishing Include="$(PackagesDirectory)/VS.Redist.Common.Net.Core.SDK.$(Architecture).*.nupkg"
                      Condition=" '$(OS)' == 'Windows_NT' "/>
+      <!-- Disabling this for now because we don't have the MSBuildExtensions available. -->
+      <!--
       <ForPublishing Include="$(PackagesDirectory)/VS.Redist.Common.Net.Core.SDK.MSBuildExtensions.*.nupkg"
                      Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' "/>
       <ForPublishing Include="$(PackagesDirectory)/VS.Redist.Common.Net.Core.SDK.MSBuildExtensions.swr"
                      Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' "/>
+      -->
     </ItemGroup>
 
     <ItemGroup>
