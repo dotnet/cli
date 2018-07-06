@@ -2,6 +2,7 @@
   <PropertyGroup>
     <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
   </PropertyGroup>
+  <Import Project="build/TargetFramework.props" />
   <Import Project="build/InitRepo.props" />
   <Import Project="build/DependencyVersions.props" />
   <PropertyGroup>
