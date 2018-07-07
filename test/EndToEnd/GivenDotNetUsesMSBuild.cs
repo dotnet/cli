@@ -3,6 +3,8 @@
 
 using System;
 using System.IO;
+using System.Linq;
+using System.Xml.Linq;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
 
@@ -19,11 +21,21 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             {
                 string projectDirectory = directory.Path;
 
-                string newArgs = "console -f netcoreapp2.1 --debug:ephemeral-hive --no-restore";
+                string newArgs = "console --debug:ephemeral-hive --no-restore";
                 new NewCommandShim()
                     .WithWorkingDirectory(projectDirectory)
                     .Execute(newArgs)
                     .Should().Pass();
+
+                string projectPath = Directory.GetFiles(projectDirectory, "*.csproj").Single();
+
+                //  Override TargetFramework since there aren't .NET Core 3 templates yet
+                XDocument project = XDocument.Load(projectPath);
+                var ns = project.Root.Name.Namespace;
+                project.Root.Element(ns + "PropertyGroup")
+                    .Element(ns + "TargetFramework")
+                    .Value = "netcoreapp3.0";
+                project.Save(projectPath);
 
                 new RestoreCommand()
                     .WithWorkingDirectory(projectDirectory)
@@ -65,7 +77,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 
             new DotnetCommand()
                 .WithWorkingDirectory(testInstance.Root)
-                .ExecuteWithCapturedOutput("portable")
+                .ExecuteWithCapturedOutput("-d portable")
                 .Should()
                 .Pass()
                 .And
@@ -84,7 +96,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
 
             new DotnetCommand()
                 .WithWorkingDirectory(testInstance.Root)
-                .ExecuteWithCapturedOutput("prefercliruntime")
+                .ExecuteWithCapturedOutput("-d prefercliruntime")
                 .Should().Pass()
                 .And.HaveStdOutContaining("Hello I prefer the cli runtime World!");;
         }
