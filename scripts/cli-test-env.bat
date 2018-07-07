@@ -7,7 +7,7 @@ for %%i in (%~dp0..\) DO (
     SET CLI_REPO_ROOT=%%~dpi
 )
 
-title CLI Test (%CLI_REPO_ROOT%)
+title Core SDK Test (%CLI_REPO_ROOT%)
 
 REM Add Stage 2 CLI to path
 set PATH=%CLI_REPO_ROOT%bin\2\win-x64\dotnet;%PATH%
