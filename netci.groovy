@@ -112,6 +112,7 @@ set DOTNET_CLI_UI_LANGUAGE=es
 
 	def archiveSettings = new ArchivalSettings()
 	archiveSettings.addFiles("test/**/*.trx")
+	archiveSettings.addFiles("*.binlog")
 	archiveSettings.setFailIfNothingArchived()
 	archiveSettings.setArchiveOnFailure()
     Utilities.addArchival(newJob, archiveSettings)
