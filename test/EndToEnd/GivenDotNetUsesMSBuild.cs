@@ -124,7 +124,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
             new DotnetCommand()
                 .WithWorkingDirectory(testProjectDirectory)
                 .ExecuteWithCapturedOutput(
-                    $"-d dependency-tool-invoker -c {configuration} -f netcoreapp2.2 portable")
+                    $"-d dependency-tool-invoker -c {configuration} -f netcoreapp3.0 portable")
                 .Should().Pass()
                      .And.HaveStdOutContaining("Hello Portable World!");;
         }
