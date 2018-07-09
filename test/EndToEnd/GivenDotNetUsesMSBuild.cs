@@ -30,6 +30,7 @@ namespace Microsoft.DotNet.Tests.EndToEnd
                 string projectPath = Directory.GetFiles(projectDirectory, "*.csproj").Single();
 
                 //  Override TargetFramework since there aren't .NET Core 3 templates yet
+                //  https://github.com/dotnet/core-sdk/issues/24 tracks removing this workaround
                 XDocument project = XDocument.Load(projectPath);
                 var ns = project.Root.Name.Namespace;
                 project.Root.Element(ns + "PropertyGroup")
