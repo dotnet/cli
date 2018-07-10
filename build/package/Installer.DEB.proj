@@ -15,8 +15,12 @@
 
   <Target Name="GetAspNetSharedFxInstallArgs" DependsOnTargets="EvaluateRuntimeCoherence">
     <PropertyGroup>
-      <!-- Ignored because versions of aspnetcore-runtime may be in incoherent with the version of dotnet-runtime we want to use. -->
-      <InstallAspNetCoreSharedFxArgs>--ignore-depends=dotnet-runtime-$(AspNetCoreSharedFxBaseRuntimeVersion)</InstallAspNetCoreSharedFxArgs>
+      <AspNetVersionPrereleaseSeparator>$(AspNetCoreSharedFxBaseRuntimeVersion.IndexOf('-'))</AspNetVersionPrereleaseSeparator>
+      <AspNetSimpleVersion>$(AspNetCoreSharedFxBaseRuntimeVersion)</AspNetSimpleVersion>
+      <AspNetSimpleVersion Condition=" '$(AspNetVersionPrereleaseSeparator)' != -1 ">$(AspNetCoreSharedFxBaseRuntimeVersion.Substring(0, $(AspNetVersionPrereleaseSeparator)))</AspNetSimpleVersion>
+
+      <!-- dotnet-runtime package may not currently be available -->
+      <InstallAspNetCoreSharedFxArgs>--ignore-depends=dotnet-runtime-$(AspNetSimpleVersion)</InstallAspNetCoreSharedFxArgs>
     </PropertyGroup>
   </Target>
 

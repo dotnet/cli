@@ -3,7 +3,7 @@
   <PropertyGroup>
     <DotNetCoreSdkLKGVersion>2.2.100-preview1-008982</DotNetCoreSdkLKGVersion>
     <ToolsetVersion>2.2.100-refac-009032</ToolsetVersion>
-    <MicrosoftAspNetCoreAllPackageVersion>2.2.0-preview1-34355</MicrosoftAspNetCoreAllPackageVersion>
+    <MicrosoftAspNetCoreAllPackageVersion>3.0.0-alpha1-10049</MicrosoftAspNetCoreAllPackageVersion>
     <MicrosoftAspNetCoreAppPackageVersion>$(MicrosoftAspNetCoreAllPackageVersion)</MicrosoftAspNetCoreAppPackageVersion>
     <MicrosoftNETCoreAppPackageVersion>3.0.0-preview1-26627-03</MicrosoftNETCoreAppPackageVersion>
     <MicrosoftNETCoreDotNetHostResolverPackageVersion>$(MicrosoftNETCoreAppPackageVersion)</MicrosoftNETCoreDotNetHostResolverPackageVersion>
