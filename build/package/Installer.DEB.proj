@@ -5,11 +5,17 @@
 
   <Import Project="Installer.DEB.targets" />
 
+  <!-- 
+      https://github.com/dotnet/core-sdk/issues/27
+      
+      Add the following back to DependsOnTargets once the aspnetcore base runtime version file is fixed:
+                            BuildSdkDeb;
+                            TestSdkDeb;
+   -->
+
   <Target Name="GenerateDebs"
           DependsOnTargets="SetupDebProps;
-                            TestDebuild;
-                            BuildSdkDeb;
-                            TestSdkDeb;"
+                            TestDebuild;"
           Condition=" '$(IsDebianBaseDistro)' == 'True' "
           Outputs="@(GeneratedInstallers)"/>
 
