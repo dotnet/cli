@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml.Linq;
 using FluentAssertions;
@@ -129,13 +130,27 @@ namespace EndToEnd
         {
             get
             {
-                return new[]
-                {
-                    "1.0",
-                    "1.1",
-                    "2.0",
-                    "2.1"
-                }.Select(version => new object[] { version });
+                
+                var versions = new List<string>();
+
+                // Runtime 1.x deosn't support openSUSE and Fedora 27, so skip testing those versions on Linux
+                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {                    
+                    versions.AddRange(new[]
+                    {
+                        "1.0",
+                        "1.1",
+                    });
+                }
+
+                versions.AddRange(new[]
+                    {
+                        "2.0",
+                        "2.1",
+                        "3.0"
+                    });
+
+                return versions.Select(version => new object[] { version });
             }
         }
     }

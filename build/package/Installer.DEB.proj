@@ -5,18 +5,28 @@
 
   <Import Project="Installer.DEB.targets" />
 
+  <!-- 
+      https://github.com/dotnet/core-sdk/issues/27
+      
+      Add the following back to DependsOnTargets once the aspnetcore base runtime version file is fixed:
+                            BuildSdkDeb;
+                            TestSdkDeb;
+   -->
+
   <Target Name="GenerateDebs"
           DependsOnTargets="SetupDebProps;
-                            TestDebuild;
-                            BuildSdkDeb;
-                            TestSdkDeb;"
+                            TestDebuild;"
           Condition=" '$(IsDebianBaseDistro)' == 'True' "
           Outputs="@(GeneratedInstallers)"/>
 
   <Target Name="GetAspNetSharedFxInstallArgs" DependsOnTargets="EvaluateRuntimeCoherence">
     <PropertyGroup>
-      <!-- Ignored because versions of aspnetcore-runtime may be in incoherent with the version of dotnet-runtime we want to use. -->
-      <InstallAspNetCoreSharedFxArgs>--ignore-depends=dotnet-runtime-$(AspNetCoreSharedFxBaseRuntimeVersion)</InstallAspNetCoreSharedFxArgs>
+      <AspNetVersionPrereleaseSeparator>$(AspNetCoreSharedFxBaseRuntimeVersion.IndexOf('-'))</AspNetVersionPrereleaseSeparator>
+      <AspNetSimpleVersion>$(AspNetCoreSharedFxBaseRuntimeVersion)</AspNetSimpleVersion>
+      <AspNetSimpleVersion Condition=" '$(AspNetVersionPrereleaseSeparator)' != -1 ">$(AspNetCoreSharedFxBaseRuntimeVersion.Substring(0, $(AspNetVersionPrereleaseSeparator)))</AspNetSimpleVersion>
+
+      <!-- dotnet-runtime package may not currently be available -->
+      <InstallAspNetCoreSharedFxArgs>--ignore-depends=dotnet-runtime-$(AspNetSimpleVersion)</InstallAspNetCoreSharedFxArgs>
     </PropertyGroup>
   </Target>
 

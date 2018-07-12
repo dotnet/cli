@@ -1,0 +1,9 @@
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+      <CliTargetFramework>netcoreapp3.0</CliTargetFramework>
+      
+      <!-- Workaround until the stage0 SDK supports .NET Core 3.0.
+           It won't hurt anything to leave this in though. -->
+      <NETCoreAppMaximumVersion>3.0</NETCoreAppMaximumVersion>
+  </PropertyGroup>
+</Project>
