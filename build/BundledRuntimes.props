@@ -6,9 +6,6 @@
     <!-- only the runtime OSX .pkgs have a `-internal` suffix -->
     <InstallerStartSuffix Condition="'$(HostOSName)' == 'osx'">-internal</InstallerStartSuffix>
 
-    <!-- deb and rpm based installers have the `-upgrade` suffx -->
-    <InstallerEndSuffix Condition=" '$(IsDebianBaseDistro)' == 'true' OR '$(IsRPMBasedDistro)' == 'true' ">-upgrade</InstallerEndSuffix>
-
     <!-- Downloaded Installers + Archives -->
     <DownloadedRuntimeDepsInstallerFileName Condition=" '$(InstallerExtension)' != '' ">dotnet-runtime-deps-$(SharedHostVersion)-$(CoreSetupRid)$(InstallerEndSuffix)$(InstallerExtension)</DownloadedRuntimeDepsInstallerFileName>
     <DownloadedRuntimeDepsInstallerFile Condition=" '$(InstallerExtension)' != '' ">$(PackagesDirectory)/$(DownloadedRuntimeDepsInstallerFileName)</DownloadedRuntimeDepsInstallerFile>

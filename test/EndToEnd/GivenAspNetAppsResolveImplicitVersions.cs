@@ -16,7 +16,7 @@ namespace EndToEnd
     {
         private const string AspNetTestProject = "TestWebAppSimple";
 
-        [Fact]
+        [Fact(Skip ="https://github.com/dotnet/core-sdk/issues/21")]
         public void PortablePublishWithLatestTFMUsesBundledAspNetCoreAppVersion()
         {
             var _testInstance = TestAssets.Get(AspNetTestProject)
@@ -56,7 +56,7 @@ namespace EndToEnd
                 "Please update MSBuildExtensions.targets in this repo so these versions match.");
         }
 
-        [Fact]
+        [Fact(Skip = "https://github.com/dotnet/core-sdk/issues/21")]
         public void StandalonePublishWithLatestTFMUsesBundledAspNetCoreAppVersion()
         {
             var _testInstance = TestAssets.Get(AspNetTestProject)
@@ -102,7 +102,7 @@ namespace EndToEnd
                 "Please update MSBuildExtensions.targets in this repo so these versions match.");
         }
 
-        [Theory]
+        [Theory(Skip = "https://github.com/dotnet/core-sdk/issues/21")]
         [MemberData(nameof(SupportedAspNetCoreAppVersions))]
         public void ItRollsForwardToTheLatestVersion(string minorVersion)
         {
@@ -172,7 +172,7 @@ namespace EndToEnd
                 "(see MSBuildExtensions.targets in this repo)");
         }
 
-        [Fact]
+        [Fact(Skip = "https://github.com/dotnet/core-sdk/issues/21")]
         public void WeCoverLatestAspNetCoreAppRollForward()
         {
             //  Run "dotnet new web", get TargetFramework property, and make sure it's covered in SupportedAspNetCoreAppVersions
@@ -209,12 +209,15 @@ namespace EndToEnd
                 ?.Version;
         }
 
-        public static string LatestSupportedAspNetCoreAppVersion = "2.2";
+        public static string LatestSupportedAspNetCoreAppVersion = "3.0";
 
         public static IEnumerable<object[]> SupportedAspNetCoreAppVersions
         {
             get
             {
+                yield return new object[] { "2.1" };
+                //  2.2 not yet stable
+                //yield return new object[] { "2.2" };
                 yield return new object[] { LatestSupportedAspNetCoreAppVersion };
             }
         }
