@@ -4,8 +4,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!-- licavalc: we could publish the tool set to a toolset folder in the blob storage to disambiguate it from the crossgenned toolsets we need to produce for Antares -->
-    <ToolsetRootUrl>$(CoreSetupBlobRootUrl)Sdk/$(ToolsetVersion)/</ToolsetRootUrl>
+    <ToolsetRootUrl>$(CoreSetupBlobRootUrl)Toolset/$(ToolsetVersion)/</ToolsetRootUrl>
     <ToolsetDownloadUrl>$(ToolsetRootUrl)$(ToolsetCompressedFileName)$(CoreSetupBlobAccessTokenParam)</ToolsetDownloadUrl>
     <ToolsetDownloadDirectory>$(IntermediateDirectory)/toolsetDownload/$(ToolsetVersion)/</ToolsetDownloadDirectory>
     <ToolsetArchive>$(ToolsetDownloadDirectory)$(ToolsetCompressedFileName)</ToolsetArchive>
