@@ -9,7 +9,7 @@
       <MSBuild Projects="$(MSBuildThisFileDirectory)/SandBoxAndPackageInParallel.proj"
       Targets="RunInSandBoxAndPackage"
             Properties="RepoRoot=$(RepoRoot);
-            BuildConfiguration=$(BuildConfiguration);
+            BuildConfiguration=$(CONFIGURATION);
             InstallerOutputDirectory=$(InstallerOutputDirectory);
             " />
   </Target>

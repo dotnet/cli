@@ -11,6 +11,7 @@ def branch = GithubBranchName
 def isPR = true
 
 def platformList = [
+  'AllLinux:x64:Release',
   'CentOS7.1:x64:Debug',
   'Debian8.2:x64:Debug',
   'fedora.27:x64:Debug',
@@ -83,6 +84,10 @@ set DOTNET_CLI_UI_LANGUAGE=es
         osVersionUsedForMachineAffinity = 'latest-docker'
         buildCommand = "./build.sh --linux-portable --skip-prereqs --configuration ${configuration} --docker ${os} --targets Default"
     }
+    else if (os == 'AllLinux') {
+        osUsedForMachineAffinity = 'Ubuntu16.04'
+        buildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --targets Default /t:BuildAndPublishAllLinuxDistrosNativeInstallers"
+    }
     else {
         // Jenkins non-Ubuntu CI machines don't have docker
         buildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --targets Default"
@@ -104,8 +109,8 @@ set DOTNET_CLI_UI_LANGUAGE=es
 
     Utilities.setMachineAffinity(newJob, osUsedForMachineAffinity, osVersionUsedForMachineAffinity)
     Utilities.standardJobSetup(newJob, project, isPR, "*/${branch}")
-    // ARM CI runs are build only.
-    if ((architecture != 'arm') && (architecture != 'arm64')) {
+    // ARM and AllLinux CI runs are build only.
+    if ((architecture != 'arm') && (architecture != 'arm64') && (os != 'AllLinux')) {
         Utilities.addMSTestResults(newJob, '**/*.trx')
     }
     Utilities.addGithubPRTriggerForBranch(newJob, branch, "${os} ${architecture} ${configuration} Build")

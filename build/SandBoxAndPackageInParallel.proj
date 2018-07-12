@@ -9,7 +9,7 @@
              Properties="RepoRoot=$(RepoRoot);
              LinuxDistrosNeedNativeInstaller=%(LinuxDistrosNeedNativeInstaller.Identity);
              DockerFolder=%(LinuxDistrosNeedNativeInstaller.DockerFolder);
-             BuildConfiguration=$(BuildConfiguration);
+             BuildConfiguration=$(CONFIGURATION);
              InstallerOutputDirectory=$(InstallerOutputDirectory);
              BuildInParallel='true'" />
   </Target >

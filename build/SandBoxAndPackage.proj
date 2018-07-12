@@ -48,7 +48,7 @@
   <Target Name="PackageWithDocker" DependsOnTargets="PrepareSandBox">
     <PropertyGroup>
       <CommandToInvokeBuildScriptInDockerToPackageInSandBox>$(SandBoxRepoRoot)/build.sh</CommandToInvokeBuildScriptInDockerToPackageInSandBox>
-      <CommandToInvokeBuildScriptInDockerToPackageInSandBox>$(CommandToInvokeBuildScriptInDockerToPackageInSandBox) --configuration $(BuildConfiguration)</CommandToInvokeBuildScriptInDockerToPackageInSandBox>
+      <CommandToInvokeBuildScriptInDockerToPackageInSandBox>$(CommandToInvokeBuildScriptInDockerToPackageInSandBox) --configuration $(CONFIGURATION)</CommandToInvokeBuildScriptInDockerToPackageInSandBox>
       <CommandToInvokeBuildScriptInDockerToPackageInSandBox>$(CommandToInvokeBuildScriptInDockerToPackageInSandBox) --docker $(DockerFolder)</CommandToInvokeBuildScriptInDockerToPackageInSandBox>
       <CommandToInvokeBuildScriptInDockerToPackageInSandBox>$(CommandToInvokeBuildScriptInDockerToPackageInSandBox) --skip-prereqs</CommandToInvokeBuildScriptInDockerToPackageInSandBox>
       <CommandToInvokeBuildScriptInDockerToPackageInSandBox>$(CommandToInvokeBuildScriptInDockerToPackageInSandBox) /t:GenerateInstallersAndCopyOutOfSandBox</CommandToInvokeBuildScriptInDockerToPackageInSandBox>
