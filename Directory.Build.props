@@ -59,7 +59,6 @@ tools\TestAssetsDependencies\TestAssetsDependencies.csproj
     <Import Project="build/BuildDefaults.props" />
     <Import Project="build/BundledRuntimes.props" />
     <Import Project="build/BundledToolset.props" />
-    <Import Project="build/DotnetCoreSdkLKG.props" />
     <Import Project="build/CrossGen.props" />
     <Import Project="build/BackwardsCompatibilityRuntimes.props" />
 
