@@ -54,7 +54,7 @@
     </ItemGroup>
 
     <Copy SourceFiles="@(Toolset)"
-          DestinationFiles="@(Toolset->'$(OutputDirectory)/sdk/$(ToolsetVersion)/%(RecursiveDir)%(Filename)%(Extension)')" />
+          DestinationFiles="@(Toolset->'$(SdkOutputDirectory)/%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
 
   <Target Name="PublishDotnetTools"
