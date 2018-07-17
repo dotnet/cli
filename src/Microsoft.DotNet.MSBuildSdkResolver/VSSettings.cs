@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 
 #if NET46
 using Microsoft.VisualStudio.Setup.Configuration;
@@ -27,21 +28,25 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
                 return;
             }
 
-            var configuration = new SetupConfiguration();
-            var instance = configuration?.GetInstanceForCurrentProcess();
+            string instanceId;
+            string installationVersion;
+            bool isPrerelease;
 
-            if (instance == null)
+            try
+            {
+                var configuration = new SetupConfiguration();
+                var instance = configuration.GetInstanceForCurrentProcess();
+
+                instanceId = instance.GetInstanceId();
+                installationVersion = instance.GetInstallationVersion();
+                isPrerelease = ((ISetupInstanceCatalog)instance).IsPrerelease();
+            }
+            catch (COMException)
             {
                 return;
             }
 
-            if (instance is ISetupInstanceCatalog catalog)
-            {
-                _disallowPrereleaseByDefault = !catalog.IsPrerelease();
-            }
-
-            var instanceId = instance.GetInstanceId();
-            var version = Version.Parse(instance.GetInstallationVersion());
+            var version = Version.Parse(installationVersion);
 
             _settingsFilePath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -50,6 +55,7 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
                 version.Major + ".0_" + instanceId,
                 "sdk.txt");
 
+            _disallowPrereleaseByDefault = !isPrerelease;
             _disallowPrerelease = _disallowPrereleaseByDefault;
 #endif
         }
