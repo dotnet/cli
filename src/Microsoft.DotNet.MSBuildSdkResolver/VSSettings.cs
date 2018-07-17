@@ -82,14 +82,14 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
         {
             Debug.Assert(_settingsFilePath != null);
 
+            var file = new FileInfo(_settingsFilePath);
+
+            // NB: All calls to Exists and LastWriteTimeUtc below will not hit the disk
+            //     They will return data obtained during Refresh() here.
+            file.Refresh(); 
+
             lock (_lock)
             {
-                var file = new FileInfo(_settingsFilePath);
-
-                // NB: All calls to Exists and LastWriteTimeUtc below will not hit the disk
-                //     They will return data obtained during Refresh().
-                file.Refresh(); 
-
                 // File does not exist -> use default.
                 if (!file.Exists)
                 {
