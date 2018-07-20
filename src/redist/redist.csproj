@@ -77,7 +77,7 @@
     </MSBuild>
   </Target>
 
-  <Target Name="PublishAppHostTemplate">
+  <Target Name="PublishAppHostTemplate" DependsOnTargets="RunResolvePackageDependencies">
 
     <PropertyGroup>
       <NETCoreDotNetAppHostPackageName>Microsoft.NETCore.DotNetAppHost</NETCoreDotNetAppHostPackageName>
