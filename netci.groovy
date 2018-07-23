@@ -12,6 +12,7 @@ def isPR = true
 def platformList = [
   'CentOS7.1:x64:Debug',
   'Debian8.2:x64:Debug',
+  'Debian9:x64:Debug',
   'Fedora27:x64:Debug',
   'Fedora28:x64:Release',
   'OpenSUSE42.3:x64:Release',
@@ -57,6 +58,11 @@ platformList.each { platform ->
         else if (os == 'Debian8.2') {
             osUsedForMachineAffinity = 'Ubuntu16.04';
             dockerFlag = "debian"
+        }
+        else if (os == 'Debian9') {
+            osUsedForMachineAffinity = 'Ubuntu16.04';
+            osVersionUsedForMachineAffinity = 'latest-docker'
+            dockerFlag = "debian.9"
         }
         else if (os == 'Fedora27') {
             osUsedForMachineAffinity = 'Ubuntu16.04';

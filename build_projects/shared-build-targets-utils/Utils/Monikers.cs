@@ -31,6 +31,8 @@ namespace Microsoft.DotNet.Cli.Build
                     return "CentOS_x64";
                 case "debian.8-x64":
                     return "Debian_x64";
+                case "debian.9-x64":
+                    return "Debian_9_x64";
             }
 
             return $"{CurrentPlatform.Current}_{CurrentArchitecture.Current}";
