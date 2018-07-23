@@ -100,6 +100,7 @@
                                      '$(Rid)' == 'ubuntu.18.04-x64' Or
                                      '$(Rid)' == 'fedora.27-x64' Or
                                      '$(Rid)' == 'fedora.28-x64' Or
+                                     '$(Rid)' == 'debian.9-x64' Or
                                      '$(Rid)' == 'opensuse.42.3-x64' ">$(Rid)</ProductMonikerRid>
       <ProductMonikerRid Condition=" '$(ProductMonikerRid)' == '' ">$(OSName)-$(Architecture)</ProductMonikerRid>
 
@@ -136,6 +137,7 @@
       <HasAdditionalSharedFramework Condition="'$(Rid)' != 'ubuntu.18.04-x64' AND
                                                '$(Rid)' != 'fedora.27-x64' AND
                                                '$(Rid)' != 'fedora.28-x64' AND
+                                               '$(Rid)' != 'debian.9-x64' AND
                                                '$(Rid)' != 'opensuse.42.3-x64'">true</HasAdditionalSharedFramework>
       <IncludeAdditionalSharedFrameworks Condition=" '$(IncludeAdditionalSharedFrameworks)' == '' AND '$(HasAdditionalSharedFramework)' == 'true' ">true</IncludeAdditionalSharedFrameworks>
       <IncludeAdditionalSharedFrameworks Condition=" '$(IncludeAdditionalSharedFrameworks)' == '' ">false</IncludeAdditionalSharedFrameworks>
