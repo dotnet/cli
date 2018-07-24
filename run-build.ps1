@@ -89,8 +89,8 @@ if ($LastExitCode -ne 0)
 }
 
 # install the post-PJnistic stage0
-Write-Host "$dotnetInstallPath -Version ""1.1.9-servicing-005253""  -InstallDir $env:DOTNET_INSTALL_DIR -Architecture ""$Architecture"""
-Invoke-Expression "$dotnetInstallPath -Version ""1.1.9-servicing-005253"" -InstallDir $env:DOTNET_INSTALL_DIR -Architecture ""$Architecture"""
+Write-Host "$dotnetInstallPath -Version ""1.1.10-servicing-005283""  -InstallDir $env:DOTNET_INSTALL_DIR -Architecture ""$Architecture"""
+Invoke-Expression "$dotnetInstallPath -Version ""1.1.10-servicing-005283"" -InstallDir $env:DOTNET_INSTALL_DIR -Architecture ""$Architecture"""
 if ($LastExitCode -ne 0)
 {
     Write-Output "The .NET CLI stage0 installation failed with exit code $LastExitCode"
