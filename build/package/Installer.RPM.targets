@@ -172,7 +172,7 @@
       <SdkRpmPackageName>$(ArtifactNameCombinedHostHostFxrFrameworkSdk)-$(SdkRpmPackageVersion)</SdkRpmPackageName>
       <SharedFxRpmPackageVersion>$(MicrosoftNETCoreAppMajorMinorVersion)</SharedFxRpmPackageVersion>
       <SharedFxRpmPackageFileVersion>$(MicrosoftNETCoreAppPackageVersion)</SharedFxRpmPackageFileVersion>
-      <SharedFxRpmPackageName>dotnet-runtime-$(SharedFxRpmPackageVersion)</SharedFxRpmPackageName> -->
+      <SharedFxRpmPackageName>dotnet-runtime-$(SharedFxRpmPackageVersion)</SharedFxRpmPackageName>
       <SharedFxRpmPackageName>$(SharedFxRpmPackageName.ToLower())</SharedFxRpmPackageName>
       <SharedFxRpmPackageFileName>dotnet-runtime-$(SharedFxRpmPackageFileVersion)</SharedFxRpmPackageFileName>
       <SharedFxRpmPackageFileName>$(SharedFxRpmPackageFileName.ToLower())</SharedFxRpmPackageFileName>
@@ -180,7 +180,7 @@
       <HostFxrRpmPackageName>dotnet-hostfxr-$(HostFxrRpmPackageVersion)</HostFxrRpmPackageName>
       <HostFxrRpmPackageName>$(HostFxrRpmPackageName.ToLower())</HostFxrRpmPackageName>
       <HostRpmPackageName>dotnet-host</HostRpmPackageName>
-      <AspNetCoreSharedFxRpmPackageName>aspnetcore-runtime-$(AspNetCoreMajorMinorVersion)</AspNetCoreSharedFxRpmPackageName> -->
+      <AspNetCoreSharedFxRpmPackageName>aspnetcore-runtime-$(AspNetCoreMajorMinorVersion)</AspNetCoreSharedFxRpmPackageName>
       <AspNetCoreSharedFxRpmPackageName>$(AspNetCoreSharedFxRpmPackageName.ToLower())</AspNetCoreSharedFxRpmPackageName>
       <AspNetCoreSharedFxRpmPackageFileName>aspnetcore-runtime-$(AspNetCoreVersion)</AspNetCoreSharedFxRpmPackageFileName>
       <AspNetCoreSharedFxRpmPackageFileName>$(AspNetCoreSharedFxRpmPackageFileName.ToLower())</AspNetCoreSharedFxRpmPackageFileName>

@@ -30,7 +30,7 @@
       <SharedFxDebianPackageVersion>$(MicrosoftNETCoreAppMajorMinorVersion)</SharedFxDebianPackageVersion>
       <SharedFxDebianPackageFileName>dotnet-runtime-$(SharedFxDebianPackageFileVersion)</SharedFxDebianPackageFileName>
       <SharedFxDebianPackageFileName>$(SharedFxDebianPackageFileName.ToLower())</SharedFxDebianPackageFileName>
-      <SharedFxDebianPackageName>dotnet-runtime-$(SharedFxDebianPackageVersion)</SharedFxDebianPackageName> -->
+      <SharedFxDebianPackageName>dotnet-runtime-$(SharedFxDebianPackageVersion)</SharedFxDebianPackageName>
       <SharedFxDebianPackageName>$(SharedFxDebianPackageName.ToLower())</SharedFxDebianPackageName>
       <HostFxrDebianPackageVersion>$(HostFxrMajorMinorVersion)</HostFxrDebianPackageVersion>
       <HostFxrDebianPackageName>dotnet-hostfxr-$(HostFxrDebianPackageVersion)</HostFxrDebianPackageName>
@@ -38,7 +38,7 @@
       <HostDebianPackageName>dotnet-host</HostDebianPackageName>
       <AspNetCoreSharedFxDebianPackageFileName>aspnetcore-runtime-$(AspNetCoreVersion)</AspNetCoreSharedFxDebianPackageFileName>
       <AspNetCoreSharedFxDebianPackageFileName>$(AspNetCoreSharedFxDebianPackageFileName.ToLower())</AspNetCoreSharedFxDebianPackageFileName>
-      <AspNetCoreSharedFxDebianPackageName>aspnetcore-runtime-$(AspNetCoreMajorMinorVersion)</AspNetCoreSharedFxDebianPackageName> -->
+      <AspNetCoreSharedFxDebianPackageName>aspnetcore-runtime-$(AspNetCoreMajorMinorVersion)</AspNetCoreSharedFxDebianPackageName>
       <AspNetCoreSharedFxDebianPackageName>$(AspNetCoreSharedFxDebianPackageName.ToLower())</AspNetCoreSharedFxDebianPackageName>
     </PropertyGroup>
 
