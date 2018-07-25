@@ -177,11 +177,7 @@
       <SharedFxRpmPackageFileName>dotnet-runtime-$(SharedFxRpmPackageFileVersion)</SharedFxRpmPackageFileName>
       <SharedFxRpmPackageFileName>$(SharedFxRpmPackageFileName.ToLower())</SharedFxRpmPackageFileName>
       <HostFxrRpmPackageVersion>$(HostFxrVersion)</HostFxrRpmPackageVersion>
-
-      <!-- Replace the line below with this line when the following issue is resolved: https://github.com/dotnet/cli/issues/9672 
-              <HostFxrRpmPackageName>dotnet-hostfxr-$(HostFxrRpmPackageVersion)</HostFxrRpmPackageName> -->
-      <HostFxrRpmPackageName>dotnet-hostfxr-$(SharedFxRpmPackageFileVersion)</HostFxrRpmPackageName>
-
+      <HostFxrRpmPackageName>dotnet-hostfxr-$(HostFxrRpmPackageVersion)</HostFxrRpmPackageName>
       <HostFxrRpmPackageName>$(HostFxrRpmPackageName.ToLower())</HostFxrRpmPackageName>
       <HostRpmPackageName>dotnet-host</HostRpmPackageName>
       <AspNetCoreSharedFxRpmPackageName>aspnetcore-runtime-$(AspNetCoreMajorMinorVersion)</AspNetCoreSharedFxRpmPackageName>

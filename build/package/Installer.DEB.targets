@@ -32,12 +32,9 @@
       <SharedFxDebianPackageFileName>$(SharedFxDebianPackageFileName.ToLower())</SharedFxDebianPackageFileName>
       <SharedFxDebianPackageName>dotnet-runtime-$(SharedFxDebianPackageVersion)</SharedFxDebianPackageName>
       <SharedFxDebianPackageName>$(SharedFxDebianPackageName.ToLower())</SharedFxDebianPackageName>
-      <HostFxrDebianPackageVersion>$(HostFxrMajorMinorVersion)</HostFxrDebianPackageVersion>
-
-      <!-- Replace the line below with this line when the following issue is resolved: https://github.com/dotnet/cli/issues/9672 
-              <HostFxrDebianPackageName>dotnet-hostfxr-$(HostFxrDebianPackageVersion)</HostFxrDebianPackageName> -->
-      <HostFxrDebianPackageName>dotnet-hostfxr-$(SharedFxDebianPackageFileVersion)</HostFxrDebianPackageName>
-
+      <HostFxrDebianPackageFileName>dotnet-hostfxr-$(HostFxrVersion)</HostFxrDebianPackageFileName> -->
+      <HostFxrDebianPackageFileName>$(HostFxrDebianPackageFileName.ToLower())</HostFxrDebianPackageFileName>
+      <HostFxrDebianPackageName>dotnet-hostfxr-$(HostFxrMajorMinorVersion)</HostFxrDebianPackageName>
       <HostFxrDebianPackageName>$(HostFxrDebianPackageName.ToLower())</HostFxrDebianPackageName>
       <HostDebianPackageName>dotnet-host</HostDebianPackageName>
       <AspNetCoreSharedFxDebianPackageFileName>aspnetcore-runtime-$(AspNetCoreVersion)</AspNetCoreSharedFxDebianPackageFileName>
