@@ -77,6 +77,7 @@ namespace Microsoft.DotNet.Tests.Commands
         public void GivenNewCommandItDisplaysCompletions()
         {
             var expected = new string[] {
+                "--dry-run",
                 "--force",
                 "--help",
                 "--install",
