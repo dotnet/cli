@@ -101,7 +101,7 @@
       </DebianConfigTokenValues>
       <DebianConfigTokenValues Include="%SHARED_FRAMEWORK_DEBIAN_PACKAGE_ADDITIONAL_DEPENDENCY%"
                                Condition="'$(IncludeAdditionalSharedFrameworks)' == 'true'">
-                <ReplacementString>,
+        <ReplacementString>,
         "$(AdditionalSharedFxDebianPackageName)" : {}</ReplacementString>
       </DebianConfigTokenValues>
       <DebianConfigTokenValues Include="%SHARED_FRAMEWORK_DEBIAN_PACKAGE_ADDITIONAL_DEPENDENCY%"
