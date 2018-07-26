@@ -27,82 +27,80 @@
                         GetAspNetSharedFxInstallArgs;"
       Inputs="@(CLISdkFiles)"
       Outputs="$(SdkInstallerFile)" >
-      <!-- Install Shared Framework Packages -->
+    <!-- Install Shared Framework Packages -->
 
-      <Exec Command="sudo dpkg -i $(DownloadedRuntimeDepsInstallerFile)" />
-      <Exec Command="sudo dpkg -i $(DownloadedSharedHostInstallerFile)" />
-      <Exec Command="sudo dpkg -i $(DownloadedHostFxrInstallerFile)" />
-      <Exec Command="sudo dpkg -i $(DownloadedSharedFrameworkInstallerFile)" />
-      <Exec Command="sudo dpkg $(InstallAspNetCoreSharedFxArgs) -i $(DownloadedAspNetCoreSharedFxInstallerFile)" />
+    <Exec Command="sudo dpkg -i $(DownloadedRuntimeDepsInstallerFile)" />
+    <Exec Command="sudo dpkg -i $(DownloadedSharedHostInstallerFile)" />
+    <Exec Command="sudo dpkg -i $(DownloadedHostFxrInstallerFile)" />
+    <Exec Command="sudo dpkg -i $(DownloadedSharedFrameworkInstallerFile)" />
+    <Exec Command="sudo dpkg $(InstallAspNetCoreSharedFxArgs) -i $(DownloadedAspNetCoreSharedFxInstallerFile)" />
 
-      <!-- Create layout: Binaries -->
-      <Copy
-        DestinationFiles="@(CLISdkFiles->'$(LayoutPackageRootDir)/sdk/%(RecursiveDir)%(Filename)%(Extension)')"
-        SourceFiles="@(CLISdkFiles)"
-        OverwriteReadOnlyFiles="True"
-        SkipUnchangedFiles="False"
-        UseHardlinksIfPossible="False" />
+    <!-- Create layout: Binaries -->
+    <Copy
+      DestinationFiles="@(CLISdkFiles->'$(LayoutPackageRootDir)/sdk/%(RecursiveDir)%(Filename)%(Extension)')"
+      SourceFiles="@(CLISdkFiles)"
+      OverwriteReadOnlyFiles="True"
+      SkipUnchangedFiles="False"
+      UseHardlinksIfPossible="False" />
 
-      <!-- Create layout: Man Pages -->
-      <Copy
-        DestinationFiles="@(SdkDebManPageFiles->'$(LayoutDocsDir)/%(RecursiveDir)%(Filename)-$(SdkVersion)%(Extension)')"
-        SourceFiles="@(SdkDebManPageFiles)"
-        OverwriteReadOnlyFiles="True"
-        SkipUnchangedFiles="False"
-        UseHardlinksIfPossible="False" />
+    <!-- Create layout: Man Pages -->
+    <Copy
+      DestinationFiles="@(SdkDebManPageFiles->'$(LayoutDocsDir)/%(RecursiveDir)%(Filename)-$(SdkVersion)%(Extension)')"
+      SourceFiles="@(SdkDebManPageFiles)"
+      OverwriteReadOnlyFiles="True"
+      SkipUnchangedFiles="False"
+      UseHardlinksIfPossible="False" />
 
-      <!-- Create layout: Generate and Place postinst -->
-      <ReplaceFileContents
-        InputFiles="$(DebianPostinstTemplateFile)"
-        DestinationFiles="$(DebianPostinstFile)"
-        ReplacementItems="@(DebianPostInstTokenValues)" />
+    <!-- Create layout: Generate and Place postinst -->
+    <ReplaceFileContents
+      InputFiles="$(DebianPostinstTemplateFile)"
+      DestinationFiles="$(DebianPostinstFile)"
+      ReplacementItems="@(DebianPostInstTokenValues)" />
 
-      <Chmod
-        Glob="$(DebianPostinstFile)"
-        Mode="ugo+x" />
+    <Chmod
+      Glob="$(DebianPostinstFile)"
+      Mode="ugo+x" />
 
-      <!-- Create layout: Generate and Place debian_config.json -->
-      <ReplaceFileContents
-        InputFiles="$(DebianConfigTemplateFile)"
-        DestinationFiles="$(DebianConfigJsonFile)"
-        ReplacementItems="@(DebianConfigTokenValues)" />
+    <!-- Create layout: Generate and Place debian_config.json -->
+    <ReplaceFileContents
+      InputFiles="$(DebianConfigTemplateFile)"
+      DestinationFiles="$(DebianConfigJsonFile)"
+      ReplacementItems="@(DebianConfigTokenValues)" />
 
-      <Chmod
-        Glob="$(PackageTool)"
-        Mode="u+x" />
+    <Chmod
+      Glob="$(PackageTool)"
+      Mode="u+x" />
 
-      <!-- Build SDK Deb package -->
-      <DotNetDebTool ToolPath="$(PreviousStageDirectory)"
-                     InputDirectory="$(LayoutDirectory)"
-                     OutputDirectory="$(DotNetDebToolOutputDirectory)"
-                     PackageName="$(SdkDebianPackageName)"
-                     PackageVersion="$(SdkVersion)"
-                     WorkingDirectory="$(DotnetDebToolDir)" />
+    <!-- Build SDK Deb package -->
+    <DotNetDebTool ToolPath="$(PreviousStageDirectory)"
+                   InputDirectory="$(LayoutDirectory)"
+                   OutputDirectory="$(DotNetDebToolOutputDirectory)"
+                   PackageName="$(SdkDebianPackageName)"
+                   PackageVersion="$(SdkVersion)"
+                   WorkingDirectory="$(DotnetDebToolDir)" />
 
-      <!-- Copy SDK package to output -->
-      <ItemGroup>
-        <GeneratedDebFiles Include="$(DotNetDebToolOutputDirectory)/*.deb" />
-      </ItemGroup>
+    <!-- Copy SDK package to output -->
+    <ItemGroup>
+      <GeneratedDebFiles Include="$(DotNetDebToolOutputDirectory)/*.deb" />
+    </ItemGroup>
 
-      <Error Text="@(GeneratedDebFiles->Count()) .deb files generated." Condition="'@(GeneratedDebFiles->Count())' != 1" />
+    <Error Text="@(GeneratedDebFiles->Count()) .deb files generated." Condition="'@(GeneratedDebFiles->Count())' != 1" />
 
-      <Copy
-        DestinationFiles="$(SdkInstallerFile)"
-        SourceFiles="@(GeneratedDebFiles)"
-        OverwriteReadOnlyFiles="True"
-        SkipUnchangedFiles="False"
-        UseHardlinksIfPossible="False" />
+    <Copy
+      DestinationFiles="$(SdkInstallerFile)"
+      SourceFiles="@(GeneratedDebFiles)"
+      OverwriteReadOnlyFiles="True"
+      SkipUnchangedFiles="False"
+      UseHardlinksIfPossible="False" />
 
-      <!-- Remove Shared Framework and Debian Packages -->
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(SdkDebianPackageName)" />
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(AspNetCoreSharedFxDebianPackageName)" />
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(AspNetCoreSharedFxDebianPackageFileName)" />
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(SharedFxDebianPackageName)" />
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(SharedFxDebianPackageFileName)" />
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(HostFxrDebianPackageName)" />
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(SharedFxDebianPackageFileName)" />
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(HostDebianPackageName)" />
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(RuntimeDepsPackageName)" />
+    <!-- Remove Shared Framework and Debian Packages -->
+    <!-- Remove the "ContinueOnError="WarnAndContinue"" when the following issue is resolved: https://github.com/dotnet/cli/issues/9672 -->
+    <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(SdkDebianPackageName)" />
+    <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(AspNetCoreSharedFxDebianPackageName)" />
+    <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(SharedFxDebianPackageName)" />
+    <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(HostFxrDebianPackageName)" />
+    <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(HostDebianPackageName)" />
+    <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(RuntimeDepsPackageName)" />
   </Target>
 
   <Target Name="TestSdkDeb"
@@ -114,33 +112,31 @@
               $(SdkInstallerFile);"
       Outputs="$(DebianTestResultsXmlFile)" >
 
-      <!-- Install Dependencies and SDK Packages -->
-      <Exec Command="sudo dpkg -i $(DownloadedRuntimeDepsInstallerFile)" />
-      <Exec Command="sudo dpkg -i $(DownloadedSharedHostInstallerFile)" />
-      <Exec Command="sudo dpkg -i $(DownloadedHostFxrInstallerFile)" />
-      <Exec Command="sudo dpkg -i $(DownloadedSharedFrameworkInstallerFile)" />
-      <Exec Command="sudo dpkg $(InstallAspNetCoreSharedFxArgs) -i $(DownloadedAspNetCoreSharedFxInstallerFile)" />
+    <!-- Install Dependencies and SDK Packages -->
+    <Exec Command="sudo dpkg -i $(DownloadedRuntimeDepsInstallerFile)" />
+    <Exec Command="sudo dpkg -i $(DownloadedSharedHostInstallerFile)" />
+    <Exec Command="sudo dpkg -i $(DownloadedHostFxrInstallerFile)" />
+    <Exec Command="sudo dpkg -i $(DownloadedSharedFrameworkInstallerFile)" />
+    <Exec Command="sudo dpkg $(InstallAspNetCoreSharedFxArgs) -i $(DownloadedAspNetCoreSharedFxInstallerFile)" />
 
-      <Exec Command="sudo dpkg -i $(SdkInstallerFile)" />
+    <Exec Command="sudo dpkg -i $(SdkInstallerFile)" />
 
-      <!-- Run E2E -->
-      <DotNetRestore ProjectPath="$(EndToEndTestProject)"
-                     ToolPath="$(DebianInstalledDirectory)" />
+    <!-- Run E2E -->
+    <DotNetRestore ProjectPath="$(EndToEndTestProject)"
+                   ToolPath="$(DebianInstalledDirectory)" />
 
-      <DotNetTest ProjectPath="$(EndToEndTestProject)"
-                  EnvironmentVariables="@(TestSdkDebTaskEnvironmentVariables)"
-                  ToolPath="$(DebianInstalledDirectory)" />
+    <DotNetTest ProjectPath="$(EndToEndTestProject)"
+                EnvironmentVariables="@(TestSdkDebTaskEnvironmentVariables)"
+                ToolPath="$(DebianInstalledDirectory)" />
 
-      <!-- Clean up Packages -->
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(SdkDebianPackageName)" />
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(AspNetCoreSharedFxDebianPackageName)" />
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(AspNetCoreSharedFxDebianPackageFileName)" />
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(SharedFxDebianPackageName)" />
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(SharedFxDebianPackageFileName)" />
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(HostFxrDebianPackageName)" />
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(SharedFxDebianPackageFileName)" />
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(HostDebianPackageName)" />
-      <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(RuntimeDepsPackageName)" />
+    <!-- Clean up Packages -->
+    <!-- Remove the "ContinueOnError="WarnAndContinue"" when the following issue is resolved: https://github.com/dotnet/cli/issues/9672 -->
+    <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(SdkDebianPackageName)" />
+    <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(AspNetCoreSharedFxDebianPackageName)" />
+    <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(SharedFxDebianPackageName)" />
+    <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(HostFxrDebianPackageName)" />
+    <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(HostDebianPackageName)" />
+    <Exec ContinueOnError="WarnAndContinue" Command="sudo dpkg -r $(RuntimeDepsPackageName)" />
   </Target>
 
   <Target Name="PrepareDotnetDebDirectories">
@@ -178,22 +174,22 @@
   </Target>
 
   <Target Name="TestDebuild">
-      <Message Text="Don't remove this" />
+    <Message Text="Don't remove this" />
 
-      <!-- run Debuild -->
-      <Exec Command="/usr/bin/env debuild -h" ContinueOnError="true">
-          <Output TaskParameter="ExitCode" PropertyName="DebuildExitCode" />
-      </Exec>
+    <!-- run Debuild -->
+    <Exec Command="/usr/bin/env debuild -h" ContinueOnError="true">
+      <Output TaskParameter="ExitCode" PropertyName="DebuildExitCode" />
+    </Exec>
 
-      <!-- Check if it returned 0 -->
-      <PropertyGroup>
-        <DebuildPresent>false</DebuildPresent>
-        <DebuildPresent Condition=" '$(DebuildExitCode)' == '0' ">true</DebuildPresent>
-      </PropertyGroup>
+    <!-- Check if it returned 0 -->
+    <PropertyGroup>
+      <DebuildPresent>false</DebuildPresent>
+      <DebuildPresent Condition=" '$(DebuildExitCode)' == '0' ">true</DebuildPresent>
+    </PropertyGroup>
 
-      <!-- Workaround for Ubuntu16 Jenkins https://github.com/dotnet/core-setup/issues/167 -->
-      <Message Condition=" '$(DebuildPresent)'  != 'true' "
-               Text="Debuild Not found, Debian packages will not be built."
-               Importance="High" />
+    <!-- Workaround for Ubuntu16 Jenkins https://github.com/dotnet/core-setup/issues/167 -->
+    <Message Condition=" '$(DebuildPresent)'  != 'true' "
+             Text="Debuild Not found, Debian packages will not be built."
+             Importance="High" />
   </Target>
 </Project>
