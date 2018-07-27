@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -22,8 +23,9 @@ namespace EndToEnd
         [ClassData(typeof(SupportedNetCoreAppVersions))]
         public void ItRollsForwardToTheLatestVersion(string minorVersion)
         {
-            // https://github.com/dotnet/cli/issues/9661: remove this once the ASP.NET version bump
-            // merges from 2.1.3xx -> 2.1.4xx -> 2.2.1xx
+            // https://github.com/dotnet/cli/issues/9661
+            // https://github.com/dotnet/sdk/issues/2446
+            // dotnet/sdk is missing handling for 2.1 when it isn't the latest runtime
             if (minorVersion == "2.1")
             {
                 return;
@@ -132,32 +134,5 @@ namespace EndToEnd
             }
         }
 
-        public static IEnumerable<object[]> SupportedNetCoreAppVersions
-        {
-            get
-            {
-                
-                var versions = new List<string>();
-
-                // Runtime 1.x deosn't support openSUSE and Fedora 27, so skip testing those versions on Linux
-                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                {                    
-                    versions.AddRange(new[]
-                    {
-                        "1.0",
-                        "1.1",
-                    });
-                }
-
-                versions.AddRange(new[]
-                    {
-                        "2.0",
-                        "2.1",
-                        "3.0"
-                    });
-
-                return versions.Select(version => new object[] { version });
-            }
-        }
     }
 }
