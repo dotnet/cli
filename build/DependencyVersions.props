@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ToolsetVersion>3.0.100-alpha1-009033</ToolsetVersion>
+    <ToolsetVersion>3.0.100-alpha1-009347</ToolsetVersion>
     <MicrosoftAspNetCoreAllPackageVersion>3.0.0-alpha1-10062</MicrosoftAspNetCoreAllPackageVersion>
     <MicrosoftAspNetCoreAppPackageVersion>$(MicrosoftAspNetCoreAllPackageVersion)</MicrosoftAspNetCoreAppPackageVersion>
     <MicrosoftAspNetCoreDeveloperCertificatesXPlatPackageVersion>$(MicrosoftAspNetCoreAllPackageVersion)</MicrosoftAspNetCoreDeveloperCertificatesXPlatPackageVersion>
