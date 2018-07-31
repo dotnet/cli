@@ -3,7 +3,7 @@ Signing .NET Core Global Tool Packages
 
 To create a signed package for your Dotnet Tool, you will need to create a signed shim. If a shim is found in the nupkg during `dotnet tool install`, it is used instead of creating one on consumer's machine.
 
-To create a signed shim, you need to add the following extra property in you project ile:
+To create a signed shim, you need to add the following extra property in you project file:
 
 ```
    <PackAsToolShimRuntimeIdentifiers>[list of RIDs]</PackAsToolShimRuntimeIdentifiers>
