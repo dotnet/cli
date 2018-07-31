@@ -14,15 +14,23 @@ using Xunit;
 
 namespace EndToEnd
 {
-    public class GivenSelfContainedAppsRollForward : TestBase
+    public partial class GivenSelfContainedAppsRollForward : TestBase
     {
 
-        [Theory(Skip = "Runtime 1.1 support for openSUSE and Fedora 27 needed")]
+        [Theory]
         //  MemberData is used instead of InlineData here so we can access it in another test to
         //  verify that we are covering the latest release of .NET Core
-        [MemberData(nameof(SupportedNetCoreAppVersions))]
+        [ClassData(typeof(SupportedNetCoreAppVersions))]
         public void ItRollsForwardToTheLatestVersion(string minorVersion)
         {
+            // https://github.com/dotnet/cli/issues/9661
+            // https://github.com/dotnet/sdk/issues/2446
+            // dotnet/sdk is missing handling for 2.1 when it isn't the latest runtime
+            if (minorVersion == "2.1")
+            {
+                return;
+            }
+
             var _testInstance = TestAssets.Get("TestAppSimple")
                 .CreateInstance(identifier: minorVersion)
                 .WithSourceFiles();
@@ -119,39 +127,12 @@ namespace EndToEnd
                     .Element(ns + "TargetFramework")
                     .Value;
 
-                SupportedNetCoreAppVersions.Select(v => $"netcoreapp{v[0]}")
-                    .Should().Contain(targetFramework, $"the {nameof(SupportedNetCoreAppVersions)} property should include the default version " +
+                SupportedNetCoreAppVersions.Versions.Select(v => $"netcoreapp{v[0]}")
+                    .Should().Contain(targetFramework, $"the {nameof(SupportedNetCoreAppVersions)}.{nameof(SupportedNetCoreAppVersions.Versions)} property should include the default version " +
                     "of .NET Core created by \"dotnet new\"");
                 
             }
         }
 
-        public static IEnumerable<object[]> SupportedNetCoreAppVersions
-        {
-            get
-            {
-                
-                var versions = new List<string>();
-
-                // Runtime 1.x deosn't support openSUSE and Fedora 27, so skip testing those versions on Linux
-                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                {                    
-                    versions.AddRange(new[]
-                    {
-                        "1.0",
-                        "1.1",
-                    });
-                }
-
-                versions.AddRange(new[]
-                    {
-                        "2.0",
-                        "2.1",
-                        "3.0"
-                    });
-
-                return versions.Select(version => new object[] { version });
-            }
-        }
     }
 }
