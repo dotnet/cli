@@ -6,13 +6,14 @@ The most straightforward way to create a .NET tool package is to run `dotnet pac
 - The NuGet package has only _/tools_ folder under the root and does **not** contain any other folders; do not include folders like  _/lib_, _/content_, etc.
 - Under _/tools_ folder, the subfolders must be structured with pattern _target framework short version/RID_. For example, tool assets targeting .NET core framework V2.1 that are portable across platforms should be in the folder _tools/netcoreapp2.1/any_.
 
-Let's call assets under every _tools/target framework short version/RID_ combination per TFM-RID assets :
-- There is a DotnetToolSettings.xml for every per TFM-RID assets.
-- The package type is DotnetTool
-- Each set of TFM-RID assets should have all the dependencies the tool requires to run. The TFM-RID assets should be work correctly after being copied via `xcopy` to another machine, assuming that machine has the correct runtime version and RID environment. For portable app, there must be runtimeconfig.json for every per TFM-RID assets.
+Let's call assets under every _tools/target framework short version/RID_ combination "per TFM-RID assets" :
+- There is a DotnetToolSettings.xml for every "per TFM-RID assets".
+- The package type is DotnetTool.
+- Each set of TFM-RID assets should have all the dependencies the tool requires to run. The TFM-RID assets should work correctly after being copied via `xcopy` to another machine, assuming that machine has the correct runtime version and RID environment.
+- For portable app, there must be runtimeconfig.json for every "per TFM-RID assets".
 
 # Remark:
-- Only portable apps are supported so the RID must be _any_.
+- Currently, only portable apps are supported so the RID must be _any_.
 - Only one tool per tool package.
 
 DotnetToolSettings.xml:
