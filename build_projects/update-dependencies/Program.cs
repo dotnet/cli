@@ -83,54 +83,21 @@ namespace Microsoft.DotNet.Scripts
         private static IEnumerable<IDependencyUpdater> GetUpdaters()
         {
             string dependencyVersionsPath = Path.Combine("build", "DependencyVersions.props");
-            
+            string testDependencyVersionsPath = Path.Combine("build", "TestDependencyVersions.props");
+
             if (s_config.HasVersionFragment("aspnet"))
             {
                 yield return CreateRegexUpdater(dependencyVersionsPath, "MicrosoftAspNetCoreAppPackageVersion", "Microsoft.AspNetCore.App");
             }
-            if (s_config.HasVersionFragment("clicommandlineparser"))
-            {
-                yield return CreateRegexUpdater(dependencyVersionsPath, "MicrosoftDotNetCliCommandLinePackageVersion", "Microsoft.DotNet.Cli.CommandLine");
-            }
-            if (s_config.HasVersionFragment("climigrate"))
-            {
-                yield return CreateRegexUpdater(dependencyVersionsPath, "MicrosoftDotNetProjectJsonMigrationPackageVersion", "Microsoft.DotNet.ProjectJsonMigration");
-            }
             if (s_config.HasVersionFragment("coresetup"))
             {
                 yield return CreateRegexUpdater(dependencyVersionsPath, "MicrosoftNETCoreAppPackageVersion", "Microsoft.NETCore.App");
-                yield return CreateRegexUpdater(dependencyVersionsPath, "MicrosoftDotNetPlatformAbstractionsPackageVersion", "Microsoft.DotNet.PlatformAbstractions");
-                yield return CreateRegexUpdater(dependencyVersionsPath, "MicrosoftExtensionsDependencyModelPackageVersion", "Microsoft.Extensions.DependencyModel");
-            }
-            if (s_config.HasVersionFragment("fsharp"))
-            {
-                yield return CreateRegexUpdater(dependencyVersionsPath, "MicrosoftFSharpCompilerPackageVersion", "Microsoft.FSharp.Compiler");
-            }
-            if (s_config.HasVersionFragment("msbuild"))
-            {
-                yield return CreateRegexUpdater(dependencyVersionsPath, "MicrosoftBuildPackageVersion", "Microsoft.Build");
-            }
-            if (s_config.HasVersionFragment("nugetclient"))
-            {
-                yield return CreateRegexUpdater(dependencyVersionsPath, "NuGetBuildTasksPackageVersion", "NuGet.Build.Tasks");
-            }
-            if (s_config.HasVersionFragment("roslyn"))
-            {
-                yield return CreateRegexUpdater(dependencyVersionsPath, "MicrosoftCodeAnalysisCSharpPackageVersion", "Microsoft.CodeAnalysis.CSharp");
-            }
-            if (s_config.HasVersionFragment("sdk"))
-            {
-                yield return CreateRegexUpdater(dependencyVersionsPath, "MicrosoftNETSdkPackageVersion", "Microsoft.NET.Sdk");
+                yield return CreateRegexUpdater(testDependencyVersionsPath, "MicrosoftDotNetPlatformAbstractionsPackageVersion", "Microsoft.DotNet.PlatformAbstractions");
             }
             if (s_config.HasVersionFragment("templating"))
             {
                 yield return CreateRegexUpdater(dependencyVersionsPath, "MicrosoftDotNetCommonItemTemplatesPackageVersion", "Microsoft.DotNet.Common.ItemTemplates");
                 yield return CreateRegexUpdater(dependencyVersionsPath, "MicrosoftDotNetTestProjectTemplates20PackageVersion", "Microsoft.DotNet.Test.ProjectTemplates.2.0");
-                yield return CreateRegexUpdater(dependencyVersionsPath, "MicrosoftTemplateEngineCliPackageVersion", "Microsoft.TemplateEngine.Cli");
-            }
-            if (s_config.HasVersionFragment("websdk"))
-            {
-                yield return CreateRegexUpdater(dependencyVersionsPath, "MicrosoftNETSdkWebPackageVersion", "Microsoft.NET.Sdk.Web");
             }
         }
 
