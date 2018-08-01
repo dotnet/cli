@@ -102,7 +102,7 @@ ${buildCommand}
     }
     else if (os == 'AllLinux') {
         osUsedForMachineAffinity = 'Ubuntu16.04'
-        buildCommand = "{baseShellBuildCommand} --skip-prereqs --configuration ${configuration} --targets Default /t:BuildAndPublishAllLinuxDistrosNativeInstallers"
+        buildCommand = "${baseShellBuildCommand} --skip-prereqs --configuration ${configuration} --targets Default /t:BuildAndPublishAllLinuxDistrosNativeInstallers"
     }
     else {
         buildCommand = "${baseShellBuildCommand}"
