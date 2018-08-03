@@ -313,7 +313,7 @@ namespace Microsoft.DotNet.Cli.Test.Tests
         }
 
 
-        [WindowsOnlyFact(Skip = "https://github.com/dotnet/cli/issues/9773")]
+        [WindowsOnlyFact]
         public void ItCreatesCoverageFileWhenCodeCoverageEnabledByRunsettings()
         {
             var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp("11");
