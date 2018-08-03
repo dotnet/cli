@@ -32,8 +32,7 @@ namespace Microsoft.DotNet.Tools.Test
             {
                 "-target:VSTest",
                 "-verbosity:quiet",
-                "-nodereuse:false", // workaround for https://github.com/Microsoft/vstest/issues/1503
-                "-nologo"
+                "-nodereuse:false" // workaround for https://github.com/Microsoft/vstest/issues/1503
             };
 
             var parser = Parser.Instance;
@@ -68,6 +67,12 @@ namespace Microsoft.DotNet.Tools.Test
                 {
                     msbuildArgs.Add($"-property:VSTestVerbosity={verbosity[1]}");
                 }
+            }
+
+            // Add VSTestNoLogo property if specified by user
+            if(parsedTest.Arguments.Contains("--nologo") || parsedTest.Arguments.Contains("/nologo"))
+            {
+                msbuildArgs.Add($"-property:VSTestNoLogo=--nologo");
             }
 
             bool noRestore = parsedTest.HasOption("--no-restore") || parsedTest.HasOption("--no-build");
