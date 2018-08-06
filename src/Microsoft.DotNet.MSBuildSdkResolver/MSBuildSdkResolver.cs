@@ -33,13 +33,31 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
             _vsSettings = vsSettings;
         }
 
+        private sealed class CachedResult
+        {
+            public string MSBuildSdksDir;
+            public string NETCoreSdkVersion;
+        }
+
         public override SdkResult Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory)
         {
-            // These are overrides that are used to force the resolved SDK tasks and targets to come from a given
-            // base directory and report a given version to msbuild (which may be null if unknown. One key use case
-            // for this is to test SDK tasks and targets without deploying them inside the .NET Core SDK.
-            string msbuildSdksDir = _getEnvironmentVariable("DOTNET_MSBUILD_SDK_RESOLVER_SDKS_DIR");
-            string netcoreSdkVersion = _getEnvironmentVariable("DOTNET_MSBUILD_SDK_RESOLVER_SDKS_VER");
+            string msbuildSdksDir = null;
+            string netcoreSdkVersion = null;
+
+            if (context.State is CachedResult priorResult)
+            {
+                msbuildSdksDir = priorResult.MSBuildSdksDir;
+                netcoreSdkVersion = priorResult.NETCoreSdkVersion;
+            }
+
+            if (msbuildSdksDir == null)
+            {
+                // These are overrides that are used to force the resolved SDK tasks and targets to come from a given
+                // base directory and report a given version to msbuild (which may be null if unknown. One key use case
+                // for this is to test SDK tasks and targets without deploying them inside the .NET Core SDK.
+                msbuildSdksDir = _getEnvironmentVariable("DOTNET_MSBUILD_SDK_RESOLVER_SDKS_DIR");
+                netcoreSdkVersion = _getEnvironmentVariable("DOTNET_MSBUILD_SDK_RESOLVER_SDKS_VER");
+            }
 
             if (msbuildSdksDir == null)
             {
@@ -98,6 +116,12 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
                         });
                 }
             }
+
+            context.State = new CachedResult
+            {
+                MSBuildSdksDir = msbuildSdksDir,
+                NETCoreSdkVersion = netcoreSdkVersion
+            };
 
             string msbuildSdkDir = Path.Combine(msbuildSdksDir, sdkReference.Name, "Sdk");
             if (!Directory.Exists(msbuildSdkDir))
