@@ -107,12 +107,19 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 + " version that requires the MSBuild version currently available.");
         }
 
-        [Fact]
-        public void ItReturnsHighestSdkAvailableThatIsCompatibleWithMSBuild()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void ItReturnsHighestSdkAvailableThatIsCompatibleWithMSBuild(bool disallowPreviews)
         {
-            var environment = new TestEnvironment();
-            var expected = environment.CreateSdkDirectory(ProgramFiles.X64, "Some.Test.Sdk", "99.99.99", new Version(20, 0, 0, 0));
-            var incompatible = environment.CreateSdkDirectory(ProgramFiles.X64, "Some.Test.Sdk", "100.99.99", new Version(21, 0, 0, 0));
+            var environment = new TestEnvironment(identifier: disallowPreviews.ToString())
+            {
+                DisallowPrereleaseByDefault = disallowPreviews
+            };
+
+            var compatibleRtm = environment.CreateSdkDirectory(ProgramFiles.X64, "Some.Test.Sdk", "98.98.98", new Version(19, 0, 0, 0));
+            var compatiblePreview = environment.CreateSdkDirectory(ProgramFiles.X64, "Some.Test.Sdk", "99.99.99-preview", new Version(20, 0, 0, 0));
+            var incompatible = environment.CreateSdkDirectory(ProgramFiles.X64, "Some.Test.Sdk", "100.100.100", new Version(21, 0, 0, 0));
 
             environment.CreateMuxerAndAddToPath(ProgramFiles.X64);
 
@@ -127,8 +134,8 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 new MockFactory());
 
             result.Success.Should().BeTrue();
-            result.Path.Should().Be(expected.FullName);
-            result.Version.Should().Be("99.99.99");
+            result.Path.Should().Be((disallowPreviews ? compatibleRtm : compatiblePreview).FullName);
+            result.Version.Should().Be(disallowPreviews ? "98.98.98" : "99.99.99-preview");
             result.Warnings.Should().BeNullOrEmpty();
             result.Errors.Should().BeNullOrEmpty();
         }
