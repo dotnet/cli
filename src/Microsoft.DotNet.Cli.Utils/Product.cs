@@ -13,16 +13,7 @@ namespace Microsoft.DotNet.Cli.Utils
         private static string GetProductVersion()
         {
             DotnetVersionFile versionFile = DotnetFiles.VersionFileObject;
-            return versionFile.BuildNumber ?? GetProductVersionFromAssembly();
-        }
-
-        private static string GetProductVersionFromAssembly()
-        {
-            var attr = typeof(Product)
-                .GetTypeInfo()
-                .Assembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-            return attr?.InformationalVersion;
+            return versionFile.BuildNumber ?? "N/A";
         }
     }
 }
