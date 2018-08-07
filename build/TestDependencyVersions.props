@@ -4,6 +4,6 @@
     <MicrosoftDotNetCliUtilsPackageVersion>3.0.100-alpha1-20180711-1</MicrosoftDotNetCliUtilsPackageVersion>
     <MicrosoftDotNetCliCommandLinePackageVersion>0.1.1</MicrosoftDotNetCliCommandLinePackageVersion>
     <MicrosoftNETTestSdkPackageVersion>15.8.0</MicrosoftNETTestSdkPackageVersion>
-    <MicrosoftDotNetPlatformAbstractionsPackageVersion>3.0.0-preview1-26710-03</MicrosoftDotNetPlatformAbstractionsPackageVersion>
+    <MicrosoftDotNetPlatformAbstractionsPackageVersion>3.0.0-preview1-26807-04</MicrosoftDotNetPlatformAbstractionsPackageVersion>
   </PropertyGroup>
 </Project>
