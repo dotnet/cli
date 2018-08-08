@@ -301,7 +301,7 @@ namespace Microsoft.DotNet.Cli
 
         private static void PrintVersion()
         {
-            var sdkVersion = Product.Version ?? "N/A";
+            var sdkVersion = SdkProduct.Version ?? "N/A";
             Reporter.Output.WriteLine(sdkVersion);
         }
 
@@ -309,7 +309,7 @@ namespace Microsoft.DotNet.Cli
         {
             DotnetVersionFile versionFile = DotnetFiles.VersionFileObject;
             var commitSha = versionFile.CommitSha ?? "N/A";
-            var sdkVersion = Product.Version ?? "N/A";
+            var sdkVersion = SdkProduct.Version ?? "N/A";
             Reporter.Output.WriteLine($"{LocalizableStrings.DotNetSdkInfoLabel}");
             Reporter.Output.WriteLine($" Version:   {sdkVersion}");
             Reporter.Output.WriteLine($" Commit:    {commitSha}");

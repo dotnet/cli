@@ -273,6 +273,11 @@ dotnet tool install --global {1}</target>
         <target state="translated">'{1}' ortam değişkeni tarafından ayarlanan '{0}' giriş dizini kullanılıyor.</target>
         <note />
       </trans-unit>
+      <trans-unit id="DotNetSdkInfo">
+        <source>.NET Core SDK</source>
+        <target state="new">.NET Core SDK</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

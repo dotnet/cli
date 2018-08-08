@@ -273,6 +273,11 @@ dotnet tool install --global {1}</target>
         <target state="translated">Se utiliza el directorio principal "{0}" establecido por la variable de entorno "{1}".</target>
         <note />
       </trans-unit>
+      <trans-unit id="DotNetSdkInfo">
+        <source>.NET Core SDK</source>
+        <target state="new">.NET Core SDK</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -241,6 +241,9 @@
   <data name="DotNetCommandLineTools" xml:space="preserve">
     <value>.NET Command Line Tools</value>
   </data>
+  <data name="DotNetSdkInfo" xml:space="preserve">
+    <value>.NET Core SDK</value>
+  </data>
   <data name="DotNetSdkInfoLabel" xml:space="preserve">
     <value>.NET Core SDK (reflecting any global.json):</value>
   </data>
