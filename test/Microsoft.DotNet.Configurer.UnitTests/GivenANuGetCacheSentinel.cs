@@ -111,7 +111,7 @@ namespace Microsoft.DotNet.Configurer.UnitTests
         [Fact]
         public void The_sentinel_has_the_current_version_in_its_name()
         {
-            NuGetCacheSentinel.SENTINEL.Should().Contain($"{Product.Version}");
+            NuGetCacheSentinel.SENTINEL.Should().Contain($"{SdkProduct.Version}");
         }
 
         [Fact]

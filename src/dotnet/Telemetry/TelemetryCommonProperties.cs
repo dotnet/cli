@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.Cli.Telemetry
                 {OSVersion, RuntimeEnvironment.OperatingSystemVersion},
                 {OSPlatform, RuntimeEnvironment.OperatingSystemPlatform.ToString()},
                 {RuntimeId, RuntimeEnvironment.GetRuntimeIdentifier()},
-                {ProductVersion, Product.Version},
+                {ProductVersion, SdkProduct.Version},
                 {TelemetryProfile, Environment.GetEnvironmentVariable(TelemetryProfileEnvironmentVariable)},
                 {DockerContainer, _userLevelCacheWriter.RunWithCache(IsDockerContainerCacheKey, () => _dockerContainerDetector.IsDockerContainer().ToString("G") )},
                 {CurrentPathHash, _hasher(_getCurrentDirectory())},

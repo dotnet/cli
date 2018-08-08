@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.Cli
 {
     public class Program
     {
-        private static readonly string ToolPathSentinelFileName = $"{Product.Version}.toolpath.sentinel";
+        private static readonly string ToolPathSentinelFileName = $"{SdkProduct.Version}.toolpath.sentinel";
 
         public static int Main(string[] args)
         {

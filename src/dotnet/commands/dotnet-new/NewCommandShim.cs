@@ -59,12 +59,12 @@ namespace Microsoft.DotNet.Tools.New
             var preferences = new Dictionary<string, string>
             {
                 { "prefs:language", "C#" },
-                { "dotnet-cli-version", Product.Version },
+                { "dotnet-cli-version", SdkProduct.Version },
                 { "RuntimeFrameworkVersion", new Muxer().SharedFxVersion },
                 { "NetStandardImplicitPackageVersion", new FrameworkDependencyFile().GetNetStandardLibraryVersion() },
             };
 
-            return new DefaultTemplateEngineHost(HostIdentifier, "v" + Product.Version, CultureInfo.CurrentCulture.Name, preferences, builtIns);
+            return new DefaultTemplateEngineHost(HostIdentifier, "v" + SdkProduct.Version, CultureInfo.CurrentCulture.Name, preferences, builtIns);
         }
 
         private static void FirstRun(IEngineEnvironmentSettings environmentSettings, IInstaller installer)
