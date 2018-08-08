@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.Cli
         {
             var profileRoot = GetRuntimeDataRootPathString();
 
-            var version = Product.Version;
+            var version = SdkProduct.Version;
 
             var rid = PlatformAbstractions.RuntimeEnvironment.GetRuntimeIdentifier();
 
