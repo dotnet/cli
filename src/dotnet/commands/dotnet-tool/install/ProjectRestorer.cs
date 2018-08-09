@@ -64,6 +64,11 @@ namespace Microsoft.DotNet.Tools.Tool.Install
             }
         }
 
+        public List<string> ToRestoreArguments(PackageLocation packageLocation)
+        {
+            throw new NotImplementedException();
+        }
+
         private static void WriteLine(IReporter reporter, string line, FilePath project)
         {
             line = line ?? "";
