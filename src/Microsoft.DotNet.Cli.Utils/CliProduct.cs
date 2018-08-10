@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.Cli.Utils
 
         private static string GetProductVersion()
         {
-            var attr = typeof(Product)
+            var attr = typeof(CliProduct)
                 .GetTypeInfo()
                 .Assembly
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>();
