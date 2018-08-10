@@ -76,6 +76,16 @@ namespace Microsoft.DotNet.Tools.Tool.Install
                 args.Add("--disable-parallel");
             }
 
+            if (packageLocation.NoCache)
+            {
+                args.Add("--no-cache");
+            }
+
+            if (packageLocation.IgnoreFailedSources)
+            {
+                args.Add("--ignore-failed-sources");
+            }
+
             return args;
         }
 

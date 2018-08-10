@@ -52,6 +52,45 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             restoreAppliedCommand.HasOption("--disable-parallel").Should().BeFalse();
         }
 
+        [Fact]
+        void ItCreatesValidArgumentsToRestoreForwardingNoCache()
+        {
+            PackageLocation packageLocation = CreatePackageLocationByInstallCommand($"dotnet tool install -g console.test.app --no-cache");
+
+            List<string> args = ProjectRestorer.ToRestoreArguments(packageLocation);
+
+            AppliedOption restoreAppliedCommand = CreateRestoreCommandParseResultUsingToRestoreArguments(args);
+            restoreAppliedCommand.HasOption("--no-cache").Should().BeTrue();
+        }
+
+        [Fact]
+        void ItCreatesValidArgumentsToRestoreForwardingIgnoreFailedSources()
+        {
+            PackageLocation packageLocation = CreatePackageLocationByInstallCommand($"dotnet tool install -g console.test.app --ignore-failed-sources");
+
+            List<string> args = ProjectRestorer.ToRestoreArguments(packageLocation);
+
+            AppliedOption restoreAppliedCommand = CreateRestoreCommandParseResultUsingToRestoreArguments(args);
+            restoreAppliedCommand.HasOption("--ignore-failed-sources").Should().BeTrue();
+        }
+
+        [Fact]
+        void ItCreatesValidArgumentsToRestoreForwardingMixArguments()
+        {
+            const string configPath = "c:\\nuget.config";
+            PackageLocation packageLocation = CreatePackageLocationByInstallCommand($"dotnet tool install -g console.test.app --configfile {configPath} --ignore-failed-sources");
+
+            List<string> args = ProjectRestorer.ToRestoreArguments(packageLocation);
+
+            AppliedOption restoreAppliedCommand = CreateRestoreCommandParseResultUsingToRestoreArguments(args);
+            restoreAppliedCommand.HasOption("--no-cache").Should().BeFalse();
+            restoreAppliedCommand.HasOption("--disable-parallel").Should().BeFalse();
+            restoreAppliedCommand.HasOption("--ignore-failed-sources").Should().BeTrue();
+            restoreAppliedCommand["--configfile"].Arguments.Single()
+                .Should()
+                .Be(configPath);
+        }
+
         private static AppliedOption CreateRestoreCommandParseResultUsingToRestoreArguments(List<string> args)
         {
             args.Insert(0, "restore");
