@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Microsoft.DotNet.Cli.Utils
 {
-    public class Product
+    public class CliProduct
     {
         public static string LongName => LocalizableStrings.DotNetCommandLineTools;
         public static readonly string Version = GetProductVersion();

@@ -12,7 +12,8 @@ namespace Microsoft.DotNet.Configurer
 {
     public class AspNetCertificateSentinel : IAspNetCertificateSentinel
     {
-        public static readonly string SENTINEL = $"{SdkProduct.Version}.aspNetCertificateSentinel";
+        private string versionStr = SdkProduct.Version ?? CliProduct.Version;
+        public static readonly string SENTINEL = $"{versionStr}.aspNetCertificateSentinel";
 
         private readonly IFile _file;
         private readonly IDirectory _directory;

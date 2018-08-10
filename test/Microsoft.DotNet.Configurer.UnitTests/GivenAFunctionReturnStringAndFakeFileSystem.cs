@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.Configurer.UnitTests
         public void ItKeepsTheCacheInUserProfileWithCacheKey()
         {
             _userLevelCacheWriter.RunWithCache("fooKey", () => "foo");
-            var path = Path.Combine("some path", $"{SdkProduct.Version}_fooKey.dotnetUserLevelCache");
+            var path = Path.Combine("some path", $"{CliProduct.Version}_fooKey.dotnetUserLevelCache");
             _fileSystemMock.File.Exists(path);
             _fileSystemMock.File.ReadAllText(path).Should().Be("foo");
         }

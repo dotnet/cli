@@ -11,8 +11,9 @@ namespace Microsoft.DotNet.Configurer
 {
     public class NuGetCacheSentinel : INuGetCacheSentinel
     {
-        public static readonly string SENTINEL = $"{SdkProduct.Version}.dotnetSentinel";
-        public static readonly string INPROGRESS_SENTINEL = $"{SdkProduct.Version}.inprogress.dotnetSentinel";
+        private string versionStr = SdkProduct.Version ?? CliProduct.Version;
+        public static readonly string SENTINEL = $"{versionStr}.dotnetSentinel";
+        public static readonly string INPROGRESS_SENTINEL = $"{versionStr}.inprogress.dotnetSentinel";
 
         public bool UnauthorizedAccess { get; private set; }
 
