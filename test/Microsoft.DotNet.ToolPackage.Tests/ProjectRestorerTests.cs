@@ -10,25 +10,64 @@ using Xunit;
 using System.Linq;
 using Microsoft.DotNet.Cli.CommandLine;
 using Parser = Microsoft.DotNet.Cli.Parser;
+using System.Collections.Generic;
 
 namespace Microsoft.DotNet.ToolPackage.Tests
 {
     public class ProjectRestorerTests : TestBase
     {
         [Fact]
-        void ToRestoreArgumentsNugetConfigTests()
+        void ItCreatesValidArgumentsToRestoreForwardingConfigPath()
         {
             const string configPath = "c:\\nuget.config";
-            var packageLocation = new PackageLocation(nugetConfig: new FilePath(configPath));
-            System.Collections.Generic.List<string> args = ProjectRestorer.ToRestoreArguments(packageLocation);
+            PackageLocation packageLocation = CreatePackageLocationByInstallCommand($"dotnet tool install -g console.test.app --configfile {configPath}");
+
+            List<string> args = ProjectRestorer.ToRestoreArguments(packageLocation);
+
+            AppliedOption restoreAppliedCommand = CreateRestoreCommandParseResultUsingToRestoreArguments(args);
+            restoreAppliedCommand["--configfile"].Arguments.Single()
+                .Should()
+                .Be(configPath);
+        }
+
+        [Fact]
+        void ItCreatesValidArgumentsToRestoreForwardingDisableParallel()
+        {
+            PackageLocation packageLocation = CreatePackageLocationByInstallCommand($"dotnet tool install -g console.test.app --disable-parallel");
+
+            List<string> args = ProjectRestorer.ToRestoreArguments(packageLocation);
+
+            AppliedOption restoreAppliedCommand = CreateRestoreCommandParseResultUsingToRestoreArguments(args);
+            restoreAppliedCommand.HasOption("--disable-parallel").Should().BeTrue();
+        }
+
+        [Fact]
+        void ItCreatesValidArgumentsToRestoreForwardingDisableParallelWhenItIsMissing()
+        {
+            PackageLocation packageLocation = CreatePackageLocationByInstallCommand($"dotnet tool install -g console.test.app");
+
+            List<string> args = ProjectRestorer.ToRestoreArguments(packageLocation);
+
+            AppliedOption restoreAppliedCommand = CreateRestoreCommandParseResultUsingToRestoreArguments(args);
+            restoreAppliedCommand.HasOption("--disable-parallel").Should().BeFalse();
+        }
+
+        private static AppliedOption CreateRestoreCommandParseResultUsingToRestoreArguments(List<string> args)
+        {
             args.Insert(0, "restore");
             args.Insert(0, "dotnet");
 
             AppliedOption appliedCommand = Parser.Instance.Parse(args.ToArray()).AppliedCommand();
+            return appliedCommand;
+        }
 
-            appliedCommand["--configfile"].Arguments.Single()
-                .Should()
-                .Be(configPath);
+        private static PackageLocation CreatePackageLocationByInstallCommand(string installCommand)
+        {
+            var command = Parser.Instance;
+            var result = command.Parse(installCommand);
+            var parseResult = result["dotnet"]["tool"]["install"];
+            var packageLocation = new PackageLocation(parseResult);
+            return packageLocation;
         }
     }
 }

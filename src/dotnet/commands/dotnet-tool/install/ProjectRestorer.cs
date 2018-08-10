@@ -71,6 +71,11 @@ namespace Microsoft.DotNet.Tools.Tool.Install
                 args.Add(packageLocation.NugetConfig.Value.Value);
             }
 
+            if (packageLocation.DisableParallel)
+            {
+                args.Add("--disable-parallel");
+            }
+
             return args;
         }
 
