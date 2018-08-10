@@ -1,0 +1,44 @@
+// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using Microsoft.DotNet.Cli.CommandLine;
+using LocalizableStrings = Microsoft.DotNet.Tools.Restore.LocalizableStrings;
+
+namespace Microsoft.DotNet.Cli
+{
+    internal static class ToolCommandRestorePassThroughOptions
+    {
+        public static Option DisableParallelOption()
+        {
+            return Create.Option(
+                "--disable-parallel",
+                LocalizableStrings.CmdDisableParallelOptionDescription,
+                Accept.NoArguments());
+        }
+
+        public static Option ConfigfileOption()
+        {
+            return Create.Option(
+                    "--configfile",
+                    LocalizableStrings.CmdConfigFileOptionDescription,
+                    Accept.ExactlyOneArgument()
+                          .With(name: LocalizableStrings.CmdConfigFileOption));
+        }
+
+        public static Option NoCacheOption()
+        {
+            return Create.Option(
+                    "--no-cache",
+                    LocalizableStrings.CmdNoCacheOptionDescription,
+                    Accept.NoArguments());
+        }
+
+        public static Option IgnoreFailedSourcesOption()
+        {
+            return Create.Option(
+                    "--ignore-failed-sources",
+                    LocalizableStrings.CmdIgnoreFailedSourcesOptionDescription,
+                    Accept.NoArguments());
+        }
+    }
+}
