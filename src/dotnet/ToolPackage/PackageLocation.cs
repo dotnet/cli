@@ -8,7 +8,7 @@ namespace Microsoft.DotNet.ToolPackage
     {
         public PackageLocation(
             FilePath? nugetConfig = null,
-            DirectoryPath? rootConfigDirectory = null, 
+            DirectoryPath? rootConfigDirectory = null,
             string[] additionalFeeds = null)
         {
             NugetConfig = nugetConfig;

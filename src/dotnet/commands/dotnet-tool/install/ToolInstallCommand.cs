@@ -30,9 +30,8 @@ namespace Microsoft.DotNet.Tools.Tool.Install
 
         private readonly PackageId _packageId;
         private readonly string _packageVersion;
-        private readonly string _configFilePath;
+        private readonly PackageLocation _packageLocation;
         private readonly string _framework;
-        private readonly string[] _source;
         private readonly bool _global;
         private readonly string _verbosity;
         private readonly string _toolPath;
@@ -53,9 +52,10 @@ namespace Microsoft.DotNet.Tools.Tool.Install
 
             _packageId = new PackageId(appliedCommand.Arguments.Single());
             _packageVersion = appliedCommand.ValueOrDefault<string>("version");
-            _configFilePath = appliedCommand.ValueOrDefault<string>("configfile");
+            _packageLocation = new PackageLocation(
+                nugetConfig: FilePath.CreateOrReturnNullWhenValueIsNull(appliedCommand.ValueOrDefault<string>("configfile")),
+                additionalFeeds: appliedCommand.ValueOrDefault<string[]>("add-source"));
             _framework = appliedCommand.ValueOrDefault<string>("framework");
-            _source = appliedCommand.ValueOrDefault<string[]>("add-source");
             _global = appliedCommand.ValueOrDefault<bool>("global");
             _verbosity = appliedCommand.SingleArgumentOrDefault("verbosity");
             _toolPath = appliedCommand.SingleArgumentOrDefault("tool-path");
@@ -82,14 +82,13 @@ namespace Microsoft.DotNet.Tools.Tool.Install
                 throw new GracefulException(LocalizableStrings.InstallToolCommandInvalidGlobalAndToolPath);
             }
 
-            if (_configFilePath != null && !File.Exists(_configFilePath))
+            if (_packageLocation.NugetConfig.HasValue && !File.Exists(_packageLocation.NugetConfig.Value.Value))
             {
                 throw new GracefulException(
                     string.Format(
                         LocalizableStrings.NuGetConfigurationFileDoesNotExist,
-                        Path.GetFullPath(_configFilePath)));
+                        Path.GetFullPath(_packageLocation.NugetConfig.Value.Value)));
             }
-
 
             VersionRange versionRange = null;
             if (!string.IsNullOrEmpty(_packageVersion) && !VersionRange.TryParse(_packageVersion, out versionRange))
@@ -117,12 +116,6 @@ namespace Microsoft.DotNet.Tools.Tool.Install
                 return 1;
             }
 
-            FilePath? configFile = null;
-            if (_configFilePath != null)
-            {
-                configFile = new FilePath(_configFilePath);
-            }
-
             try
             {
                 IToolPackage package = null;
@@ -131,7 +124,7 @@ namespace Microsoft.DotNet.Tools.Tool.Install
                     TimeSpan.Zero))
                 {
                     package = toolPackageInstaller.InstallPackage(
-                        new PackageLocation(nugetConfig: configFile, additionalFeeds: _source),
+                        _packageLocation,
                         packageId: _packageId,
                         versionRange: versionRange,
                         targetFramework: _framework, verbosity: _verbosity);
