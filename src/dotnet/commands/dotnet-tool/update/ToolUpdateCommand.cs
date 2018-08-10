@@ -30,12 +30,11 @@ namespace Microsoft.DotNet.Tools.Tool.Update
         private readonly CreateToolPackageStoreAndInstaller _createToolPackageStoreAndInstaller;
 
         private readonly PackageId _packageId;
-        private readonly string _configFilePath;
         private readonly string _framework;
-        private readonly string[] _additionalFeeds;
         private readonly bool _global;
         private readonly string _verbosity;
         private readonly string _toolPath;
+        private readonly PackageLocation _packageLocation;
 
         public ToolUpdateCommand(AppliedOption appliedCommand,
             ParseResult parseResult,
@@ -50,12 +49,11 @@ namespace Microsoft.DotNet.Tools.Tool.Update
             }
 
             _packageId = new PackageId(appliedCommand.Arguments.Single());
-            _configFilePath = appliedCommand.ValueOrDefault<string>("configfile");
             _framework = appliedCommand.ValueOrDefault<string>("framework");
-            _additionalFeeds = appliedCommand.ValueOrDefault<string[]>("add-source");
             _global = appliedCommand.ValueOrDefault<bool>("global");
             _verbosity = appliedCommand.SingleArgumentOrDefault("verbosity");
             _toolPath = appliedCommand.SingleArgumentOrDefault("tool-path");
+            _packageLocation = new PackageLocation(appliedCommand);
 
             _createToolPackageStoreAndInstaller = createToolPackageStoreAndInstaller ??
                                                   ToolPackageFactory.CreateToolPackageStoreAndInstaller;
@@ -110,12 +108,6 @@ namespace Microsoft.DotNet.Tools.Tool.Update
                     isUserError: false);
             }
 
-            FilePath? configFile = null;
-            if (_configFilePath != null)
-            {
-                configFile = new FilePath(_configFilePath);
-            }
-
             using (var scope = new TransactionScope(
                 TransactionScopeOption.Required,
                 TimeSpan.Zero))
@@ -133,7 +125,7 @@ namespace Microsoft.DotNet.Tools.Tool.Update
                 RunWithHandlingInstallError(() =>
                 {
                     IToolPackage newInstalledPackage = toolPackageInstaller.InstallPackage(
-                        new PackageLocation(nugetConfig: configFile, additionalFeeds: _additionalFeeds),
+                        _packageLocation,
                         packageId: _packageId,
                         targetFramework: _framework,
                         verbosity: _verbosity);
@@ -166,12 +158,12 @@ namespace Microsoft.DotNet.Tools.Tool.Update
                     LocalizableStrings.UpdateToolCommandInvalidGlobalAndToolPath);
             }
 
-            if (_configFilePath != null && !File.Exists(_configFilePath))
+            if (_packageLocation.NugetConfig.HasValue && !File.Exists(_packageLocation.NugetConfig.Value.Value))
             {
                 throw new GracefulException(
                     string.Format(
                         LocalizableStrings.NuGetConfigurationFileDoesNotExist,
-                        Path.GetFullPath(_configFilePath)));
+                        Path.GetFullPath(_packageLocation.NugetConfig.Value.Value)));
             }
         }
 

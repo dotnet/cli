@@ -1,5 +1,7 @@
 ﻿
 using System;
+using Microsoft.DotNet.Cli;
+using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.ToolPackage
@@ -14,6 +16,12 @@ namespace Microsoft.DotNet.ToolPackage
             NugetConfig = nugetConfig;
             RootConfigDirectory = rootConfigDirectory;
             AdditionalFeeds = additionalFeeds ?? Array.Empty<string>();
+        }
+
+        public PackageLocation(AppliedOption appliedOption)
+        {
+            NugetConfig = FilePath.CreateOrReturnNullWhenValueIsNull(appliedOption.ValueOrDefault<string>("configfile"));
+            AdditionalFeeds  = appliedOption.ValueOrDefault<string[]>("add-source");
         }
 
         public FilePath? NugetConfig { get; }

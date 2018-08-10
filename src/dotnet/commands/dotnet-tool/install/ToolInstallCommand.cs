@@ -52,9 +52,7 @@ namespace Microsoft.DotNet.Tools.Tool.Install
 
             _packageId = new PackageId(appliedCommand.Arguments.Single());
             _packageVersion = appliedCommand.ValueOrDefault<string>("version");
-            _packageLocation = new PackageLocation(
-                nugetConfig: FilePath.CreateOrReturnNullWhenValueIsNull(appliedCommand.ValueOrDefault<string>("configfile")),
-                additionalFeeds: appliedCommand.ValueOrDefault<string[]>("add-source"));
+            _packageLocation = new PackageLocation(appliedCommand);
             _framework = appliedCommand.ValueOrDefault<string>("framework");
             _global = appliedCommand.ValueOrDefault<bool>("global");
             _verbosity = appliedCommand.SingleArgumentOrDefault("verbosity");
