@@ -33,17 +33,14 @@ namespace Microsoft.DotNet.Tools.Tool.Install
             var argsToPassToRestore = new List<string>();
 
             argsToPassToRestore.Add(project.Value);
-            if (packageLocation.NugetConfig != null)
-            {
-                argsToPassToRestore.Add("--configfile");
-                argsToPassToRestore.Add(packageLocation.NugetConfig.Value.Value);
-            }
 
             argsToPassToRestore.AddRange(new List<string>
             {
                 "--runtime",
                 AnyRid
             });
+
+            argsToPassToRestore.AddRange(ToRestoreArguments(packageLocation));
 
             argsToPassToRestore.Add($"-verbosity:{verbosity ?? "quiet"}");
 
@@ -64,9 +61,17 @@ namespace Microsoft.DotNet.Tools.Tool.Install
             }
         }
 
-        public List<string> ToRestoreArguments(PackageLocation packageLocation)
+        public static List<string> ToRestoreArguments(PackageLocation packageLocation)
         {
-            throw new NotImplementedException();
+            var args = new List<string>();
+
+            if (packageLocation.NugetConfig != null)
+            {
+                args.Add("--configfile");
+                args.Add(packageLocation.NugetConfig.Value.Value);
+            }
+
+            return args;
         }
 
         private static void WriteLine(IReporter reporter, string line, FilePath project)

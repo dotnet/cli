@@ -181,7 +181,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 feeds: GetMockFeedsForConfigFile(nugetConfigPath));
 
             var package = installer.InstallPackage(
-                new PackageLocation(nugetConfig: nugetConfigPath), 
+                new PackageLocation(nugetConfig: nugetConfigPath),
                 packageId: TestPackageId,
                 targetFramework: _testTargetframework);
 
