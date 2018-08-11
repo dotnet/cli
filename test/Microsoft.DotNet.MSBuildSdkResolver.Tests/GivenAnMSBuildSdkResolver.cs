@@ -107,6 +107,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 + " version that requires the MSBuild version currently available.");
         }
 
+        
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
@@ -280,6 +281,52 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             result.Version.Should().Be(disallowPreviews ? "10.0.0" : "11.0.0-preview1");
             result.Warnings.Should().BeNullOrEmpty();
             result.Errors.Should().BeNullOrEmpty();
+        }
+
+        [Fact]
+        public void ItObservesChangesToVSSettingsFile()
+        {
+            var environment = new TestEnvironment();
+            var rtm = environment.CreateSdkDirectory(ProgramFiles.X64, "Some.Test.Sdk", "10.0.0");
+            var preview = environment.CreateSdkDirectory(ProgramFiles.X64, "Some.Test.Sdk", "11.0.0-preview1");
+
+            environment.CreateMuxerAndAddToPath(ProgramFiles.X64);
+            environment.CreateVSSettingsFile(disallowPreviews: true);
+            var resolver = environment.CreateResolver();
+
+            void Check(bool disallowPreviews)
+            {
+                // check twice because file-up-to-date is a separate code path
+                for (int i = 0; i < 2; i++)
+                {
+                    var result = (MockResult)resolver.Resolve(
+                        new SdkReference("Some.Test.Sdk", null, null),
+                        new MockContext { ProjectFileDirectory = environment.TestDirectory },
+                        new MockFactory());
+
+                    var expected = disallowPreviews ? rtm : preview;
+                    result.Success.Should().BeTrue();
+                    result.Path.Should().Be(expected.FullName);
+                    result.Version.Should().Be(disallowPreviews ? "10.0.0" : "11.0.0-preview1");
+                    result.Warnings.Should().BeNullOrEmpty();
+                    result.Errors.Should().BeNullOrEmpty();
+                }
+            }
+
+            environment.DeleteVSSettingsFile();
+            Check(disallowPreviews: false); // default with no file
+
+            environment.CreateVSSettingsFile(disallowPreviews: true);
+            Check(disallowPreviews: true);
+
+            environment.CreateVSSettingsFile(disallowPreviews: false);
+            Check(disallowPreviews: false);
+
+            environment.CreateVSSettingsFile(disallowPreviews: true);
+            Check(disallowPreviews: true);
+
+            environment.DeleteVSSettingsFile();
+            Check(disallowPreviews: false);
         }
 
         [Fact]
@@ -462,10 +509,15 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 return Path.Combine(baseDirectory, "minimumVSDefinedSDKVersion");
             }
 
-            internal void CreateVSSettingsFile(bool disallowPreviews)
+            public void CreateVSSettingsFile(bool disallowPreviews)
             {
                 VSSettingsFile = TestDirectory.GetFile("sdk.txt");
                 File.WriteAllText(VSSettingsFile.FullName, $"UsePreviews={!disallowPreviews}");
+            }
+
+            public void DeleteVSSettingsFile()
+            {
+                VSSettingsFile.Delete();
             }
         }
 
