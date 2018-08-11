@@ -3,14 +3,14 @@
 
 using FluentAssertions;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Tools.Tool.Install;
-using Microsoft.Extensions.EnvironmentAbstractions;
 using Xunit;
 using System.Linq;
 using Microsoft.DotNet.Cli.CommandLine;
 using Parser = Microsoft.DotNet.Cli.Parser;
 using System.Collections.Generic;
+using System.IO;
+using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.ToolPackage.Tests
 {
@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         [Fact]
         void ItCreatesValidArgumentsToRestoreForwardingConfigPath()
         {
-            const string configPath = "c:\\nuget.config";
+            const string configPath = "nuget.config";
             PackageLocation packageLocation = CreatePackageLocationByInstallCommand($"dotnet tool install -g console.test.app --configfile {configPath}");
 
             List<string> args = ProjectRestorer.ToRestoreArguments(packageLocation);
@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             AppliedOption restoreAppliedCommand = CreateRestoreCommandParseResultUsingToRestoreArguments(args);
             restoreAppliedCommand["--configfile"].Arguments.Single()
                 .Should()
-                .Be(configPath);
+                .Be(new FilePath(configPath).Value);
         }
 
         [Fact]
@@ -77,7 +77,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         [Fact]
         void ItCreatesValidArgumentsToRestoreForwardingMixArguments()
         {
-            const string configPath = "c:\\nuget.config";
+            const string configPath = "nuget.config";
             PackageLocation packageLocation = CreatePackageLocationByInstallCommand($"dotnet tool install -g console.test.app --configfile {configPath} --ignore-failed-sources");
 
             List<string> args = ProjectRestorer.ToRestoreArguments(packageLocation);
@@ -88,7 +88,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             restoreAppliedCommand.HasOption("--ignore-failed-sources").Should().BeTrue();
             restoreAppliedCommand["--configfile"].Arguments.Single()
                 .Should()
-                .Be(configPath);
+                .Be(new FilePath(configPath).Value);
         }
 
         private static AppliedOption CreateRestoreCommandParseResultUsingToRestoreArguments(List<string> args)
