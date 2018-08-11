@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.Cli
 {
     public class Program
     {
-        private static readonly string ToolPathSentinelFileName = $"{SdkProduct.Version}.toolpath.sentinel";
+        private static readonly string ToolPathSentinelFileName = $"{Product.Version}.toolpath.sentinel";
 
         public static int Main(string[] args)
         {
@@ -301,17 +301,15 @@ namespace Microsoft.DotNet.Cli
 
         private static void PrintVersion()
         {
-            var sdkVersion = SdkProduct.Version ?? "N/A";
-            Reporter.Output.WriteLine(sdkVersion);
+            Reporter.Output.WriteLine(Product.Version);
         }
 
         private static void PrintInfo()
         {
             DotnetVersionFile versionFile = DotnetFiles.VersionFileObject;
             var commitSha = versionFile.CommitSha ?? "N/A";
-            var sdkVersion = SdkProduct.Version ?? "N/A";
             Reporter.Output.WriteLine($"{LocalizableStrings.DotNetSdkInfoLabel}");
-            Reporter.Output.WriteLine($" Version:   {sdkVersion}");
+            Reporter.Output.WriteLine($" Version:   {Product.Version}");
             Reporter.Output.WriteLine($" Commit:    {commitSha}");
             Reporter.Output.WriteLine();
             Reporter.Output.WriteLine($"{LocalizableStrings.DotNetRuntimeInfoLabel}");

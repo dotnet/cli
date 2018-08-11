@@ -60,8 +60,8 @@ namespace Microsoft.DotNet.Tools.Help
 
         public static void PrintVersionHeader()
         {
-            var versionString = string.IsNullOrEmpty(SdkProduct.Version) ? string.Empty : $" ({SdkProduct.Version})";
-            Reporter.Output.WriteLine(SdkProduct.LongName + versionString);
+            var versionString = string.IsNullOrEmpty(Product.Version) ? string.Empty : $" ({Product.Version})";
+            Reporter.Output.WriteLine(Product.LongName + versionString);
         }
 
         public static Process ConfigureProcess(string docUrl)

@@ -10,8 +10,7 @@ namespace Microsoft.DotNet.Configurer
 {
     public class FirstTimeUseNoticeSentinel : IFirstTimeUseNoticeSentinel
     {
-        private static readonly string versionStr = SdkProduct.Version ?? CliProduct.Version;
-        public static readonly string SENTINEL = $"{versionStr}.dotnetFirstUseSentinel";
+        public static readonly string SENTINEL = $"{Product.Version}.dotnetFirstUseSentinel";
 
         private readonly IFile _file;
         private readonly IDirectory _directory;

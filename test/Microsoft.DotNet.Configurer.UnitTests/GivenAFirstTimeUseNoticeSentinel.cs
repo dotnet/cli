@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.Configurer.UnitTests
         [Fact]
         public void TheSentinelHasTheCurrentVersionInItsName()
         {
-            FirstTimeUseNoticeSentinel.SENTINEL.Should().Contain($"{CliProduct.Version}");
+            FirstTimeUseNoticeSentinel.SENTINEL.Should().Contain($"{Product.Version}");
         }
 
         [Fact]

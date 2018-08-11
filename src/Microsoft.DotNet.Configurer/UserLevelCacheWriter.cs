@@ -67,8 +67,7 @@ namespace Microsoft.DotNet.Configurer
 
         private string GetCacheFilePath(string cacheKey)
         {
-            var versionStr = SdkProduct.Version ?? CliProduct.Version;
-            return Path.Combine(_dotnetUserProfileFolderPath, $"{versionStr}_{cacheKey}.dotnetUserLevelCache");
+            return Path.Combine(_dotnetUserProfileFolderPath, $"{Product.Version}_{cacheKey}.dotnetUserLevelCache");
         }
     }
 }
