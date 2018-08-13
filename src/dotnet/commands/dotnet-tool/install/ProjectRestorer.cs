@@ -33,17 +33,14 @@ namespace Microsoft.DotNet.Tools.Tool.Install
             var argsToPassToRestore = new List<string>();
 
             argsToPassToRestore.Add(project.Value);
-            if (packageLocation.NugetConfig != null)
-            {
-                argsToPassToRestore.Add("--configfile");
-                argsToPassToRestore.Add(packageLocation.NugetConfig.Value.Value);
-            }
 
             argsToPassToRestore.AddRange(new List<string>
             {
                 "--runtime",
                 AnyRid
             });
+
+            argsToPassToRestore.AddRange(ToRestoreArguments(packageLocation));
 
             argsToPassToRestore.Add($"-verbosity:{verbosity ?? "quiet"}");
 
@@ -62,6 +59,34 @@ namespace Microsoft.DotNet.Tools.Tool.Install
             {
                 throw new ToolPackageException(LocalizableStrings.ToolInstallationRestoreFailed);
             }
+        }
+
+        public static List<string> ToRestoreArguments(PackageLocation packageLocation)
+        {
+            var args = new List<string>();
+
+            if (packageLocation.NugetConfig != null)
+            {
+                args.Add("--configfile");
+                args.Add(packageLocation.NugetConfig.Value.Value);
+            }
+
+            if (packageLocation.DisableParallel)
+            {
+                args.Add("--disable-parallel");
+            }
+
+            if (packageLocation.NoCache)
+            {
+                args.Add("--no-cache");
+            }
+
+            if (packageLocation.IgnoreFailedSources)
+            {
+                args.Add("--ignore-failed-sources");
+            }
+
+            return args;
         }
 
         private static void WriteLine(IReporter reporter, string line, FilePath project)

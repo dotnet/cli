@@ -85,31 +85,11 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             package.Uninstall();
         }
 
-        [Theory]
-        [InlineData(false)]
-        [InlineData(true)]
-        public void GivenNugetConfigInstallSucceeds(bool testMockBehaviorIsInSync)
-        {
-            var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
-
-            var (store, installer, reporter, fileSystem) = Setup(
-                useMock: testMockBehaviorIsInSync,
-                feeds: GetMockFeedsForConfigFile(nugetConfigPath));
-
-            var package = installer.InstallPackage(new PackageLocation(nugetConfig: nugetConfigPath),
-                packageId: TestPackageId,
-                versionRange: VersionRange.Parse(TestPackageVersion),
-                targetFramework: _testTargetframework);
-
-            AssertPackageInstall(reporter, fileSystem, package, store);
-
-            package.Uninstall();
-        }
 
         [Theory]
         [InlineData(false)]
         [InlineData(true)]
-        public void GivenNugetConfigInstallSucceedsInTransaction(bool testMockBehaviorIsInSync)
+        public void GivenNugetInstallSucceedsInTransaction(bool testMockBehaviorIsInSync)
         {
             var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
 
@@ -138,7 +118,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         [Theory]
         [InlineData(false)]
         [InlineData(true)]
-        public void GivenNugetConfigInstallCreatesAnAssetFile(bool testMockBehaviorIsInSync)
+        public void GivenNugetInstallCreatesAnAssetFile(bool testMockBehaviorIsInSync)
         {
             var nugetConfigPath = WriteNugetConfigFileToPointToTheFeed();
 
@@ -201,7 +181,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 feeds: GetMockFeedsForConfigFile(nugetConfigPath));
 
             var package = installer.InstallPackage(
-                new PackageLocation(nugetConfig: nugetConfigPath), 
+                new PackageLocation(nugetConfig: nugetConfigPath),
                 packageId: TestPackageId,
                 targetFramework: _testTargetframework);
 

@@ -23,6 +23,16 @@ namespace Microsoft.Extensions.EnvironmentAbstractions
             Value = value;
         }
 
+        public static FilePath? CreateOrReturnNullWhenValueIsNull(string value)
+        {
+            if (value != null)
+            {
+                return new FilePath(value);
+            }
+
+            return null;
+        }
+
         public string ToQuotedString()
         {
             return $"\"{Value}\"";
