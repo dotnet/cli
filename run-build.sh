@@ -151,8 +151,8 @@ if [ $? != 0 ]; then
 fi
 
 # install the post-PJnistic stage0
-echo "installing CLI: $dotnetInstallPath --version \"1.1.9-servicing-005253\" --install-dir $DOTNET_INSTALL_DIR --architecture \"$ARCHITECTURE\""
-$dotnetInstallPath --version "1.1.9-servicing-005253" --install-dir $DOTNET_INSTALL_DIR --architecture "$ARCHITECTURE"
+echo "installing CLI: $dotnetInstallPath --version \"1.1.10-servicing-005283\" --install-dir $DOTNET_INSTALL_DIR --architecture \"$ARCHITECTURE\""
+$dotnetInstallPath --version "1.1.10-servicing-005283" --install-dir $DOTNET_INSTALL_DIR --architecture "$ARCHITECTURE"
 if [ $? != 0 ]; then
     echo "run-build: Error: The .NET CLI stage0 installation failed with exit code $?." >&2
     exit $?

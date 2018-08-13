@@ -14,6 +14,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
                 string rid = RuntimeEnvironment.GetRuntimeIdentifier();
                 switch (rid)
                 {
+                    case "debian.9-x64":
                     case "fedora.24-x64":
                     case "fedora.27-x64":
                     case "fedora.28-x64":

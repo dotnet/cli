@@ -71,8 +71,14 @@ if [ -z "$DOCKERFILE" ]; then
             echo "Detected current OS as CentOS, using 'centos' image"
             export DOCKERFILE=scripts/docker/centos
         elif [ "$(cat /etc/*-release | grep -cim1 debian)" -eq 1 ]; then
-            echo "Detected current OS as Debian, using 'debian' image"
-            export DOCKERFILE=scripts/docker/debian
+            echo "Detected current OS as Debian, determining debian version to use..."
+            if [ "$(cat /etc/*-release | grep -cim1 9)" -eq 1 ]; then
+                echo "using 'debian.9' image"
+                export DOCKERFILE=scripts/docker/debian.9
+            else
+                echo "using 'debian' image"
+                export DOCKERFILE=scripts/docker/debian
+            fi
         elif [ "$(cat /etc/*-release | grep -cim1 fedora)" -eq 1 ]; then
             echo "Detected current OS as Fedora, determining fedora version to use..."
             if [ "$(cat /etc/*-release | grep -cim1 28)" -eq 1 ]; then
