@@ -59,7 +59,7 @@ say_verbose() {
     fi
 }
 
-# This platform list is finite - if the SDK/Runtime has supported Linux distribution-specific assets,
+# This platform list is finite - if the SDK/Runtime has supported legacy Linux distribution-specific assets,
 #   then and only then should the Linux distribution appear in this list.
 # Adding a Linux distribution to this list does not imply distribution-specific support.
 get_legacy_os_name_from_platform() {
@@ -73,6 +73,10 @@ get_legacy_os_name_from_platform() {
             ;;
         "debian.8")
             echo "debian"
+            return 0
+            ;;
+        "debian.9")
+            echo "debian.9"
             return 0
             ;;
         "fedora.23")

@@ -32,6 +32,14 @@
           }
         },
         {
+          "Name": "DotNet-CLI-Debian9-x64",
+          "ReportingParameters": {
+            "OperatingSystem": "Debian 9",
+            "Type": "build/product/",
+            "Platform": "x64"
+          }
+        },
+        {
           "Name": "DotNet-CLI-Fedora27-x64",
           "ReportingParameters": {
             "OperatingSystem": "Fedora 27",

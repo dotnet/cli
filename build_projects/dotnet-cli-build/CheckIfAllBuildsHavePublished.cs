@@ -54,6 +54,7 @@ namespace Microsoft.DotNet.Cli.Build
                 { "RHEL_x64", false },
                 { "OSX_x64", false },
                 { "Debian_x64", false },
+                { "Debian_9_x64", false },
                 { "CentOS_x64", false },
                 { "Fedora_27_x64", false },
                 { "Fedora_28_x64", false },
