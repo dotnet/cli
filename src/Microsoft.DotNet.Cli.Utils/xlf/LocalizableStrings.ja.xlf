@@ -184,11 +184,6 @@
         <target state="translated">資産ファイルにアクセスできませんでした。</target>
         <note />
       </trans-unit>
-      <trans-unit id="DotNetCommandLineTools">
-        <source>.NET Command Line Tools</source>
-        <target state="translated">.NET コマンド ライン ツール</target>
-        <note />
-      </trans-unit>
       <trans-unit id="WriteLineForwarderSetPreviously">
         <source>WriteLine forwarder set previously</source>
         <target state="translated">以前に設定した WriteLine フォワーダー</target>

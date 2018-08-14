@@ -184,11 +184,6 @@
         <target state="translated">No se pudo tener acceso al archivo de recursos.</target>
         <note />
       </trans-unit>
-      <trans-unit id="DotNetCommandLineTools">
-        <source>.NET Command Line Tools</source>
-        <target state="translated">Herramientas de la línea de comandos .NET</target>
-        <note />
-      </trans-unit>
       <trans-unit id="WriteLineForwarderSetPreviously">
         <source>WriteLine forwarder set previously</source>
         <target state="translated">El reenviador WriteLine se estableció previamente</target>

@@ -184,11 +184,6 @@
         <target state="translated">Nie można uzyskać dostępu do pliku zasobów.</target>
         <note />
       </trans-unit>
-      <trans-unit id="DotNetCommandLineTools">
-        <source>.NET Command Line Tools</source>
-        <target state="translated">Narzędzia wiersza polecenia programu .NET</target>
-        <note />
-      </trans-unit>
       <trans-unit id="WriteLineForwarderSetPreviously">
         <source>WriteLine forwarder set previously</source>
         <target state="translated">Ustawiona wcześniej usługa przesyłania dalej WriteLine</target>

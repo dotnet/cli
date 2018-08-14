@@ -184,11 +184,6 @@
         <target state="translated">Não foi possível acessar o arquivo de ativos.</target>
         <note />
       </trans-unit>
-      <trans-unit id="DotNetCommandLineTools">
-        <source>.NET Command Line Tools</source>
-        <target state="translated">Ferramentas de Linha de Comando do .NET</target>
-        <note />
-      </trans-unit>
       <trans-unit id="WriteLineForwarderSetPreviously">
         <source>WriteLine forwarder set previously</source>
         <target state="translated">Encaminhador WriteLine definido anteriormente</target>

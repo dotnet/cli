@@ -184,11 +184,6 @@
         <target state="translated">无法访问资产文件。</target>
         <note />
       </trans-unit>
-      <trans-unit id="DotNetCommandLineTools">
-        <source>.NET Command Line Tools</source>
-        <target state="translated">.NET 命令行工具</target>
-        <note />
-      </trans-unit>
       <trans-unit id="WriteLineForwarderSetPreviously">
         <source>WriteLine forwarder set previously</source>
         <target state="translated">以前设置的 WriteLine 转发器</target>

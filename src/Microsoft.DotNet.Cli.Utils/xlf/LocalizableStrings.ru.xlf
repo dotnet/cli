@@ -184,11 +184,6 @@
         <target state="translated">Не удалось получить доступ к файлу активов.</target>
         <note />
       </trans-unit>
-      <trans-unit id="DotNetCommandLineTools">
-        <source>.NET Command Line Tools</source>
-        <target state="translated">Программы командной строки .NET</target>
-        <note />
-      </trans-unit>
       <trans-unit id="WriteLineForwarderSetPreviously">
         <source>WriteLine forwarder set previously</source>
         <target state="translated">Сервер пересылки WriteLine, заданный ранее</target>

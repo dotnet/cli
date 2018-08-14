@@ -184,11 +184,6 @@
         <target state="translated">Varlık dosyasına erişilemiyor.</target>
         <note />
       </trans-unit>
-      <trans-unit id="DotNetCommandLineTools">
-        <source>.NET Command Line Tools</source>
-        <target state="translated">.NET Komut Satırı Araçları</target>
-        <note />
-      </trans-unit>
       <trans-unit id="WriteLineForwarderSetPreviously">
         <source>WriteLine forwarder set previously</source>
         <target state="translated">WriteLine ileticisi önceden ayarlandı</target>
