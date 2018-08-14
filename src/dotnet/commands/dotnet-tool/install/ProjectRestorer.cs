@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools;
@@ -18,9 +19,11 @@ namespace Microsoft.DotNet.Tools.Tool.Install
         private readonly IReporter _reporter;
         private readonly IReporter _errorReporter;
         private readonly bool _forceOutputRedirection;
+        private readonly IEnumerable<string> _alwaysForwardArguments;
 
-        public ProjectRestorer(IReporter reporter = null)
+        public ProjectRestorer(IReporter reporter = null, IEnumerable<string> alwaysForwardArguments = null)
         {
+            _alwaysForwardArguments = alwaysForwardArguments;
             _reporter = reporter ?? Reporter.Output;
             _errorReporter = reporter ?? Reporter.Error;
             _forceOutputRedirection = reporter != null;
@@ -46,6 +49,11 @@ namespace Microsoft.DotNet.Tools.Tool.Install
             });
 
             argsToPassToRestore.Add($"-verbosity:{verbosity ?? "quiet"}");
+
+            if (_alwaysForwardArguments != null && _alwaysForwardArguments.Any())
+            {
+                argsToPassToRestore.AddRange(_alwaysForwardArguments);
+            }
 
             var command = new DotNetCommandFactory(alwaysRunOutOfProc: true)
                 .Create("restore", argsToPassToRestore);
