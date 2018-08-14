@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.Tools.Tool.Update
 
     internal delegate (IToolPackageStore, IToolPackageInstaller) CreateToolPackageStoreAndInstaller(
         DirectoryPath? nonGlobalLocation = null,
-        IEnumerable<string> alwaysForwardArguments = null);
+        IEnumerable<string> additionalRestoreArguments = null);
 
     internal class ToolUpdateCommand : CommandBase
     {

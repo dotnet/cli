@@ -13,12 +13,12 @@ namespace Microsoft.DotNet.ToolPackage
     {
         public static (IToolPackageStore, IToolPackageInstaller) CreateToolPackageStoreAndInstaller(
             DirectoryPath? nonGlobalLocation = null,
-            IEnumerable<string> alwaysForwardArguments = null)
+            IEnumerable<string> additionalRestoreArguments = null)
         {
             IToolPackageStore toolPackageStore = CreateToolPackageStore(nonGlobalLocation);
             var toolPackageInstaller = new ToolPackageInstaller(
                 toolPackageStore,
-                new ProjectRestorer(alwaysForwardArguments: alwaysForwardArguments));
+                new ProjectRestorer(additionalRestoreArguments: additionalRestoreArguments));
 
             return (toolPackageStore, toolPackageInstaller);
         }

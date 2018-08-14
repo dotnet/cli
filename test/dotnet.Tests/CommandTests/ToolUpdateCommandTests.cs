@@ -134,7 +134,7 @@ namespace Microsoft.DotNet.Tests.Commands
             var command = new ToolUpdateCommand(
                 result["dotnet"]["tool"]["update"],
                 result,
-                (location, forwardArguement) => (_store,
+                (location, forwardArguments) => (_store,
                     new ToolPackageInstallerMock(
                         _fileSystem,
                         _store,
@@ -163,7 +163,7 @@ namespace Microsoft.DotNet.Tests.Commands
             var command = new ToolUpdateCommand(
                 result["dotnet"]["tool"]["update"],
                 result,
-                (location, forwardArguement) => (_store,
+                (location, forwardArguments) => (_store,
                     new ToolPackageInstallerMock(
                         _fileSystem,
                         _store,
@@ -213,7 +213,7 @@ namespace Microsoft.DotNet.Tests.Commands
             return new ToolInstallCommand(
                 result["dotnet"]["tool"]["install"],
                 result,
-                (location, forwardArguement) => (_store, new ToolPackageInstallerMock(
+                (location, forwardArguments) => (_store, new ToolPackageInstallerMock(
                     _fileSystem,
                     _store,
                     new ProjectRestorerMock(
@@ -233,7 +233,7 @@ namespace Microsoft.DotNet.Tests.Commands
             return new ToolUpdateCommand(
                 result["dotnet"]["tool"]["update"],
                 result,
-                (location, forwardArguement) => (_store, new ToolPackageInstallerMock(
+                (location, forwardArguments) => (_store, new ToolPackageInstallerMock(
                     _fileSystem,
                     _store,
                     new ProjectRestorerMock(
