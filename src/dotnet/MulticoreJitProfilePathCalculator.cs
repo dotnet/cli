@@ -51,7 +51,12 @@ namespace Microsoft.DotNet.Cli
 
         private static string GetNonWindowsRuntimeDataRoot()
         {
-            return $"{(Environment.GetEnvironmentVariable("HOME"))}/.dotnet/";
+            var XDG_DATA_HOME = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
+
+            if(string.IsNullOrEmpty(XDG_DATA_HOME))
+                XDG_DATA_HOME = Path.Combine(Environment.GetEnvironmentVariable("HOME"), ".local/share");
+            
+            return Path.Combine(XDG_DATA_HOME, "dotnet");
         }
     }
 }
