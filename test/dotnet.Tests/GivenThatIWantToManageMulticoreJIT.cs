@@ -92,9 +92,14 @@ namespace Microsoft.DotNet.Tests
         {
             var rid = PlatformAbstractions.RuntimeEnvironment.GetRuntimeIdentifier();
             
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? $@"Microsoft\dotnet\optimizationdata\{version}\{rid}" 
-                : $@".dotnet/optimizationdata/{version}/{rid}";
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return $@"Microsoft\dotnet\optimizationdata\{version}\{rid}";
+            
+            else if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                return $@"Library/dotnet/optimizationdata/{version}/{rid}";
+
+            else
+                return $@".local/share/dotnet/optimizationdata/{version}/{rid}";
         }
 
         private static string GetDotnetVersion()
