@@ -39,9 +39,14 @@ namespace Microsoft.DotNet.Cli
 
         private string GetRuntimeDataRootPathString()
         {
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? GetWindowsRuntimeDataRoot()
-                : GetNonWindowsRuntimeDataRoot();
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return GetWindowsRuntimeDataRoot();
+
+            else if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                return GetOSXRuntimeDataRoot();
+            
+            else
+                return GetUnixRuntimeDataRoot();
         }
 
         private static string GetWindowsRuntimeDataRoot()
@@ -49,7 +54,12 @@ namespace Microsoft.DotNet.Cli
             return $@"{(Environment.GetEnvironmentVariable("LocalAppData"))}\Microsoft\dotnet\";
         }
 
-        private static string GetNonWindowsRuntimeDataRoot()
+        private static string GetOSXRuntimeDataRoot()
+        {
+            return Path.Combine(Environment.GetEnvironmentVariable("HOME"), "Library/dotnet");
+        }
+
+        private static string GetUnixRuntimeDataRoot()
         {
             var XDG_DATA_HOME = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
 
