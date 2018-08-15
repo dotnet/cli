@@ -294,39 +294,41 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             environment.CreateVSSettingsFile(disallowPreviews: true);
             var resolver = environment.CreateResolver();
 
-            void Check(bool disallowPreviews)
+            void Check(bool disallowPreviews, string message)
             {
                 // check twice because file-up-to-date is a separate code path
                 for (int i = 0; i < 2; i++)
                 {
+
                     var result = (MockResult)resolver.Resolve(
                         new SdkReference("Some.Test.Sdk", null, null),
                         new MockContext { ProjectFileDirectory = environment.TestDirectory },
                         new MockFactory());
 
+                    string m = $"{message} ({i})";
                     var expected = disallowPreviews ? rtm : preview;
-                    result.Success.Should().BeTrue();
-                    result.Path.Should().Be(expected.FullName);
-                    result.Version.Should().Be(disallowPreviews ? "10.0.0" : "11.0.0-preview1");
-                    result.Warnings.Should().BeNullOrEmpty();
-                    result.Errors.Should().BeNullOrEmpty();
+                    result.Success.Should().BeTrue(m);
+                    result.Path.Should().Be(expected.FullName, m);
+                    result.Version.Should().Be(disallowPreviews ? "10.0.0" : "11.0.0-preview1", m);
+                    result.Warnings.Should().BeNullOrEmpty(m);
+                    result.Errors.Should().BeNullOrEmpty(m);
                 }
             }
 
             environment.DeleteVSSettingsFile();
-            Check(disallowPreviews: false); // default with no file
+            Check(disallowPreviews: false, message: "default with no file");
 
             environment.CreateVSSettingsFile(disallowPreviews: true);
-            Check(disallowPreviews: true);
+            Check(disallowPreviews: true, message: "file changed to disallow previews");
 
             environment.CreateVSSettingsFile(disallowPreviews: false);
-            Check(disallowPreviews: false);
+            Check(disallowPreviews: false,  message: "file changed to not disallow previews");
 
             environment.CreateVSSettingsFile(disallowPreviews: true);
-            Check(disallowPreviews: true);
+            Check(disallowPreviews: true, message: "file changed back to disallow previews");
 
             environment.DeleteVSSettingsFile();
-            Check(disallowPreviews: false);
+            Check(disallowPreviews: false, message: "file deleted to return to default");
         }
 
         [Fact]
