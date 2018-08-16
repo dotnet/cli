@@ -361,7 +361,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             // When run in test explorer in VS, this will actually locate the settings for the current VS instance
             // based on location of testhost executable. This gives us some coverage threw that path but we cannot
             // fix our expectations since the behavior will vary (by design) based on the current VS instance's settings.
-            var vsSettings = new VSSettings();
+            var vsSettings = VSSettings.Ambient;
 
             var environment = new TestEnvironment();
             var rtm = environment.CreateSdkDirectory(ProgramFiles.X64, "Some.Test.Sdk", "10.0.0");
@@ -416,7 +416,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 => new DotNetMSBuildSdkResolver(
                     GetEnvironmentVariable, 
                     useAmbientSettings
-                        ? new VSSettings()
+                        ? VSSettings.Ambient
                         : new VSSettings(VSSettingsFile?.FullName, DisallowPrereleaseByDefault));
 
             public DirectoryInfo GetSdkDirectory(ProgramFiles programFiles, string sdkName, string sdkVersion)

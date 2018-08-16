@@ -20,7 +20,11 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
         private FileInfo _settingsFile;
         private bool _disallowPrerelease;
 
-        public VSSettings()
+        // In the product, this singleton is used. It must be safe to use in parallel on multiple threads.
+        // In tests, mock instances can be created with the test constructor below.
+        public static readonly VSSettings Ambient = new VSSettings();
+
+        private VSSettings()
         {
 #if NET46
             if (!Interop.RunningOnWindows)

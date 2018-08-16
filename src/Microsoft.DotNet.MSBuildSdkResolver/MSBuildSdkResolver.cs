@@ -4,13 +4,20 @@
 using Microsoft.Build.Framework;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 
 namespace Microsoft.DotNet.MSBuildSdkResolver
 {
+    // Thread-safety note:
+    //  1. MSBuild can call the same resolver instance in parallel on multiple threads.
+    //  2. Nevertheless, in the IDE, project re-evaluation can create new instances for each evaluation.
+    //
+    // As such, all state (instance or static) must be guarded against concurrent access/updates.
+    // Caches of minimum versions, compatible SDKs are static to benefit multiple IDE evaluations.
+    // VSSettings are also effectively static (singleton instance that can be swapped by tests).
+
     public sealed class DotNetMSBuildSdkResolver : SdkResolver
     {
         public override string Name => "Microsoft.DotNet.MSBuildSdkResolver";
@@ -21,8 +28,14 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
         private readonly Func<string, string> _getEnvironmentVariable;
         private readonly VSSettings _vsSettings;
 
+        private static readonly ConcurrentDictionary<string, Version> s_minimumMSBuildVersions
+            = new ConcurrentDictionary<string, Version>();
+
+        private static readonly ConcurrentDictionary<CompatibleSdkKey, CompatibleSdkValue> s_compatibleSdks
+            = new ConcurrentDictionary<CompatibleSdkKey, CompatibleSdkValue>();
+
         public DotNetMSBuildSdkResolver() 
-            : this(Environment.GetEnvironmentVariable, new VSSettings())
+            : this(Environment.GetEnvironmentVariable, VSSettings.Ambient)
         {
         }
 
@@ -180,9 +193,6 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
             }
         }
 
-        private readonly ConcurrentDictionary<CompatibleSdkKey, CompatibleSdkValue> _compatibleSdks
-            = new ConcurrentDictionary<CompatibleSdkKey, CompatibleSdkValue>();
-
         private string GetMostCompatibleSdk(string dotnetExeDirectory, Version msbuildVersion)
         {
             CompatibleSdkValue sdks = GetMostCompatibleSdks(dotnetExeDirectory, msbuildVersion);
@@ -196,7 +206,7 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
 
         private CompatibleSdkValue GetMostCompatibleSdks(string dotnetExeDirectory, Version msbuildVersion)
         {
-            return _compatibleSdks.GetOrAdd(
+            return s_compatibleSdks.GetOrAdd(
                 new CompatibleSdkKey(dotnetExeDirectory, msbuildVersion),
                 key =>
                 {
@@ -231,12 +241,9 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
                 });
         }
 
-        private readonly ConcurrentDictionary<string, Version> _minimumMSBuildVersions
-            = new ConcurrentDictionary<string, Version>();
-
         private Version GetMinimumMSBuildVersion(string netcoreSdkDir)
         {
-            return _minimumMSBuildVersions.GetOrAdd(
+            return s_minimumMSBuildVersions.GetOrAdd(
                 netcoreSdkDir,
                 dir => 
                 {
