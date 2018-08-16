@@ -107,7 +107,6 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 + " version that requires the MSBuild version currently available.");
         }
 
-        
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
@@ -130,7 +129,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 new MockContext
                 {
                     MSBuildVersion = new Version(20, 0, 0, 0),
-                    ProjectFilePath = environment.TestDirectory.FullName
+                    ProjectFileDirectory = environment.TestDirectory,
                 },
                 new MockFactory());
 
@@ -139,6 +138,40 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             result.Version.Should().Be(disallowPreviews ? "98.98.98" : "99.99.99-preview");
             result.Warnings.Should().BeNullOrEmpty();
             result.Errors.Should().BeNullOrEmpty();
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void ItDoesNotReturnHighestSdkAvailableThatIsCompatibleWithMSBuildWhenVersionInGlobalJsonCannotBeFound(bool disallowPreviews)
+        {
+            var environment = new TestEnvironment(identifier: disallowPreviews.ToString())
+            {
+                DisallowPrereleaseByDefault = disallowPreviews
+            };
+
+            var compatibleRtm = environment.CreateSdkDirectory(ProgramFiles.X64, "Some.Test.Sdk", "98.98.98", new Version(19, 0, 0, 0));
+            var compatiblePreview = environment.CreateSdkDirectory(ProgramFiles.X64, "Some.Test.Sdk", "99.99.99-preview", new Version(20, 0, 0, 0));
+            var incompatible = environment.CreateSdkDirectory(ProgramFiles.X64, "Some.Test.Sdk", "100.100.100", new Version(21, 0, 0, 0));
+
+            environment.CreateMuxerAndAddToPath(ProgramFiles.X64);
+            environment.CreateGlobalJson(environment.TestDirectory, "1.2.3");
+
+            var resolver = environment.CreateResolver();
+            var result = (MockResult)resolver.Resolve(
+                new SdkReference("Some.Test.Sdk", null, null),
+                new MockContext
+                {
+                    MSBuildVersion = new Version(20, 0, 0, 0),
+                    ProjectFileDirectory = environment.TestDirectory,
+                },
+                new MockFactory());
+
+            result.Success.Should().BeFalse();
+            result.Path.Should().BeNull();
+            result.Version.Should().BeNull();;
+            result.Warnings.Should().BeNullOrEmpty();
+            result.Errors.Should().NotBeEmpty();
         }
 
         [Fact]

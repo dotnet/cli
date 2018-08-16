@@ -299,10 +299,10 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
         {
             string globalJsonStartDir = Path.GetDirectoryName(context.SolutionFilePath ?? context.ProjectFilePath);
             var result = NETCoreSdkResolver.ResolveSdk(dotnetExeDir, globalJsonStartDir, _vsSettings.DisallowPrerelease());
-            Version minimumMSBuildVersion = GetMinimumMSBuildVersion(result.ResolvedSdkDirectory);
 
             if (result.ResolvedSdkDirectory != null
-                && context.MSBuildVersion < minimumMSBuildVersion)
+                && result.GlobalJsonPath == null
+                && context.MSBuildVersion < GetMinimumMSBuildVersion(result.ResolvedSdkDirectory))
             {
                 string mostCompatible = GetMostCompatibleSdk(dotnetExeDir, context.MSBuildVersion);
 
