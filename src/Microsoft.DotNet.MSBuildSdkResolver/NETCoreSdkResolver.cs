@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
                 ? Interop.Windows.hostfxr_resolve_sdk2(dotnetExeDirectory, globalJsonStartDirectory, flags, result.Initialize)
                 : Interop.Unix.hostfxr_resolve_sdk2(dotnetExeDirectory, globalJsonStartDirectory, flags, result.Initialize);
 
-            Debug.Assert(errorCode == 0 || result.ResolvedSdkDirectory != null);
+            Debug.Assert((errorCode == 0) == (result.ResolvedSdkDirectory != null));
             return result;
         }
 
