@@ -547,7 +547,24 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             public void CreateVSSettingsFile(bool disallowPreviews)
             {
                 VSSettingsFile = TestDirectory.GetFile("sdk.txt");
-                File.WriteAllText(VSSettingsFile.FullName, $"UsePreviews={!disallowPreviews}");
+
+                // Guard against tests writing too fast for the up-to-date check
+                // It happens more often on Unix due to https://github.com/dotnet/corefx/issues/12403
+                var lastWriteTimeUtc = VSSettingsFile.Exists ? VSSettingsFile.LastWriteTimeUtc : DateTime.MinValue;
+                for (int sleep = 10; sleep < 3000; sleep *= 2)
+                {
+                    File.WriteAllText(VSSettingsFile.FullName, $"UsePreviews={!disallowPreviews}");
+                    VSSettingsFile.Refresh();
+
+                    if (VSSettingsFile.LastWriteTimeUtc > lastWriteTimeUtc)
+                    {
+                        return;
+                    }
+
+                    System.Threading.Thread.Sleep(sleep);
+                }
+
+                throw new InvalidOperationException("LastWriteTime is not changing.");
             }
 
             public void DeleteVSSettingsFile()
