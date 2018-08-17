@@ -145,7 +145,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         [InlineData(false)]
         public void ItDoesNotReturnHighestSdkAvailableThatIsCompatibleWithMSBuildWhenVersionInGlobalJsonCannotBeFound(bool disallowPreviews)
         {
-            var environment = new TestEnvironment(identifier: disallowPreviews.ToString())
+            var environment = new TestEnvironment(callingMethod: "ItDoesNotReturnHighest___", identifier: disallowPreviews.ToString())
             {
                 DisallowPrereleaseByDefault = disallowPreviews
             };
