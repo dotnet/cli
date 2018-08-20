@@ -123,6 +123,7 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
             var outputDirectory = PublishApp(testAppName, rid, args);
 
             outputDirectory.Should().OnlyHaveFiles(new[] {
+                $"{testAppName}{Constants.ExeSuffix}",
                 $"{testAppName}.dll",
                 $"{testAppName}.pdb",
                 $"{testAppName}.deps.json",
@@ -131,10 +132,14 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
 
             var outputProgram = Path.Combine(outputDirectory.FullName, $"{testAppName}{Constants.ExeSuffix}");
 
-            new DotnetCommand()
-                .ExecuteWithCapturedOutput(Path.Combine(outputDirectory.FullName, $"{testAppName}.dll"))
-                .Should().Pass()
-                     .And.HaveStdOutContaining("Hello World");
+            var command = new TestCommand(outputProgram);
+            command.Environment[Environment.Is64BitProcess ? "DOTNET_ROOT" : "DOTNET_ROOT(x86)"] =
+                new RepoDirectoriesProvider().DotnetRoot;
+            command.ExecuteWithCapturedOutput()
+                .Should()
+                .Pass()
+                .And
+                .HaveStdOutContaining("Hello World");
         }
 
         [Theory]
@@ -208,7 +213,7 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
             var configuration = Environment.GetEnvironmentVariable("CONFIGURATION") ?? "Debug";
 
             var outputProgram = rootDir
-                .GetDirectory("bin", configuration, "netcoreapp2.1", "publish", $"{rootDir.Name}.dll")
+                .GetDirectory("bin", configuration, "netcoreapp2.2", "publish", $"{rootDir.Name}.dll")
                 .FullName;
 
             new TestCommand(outputProgram)
@@ -270,7 +275,7 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
             var configuration = Environment.GetEnvironmentVariable("CONFIGURATION") ?? "Debug";
 
             var outputProgram = rootDir
-                .GetDirectory("bin", configuration, "netcoreapp2.1", rid, "publish", $"{rootDir.Name}.dll")
+                .GetDirectory("bin", configuration, "netcoreapp2.2", rid, "publish", $"{rootDir.Name}.dll")
                 .FullName;
 
             new TestCommand(outputProgram)

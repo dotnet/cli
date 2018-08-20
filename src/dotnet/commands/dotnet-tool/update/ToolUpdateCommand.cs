@@ -20,7 +20,8 @@ namespace Microsoft.DotNet.Tools.Tool.Update
     internal delegate IShellShimRepository CreateShellShimRepository(DirectoryPath? nonGlobalLocation = null);
 
     internal delegate (IToolPackageStore, IToolPackageInstaller) CreateToolPackageStoreAndInstaller(
-        DirectoryPath? nonGlobalLocation = null);
+        DirectoryPath? nonGlobalLocation = null,
+        IEnumerable<string> additionalRestoreArguments = null);
 
     internal class ToolUpdateCommand : CommandBase
     {
@@ -133,10 +134,9 @@ namespace Microsoft.DotNet.Tools.Tool.Update
                 RunWithHandlingInstallError(() =>
                 {
                     IToolPackage newInstalledPackage = toolPackageInstaller.InstallPackage(
+                        new PackageLocation(nugetConfig: configFile, additionalFeeds: _additionalFeeds),
                         packageId: _packageId,
                         targetFramework: _framework,
-                        nugetConfig: configFile,
-                        additionalFeeds: _additionalFeeds,
                         verbosity: _verbosity);
 
                     foreach (CommandSettings command in newInstalledPackage.Commands)
