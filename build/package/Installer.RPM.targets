@@ -224,14 +224,13 @@
           Outputs="$(RpmTestResultsXmlFile)" >
 
     <!-- Install Dependencies and SDK Packages -->
-    <Exec Command="sudo yum -y install $(DownloadedRuntimeDepsInstallerFile)" />
-    <Exec Command="sudo yum -y install $(DownloadedSharedHostInstallerFile)" />
-    <Exec Command="sudo yum -y install $(DownloadedHostFxrInstallerFile)" />
-    <Exec Command="sudo yum -y install $(DownloadedSharedFrameworkInstallerFile)" />
+    <Exec Command="sudo rpm --install --nosignature  $(DownloadedRuntimeDepsInstallerFile)" />
+    <Exec Command="sudo rpm --install --nosignature  $(DownloadedSharedHostInstallerFile)" />
+    <Exec Command="sudo rpm --install --nosignature  $(DownloadedHostFxrInstallerFile)" />
+    <Exec Command="sudo rpm --install --nosignature  $(DownloadedSharedFrameworkInstallerFile)" />
     <!-- Ignore dependencies, which may have an incoherent dependency on dotnet-runtime -->
-    <Exec Command="sudo rpm --install --nodeps $(DownloadedAspNetCoreSharedFxInstallerFile)" />
-
-    <Exec Command="sudo yum -y install $(SdkInstallerFile)" />
+    <Exec Command="sudo rpm --install --nosignature  --nodeps $(DownloadedAspNetCoreSharedFxInstallerFile)" />
+    <Exec Command="sudo rpm --install --nosignature  $(SdkInstallerFile)" />
 
     <!-- Run Tests -->
     <DotNetRestore ProjectPath="$(EndToEndTestProject)"
@@ -242,12 +241,11 @@
                 ToolPath="$(RpmInstalledDirectory)" />
 
     <!-- Clean up Packages -->
-    <Exec Command="sudo yum remove -y $(SdkRpmPackageName)" />
-
-    <Exec Command="sudo yum remove -y $(AspNetCoreSharedFxRpmPackageFileName)" />
-    <Exec Command="sudo yum remove -y $(SharedFxRpmPackageFileName)" />
-    <Exec Command="sudo yum remove -y $(HostFxrRpmPackageName)" />
-    <Exec Command="sudo yum remove -y $(HostRpmPackageName)" />
-    <Exec Command="sudo yum remove -y $(RuntimeDepsPackageFileName)" />
+    <Exec Command="sudo rpm -e $(SdkRpmPackageName)" />
+    <Exec Command="sudo rpm -e $(AspNetCoreSharedFxRpmPackageFileName)" />
+    <Exec Command="sudo rpm -e $(SharedFxRpmPackageFileName)" />
+    <Exec Command="sudo rpm -e $(HostFxrRpmPackageName)" />
+    <Exec Command="sudo rpm -e $(HostRpmPackageName)" />
+    <Exec Command="sudo rpm -e $(RuntimeDepsPackageFileName)" />
   </Target>
 </Project>
