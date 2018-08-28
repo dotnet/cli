@@ -176,10 +176,6 @@
       <SharedFxRpmPackageName>$(SharedFxRpmPackageName.ToLower())</SharedFxRpmPackageName>
       <SharedFxRpmPackageFileName>dotnet-runtime-$(SharedFxRpmPackageFileVersion)</SharedFxRpmPackageFileName>
       <SharedFxRpmPackageFileName>$(SharedFxRpmPackageFileName.ToLower())</SharedFxRpmPackageFileName>
-      <HostFxrRpmPackageVersion>$(HostFxrVersion)</HostFxrRpmPackageVersion>
-      <HostFxrRpmPackageName>dotnet-hostfxr-$(HostFxrRpmPackageVersion)</HostFxrRpmPackageName>
-      <HostFxrRpmPackageName>$(HostFxrRpmPackageName.ToLower())</HostFxrRpmPackageName>
-      <HostRpmPackageName>dotnet-host</HostRpmPackageName>
       <AspNetCoreSharedFxRpmPackageName>aspnetcore-runtime-$(AspNetCoreMajorMinorVersion)</AspNetCoreSharedFxRpmPackageName>
       <AspNetCoreSharedFxRpmPackageName>$(AspNetCoreSharedFxRpmPackageName.ToLower())</AspNetCoreSharedFxRpmPackageName>
       <AspNetCoreSharedFxRpmPackageFileName>aspnetcore-runtime-$(AspNetCoreVersion)</AspNetCoreSharedFxRpmPackageFileName>
@@ -224,13 +220,13 @@
           Outputs="$(RpmTestResultsXmlFile)" >
 
     <!-- Install Dependencies and SDK Packages -->
-    <Exec Command="sudo rpm --install --nosignature  $(DownloadedRuntimeDepsInstallerFile)" />
-    <Exec Command="sudo rpm --install --nosignature  $(DownloadedSharedHostInstallerFile)" />
-    <Exec Command="sudo rpm --install --nosignature  $(DownloadedHostFxrInstallerFile)" />
-    <Exec Command="sudo rpm --install --nosignature  $(DownloadedSharedFrameworkInstallerFile)" />
+    <Exec Command="sudo rpm --install --nosignature $(DownloadedRuntimeDepsInstallerFile)" />
+    <Exec Command="sudo rpm --install --nosignature $(DownloadedSharedHostInstallerFile)" />
+    <Exec Command="sudo rpm --install --nosignature $(DownloadedHostFxrInstallerFile)" />
+    <Exec Command="sudo rpm --install --nosignature $(DownloadedSharedFrameworkInstallerFile)" />
     <!-- Ignore dependencies, which may have an incoherent dependency on dotnet-runtime -->
-    <Exec Command="sudo rpm --install --nosignature  --nodeps $(DownloadedAspNetCoreSharedFxInstallerFile)" />
-    <Exec Command="sudo rpm --install --nosignature  $(SdkInstallerFile)" />
+    <Exec Command="sudo rpm --install --nosignature --nodeps $(DownloadedAspNetCoreSharedFxInstallerFile)" />
+    <Exec Command="sudo rpm --install --nosignature $(SdkInstallerFile)" />
 
     <!-- Run Tests -->
     <DotNetRestore ProjectPath="$(EndToEndTestProject)"
@@ -241,11 +237,16 @@
                 ToolPath="$(RpmInstalledDirectory)" />
 
     <!-- Clean up Packages -->
-    <Exec Command="sudo rpm -e $(SdkRpmPackageName)" />
-    <Exec Command="sudo rpm -e $(AspNetCoreSharedFxRpmPackageFileName)" />
-    <Exec Command="sudo rpm -e $(SharedFxRpmPackageFileName)" />
-    <Exec Command="sudo rpm -e $(HostFxrRpmPackageName)" />
-    <Exec Command="sudo rpm -e $(HostRpmPackageName)" />
-    <Exec Command="sudo rpm -e $(RuntimeDepsPackageFileName)" />
+    <ItemGroup>
+      <InstalledPackageName Include="$(SdkInstallerFile)" />
+      <InstalledPackageName Include="$(DownloadedAspNetCoreSharedFxInstallerFile)" />
+      <InstalledPackageName Include="$(DownloadedSharedFrameworkInstallerFile)" />
+      <InstalledPackageName Include="$(DownloadedHostFxrInstallerFile)" />
+      <InstalledPackageName Include="$(DownloadedSharedHostInstallerFile)" />
+      <InstalledPackageName Include="$(DownloadedRuntimeDepsInstallerFile)" />
+    </ItemGroup>
+
+    <!-- Query the package name of the file and give it to uninstall input -->
+    <Exec Command="sudo rpm -e `rpm --queryformat &quot;%25{NAME}&quot; -qp %(InstalledPackageName.Identity)`" />
   </Target>
 </Project>
