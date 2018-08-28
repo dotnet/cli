@@ -219,8 +219,6 @@
               $(RpmTestResultsXmlFile);"
           Outputs="$(RpmTestResultsXmlFile)" >
 
-    <!-- import key -->
-    <Exec Command="sudo rpm -Uvh https://packages.microsoft.com/config/rhel/7/packages-microsoft-prod.rpm" />
     <!-- Install Dependencies and SDK Packages -->
     <Exec Command="sudo rpm --install $(DownloadedRuntimeDepsInstallerFile)" />
     <Exec Command="sudo rpm --install $(DownloadedSharedHostInstallerFile)" />
