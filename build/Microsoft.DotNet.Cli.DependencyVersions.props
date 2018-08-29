@@ -4,9 +4,9 @@
     <CLI_SharedFrameworkVersion>1.1.10-servicing-001782-00</CLI_SharedFrameworkVersion>
     <CLI_CoreCLRVersion>1.1.10-servicing-26813-03</CLI_CoreCLRVersion>
     <CLI_JitVersion>1.1.10-servicing-26813-03</CLI_JitVersion>
-    <CLI_SharedHostVersion>1.1.10-servicing-001772-00</CLI_SharedHostVersion>
-    <CLI_HostFxrContainerVersion>1.1.10-servicing-001772-00</CLI_HostFxrContainerVersion>
-    <CLI_HostFxrVersion Condition="'$(OS)' != 'Windows_NT'">1.1.10-servicing-001772-00</CLI_HostFxrVersion>
+    <CLI_SharedHostVersion>1.1.10-servicing-001782-00</CLI_SharedHostVersion>
+    <CLI_HostFxrContainerVersion>1.1.10-servicing-001782-00</CLI_HostFxrContainerVersion>
+    <CLI_HostFxrVersion Condition="'$(OS)' != 'Windows_NT'">1.1.10-servicing-001782-00</CLI_HostFxrVersion>
     <CLI_HostFxrVersion Condition="'$(OS)' == 'Windows_NT'">1.1.9</CLI_HostFxrVersion>
 
     <CLI_SharedFrameworkVersion_1_0>1.0.13-servicing-005091-00</CLI_SharedFrameworkVersion_1_0>
