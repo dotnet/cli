@@ -122,9 +122,6 @@ namespace Microsoft.DotNet.ToolPackage
             string targetFramework = null,
             string verbosity = null)
         {
-            var stageDirectory = _store.GetRandomStagingDirectory();
-            Directory.CreateDirectory(stageDirectory.Value);
-
             var tempDirectoryForAssetJson = new DirectoryPath(Path.GetTempPath())
                 .WithSubDirectories(Path.GetRandomFileName());
 
