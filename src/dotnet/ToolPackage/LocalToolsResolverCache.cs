@@ -37,8 +37,30 @@ namespace Microsoft.DotNet.ToolPackage
                 listOfCommandSettings,
                 nuGetGlobalPackagesFolder);
 
-            string json = JsonConvert.SerializeObject(new[] {serializableSchema});
-            _fileSystem.File.WriteAllText(GetCacheFile(packageId), json);
+            string packageCacheFile = GetCacheFile(packageId);
+
+            if (_fileSystem.File.Exists(packageCacheFile))
+            {
+                CacheRow[] cacheTable =
+                    JsonConvert.DeserializeObject<CacheRow[]>(_fileSystem.File.ReadAllText(packageCacheFile));
+                var cacheRowExists =
+                    GetMatchingCommandSettingsArray(version, targetFramework, runtimeIdentifier, cacheTable) != null;
+
+                if (!cacheRowExists)
+                {
+                    var mergedTable = cacheTable.Concat(new[] {serializableSchema}).ToArray();
+                    _fileSystem.File.WriteAllText(
+                        packageCacheFile,
+                        JsonConvert.SerializeObject(mergedTable));
+                }
+            }
+            else
+            {
+                string json = JsonConvert.SerializeObject(new[] {serializableSchema});
+                _fileSystem.File.WriteAllText(
+                    packageCacheFile,
+                    json);
+            }
         }
 
         private string GetCacheFile(PackageId packageId)
@@ -61,7 +83,7 @@ namespace Microsoft.DotNet.ToolPackage
             {
                 Version = version.ToNormalizedString(),
                 TargetFramework = targetFramework.GetShortFolderName(),
-                RuntimeIdentifier = runtimeIdentifier,
+                RuntimeIdentifier = runtimeIdentifier.ToLowerInvariant(),
                 SerializableCommandSettingsArray =
                     listOfCommandSettings.Select(s => new SerializableCommandSettings
                     {
@@ -87,11 +109,7 @@ namespace Microsoft.DotNet.ToolPackage
                     JsonConvert.DeserializeObject<CacheRow[]>(_fileSystem.File.ReadAllText(packageCacheFile));
 
                 SerializableCommandSettings[] matchingCommandSettingsArray =
-                    cacheTable
-                        .SingleOrDefault(row => row.Version == version.ToNormalizedString() &&
-                                                row.TargetFramework == targetFramework.GetShortFolderName() &&
-                                                row.RuntimeIdentifier == runtimeIdentifier)
-                        ?.SerializableCommandSettingsArray;
+                    GetMatchingCommandSettingsArray(version, targetFramework, runtimeIdentifier, cacheTable);
 
                 if (matchingCommandSettingsArray != null)
                 {
@@ -107,6 +125,18 @@ namespace Microsoft.DotNet.ToolPackage
             }
 
             return Array.Empty<CommandSettings>();
+        }
+
+        private static SerializableCommandSettings[] GetMatchingCommandSettingsArray(NuGetVersion version,
+            NuGetFramework targetFramework, string runtimeIdentifier, CacheRow[] cacheTable)
+        {
+            SerializableCommandSettings[] matchingCommandSettingsArray =
+                cacheTable
+                    .SingleOrDefault(row => row.Version == version.ToNormalizedString() &&
+                                            row.TargetFramework == targetFramework.GetShortFolderName() &&
+                                            row.RuntimeIdentifier == runtimeIdentifier)
+                    ?.SerializableCommandSettingsArray;
+            return matchingCommandSettingsArray;
         }
 
         private class CacheRow
