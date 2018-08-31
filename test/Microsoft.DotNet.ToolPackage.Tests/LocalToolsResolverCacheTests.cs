@@ -37,10 +37,10 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 localToolsResolverCache.Load(packageId, nuGetVersion, targetFramework, runtimeIdentifier,
                     nuGetGlobalPackagesFolder);
 
-            loadedResolverCache.Should().Contain(c =>
+            loadedResolverCache.Should().ContainSingle(c =>
                 c.Name == "tool1" && c.Runner == "dotnet" &&
                 c.Executable.ToString() == nuGetGlobalPackagesFolder.WithFile("tool1.dll").ToString());
-            loadedResolverCache.Should().Contain(c =>
+            loadedResolverCache.Should().ContainSingle(c =>
                 c.Name == "tool2" && c.Runner == "dotnet" &&
                 c.Executable.ToString() == nuGetGlobalPackagesFolder.WithFile("tool2.dll").ToString());
         }
@@ -80,20 +80,20 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 localToolsResolverCache.Load(packageId, newerNuGetVersion, targetFramework, runtimeIdentifier,
                     nuGetGlobalPackagesFolder);
 
-            loadedResolverCacheOlderVersion.Should().Contain(c =>
+            loadedResolverCacheOlderVersion.Should().ContainSingle(c =>
                 c.Name == "tool1" && c.Runner == "dotnet" &&
                 c.Executable.ToString() == nuGetGlobalPackagesFolder.WithFile("tool1.dll").ToString());
-            loadedResolverCacheOlderVersion.Should().Contain(c =>
+            loadedResolverCacheOlderVersion.Should().ContainSingle(c =>
                 c.Name == "tool2" && c.Runner == "dotnet" &&
                 c.Executable.ToString() == nuGetGlobalPackagesFolder.WithFile("tool2.dll").ToString());
             
-            loadedResolverCacheNewerVersion.Should().Contain(c =>
+            loadedResolverCacheNewerVersion.Should().ContainSingle(c =>
                 c.Name == "tool1" && c.Runner == "dotnet" &&
                 c.Executable.ToString() == nuGetGlobalPackagesFolder.WithFile("tool1new.dll").ToString());
-            loadedResolverCacheNewerVersion.Should().Contain(c =>
+            loadedResolverCacheNewerVersion.Should().ContainSingle(c =>
                 c.Name == "tool2" && c.Runner == "dotnet" &&
                 c.Executable.ToString() == nuGetGlobalPackagesFolder.WithFile("tool2new.dll").ToString());
-            loadedResolverCacheNewerVersion.Should().Contain(c =>
+            loadedResolverCacheNewerVersion.Should().ContainSingle(c =>
                 c.Name == "tool3" && c.Runner == "dotnet" &&
                 c.Executable.ToString() == nuGetGlobalPackagesFolder.WithFile("tool3new.dll").ToString());
         }
