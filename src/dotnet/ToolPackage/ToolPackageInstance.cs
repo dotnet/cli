@@ -184,9 +184,11 @@ namespace Microsoft.DotNet.ToolPackage
             }
         }
 
-        private ToolConfiguration DeserializeToolConfiguration(string ToolSettingsFileName, LockFileTargetLibrary library)
+        private ToolConfiguration DeserializeToolConfiguration(
+            string toolSettingsFileName,
+            LockFileTargetLibrary library)
         {
-            var dotnetToolSettings = FindItemInTargetLibrary(library, ToolSettingsFileName);
+            var dotnetToolSettings = FindItemInTargetLibrary(library, toolSettingsFileName);
             if (dotnetToolSettings == null)
             {
                 throw new ToolConfigurationException(
