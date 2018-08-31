@@ -1,15 +1,12 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using FluentAssertions;
+using Microsoft.DotNet.ToolPackage;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Microsoft.Extensions.DependencyModel.Tests;
 using Microsoft.Extensions.EnvironmentAbstractions;
-using Newtonsoft.Json;
 using NuGet.Frameworks;
 using NuGet.Versioning;
 using Xunit;
@@ -21,26 +18,18 @@ namespace Microsoft.DotNet.ToolPackage.Tests
         [Fact]
         public void GivenExecutableIdentifierItCanSaveAndLoad()
         {
-            IFileSystem fileSystem = new FileSystemMockBuilder().UseCurrentSystemTemporaryDirectory().Build();
-            DirectoryPath tempDirectory =
-                new DirectoryPath(fileSystem.Directory.CreateTemporaryDirectory().DirectoryPath);
-            DirectoryPath cacheDirectory = tempDirectory.WithSubDirectories("cacheDirectory");
-            DirectoryPath nuGetGlobalPackagesFolder = tempDirectory.WithSubDirectories("nugetGlobalPackageLocation");
-            fileSystem.Directory.CreateDirectory(cacheDirectory.Value);
-            const int version = 1;
+            (DirectoryPath nuGetGlobalPackagesFolder, LocalToolsResolverCache localToolsResolverCache) = Setup();
 
-            LocalToolsResolverCache localToolsResolverCache =
-                new LocalToolsResolverCache(fileSystem, cacheDirectory, version);
+            NuGetFramework targetFramework = NuGetFramework.Parse("netcoreapp2.1");
+            string runtimeIdentifier = "any";
+            PackageId packageId = new PackageId("my.toolBundle");
+            NuGetVersion nuGetVersion = NuGetVersion.Parse("1.0.2");
             IReadOnlyList<CommandSettings> listOfCommandSettings = new[]
             {
                 new CommandSettings("tool1", "dotnet", nuGetGlobalPackagesFolder.WithFile("tool1.dll")),
                 new CommandSettings("tool2", "dotnet", nuGetGlobalPackagesFolder.WithFile("tool2.dll"))
             };
 
-            NuGetFramework targetFramework = NuGetFramework.Parse("netcoreapp2.1");
-            string runtimeIdentifier = "any";
-            PackageId packageId = new PackageId("my.toolBundle");
-            NuGetVersion nuGetVersion = NuGetVersion.Parse("1.0.2");
             localToolsResolverCache.Save(packageId, nuGetVersion, targetFramework, runtimeIdentifier,
                 listOfCommandSettings, nuGetGlobalPackagesFolder);
 
@@ -51,128 +40,81 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             loadedResolverCache.Should().Contain(c =>
                 c.Name == "tool1" && c.Runner == "dotnet" &&
                 c.Executable.ToString() == nuGetGlobalPackagesFolder.WithFile("tool1.dll").ToString());
-
             loadedResolverCache.Should().Contain(c =>
                 c.Name == "tool2" && c.Runner == "dotnet" &&
                 c.Executable.ToString() == nuGetGlobalPackagesFolder.WithFile("tool2.dll").ToString());
         }
+
+        [Fact]
+        public void GivenExecutableIdentifierItCanSaveMultipleVersionAndLoad()
+        {
+            (DirectoryPath nuGetGlobalPackagesFolder, LocalToolsResolverCache localToolsResolverCache) = Setup();
+
+            NuGetFramework targetFramework = NuGetFramework.Parse("netcoreapp2.1");
+            string runtimeIdentifier = "any";
+            PackageId packageId = new PackageId("my.toolBundle");
+            NuGetVersion nuGetVersion = NuGetVersion.Parse("1.0.2");
+            IReadOnlyList<CommandSettings> listOfCommandSettings = new[]
+            {
+                new CommandSettings("tool1", "dotnet", nuGetGlobalPackagesFolder.WithFile("tool1.dll")),
+                new CommandSettings("tool2", "dotnet", nuGetGlobalPackagesFolder.WithFile("tool2.dll"))
+            };
+            
+            NuGetVersion newerNuGetVersion = NuGetVersion.Parse("2.0.2");
+            IReadOnlyList<CommandSettings> listOfCommandSettings2 = new[]
+            {
+                new CommandSettings("tool1", "dotnet", nuGetGlobalPackagesFolder.WithFile("tool1new.dll")),
+                new CommandSettings("tool2", "dotnet", nuGetGlobalPackagesFolder.WithFile("tool2new.dll")),
+                new CommandSettings("tool3", "dotnet", nuGetGlobalPackagesFolder.WithFile("tool3new.dll"))
+            };
+
+            localToolsResolverCache.Save(packageId, nuGetVersion, targetFramework, runtimeIdentifier,
+                listOfCommandSettings, nuGetGlobalPackagesFolder);
+            localToolsResolverCache.Save(packageId, newerNuGetVersion, targetFramework, runtimeIdentifier,
+                listOfCommandSettings2, nuGetGlobalPackagesFolder);
+
+            IReadOnlyList<CommandSettings> loadedResolverCacheOlderVersion =
+                localToolsResolverCache.Load(packageId, nuGetVersion, targetFramework, runtimeIdentifier,
+                    nuGetGlobalPackagesFolder);
+            IReadOnlyList<CommandSettings> loadedResolverCacheNewerVersion =
+                localToolsResolverCache.Load(packageId, newerNuGetVersion, targetFramework, runtimeIdentifier,
+                    nuGetGlobalPackagesFolder);
+
+            loadedResolverCacheOlderVersion.Should().Contain(c =>
+                c.Name == "tool1" && c.Runner == "dotnet" &&
+                c.Executable.ToString() == nuGetGlobalPackagesFolder.WithFile("tool1.dll").ToString());
+            loadedResolverCacheOlderVersion.Should().Contain(c =>
+                c.Name == "tool2" && c.Runner == "dotnet" &&
+                c.Executable.ToString() == nuGetGlobalPackagesFolder.WithFile("tool2.dll").ToString());
+            
+            loadedResolverCacheNewerVersion.Should().Contain(c =>
+                c.Name == "tool1" && c.Runner == "dotnet" &&
+                c.Executable.ToString() == nuGetGlobalPackagesFolder.WithFile("tool1new.dll").ToString());
+            loadedResolverCacheNewerVersion.Should().Contain(c =>
+                c.Name == "tool2" && c.Runner == "dotnet" &&
+                c.Executable.ToString() == nuGetGlobalPackagesFolder.WithFile("tool2new.dll").ToString());
+            loadedResolverCacheNewerVersion.Should().Contain(c =>
+                c.Name == "tool3" && c.Runner == "dotnet" &&
+                c.Executable.ToString() == nuGetGlobalPackagesFolder.WithFile("tool3new.dll").ToString());
+        }
+        
+        private static (DirectoryPath nuGetGlobalPackagesFolder, LocalToolsResolverCache localToolsResolverCache) Setup()
+        {
+            IFileSystem fileSystem = new FileSystemMockBuilder().UseCurrentSystemTemporaryDirectory().Build();
+            DirectoryPath tempDirectory =
+                new DirectoryPath(fileSystem.Directory.CreateTemporaryDirectory().DirectoryPath);
+            DirectoryPath cacheDirectory = tempDirectory.WithSubDirectories("cacheDirectory");
+            DirectoryPath nuGetGlobalPackagesFolder = tempDirectory.WithSubDirectories("nugetGlobalPackageLocation");
+            fileSystem.Directory.CreateDirectory(cacheDirectory.Value);
+            const int version = 1;
+
+            LocalToolsResolverCache localToolsResolverCache =
+                new LocalToolsResolverCache(fileSystem, cacheDirectory, version);
+            return (nuGetGlobalPackagesFolder, localToolsResolverCache);
+        }
     }
 
     // TODO WUL nochecin move to a different file
-    internal class LocalToolsResolverCache
-    {
-        private readonly DirectoryPath _cacheVersionedDirectory;
-        private readonly IFileSystem _fileSystem;
-
-        public LocalToolsResolverCache(IFileSystem fileSystem, DirectoryPath cacheDirectory, int version)
-        {
-            _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-            _cacheVersionedDirectory = cacheDirectory.WithSubDirectories(version.ToString());
-        }
-
-        public void Save(
-            PackageId packageId,
-            NuGetVersion version,
-            NuGetFramework targetFramework,
-            string runtimeIdentifier,
-            IReadOnlyList<CommandSettings> listOfCommandSettings,
-            DirectoryPath nuGetGlobalPackagesFolder)
-        {
-            EnsureFileStorageExists();
-            CacheRow serializableSchema = Convert(
-                version,
-                targetFramework,
-                runtimeIdentifier,
-                listOfCommandSettings,
-                nuGetGlobalPackagesFolder);
-
-            string json = JsonConvert.SerializeObject(new[] {serializableSchema});
-            _fileSystem.File.WriteAllText(GetCacheFile(packageId), json);
-        }
-
-        private string GetCacheFile(PackageId packageId)
-        {
-            return _cacheVersionedDirectory.WithFile(packageId.ToString()).Value;
-        }
-
-        private void EnsureFileStorageExists()
-        {
-            _fileSystem.Directory.CreateDirectory(_cacheVersionedDirectory.Value);
-        }
-
-        private static CacheRow Convert(NuGetVersion version,
-            NuGetFramework targetFramework,
-            string runtimeIdentifier,
-            IReadOnlyList<CommandSettings> listOfCommandSettings,
-            DirectoryPath nuGetGlobalPackagesFolder)
-        {
-            return new CacheRow
-            {
-                Version = version.ToNormalizedString(),
-                TargetFramework = targetFramework.GetShortFolderName(),
-                RuntimeIdentifier = runtimeIdentifier,
-                SerializableCommandSettingsArray =
-                    listOfCommandSettings.Select(s => new SerializableCommandSettings
-                    {
-                        Name = s.Name,
-                        Runner = s.Runner,
-                        RelativeToNuGetGlobalPackagesFolderPathToDll =
-                            Path.GetRelativePath(nuGetGlobalPackagesFolder.Value, s.Executable.Value)
-                    }).ToArray()
-            };
-        }
-
-        public IReadOnlyList<CommandSettings> Load(
-            PackageId packageId,
-            NuGetVersion version,
-            NuGetFramework targetFramework,
-            string runtimeIdentifier,
-            DirectoryPath nuGetGlobalPackagesFolder)
-        {
-            string packageCacheFile = GetCacheFile(packageId);
-            if (_fileSystem.File.Exists(packageCacheFile))
-            {
-                CacheRow[] cacheTable =
-                    JsonConvert.DeserializeObject<CacheRow[]>(_fileSystem.File.ReadAllText(packageCacheFile));
-
-                SerializableCommandSettings[] matchingCommandSettingsArray =
-                    cacheTable
-                        .SingleOrDefault(row => row.Version == version.ToNormalizedString() &&
-                                                row.TargetFramework == targetFramework.GetShortFolderName() &&
-                                                row.RuntimeIdentifier == runtimeIdentifier)
-                        ?.SerializableCommandSettingsArray;
-
-                if (matchingCommandSettingsArray != null)
-                {
-                    return matchingCommandSettingsArray.Select(
-                        serializableCommandSettings =>
-                            new CommandSettings(
-                                serializableCommandSettings.Name,
-                                serializableCommandSettings.Runner,
-                                nuGetGlobalPackagesFolder.WithFile(serializableCommandSettings
-                                    .RelativeToNuGetGlobalPackagesFolderPathToDll))
-                    ).ToArray();
-                }
-            }
-
-            return Array.Empty<CommandSettings>();
-        }
-
-        private class CacheRow
-        {
-            public string Version { get; set; }
-            public string TargetFramework { get; set; }
-            public string RuntimeIdentifier { get; set; }
-            public SerializableCommandSettings[] SerializableCommandSettingsArray { get; set; }
-        }
-
-        private class SerializableCommandSettings
-        {
-            public string Name { get; set; }
-            public string Runner { get; set; }
-            public string RelativeToNuGetGlobalPackagesFolderPathToDll { get; set; }
-        }
-    }
 }
 
 
