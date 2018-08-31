@@ -8,7 +8,9 @@ using Microsoft.DotNet.Tools.Test.Utilities;
 using Microsoft.Extensions.DependencyModel.Tests;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
+using NuGet.Frameworks;
 using NuGet.ProjectModel;
+using NuGet.Versioning;
 using Xunit;
 
 namespace Microsoft.DotNet.ToolPackage.Tests
@@ -30,12 +32,25 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 new LocalToolsResolverCache(fileSystem, cacheDirectory, version);
             IReadOnlyList<CommandSettings> listOfCommandSettings = new[]
             {
-                new CommandSettings("tool1", "dotnet", tempDirectory.WithFile("too1.dll")),
-                new CommandSettings("tool2", "dotnet", tempDirectory.WithFile("too1.dll"))
+                new CommandSettings("tool1", "dotnet", tempDirectory.WithFile("tool1.dll")),
+                new CommandSettings("tool2", "dotnet", tempDirectory.WithFile("tool2.dll"))
             };
+
+            var targetFramework = NuGetFramework.Parse("netcoreapp2.1");
+            var runtimeIdentifier = "any";
+            PackageId packageId = new PackageId("my.toolBundle");
+            NuGetVersion nuGetVersion =  NuGetVersion.Parse("1.0.2");
+            localToolsResolverCache.Save(packageId, nuGetVersion, targetFramework, runtimeIdentifier, listOfCommandSettings);
             
-            var targetFramework = new Targe
-            localToolsResolverCache.Save(listOfCommandSettings, );
+            IReadOnlyList<CommandSettings> loadedResolverCache = localToolsResolverCache.Load(packageId, nuGetVersion, targetFramework, runtimeIdentifier);
+
+            loadedResolverCache.Should().Contain(c =>
+                c.Name == "tool1" && c.Runner == "dotnet" &&
+                c.Executable.ToString() == tempDirectory.WithFile("too1.dll").ToString());
+            
+            loadedResolverCache.Should().Contain(c =>
+                c.Name == "tool2" && c.Runner == "dotnet" &&
+                c.Executable.ToString() == tempDirectory.WithFile("too2.dll").ToString());
         }
     }
 }
