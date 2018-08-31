@@ -27,7 +27,10 @@ namespace Microsoft.DotNet.Tools.Build
 
         public static BuildCommand FromArgs(string[] args, string msbuildPath = null)
         {
-            var msbuildArgs = new List<string>();
+            var msbuildArgs = new List<string>
+            {
+                "-nologo"
+            };
 
             var parser = Parser.Instance;
 
@@ -67,7 +70,7 @@ namespace Microsoft.DotNet.Tools.Build
             DebugHelper.HandleDebugSwitch(ref args);
 
             BuildCommand cmd;
-            
+
             try
             {
                 cmd = FromArgs(args);

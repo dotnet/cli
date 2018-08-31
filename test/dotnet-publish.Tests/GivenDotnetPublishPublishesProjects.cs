@@ -290,5 +290,29 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
                 .Should()
                 .Fail();
         }
+
+        [Fact]
+        public void QuietPublishDoesNotPrintVersionHeader()
+        {
+            var testInstance = TestAssets.Get("TestAppSimple")
+                .CreateInstance()
+                .WithSourceFiles();
+
+            var rootPath = testInstance.Root;
+
+            new BuildCommand()
+                .WithWorkingDirectory(rootPath)
+                .ExecuteWithCapturedOutput()
+                .Should()
+                .Pass();
+
+            var cmd = new PublishCommand()
+                .WithWorkingDirectory(rootPath)
+                .ExecuteWithCapturedOutput("--verbosity quiet");
+
+            cmd.Should().Pass();
+            cmd.StdOut.Should().NotContain("Microsoft (R) Build Engine version");
+            cmd.StdErr.Should().BeEmpty();
+        }
     }
 }
