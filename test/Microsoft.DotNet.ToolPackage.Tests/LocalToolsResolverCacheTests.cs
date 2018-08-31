@@ -19,8 +19,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
     public class LocalToolsResolverCacheTests : TestBase
     {
         [Fact]
-        public void
-            GivenListOfCommandSettingsAndTargetFrameworkAndRidAndCurrentNugetCacheLocationItCanWriteAndRetrieve()
+        public void GivenExecutableIdentifierItCanSaveAndLoad()
         {
             IFileSystem fileSystem = new FileSystemMockBuilder().UseCurrentSystemTemporaryDirectory().Build();
             DirectoryPath tempDirectory =
@@ -28,7 +27,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             DirectoryPath cacheDirectory = tempDirectory.WithSubDirectories("cacheDirectory");
             DirectoryPath nuGetGlobalPackagesFolder = tempDirectory.WithSubDirectories("nugetGlobalPackageLocation");
             fileSystem.Directory.CreateDirectory(cacheDirectory.Value);
-            int version = 1;
+            const int version = 1;
 
             LocalToolsResolverCache localToolsResolverCache =
                 new LocalToolsResolverCache(fileSystem, cacheDirectory, version);
@@ -62,17 +61,13 @@ namespace Microsoft.DotNet.ToolPackage.Tests
     // TODO WUL nochecin move to a different file
     internal class LocalToolsResolverCache
     {
-        private readonly DirectoryPath _cacheDirectory;
         private readonly DirectoryPath _cacheVersionedDirectory;
         private readonly IFileSystem _fileSystem;
-        private readonly int _version;
 
         public LocalToolsResolverCache(IFileSystem fileSystem, DirectoryPath cacheDirectory, int version)
         {
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-            _cacheDirectory = cacheDirectory;
-            _version = version;
-            _cacheVersionedDirectory = _cacheDirectory.WithSubDirectories(_version.ToString());
+            _cacheVersionedDirectory = cacheDirectory.WithSubDirectories(version.ToString());
         }
 
         public void Save(
@@ -100,13 +95,12 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             return _cacheVersionedDirectory.WithFile(packageId.ToString()).Value;
         }
 
-
         private void EnsureFileStorageExists()
         {
             _fileSystem.Directory.CreateDirectory(_cacheVersionedDirectory.Value);
         }
 
-        private CacheRow Convert(NuGetVersion version,
+        private static CacheRow Convert(NuGetVersion version,
             NuGetFramework targetFramework,
             string runtimeIdentifier,
             IReadOnlyList<CommandSettings> listOfCommandSettings,
@@ -141,11 +135,12 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 CacheRow[] cacheTable =
                     JsonConvert.DeserializeObject<CacheRow[]>(_fileSystem.File.ReadAllText(packageCacheFile));
 
-                SerializableCommandSettings[] matchingCommandSettingsArray = cacheTable
-                    .SingleOrDefault(row => row.Version == version.ToNormalizedString() &&
-                                            row.TargetFramework == targetFramework.GetShortFolderName() &&
-                                            row.RuntimeIdentifier == runtimeIdentifier)
-                    ?.SerializableCommandSettingsArray;
+                SerializableCommandSettings[] matchingCommandSettingsArray =
+                    cacheTable
+                        .SingleOrDefault(row => row.Version == version.ToNormalizedString() &&
+                                                row.TargetFramework == targetFramework.GetShortFolderName() &&
+                                                row.RuntimeIdentifier == runtimeIdentifier)
+                        ?.SerializableCommandSettingsArray;
 
                 if (matchingCommandSettingsArray != null)
                 {
