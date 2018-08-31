@@ -27,7 +27,10 @@ namespace Microsoft.DotNet.Tools.Publish
         {
             DebugHelper.HandleDebugSwitch(ref args);
 
-            var msbuildArgs = new List<string>();
+            var msbuildArgs = new List<string>
+            {
+                "-nologo"
+            };
 
             var parser = Parser.Instance;
 
