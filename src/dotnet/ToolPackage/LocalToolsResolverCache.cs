@@ -25,12 +25,13 @@ namespace Microsoft.DotNet.ToolPackage
 
         public void Save(
             CommandSettingsListId commandSettingsListId,
-            IReadOnlyList<CommandSettings> listOfCommandSettings,
+            IReadOnlyList<CommandSettings> commandSettingsList,
             DirectoryPath nuGetGlobalPackagesFolder)
         {
             EnsureFileStorageExists();
+
             CacheRow serializableSchema =
-                ConvertToCacheRow(commandSettingsListId, listOfCommandSettings, nuGetGlobalPackagesFolder);
+                ConvertToCacheRow(commandSettingsListId, commandSettingsList, nuGetGlobalPackagesFolder);
 
             string packageCacheFile = GetCacheFile(commandSettingsListId.PackageId);
 
@@ -45,10 +46,10 @@ namespace Microsoft.DotNet.ToolPackage
                     cacheTable,
                     out IReadOnlyList<CommandSettings> _))
                 {
-                    CacheRow[] mergedTable = cacheTable.Concat(new[] {serializableSchema}).ToArray();
                     _fileSystem.File.WriteAllText(
                         packageCacheFile,
-                        JsonConvert.SerializeObject(mergedTable));
+                        JsonConvert.SerializeObject(
+                            cacheTable.Concat(new[] {serializableSchema}).ToArray()));
                 }
             }
             else
@@ -58,63 +59,6 @@ namespace Microsoft.DotNet.ToolPackage
                     packageCacheFile,
                     json);
             }
-        }
-
-        private string GetCacheFile(PackageId packageId)
-        {
-            return _cacheVersionedDirectory.WithFile(packageId.ToString()).Value;
-        }
-
-        private void EnsureFileStorageExists()
-        {
-            _fileSystem.Directory.CreateDirectory(_cacheVersionedDirectory.Value);
-        }
-
-        private static CacheRow ConvertToCacheRow(
-            CommandSettingsListId commandSettingsListId,
-            IReadOnlyList<CommandSettings> listOfCommandSettings,
-            DirectoryPath nuGetGlobalPackagesFolder)
-        {
-            return new CacheRow
-            {
-                Version = commandSettingsListId.Version.ToNormalizedString(),
-                TargetFramework = commandSettingsListId.TargetFramework.GetShortFolderName(),
-                RuntimeIdentifier = commandSettingsListId.RuntimeIdentifier.ToLowerInvariant(),
-                SerializableCommandSettingsArray =
-                    listOfCommandSettings.Select(s => new SerializableCommandSettings
-                    {
-                        Name = s.Name,
-                        Runner = s.Runner,
-                        RelativeToNuGetGlobalPackagesFolderPathToDll =
-                            Path.GetRelativePath(nuGetGlobalPackagesFolder.Value, s.Executable.Value)
-                    }).ToArray()
-            };
-        }
-
-        private static
-            (CommandSettingsListId commandSettingsListId,
-            IReadOnlyList<CommandSettings> listOfCommandSettings)
-            Convert(
-                PackageId packageId,
-                CacheRow cacheRow,
-                DirectoryPath nuGetGlobalPackagesFolder)
-        {
-            CommandSettingsListId commandSettingsListId = new CommandSettingsListId(
-                packageId,
-                NuGetVersion.Parse(cacheRow.Version),
-                NuGetFramework.Parse(cacheRow.TargetFramework),
-                cacheRow.RuntimeIdentifier);
-
-            IReadOnlyList<CommandSettings> listOfCommandSettings =
-                cacheRow.SerializableCommandSettingsArray
-                    .Select(
-                        c => new CommandSettings(
-                            c.Name,
-                            c.Runner,
-                            nuGetGlobalPackagesFolder
-                                .WithFile(c.RelativeToNuGetGlobalPackagesFolderPathToDll))).ToArray();
-
-            return (commandSettingsListId, listOfCommandSettings);
         }
 
         public IReadOnlyList<CommandSettings> Load(CommandSettingsListId commandSettingsListId,
@@ -139,25 +83,85 @@ namespace Microsoft.DotNet.ToolPackage
             return Array.Empty<CommandSettings>();
         }
 
+
+        private string GetCacheFile(PackageId packageId)
+        {
+            return _cacheVersionedDirectory.WithFile(packageId.ToString()).Value;
+        }
+
+        private void EnsureFileStorageExists()
+        {
+            _fileSystem.Directory.CreateDirectory(_cacheVersionedDirectory.Value);
+        }
+
+        private static CacheRow ConvertToCacheRow(
+            CommandSettingsListId commandSettingsListId,
+            IReadOnlyList<CommandSettings> commandSettingsList,
+            DirectoryPath nuGetGlobalPackagesFolder)
+        {
+            return new CacheRow
+            {
+                Version = commandSettingsListId.Version.ToNormalizedString(),
+                TargetFramework = commandSettingsListId.TargetFramework.GetShortFolderName(),
+                RuntimeIdentifier = commandSettingsListId.RuntimeIdentifier.ToLowerInvariant(),
+                SerializableCommandSettingsArray =
+                    commandSettingsList.Select(s => new SerializableCommandSettings
+                    {
+                        Name = s.Name,
+                        Runner = s.Runner,
+                        RelativeToNuGetGlobalPackagesFolderPathToDll =
+                            Path.GetRelativePath(nuGetGlobalPackagesFolder.Value, s.Executable.Value)
+                    }).ToArray()
+            };
+        }
+
+        private static
+            (CommandSettingsListId commandSettingsListId,
+            IReadOnlyList<CommandSettings> commandSettingsList)
+            Convert(
+                PackageId packageId,
+                CacheRow cacheRow,
+                DirectoryPath nuGetGlobalPackagesFolder)
+        {
+            CommandSettingsListId commandSettingsListId = new CommandSettingsListId(
+                packageId,
+                NuGetVersion.Parse(cacheRow.Version),
+                NuGetFramework.Parse(cacheRow.TargetFramework),
+                cacheRow.RuntimeIdentifier);
+
+            IReadOnlyList<CommandSettings> commandSettingsList =
+                cacheRow.SerializableCommandSettingsArray
+                    .Select(
+                        c => new CommandSettings(
+                            c.Name,
+                            c.Runner,
+                            nuGetGlobalPackagesFolder
+                                .WithFile(c.RelativeToNuGetGlobalPackagesFolderPathToDll))).ToArray();
+
+            return (commandSettingsListId, commandSettingsList);
+        }
+
         private static bool TryGetMatchingCommandSettingsList(
             CommandSettingsListId commandSettingsListId,
             DirectoryPath nuGetGlobalPackagesFolder,
-            CacheRow[] cacheTable, out IReadOnlyList<CommandSettings> commandSettingsList)
+            CacheRow[] cacheTable,
+            out IReadOnlyList<CommandSettings> commandSettingsList)
         {
             (CommandSettingsListId commandSettingsListId,
-                IReadOnlyList<CommandSettings> listOfCommandSettings)[]
+                IReadOnlyList<CommandSettings> commandSettingsList)[]
                 matchingRow = cacheTable
                     .Select(c => Convert(commandSettingsListId.PackageId, c, nuGetGlobalPackagesFolder))
                     .Where(candidate => candidate.commandSettingsListId == commandSettingsListId).ToArray();
 
-            if (matchingRow.Length > 2)
+            if (matchingRow.Length >= 2)
             {
-                throw new CacheInconsistentException($"more than one row for {commandSettingsListId.DebugToString()}");
+                throw new ResolverCacheInconsistentException(
+                    $"more than one row for {commandSettingsListId.DebugToString()}");
             }
 
             if (matchingRow.Length == 1)
             {
-                commandSettingsList = matchingRow[0].listOfCommandSettings;
+                commandSettingsList = matchingRow[0].commandSettingsList;
                 return true;
             }
 
@@ -181,9 +185,9 @@ namespace Microsoft.DotNet.ToolPackage
         }
     }
 
-    internal class CacheInconsistentException : Exception
+    internal class ResolverCacheInconsistentException : Exception
     {
-        public CacheInconsistentException(string message) : base(message)
+        public ResolverCacheInconsistentException(string message) : base(message)
         {
         }
     }

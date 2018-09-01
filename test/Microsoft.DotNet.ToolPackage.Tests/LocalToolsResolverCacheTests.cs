@@ -31,6 +31,11 @@ namespace Microsoft.DotNet.ToolPackage.Tests
             return (nuGetGlobalPackagesFolder, localToolsResolverCache);
         }
 
+        [Fact(Skip = "Pending")]
+        public void GivenDifferentResolverCacheVersionItCannotSaveAndLoad()
+        {
+        }
+
 
         [Fact]
         public void GivenExecutableIdentifierItCanSaveAndCannotLoadWithMismatches()
@@ -192,20 +197,15 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 c.Name == "tool3" && c.Runner == "dotnet" &&
                 c.Executable.ToString() == nuGetGlobalPackagesFolder.WithFile("tool3new.dll").ToString());
         }
+
+        [Fact(Skip = "Pending")]
+        public void GivenExecutableIdentifierRangeItCanSaveAndLoad()
+        {
+        }
+
+        [Fact(Skip = "Pending")]
+        public void ItShouldHandlePotentialCorruption()
+        {
+        }
     }
-
-    // TODO WUL nochecin move to a different file
 }
-
-
-//given IReadOnlyList<CommandSettings> target frameowork and rid and current nuget cache location. it can write it down 
-//
-//give it package id, package version, command name, target frameowork and rid, it can give back commandsettings 
-//
-//give it package id, package version range, command name, target frameowork and rid, it can give back 
-//
-//different version of resolver cache is different. cannot resolve each other's cache 
-
-// only save diff
-
-// handle read and write concurrency
