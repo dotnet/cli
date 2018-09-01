@@ -62,5 +62,11 @@ namespace Microsoft.DotNet.ToolPackage
         {
             return !(id1 == id2);
         }
+
+        public string DebugToString()
+        {
+            return
+                $"{PackageId}-{Version.ToNormalizedString()}-{TargetFramework.GetShortFolderName()}-{RuntimeIdentifier}";
+        }
     }
 }

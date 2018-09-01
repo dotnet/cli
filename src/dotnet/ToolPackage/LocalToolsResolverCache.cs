@@ -8,7 +8,6 @@ using System.Linq;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using Newtonsoft.Json;
 using NuGet.Frameworks;
-using NuGet.Packaging.Signing;
 using NuGet.Versioning;
 
 namespace Microsoft.DotNet.ToolPackage
@@ -39,13 +38,12 @@ namespace Microsoft.DotNet.ToolPackage
             {
                 CacheRow[] cacheTable =
                     JsonConvert.DeserializeObject<CacheRow[]>(_fileSystem.File.ReadAllText(packageCacheFile));
-                bool cacheRowExists =
-                    GetMatchingCommandSettingsArray(commandSettingsListId.Version,
-                        commandSettingsListId.TargetFramework,
-                        commandSettingsListId.RuntimeIdentifier,
-                        cacheTable) != null;
 
-                if (!cacheRowExists)
+                if (!TryGetMatchingCommandSettingsList(
+                    commandSettingsListId,
+                    nuGetGlobalPackagesFolder,
+                    cacheTable,
+                    out IReadOnlyList<CommandSettings> _))
                 {
                     CacheRow[] mergedTable = cacheTable.Concat(new[] {serializableSchema}).ToArray();
                     _fileSystem.File.WriteAllText(
@@ -93,12 +91,13 @@ namespace Microsoft.DotNet.ToolPackage
             };
         }
 
-        private static 
-            (CommandSettingsListId commandSettingsListId, 
-            IReadOnlyList<CommandSettings> listOfCommandSettings) Convert(
-            PackageId packageId,
-            CacheRow cacheRow,
-            DirectoryPath nuGetGlobalPackagesFolder)
+        private static
+            (CommandSettingsListId commandSettingsListId,
+            IReadOnlyList<CommandSettings> listOfCommandSettings)
+            Convert(
+                PackageId packageId,
+                CacheRow cacheRow,
+                DirectoryPath nuGetGlobalPackagesFolder)
         {
             CommandSettingsListId commandSettingsListId = new CommandSettingsListId(
                 packageId,
@@ -118,8 +117,6 @@ namespace Microsoft.DotNet.ToolPackage
             return (commandSettingsListId, listOfCommandSettings);
         }
 
-        // TODO ALL == should be invarianat and extract version, TargetFramework, RuntimeIdentifier for it
-
         public IReadOnlyList<CommandSettings> Load(CommandSettingsListId commandSettingsListId,
             DirectoryPath nuGetGlobalPackagesFolder)
         {
@@ -129,26 +126,43 @@ namespace Microsoft.DotNet.ToolPackage
                 CacheRow[] cacheTable =
                     JsonConvert.DeserializeObject<CacheRow[]>(_fileSystem.File.ReadAllText(packageCacheFile));
 
-                return cacheTable
-                    .Select(c => Convert(commandSettingsListId.PackageId, c, nuGetGlobalPackagesFolder))
-                    .Where(candidate => candidate.commandSettingsListId == commandSettingsListId)
-                    .SelectMany(matchingRow => matchingRow.listOfCommandSettings)
-                    .ToArray();
+                if (TryGetMatchingCommandSettingsList(
+                    commandSettingsListId,
+                    nuGetGlobalPackagesFolder,
+                    cacheTable,
+                    out IReadOnlyList<CommandSettings> commandSettingsList))
+                {
+                    return commandSettingsList;
+                }
             }
 
             return Array.Empty<CommandSettings>();
         }
 
-        private static SerializableCommandSettings[] GetMatchingCommandSettingsArray(NuGetVersion version,
-            NuGetFramework targetFramework, string runtimeIdentifier, CacheRow[] cacheTable)
+        private static bool TryGetMatchingCommandSettingsList(
+            CommandSettingsListId commandSettingsListId,
+            DirectoryPath nuGetGlobalPackagesFolder,
+            CacheRow[] cacheTable, out IReadOnlyList<CommandSettings> commandSettingsList)
         {
-            SerializableCommandSettings[] matchingCommandSettingsArray =
-                cacheTable
-                    .SingleOrDefault(row => row.Version == version.ToNormalizedString() &&
-                                            row.TargetFramework == targetFramework.GetShortFolderName() &&
-                                            row.RuntimeIdentifier == runtimeIdentifier)
-                    ?.SerializableCommandSettingsArray;
-            return matchingCommandSettingsArray;
+            (CommandSettingsListId commandSettingsListId,
+                IReadOnlyList<CommandSettings> listOfCommandSettings)[]
+                matchingRow = cacheTable
+                    .Select(c => Convert(commandSettingsListId.PackageId, c, nuGetGlobalPackagesFolder))
+                    .Where(candidate => candidate.commandSettingsListId == commandSettingsListId).ToArray();
+
+            if (matchingRow.Length > 2)
+            {
+                throw new CacheInconsistentException($"more than one row for {commandSettingsListId.DebugToString()}");
+            }
+
+            if (matchingRow.Length == 1)
+            {
+                commandSettingsList = matchingRow[0].listOfCommandSettings;
+                return true;
+            }
+
+            commandSettingsList = null;
+            return false;
         }
 
         private class CacheRow
@@ -164,6 +178,13 @@ namespace Microsoft.DotNet.ToolPackage
             public string Name { get; set; }
             public string Runner { get; set; }
             public string RelativeToNuGetGlobalPackagesFolderPathToDll { get; set; }
+        }
+    }
+
+    internal class CacheInconsistentException : Exception
+    {
+        public CacheInconsistentException(string message) : base(message)
+        {
         }
     }
 }
