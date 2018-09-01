@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.ToolPackage
     /// <summary>
     ///     Given the following parameter, a listOfCommandSettings of a NuGet package can be uniquely identified
     /// </summary>
-    internal class CommandSettingsListId
+    internal class CommandSettingsListId : IEquatable<CommandSettingsListId>
     {
         public CommandSettingsListId(
             PackageId packageId,
@@ -30,6 +30,38 @@ namespace Microsoft.DotNet.ToolPackage
         public NuGetVersion Version { get; }
         public NuGetFramework TargetFramework { get; }
         public string RuntimeIdentifier { get; }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as CommandSettingsListId);
+        }
+
+        public bool Equals(CommandSettingsListId other)
+        {
+            return other != null &&
+                   PackageId.Equals(other.PackageId) &&
+                   EqualityComparer<NuGetVersion>.Default.Equals(Version, other.Version) &&
+                   EqualityComparer<NuGetFramework>.Default.Equals(TargetFramework, other.TargetFramework) &&
+                   string.Equals(
+                       RuntimeIdentifier,
+                       other.RuntimeIdentifier,
+                       StringComparison.OrdinalIgnoreCase);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(PackageId, Version, TargetFramework, StringComparer.OrdinalIgnoreCase.GetHashCode(RuntimeIdentifier));
+        }
+
+        public static bool operator ==(CommandSettingsListId id1, CommandSettingsListId id2)
+        {
+            return EqualityComparer<CommandSettingsListId>.Default.Equals(id1, id2);
+        }
+
+        public static bool operator !=(CommandSettingsListId id1, CommandSettingsListId id2)
+        {
+            return !(id1 == id2);
+        }
     }
 
     internal class LocalToolsResolverCache
