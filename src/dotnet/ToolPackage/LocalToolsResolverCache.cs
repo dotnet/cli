@@ -95,6 +95,8 @@ namespace Microsoft.DotNet.ToolPackage
             };
         }
 
+        // TODO ALL == should be invarianat and extract version, TargetFramework, RuntimeIdentifier for it
+
         public IReadOnlyList<CommandSettings> Load(
             PackageId packageId,
             NuGetVersion version,
