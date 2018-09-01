@@ -1,3 +1,6 @@
+// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -5,65 +8,11 @@ using System.Linq;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using Newtonsoft.Json;
 using NuGet.Frameworks;
+using NuGet.Packaging.Signing;
 using NuGet.Versioning;
 
 namespace Microsoft.DotNet.ToolPackage
 {
-    /// <summary>
-    ///     Given the following parameter, a listOfCommandSettings of a NuGet package can be uniquely identified
-    /// </summary>
-    internal class CommandSettingsListId : IEquatable<CommandSettingsListId>
-    {
-        public CommandSettingsListId(
-            PackageId packageId,
-            NuGetVersion version,
-            NuGetFramework targetFramework,
-            string runtimeIdentifier)
-        {
-            PackageId = packageId;
-            Version = version ?? throw new ArgumentException(nameof(version));
-            TargetFramework = targetFramework ?? throw new ArgumentException(nameof(targetFramework));
-            RuntimeIdentifier = runtimeIdentifier ?? throw new ArgumentException(nameof(runtimeIdentifier));
-        }
-
-        public PackageId PackageId { get; }
-        public NuGetVersion Version { get; }
-        public NuGetFramework TargetFramework { get; }
-        public string RuntimeIdentifier { get; }
-
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as CommandSettingsListId);
-        }
-
-        public bool Equals(CommandSettingsListId other)
-        {
-            return other != null &&
-                   PackageId.Equals(other.PackageId) &&
-                   EqualityComparer<NuGetVersion>.Default.Equals(Version, other.Version) &&
-                   EqualityComparer<NuGetFramework>.Default.Equals(TargetFramework, other.TargetFramework) &&
-                   string.Equals(
-                       RuntimeIdentifier,
-                       other.RuntimeIdentifier,
-                       StringComparison.OrdinalIgnoreCase);
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(PackageId, Version, TargetFramework, StringComparer.OrdinalIgnoreCase.GetHashCode(RuntimeIdentifier));
-        }
-
-        public static bool operator ==(CommandSettingsListId id1, CommandSettingsListId id2)
-        {
-            return EqualityComparer<CommandSettingsListId>.Default.Equals(id1, id2);
-        }
-
-        public static bool operator !=(CommandSettingsListId id1, CommandSettingsListId id2)
-        {
-            return !(id1 == id2);
-        }
-    }
-
     internal class LocalToolsResolverCache
     {
         private readonly DirectoryPath _cacheVersionedDirectory;
@@ -81,12 +30,8 @@ namespace Microsoft.DotNet.ToolPackage
             DirectoryPath nuGetGlobalPackagesFolder)
         {
             EnsureFileStorageExists();
-            CacheRow serializableSchema = Convert(
-                commandSettingsListId.Version,
-                commandSettingsListId.TargetFramework,
-                commandSettingsListId.RuntimeIdentifier,
-                listOfCommandSettings,
-                nuGetGlobalPackagesFolder);
+            CacheRow serializableSchema =
+                ConvertToCacheRow(commandSettingsListId, listOfCommandSettings, nuGetGlobalPackagesFolder);
 
             string packageCacheFile = GetCacheFile(commandSettingsListId.PackageId);
 
@@ -127,17 +72,16 @@ namespace Microsoft.DotNet.ToolPackage
             _fileSystem.Directory.CreateDirectory(_cacheVersionedDirectory.Value);
         }
 
-        private static CacheRow Convert(NuGetVersion version,
-            NuGetFramework targetFramework,
-            string runtimeIdentifier,
+        private static CacheRow ConvertToCacheRow(
+            CommandSettingsListId commandSettingsListId,
             IReadOnlyList<CommandSettings> listOfCommandSettings,
             DirectoryPath nuGetGlobalPackagesFolder)
         {
             return new CacheRow
             {
-                Version = version.ToNormalizedString(),
-                TargetFramework = targetFramework.GetShortFolderName(),
-                RuntimeIdentifier = runtimeIdentifier.ToLowerInvariant(),
+                Version = commandSettingsListId.Version.ToNormalizedString(),
+                TargetFramework = commandSettingsListId.TargetFramework.GetShortFolderName(),
+                RuntimeIdentifier = commandSettingsListId.RuntimeIdentifier.ToLowerInvariant(),
                 SerializableCommandSettingsArray =
                     listOfCommandSettings.Select(s => new SerializableCommandSettings
                     {
@@ -149,35 +93,47 @@ namespace Microsoft.DotNet.ToolPackage
             };
         }
 
-        // TODO ALL == should be invarianat and extract version, TargetFramework, RuntimeIdentifier for it
-
-        public IReadOnlyList<CommandSettings> Load(
+        private static 
+            (CommandSettingsListId commandSettingsListId, 
+            IReadOnlyList<CommandSettings> listOfCommandSettings) Convert(
             PackageId packageId,
-            NuGetVersion version,
-            NuGetFramework targetFramework,
-            string runtimeIdentifier,
+            CacheRow cacheRow,
             DirectoryPath nuGetGlobalPackagesFolder)
         {
-            string packageCacheFile = GetCacheFile(packageId);
+            CommandSettingsListId commandSettingsListId = new CommandSettingsListId(
+                packageId,
+                NuGetVersion.Parse(cacheRow.Version),
+                NuGetFramework.Parse(cacheRow.TargetFramework),
+                cacheRow.RuntimeIdentifier);
+
+            IReadOnlyList<CommandSettings> listOfCommandSettings =
+                cacheRow.SerializableCommandSettingsArray
+                    .Select(
+                        c => new CommandSettings(
+                            c.Name,
+                            c.Runner,
+                            nuGetGlobalPackagesFolder
+                                .WithFile(c.RelativeToNuGetGlobalPackagesFolderPathToDll))).ToArray();
+
+            return (commandSettingsListId, listOfCommandSettings);
+        }
+
+        // TODO ALL == should be invarianat and extract version, TargetFramework, RuntimeIdentifier for it
+
+        public IReadOnlyList<CommandSettings> Load(CommandSettingsListId commandSettingsListId,
+            DirectoryPath nuGetGlobalPackagesFolder)
+        {
+            string packageCacheFile = GetCacheFile(commandSettingsListId.PackageId);
             if (_fileSystem.File.Exists(packageCacheFile))
             {
                 CacheRow[] cacheTable =
                     JsonConvert.DeserializeObject<CacheRow[]>(_fileSystem.File.ReadAllText(packageCacheFile));
 
-                SerializableCommandSettings[] matchingCommandSettingsArray =
-                    GetMatchingCommandSettingsArray(version, targetFramework, runtimeIdentifier, cacheTable);
-
-                if (matchingCommandSettingsArray != null)
-                {
-                    return matchingCommandSettingsArray.Select(
-                        serializableCommandSettings =>
-                            new CommandSettings(
-                                serializableCommandSettings.Name,
-                                serializableCommandSettings.Runner,
-                                nuGetGlobalPackagesFolder.WithFile(serializableCommandSettings
-                                    .RelativeToNuGetGlobalPackagesFolderPathToDll))
-                    ).ToArray();
-                }
+                return cacheTable
+                    .Select(c => Convert(commandSettingsListId.PackageId, c, nuGetGlobalPackagesFolder))
+                    .Where(candidate => candidate.commandSettingsListId == commandSettingsListId)
+                    .SelectMany(matchingRow => matchingRow.listOfCommandSettings)
+                    .ToArray();
             }
 
             return Array.Empty<CommandSettings>();
