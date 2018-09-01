@@ -47,8 +47,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 new CommandSettings("tool2", "dotnet", nuGetGlobalPackagesFolder.WithFile("tool2.dll"))
             };
 
-            localToolsResolverCache.Save(packageId, nuGetVersion, targetFramework, runtimeIdentifier,
-                listOfCommandSettings, nuGetGlobalPackagesFolder);
+            localToolsResolverCache.Save(new CommandSettingsListId(packageId, nuGetVersion, targetFramework, runtimeIdentifier), listOfCommandSettings, nuGetGlobalPackagesFolder);
 
             localToolsResolverCache.Load(
                     packageId,
@@ -89,8 +88,7 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 new CommandSettings("tool2", "dotnet", nuGetGlobalPackagesFolder.WithFile("tool2.dll"))
             };
 
-            localToolsResolverCache.Save(packageId, nuGetVersion, targetFramework, runtimeIdentifier,
-                listOfCommandSettings, nuGetGlobalPackagesFolder);
+            localToolsResolverCache.Save(new CommandSettingsListId(packageId, nuGetVersion, targetFramework, runtimeIdentifier), listOfCommandSettings, nuGetGlobalPackagesFolder);
 
             IReadOnlyList<CommandSettings> loadedResolverCache =
                 localToolsResolverCache.Load(packageId, nuGetVersion, targetFramework, runtimeIdentifier,
@@ -119,10 +117,8 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 new CommandSettings("tool2", "dotnet", nuGetGlobalPackagesFolder.WithFile("tool2.dll"))
             };
 
-            localToolsResolverCache.Save(packageId, nuGetVersion, targetFramework, runtimeIdentifier,
-                listOfCommandSettings, nuGetGlobalPackagesFolder);
-            localToolsResolverCache.Save(packageId, nuGetVersion, targetFramework, runtimeIdentifier,
-                listOfCommandSettings, nuGetGlobalPackagesFolder);
+            localToolsResolverCache.Save(new CommandSettingsListId(packageId, nuGetVersion, targetFramework, runtimeIdentifier), listOfCommandSettings, nuGetGlobalPackagesFolder);
+            localToolsResolverCache.Save(new CommandSettingsListId(packageId, nuGetVersion, targetFramework, runtimeIdentifier), listOfCommandSettings, nuGetGlobalPackagesFolder);
 
             IReadOnlyList<CommandSettings> loadedResolverCache =
                 localToolsResolverCache.Load(packageId, nuGetVersion, targetFramework, runtimeIdentifier,
@@ -159,10 +155,8 @@ namespace Microsoft.DotNet.ToolPackage.Tests
                 new CommandSettings("tool3", "dotnet", nuGetGlobalPackagesFolder.WithFile("tool3new.dll"))
             };
 
-            localToolsResolverCache.Save(packageId, nuGetVersion, targetFramework, runtimeIdentifier,
-                listOfCommandSettings, nuGetGlobalPackagesFolder);
-            localToolsResolverCache.Save(packageId, newerNuGetVersion, targetFramework, runtimeIdentifier,
-                listOfCommandSettings2, nuGetGlobalPackagesFolder);
+            localToolsResolverCache.Save(new CommandSettingsListId(packageId, nuGetVersion, targetFramework, runtimeIdentifier), listOfCommandSettings, nuGetGlobalPackagesFolder);
+            localToolsResolverCache.Save(new CommandSettingsListId(packageId, newerNuGetVersion, targetFramework, runtimeIdentifier), listOfCommandSettings2, nuGetGlobalPackagesFolder);
 
             IReadOnlyList<CommandSettings> loadedResolverCacheOlderVersion =
                 localToolsResolverCache.Load(packageId, nuGetVersion, targetFramework, runtimeIdentifier,

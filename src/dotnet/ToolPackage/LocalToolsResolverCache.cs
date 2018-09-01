@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.DotNet.ToolPackage;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using Newtonsoft.Json;
 using NuGet.Frameworks;
@@ -10,6 +9,29 @@ using NuGet.Versioning;
 
 namespace Microsoft.DotNet.ToolPackage
 {
+    /// <summary>
+    ///     Given the following parameter, a listOfCommandSettings of a NuGet package can be uniquely identified
+    /// </summary>
+    internal class CommandSettingsListId
+    {
+        public CommandSettingsListId(
+            PackageId packageId,
+            NuGetVersion version,
+            NuGetFramework targetFramework,
+            string runtimeIdentifier)
+        {
+            PackageId = packageId;
+            Version = version ?? throw new ArgumentException(nameof(version));
+            TargetFramework = targetFramework ?? throw new ArgumentException(nameof(targetFramework));
+            RuntimeIdentifier = runtimeIdentifier ?? throw new ArgumentException(nameof(runtimeIdentifier));
+        }
+
+        public PackageId PackageId { get; }
+        public NuGetVersion Version { get; }
+        public NuGetFramework TargetFramework { get; }
+        public string RuntimeIdentifier { get; }
+    }
+
     internal class LocalToolsResolverCache
     {
         private readonly DirectoryPath _cacheVersionedDirectory;
@@ -22,33 +44,33 @@ namespace Microsoft.DotNet.ToolPackage
         }
 
         public void Save(
-            PackageId packageId,
-            NuGetVersion version,
-            NuGetFramework targetFramework,
-            string runtimeIdentifier,
+            CommandSettingsListId commandSettingsListId,
             IReadOnlyList<CommandSettings> listOfCommandSettings,
             DirectoryPath nuGetGlobalPackagesFolder)
         {
             EnsureFileStorageExists();
             CacheRow serializableSchema = Convert(
-                version,
-                targetFramework,
-                runtimeIdentifier,
+                commandSettingsListId.Version,
+                commandSettingsListId.TargetFramework,
+                commandSettingsListId.RuntimeIdentifier,
                 listOfCommandSettings,
                 nuGetGlobalPackagesFolder);
 
-            string packageCacheFile = GetCacheFile(packageId);
+            string packageCacheFile = GetCacheFile(commandSettingsListId.PackageId);
 
             if (_fileSystem.File.Exists(packageCacheFile))
             {
                 CacheRow[] cacheTable =
                     JsonConvert.DeserializeObject<CacheRow[]>(_fileSystem.File.ReadAllText(packageCacheFile));
-                var cacheRowExists =
-                    GetMatchingCommandSettingsArray(version, targetFramework, runtimeIdentifier, cacheTable) != null;
+                bool cacheRowExists =
+                    GetMatchingCommandSettingsArray(commandSettingsListId.Version,
+                        commandSettingsListId.TargetFramework,
+                        commandSettingsListId.RuntimeIdentifier,
+                        cacheTable) != null;
 
                 if (!cacheRowExists)
                 {
-                    var mergedTable = cacheTable.Concat(new[] {serializableSchema}).ToArray();
+                    CacheRow[] mergedTable = cacheTable.Concat(new[] {serializableSchema}).ToArray();
                     _fileSystem.File.WriteAllText(
                         packageCacheFile,
                         JsonConvert.SerializeObject(mergedTable));
