@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.EnvironmentAbstractions;
 
-internal interface IToolPackageUninstaller
+namespace Microsoft.DotNet.ToolPackage
 {
-    void Uninstall(DirectoryPath packageDirectory);
+    internal interface IToolPackageUninstaller
+    {
+        void Uninstall(DirectoryPath packageDirectory);
+    }
 }
