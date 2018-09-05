@@ -183,7 +183,7 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 throw new NotImplementedException();
             }
 
-            public IEnumerable<string> EnumerateAllFiles(string path)
+            public IEnumerable<string> EnumerateFiles(string path)
             {
                 throw new NotImplementedException();
             }

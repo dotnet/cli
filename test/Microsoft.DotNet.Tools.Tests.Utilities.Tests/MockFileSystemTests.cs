@@ -423,7 +423,7 @@ namespace Microsoft.DotNet.Tools.Tests.Utilities.Tests
             string directory = fileSystem.Directory.CreateTemporaryDirectory().DirectoryPath;
             string nonExistDirectory = Path.Combine(directory, Path.GetRandomFileName(), Path.GetRandomFileName());
 
-            Action a = () => fileSystem.Directory.EnumerateAllFiles(nonExistDirectory);
+            Action a = () => fileSystem.Directory.EnumerateFiles(nonExistDirectory);
 
             a.ShouldThrow<DirectoryNotFoundException>().And.Message.Should()
                 .Contain("Could not find a part of the path");
@@ -439,7 +439,7 @@ namespace Microsoft.DotNet.Tools.Tests.Utilities.Tests
             string wrongFilePath = Path.Combine(directory, Path.GetRandomFileName());
             fileSystem.File.CreateEmptyFile(wrongFilePath);
 
-            Action a = () => fileSystem.Directory.EnumerateAllFiles(wrongFilePath).ToArray();
+            Action a = () => fileSystem.Directory.EnumerateFiles(wrongFilePath).ToArray();
 
             // On Windows: The parameter is incorrect
             // On Linux: Not a directory
@@ -457,7 +457,7 @@ namespace Microsoft.DotNet.Tools.Tests.Utilities.Tests
             string emptyDirectory = Path.Combine(tempDirectory, Path.GetRandomFileName());
             fileSystem.Directory.CreateDirectory(emptyDirectory);
 
-            fileSystem.Directory.EnumerateAllFiles(emptyDirectory).Should().BeEmpty();
+            fileSystem.Directory.EnumerateFiles(emptyDirectory).Should().BeEmpty();
         }
 
         [Theory]
@@ -475,8 +475,8 @@ namespace Microsoft.DotNet.Tools.Tests.Utilities.Tests
             fileSystem.File.CreateEmptyFile(file1);
             fileSystem.File.CreateEmptyFile(file2);
 
-            fileSystem.Directory.EnumerateAllFiles(testDirectory).Should().Contain(file1);
-            fileSystem.Directory.EnumerateAllFiles(testDirectory).Should().Contain(file2);
+            fileSystem.Directory.EnumerateFiles(testDirectory).Should().Contain(file1);
+            fileSystem.Directory.EnumerateFiles(testDirectory).Should().Contain(file2);
         }
 
 
