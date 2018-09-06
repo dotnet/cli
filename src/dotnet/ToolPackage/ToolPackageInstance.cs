@@ -127,7 +127,7 @@ namespace Microsoft.DotNet.ToolPackage
             try
             {
                 var library = FindLibraryInLockFile(_lockFile.Value);
-                return DeserializeToolConfiguration(ToolSettingsFileName, library);
+                return DeserializeToolConfiguration(library);
             }
             catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
             {
@@ -187,11 +187,9 @@ namespace Microsoft.DotNet.ToolPackage
             }
         }
 
-        private ToolConfiguration DeserializeToolConfiguration(
-            string toolSettingsFileName,
-            LockFileTargetLibrary library)
+        private ToolConfiguration DeserializeToolConfiguration(LockFileTargetLibrary library)
         {
-            var dotnetToolSettings = FindItemInTargetLibrary(library, toolSettingsFileName);
+            var dotnetToolSettings = FindItemInTargetLibrary(library, ToolSettingsFileName);
             if (dotnetToolSettings == null)
             {
                 throw new ToolConfigurationException(
