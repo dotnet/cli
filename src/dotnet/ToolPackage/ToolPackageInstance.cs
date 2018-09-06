@@ -1,3 +1,6 @@
+// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using System.IO;
 using System.Linq;
@@ -184,9 +187,11 @@ namespace Microsoft.DotNet.ToolPackage
             }
         }
 
-        private ToolConfiguration DeserializeToolConfiguration(string ToolSettingsFileName, LockFileTargetLibrary library)
+        private ToolConfiguration DeserializeToolConfiguration(
+            string toolSettingsFileName,
+            LockFileTargetLibrary library)
         {
-            var dotnetToolSettings = FindItemInTargetLibrary(library, ToolSettingsFileName);
+            var dotnetToolSettings = FindItemInTargetLibrary(library, toolSettingsFileName);
             if (dotnetToolSettings == null)
             {
                 throw new ToolConfigurationException(
