@@ -13,6 +13,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.DotNet.VersionTools" Version="$(VersionToolsVersion)" />
+    <PackageReference Include="Nuget.Versioning" Version="4.5.0" />
+    <PackageReference Include="Nuget.Packaging.Core" Version="4.5.0" />
   </ItemGroup>
 
 </Project>
