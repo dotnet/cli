@@ -7,6 +7,7 @@ for %%i in (%~dp0..\) DO (
     SET CLI_REPO_ROOT=%%~dpi
 )
 
+
 title CLI Test (%CLI_REPO_ROOT%)
 
 REM Add Stage 2 CLI to path
