@@ -166,7 +166,6 @@ Only dependencies with a `type` value of `package` should be considered by the h
 ### `libraries` Section (`.deps.json`)
 
 This section contains a union of all the dependencies found in the various targets, and contains common metadata for them. Specifically, it contains the `type`, as well as a boolean indicating if the library can be serviced (`serviceable`, only for `package`-typed libraries) and a SHA-512 hash of the package file (`sha512`, only for `package`-typed libraries.
-
 ## How the file is used
 
 The file is read by two different components:
@@ -199,6 +198,24 @@ In the framework-dependent deployment model, the `*.runtimeConfig.json` file wil
 ```
 
 This data is used to locate the shared framework folder. The exact mechanics of which version are selected are defined elsewhere, but in general, it locates the shared runtime in the `shared` folder located beside it by using the relative path `shared/[runtimeOptions.framework.name]/[runtimeOptions.framework.version]`. Once it has applied any version roll-forward logic and come to a final path to the shared framework, it locates the `[runtimeOptions.framework.name].deps.json` file within that folder and loads it **first**.
+
+Note, starting with 3.0, the "framework" section is optional and a new "frameworks" section supports multiple frameworks:
+```json
+{
+    "runtimeOptions": {
+        "frameworks": [
+            {
+                "name": "Microsoft.AspNetCore.All",
+                "version": "3.0.0"
+            },
+            {
+                "name": "Microsoft.Forms",
+                "version": "3.0.0"
+            }
+        ]
+    }
+}
+```
 
 Next, the deps file from the application is loaded and merged into this deps file (this is conceptual, the host implementation doesn't necessary have to directly merge the data ;)). Data from the app-local deps file trumps data from the shared framework.
 
@@ -287,52 +304,3 @@ When setting up the TPA and native library lists, it will do the following for t
 Note one important aspect about asset resolution: The resolution scope is **per-package**, **not per-application**, **nor per-asset**. For each individual package, the most appropriate RID is selected, and **all** assets taken from that package must match the selected RID exactly. For example, if a package provides both a `linux-x64` and a `unix` RID (in the `ubuntu.14.04-x64` example above), **only** the `linux-x64` asset would be selected for that package. However, if a different package provides only a `unix` RID, then the asset from the `unix` RID would be selected.
 
 The path to a runtime-specific asset is resolved in the same way as a normal asset (first check Servicing, then Package Cache, App-Local, Global Packages Location, etc.) with **one exception**. When searching app-local, rather than just looking for the simple file name in the app-local directory, a runtime-specific asset is expected to be located in a subdirectory matching the relative path information for that asset in the lock file. So the `native` `sni.dll` asset for `win7-x64` in the `System.Data.SqlClient` example above would be located at `APPROOT/runtimes/win7-x64/native/sni.dll`, rather than the normal app-local path of `APPROOT/sni.dll`.
-
-## Opt-In [appname].runtimeconfig.json Explicit Overrides for Framework Settings
-In order to address potential issues with compatibility, an application can override a framework's runtimeconfig.json settings. This should only be done with the understanding that any settings specified here have unintended consequences and may prevent future upgrade \ roll-forward compatibility. The settings include `version`, `rollForwardOnNoCandidateFx` and `applyPatches`.
-
-As an example, assume the following framework layering:
-- Application
-- Microsoft.AspNetCore.All
-- Microsoft.AspNetCore.App
-- Microsoft.NetCore.App
-
-Except for Microsoft.NetCore.App (since it does not have a lower-level framework), each layer has a runtimeconfig.json setting specifying a single lower-layer framework's `name`, `version` and optional `rollForwardOnNoCandidateFx` and `applyPatches`.
-
-The normal hierarchy processing for most knobs, such as `rollForwardOnNoCandidateFx`:
- - a) Default value determined by the framework (e.g. roll-forward on [Minor])
- - b) Environment variable override (e.g. `DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX`)
- - c) Each layer's `runtimeOptions` override setting in its runtimeconfig.json, starting with app (e.g. `rollForwardOnNoCandidateFx`). Lower layers can override this.
- - d) The app's `additionalFrameworks` override section in `[appname].runtimeconfig.json` which specifies knobs per-framework.
- - e) A `--` command line value such as `--roll-forward-on-no-candidate-fx`
-
-In a hypothetical example, `Microsoft.AspNetCore.App` turns on the ability via mechanism `c` above to roll-forward `Microsoft.NetCore.App` on [major] releases by specifying `rollForwardOnNoCandidateFx = 2` in its runtimeconfig.json. For example:
-```json
-{
-    "runtimeOptions": {
-        "framework": {
-            "name": "Microsoft.NetCore.App",
-            "version": "2.2.0"
-        },
-        "rollForwardOnNoCandidateFx": "2"
-    }
-}
-```
-
-However, if that behavior is not wanted by the app, the app has the option of overriding. This cannot be done by the same mechanism `c` because the app's runtimeconfig settings would be overridden by the sample above since the sample is in a lower layer. Thus to override the setting, mechanism `d` is used. An example of the `additionalFrameworks` section for mechanism `d`:
-```json
-{
-    "runtimeOptions": {
-        "framework": {
-            "name": "Microsoft.AspNetCore.All",
-            "version": "1.0.1"
-        },
-        "additionalFrameworks": [
-            {
-                "name": "Microsoft.AspNetCore.App",
-                "rollForwardOnNoCandidateFx": "1",
-            }
-        ]
-    }
-}
-```
