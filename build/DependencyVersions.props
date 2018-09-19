@@ -69,7 +69,7 @@
 
   <!-- infrastructure and test only dependencies -->
   <PropertyGroup>
-    <BuildTasksFeedToolVersion>2.1.0-prerelease-02430-04</BuildTasksFeedToolVersion>
+    <BuildTasksFeedToolVersion>3.0.0-preview1-03217-01</BuildTasksFeedToolVersion>
     <VersionToolsVersion>$(BuildTasksFeedToolVersion)</VersionToolsVersion>
     <DotnetDebToolVersion>2.0.0</DotnetDebToolVersion>
   </PropertyGroup>
