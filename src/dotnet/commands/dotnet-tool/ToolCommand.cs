@@ -8,6 +8,7 @@ using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.Tools.Tool.Install;
 using Microsoft.DotNet.Tools.Tool.List;
+using Microsoft.DotNet.Tools.Tool.Restore;
 using Microsoft.DotNet.Tools.Tool.Uninstall;
 using Microsoft.DotNet.Tools.Tool.Update;
 
@@ -38,7 +39,11 @@ namespace Microsoft.DotNet.Tools.Tool
                 ["list"] =
                 appliedOption => new ListToolCommand(
                     appliedOption["list"],
-                    ParseResult)
+                    ParseResult),
+                ["restore"] =
+                    appliedOption => new ToolRestoreCommand(
+                        appliedOption["restore"],
+                        ParseResult)
             };
 
         public static int Run(string[] args)
