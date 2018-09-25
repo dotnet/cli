@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
         private readonly string[] _sources;
         private readonly IToolPackageInstaller _toolPackageInstaller;
         private readonly string _verbosity;
-        private const int _localToolResolverCacheVersion = 1;
+        private const int LocalToolResolverCacheVersion = 1;
 
         public ToolRestoreCommand(
             AppliedOption appliedCommand,
@@ -65,8 +65,9 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
             _localToolsResolverCache = localToolsResolverCache ??
                                        new LocalToolsResolverCache(
                                            new FileSystemWrapper(),
-                                           new DirectoryPath(Path.Combine(CliFolderPathCalculator.ToolsResolverCachePath)),
-                                           _localToolResolverCacheVersion);
+                                           new DirectoryPath(
+                                               Path.Combine(CliFolderPathCalculator.ToolsResolverCachePath)),
+                                           LocalToolResolverCacheVersion);
 
             _nugetGlobalPackagesFolder =
                 nugetGlobalPackagesFolder ?? new DirectoryPath(NuGetGlobalPackagesFolder.GetLocation());
@@ -101,11 +102,21 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
 
             Dictionary<PackageId, ToolPackageException> toolPackageExceptions =
                 new Dictionary<PackageId, ToolPackageException>();
+
             List<string> errorMessages = new List<string>();
+            List<string> successMessages = new List<string>();
 
             foreach (var package in packagesFromManifest)
             {
                 string targetFramework = BundledTargetFramework.GetTargetFrameworkMoniker();
+
+                if (PackageHasBeenRestored(package, targetFramework))
+                {
+                    successMessages.Add(string.Format(
+                        "Tool '{0}' (version '{1}') was restored. Available commands: {2}", package.PackageId,
+                        package.Version.ToNormalizedString(), string.Join(", ", package.CommandNames)));
+                    continue;
+                }
 
                 try
                 {
@@ -137,6 +148,10 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
                                 command.Name),
                             command);
                     }
+
+                    successMessages.Add(string.Format(
+                        "Tool '{0}' (version '{1}') was restored. Available commands: {2}", package.PackageId,
+                        package.Version.ToNormalizedString(), string.Join(" ", package.CommandNames)));
                 }
                 catch (ToolPackageException e)
                 {
@@ -162,6 +177,9 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
 
                 return 1;
             }
+
+            _reporter.WriteLine("Restore was successful.");
+            _reporter.WriteLine(string.Join(Environment.NewLine, successMessages));
 
             return 0;
         }
@@ -196,6 +214,28 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
             }
 
             return true;
+        }
+
+        private bool PackageHasBeenRestored(
+            ToolManifestPackage package,
+            string targetFramework)
+        {
+            var sampleRestoredCommandIdentifierOfThePackage = new RestoredCommandIdentifier(
+                package.PackageId,
+                package.Version,
+                NuGetFramework.Parse(targetFramework),
+                "any",
+                package.CommandNames.First());
+
+            if (_localToolsResolverCache.TryLoad(
+                sampleRestoredCommandIdentifierOfThePackage,
+                _nugetGlobalPackagesFolder,
+                out _))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private FilePath? GetCustomManifestFileLocation()
