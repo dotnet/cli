@@ -49,6 +49,8 @@ namespace Microsoft.DotNet.Tests.Commands
         private readonly ToolCommandName _toolCommandNameB = new ToolCommandName("b");
         private readonly DirectoryPath _nugetGlobalPackagesFolder;
 
+        private int _installCalledCount = 0;
+
         public ToolRestoreCommandTests()
         {
             _packageVersionA = NuGetVersion.Parse("1.0.4");
@@ -96,7 +98,8 @@ namespace Microsoft.DotNet.Tests.Commands
                                 }
                             }
                         }
-                    }));
+                    }),
+                installCallback: () => _installCalledCount++);
 
             ParseResult result = Parser.Instance.Parse("dotnet tool restore");
             _appliedCommand = result["dotnet"]["tool"]["restore"];
@@ -147,6 +150,38 @@ namespace Microsoft.DotNet.Tests.Commands
         }
 
         [Fact]
+        public void WhenRunItCanSaveCommandsToCacheAndShowSuccessMessage()
+        {
+            IToolManifestFinder manifestFileFinder =
+                new MockManifestFileFinder(new[]
+                {
+                    new ToolManifestPackage(_packageIdA, _packageVersionA,
+                        new[] {_toolCommandNameA}, null),
+                    new ToolManifestPackage(_packageIdB, _packageVersionB,
+                        new[] {_toolCommandNameB}, _targetFrameworkB)
+                });
+
+            ToolRestoreCommand toolRestoreCommand = new ToolRestoreCommand(_appliedCommand,
+                _parseResult,
+                _toolPackageInstallerMock,
+                manifestFileFinder,
+                _localToolsResolverCache,
+                _nugetGlobalPackagesFolder,
+                _reporter
+            );
+
+            toolRestoreCommand.Execute().Should().Be(0);
+
+            _reporter.Lines.Should().Contain(l => l.Contains("Restore was successful."));
+            _reporter.Lines.Should().Contain(l => l.Contains(string.Format(
+                "Tool '{0}' (version '{1}') was restored. Available commands: {2}", _packageIdA,
+                _packageVersionA.ToNormalizedString(), _toolCommandNameA)));
+            _reporter.Lines.Should().Contain(l => l.Contains(string.Format(
+                "Tool '{0}' (version '{1}') was restored. Available commands: {2}", _packageIdB,
+                _packageVersionB.ToNormalizedString(), _toolCommandNameB)));
+        }
+
+        [Fact]
         public void WhenRestoredCommandHasTheSameCommandNameItThrows()
         {
             IToolManifestFinder manifestFileFinder =
@@ -184,7 +219,7 @@ namespace Microsoft.DotNet.Tests.Commands
                     new ToolManifestPackage(_packageIdA, _packageVersionA,
                         new[] {_toolCommandNameA}),
                     new ToolManifestPackage(new PackageId("non-exists"), NuGetVersion.Parse("1.0.0"),
-                        Array.Empty<ToolCommandName>())
+                        new[] {new ToolCommandName("non-exists"),})
                 });
 
             ToolRestoreCommand toolRestoreCommand = new ToolRestoreCommand(_appliedCommand,
@@ -238,7 +273,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 _reporter
             );
 
-            toolRestoreCommand.Execute().Should().Be(1);
+               toolRestoreCommand.Execute().Should().Be(1);
             _reporter.Lines.Should()
                 .Contain(l =>
                     l.Contains(
@@ -266,6 +301,33 @@ namespace Microsoft.DotNet.Tests.Commands
 
             _reporter.Lines.Should()
                 .Contain(l => l.Contains(string.Format(ToolManifest.LocalizableStrings.CannotFindAnyManifestsFileSearched, "")));
+        }
+
+		[Fact]
+        public void WhenPackageIsRestoredAlreadyItWillNotRestoreItAgain()
+        {
+            IToolManifestFinder manifestFileFinder =
+                new MockManifestFileFinder(new[]
+                {
+                    new ToolManifestPackage(_packageIdA, _packageVersionA,
+                        new[] {_toolCommandNameA})
+                });
+
+            ToolRestoreCommand toolRestoreCommand = new ToolRestoreCommand(_appliedCommand,
+                _parseResult,
+                _toolPackageInstallerMock,
+                manifestFileFinder,
+                _localToolsResolverCache,
+                _nugetGlobalPackagesFolder,
+                _reporter
+            );
+
+            toolRestoreCommand.Execute();
+            var installCallCountBeforeTheSecondRestore = _installCalledCount;
+            toolRestoreCommand.Execute();
+
+            installCallCountBeforeTheSecondRestore.Should().BeGreaterThan(0);
+            _installCalledCount.Should().Be(installCallCountBeforeTheSecondRestore);
         }
 
         private class MockManifestFileFinder : IToolManifestFinder
