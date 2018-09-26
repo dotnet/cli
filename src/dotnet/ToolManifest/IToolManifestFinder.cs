@@ -8,6 +8,6 @@ namespace Microsoft.DotNet.ToolManifest
 {
     internal interface IToolManifestFinder
     {
-        IReadOnlyCollection<ToolManifestFindingResultSinglePackage> Find(FilePath? filePath = null);
+        IReadOnlyCollection<ToolManifestPackage> Find(FilePath? filePath = null);
     }
 }

@@ -121,27 +121,21 @@
     <value>Cannot find any manifests file. Searched {0}</value>
   </data>
   <data name="FieldCommandsIsMissing" xml:space="preserve">
-    <value>field commands is missing</value>
+    <value>field commands is missing.</value>
   </data>
   <data name="InvalidManifestFilePrefix" xml:space="preserve">
-    <value>Invalid manifest file. {0}</value>
-  </data>
-  <data name="IsRootFalseNotSupported" xml:space="preserve">
-    <value>isRoot is false is not supported.</value>
+    <value>Invalid manifest file.</value>
   </data>
   <data name="MissingVersion" xml:space="preserve">
-    <value>field version is missing</value>
+    <value>field version is missing.</value>
   </data>
-  <data name="PackageNameAndErrors" xml:space="preserve">
-    <value>In package {0}: {1}.</value>
+  <data name="InPackage" xml:space="preserve">
+    <value>In package {0}:</value>
   </data>
   <data name="TargetFrameworkIsUnsupported" xml:space="preserve">
-    <value>TargetFramework {0} is unsupported</value>
-  </data>
-  <data name="Version1NotSupported" xml:space="preserve">
-    <value>version that is not 1 is not supported.</value>
+    <value>TargetFramework {0} is unsupported.</value>
   </data>
   <data name="VersionIsInvalid" xml:space="preserve">
-    <value>version {0} is invalid</value>
+    <value>version {0} is invalid.</value>
   </data>
 </root>

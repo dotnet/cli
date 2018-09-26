@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
@@ -14,6 +15,7 @@ using Microsoft.DotNet.ToolPackage;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using NuGet.Frameworks;
 using NuGet.Versioning;
+using Command = Microsoft.DotNet.Cli.Utils.Command;
 
 namespace Microsoft.DotNet.Tools.Tool.Restore
 {
@@ -26,7 +28,7 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
         private readonly DirectoryPath _nugetGlobalPackagesFolder;
         private readonly AppliedOption _options;
         private readonly IReporter _reporter;
-        private readonly string[] _source;
+        private readonly string[] _sources;
         private readonly IToolPackageInstaller _toolPackageInstaller;
         private readonly string _verbosity;
         private const int _localToolResolverCacheVersion = 1;
@@ -72,7 +74,7 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
             _errorReporter = reporter ?? Reporter.Error;
 
             _configFilePath = appliedCommand.ValueOrDefault<string>("configfile");
-            _source = appliedCommand.ValueOrDefault<string[]>("add-source");
+            _sources = appliedCommand.ValueOrDefault<string[]>("add-source");
             _verbosity = appliedCommand.SingleArgumentOrDefault("verbosity");
         }
 
@@ -83,7 +85,7 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
             FilePath? configFile = null;
             if (_configFilePath != null) configFile = new FilePath(_configFilePath);
 
-            IReadOnlyCollection<ToolManifestFindingResultSinglePackage> packagesFromManifest =
+            IReadOnlyCollection<ToolManifestPackage> packagesFromManifest =
                 _toolManifestFinder.Find(customManifestFileLocation);
 
             Dictionary<RestoredCommandIdentifier, RestoredCommand> dictionary =
@@ -91,6 +93,7 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
 
             Dictionary<PackageId, ToolPackageException> toolPackageExceptions =
                 new Dictionary<PackageId, ToolPackageException>();
+            List<string> errorMessages = new List<string>();
 
             foreach (var package in packagesFromManifest)
             {
@@ -104,9 +107,18 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
                         _toolPackageInstaller.InstallPackageToExternalManagedLocation(
                             new PackageLocation(
                                 nugetConfig: configFile,
-                                additionalFeeds: _source),
+                                additionalFeeds: _sources),
                             package.PackageId, ToVersionRangeWithOnlyOneVersion(package.Version), targetFramework,
                             verbosity: _verbosity);
+
+                    if (!ManifestCommandMatchesActualInPackage(package.CommandNames, toolPackage.Commands))
+                    {
+                        errorMessages.Add(
+                            string.Format(LocalizableStrings.CommandsMismatch,
+                                package.PackageId,
+                                JoinBySpaceWithQuote(toolPackage.Commands.Select(c => c.Name.ToString())),
+                                JoinBySpaceWithQuote(package.CommandNames.Select(c => c.Value.ToString()))));
+                    }
 
                     foreach (RestoredCommand command in toolPackage.Commands)
                     {
@@ -130,15 +142,17 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
 
             _localToolsResolverCache.Save(dictionary, _nugetGlobalPackagesFolder);
 
-            if (toolPackageExceptions.Any())
+            if (toolPackageExceptions.Any() || errorMessages.Any())
             {
-                _errorReporter.WriteLine(LocalizableStrings.RestorePartiallySuccessful +
+                var partialOrTotalFailed = dictionary.Count() > 0
+                    ? LocalizableStrings.RestorePartiallySuccessful
+                    : LocalizableStrings.RestoreFailed;
+
+                _errorReporter.WriteLine(partialOrTotalFailed +
                                          Environment.NewLine +
                                          string.Join(
                                              Environment.NewLine,
-                                             toolPackageExceptions.Select(p =>
-                                                 string.Format(LocalizableStrings.PackageFailedToRestore,
-                                                     p.Key.ToString(), p.Value.ToString()))));
+                                             CreateErrorMessage(toolPackageExceptions).Concat(errorMessages)));
 
                 return 1;
             }
@@ -146,9 +160,41 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
             return 0;
         }
 
+        private static IEnumerable<string> CreateErrorMessage(
+            Dictionary<PackageId, ToolPackageException> toolPackageExceptions)
+        {
+            return toolPackageExceptions.Select(p =>
+                string.Format(LocalizableStrings.PackageFailedToRestore,
+                    p.Key.ToString(), p.Value.ToString()));
+        }
+
+        private static bool ManifestCommandMatchesActualInPackage(
+            ToolCommandName[] commandsFromManifest,
+            IReadOnlyList<RestoredCommand> toolPackageCommands)
+        {
+            ToolCommandName[] commandsFromPackage = toolPackageCommands.Select(t => t.Name).ToArray();
+            foreach (var command in commandsFromManifest)
+            {
+                if (!commandsFromPackage.Contains(command))
+                {
+                    return false;
+                }
+            }
+
+            foreach (var command in commandsFromPackage)
+            {
+                if (!commandsFromManifest.Contains(command))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private FilePath? GetCustomManifestFileLocation()
         {
-            string customFile = _options.Arguments.SingleOrDefault();
+            string customFile = _options.ValueOrDefault<string>("tool-manifest");
             FilePath? customManifestFileLocation;
             if (customFile != null)
             {
@@ -182,7 +228,7 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
 
         private static string JoinBySpaceWithQuote(IEnumerable<object> objects)
         {
-            return string.Join(", ", objects.Select(o => $"\"{o.ToString()}\""));
+            return string.Join(" ", objects.Select(o => $"\"{o.ToString()}\""));
         }
 
         private static VersionRange ToVersionRangeWithOnlyOneVersion(NuGetVersion version)

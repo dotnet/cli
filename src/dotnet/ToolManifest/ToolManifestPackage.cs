@@ -11,53 +11,53 @@ using NuGet.Versioning;
 
 namespace Microsoft.DotNet.ToolManifest
 {
-    internal struct ToolManifestFindingResultSinglePackage : IEquatable<ToolManifestFindingResultSinglePackage>
+    internal struct ToolManifestPackage : IEquatable<ToolManifestPackage>
     {
         public PackageId PackageId { get; }
         public NuGetVersion Version { get; }
-        public ToolCommandName[] CommandName { get; }
+        public ToolCommandName[] CommandNames { get; }
         public NuGetFramework OptionalNuGetFramework { get; }
 
-        public ToolManifestFindingResultSinglePackage(
+        public ToolManifestPackage(
             PackageId packagePackageId,
             NuGetVersion version,
-            ToolCommandName[] toolCommandName,
+            ToolCommandName[] toolCommandNames,
             NuGetFramework optionalNuGetFramework = null)
         {
             PackageId = packagePackageId;
             Version = version;
-            CommandName = toolCommandName;
+            CommandNames = toolCommandNames;
             OptionalNuGetFramework = optionalNuGetFramework;
         }
 
         public override bool Equals(object obj)
         {
-            return obj is ToolManifestFindingResultSinglePackage tool &&
+            return obj is ToolManifestPackage tool &&
                    Equals(tool);
         }
 
-        public bool Equals(ToolManifestFindingResultSinglePackage other)
+        public bool Equals(ToolManifestPackage other)
         {
             return PackageId.Equals(other.PackageId) &&
                    EqualityComparer<NuGetVersion>.Default.Equals(Version, other.Version) &&
-                   CommandName.SequenceEqual(other.CommandName) &&
+                   CommandNames.SequenceEqual(other.CommandNames) &&
                    EqualityComparer<NuGetFramework>.Default.Equals(OptionalNuGetFramework,
                        other.OptionalNuGetFramework);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(PackageId, Version, CommandName, OptionalNuGetFramework);
+            return HashCode.Combine(PackageId, Version, CommandNames, OptionalNuGetFramework);
         }
 
-        public static bool operator ==(ToolManifestFindingResultSinglePackage tool1,
-            ToolManifestFindingResultSinglePackage tool2)
+        public static bool operator ==(ToolManifestPackage tool1,
+            ToolManifestPackage tool2)
         {
             return tool1.Equals(tool2);
         }
 
-        public static bool operator !=(ToolManifestFindingResultSinglePackage tool1,
-            ToolManifestFindingResultSinglePackage tool2)
+        public static bool operator !=(ToolManifestPackage tool1,
+            ToolManifestPackage tool2)
         {
             return !(tool1 == tool2);
         }

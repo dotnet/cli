@@ -41,9 +41,9 @@ namespace Microsoft.DotNet.Tools.Tool
                     appliedOption["list"],
                     ParseResult),
                 ["restore"] =
-                    appliedOption => new ToolRestoreCommand(
-                        appliedOption["restore"],
-                        ParseResult)
+                appliedOption => new ToolRestoreCommand(
+                    appliedOption["restore"],
+                    ParseResult)
             };
 
         public static int Run(string[] args)

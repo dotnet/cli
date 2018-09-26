@@ -27,14 +27,14 @@ namespace Microsoft.DotNet.Tests.Commands
             _fileSystem = new FileSystemMockBuilder().UseCurrentSystemTemporaryDirectory().Build();
             _testDirectoryRoot = _fileSystem.Directory.CreateTemporaryDirectory().DirectoryPath;
 
-            _defaultExpectedResult = new List<ToolManifestFindingResultSinglePackage>
+            _defaultExpectedResult = new List<ToolManifestPackage>
             {
-                new ToolManifestFindingResultSinglePackage(
+                new ToolManifestPackage(
                     new PackageId("t-rex"),
                     NuGetVersion.Parse("1.0.53"),
                     new[] {new ToolCommandName("t-rex")},
                     NuGetFramework.Parse("netcoreapp2.1")),
-                new ToolManifestFindingResultSinglePackage(
+                new ToolManifestPackage(
                     new PackageId("dotnetsay"),
                     NuGetVersion.Parse("2.1.4"),
                     new[] {new ToolCommandName("dotnetsay")})
@@ -74,7 +74,7 @@ namespace Microsoft.DotNet.Tests.Commands
 
             manifestResult.Should()
                 .Contain(
-                    new ToolManifestFindingResultSinglePackage(
+                    new ToolManifestPackage(
                         new PackageId("t-rex"),
                         NuGetVersion.Parse("2.1.4"),
                         new[] { new ToolCommandName("t-rex") }));
@@ -96,7 +96,7 @@ namespace Microsoft.DotNet.Tests.Commands
         public void WhenCalledWithNonExistsFilePathItThrows()
         {
             var toolManifest = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem);
-            Action a = () => toolManifest.Find(new FilePath(Path.Combine(_testDirectoryRoot, "non-exits")));
+            Action a = () => toolManifest.Find(new FilePath(Path.Combine(_testDirectoryRoot, "non-exists")));
             a.ShouldThrow<ToolManifestException>().And.Message.Should().Contain(string.Format(LocalizableStrings.CannotFindAnyManifestsFileSearched, ""));
         }
 
@@ -116,10 +116,10 @@ namespace Microsoft.DotNet.Tests.Commands
             Action a = () => toolManifest.Find();
 
             a.ShouldThrow<ToolManifestException>().And.Message.Should().Contain(
-                string.Format(LocalizableStrings.InvalidManifestFilePrefix,
-                            string.Join(" ",
-                                string.Format(LocalizableStrings.PackageNameAndErrors, "t-rex",
-                                    LocalizableStrings.MissingVersion + ", " + LocalizableStrings.FieldCommandsIsMissing))));
+                LocalizableStrings.InvalidManifestFilePrefix + Environment.NewLine + "  " +
+                string.Format(LocalizableStrings.InPackage, "t-rex") + Environment.NewLine + "    " +
+                LocalizableStrings.MissingVersion + Environment.NewLine + "    " +
+                LocalizableStrings.FieldCommandsIsMissing);
         }
 
         [Fact]
@@ -134,6 +134,7 @@ namespace Microsoft.DotNet.Tests.Commands
         }
 
         // Remove this test when the follow pending test is enabled and feature is implemented.
+        // https://github.com/dotnet/cli/issues/10032
         [Fact]
         public void RequireRootAndVersionIs1()
         {
@@ -143,7 +144,7 @@ namespace Microsoft.DotNet.Tests.Commands
 
             a.ShouldThrow<ToolManifestException>()
                 .And.Message.Should()
-                .Contain(LocalizableStrings.IsRootFalseNotSupported + " " + LocalizableStrings.Version1NotSupported);
+                .Contain("  isRoot is false is not supported." + Environment.NewLine + "  Tools manifest format version 2 is not supported.");
         }
 
         [Fact(Skip = "pending implementation")]
@@ -162,21 +163,88 @@ namespace Microsoft.DotNet.Tests.Commands
         }
 
         private string _jsonContent =
-            "{\"version\":1,\"isRoot\":true,\"tools\":{\"t-rex\":{\"version\":\"1.0.53\",\"commands\":[\"t-rex\"],\"targetFramework\":\"netcoreapp2.1\"},\"dotnetsay\":{\"version\":\"2.1.4\",\"commands\":[\"dotnetsay\"]}}}";
+            @"{  
+   ""version"":1,
+   ""isRoot"":true,
+   ""tools"":{  
+      ""t-rex"":{  
+         ""version"":""1.0.53"",
+         ""commands"":[  
+            ""t-rex""
+         ],
+         ""targetFramework"":""netcoreapp2.1""
+      },
+      ""dotnetsay"":{  
+         ""version"":""2.1.4"",
+         ""commands"":[  
+            ""dotnetsay""
+         ]
+      }
+   }
+}";
 
         private string _jsonWithDuplicatedPackagedId =
-            "{\"version\":1,\"isRoot\":true,\"tools\":{\"t-rex\":{\"version\":\"1.0.53\",\"commands\":[\"t-rex\"],\"targetFramework\":\"netcoreapp2.1\"},\"t-rex\":{\"version\":\"2.1.4\",\"commands\":[\"t-rex\"]}}}";
+            @"{  
+   ""version"":1,
+   ""isRoot"":true,
+   ""tools"":{  
+      ""t-rex"":{  
+         ""version"":""1.0.53"",
+         ""commands"":[  
+            ""t-rex""
+         ],
+         ""targetFramework"":""netcoreapp2.1""
+      },
+      ""t-rex"":{  
+         ""version"":""2.1.4"",
+         ""commands"":[  
+            ""t-rex""
+         ]
+      }
+   }
+}";
 
         private string _jsonWithMissingField =
-            "{\"version\":1,\"isRoot\":true,\"tools\":{\"t-rex\":{\"extra\":1}}}";
+            @"{  
+   ""version"":1,
+   ""isRoot"":true,
+   ""tools"":{  
+      ""t-rex"":{  
+         ""extra"":1
+      }
+   }
+}";
 
         private string _jsonWithInvalidField =
-            "{\"version\":1,\"isRoot\":true,\"tools\":{\"t-rex\":{\"version\":\"1.*\",\"commands\":[\"t-rex\"],\"targetFramework\":\"abc\"}}}";
+            @"{  
+   ""version"":1,
+   ""isRoot"":true,
+   ""tools"":{  
+      ""t-rex"":{  
+         ""version"":""1.*"",
+         ""commands"":[  
+            ""t-rex""
+         ],
+         ""targetFramework"":""abc""
+      }
+   }
+}";
 
         private string _jsonWithNonRoot =
-            "{\"version\":2,\"isRoot\":false,\"tools\":{\"t-rex\":{\"version\":\"1.0.53\",\"commands\":[\"t-rex\"]}}}";
+            @"{  
+   ""version"":2,
+   ""isRoot"":false,
+   ""tools"":{  
+      ""t-rex"":{  
+         ""version"":""1.0.53"",
+         ""commands"":[  
+            ""trex""
+         ]
+      }
+   }
+}";
 
-        private readonly List<ToolManifestFindingResultSinglePackage> _defaultExpectedResult;
+        private readonly List<ToolManifestPackage> _defaultExpectedResult;
         private readonly string _testDirectoryRoot;
         private const string _manifestFilename = "localtool.manifest.json";
     }

@@ -26,9 +26,9 @@ namespace Microsoft.DotNet.ToolManifest
             _fileSystem = fileSystem ?? new FileSystemWrapper();
         }
 
-        public IReadOnlyCollection<ToolManifestFindingResultSinglePackage> Find(FilePath? filePath = null)
+        public IReadOnlyCollection<ToolManifestPackage> Find(FilePath? filePath = null)
         {
-            var result = new List<ToolManifestFindingResultSinglePackage>();
+            var result = new List<ToolManifestPackage>();
 
             IEnumerable<FilePath> allPossibleManifests =
                 filePath != null
@@ -49,12 +49,13 @@ namespace Microsoft.DotNet.ToolManifest
 
                     if (!deserializedManifest.isRoot)
                     {
-                        errors.Add(LocalizableStrings.IsRootFalseNotSupported);
+                        errors.Add("isRoot is false is not supported.");
                     }
 
                     if (deserializedManifest.version != 1)
                     {
-                        errors.Add(LocalizableStrings.Version1NotSupported);
+                        errors.Add(string.Format("Tools manifest format version {0} is not supported.",
+                            deserializedManifest.version));
                     }
 
                     foreach (var tools in deserializedManifest.tools)
@@ -95,26 +96,20 @@ namespace Microsoft.DotNet.ToolManifest
                             }
                         }
 
-                        if (tools.Value.commands != null)
-                        {
-                            if (tools.Value.commands.Length == 0)
-                            {
-                                packageLevelErrors.Add(LocalizableStrings.FieldCommandsIsMissing);
-                            }
-                        }
-                        else
+                        if (tools.Value.commands == null 
+                            || (tools.Value.commands != null && tools.Value.commands.Length == 0))
                         {
                             packageLevelErrors.Add(LocalizableStrings.FieldCommandsIsMissing);
                         }
 
                         if (packageLevelErrors.Any())
                         {
-                            var joined = string.Join(", ", packageLevelErrors);
-                            errors.Add(string.Format(LocalizableStrings.PackageNameAndErrors, packageId.ToString(), joined));
+                            var joined = string.Join(string.Empty, packageLevelErrors.Select(e => Environment.NewLine + "    " + e));
+                            errors.Add(string.Format(LocalizableStrings.InPackage, packageId.ToString()) + joined);
                         }
                         else
                         {
-                            result.Add(new ToolManifestFindingResultSinglePackage(
+                            result.Add(new ToolManifestPackage(
                                 packageId,
                                 version,
                                 ToolCommandName.Convert(tools.Value.commands),
@@ -124,8 +119,8 @@ namespace Microsoft.DotNet.ToolManifest
 
                     if (errors.Any())
                     {
-                        throw new ToolManifestException(string.Format(LocalizableStrings.InvalidManifestFilePrefix,
-                            string.Join(" ", errors)));
+                        throw new ToolManifestException(LocalizableStrings.InvalidManifestFilePrefix +
+                            string.Join(string.Empty, errors.Select(e => Environment.NewLine + "  " + e)));
                     }
 
                     return result;
@@ -134,7 +129,7 @@ namespace Microsoft.DotNet.ToolManifest
 
             throw new ToolManifestException(
                 string.Format(LocalizableStrings.CannotFindAnyManifestsFileSearched,
-                    string.Join("; ", allPossibleManifests.Select(f => f.Value))));
+                    string.Join(Environment.NewLine, allPossibleManifests.Select(f => f.Value))));
         }
 
         private IEnumerable<FilePath> EnumerateDefaultAllPossibleManifests()
@@ -157,6 +152,7 @@ namespace Microsoft.DotNet.ToolManifest
             public bool isRoot { get; set; }
 
             [JsonProperty(Required = Required.Always)]
+            // The dictionary's key is the package id
             public Dictionary<string, SerializableLocalToolSinglePackage> tools { get; set; }
         }
 

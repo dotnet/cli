@@ -138,6 +138,9 @@
   <data name="CommandsColumn" xml:space="preserve">
     <value>Commands</value>
   </data>
+    <data name="CommandsMismatch" xml:space="preserve">
+    <value>Package Id {0} has command {1}, but expect {2} in the manifest file.</value>
+  </data>
   <data name="InvalidToolPathOption" xml:space="preserve">
     <value>Tool path '{0}' does not exist.</value>
   </data>
@@ -153,10 +156,10 @@
   <data name="ConfigFileOptionName" xml:space="preserve">
     <value>FILE</value>
   </data>
-  <data name="ManifestPath" xml:space="preserve">
+  <data name="ManifestPathOptionName" xml:space="preserve">
     <value>PATH</value>
   </data>
-  <data name="ManifestPathDescription" xml:space="preserve">
+  <data name="ManifestPathOptionDescription" xml:space="preserve">
     <value>Path to the manifest file.</value>
   </data>
   <data name="VersionOptionDescription" xml:space="preserve">
@@ -173,5 +176,8 @@
   </data>
   <data name="RestorePartiallySuccessful" xml:space="preserve">
     <value>Restore Partially Successful.</value>
+  </data>
+  <data name="RestoreFailed" xml:space="preserve">
+    <value>Restore Failed.</value>
   </data>
 </root>

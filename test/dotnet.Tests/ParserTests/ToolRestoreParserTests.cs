@@ -24,24 +24,11 @@ namespace Microsoft.DotNet.Tests.ParserTests
         public void ToolRestoreParserCanGetManifestFilePath()
         {
             var command = Parser.Instance;
-            var result = command.Parse("dotnet tool restore folder/my-manifest.format");
+            var result = command.Parse("dotnet tool restore --tool-manifest folder/my-manifest.format");
 
             var parseResult = result["dotnet"]["tool"]["restore"];
 
-            var manifestFilePath = parseResult.Arguments.Single();
-
-            manifestFilePath.Should().Be("folder/my-manifest.format");
-        }
-
-        [Fact]
-        public void ToolRestoreParserManifestFilePathIsOptional()
-        {
-            var command = Parser.Instance;
-            var result = command.Parse("dotnet tool restore");
-
-            var parseResult = result["dotnet"]["tool"]["restore"];
-
-            parseResult.ValidateAll().Should().BeEmpty();
+            parseResult.ValueOrDefault<string>("tool-manifest").Should().Be("folder/my-manifest.format");
         }
 
         [Fact]

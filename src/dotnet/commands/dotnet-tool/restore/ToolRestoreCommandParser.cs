@@ -13,9 +13,7 @@ namespace Microsoft.DotNet.Cli
             return Create.Command(
                 "restore",
                 LocalizableStrings.CommandDescription,
-             Accept.ZeroOrOneArgument()
-                      .With(name: LocalizableStrings.ManifestPath,
-                            description: LocalizableStrings.ManifestPathDescription),
+                Accept.NoArguments(),
                 Create.Option(
                     "--configfile",
                     LocalizableStrings.ConfigFileOptionDescription,
@@ -26,6 +24,11 @@ namespace Microsoft.DotNet.Cli
                     LocalizableStrings.AddSourceOptionDescription,
                     Accept.OneOrMoreArguments()
                           .With(name: LocalizableStrings.AddSourceOptionName)),
+                Create.Option(
+                    "--tool-manifest",
+                    LocalizableStrings.ManifestPathOptionDescription,
+                    Accept.ZeroOrOneArgument()
+                        .With(name: LocalizableStrings.ManifestPathOptionName)),
                 ToolCommandRestorePassThroughOptions.DisableParallelOption(),
                 ToolCommandRestorePassThroughOptions.IgnoreFailedSourcesOption(),
                 ToolCommandRestorePassThroughOptions.NoCacheOption(),
