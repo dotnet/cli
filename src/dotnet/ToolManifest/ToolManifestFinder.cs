@@ -66,7 +66,7 @@ namespace Microsoft.DotNet.ToolManifest
 
             if (!findAnyManifest)
             {
-                throw new ToolManifestException(
+                throw new ToolManifestCannotFindException(
                     string.Format(LocalizableStrings.CannotFindAnyManifestsFileSearched,
                         string.Join(Environment.NewLine, allPossibleManifests.Select(f => f.Value))));
             }
@@ -92,10 +92,10 @@ namespace Microsoft.DotNet.ToolManifest
             if (deserializedManifest.version == 0)
             {
                 _reporter.WriteLine(
-                    LocalizableStrings.ManifestMissionVersion +
+                    LocalizableStrings.ManifestMissingVersion +
                     path.Value);
             }
-            
+
             if (deserializedManifest.version > SupportedVersion)
             {
                 _reporter.WriteLine(
@@ -160,14 +160,13 @@ namespace Microsoft.DotNet.ToolManifest
                     result.Add(new ToolManifestPackage(
                         packageId,
                         version,
-                        ToolCommandName.Convert(tools.Value.commands),
-                        targetFramework));
+                        ToolCommandName.Convert(tools.Value.commands)));
                 }
             }
 
             if (errors.Any())
             {
-                throw new ToolManifestCannotFindException(LocalizableStrings.InvalidManifestFilePrefix +
+                throw new ToolManifestException(LocalizableStrings.InvalidManifestFilePrefix +
                                                 string.Join(string.Empty,
                                                     errors.Select(e => Environment.NewLine + "  " + e)));
             }

@@ -147,23 +147,20 @@ namespace Microsoft.DotNet.Tests.Commands
                 p => p == new ToolManifestPackage(
                          new PackageId("t-rex"),
                          NuGetVersion.Parse("1.0.49"),
-                         new[] {new ToolCommandName("t-rex")},
-                         NuGetFramework.Parse("netcoreapp2.1")),
+                         new[] {new ToolCommandName("t-rex")}),
                 because: "when different manifest file has the same package id, " +
                          "only keep entry that is in the manifest close to current directory");
             manifestResult.Should().Contain(
                 p => p == new ToolManifestPackage(
                          new PackageId("dotnetsay"),
                          NuGetVersion.Parse("2.1.4"),
-                         new[] {new ToolCommandName("dotnetsay")},
-                         null));
+                         new[] {new ToolCommandName("dotnetsay")}));
 
             manifestResult.Should().Contain(
                 p => p == new ToolManifestPackage(
                          new PackageId("dotnetsay"),
                          NuGetVersion.Parse("2.1.4"),
-                         new[] {new ToolCommandName("dotnetsay")},
-                         null),
+                         new[] {new ToolCommandName("dotnetsay")}),
                 because: "combine both content in different manifests");
         }
 
@@ -209,7 +206,7 @@ namespace Microsoft.DotNet.Tests.Commands
 
             bufferedReporter.Lines.Should()
                 .Contain(l =>
-                    l.Contains(LocalizableStrings.ManifestMissionVersion));
+                    l.Contains(LocalizableStrings.ManifestMissingVersion));
         }
 
         private string _jsonContent =
@@ -217,13 +214,13 @@ namespace Microsoft.DotNet.Tests.Commands
    ""version"":1,
    ""isRoot"":true,
    ""tools"":{
-      ""t-rex"":{  
+      ""t-rex"":{
          ""version"":""1.0.53"",
          ""commands"":[
             ""t-rex""
          ]
       },
-      ""dotnetsay"":{  
+      ""dotnetsay"":{
          ""version"":""2.1.4"",
          ""commands"":[
             ""dotnetsay""
@@ -237,13 +234,13 @@ namespace Microsoft.DotNet.Tests.Commands
    ""version"":1,
    ""isRoot"":true,
    ""tools"":{
-      ""t-rex"":{  
+      ""t-rex"":{
          ""version"":""1.0.53"",
          ""commands"":[
             ""t-rex""
          ]
       },
-      ""t-rex"":{  
+      ""t-rex"":{
          ""version"":""2.1.4"",
          ""commands"":[
             ""t-rex""
@@ -257,18 +254,18 @@ namespace Microsoft.DotNet.Tests.Commands
    ""version"":1,
    ""isRoot"":true,
    ""tools"":{
-      ""t-rex"":{  
+      ""t-rex"":{
          ""extra"":1
       }
    }
 }";
 
         private string _jsonWithInvalidField =
-            @"{  
+            @"{
    ""version"":1,
    ""isRoot"":true,
    ""tools"":{
-      ""t-rex"":{  
+      ""t-rex"":{
          ""version"":""1.*"",
          ""commands"":[
             ""t-rex""
@@ -285,8 +282,7 @@ namespace Microsoft.DotNet.Tests.Commands
          ""version"":""1.0.49"",
          ""commands"":[
             ""t-rex""
-         ],
-         ""targetFramework"":""netcoreapp2.1""
+         ]
       },
       ""dotnetsay"":{
          ""version"":""2.1.4"",
@@ -296,7 +292,7 @@ namespace Microsoft.DotNet.Tests.Commands
       }
    }
 }";
-        
+
         private string _jsonContentInCurrentDirectoryIsRootTrue =
             @"{
    ""version"":1,
@@ -306,8 +302,7 @@ namespace Microsoft.DotNet.Tests.Commands
          ""version"":""1.0.49"",
          ""commands"":[
             ""t-rex""
-         ],
-         ""targetFramework"":""netcoreapp2.1""
+         ]
       },
       ""dotnetsay"":{
          ""version"":""2.1.4"",
@@ -324,12 +319,11 @@ namespace Microsoft.DotNet.Tests.Commands
    ""version"":1,
    ""isRoot"":false,
    ""tools"":{
-      ""t-rex"":{  
+      ""t-rex"":{
          ""version"":""1.0.53"",
          ""commands"":[
             ""t-rex""
-         ],
-         ""targetFramework"":""netcoreapp2.1""
+         ]
       },
       ""dotnetsay2"":{
          ""version"":""4.0.0"",
@@ -339,19 +333,18 @@ namespace Microsoft.DotNet.Tests.Commands
       }
    }
 }";
-        
+
         private string _jsonContentNoVersion =
             @"{
    ""isRoot"":true,
    ""tools"":{
-      ""t-rex"":{  
+      ""t-rex"":{
          ""version"":""1.0.53"",
          ""commands"":[
             ""t-rex""
-         ],
-         ""targetFramework"":""netcoreapp2.1""
+         ]
       },
-      ""dotnetsay"":{  
+      ""dotnetsay"":{
          ""version"":""2.1.4"",
          ""commands"":[
             ""dotnetsay""
@@ -359,20 +352,19 @@ namespace Microsoft.DotNet.Tests.Commands
       }
    }
 }";
-        
+
         private string _jsonContentHigherVersion =
             @"{
    ""isRoot"":true,
    ""version"":99,
    ""tools"":{
-      ""t-rex"":{  
+      ""t-rex"":{
          ""version"":""1.0.53"",
          ""commands"":[
             ""t-rex""
-         ],
-         ""targetFramework"":""netcoreapp2.1""
+         ]
       },
-      ""dotnetsay"":{  
+      ""dotnetsay"":{
          ""version"":""2.1.4"",
          ""commands"":[
             ""dotnetsay""
