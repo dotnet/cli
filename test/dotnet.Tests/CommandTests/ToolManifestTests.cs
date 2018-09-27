@@ -183,14 +183,33 @@ namespace Microsoft.DotNet.Tests.Commands
         }
 
 
-        [Fact(Skip = "pending implementation")]
+        [Fact]
         public void DifferentVersionOfManifestFileItShouldHaveWarnings()
         {
+            _fileSystem.File.WriteAllText(Path.Combine(_testDirectoryRoot, _manifestFilename), _jsonContentHigherVersion);
+            BufferedReporter bufferedReporter = new BufferedReporter();
+            var toolManifest = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem, bufferedReporter);
+            toolManifest.Find();
+
+            bufferedReporter.Lines.Should()
+                .Contain(l =>
+                    l.Contains(
+                        string.Format(
+                            LocalizableStrings.ManifestVersionHigherThanSupported,
+                            99, 1)));
         }
 
-        [Fact(Skip = "pending implementation")]
-        public void DifferentVersionOfManifestFileItShouldNotThrow()
+        [Fact]
+        public void NoVersionInManifestFileItShouldHaveWarnings()
         {
+            _fileSystem.File.WriteAllText(Path.Combine(_testDirectoryRoot, _manifestFilename), _jsonContentNoVersion);
+            BufferedReporter bufferedReporter = new BufferedReporter();
+            var toolManifest = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem, bufferedReporter);
+            toolManifest.Find();
+
+            bufferedReporter.Lines.Should()
+                .Contain(l =>
+                    l.Contains(LocalizableStrings.ManifestMissionVersion));
         }
 
         private string _jsonContent =
@@ -316,6 +335,47 @@ namespace Microsoft.DotNet.Tests.Commands
          ""version"":""4.0.0"",
          ""commands"":[
             ""dotnetsay2""
+         ]
+      }
+   }
+}";
+        
+        private string _jsonContentNoVersion =
+            @"{
+   ""isRoot"":true,
+   ""tools"":{
+      ""t-rex"":{  
+         ""version"":""1.0.53"",
+         ""commands"":[
+            ""t-rex""
+         ],
+         ""targetFramework"":""netcoreapp2.1""
+      },
+      ""dotnetsay"":{  
+         ""version"":""2.1.4"",
+         ""commands"":[
+            ""dotnetsay""
+         ]
+      }
+   }
+}";
+        
+        private string _jsonContentHigherVersion =
+            @"{
+   ""isRoot"":true,
+   ""version"":99,
+   ""tools"":{
+      ""t-rex"":{  
+         ""version"":""1.0.53"",
+         ""commands"":[
+            ""t-rex""
+         ],
+         ""targetFramework"":""netcoreapp2.1""
+      },
+      ""dotnetsay"":{  
+         ""version"":""2.1.4"",
+         ""commands"":[
+            ""dotnetsay""
          ]
       }
    }

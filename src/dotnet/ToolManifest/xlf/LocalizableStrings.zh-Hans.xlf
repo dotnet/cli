@@ -37,6 +37,16 @@
         <target state="new">In package {0}:</target>
         <note />
       </trans-unit>
+      <trans-unit id="ManifestMissionVersion">
+        <source>Manifest version is missing or is 0. This manifest may not be supported in this SDK version. Manifest file path: </source>
+        <target state="new">Manifest version is missing or is 0. This manifest may not be supported in this SDK version. Manifest file path: </target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ManifestVersionHigherThanSupported">
+        <source>Manifest version is {0}. This manifest may not be supported in this SDK version that can support up to manifest version {1}. Manifest file path: </source>
+        <target state="new">Manifest version is {0}. This manifest may not be supported in this SDK version that can support up to manifest version {1}. Manifest file path: </target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

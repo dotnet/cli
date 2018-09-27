@@ -126,6 +126,12 @@
   <data name="InvalidManifestFilePrefix" xml:space="preserve">
     <value>Invalid manifest file.</value>
   </data>
+  <data name="ManifestMissionVersion" xml:space="preserve">
+    <value>Manifest version is missing or is 0. This manifest may not be supported in this SDK version. Manifest file path: </value>
+  </data>
+  <data name="ManifestVersionHigherThanSupported" xml:space="preserve">
+    <value>Manifest version is {0}. This manifest may not be supported in this SDK version that can support up to manifest version {1}. Manifest file path: </value>
+  </data>
   <data name="MissingVersion" xml:space="preserve">
     <value>field version is missing.</value>
   </data>
