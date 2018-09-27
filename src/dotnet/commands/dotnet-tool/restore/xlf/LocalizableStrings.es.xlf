@@ -107,6 +107,11 @@
         <target state="new">Path to the manifest file.</target>
         <note />
       </trans-unit>
+      <trans-unit id="RestoreSuccessful">
+        <source>Tool '{0}' (version '{1}') was restored. Available commands: {2}</source>
+        <target state="new">Tool '{0}' (version '{1}') was restored. Available commands: {2}</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>
