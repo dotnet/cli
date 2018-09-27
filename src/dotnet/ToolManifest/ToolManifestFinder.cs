@@ -81,22 +81,7 @@ namespace Microsoft.DotNet.ToolManifest
                             }
                         }
 
-                        NuGetFramework targetFramework = null;
-                        var targetFrameworkString = tools.Value.targetFramework;
-                        if (!(targetFrameworkString is null))
-                        {
-                            targetFramework = NuGetFramework.Parse(
-                                targetFrameworkString);
-
-                            if (targetFramework.IsUnsupported)
-                            {
-                                packageLevelErrors.Add(
-                                    string.Format(LocalizableStrings.TargetFrameworkIsUnsupported,
-                                        targetFrameworkString));
-                            }
-                        }
-
-                        if (tools.Value.commands == null 
+                        if (tools.Value.commands == null
                             || (tools.Value.commands != null && tools.Value.commands.Length == 0))
                         {
                             packageLevelErrors.Add(LocalizableStrings.FieldCommandsIsMissing);
@@ -112,8 +97,7 @@ namespace Microsoft.DotNet.ToolManifest
                             result.Add(new ToolManifestPackage(
                                 packageId,
                                 version,
-                                ToolCommandName.Convert(tools.Value.commands),
-                                targetFramework));
+                                ToolCommandName.Convert(tools.Value.commands)));
                         }
                     }
 

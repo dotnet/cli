@@ -16,18 +16,15 @@ namespace Microsoft.DotNet.ToolManifest
         public PackageId PackageId { get; }
         public NuGetVersion Version { get; }
         public ToolCommandName[] CommandNames { get; }
-        public NuGetFramework OptionalNuGetFramework { get; }
 
         public ToolManifestPackage(
             PackageId packagePackageId,
             NuGetVersion version,
-            ToolCommandName[] toolCommandNames,
-            NuGetFramework optionalNuGetFramework = null)
+            ToolCommandName[] toolCommandNames)
         {
             PackageId = packagePackageId;
             Version = version;
             CommandNames = toolCommandNames;
-            OptionalNuGetFramework = optionalNuGetFramework;
         }
 
         public override bool Equals(object obj)
@@ -40,14 +37,12 @@ namespace Microsoft.DotNet.ToolManifest
         {
             return PackageId.Equals(other.PackageId) &&
                    EqualityComparer<NuGetVersion>.Default.Equals(Version, other.Version) &&
-                   CommandNames.SequenceEqual(other.CommandNames) &&
-                   EqualityComparer<NuGetFramework>.Default.Equals(OptionalNuGetFramework,
-                       other.OptionalNuGetFramework);
+                   CommandNames.SequenceEqual(other.CommandNames);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(PackageId, Version, CommandNames, OptionalNuGetFramework);
+            return HashCode.Combine(PackageId, Version, CommandNames);
         }
 
         public static bool operator ==(ToolManifestPackage tool1,

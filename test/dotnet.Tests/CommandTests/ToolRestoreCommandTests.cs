@@ -46,7 +46,6 @@ namespace Microsoft.DotNet.Tests.Commands
 
         private readonly PackageId _packageIdB = new PackageId("local.tool.console.B");
         private readonly NuGetVersion _packageVersionB;
-        private readonly NuGetFramework _targetFrameworkB;
         private readonly ToolCommandName _toolCommandNameB = new ToolCommandName("b");
         private readonly DirectoryPath _nugetGlobalPackagesFolder;
 
@@ -55,7 +54,6 @@ namespace Microsoft.DotNet.Tests.Commands
             _packageVersionA = NuGetVersion.Parse("1.0.4");
             _packageVersionWithCommandNameCollisionWithA = NuGetVersion.Parse("1.0.9");
             _packageVersionB = NuGetVersion.Parse("1.0.4");
-            _targetFrameworkB = NuGetFramework.Parse("netcoreapp2.1");
 
             _reporter = new BufferedReporter();
             _fileSystem = new FileSystemMockBuilder().UseCurrentSystemTemporaryDirectory().Build();
@@ -119,9 +117,9 @@ namespace Microsoft.DotNet.Tests.Commands
                 new MockManifestFileFinder(new[]
                 {
                     new ToolManifestPackage(_packageIdA, _packageVersionA,
-                        new[] {_toolCommandNameA}, null),
+                        new[] {_toolCommandNameA}),
                     new ToolManifestPackage(_packageIdB, _packageVersionB,
-                        new[] {_toolCommandNameB}, _targetFrameworkB)
+                        new[] {_toolCommandNameB})
                 });
 
             ToolRestoreCommand toolRestoreCommand = new ToolRestoreCommand(_appliedCommand,
@@ -228,7 +226,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new MockManifestFileFinder(new[]
                 {
                     new ToolManifestPackage(_packageIdA, _packageVersionA,
-                        new[] {differentCommandNameA, differentCommandNameB}, null),
+                        new[] {differentCommandNameA, differentCommandNameB}),
                 });
 
             ToolRestoreCommand toolRestoreCommand = new ToolRestoreCommand(_appliedCommand,

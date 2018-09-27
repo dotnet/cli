@@ -32,8 +32,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestPackage(
                     new PackageId("t-rex"),
                     NuGetVersion.Parse("1.0.53"),
-                    new[] {new ToolCommandName("t-rex")},
-                    NuGetFramework.Parse("netcoreapp2.1")),
+                    new[] {new ToolCommandName("t-rex")}),
                 new ToolManifestPackage(
                     new PackageId("dotnetsay"),
                     NuGetVersion.Parse("2.1.4"),
@@ -130,7 +129,6 @@ namespace Microsoft.DotNet.Tests.Commands
             Action a = () => toolManifest.Find();
 
             a.ShouldThrow<ToolManifestException>().And.Message.Should().Contain(string.Format(LocalizableStrings.VersionIsInvalid, "1.*"));
-            a.ShouldThrow<ToolManifestException>().And.Message.Should().Contain(string.Format(LocalizableStrings.TargetFrameworkIsUnsupported, "abc"));
         }
 
         // Remove this test when the follow pending test is enabled and feature is implemented.
@@ -171,8 +169,7 @@ namespace Microsoft.DotNet.Tests.Commands
          ""version"":""1.0.53"",
          ""commands"":[  
             ""t-rex""
-         ],
-         ""targetFramework"":""netcoreapp2.1""
+         ]
       },
       ""dotnetsay"":{  
          ""version"":""2.1.4"",
@@ -192,8 +189,7 @@ namespace Microsoft.DotNet.Tests.Commands
          ""version"":""1.0.53"",
          ""commands"":[  
             ""t-rex""
-         ],
-         ""targetFramework"":""netcoreapp2.1""
+         ]
       },
       ""t-rex"":{  
          ""version"":""2.1.4"",
@@ -224,8 +220,7 @@ namespace Microsoft.DotNet.Tests.Commands
          ""version"":""1.*"",
          ""commands"":[  
             ""t-rex""
-         ],
-         ""targetFramework"":""abc""
+         ]
       }
    }
 }";

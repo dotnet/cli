@@ -105,9 +105,7 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
 
             foreach (var package in packagesFromManifest)
             {
-                string targetFramework =
-                    package.OptionalNuGetFramework?.GetShortFolderName()
-                    ?? BundledTargetFramework.GetTargetFrameworkMoniker();
+                string targetFramework = BundledTargetFramework.GetTargetFrameworkMoniker();
 
                 try
                 {
