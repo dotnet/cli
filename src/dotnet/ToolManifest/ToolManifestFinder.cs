@@ -127,7 +127,7 @@ namespace Microsoft.DotNet.ToolManifest
                 }
             }
 
-            throw new ToolManifestException(
+            throw new ToolManifestCannotFindException(
                 string.Format(LocalizableStrings.CannotFindAnyManifestsFileSearched,
                     string.Join(Environment.NewLine, allPossibleManifests.Select(f => f.Value))));
         }

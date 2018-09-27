@@ -85,8 +85,16 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
             FilePath? configFile = null;
             if (_configFilePath != null) configFile = new FilePath(_configFilePath);
 
-            IReadOnlyCollection<ToolManifestPackage> packagesFromManifest =
-                _toolManifestFinder.Find(customManifestFileLocation);
+            IReadOnlyCollection<ToolManifestPackage> packagesFromManifest;
+            try
+            {
+                packagesFromManifest = _toolManifestFinder.Find(customManifestFileLocation);
+            }
+            catch (ToolManifestCannotFindException e)
+            {
+                _reporter.WriteLine(e.Message.Yellow());
+                return 0;
+            }
 
             Dictionary<RestoredCommandIdentifier, RestoredCommand> dictionary =
                 new Dictionary<RestoredCommandIdentifier, RestoredCommand>();

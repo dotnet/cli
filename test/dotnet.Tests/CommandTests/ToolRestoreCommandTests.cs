@@ -249,6 +249,27 @@ namespace Microsoft.DotNet.Tests.Commands
                             "\"a\"", "\"different-command-nameA\" \"different-command-nameB\"")));
         }
 
+        [Fact]
+        public void WhenCannotFindManifestFileItPrintsWarning()
+        {
+            IToolManifestFinder realManifestFinderImplementationWithMockFileSystem =
+                 new ToolManifestFinder(new DirectoryPath(Path.GetTempPath()), _fileSystem);
+
+            ToolRestoreCommand toolRestoreCommand = new ToolRestoreCommand(_appliedCommand,
+                _parseResult,
+                _toolPackageInstallerMock,
+                realManifestFinderImplementationWithMockFileSystem,
+                _localToolsResolverCache,
+                _nugetGlobalPackagesFolder,
+                _reporter
+            );
+
+            toolRestoreCommand.Execute().Should().Be(0);
+
+            _reporter.Lines.Should()
+                .Contain(l => l.Contains(string.Format(ToolManifest.LocalizableStrings.CannotFindAnyManifestsFileSearched, "")));
+        }
+
         private class MockManifestFileFinder : IToolManifestFinder
         {
             private readonly IReadOnlyCollection<ToolManifestPackage> _toReturn;

@@ -97,7 +97,7 @@ namespace Microsoft.DotNet.Tests.Commands
         {
             var toolManifest = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem);
             Action a = () => toolManifest.Find(new FilePath(Path.Combine(_testDirectoryRoot, "non-exists")));
-            a.ShouldThrow<ToolManifestException>().And.Message.Should().Contain(string.Format(LocalizableStrings.CannotFindAnyManifestsFileSearched, ""));
+            a.ShouldThrow<ToolManifestCannotFindException>().And.Message.Should().Contain(string.Format(LocalizableStrings.CannotFindAnyManifestsFileSearched, ""));
         }
 
         [Fact]
@@ -105,7 +105,7 @@ namespace Microsoft.DotNet.Tests.Commands
         {
             var toolManifest = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem);
             Action a = () => toolManifest.Find();
-            a.ShouldThrow<ToolManifestException>().And.Message.Should().Contain(string.Format(LocalizableStrings.CannotFindAnyManifestsFileSearched, ""));
+            a.ShouldThrow<ToolManifestCannotFindException>().And.Message.Should().Contain(string.Format(LocalizableStrings.CannotFindAnyManifestsFileSearched, ""));
         }
 
         [Fact]
