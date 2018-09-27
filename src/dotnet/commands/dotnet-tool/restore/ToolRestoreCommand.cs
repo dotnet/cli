@@ -59,8 +59,9 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
                 _toolPackageInstaller = toolPackageInstaller;
             }
 
-            _toolManifestFinder = toolManifestFinder
-                                  ?? new ToolManifestFinder(new DirectoryPath(Directory.GetCurrentDirectory()));
+            _toolManifestFinder
+                = toolManifestFinder
+                  ?? new ToolManifestFinder(new DirectoryPath(Directory.GetCurrentDirectory()), reporter: _reporter);
 
             _localToolsResolverCache = localToolsResolverCache ??
                                        new LocalToolsResolverCache(

@@ -19,12 +19,16 @@ namespace Microsoft.DotNet.ToolManifest
     {
         private readonly DirectoryPath _probStart;
         private readonly IFileSystem _fileSystem;
+        private IReporter _reporter;
         private const string _manifestFilenameConvention = "localtool.manifest.json";
 
-        public ToolManifestFinder(DirectoryPath probStart, IFileSystem fileSystem = null)
+        // The supported tool manifest file version.
+        private const int SupportedVersion = 1;
+        public ToolManifestFinder(DirectoryPath probStart, IFileSystem fileSystem = null, IReporter reporter = null)
         {
             _probStart = probStart;
             _fileSystem = fileSystem ?? new FileSystemWrapper();
+            _reporter = reporter ?? Reporter.Output;
         }
 
         public IReadOnlyCollection<ToolManifestPackage> Find(FilePath? filePath = null)
@@ -44,7 +48,7 @@ namespace Microsoft.DotNet.ToolManifest
                     SerializableLocalToolsManifest deserializedManifest =
                         DeserializableLocalToolsManifest(possibleManifest);
 
-                    foreach (ToolManifestPackage p in GetToolManifestPackageFromOneManifestFile(deserializedManifest))
+                    foreach (ToolManifestPackage p in GetToolManifestPackageFromOneManifestFile(deserializedManifest, possibleManifest))
                     {
                         if (!result.Any(addedToolManifestPackages =>
                             addedToolManifestPackages.PackageId.Equals(p.PackageId)))
@@ -79,16 +83,26 @@ namespace Microsoft.DotNet.ToolManifest
                 });
         }
 
-        private static List<ToolManifestPackage> GetToolManifestPackageFromOneManifestFile(
-            SerializableLocalToolsManifest deserializedManifest)
+        private List<ToolManifestPackage> GetToolManifestPackageFromOneManifestFile(
+            SerializableLocalToolsManifest deserializedManifest, FilePath path)
         {
             List<ToolManifestPackage> result = new List<ToolManifestPackage>();
             var errors = new List<string>();
 
-            if (deserializedManifest.version != 1)
+            if (deserializedManifest.version == 0)
             {
-                errors.Add(string.Format("Tools manifest format version {0} is not supported.",
-                    deserializedManifest.version));
+                _reporter.WriteLine(
+                    LocalizableStrings.ManifestMissionVersion +
+                    path.Value);
+            }
+            
+            if (deserializedManifest.version > SupportedVersion)
+            {
+                _reporter.WriteLine(
+                    string.Format(
+                        LocalizableStrings.ManifestVersionHigherThanSupported,
+                        deserializedManifest.version, SupportedVersion) +
+                    path.Value);
             }
 
             foreach (var tools in deserializedManifest.tools)
@@ -174,7 +188,6 @@ namespace Microsoft.DotNet.ToolManifest
 
         private class SerializableLocalToolsManifest
         {
-            [JsonProperty(Required = Required.Always)]
             public int version { get; set; }
 
             [DefaultValue(false)]
