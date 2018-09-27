@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using Microsoft.DotNet.Cli.Utils;
@@ -28,108 +29,136 @@ namespace Microsoft.DotNet.ToolManifest
 
         public IReadOnlyCollection<ToolManifestPackage> Find(FilePath? filePath = null)
         {
-            var result = new List<ToolManifestPackage>();
-
             IEnumerable<FilePath> allPossibleManifests =
                 filePath != null
-                    ? new[] { filePath.Value }
+                    ? new[] {filePath.Value}
                     : EnumerateDefaultAllPossibleManifests();
 
+            bool findAnyManifest = false;
+            var result = new List<ToolManifestPackage>();
             foreach (FilePath possibleManifest in allPossibleManifests)
             {
                 if (_fileSystem.File.Exists(possibleManifest.Value))
                 {
-                    SerializableLocalToolsManifest deserializedManifest = JsonConvert.DeserializeObject<SerializableLocalToolsManifest>(
-                        _fileSystem.File.ReadAllText(possibleManifest.Value), new JsonSerializerSettings
-                        {
-                            MissingMemberHandling = MissingMemberHandling.Ignore
-                        });
+                    findAnyManifest = true;
+                    SerializableLocalToolsManifest deserializedManifest =
+                        DeserializableLocalToolsManifest(possibleManifest);
 
-                    var errors = new List<string>();
-
-                    if (!deserializedManifest.isRoot)
+                    foreach (ToolManifestPackage p in GetToolManifestPackageFromOneManifestFile(deserializedManifest))
                     {
-                        errors.Add("isRoot is false is not supported.");
-                    }
-
-                    if (deserializedManifest.version != 1)
-                    {
-                        errors.Add(string.Format("Tools manifest format version {0} is not supported.",
-                            deserializedManifest.version));
-                    }
-
-                    foreach (var tools in deserializedManifest.tools)
-                    {
-                        var packageLevelErrors = new List<string>();
-                        var packageIdString = tools.Key;
-                        var packageId = new PackageId(packageIdString);
-
-                        string versionString = tools.Value.version;
-                        NuGetVersion version = null;
-                        if (versionString is null)
+                        if (!result.Any(addedToolManifestPackages =>
+                            addedToolManifestPackages.PackageId.Equals(p.PackageId)))
                         {
-                            packageLevelErrors.Add(LocalizableStrings.MissingVersion);
-                        }
-                        else
-                        {
-                            var versionParseResult = NuGetVersion.TryParse(
-                                versionString, out version);
-
-                            if (!versionParseResult)
-                            {
-                                packageLevelErrors.Add(string.Format(LocalizableStrings.VersionIsInvalid, versionString));
-                            }
-                        }
-
-                        NuGetFramework targetFramework = null;
-                        var targetFrameworkString = tools.Value.targetFramework;
-                        if (!(targetFrameworkString is null))
-                        {
-                            targetFramework = NuGetFramework.Parse(
-                                targetFrameworkString);
-
-                            if (targetFramework.IsUnsupported)
-                            {
-                                packageLevelErrors.Add(
-                                    string.Format(LocalizableStrings.TargetFrameworkIsUnsupported,
-                                        targetFrameworkString));
-                            }
-                        }
-
-                        if (tools.Value.commands == null 
-                            || (tools.Value.commands != null && tools.Value.commands.Length == 0))
-                        {
-                            packageLevelErrors.Add(LocalizableStrings.FieldCommandsIsMissing);
-                        }
-
-                        if (packageLevelErrors.Any())
-                        {
-                            var joined = string.Join(string.Empty, packageLevelErrors.Select(e => Environment.NewLine + "    " + e));
-                            errors.Add(string.Format(LocalizableStrings.InPackage, packageId.ToString()) + joined);
-                        }
-                        else
-                        {
-                            result.Add(new ToolManifestPackage(
-                                packageId,
-                                version,
-                                ToolCommandName.Convert(tools.Value.commands),
-                                targetFramework));
+                            result.Add(p);
                         }
                     }
 
-                    if (errors.Any())
+                    if (deserializedManifest.isRoot)
                     {
-                        throw new ToolManifestException(LocalizableStrings.InvalidManifestFilePrefix +
-                            string.Join(string.Empty, errors.Select(e => Environment.NewLine + "  " + e)));
+                        return result;
                     }
-
-                    return result;
                 }
             }
 
-            throw new ToolManifestException(
-                string.Format(LocalizableStrings.CannotFindAnyManifestsFileSearched,
-                    string.Join(Environment.NewLine, allPossibleManifests.Select(f => f.Value))));
+            if (!findAnyManifest)
+            {
+                throw new ToolManifestException(
+                    string.Format(LocalizableStrings.CannotFindAnyManifestsFileSearched,
+                        string.Join(Environment.NewLine, allPossibleManifests.Select(f => f.Value))));
+            }
+
+            return result;
+        }
+
+        private SerializableLocalToolsManifest DeserializableLocalToolsManifest(FilePath possibleManifest)
+        {
+            return JsonConvert.DeserializeObject<SerializableLocalToolsManifest>(
+                _fileSystem.File.ReadAllText(possibleManifest.Value), new JsonSerializerSettings
+                {
+                    MissingMemberHandling = MissingMemberHandling.Ignore
+                });
+        }
+
+        private static List<ToolManifestPackage> GetToolManifestPackageFromOneManifestFile(
+            SerializableLocalToolsManifest deserializedManifest)
+        {
+            List<ToolManifestPackage> result = new List<ToolManifestPackage>();
+            var errors = new List<string>();
+
+            if (deserializedManifest.version != 1)
+            {
+                errors.Add(string.Format("Tools manifest format version {0} is not supported.",
+                    deserializedManifest.version));
+            }
+
+            foreach (var tools in deserializedManifest.tools)
+            {
+                var packageLevelErrors = new List<string>();
+                var packageIdString = tools.Key;
+                var packageId = new PackageId(packageIdString);
+
+                string versionString = tools.Value.version;
+                NuGetVersion version = null;
+                if (versionString is null)
+                {
+                    packageLevelErrors.Add(LocalizableStrings.MissingVersion);
+                }
+                else
+                {
+                    var versionParseResult = NuGetVersion.TryParse(
+                        versionString, out version);
+
+                    if (!versionParseResult)
+                    {
+                        packageLevelErrors.Add(string.Format(LocalizableStrings.VersionIsInvalid, versionString));
+                    }
+                }
+
+                NuGetFramework targetFramework = null;
+                var targetFrameworkString = tools.Value.targetFramework;
+                if (!(targetFrameworkString is null))
+                {
+                    targetFramework = NuGetFramework.Parse(
+                        targetFrameworkString);
+
+                    if (targetFramework.IsUnsupported)
+                    {
+                        packageLevelErrors.Add(
+                            string.Format(LocalizableStrings.TargetFrameworkIsUnsupported,
+                                targetFrameworkString));
+                    }
+                }
+
+                if (tools.Value.commands == null
+                    || (tools.Value.commands != null && tools.Value.commands.Length == 0))
+                {
+                    packageLevelErrors.Add(LocalizableStrings.FieldCommandsIsMissing);
+                }
+
+                if (packageLevelErrors.Any())
+                {
+                    var joined = string.Join(string.Empty,
+                        packageLevelErrors.Select(e => Environment.NewLine + "    " + e));
+                    errors.Add(string.Format(LocalizableStrings.InPackage, packageId.ToString()) + joined);
+                }
+                else
+                {
+                    result.Add(new ToolManifestPackage(
+                        packageId,
+                        version,
+                        ToolCommandName.Convert(tools.Value.commands),
+                        targetFramework));
+                }
+            }
+
+            if (errors.Any())
+            {
+                throw new ToolManifestException(LocalizableStrings.InvalidManifestFilePrefix +
+                                                string.Join(string.Empty,
+                                                    errors.Select(e => Environment.NewLine + "  " + e)));
+            }
+
+            return result;
         }
 
         private IEnumerable<FilePath> EnumerateDefaultAllPossibleManifests()
@@ -148,7 +177,8 @@ namespace Microsoft.DotNet.ToolManifest
             [JsonProperty(Required = Required.Always)]
             public int version { get; set; }
 
-            [JsonProperty(Required = Required.Always)]
+            [DefaultValue(false)]
+            [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
             public bool isRoot { get; set; }
 
             [JsonProperty(Required = Required.Always)]
