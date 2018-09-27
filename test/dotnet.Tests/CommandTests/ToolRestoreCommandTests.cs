@@ -178,6 +178,8 @@ namespace Microsoft.DotNet.Tests.Commands
             _reporter.Lines.Should().Contain(l => l.Contains(string.Format(
                 LocalizableStrings.RestoreSuccessful, _packageIdB,
                 _packageVersionB.ToNormalizedString(), _toolCommandNameB)));
+
+            _reporter.Lines.Should().Contain(l => l.Contains("\x1B[32m"), "ansicolor code for green, message should be green");
         }
 
         [Fact]

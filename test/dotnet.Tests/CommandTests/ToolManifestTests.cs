@@ -117,7 +117,7 @@ namespace Microsoft.DotNet.Tests.Commands
             a.ShouldThrow<ToolManifestException>().And.Message.Should().Contain(
                 LocalizableStrings.InvalidManifestFilePrefix + Environment.NewLine + "  " +
                 string.Format(LocalizableStrings.InPackage, "t-rex") + Environment.NewLine + "    " +
-                LocalizableStrings.MissingVersion + Environment.NewLine + "    " +
+                LocalizableStrings.ToolMissingVersion + Environment.NewLine + "    " +
                 LocalizableStrings.FieldCommandsIsMissing);
         }
 
@@ -160,7 +160,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 p => p == new ToolManifestPackage(
                          new PackageId("dotnetsay"),
                          NuGetVersion.Parse("2.1.4"),
-                         new[] {new ToolCommandName("dotnetsay")}),
+                         new[] { new ToolCommandName("dotnetsay") }),
                 because: "combine both content in different manifests");
         }
 
@@ -179,34 +179,17 @@ namespace Microsoft.DotNet.Tests.Commands
             manifestResult.Count.Should().Be(2, "only content in the current directory manifest file is considered");
         }
 
-
         [Fact]
-        public void DifferentVersionOfManifestFileItShouldHaveWarnings()
+        public void DifferentVersionOfManifestFileItShouldThrow()
         {
             _fileSystem.File.WriteAllText(Path.Combine(_testDirectoryRoot, _manifestFilename), _jsonContentHigherVersion);
             BufferedReporter bufferedReporter = new BufferedReporter();
-            var toolManifest = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem, bufferedReporter);
-            toolManifest.Find();
+            var toolManifest = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem);
+            Action a = () => toolManifest.Find();
 
-            bufferedReporter.Lines.Should()
-                .Contain(l =>
-                    l.Contains(
-                        string.Format(
+            a.ShouldThrow<ToolManifestException>().And.Message.Contains(string.Format(
                             LocalizableStrings.ManifestVersionHigherThanSupported,
-                            99, 1)));
-        }
-
-        [Fact]
-        public void NoVersionInManifestFileItShouldHaveWarnings()
-        {
-            _fileSystem.File.WriteAllText(Path.Combine(_testDirectoryRoot, _manifestFilename), _jsonContentNoVersion);
-            BufferedReporter bufferedReporter = new BufferedReporter();
-            var toolManifest = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem, bufferedReporter);
-            toolManifest.Find();
-
-            bufferedReporter.Lines.Should()
-                .Contain(l =>
-                    l.Contains(LocalizableStrings.ManifestMissingVersion));
+                            99, 1));
         }
 
         private string _jsonContent =
@@ -313,7 +296,6 @@ namespace Microsoft.DotNet.Tests.Commands
    }
 }";
 
-
         private string _jsonContentInParentDirectory =
             @"{
    ""version"":1,
@@ -329,25 +311,6 @@ namespace Microsoft.DotNet.Tests.Commands
          ""version"":""4.0.0"",
          ""commands"":[
             ""dotnetsay2""
-         ]
-      }
-   }
-}";
-
-        private string _jsonContentNoVersion =
-            @"{
-   ""isRoot"":true,
-   ""tools"":{
-      ""t-rex"":{
-         ""version"":""1.0.53"",
-         ""commands"":[
-            ""t-rex""
-         ]
-      },
-      ""dotnetsay"":{
-         ""version"":""2.1.4"",
-         ""commands"":[
-            ""dotnetsay""
          ]
       }
    }

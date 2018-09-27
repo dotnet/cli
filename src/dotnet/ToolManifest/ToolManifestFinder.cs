@@ -19,16 +19,14 @@ namespace Microsoft.DotNet.ToolManifest
     {
         private readonly DirectoryPath _probStart;
         private readonly IFileSystem _fileSystem;
-        private IReporter _reporter;
         private const string _manifestFilenameConvention = "localtool.manifest.json";
 
         // The supported tool manifest file version.
         private const int SupportedVersion = 1;
-        public ToolManifestFinder(DirectoryPath probStart, IFileSystem fileSystem = null, IReporter reporter = null)
+        public ToolManifestFinder(DirectoryPath probStart, IFileSystem fileSystem = null)
         {
             _probStart = probStart;
             _fileSystem = fileSystem ?? new FileSystemWrapper();
-            _reporter = reporter ?? Reporter.Output;
         }
 
         public IReadOnlyCollection<ToolManifestPackage> Find(FilePath? filePath = null)
@@ -91,21 +89,21 @@ namespace Microsoft.DotNet.ToolManifest
 
             if (deserializedManifest.version == 0)
             {
-                _reporter.WriteLine(
-                    LocalizableStrings.ManifestMissingVersion +
+                errors.Add(
+                    LocalizableStrings.ManifestVersion0 +
                     path.Value);
             }
 
             if (deserializedManifest.version > SupportedVersion)
             {
-                _reporter.WriteLine(
+                errors.Add(
                     string.Format(
                         LocalizableStrings.ManifestVersionHigherThanSupported,
                         deserializedManifest.version, SupportedVersion) +
                     path.Value);
             }
 
-            foreach (var tools in deserializedManifest.tools)
+            foreach (KeyValuePair<string, SerializableLocalToolSinglePackage> tools in deserializedManifest.tools)
             {
                 var packageLevelErrors = new List<string>();
                 var packageIdString = tools.Key;
@@ -115,19 +113,17 @@ namespace Microsoft.DotNet.ToolManifest
                 NuGetVersion version = null;
                 if (versionString is null)
                 {
-                    packageLevelErrors.Add(LocalizableStrings.MissingVersion);
+                    packageLevelErrors.Add(LocalizableStrings.ToolMissingVersion);
                 }
                 else
                 {
                     var versionParseResult = NuGetVersion.TryParse(
                         versionString, out version);
-
                     if (!versionParseResult)
                     {
                         packageLevelErrors.Add(string.Format(LocalizableStrings.VersionIsInvalid, versionString));
                     }
                 }
-
                 NuGetFramework targetFramework = null;
                 var targetFrameworkString = tools.Value.targetFramework;
                 if (!(targetFrameworkString is null))
@@ -187,6 +183,8 @@ namespace Microsoft.DotNet.ToolManifest
 
         private class SerializableLocalToolsManifest
         {
+            [DefaultValue(1)]
+            [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
             public int version { get; set; }
 
             [DefaultValue(false)]

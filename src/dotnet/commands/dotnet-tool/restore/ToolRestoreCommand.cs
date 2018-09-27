@@ -61,7 +61,7 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
 
             _toolManifestFinder
                 = toolManifestFinder
-                  ?? new ToolManifestFinder(new DirectoryPath(Directory.GetCurrentDirectory()), reporter: _reporter);
+                  ?? new ToolManifestFinder(new DirectoryPath(Directory.GetCurrentDirectory()));
 
             _localToolsResolverCache = localToolsResolverCache ??
                                        new LocalToolsResolverCache(
@@ -180,7 +180,7 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
             }
 
             _reporter.WriteLine("Restore was successful.");
-            _reporter.WriteLine(string.Join(Environment.NewLine, successMessages));
+            _reporter.WriteLine(string.Join(Environment.NewLine, successMessages).Green());
 
             return 0;
         }
