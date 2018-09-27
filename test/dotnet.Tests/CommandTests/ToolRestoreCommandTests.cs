@@ -172,12 +172,11 @@ namespace Microsoft.DotNet.Tests.Commands
 
             toolRestoreCommand.Execute().Should().Be(0);
 
-            _reporter.Lines.Should().Contain(l => l.Contains("Restore was successful."));
             _reporter.Lines.Should().Contain(l => l.Contains(string.Format(
-                "Tool '{0}' (version '{1}') was restored. Available commands: {2}", _packageIdA,
+                LocalizableStrings.RestoreSuccessful, _packageIdA,
                 _packageVersionA.ToNormalizedString(), _toolCommandNameA)));
             _reporter.Lines.Should().Contain(l => l.Contains(string.Format(
-                "Tool '{0}' (version '{1}') was restored. Available commands: {2}", _packageIdB,
+                LocalizableStrings.RestoreSuccessful, _packageIdB,
                 _packageVersionB.ToNormalizedString(), _toolCommandNameB)));
         }
 
