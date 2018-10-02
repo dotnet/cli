@@ -92,7 +92,7 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
             {
                 packagesFromManifest = _toolManifestFinder.Find(customManifestFileLocation);
             }
-            catch (ToolManifestCannotFindException e)
+            catch (ToolManifestCannotBeFoundException e)
             {
                 _reporter.WriteLine(e.Message.Yellow());
                 return 0;
@@ -114,7 +114,7 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
                 if (PackageHasBeenRestored(package, targetFramework))
                 {
                     successMessages.Add(string.Format(
-                        "Tool '{0}' (version '{1}') was restored. Available commands: {2}", package.PackageId,
+                        LocalizableStrings.RestoreSuccessful, package.PackageId,
                         package.Version.ToNormalizedString(), string.Join(", ", package.CommandNames)));
                     continue;
                 }
@@ -179,7 +179,7 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
                 return 1;
             }
 
-            _reporter.WriteLine("Restore was successful.");
+            _reporter.WriteLine(LocalizableStrings.LocalToolsRestoreWasSuccessful.Green());
             _reporter.WriteLine(string.Join(Environment.NewLine, successMessages).Green());
 
             return 0;

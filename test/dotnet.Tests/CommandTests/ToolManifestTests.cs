@@ -96,7 +96,7 @@ namespace Microsoft.DotNet.Tests.Commands
         {
             var toolManifest = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem);
             Action a = () => toolManifest.Find(new FilePath(Path.Combine(_testDirectoryRoot, "non-exists")));
-            a.ShouldThrow<ToolManifestCannotFindException>().And.Message.Should().Contain(string.Format(LocalizableStrings.CannotFindAnyManifestsFileSearched, ""));
+            a.ShouldThrow<ToolManifestCannotBeFoundException>().And.Message.Should().Contain(string.Format(LocalizableStrings.CannotFindAnyManifestsFileSearched, ""));
         }
 
         [Fact]
@@ -104,7 +104,7 @@ namespace Microsoft.DotNet.Tests.Commands
         {
             var toolManifest = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem);
             Action a = () => toolManifest.Find();
-            a.ShouldThrow<ToolManifestCannotFindException>().And.Message.Should().Contain(string.Format(LocalizableStrings.CannotFindAnyManifestsFileSearched, ""));
+            a.ShouldThrow<ToolManifestCannotBeFoundException>().And.Message.Should().Contain(string.Format(LocalizableStrings.CannotFindAnyManifestsFileSearched, ""));
         }
 
         [Fact]
@@ -115,10 +115,10 @@ namespace Microsoft.DotNet.Tests.Commands
             Action a = () => toolManifest.Find();
 
             a.ShouldThrow<ToolManifestException>().And.Message.Should().Contain(
-                LocalizableStrings.InvalidManifestFilePrefix + Environment.NewLine + "  " +
-                string.Format(LocalizableStrings.InPackage, "t-rex") + Environment.NewLine + "    " +
-                LocalizableStrings.ToolMissingVersion + Environment.NewLine + "    " +
-                LocalizableStrings.FieldCommandsIsMissing);
+                string.Format(LocalizableStrings.InvalidManifestFilePrefix,
+                    "\t" + string.Format(LocalizableStrings.InPackage, "t-rex",
+                        ("\t\t" + LocalizableStrings.ToolMissingVersion + Environment.NewLine +
+                        "\t\t" + LocalizableStrings.FieldCommandsIsMissing))));
         }
 
         [Fact]
@@ -187,9 +187,9 @@ namespace Microsoft.DotNet.Tests.Commands
             var toolManifest = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem);
             Action a = () => toolManifest.Find();
 
-            a.ShouldThrow<ToolManifestException>().And.Message.Contains(string.Format(
+            a.ShouldThrow<ToolManifestException>().And.Message.Should().Contain(string.Format(
                             LocalizableStrings.ManifestVersionHigherThanSupported,
-                            99, 1));
+                            99, 1, ""));
         }
 
         private string _jsonContent =
