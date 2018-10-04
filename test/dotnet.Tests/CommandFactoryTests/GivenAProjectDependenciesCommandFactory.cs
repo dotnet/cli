@@ -5,10 +5,12 @@ using System;
 using System.IO;
 using FluentAssertions;
 using Microsoft.DotNet.TestFramework;
+using Microsoft.DotNet.CommandFactory;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using NuGet.Frameworks;
 using Xunit;
 using Microsoft.DotNet.Tools.Tests.Utilities;
+using Microsoft.DotNet.Cli.Utils;
 
 namespace Microsoft.DotNet.Tests
 {

@@ -3,6 +3,7 @@
 
 using FluentAssertions;
 using Microsoft.DotNet.Tools.Test.Utilities;
+using Microsoft.DotNet.CommandFactory;
 using Xunit;
 
 namespace Microsoft.DotNet.Tests

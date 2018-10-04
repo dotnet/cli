@@ -3,6 +3,7 @@
 
 using System.Linq;
 using FluentAssertions;
+using Microsoft.DotNet.CommandFactory;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
 

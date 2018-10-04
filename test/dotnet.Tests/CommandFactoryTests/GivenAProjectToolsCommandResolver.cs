@@ -13,6 +13,7 @@ using NuGet.ProjectModel;
 using NuGet.Versioning;
 using Xunit;
 using Microsoft.DotNet.Tools.Tests.Utilities;
+using Microsoft.DotNet.CommandFactory;
 
 namespace Microsoft.DotNet.Tests
 {

@@ -1,4 +1,4 @@
-﻿namespace Microsoft.DotNet.Cli.Utils
+﻿namespace Microsoft.DotNet.Tools
 {
     internal interface IFilePermissionSetter
     {

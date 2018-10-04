@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using Microsoft.DotNet.Cli.Utils;
 
 namespace Microsoft.DotNet.Tests
 {
