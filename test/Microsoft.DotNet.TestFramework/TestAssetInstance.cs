@@ -251,7 +251,7 @@ namespace Microsoft.DotNet.TestFramework
 
             Console.WriteLine($"TestAsset Build '{TestAssetInfo.AssetName}'");
 
-            var commandResult = Command.Create(TestAssetInfo.DotnetExeFile.FullName, args)
+            var commandResult = TestCommandFactory.Create(TestAssetInfo.DotnetExeFile.FullName, args)
                                     .WorkingDirectory(Root.FullName)
                                     .CaptureStdOut()
                                     .CaptureStdErr()
@@ -280,7 +280,7 @@ namespace Microsoft.DotNet.TestFramework
         {
             var restoreArgs = new string[] { "restore", projectFile.FullName };
 
-            var commandResult = Command.Create(TestAssetInfo.DotnetExeFile.FullName, restoreArgs)
+            var commandResult = TestCommandFactory.Create(TestAssetInfo.DotnetExeFile.FullName, restoreArgs)
                                 .CaptureStdOut()
                                 .CaptureStdErr()
                                 .Execute();
