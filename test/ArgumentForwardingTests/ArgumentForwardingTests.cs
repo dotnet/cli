@@ -168,7 +168,7 @@ namespace Microsoft.DotNet.Tests.ArgumentForwarding
         private string[] EscapeAndEvaluateArgumentString(string[] rawEvaluatedArgument)
         {
             var commandResult = new DotnetCommand()
-                .ExecuteWithCapturedOutput(ArgumentEscaper.EscapeAndConcatenateArgArrayForProcessStart(new[] { ReflectorPath }.Concat(rawEvaluatedArgument));
+                .ExecuteWithCapturedOutput(ArgumentEscaper.EscapeAndConcatenateArgArrayForProcessStart(new[] { ReflectorPath }.Concat(rawEvaluatedArgument)));
 
             Console.WriteLine($"STDOUT: {commandResult.StdOut}");
 
