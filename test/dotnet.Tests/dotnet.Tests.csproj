@@ -23,7 +23,9 @@
     </Content>
   </ItemGroup>
   
-  <Target Name="WriteExpectedVersion" BeforeTargets="BeforeBuild" DependsOnTargets="PrepareForBuild">
+  <Target Name="WriteExpectedVersion"
+          BeforeTargets="BeforeBuild"
+          DependsOnTargets="PrepareForBuild">
 
     <PropertyGroup>
       <ExpectedVersionFileInIntermediateFolder>$(IntermediateOutputPath)ExpectedSdkVersion.txt</ExpectedVersionFileInIntermediateFolder>
@@ -34,10 +36,14 @@
       </ExistingVersionFileContent>
 
       <ShouldOverwriteVersionFile>false</ShouldOverwriteVersionFile>
-      <ShouldOverwriteVersionFile Condition=" '$(ExistingVersionFileContent.Trim())' != '$(VersionFileContent.Trim())' ">true</ShouldOverwriteVersionFile>
+      <ShouldOverwriteVersionFile
+        Condition=" '$(ExistingVersionFileContent.Trim())' != '$(VersionFileContent.Trim())' ">true</ShouldOverwriteVersionFile>
     </PropertyGroup>
     
-    <WriteLinesToFile File="$(ExpectedVersionFileInIntermediateFolder)" Lines="$(VersionFileContent)" Condition=" '$(ShouldOverwriteVersionFile)' == 'true' " Overwrite="true" />
+    <WriteLinesToFile File="$(ExpectedVersionFileInIntermediateFolder)"
+                      Lines="$(VersionFileContent)"
+                      Condition=" '$(ShouldOverwriteVersionFile)' == 'true' "
+                      Overwrite="true" />
 
     <ItemGroup>
       <Content Include="$(ExpectedVersionFileInIntermediateFolder)" CopyToOutputDirectory="PreserveNewest" />
@@ -73,11 +79,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkPackageVersion)" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Build.Runtime" Version="$(MicrosoftBuildRuntimePackageVersion)" />
     <PackageReference Include="xunit" Version="2.2.0" />
     <PackageReference Include="Moq" Version="4.7.25" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="$(MicrosoftDotNetPlatformAbstractionsPackageVersion)" />
     <PackageReference Include="Microsoft.DotNet.Cli.CommandLine" Version="$(MicrosoftDotNetCliCommandLinePackageVersion)" />
+    <PackageReference Include="Microsoft.Build.Runtime" Version="$(MicrosoftBuildRuntimePackageVersion)" />
     <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
   </ItemGroup>
 </Project>
