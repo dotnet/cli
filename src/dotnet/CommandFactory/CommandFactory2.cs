@@ -11,31 +11,6 @@ namespace Microsoft.DotNet.CommandFactory
     {
         private static string[] _knownCommandsAvailableAsDotNetTool = new[] { "dotnet-dev-certs", "dotnet-ef", "dotnet-sql-cache", "dotnet-user-secrets", "dotnet-watch" };
 
-        private static Command Command(CommandSpec commandSpec)
-        {
-            var psi = new ProcessStartInfo
-            {
-                FileName = commandSpec.Path,
-                Arguments = commandSpec.Args,
-                UseShellExecute = false
-            };
-
-            foreach (var environmentVariable in commandSpec.EnvironmentVariables)
-            {
-                if (!psi.Environment.ContainsKey(environmentVariable.Key))
-                {
-                    psi.Environment.Add(environmentVariable.Key, environmentVariable.Value);
-                }
-            }
-
-            var _process = new Process
-            {
-                StartInfo = psi
-            };
-
-            return new Command(_process);
-        }
-
         public static Command CreateDotNet(
             string commandName,
             IEnumerable<string> args,
@@ -102,14 +77,34 @@ namespace Microsoft.DotNet.CommandFactory
                 }
             }
 
-            var command = Command(commandSpec);
+            var command = Create(commandSpec);
 
             return command;
         }
 
         public static Command Create(CommandSpec commandSpec)
         {
-            return Command(commandSpec);
+            var psi = new ProcessStartInfo
+            {
+                FileName = commandSpec.Path,
+                Arguments = commandSpec.Args,
+                UseShellExecute = false
+            };
+
+            foreach (var environmentVariable in commandSpec.EnvironmentVariables)
+            {
+                if (!psi.Environment.ContainsKey(environmentVariable.Key))
+                {
+                    psi.Environment.Add(environmentVariable.Key, environmentVariable.Value);
+                }
+            }
+
+            var _process = new Process
+            {
+                StartInfo = psi
+            };
+
+            return new Command(_process);
         }
     }
 }
