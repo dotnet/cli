@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.CommandFactory
             NuGetFramework framework = null,
             string configuration = Constants.DefaultConfiguration)
         {
-            return CommandFactory2.Create(commandName, args, framework, configuration, _publishDirectory, _applicationName);
+            return CommandUsingResolver.Create(commandName, args, framework, configuration, _publishDirectory, _applicationName);
         }
     }
 }

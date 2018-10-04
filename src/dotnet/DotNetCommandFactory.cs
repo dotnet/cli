@@ -34,7 +34,7 @@ namespace Microsoft.DotNet.Cli
                 return new BuiltInCommand(commandName, args, builtInCommand.Command);
             }
 
-            return CommandFactory2.CreateDotNet(commandName, args, framework, configuration);
+            return CommandUsingResolver.CreateDotNet(commandName, args, framework, configuration);
         }
     }
 }

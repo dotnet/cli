@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.CommandFactory
 
             var commandSpec = _depsJsonCommandResolver.Resolve(commandResolverArgs);
 
-            return CommandFactory2.Create(commandSpec);
+            return CommandUsingResolver.Create(commandSpec);
         }
     }
 }

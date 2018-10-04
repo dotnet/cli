@@ -60,7 +60,7 @@ namespace Microsoft.DotNet.CommandFactory
                 _buildBasePath,
                 _projectDirectory);
 
-            return CommandFactory2.Create(commandSpec);
+            return CommandUsingResolver.Create(commandSpec);
         }
 
         private CommandSpec FindProjectDependencyCommands(

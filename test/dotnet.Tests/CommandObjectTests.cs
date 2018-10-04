@@ -23,21 +23,21 @@ namespace Microsoft.DotNet.Tests
         [Fact]
         public void WhenItCannotResolveCommandItThrows()
         {
-            Action a = () => { CommandFactory2.Create(new ResolveNothingCommandResolverPolicy(), "non-exist-command", Array.Empty<string>() ); };
+            Action a = () => { CommandUsingResolver.Create(new ResolveNothingCommandResolverPolicy(), "non-exist-command", Array.Empty<string>() ); };
             a.ShouldThrow<CommandUnknownException>();
         }
 
         [Fact]
         public void WhenItCannotResolveCommandButCommandIsInListOfKnownToolsItThrows()
         {
-            Action a = () => { CommandFactory2.Create(new ResolveNothingCommandResolverPolicy(), "non-exist-command", Array.Empty<string>()); };
+            Action a = () => { CommandUsingResolver.Create(new ResolveNothingCommandResolverPolicy(), "non-exist-command", Array.Empty<string>()); };
             a.ShouldThrow<CommandUnknownException>();
         }
 
         [Fact]
         public void WhenItCannotResolveCommandButCommandIsInListOfKnownToolsItThrowsWithGuideToUseTool()
         {
-            Action a = () => { CommandFactory2.Create(new ResolveNothingCommandResolverPolicy(), "dotnet-ef", Array.Empty<string>()); };
+            Action a = () => { CommandUsingResolver.Create(new ResolveNothingCommandResolverPolicy(), "dotnet-ef", Array.Empty<string>()); };
             a.ShouldThrow<CommandAvailableAsDotNetToolException>()
                 .And.Message.Should()
                 .Contain(string.Format(LocalizableStrings.CannotFindCommandAvailableAsTool,
@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.Tests
         [Fact]
         public void WhenItCannotResolveCommandButCommandIsInListOfKnownToolsItThrowsWithGuideToUseToolWithNormalizedCasing()
         {
-            Action a = () => { CommandFactory2.Create(new ResolveNothingCommandResolverPolicy(), "dotnet-EF", Array.Empty<string>()); };
+            Action a = () => { CommandUsingResolver.Create(new ResolveNothingCommandResolverPolicy(), "dotnet-EF", Array.Empty<string>()); };
             a.ShouldThrow<CommandAvailableAsDotNetToolException>()
                 .And.Message.Should()
                 .Contain(string.Format(LocalizableStrings.CannotFindCommandAvailableAsTool,

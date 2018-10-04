@@ -7,7 +7,7 @@ using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.CommandFactory
 {
-    public static class CommandFactory2
+    public static class CommandUsingResolver
     {
         private static string[] _knownCommandsAvailableAsDotNetTool = new[] { "dotnet-dev-certs", "dotnet-ef", "dotnet-sql-cache", "dotnet-user-secrets", "dotnet-watch" };
 
