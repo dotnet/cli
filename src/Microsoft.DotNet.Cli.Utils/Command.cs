@@ -26,26 +26,6 @@ namespace Microsoft.DotNet.Cli.Utils
             _process = process ?? throw new ArgumentNullException(nameof(process));
         }
 
-
-        // TODO wul move it to test only
-        public static Command Create(string path, IEnumerable<string> args)
-        {
-            var psi = new ProcessStartInfo
-            {
-                FileName = path,
-                Arguments = ArgumentEscaper.EscapeAndConcatenateArgArrayForProcessStart(args),
-                UseShellExecute = false
-            };
-
-
-            var _process = new Process
-            {
-                StartInfo = psi
-            };
-
-            return new Command(_process);
-        }
-
         public CommandResult Execute()
         {
 
