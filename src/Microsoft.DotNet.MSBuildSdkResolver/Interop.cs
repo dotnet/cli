@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
             string architecture = IntPtr.Size == 8 ? "x64" : "x86";
             string dllPath = Path.Combine(basePath, architecture, dllFileName);
 
-            // return value is intentially ignored as we let the subsequent P/Invokes fail naturally.
+            // return value is intentionally ignored as we let the subsequent P/Invokes fail naturally.
             LoadLibraryExW(dllPath, IntPtr.Zero, LOAD_WITH_ALTERED_SEARCH_PATH);
         }
 
