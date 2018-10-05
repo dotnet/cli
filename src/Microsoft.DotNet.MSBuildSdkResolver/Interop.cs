@@ -90,7 +90,7 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
 
         internal static class Unix
         {
-            // Ansi marhsaling on Unix is actually UTF8
+            // Ansi marshaling on Unix is actually UTF8
             private const CharSet UTF8 = CharSet.Ansi;
             private static string PtrToStringUTF8(IntPtr ptr) => Marshal.PtrToStringAnsi(ptr);
 
