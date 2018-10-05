@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.DotNet.ToolPackage;
 using Microsoft.Extensions.EnvironmentAbstractions;
@@ -41,25 +42,38 @@ namespace Microsoft.DotNet.ToolManifest
             var result = new List<ToolManifestPackage>();
             foreach (FilePath possibleManifest in allPossibleManifests)
             {
-                if (_fileSystem.File.Exists(possibleManifest.Value))
+                if (!_fileSystem.File.Exists(possibleManifest.Value))
                 {
-                    findAnyManifest = true;
-                    SerializableLocalToolsManifest deserializedManifest =
-                        DeserializeLocalToolsManifest(possibleManifest);
+                    continue;
+                }
 
-                    foreach (ToolManifestPackage p in GetToolManifestPackageFromOneManifestFile(deserializedManifest, possibleManifest))
-                    {
-                        if (!result.Any(addedToolManifestPackages =>
-                            addedToolManifestPackages.PackageId.Equals(p.PackageId)))
-                        {
-                            result.Add(p);
-                        }
-                    }
+                findAnyManifest = true;
+                SerializableLocalToolsManifest deserializedManifest =
+                    DeserializeLocalToolsManifest(possibleManifest);
 
-                    if (deserializedManifest.isRoot)
+                var (toolManifestPackageFromOneManifestFile, errors) =
+                    GetToolManifestPackageFromOneManifestFile(deserializedManifest, possibleManifest);
+
+                if (errors.Any())
+                {
+                    throw new ToolManifestException(
+                        string.Format(LocalizableStrings.InvalidManifestFilePrefix,
+                            path.Value,
+                            string.Join(Environment.NewLine, errors.Select(e => "\t" + e))));
+                }
+
+                foreach (ToolManifestPackage p in toolManifestPackageFromOneManifestFile)
+                {
+                    if (!result.Any(addedToolManifestPackages =>
+                        addedToolManifestPackages.PackageId.Equals(p.PackageId)))
                     {
-                        return result;
+                        result.Add(p);
                     }
+                }
+
+                if (deserializedManifest.isRoot)
+                {
+                    return result;
                 }
             }
 
@@ -71,6 +85,52 @@ namespace Microsoft.DotNet.ToolManifest
             }
 
             return result;
+        }
+
+        public bool TryFind(ToolCommandName toolCommandName, out ToolManifestPackage toolManifestPackage)
+        {
+            toolManifestPackage = default(ToolManifestPackage);
+            foreach (FilePath possibleManifest in EnumerateDefaultAllPossibleManifests())
+            {
+                if (!_fileSystem.File.Exists(possibleManifest.Value))
+                {
+                    continue;
+                }
+
+                SerializableLocalToolsManifest deserializedManifest;
+                try
+                {
+                    deserializedManifest = DeserializeLocalToolsManifest(possibleManifest);
+                }
+                catch (JsonReaderException)
+                {
+                    continue;
+                }
+
+                var (toolManifestPackages, errors) =
+                    GetToolManifestPackageFromOneManifestFile(deserializedManifest, possibleManifest);
+
+                if (errors.Any())
+                {
+                    continue;
+                }
+
+                foreach (var package in toolManifestPackages)
+                {
+                    if (package.CommandNames.Contains(toolCommandName))
+                    {
+                        toolManifestPackage = package;
+                        return true;
+                    }
+                }
+
+                if (deserializedManifest.isRoot)
+                {
+                    return false;
+                }
+            }
+
+            return false;
         }
 
         private SerializableLocalToolsManifest DeserializeLocalToolsManifest(FilePath possibleManifest)
@@ -89,7 +149,7 @@ namespace Microsoft.DotNet.ToolManifest
             }
         }
 
-        private List<ToolManifestPackage> GetToolManifestPackageFromOneManifestFile(
+        private (List<ToolManifestPackage> result, List<string> errors) GetToolManifestPackageFromOneManifestFile(
             SerializableLocalToolsManifest deserializedManifest, FilePath path)
         {
             List<ToolManifestPackage> result = new List<ToolManifestPackage>();
@@ -138,7 +198,8 @@ namespace Microsoft.DotNet.ToolManifest
                 {
                     var joinedWithIndentation = string.Join(Environment.NewLine,
                         packageLevelErrors.Select(e => "\t\t" + e));
-                    errors.Add(string.Format(LocalizableStrings.InPackage, packageId.ToString(), joinedWithIndentation));
+                    errors.Add(string.Format(LocalizableStrings.InPackage, packageId.ToString(),
+                        joinedWithIndentation));
                 }
                 else
                 {
@@ -149,15 +210,7 @@ namespace Microsoft.DotNet.ToolManifest
                 }
             }
 
-            if (errors.Any())
-            {
-                throw new ToolManifestException(
-                    string.Format(LocalizableStrings.InvalidManifestFilePrefix,
-                        path.Value,
-                        string.Join(Environment.NewLine, errors.Select(e => "\t" + e))));
-            }
-
-            return result;
+            return (result, errors);
         }
 
         private IEnumerable<FilePath> EnumerateDefaultAllPossibleManifests()

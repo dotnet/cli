@@ -220,4 +220,7 @@
   <data name="MSBuildArgs" xml:space="preserve">
     <value>MSBuild arguments: {0}</value>
   </data>
+  <data name="NeedRunToolRestore" xml:space="preserve">
+    <value>Please run \"dotnet tool restore\" to make command \"{0}\" available.</value>
+  </data>
 </root>
