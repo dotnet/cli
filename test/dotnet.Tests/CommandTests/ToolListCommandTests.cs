@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.Tests.Commands
              .And
              .Message
              .Should()
-             .Be(LocalizableStrings.NeedGlobalOrToolPath);
+             .Be(LocalizableStrings.NeedGlobalLocalOrToolPath);
         }
 
         [Fact]

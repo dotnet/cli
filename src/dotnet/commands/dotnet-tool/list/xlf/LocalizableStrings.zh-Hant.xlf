@@ -32,11 +32,6 @@
         <target state="translated">警告: 工具套件 '{0}' 無效: {1}</target>
         <note />
       </trans-unit>
-      <trans-unit id="NeedGlobalOrToolPath">
-        <source>Please specify either the global option (--global) or the tool path option (--tool-path).</source>
-        <target state="translated">請指定全域選項 (--global) 或工具路徑選項 (--tool-path) 兩者之一。</target>
-        <note />
-      </trans-unit>
       <trans-unit id="GlobalAndToolPathConflict">
         <source>(--global) conflicts with the tool path option (--tool-path). Please specify only one of the options.</source>
         <target state="translated">(--global) 與工具路徑選項 (--tool-path) 衝突。請只指定其中一個選項。</target>
@@ -55,6 +50,26 @@
       <trans-unit id="ToolPathOptionDescription">
         <source>The directory containing the tools to list.</source>
         <target state="translated">包含要列出之工具的目錄。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NeedGlobalLocalOrToolPath">
+        <source>Please specify either the global option (--global), local option (--local), or the tool path option (--tool-path).</source>
+        <target state="new">Please specify either the global option (--global), local option (--local), or the tool path option (--tool-path).</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="LocalAndToolPathConflict">
+        <source>(--local) conflicts with the tool path option (--tool-path). Please specify only one of the options.</source>
+        <target state="new">(--local) conflicts with the tool path option (--tool-path). Please specify only one of the options.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="LocalAndGlobalConflict">
+        <source>(--local) conflicts with the global option (--global). Please specify only one of the options.</source>
+        <target state="new">(--local) conflicts with the global option (--global). Please specify only one of the options.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="LocalOptionDescription">
+        <source>List tools in the current user's current directory.</source>
+        <target state="new">List tools in the current user's current directory.</target>
         <note />
       </trans-unit>
     </body>
