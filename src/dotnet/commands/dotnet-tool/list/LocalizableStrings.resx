@@ -123,17 +123,26 @@
   <data name="GlobalOptionDescription" xml:space="preserve">
     <value>List tools in the current user's tools directory.</value>
   </data>
+  <data name="LocalOptionDescription" xml:space="preserve">
+    <value>List tools in the current user's current directory.</value>
+  </data>
   <data name="ToolPathOptionName" xml:space="preserve">
     <value>PATH</value>
   </data>
   <data name="ToolPathOptionDescription" xml:space="preserve">
     <value>The directory containing the tools to list.</value>
   </data>
-  <data name="NeedGlobalOrToolPath" xml:space="preserve">
-    <value>Please specify either the global option (--global) or the tool path option (--tool-path).</value>
+  <data name="NeedGlobalLocalOrToolPath" xml:space="preserve">
+    <value>Please specify either the global option (--global), local option (--local), or the tool path option (--tool-path).</value>
   </data>
   <data name="GlobalAndToolPathConflict" xml:space="preserve">
     <value>(--global) conflicts with the tool path option (--tool-path). Please specify only one of the options.</value>
+  </data>
+  <data name="LocalAndToolPathConflict" xml:space="preserve">
+    <value>(--local) conflicts with the tool path option (--tool-path). Please specify only one of the options.</value>
+  </data>
+  <data name="LocalAndGlobalConflict" xml:space="preserve">
+    <value>(--local) conflicts with the global option (--global). Please specify only one of the options.</value>
   </data>
   <data name="InvalidPackageWarning" xml:space="preserve">
     <value>Warning: tool package '{0}' is invalid: {1}</value>

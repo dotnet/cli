@@ -41,6 +41,7 @@ namespace Microsoft.DotNet.Tools.Tool.List
         {
             var global = _options.ValueOrDefault<bool>("global");
             var toolPathOption = _options.ValueOrDefault<string>("tool-path");
+            var useLocal = _options.ValueOrDefault<bool>("local");
 
             DirectoryPath? toolPath = null;
             if (!string.IsNullOrWhiteSpace(toolPathOption))
@@ -56,14 +57,28 @@ namespace Microsoft.DotNet.Tools.Tool.List
                 toolPath = new DirectoryPath(toolPathOption);
             }
 
-            if (toolPath == null && !global)
+            if (toolPath == null && !global && !useLocal)
             {
-                throw new GracefulException(LocalizableStrings.NeedGlobalOrToolPath);
+                throw new GracefulException(LocalizableStrings.NeedGlobalLocalOrToolPath);
             }
 
             if (toolPath != null && global)
             {
                 throw new GracefulException(LocalizableStrings.GlobalAndToolPathConflict);
+            }
+
+            if (toolPath != null && useLocal)
+            {
+                throw new GracefulException(LocalizableStrings.LocalAndToolPathConflict);
+            }
+
+            if (global && useLocal)
+            {
+                throw new GracefulException(LocalizableStrings.LocalAndGlobalConflict);
+            }
+
+            if (useLocal) {
+                toolPath = new DirectoryPath(System.IO.Directory.GetCurrentDirectory());
             }
 
             var table = new PrintableTable<IToolPackage>();
@@ -77,7 +92,7 @@ namespace Microsoft.DotNet.Tools.Tool.List
             table.AddColumn(
                 LocalizableStrings.CommandsColumn,
                 p => string.Join(CommandDelimiter, p.Commands.Select(c => c.Name)));
-
+            Console.WriteLine(toolPath);
             table.PrintRows(GetPackages(toolPath), l => _reporter.WriteLine(l));
             return 0;
         }
