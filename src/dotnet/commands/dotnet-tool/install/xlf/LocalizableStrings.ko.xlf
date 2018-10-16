@@ -15,7 +15,7 @@ Tool '{1}' (version '{2}') was successfully installed.</source>
         <note />
       </trans-unit>
       <trans-unit id="CommandDescription">
-        <source>Install global tool or add tool to local manifest and make it available.</source>
+        <source>Install global or local tool. Local tools are added to manifest and restored.</source>
         <target state="needs-review-translation">명령줄에서 사용할 도구를 설치합니다.</target>
         <note />
       </trans-unit>

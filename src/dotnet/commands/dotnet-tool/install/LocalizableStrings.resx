@@ -139,7 +139,7 @@
     <value>Add an additional NuGet package source to use during installation.</value>
   </data>
   <data name="CommandDescription" xml:space="preserve">
-    <value>Install global tool or add tool to local manifest and make it available.</value>
+    <value>Install global or local tool. Local tools are added to manifest and restored.</value>
   </data>
   <data name="ConfigFileOptionName" xml:space="preserve">
     <value>FILE</value>

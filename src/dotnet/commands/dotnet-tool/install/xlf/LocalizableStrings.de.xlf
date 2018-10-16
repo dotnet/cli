@@ -15,7 +15,7 @@ Das Tool "{1}" (Version {2}) wurde erfolgreich installiert.</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandDescription">
-        <source>Install global tool or add tool to local manifest and make it available.</source>
+        <source>Install global or local tool. Local tools are added to manifest and restored.</source>
         <target state="needs-review-translation">Hiermit wird ein Tool zur Verwendung über die Befehlszeile installiert.</target>
         <note />
       </trans-unit>

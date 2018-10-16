@@ -95,9 +95,9 @@
         <note />
       </trans-unit>
       <trans-unit id="PackagesCommandNameCollisionConclusion">
-        <source>Command name conflicts. Command names are case insensitive.
+        <source>Command names conflict. Command names are case insensitive.
 {0}</source>
-        <target state="new">Command name conflicts. Command names are case insensitive.
+        <target state="new">Command names conflict. Command names are case insensitive.
 {0}</target>
         <note />0 could be multiple PackagesCommandNameCollisionForOnePackage</trans-unit>
       <trans-unit id="PackagesCommandNameCollisionForOnePackage">

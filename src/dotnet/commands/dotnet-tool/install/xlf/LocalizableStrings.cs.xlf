@@ -15,7 +15,7 @@ Nástroj {1} (verze {2}) byl úspěšně nainstalován.</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandDescription">
-        <source>Install global tool or add tool to local manifest and make it available.</source>
+        <source>Install global or local tool. Local tools are added to manifest and restored.</source>
         <target state="needs-review-translation">Nainstaluje nástroj, který se bude používat na příkazovém řádku.</target>
         <note />
       </trans-unit>

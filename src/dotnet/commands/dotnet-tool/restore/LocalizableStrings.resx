@@ -164,7 +164,7 @@
     <value>Package "{0}" failed to restore, due to {1}</value>
   </data>
   <data name="PackagesCommandNameCollisionConclusion" xml:space="preserve">
-    <value>Command name conflicts. Command names are case insensitive.
+    <value>Command names conflict. Command names are case insensitive.
 {0}</value>
   </data>
   <data name="RestoreSuccessful" xml:space="preserve">

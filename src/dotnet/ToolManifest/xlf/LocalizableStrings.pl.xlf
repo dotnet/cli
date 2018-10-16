@@ -13,16 +13,16 @@
         <note />
       </trans-unit>
       <trans-unit id="InvalidManifestFilePrefix">
-        <source>Invalid manifest file. Path: {0}
+        <source>Invalid manifest file. Path {0}:
 {1}</source>
-        <target state="new">Invalid manifest file. Path: {0}
+        <target state="new">Invalid manifest file. Path {0}:
 {1}</target>
         <note />
       </trans-unit>
       <trans-unit id="CannotFindAnyManifestsFileSearched">
-        <source>Cannot find any manifests file. Searched
+        <source>Cannot find any manifests file. Searched:
 {0}</source>
-        <target state="new">Cannot find any manifests file. Searched
+        <target state="new">Cannot find any manifests file. Searched:
 {0}</target>
         <note />
       </trans-unit>

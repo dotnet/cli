@@ -84,7 +84,9 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
 
             FilePath? configFile = null;
             if (_configFilePath != null)
+            {
                 configFile = new FilePath(_configFilePath);
+            }
 
             IReadOnlyCollection<ToolManifestPackage> packagesFromManifest;
             try

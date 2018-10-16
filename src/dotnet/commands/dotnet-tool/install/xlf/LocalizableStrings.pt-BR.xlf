@@ -15,7 +15,7 @@ A ferramenta '{1}' (versão '{2}') foi instalada com êxito.</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandDescription">
-        <source>Install global tool or add tool to local manifest and make it available.</source>
+        <source>Install global or local tool. Local tools are added to manifest and restored.</source>
         <target state="needs-review-translation">Instalar uma ferramenta para ser usada na linha de comando.</target>
         <note />
       </trans-unit>

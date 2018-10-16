@@ -118,14 +118,14 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CannotFindAnyManifestsFileSearched" xml:space="preserve">
-    <value>Cannot find any manifests file. Searched
+    <value>Cannot find any manifests file. Searched:
 {0}</value>
   </data>
   <data name="FieldCommandsIsMissing" xml:space="preserve">
     <value>Missing 'commands' entry.</value>
   </data>
   <data name="InvalidManifestFilePrefix" xml:space="preserve">
-    <value>Invalid manifest file. Path: {0}
+    <value>Invalid manifest file. Path {0}:
 {1}</value>
   </data>
   <data name="ManifestVersion0" xml:space="preserve">
