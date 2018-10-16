@@ -51,16 +51,8 @@ namespace Microsoft.DotNet.ToolManifest
                 SerializableLocalToolsManifest deserializedManifest =
                     DeserializeLocalToolsManifest(possibleManifest);
 
-                var (toolManifestPackageFromOneManifestFile, errors) =
+                List<ToolManifestPackage> toolManifestPackageFromOneManifestFile =
                     GetToolManifestPackageFromOneManifestFile(deserializedManifest, possibleManifest);
-
-                if (errors.Any())
-                {
-                    throw new ToolManifestException(
-                        string.Format(LocalizableStrings.InvalidManifestFilePrefix,
-                            path.Value,
-                            string.Join(Environment.NewLine, errors.Select(e => "\t" + e))));
-                }
 
                 foreach (ToolManifestPackage p in toolManifestPackageFromOneManifestFile)
                 {
@@ -97,23 +89,11 @@ namespace Microsoft.DotNet.ToolManifest
                     continue;
                 }
 
-                SerializableLocalToolsManifest deserializedManifest;
-                try
-                {
-                    deserializedManifest = DeserializeLocalToolsManifest(possibleManifest);
-                }
-                catch (JsonReaderException)
-                {
-                    continue;
-                }
+                SerializableLocalToolsManifest deserializedManifest =
+                    DeserializeLocalToolsManifest(possibleManifest);
 
-                var (toolManifestPackages, errors) =
+                List<ToolManifestPackage> toolManifestPackages =
                     GetToolManifestPackageFromOneManifestFile(deserializedManifest, possibleManifest);
-
-                if (errors.Any())
-                {
-                    continue;
-                }
 
                 foreach (var package in toolManifestPackages)
                 {
@@ -149,7 +129,7 @@ namespace Microsoft.DotNet.ToolManifest
             }
         }
 
-        private (List<ToolManifestPackage> result, List<string> errors) GetToolManifestPackageFromOneManifestFile(
+        private List<ToolManifestPackage> GetToolManifestPackageFromOneManifestFile(
             SerializableLocalToolsManifest deserializedManifest, FilePath path)
         {
             List<ToolManifestPackage> result = new List<ToolManifestPackage>();
@@ -210,7 +190,15 @@ namespace Microsoft.DotNet.ToolManifest
                 }
             }
 
-            return (result, errors);
+            if (errors.Any())
+            {
+                throw new ToolManifestException(
+                    string.Format(LocalizableStrings.InvalidManifestFilePrefix,
+                        path.Value,
+                        string.Join(Environment.NewLine, errors.Select(e => "\t" + e))));
+            }
+
+            return result;
         }
 
         private IEnumerable<FilePath> EnumerateDefaultAllPossibleManifests()

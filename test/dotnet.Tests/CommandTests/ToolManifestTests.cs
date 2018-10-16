@@ -241,30 +241,33 @@ namespace Microsoft.DotNet.Tests.Commands
         }
 
         [Fact]
-        public void GivenMissingFieldManifestFileWhenFindByCommandNameItReturnFalse()
+        public void GivenMissingFieldManifestFileWhenFindByCommandNameItThrows()
         {
             _fileSystem.File.WriteAllText(Path.Combine(_testDirectoryRoot, _manifestFilename), _jsonWithMissingField);
             var toolManifest = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem);
 
-            toolManifest.TryFind(new ToolCommandName("dotnetSay"), out var result).Should().BeFalse();
+            Action a = () => toolManifest.TryFind(new ToolCommandName("dotnetSay"), out var result);
+            a.ShouldThrow<ToolManifestException>();
         }
 
         [Fact]
-        public void GivenInvalidFieldsManifestFileWhenFindByCommandNameItReturnFalse()
+        public void GivenInvalidFieldsManifestFileWhenFindByCommandNameItThrows()
         {
             _fileSystem.File.WriteAllText(Path.Combine(_testDirectoryRoot, _manifestFilename), _jsonWithInvalidField);
             var toolManifest = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem);
 
-            toolManifest.TryFind(new ToolCommandName("dotnetSay"), out var result).Should().BeFalse();
+            Action a = () => toolManifest.TryFind(new ToolCommandName("dotnetSay"), out var result);
+            a.ShouldThrow<ToolManifestException>();
         }
 
         [Fact]
-        public void GivenInvalidJsonManifestFileWhenFindByCommandNameItReturnFalse()
+        public void GivenInvalidJsonManifestFileWhenFindByCommandNameItThrows()
         {
             _fileSystem.File.WriteAllText(Path.Combine(_testDirectoryRoot, _manifestFilename), _jsonContentInvalidJson);
             var toolManifest = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem);
 
-            toolManifest.TryFind(new ToolCommandName("dotnetSay"), out var result).Should().BeFalse();
+            Action a = () => toolManifest.TryFind(new ToolCommandName("dotnetSay"), out var result);
+            a.ShouldThrow<ToolManifestException>();
         }
 
         [Fact]
@@ -302,14 +305,15 @@ namespace Microsoft.DotNet.Tests.Commands
         }
 
         [Fact]
-        public void DifferentVersionOfManifestFileItShouldReturnFalse()
+        public void DifferentVersionOfManifestFileItThrows()
         {
             _fileSystem.File.WriteAllText(Path.Combine(_testDirectoryRoot, _manifestFilename),
                 _jsonContentHigherVersion);
             BufferedReporter bufferedReporter = new BufferedReporter();
             var toolManifest = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem);
 
-            toolManifest.TryFind(new ToolCommandName("dotnetsay"), out var result).Should().BeFalse();
+            Action a = () => toolManifest.TryFind(new ToolCommandName("dotnetsay"), out var result);
+            a.ShouldThrow<ToolManifestException>();
         }
 
         private string _jsonContent =

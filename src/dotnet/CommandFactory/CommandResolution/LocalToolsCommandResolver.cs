@@ -23,7 +23,8 @@ namespace Microsoft.DotNet.CommandFactory
         private readonly DirectoryPath _nugetGlobalPackagesFolder;
         private const string LeadingDotnetPrefix = "dotnet-";
 
-        public LocalToolsCommandResolver(ToolManifestFinder toolManifest = null,
+        public LocalToolsCommandResolver(
+            ToolManifestFinder toolManifest = null,
             ILocalToolsResolverCache localToolsResolverCache = null,
             IFileSystem fileSystem = null,
             DirectoryPath? nugetGlobalPackagesFolder = null)
@@ -47,11 +48,11 @@ namespace Microsoft.DotNet.CommandFactory
                 return null;
             }
 
-            var resolveResultWithoutLeadingDotnet = PackageCommandSpecUsingMuxer(arguments,
-                new ToolCommandName(arguments.CommandName.Replace(LeadingDotnetPrefix, string.Empty,
-                    StringComparison.OrdinalIgnoreCase)));
+            var resolveResultWithoutLeadingDotnet = GetPackageCommandSpecUsingMuxer(arguments,
+                new ToolCommandName(arguments.CommandName.Substring(LeadingDotnetPrefix.Length)));
+
             var resolveResultWithLeadingDotnet =
-                PackageCommandSpecUsingMuxer(arguments, new ToolCommandName(arguments.CommandName));
+                GetPackageCommandSpecUsingMuxer(arguments, new ToolCommandName(arguments.CommandName));
 
             if (resolveResultWithoutLeadingDotnet != null && resolveResultWithLeadingDotnet != null)
             {
@@ -63,7 +64,7 @@ namespace Microsoft.DotNet.CommandFactory
             }
         }
 
-        private CommandSpec PackageCommandSpecUsingMuxer(CommandResolverArguments arguments,
+        private CommandSpec GetPackageCommandSpecUsingMuxer(CommandResolverArguments arguments,
             ToolCommandName toolCommandName)
         {
             if (!_toolManifest.TryFind(toolCommandName, out var toolManifestPackage))
