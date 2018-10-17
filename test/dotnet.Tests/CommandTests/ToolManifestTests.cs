@@ -62,6 +62,18 @@ namespace Microsoft.DotNet.Tests.Commands
         }
 
         [Fact]
+        public void GivenManifestFileInDotConfigDirectoryItGetContent()
+        {
+            var dotnetconfigDirectory = Path.Combine(_testDirectoryRoot, ".config");
+            _fileSystem.Directory.CreateDirectory(dotnetconfigDirectory);
+            _fileSystem.File.WriteAllText(Path.Combine(dotnetconfigDirectory, _manifestFilename), _jsonContent);
+            var toolManifest = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem);
+            var manifestResult = toolManifest.Find();
+
+            manifestResult.ShouldBeEquivalentTo(_defaultExpectedResult);
+        }
+
+        [Fact]
         // https://github.com/JamesNK/Newtonsoft.Json/issues/931#issuecomment-224104005
         // Due to a limitation of newtonsoft json
         public void GivenManifestWithDuplicatedPackageIdItReturnsTheLastValue()

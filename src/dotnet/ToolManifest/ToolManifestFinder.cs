@@ -209,9 +209,11 @@ namespace Microsoft.DotNet.ToolManifest
         private IEnumerable<FilePath> EnumerateDefaultAllPossibleManifests()
         {
             DirectoryPath? currentSearchDirectory = _probStart;
-            while (currentSearchDirectory != null)
+            while (currentSearchDirectory.HasValue)
             {
+                var currentSearchDotConfigDirectory = currentSearchDirectory.Value.WithSubDirectories(Constants.DotConfigDirectoryName);
                 var tryManifest = currentSearchDirectory.Value.WithFile(_manifestFilenameConvention);
+                yield return currentSearchDotConfigDirectory.WithFile(_manifestFilenameConvention);
                 yield return tryManifest;
                 currentSearchDirectory = currentSearchDirectory.Value.GetParentPathNullable();
             }
