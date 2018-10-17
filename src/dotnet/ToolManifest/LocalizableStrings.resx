@@ -147,4 +147,7 @@
   <data name="JsonParsingError" xml:space="preserve">
     <value>Json parsing error in file {0} : {1}</value>
   </data>
+  <data name="ManifestMissingIsRoot" xml:space="preserve">
+    <value>Missing 'isRoot' entry.</value>
+  </data>
 </root>

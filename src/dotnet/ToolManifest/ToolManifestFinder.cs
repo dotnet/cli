@@ -63,7 +63,7 @@ namespace Microsoft.DotNet.ToolManifest
                     }
                 }
 
-                if (deserializedManifest.isRoot)
+                if (deserializedManifest.isRoot.Value)
                 {
                     return result;
                 }
@@ -104,7 +104,7 @@ namespace Microsoft.DotNet.ToolManifest
                     }
                 }
 
-                if (deserializedManifest.isRoot)
+                if (deserializedManifest.isRoot.Value)
                 {
                     return false;
                 }
@@ -146,6 +146,11 @@ namespace Microsoft.DotNet.ToolManifest
                     string.Format(
                         LocalizableStrings.ManifestVersionHigherThanSupported,
                         deserializedManifest.version, SupportedVersion));
+            }
+
+            if (!deserializedManifest.isRoot.HasValue)
+            {
+                errors.Add(string.Format(LocalizableStrings.ManifestMissingIsRoot, path.Value));
             }
 
             foreach (KeyValuePair<string, SerializableLocalToolSinglePackage> tools in deserializedManifest.tools)
@@ -218,9 +223,7 @@ namespace Microsoft.DotNet.ToolManifest
             [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
             public int version { get; set; }
 
-            [DefaultValue(false)]
-            [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-            public bool isRoot { get; set; }
+            public bool? isRoot { get; set; }
 
             [JsonProperty(Required = Required.Always)]
             // The dictionary's key is the package id

@@ -194,6 +194,17 @@ namespace Microsoft.DotNet.Tests.Commands
         }
 
         [Fact]
+        public void MissingIsRootInManifestFileItShouldThrow()
+        {
+            _fileSystem.File.WriteAllText(Path.Combine(_testDirectoryRoot, _manifestFilename), _jsonContentIsRootMissing);
+            BufferedReporter bufferedReporter = new BufferedReporter();
+            var toolManifest = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem);
+            Action a = () => toolManifest.Find();
+
+            a.ShouldThrow<ToolManifestException>().And.Message.Should().Contain(LocalizableStrings.ManifestMissingIsRoot);
+        }
+
+        [Fact]
         public void GivenManifestFileOnSameDirectoryWhenFindByCommandNameItGetContent()
         {
             _fileSystem.File.WriteAllText(Path.Combine(_testDirectoryRoot, _manifestFilename), _jsonContent);
@@ -384,6 +395,7 @@ namespace Microsoft.DotNet.Tests.Commands
         private string _jsonContentInCurrentDirectory =
             @"{
    ""version"":1,
+   ""isRoot"":true,
    ""tools"":{
       ""t-rex"":{
          ""version"":""1.0.49"",
@@ -455,6 +467,18 @@ namespace Microsoft.DotNet.Tests.Commands
          ""version"":""2.1.4"",
          ""commands"":[
             ""dotnetsay""
+         ]
+      }
+   }
+}";
+        private string _jsonContentIsRootMissing =
+    @"{
+   ""version"":1,
+   ""tools"":{
+      ""t-rex"":{
+         ""version"":""1.0.53"",
+         ""commands"":[
+            ""t-rex""
          ]
       }
    }
