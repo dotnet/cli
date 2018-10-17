@@ -137,7 +137,7 @@ namespace Microsoft.DotNet.ToolManifest
 
             if (deserializedManifest.version == 0)
             {
-                errors.Add(string.Format(LocalizableStrings.ManifestVersion0, path.Value));
+                errors.Add(LocalizableStrings.ManifestVersion0);
             }
 
             if (deserializedManifest.version > SupportedVersion)
