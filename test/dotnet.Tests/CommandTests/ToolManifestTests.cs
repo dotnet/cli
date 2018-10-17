@@ -482,6 +482,6 @@ namespace Microsoft.DotNet.Tests.Commands
 
         private readonly List<ToolManifestPackage> _defaultExpectedResult;
         private readonly string _testDirectoryRoot;
-        private const string _manifestFilename = "localtool.manifest.json";
+        private const string _manifestFilename = "dotnet-tools.json";
     }
 }
