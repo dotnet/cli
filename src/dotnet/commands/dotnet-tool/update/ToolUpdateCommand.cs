@@ -89,12 +89,6 @@ namespace Microsoft.DotNet.Tools.Tool.Update
 
             IToolPackage oldPackageNullable = GetOldPackage(toolPackageStoreQuery);
 
-            FilePath? configFile = null;
-            if (_configFilePath != null)
-            {
-                configFile = new FilePath(_configFilePath);
-            }
-
             using (var scope = new TransactionScope(
                 TransactionScopeOption.Required,
                 TimeSpan.Zero))
@@ -115,7 +109,7 @@ namespace Microsoft.DotNet.Tools.Tool.Update
                 RunWithHandlingInstallError(() =>
                 {
                     IToolPackage newInstalledPackage = toolPackageInstaller.InstallPackage(
-                        new PackageLocation(nugetConfig: configFile, additionalFeeds: _additionalFeeds),
+                        new PackageLocation(nugetConfig: GetConfigFile(), additionalFeeds: _additionalFeeds),
                         packageId: _packageId,
                         targetFramework: _framework,
                         verbosity: _verbosity);
@@ -132,28 +126,6 @@ namespace Microsoft.DotNet.Tools.Tool.Update
             }
 
             return 0;
-        }
-
-        private IToolPackage GetOldPackage(IToolPackageStoreQuery toolPackageStoreQuery)
-        {
-            IToolPackage oldPackageNullable;
-            try
-            {
-                oldPackageNullable = toolPackageStoreQuery.EnumeratePackageVersions(_packageId).SingleOrDefault();
-            }
-            catch (InvalidOperationException)
-            {
-                throw new GracefulException(
-                    messages: new[]
-                    {
-                        string.Format(
-                            LocalizableStrings.ToolHasMultipleVersionsInstalled,
-                            _packageId),
-                    },
-                    isUserError: false);
-            }
-
-            return oldPackageNullable;
         }
 
         private void ValidateArguments()
@@ -224,6 +196,39 @@ namespace Microsoft.DotNet.Tools.Tool.Update
                     verboseMessages: new[] { ex.ToString() },
                     isUserError: false);
             }
+        }
+
+        private FilePath? GetConfigFile()
+        {
+            FilePath? configFile = null;
+            if (_configFilePath != null)
+            {
+                configFile = new FilePath(_configFilePath);
+            }
+
+            return configFile;
+        }
+
+        private IToolPackage GetOldPackage(IToolPackageStoreQuery toolPackageStoreQuery)
+        {
+            IToolPackage oldPackageNullable;
+            try
+            {
+                oldPackageNullable = toolPackageStoreQuery.EnumeratePackageVersions(_packageId).SingleOrDefault();
+            }
+            catch (InvalidOperationException)
+            {
+                throw new GracefulException(
+                    messages: new[]
+                    {
+                        string.Format(
+                            LocalizableStrings.ToolHasMultipleVersionsInstalled,
+                            _packageId),
+                    },
+                    isUserError: false);
+            }
+
+            return oldPackageNullable;
         }
 
         private void PrintSuccessMessage(IToolPackage oldPackage, IToolPackage newInstalledPackage)
