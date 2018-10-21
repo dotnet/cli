@@ -87,21 +87,10 @@ namespace Microsoft.DotNet.Tools.Tool.Update
 
             IShellShimRepository shellShimRepository = _createShellShimRepository(toolPath);
 
-            IToolPackage oldPackage;
+            IToolPackage oldPackageNullable;
             try
             {
-                oldPackage = toolPackageStoreQuery.EnumeratePackageVersions(_packageId).SingleOrDefault();
-                if (oldPackage == null)
-                {
-                    throw new GracefulException(
-                        messages: new[]
-                        {
-                            string.Format(
-                                LocalizableStrings.ToolNotInstalled,
-                                _packageId),
-                        },
-                        isUserError: false);
-                }
+                oldPackageNullable = toolPackageStoreQuery.EnumeratePackageVersions(_packageId).SingleOrDefault();
             }
             catch (InvalidOperationException)
             {
@@ -125,15 +114,18 @@ namespace Microsoft.DotNet.Tools.Tool.Update
                 TransactionScopeOption.Required,
                 TimeSpan.Zero))
             {
-                RunWithHandlingUninstallError(() =>
+                if (oldPackageNullable != null)
                 {
-                    foreach (RestoredCommand command in oldPackage.Commands)
+                    RunWithHandlingUninstallError(() =>
                     {
-                        shellShimRepository.RemoveShim(command.Name);
-                    }
+                        foreach (RestoredCommand command in oldPackageNullable.Commands)
+                        {
+                            shellShimRepository.RemoveShim(command.Name);
+                        }
 
-                    toolPackageUninstaller.Uninstall(oldPackage.PackageDirectory);
-                });
+                        toolPackageUninstaller.Uninstall(oldPackageNullable.PackageDirectory);
+                    });
+                }
 
                 RunWithHandlingInstallError(() =>
                 {
@@ -148,7 +140,7 @@ namespace Microsoft.DotNet.Tools.Tool.Update
                         shellShimRepository.CreateShim(command.Executable, command.Name);
                     }
 
-                    PrintSuccessMessage(oldPackage, newInstalledPackage);
+                    PrintSuccessMessage(oldPackageNullable, newInstalledPackage);
                 });
 
                 scope.Complete();
@@ -229,7 +221,16 @@ namespace Microsoft.DotNet.Tools.Tool.Update
 
         private void PrintSuccessMessage(IToolPackage oldPackage, IToolPackage newInstalledPackage)
         {
-            if (oldPackage.Version != newInstalledPackage.Version)
+            if (oldPackage == null)
+            {
+                _reporter.WriteLine(
+                    string.Format(
+                        Install.LocalizableStrings.InstallationSucceeded,
+                        string.Join(", ", newInstalledPackage.Commands.Select(c => c.Name)),
+                        newInstalledPackage.Id,
+                        newInstalledPackage.Version.ToNormalizedString()).Green());
+            }
+            else if (oldPackage.Version != newInstalledPackage.Version)
             {
                 _reporter.WriteLine(
                     string.Format(
