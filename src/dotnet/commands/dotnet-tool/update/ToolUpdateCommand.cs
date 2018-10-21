@@ -87,22 +87,7 @@ namespace Microsoft.DotNet.Tools.Tool.Update
 
             IShellShimRepository shellShimRepository = _createShellShimRepository(toolPath);
 
-            IToolPackage oldPackageNullable;
-            try
-            {
-                oldPackageNullable = toolPackageStoreQuery.EnumeratePackageVersions(_packageId).SingleOrDefault();
-            }
-            catch (InvalidOperationException)
-            {
-                throw new GracefulException(
-                    messages: new[]
-                    {
-                        string.Format(
-                            LocalizableStrings.ToolHasMultipleVersionsInstalled,
-                            _packageId),
-                    },
-                    isUserError: false);
-            }
+            IToolPackage oldPackageNullable = GetOldPackage(toolPackageStoreQuery);
 
             FilePath? configFile = null;
             if (_configFilePath != null)
@@ -147,6 +132,28 @@ namespace Microsoft.DotNet.Tools.Tool.Update
             }
 
             return 0;
+        }
+
+        private IToolPackage GetOldPackage(IToolPackageStoreQuery toolPackageStoreQuery)
+        {
+            IToolPackage oldPackageNullable;
+            try
+            {
+                oldPackageNullable = toolPackageStoreQuery.EnumeratePackageVersions(_packageId).SingleOrDefault();
+            }
+            catch (InvalidOperationException)
+            {
+                throw new GracefulException(
+                    messages: new[]
+                    {
+                        string.Format(
+                            LocalizableStrings.ToolHasMultipleVersionsInstalled,
+                            _packageId),
+                    },
+                    isUserError: false);
+            }
+
+            return oldPackageNullable;
         }
 
         private void ValidateArguments()
