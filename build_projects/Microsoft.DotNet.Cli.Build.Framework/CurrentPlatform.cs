@@ -36,6 +36,14 @@ namespace Microsoft.DotNet.Cli.Build.Framework
             }
         }
 
+        public static bool IsFreeBSD
+        {
+            get
+            {
+                return RuntimeInformation.IsOSPlatform(OSPlatform.Create("FREEBSD"));
+            }
+        }
+
         public static bool IsUbuntu
         {
             get
@@ -85,7 +93,7 @@ namespace Microsoft.DotNet.Cli.Build.Framework
         {
             get
             {
-                return IsLinux || IsOSX;
+                return IsLinux || IsOSX || IsFreeBSD;
             }
         }
 
@@ -140,6 +148,8 @@ namespace Microsoft.DotNet.Cli.Build.Framework
                     return IsUnix;
                 case BuildPlatform.Linux:
                     return IsLinux;
+                case BuildPlatform.FreeBSD:
+                    return IsFreeBSD;
                 default:
                     throw new Exception("Unrecognized Platform.");
             }
@@ -159,6 +169,10 @@ namespace Microsoft.DotNet.Cli.Build.Framework
             else if (IsOSX)
             {
                 return BuildPlatform.OSX;
+            }
+            else if (IsFreeBSD)
+            {
+                return BuildPlatform.FreeBSD;
             }
             else if (IsUbuntu)
             {

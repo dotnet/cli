@@ -14,6 +14,7 @@ namespace Microsoft.DotNet.Cli.Build.Framework
         RHEL = 7,
         Debian = 8,
         Fedora = 9,
-        OpenSuse = 10
+        OpenSuse = 10,
+        FreeBSD = 11
     }
 }
