@@ -147,7 +147,7 @@ namespace Microsoft.DotNet.Tests.Commands
             );
 
             toolRestoreCommand.Execute().Should()
-                .Be(0, "if nuget prob from sub dir, it will find only the nuget.config under sub dir. " +
+                .Be(0, "if nuget probed from sub dir, it will find only the nuget.config under sub dir. " +
                        "And it does not have the feed to package A. However, since package A is set in " +
                        "manifest file under repository root, nuget should prob from manifest file directory " +
                        "and there is another nuget.config set beside the manifest file under repository root");
