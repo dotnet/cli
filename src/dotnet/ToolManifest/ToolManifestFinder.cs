@@ -18,16 +18,16 @@ namespace Microsoft.DotNet.ToolManifest
 {
     internal class ToolManifestFinder : IToolManifestFinder
     {
-        private readonly DirectoryPath _probStart;
+        private readonly DirectoryPath _probeStart;
         private readonly IFileSystem _fileSystem;
         private const string _manifestFilenameConvention = "dotnet-tools.json";
 
         // The supported tool manifest file version.
         private const int SupportedVersion = 1;
 
-        public ToolManifestFinder(DirectoryPath probStart, IFileSystem fileSystem = null)
+        public ToolManifestFinder(DirectoryPath probeStart, IFileSystem fileSystem = null)
         {
-            _probStart = probStart;
+            _probeStart = probeStart;
             _fileSystem = fileSystem ?? new FileSystemWrapper();
         }
 
@@ -211,7 +211,7 @@ namespace Microsoft.DotNet.ToolManifest
 
         private IEnumerable<(FilePath manifestfile, DirectoryPath manifestFileFirstAffect)> EnumerateDefaultAllPossibleManifests()
         {
-            DirectoryPath? currentSearchDirectory = _probStart;
+            DirectoryPath? currentSearchDirectory = _probeStart;
             while (currentSearchDirectory.HasValue)
             {
                 var currentSearchDotConfigDirectory = currentSearchDirectory.Value.WithSubDirectories(Constants.DotConfigDirectoryName);
