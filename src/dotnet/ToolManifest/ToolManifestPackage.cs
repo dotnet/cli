@@ -22,14 +22,14 @@ namespace Microsoft.DotNet.ToolManifest
         /// When it is under .config directory, it is not .config directory
         /// it is .config's parent directory
         /// </summary>
-        public DirectoryPath FirstAffectDirectory { get; }
+        public DirectoryPath FirstEffectDirectory { get; }
 
         public ToolManifestPackage(PackageId packagePackageId,
             NuGetVersion version,
             ToolCommandName[] toolCommandNames,
             DirectoryPath firstAffectDirectory)
         {
-            FirstAffectDirectory = firstAffectDirectory;
+            FirstEffectDirectory = firstAffectDirectory;
             PackageId = packagePackageId;
             Version = version ?? throw new ArgumentNullException(nameof(version));
             CommandNames = toolCommandNames ?? throw new ArgumentNullException(nameof(toolCommandNames));
@@ -46,8 +46,8 @@ namespace Microsoft.DotNet.ToolManifest
             return PackageId.Equals(other.PackageId) &&
                    EqualityComparer<NuGetVersion>.Default.Equals(Version, other.Version) &&
                    CommandNamesEqual(other.CommandNames) &&
-                   FirstAffectDirectory.Value.TrimEnd('/', '\\')
-                     .Equals(other.FirstAffectDirectory.Value.TrimEnd('/', '\\'), StringComparison.Ordinal);
+                   FirstEffectDirectory.Value.TrimEnd('/', '\\')
+                     .Equals(other.FirstEffectDirectory.Value.TrimEnd('/', '\\'), StringComparison.Ordinal);
         }
 
         private bool CommandNamesEqual(ToolCommandName[] otherCommandNames)

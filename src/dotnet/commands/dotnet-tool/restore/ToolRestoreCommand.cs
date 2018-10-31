@@ -124,7 +124,7 @@ namespace Microsoft.DotNet.Tools.Tool.Restore
                             new PackageLocation(
                                 nugetConfig: configFile,
                                 additionalFeeds: _sources,
-                                rootConfigDirectory: package.FirstAffectDirectory),
+                                rootConfigDirectory: package.FirstEffectDirectory),
                             package.PackageId, ToVersionRangeWithOnlyOneVersion(package.Version), targetFramework,
                             verbosity: _verbosity);
 
