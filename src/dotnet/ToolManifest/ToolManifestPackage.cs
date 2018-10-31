@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.ToolManifest
         public NuGetVersion Version { get; }
         public ToolCommandName[] CommandNames { get; }
         /// <summary>
-        /// The directory the will take affect first.
+        /// The directory that will take effect first.
         /// When it is under .config directory, it is not .config directory
         /// it is .config's parent directory
         /// </summary>
