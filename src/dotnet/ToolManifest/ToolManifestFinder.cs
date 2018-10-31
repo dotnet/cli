@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.ToolManifest
 
         public IReadOnlyCollection<ToolManifestPackage> Find(FilePath? filePath = null)
         {
-            IEnumerable<(FilePath manifestfile, DirectoryPath manifestFileFirstAffect)> allPossibleManifests =
+            IEnumerable<(FilePath manifestfile, DirectoryPath _)> allPossibleManifests =
                 filePath != null
                     ? new[] {(filePath.Value, filePath.Value.GetDirectoryPath())}
                     : EnumerateDefaultAllPossibleManifests();
@@ -209,7 +209,7 @@ namespace Microsoft.DotNet.ToolManifest
             return result;
         }
 
-        private IEnumerable<(FilePath manifestfile, DirectoryPath manifestFileFirstAffect)> EnumerateDefaultAllPossibleManifests()
+        private IEnumerable<(FilePath manifestfile, DirectoryPath manifestFileFirstEffectDirectory)> EnumerateDefaultAllPossibleManifests()
         {
             DirectoryPath? currentSearchDirectory = _probeStart;
             while (currentSearchDirectory.HasValue)

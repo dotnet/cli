@@ -27,9 +27,9 @@ namespace Microsoft.DotNet.ToolManifest
         public ToolManifestPackage(PackageId packagePackageId,
             NuGetVersion version,
             ToolCommandName[] toolCommandNames,
-            DirectoryPath firstAffectDirectory)
+            DirectoryPath firstEffectDirectory)
         {
-            FirstEffectDirectory = firstAffectDirectory;
+            FirstEffectDirectory = firstEffectDirectory;
             PackageId = packagePackageId;
             Version = version ?? throw new ArgumentNullException(nameof(version));
             CommandNames = toolCommandNames ?? throw new ArgumentNullException(nameof(toolCommandNames));
