@@ -19,13 +19,15 @@ namespace Microsoft.DotNet.ToolManifest
 {
     internal class ToolManifestEditor : IToolManifestEditor
     {
+        private readonly IMarkOfTheWebDetector _markOfTheWebDetector;
         private readonly IFileSystem _fileSystem;
 
         // The supported tool manifest file version.
         private const int SupportedVersion = 1;
 
-        public ToolManifestEditor(IFileSystem fileSystem = null)
+        public ToolManifestEditor(IFileSystem fileSystem = null, IMarkOfTheWebDetector markOfTheWebDetector = null)
         {
+            _markOfTheWebDetector = markOfTheWebDetector ?? new MarkOfTheWebDetector();
             _fileSystem = fileSystem ?? new FileSystemWrapper();
         }
 
@@ -74,9 +76,15 @@ namespace Microsoft.DotNet.ToolManifest
                 JsonConvert.SerializeObject(deserializedManifest, Formatting.Indented));
         }
 
-        public (List<ToolManifestPackage> content, bool isRoot) 
+        public (List<ToolManifestPackage> content, bool isRoot)
             Read(FilePath manifest, DirectoryPath correspondingDirectory)
         {
+            if (_markOfTheWebDetector.HasMarkOfTheWeb(manifest.Value))
+            {
+                throw new ToolManifestException(
+                    string.Format(LocalizableStrings.ManifestHasMarkOfTheWeb, manifest.Value));
+            }
+
             SerializableLocalToolsManifest deserializedManifest =
                 DeserializeLocalToolsManifest(manifest);
 
