@@ -123,17 +123,11 @@
   <data name="CommandDescription" xml:space="preserve">
     <value>Run local tools installed or restored.</value>
   </data>
-  <data name="CommandNameArgumentName" xml:space="preserve">
-    <value>COMMAND_NAME</value>
-  </data>
-  <data name="CommandNameColumn" xml:space="preserve">
-    <value>command name of the tool to run.</value>
-  </data>
-  <data name="CommandNameeArgumenDescription" xml:space="preserve">
+  <data name="CommandNameArgumentDescription" xml:space="preserve">
     <value>The command name of the tool to run.</value>
   </data>
-  <data name="CommandsColumn" xml:space="preserve">
-    <value>Commands</value>
+  <data name="CommandNameArgumentName" xml:space="preserve">
+    <value>COMMAND_NAME</value>
   </data>
   <data name="SpecifyExactlyOneCommandName" xml:space="preserve">
     <value>Please specify one command name to run.</value>

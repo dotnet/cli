@@ -12,7 +12,6 @@ namespace Microsoft.DotNet.Tools.Tool.Run
 {
     internal class ToolRunCommand : CommandBase
     {
-        public const string CommandDelimiter = ", ";
         private readonly string _toolCommandName;
         private readonly LocalToolsCommandResolver _localToolsCommandResolver;
         private readonly IEnumerable<string> _forwardArgument;

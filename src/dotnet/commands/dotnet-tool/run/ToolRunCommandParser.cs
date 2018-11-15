@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.Cli
                 LocalizableStrings.CommandDescription,
                 Accept.ExactlyOneArgument(errorMessage: o => LocalizableStrings.SpecifyExactlyOneCommandName)
                     .With(name: LocalizableStrings.CommandNameArgumentName,
-                          description: LocalizableStrings.CommandNameeArgumenDescription),
+                          description: LocalizableStrings.CommandNameArgumentDescription),
                 treatUnmatchedTokensAsErrors: false,
                 options: CommonOptions.HelpOption());
         }

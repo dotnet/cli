@@ -12,24 +12,14 @@
         <target state="new">Run local tools installed or restored.</target>
         <note />
       </trans-unit>
-      <trans-unit id="CommandNameArgumentName">
-        <source>COMMAND_NAME</source>
-        <target state="new">COMMAND_NAME</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="CommandNameColumn">
-        <source>command name of the tool to run.</source>
-        <target state="new">command name of the tool to run.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="CommandNameeArgumenDescription">
+      <trans-unit id="CommandNameArgumentDescription">
         <source>The command name of the tool to run.</source>
         <target state="new">The command name of the tool to run.</target>
         <note />
       </trans-unit>
-      <trans-unit id="CommandsColumn">
-        <source>Commands</source>
-        <target state="new">Commands</target>
+      <trans-unit id="CommandNameArgumentName">
+        <source>COMMAND_NAME</source>
+        <target state="new">COMMAND_NAME</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifyExactlyOneCommandName">
