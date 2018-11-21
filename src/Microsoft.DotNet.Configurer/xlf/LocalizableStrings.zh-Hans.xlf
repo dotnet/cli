@@ -14,7 +14,7 @@ Use 'dotnet --help' to see available commands or visit: https://aka.ms/dotnet-cl
 
 遥测
 ---------
-.NET Core 工具收集用法数据，以便帮助改善用户体验。数据是匿名的，且不包括命令行参数。数据由 Microsoft 收集并与社区共享。可使用喜欢的 shell 将环境变量 DOTNET_CLI_TELEMETRY_OPTOUT 设置为 “1” 或 “true”，从而选择推出遥测。
+.NET Core 工具收集用法数据，以便帮助改善用户体验。数据是匿名的，且不包括命令行参数。数据由 Microsoft 收集并与社区共享。可使用喜欢的 shell 将环境变量 DOTNET_CLI_TELEMETRY_OPTOUT 设置为 “1” 或 “true”，从而选择退出遥测。
 
 若要深入了解 .NET Core CLI 工具遥测，请访问 https://aka.ms/dotnet-cli-telemetry</target>
         <note />
