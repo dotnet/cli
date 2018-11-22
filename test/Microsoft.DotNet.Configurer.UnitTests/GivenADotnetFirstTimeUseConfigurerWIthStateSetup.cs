@@ -222,7 +222,7 @@ namespace Microsoft.DotNet.Configurer.UnitTests
         private Telemetry RunConfigUsingMocks(bool isInstallerRun)
         {
             // Assume the following objects set up are in sync with production behavior.
-            // subject to future refractoring to de-dup with production code.
+            // subject to future refactoring to de-dup with production code.
 
             var _environmentProviderObject = _environmentProvider.Object;
             bool generateAspNetCertificate =
