@@ -20,7 +20,7 @@ This project has adopted the code of conduct defined by the [Contributor Covenan
 
 |Windows x64|
 |:------:|
-|[![Build Status](https://dnceng.visualstudio.com/internal/_apis/build/status/224)](https://dev.azure.com/dnceng/internal/_build?definitionId=224)|
+|[![Build Status](https://dev.azure.com/dnceng/internal/_apis/build/status/224)](https://dev.azure.com/dnceng/internal/_build?definitionId=224)|
 
 # Basic usage
 
