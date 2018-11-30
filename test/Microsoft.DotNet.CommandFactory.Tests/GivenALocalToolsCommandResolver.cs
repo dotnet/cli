@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.Tests
             _fileSystem.File.WriteAllText(Path.Combine(_testDirectoryRoot, ManifestFilename),
                 _jsonContent.Replace("$TOOLCOMMAND$", toolCommand));
             ToolManifestFinder toolManifest =
-                new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem, new FakeMarkOfTheWebDetector());
+                new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem, new FakeDangerousFileDetector());
             ToolCommandName toolCommandNameA = new ToolCommandName(toolCommand);
             var fakeExecutable = _nugetGlobalPackagesFolder.WithFile("fakeExecutable.dll");
             _fileSystem.Directory.CreateDirectory(_nugetGlobalPackagesFolder.Value);
@@ -89,7 +89,7 @@ namespace Microsoft.DotNet.Tests
             _fileSystem.File.WriteAllText(Path.Combine(_testDirectoryRoot, ManifestFilename),
                 _jsonContent.Replace("$TOOLCOMMAND$", toolCommandNameA.Value));
             ToolManifestFinder toolManifest =
-                new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem, new FakeMarkOfTheWebDetector());
+                new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem, new FakeDangerousFileDetector());
 
             var fakeExecutable = _nugetGlobalPackagesFolder.WithFile("fakeExecutable.dll");
             _fileSystem.Directory.CreateDirectory(_nugetGlobalPackagesFolder.Value);
@@ -161,7 +161,7 @@ namespace Microsoft.DotNet.Tests
 }";
     }
 
-    internal class FakeMarkOfTheWebDetector : IDangerousFileDetector
+    internal class FakeDangerousFileDetector : IDangerousFileDetector
     {
         public bool IsDangerous(string filePath)
         {

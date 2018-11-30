@@ -13,19 +13,19 @@ namespace Microsoft.DotNet.ToolManifest
     {
         private readonly DirectoryPath _probeStart;
         private readonly IFileSystem _fileSystem;
-        private readonly IDangerousFileDetector _markOfTheWebDetector;
+        private readonly IDangerousFileDetector _dangerousFileDetector;
         private readonly ToolManifestEditor _toolManifestEditor;
         private const string ManifestFilenameConvention = "dotnet-tools.json";
 
         public ToolManifestFinder(
             DirectoryPath probeStart,
             IFileSystem fileSystem = null,
-            IDangerousFileDetector markOfTheWebDetector = null)
+            IDangerousFileDetector dangerousFileDetector = null)
         {
             _probeStart = probeStart;
             _fileSystem = fileSystem ?? new FileSystemWrapper();
-            _markOfTheWebDetector = markOfTheWebDetector ?? new DangerousFileDetector();
-            _toolManifestEditor = new ToolManifestEditor(_fileSystem, markOfTheWebDetector);
+            _dangerousFileDetector = dangerousFileDetector ?? new DangerousFileDetector();
+            _toolManifestEditor = new ToolManifestEditor(_fileSystem, dangerousFileDetector);
         }
 
         public IReadOnlyCollection<ToolManifestPackage> Find(FilePath? filePath = null)

@@ -29,8 +29,6 @@ namespace Microsoft.DotNet.Cli.Utils
             private const uint ZoneInternet = 3;
             private const uint ZoneUntrusted = 4;
             private static IInternetSecurityManager internetSecurityManager = null;
-            // Resources can have arbitrarily serialized objects in them which can execute arbitrary code
-            // so check to see if we should trust them before analyzing them
             public static bool IsDangerous(string filename)
             {
                 // First check the zone, if they are not an untrusted zone, they aren't dangerous

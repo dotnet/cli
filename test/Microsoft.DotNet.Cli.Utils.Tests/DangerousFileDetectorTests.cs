@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Microsoft.DotNet.Cli.Utils.Tests
 {
-    public class MarkOfTheWebDetectorTests : TestBase
+    public class DangerousFileDetectorTests : TestBase
     {
         [WindowsOnlyFact]
         public void ItShouldDetectFileWithMarkOfTheWeb()
@@ -28,12 +28,11 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         }
 
         [Fact]
-        public void WhenThereIsNoFileItThrows()
+        public void WhenThereIsNoFileItReturnsFalse()
         {
             var testFile = Path.Combine(TempRoot.Root, Path.GetRandomFileName());
 
-            Action a = () => new DangerousFileDetector().IsDangerous(testFile);
-            a.ShouldThrow<FileNotFoundException>();
+            new DangerousFileDetector().IsDangerous(testFile).Should().BeFalse();
         }
 
         [NonWindowsOnlyFact]

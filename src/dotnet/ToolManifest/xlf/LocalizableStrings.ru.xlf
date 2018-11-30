@@ -8,8 +8,8 @@
         <note />
       </trans-unit>
       <trans-unit id="ManifestHasMarkOfTheWeb">
-        <source>File {0} came from another computer and might be blocked to help protect this computer. To unblock https://aka.ms/motw</source>
-        <target state="new">File {0} came from another computer and might be blocked to help protect this computer. To unblock https://aka.ms/motw</target>
+        <source>File {0} came from another computer and might be blocked to help protect this computer. For more information, including how to unblock, see https://aka.ms/motw</source>
+        <target state="new">File {0} came from another computer and might be blocked to help protect this computer. For more information, including how to unblock, see https://aka.ms/motw</target>
         <note />
       </trans-unit>
       <trans-unit id="ManifestPackageIdCollision">
