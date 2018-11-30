@@ -161,9 +161,9 @@ namespace Microsoft.DotNet.Tests
 }";
     }
 
-    internal class FakeMarkOfTheWebDetector : IMarkOfTheWebDetector
+    internal class FakeMarkOfTheWebDetector : IDangerousFileDetector
     {
-        public bool HasMarkOfTheWeb(string filePath)
+        public bool IsDangerous(string filePath)
         {
             return false;
         }

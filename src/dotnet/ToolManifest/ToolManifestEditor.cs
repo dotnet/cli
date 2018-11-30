@@ -19,15 +19,15 @@ namespace Microsoft.DotNet.ToolManifest
 {
     internal class ToolManifestEditor : IToolManifestEditor
     {
-        private readonly IMarkOfTheWebDetector _markOfTheWebDetector;
+        private readonly IDangerousFileDetector _dangerousFileDetector;
         private readonly IFileSystem _fileSystem;
 
         // The supported tool manifest file version.
         private const int SupportedVersion = 1;
 
-        public ToolManifestEditor(IFileSystem fileSystem = null, IMarkOfTheWebDetector markOfTheWebDetector = null)
+        public ToolManifestEditor(IFileSystem fileSystem = null, IDangerousFileDetector dangerousFileDetector = null)
         {
-            _markOfTheWebDetector = markOfTheWebDetector ?? new MarkOfTheWebDetector();
+            _dangerousFileDetector = dangerousFileDetector ?? new DangerousFileDetector();
             _fileSystem = fileSystem ?? new FileSystemWrapper();
         }
 
@@ -79,7 +79,7 @@ namespace Microsoft.DotNet.ToolManifest
         public (List<ToolManifestPackage> content, bool isRoot)
             Read(FilePath manifest, DirectoryPath correspondingDirectory)
         {
-            if (_markOfTheWebDetector.HasMarkOfTheWeb(manifest.Value))
+            if (_dangerousFileDetector.IsDangerous(manifest.Value))
             {
                 throw new ToolManifestException(
                     string.Format(LocalizableStrings.ManifestHasMarkOfTheWeb, manifest.Value));

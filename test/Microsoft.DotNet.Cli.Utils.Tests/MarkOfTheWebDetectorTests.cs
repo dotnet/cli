@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 "Zone.Identifier",
                 "[ZoneTransfer]\r\nZoneId=3\r\nReferrerUrl=C:\\Users\\test.zip\r\n");
 
-            new MarkOfTheWebDetector().HasMarkOfTheWeb(testFile).Should().BeTrue();
+            new DangerousFileDetector().IsDangerous(testFile).Should().BeTrue();
         }
 
         [Fact]
@@ -32,7 +32,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         {
             var testFile = Path.Combine(TempRoot.Root, Path.GetRandomFileName());
 
-            Action a = () => new MarkOfTheWebDetector().HasMarkOfTheWeb(testFile);
+            Action a = () => new DangerousFileDetector().IsDangerous(testFile);
             a.ShouldThrow<FileNotFoundException>();
         }
 
@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
             var testFile = Path.Combine(TempRoot.Root, Path.GetRandomFileName());
             File.WriteAllText(testFile, string.Empty);
 
-            new MarkOfTheWebDetector().HasMarkOfTheWeb(testFile).Should().BeFalse();
+            new DangerousFileDetector().IsDangerous(testFile).Should().BeFalse();
         }
 
         private static class AlternateStream

@@ -54,7 +54,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             var manifestResult = toolManifest.Find();
 
@@ -70,7 +70,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(subdirectoryOfTestRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             var manifestResult = toolManifest.Find();
 
@@ -87,7 +87,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             var manifestResult = toolManifest.Find();
 
@@ -105,7 +105,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             var manifestResult = toolManifest.Find();
 
@@ -127,7 +127,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             var manifestResult =
                 toolManifest.Find(new FilePath(Path.Combine(_testDirectoryRoot, customFileName)));
@@ -153,7 +153,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             Action a = () => toolManifest.Find(new FilePath(Path.Combine(_testDirectoryRoot, "non-exists")));
             a.ShouldThrow<ToolManifestCannotBeFoundException>().And.Message.Should()
@@ -167,7 +167,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             Action a = () => toolManifest.Find();
             a.ShouldThrow<ToolManifestCannotBeFoundException>().And.Message.Should()
@@ -182,7 +182,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             Action a = () => toolManifest.Find();
 
@@ -202,7 +202,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             Action a = () => toolManifest.Find();
 
@@ -223,7 +223,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(subdirectoryOfTestRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             var manifestResult = toolManifest.Find();
 
@@ -264,7 +264,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(subdirectoryOfTestRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             var manifestResult = toolManifest.Find();
 
@@ -279,7 +279,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             Action a = () => toolManifest.Find();
 
@@ -296,7 +296,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             Action a = () => toolManifest.Find();
 
@@ -311,7 +311,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             toolManifest.TryFind(new ToolCommandName("dotnetsay"), out var result).Should().BeTrue();
 
@@ -330,7 +330,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             toolManifest.TryFind(new ToolCommandName("dotnetSay"), out var result).Should().BeTrue();
 
@@ -350,7 +350,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(subdirectoryOfTestRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             toolManifest.TryFind(new ToolCommandName("dotnetsay"), out var result).Should().BeTrue();
 
@@ -368,7 +368,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             toolManifest.TryFind(new ToolCommandName("dotnetSay"), out var result).Should().BeFalse();
         }
@@ -381,7 +381,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             Action a = () => toolManifest.TryFind(new ToolCommandName("dotnetSay"), out var result);
             a.ShouldThrow<ToolManifestException>();
@@ -395,7 +395,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             Action a = () => toolManifest.TryFind(new ToolCommandName("dotnetSay"), out var result);
             a.ShouldThrow<ToolManifestException>();
@@ -409,7 +409,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             Action a = () => toolManifest.TryFind(new ToolCommandName("dotnetSay"), out var result);
             a.ShouldThrow<ToolManifestException>();
@@ -428,7 +428,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(subdirectoryOfTestRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             toolManifest.TryFind(new ToolCommandName("t-rex"), out var result).Should().BeTrue();
 
@@ -452,7 +452,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(subdirectoryOfTestRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             var manifestResult = toolManifest.Find();
 
@@ -465,7 +465,7 @@ namespace Microsoft.DotNet.Tests.Commands
             string manifestFilePath = Path.Combine(_testDirectoryRoot, _manifestFilename);
             _fileSystem.File.WriteAllText(manifestFilePath, _jsonContent);
 
-            var fakeMarkOfTheWebDetector = new FakeMarkOfTheWebDetector(manifestFilePath);
+            var fakeMarkOfTheWebDetector = new FakeDangerousFileDetector(manifestFilePath);
             var toolManifest
                 = new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem, fakeMarkOfTheWebDetector);
             Action a = () => toolManifest.Find();
@@ -486,7 +486,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
 
             Action a = () => toolManifest.TryFind(new ToolCommandName("dotnetsay"), out var result);
@@ -502,7 +502,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             FilePath toolmanifestFilePath = toolManifest.FindFirst();
 
@@ -518,7 +518,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             FilePath toolmanifestFilePath = toolManifest.FindFirst();
 
@@ -532,7 +532,7 @@ namespace Microsoft.DotNet.Tests.Commands
                 new ToolManifestFinder(
                     new DirectoryPath(_testDirectoryRoot),
                     _fileSystem,
-                    new FakeMarkOfTheWebDetector());
+                    new FakeDangerousFileDetector());
 
             Action a = () => toolManifest.FindFirst();
 

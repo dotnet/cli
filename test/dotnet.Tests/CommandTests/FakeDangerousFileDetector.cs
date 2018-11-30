@@ -6,16 +6,16 @@ using Microsoft.DotNet.Cli.Utils;
 
 namespace Microsoft.DotNet.Tests.Commands
 {
-    internal class FakeMarkOfTheWebDetector : IMarkOfTheWebDetector
+    internal class FakeDangerousFileDetector : IDangerousFileDetector
     {
-        public FakeMarkOfTheWebDetector(params string[] filesHaveIt)
+        public FakeDangerousFileDetector(params string[] filesHaveIt)
         {
             FilesHaveIt = filesHaveIt;
         }
 
         private string[] FilesHaveIt { get; }
 
-        public bool HasMarkOfTheWeb(string filePath)
+        public bool IsDangerous(string filePath)
         {
             if (FilesHaveIt != null && FilesHaveIt.Any(f => f == filePath))
             {
