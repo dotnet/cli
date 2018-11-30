@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.Tools.Tool.List
 {
     internal delegate IToolPackageStoreQuery CreateToolPackageStore(DirectoryPath? nonGlobalLocation = null);
 
-    internal class ListToolCommand : CommandBase
+    internal class ListToolGlobalOrToolPathCommand : CommandBase
     {
         public const string CommandDelimiter = ", ";
         private readonly AppliedOption _options;
@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.Tools.Tool.List
         private readonly IReporter _errorReporter;
         private CreateToolPackageStore _createToolPackageStore;
 
-        public ListToolCommand(
+        public ListToolGlobalOrToolPathCommand(
             AppliedOption options,
             ParseResult result,
             CreateToolPackageStore createToolPackageStore = null,

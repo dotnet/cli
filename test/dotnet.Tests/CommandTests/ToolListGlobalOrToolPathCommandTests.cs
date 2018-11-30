@@ -23,11 +23,11 @@ using LocalizableStrings = Microsoft.DotNet.Tools.Tool.List.LocalizableStrings;
 
 namespace Microsoft.DotNet.Tests.Commands
 {
-    public class ToolListCommandTests
+    public class ToolListGlobalOrToolPathCommandTests
     {
         private readonly BufferedReporter _reporter;
 
-        public ToolListCommandTests()
+        public ToolListGlobalOrToolPathCommandTests()
         {
             _reporter = new BufferedReporter();
         }
@@ -261,10 +261,10 @@ namespace Microsoft.DotNet.Tests.Commands
             return package.Object;
         }
 
-        private ListToolCommand CreateCommand(IToolPackageStoreQuery store, string options = "", string expectedToolPath = null)
+        private ListToolGlobalOrToolPathCommand CreateCommand(IToolPackageStoreQuery store, string options = "", string expectedToolPath = null)
         {
             ParseResult result = Parser.Instance.Parse("dotnet tool list " + options);
-            return new ListToolCommand(
+            return new ListToolGlobalOrToolPathCommand(
                 result["dotnet"]["tool"]["list"],
                 result,
                 toolPath => { AssertExpectedToolPath(toolPath, expectedToolPath); return store; },
@@ -288,7 +288,7 @@ namespace Microsoft.DotNet.Tests.Commands
         {
             string GetCommandsString(IToolPackage package)
             {
-                return string.Join(ListToolCommand.CommandDelimiter, package.Commands.Select(c => c.Name));
+                return string.Join(ListToolGlobalOrToolPathCommand.CommandDelimiter, package.Commands.Select(c => c.Name));
             }
 
             var packages = store.EnumeratePackages().Where(PackageHasCommands).OrderBy(package => package.Id);
