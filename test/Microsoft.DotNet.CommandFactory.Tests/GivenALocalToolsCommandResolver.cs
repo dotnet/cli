@@ -11,7 +11,7 @@ using Microsoft.DotNet.CommandFactory;
 using Microsoft.DotNet.ToolManifest;
 using Microsoft.DotNet.ToolPackage;
 using Microsoft.DotNet.Tools.Test.Utilities;
-using Microsoft.DotNet.Tools.Tests.ComponentMocks;
+using Microsoft.DotNet.Tools.Tests.Utilities;
 using Microsoft.Extensions.DependencyModel.Tests;
 using Microsoft.Extensions.EnvironmentAbstractions;
 using NuGet.Frameworks;
@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.Tests
             _fileSystem.File.WriteAllText(Path.Combine(_testDirectoryRoot, ManifestFilename),
                 _jsonContent.Replace("$TOOLCOMMAND$", toolCommand));
             ToolManifestFinder toolManifest =
-                new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem);
+                new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem, new FakeDangerousFileDetector());
             ToolCommandName toolCommandNameA = new ToolCommandName(toolCommand);
             var fakeExecutable = _nugetGlobalPackagesFolder.WithFile("fakeExecutable.dll");
             _fileSystem.Directory.CreateDirectory(_nugetGlobalPackagesFolder.Value);
@@ -62,13 +62,12 @@ namespace Microsoft.DotNet.Tests
                             Constants.AnyRid,
                             toolCommandNameA)]
                         = new RestoredCommand(toolCommandNameA, "dotnet", fakeExecutable)
-                }, _nugetGlobalPackagesFolder);
+                });
 
             var localToolsCommandResolver = new LocalToolsCommandResolver(
                 toolManifest,
                 _localToolsResolverCache,
-                _fileSystem,
-                _nugetGlobalPackagesFolder);
+                _fileSystem);
 
             var result = localToolsCommandResolver.Resolve(new CommandResolverArguments()
             {
@@ -90,7 +89,7 @@ namespace Microsoft.DotNet.Tests
             _fileSystem.File.WriteAllText(Path.Combine(_testDirectoryRoot, ManifestFilename),
                 _jsonContent.Replace("$TOOLCOMMAND$", toolCommandNameA.Value));
             ToolManifestFinder toolManifest =
-                new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem);
+                new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem, new FakeDangerousFileDetector());
 
             var fakeExecutable = _nugetGlobalPackagesFolder.WithFile("fakeExecutable.dll");
             _fileSystem.Directory.CreateDirectory(_nugetGlobalPackagesFolder.Value);
@@ -105,15 +104,38 @@ namespace Microsoft.DotNet.Tests
                             Constants.AnyRid,
                             toolCommandNameA)]
                         = new RestoredCommand(toolCommandNameA, "dotnet", fakeExecutable)
-                }, _nugetGlobalPackagesFolder);
+                });
 
             var localToolsCommandResolver = new LocalToolsCommandResolver(
                 toolManifest,
                 _localToolsResolverCache,
-                _fileSystem,
-                _nugetGlobalPackagesFolder);
+                _fileSystem);
 
             _fileSystem.File.Delete(fakeExecutable.Value);
+
+            Action action = () => localToolsCommandResolver.Resolve(new CommandResolverArguments()
+            {
+                CommandName = $"dotnet-{toolCommandNameA.ToString()}",
+            });
+
+            action.ShouldThrow<GracefulException>(string.Format(CommandFactory.LocalizableStrings.NeedRunToolRestore,
+                toolCommandNameA.ToString()));
+        }
+
+        [Fact]
+        public void WhenNuGetGlobalPackageLocationIsNotRestoredItThrowsGracefulException()
+        {
+            ToolCommandName toolCommandNameA = new ToolCommandName("a");
+            NuGetVersion packageVersionA = NuGetVersion.Parse("1.0.4");
+            _fileSystem.File.WriteAllText(Path.Combine(_testDirectoryRoot, ManifestFilename),
+                _jsonContent.Replace("$TOOLCOMMAND$", toolCommandNameA.Value));
+            ToolManifestFinder toolManifest =
+                new ToolManifestFinder(new DirectoryPath(_testDirectoryRoot), _fileSystem);
+
+            var localToolsCommandResolver = new LocalToolsCommandResolver(
+                toolManifest,
+                _localToolsResolverCache,
+                _fileSystem);
 
             Action action = () => localToolsCommandResolver.Resolve(new CommandResolverArguments()
             {
@@ -137,5 +159,13 @@ namespace Microsoft.DotNet.Tests
       }
    }
 }";
+    }
+
+    internal class FakeDangerousFileDetector : IDangerousFileDetector
+    {
+        public bool IsDangerous(string filePath)
+        {
+            return false;
+        }
     }
 }
