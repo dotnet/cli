@@ -87,8 +87,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 }
                 else
                 {
-                    Exception ex = new Win32Exception(Marshal.GetLastWin32Error());
-                    throw ex;
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
                 }
             }
 
