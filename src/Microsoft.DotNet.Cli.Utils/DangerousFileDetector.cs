@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.Cli.Utils
             return InternetSecurity.IsDangerous(filePath);
         }
 
-        internal class InternetSecurity
+        private static class InternetSecurity
         {
             private const string CLSID_InternetSecurityManager = "7b8a2d94-0ac9-11d1-896c-00c04fb6bfc4";
             private const uint ZoneLocalMachine = 0;

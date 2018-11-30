@@ -88,10 +88,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
                 else
                 {
                     Exception ex = new Win32Exception(Marshal.GetLastWin32Error());
-                    if (!ex.Message.Contains("cannot find the file"))
-                    {
-                        throw ex;
-                    }
+                    throw ex;
                 }
             }
 

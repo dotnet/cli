@@ -13,28 +13,20 @@ namespace Microsoft.DotNet.Cli.Utils
     [ComConversionLoss]
     internal interface IInternetSecurityManager
     {
-        [MethodImpl(MethodImplOptions.InternalCall)]
         void SetSecuritySite([In] [MarshalAs(UnmanagedType.Interface)] IInternetSecurityMgrSite pSite);
 
-        [MethodImpl(MethodImplOptions.InternalCall)]
         void GetSecuritySite([MarshalAs(UnmanagedType.Interface)] out IInternetSecurityMgrSite ppSite);
 
-        [MethodImpl(MethodImplOptions.InternalCall)]
         void MapUrlToZone([In] [MarshalAs(UnmanagedType.LPWStr)] string pwszUrl, out int pdwZone, [In] int dwFlags);
 
-        [MethodImpl(MethodImplOptions.InternalCall)]
         void GetSecurityId([In] [MarshalAs(UnmanagedType.LPWStr)] string pwszUrl, out byte pbSecurityId, [In] [Out] ref int pcbSecurityId, [In] [ComAliasName("UrlMonTypeLib.ULONG_PTR")] int dwReserved);
 
-        [MethodImpl(MethodImplOptions.InternalCall)]
         void ProcessUrlAction([In] [MarshalAs(UnmanagedType.LPWStr)] string pwszUrl, [In] int dwAction, out byte pPolicy, [In] int cbPolicy, [In] ref byte pContext, [In] int cbContext, [In] int dwFlags, [In] int dwReserved);
 
-        [MethodImpl(MethodImplOptions.InternalCall)]
         void QueryCustomPolicy([In] [MarshalAs(UnmanagedType.LPWStr)] string pwszUrl, [In] [ComAliasName("UrlMonTypeLib.GUID")] ref GUID guidKey, [Out] IntPtr ppPolicy, out int pcbPolicy, [In] ref byte pContext, [In] int cbContext, [In] int dwReserved);
 
-        [MethodImpl(MethodImplOptions.InternalCall)]
         void SetZoneMapping([In] int dwZone, [In] [MarshalAs(UnmanagedType.LPWStr)] string lpszPattern, [In] int dwFlags);
 
-        [MethodImpl(MethodImplOptions.InternalCall)]
         void GetZoneMappings([In] int dwZone, [MarshalAs(UnmanagedType.Interface)] out IEnumString ppenumString, [In] int dwFlags);
     }
 
@@ -45,10 +37,8 @@ namespace Microsoft.DotNet.Cli.Utils
     [Guid("79EAC9ED-BAF9-11CE-8C82-00AA004BA90B")]
     interface IInternetSecurityMgrSite
     {
-        [MethodImpl(MethodImplOptions.InternalCall)]
         void GetWindow([Out] [ComAliasName("UrlMonTypeLib.wireHWND")] IntPtr phwnd);
 
-        [MethodImpl(MethodImplOptions.InternalCall)]
         void EnableModeless([In] int fEnable);
     }
 
