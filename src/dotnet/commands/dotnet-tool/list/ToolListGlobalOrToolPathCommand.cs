@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.Tools.Tool.List
 {
     internal delegate IToolPackageStoreQuery CreateToolPackageStore(DirectoryPath? nonGlobalLocation = null);
 
-    internal class ListToolGlobalOrToolPathCommand : CommandBase
+    internal class ToolListGlobalOrToolPathCommand : CommandBase
     {
         public const string CommandDelimiter = ", ";
         private readonly AppliedOption _options;
@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.Tools.Tool.List
         private readonly IReporter _errorReporter;
         private CreateToolPackageStore _createToolPackageStore;
 
-        public ListToolGlobalOrToolPathCommand(
+        public ToolListGlobalOrToolPathCommand(
             AppliedOption options,
             ParseResult result,
             CreateToolPackageStore createToolPackageStore = null,
@@ -54,16 +54,6 @@ namespace Microsoft.DotNet.Tools.Tool.List
                 }
 
                 toolPath = new DirectoryPath(toolPathOption);
-            }
-
-            if (toolPath == null && !global)
-            {
-                throw new GracefulException(LocalizableStrings.NeedGlobalOrToolPath);
-            }
-
-            if (toolPath != null && global)
-            {
-                throw new GracefulException(LocalizableStrings.GlobalAndToolPathConflict);
             }
 
             var table = new PrintableTable<IToolPackage>();

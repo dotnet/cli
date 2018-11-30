@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.Tools.Tool
                     appliedOption["update"],
                     ParseResult),
                 ["list"] =
-                appliedOption => new ListToolGlobalOrToolPathCommand(
+                appliedOption => new ToolListCommand(
                     appliedOption["list"],
                     ParseResult),
                 ["restore"] =
