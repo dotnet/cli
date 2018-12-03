@@ -22,6 +22,11 @@
         <target state="new">List the tools installed in the local tool manifest.</target>
         <note />
       </trans-unit>
+      <trans-unit id="ManifestFileColumn">
+        <source>Manifest</source>
+        <target state="new">Manifest</target>
+        <note />
+      </trans-unit>
       <trans-unit id="VersionColumn">
         <source>Version</source>
         <target state="translated">Wersja</target>

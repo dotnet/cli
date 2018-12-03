@@ -19,6 +19,7 @@ namespace Microsoft.DotNet.Tools.Tool.List
         private readonly AppliedOption _options;
         private readonly ParseResult _result;
         private readonly ToolListGlobalOrToolPathCommand _toolListGlobalOrToolPathCommand;
+        private readonly ToolListLocalCommand _toolListLocalCommand;
         private readonly bool _global;
         private readonly bool _local;
         private readonly string _toolPath;
@@ -29,7 +30,8 @@ namespace Microsoft.DotNet.Tools.Tool.List
         public ToolListCommand(
             AppliedOption options,
             ParseResult result,
-            ToolListGlobalOrToolPathCommand toolListGlobalOrToolPathCommand = null
+            ToolListGlobalOrToolPathCommand toolListGlobalOrToolPathCommand = null,
+            ToolListLocalCommand toolListLocalCommand = null
         )
             : base(result)
         {
@@ -37,6 +39,8 @@ namespace Microsoft.DotNet.Tools.Tool.List
             _result = result ?? throw new ArgumentNullException(nameof(result));
             _toolListGlobalOrToolPathCommand
                 = toolListGlobalOrToolPathCommand ?? new ToolListGlobalOrToolPathCommand(_options, _result);
+            _toolListLocalCommand
+                = toolListLocalCommand ?? new ToolListLocalCommand(_options, _result);
             _global = options.ValueOrDefault<bool>(GlobalOption);
             _local = options.ValueOrDefault<bool>(LocalOption);
             _toolPath = options.SingleArgumentOrDefault(ToolPathOption);
@@ -46,7 +50,14 @@ namespace Microsoft.DotNet.Tools.Tool.List
         {
             EnsureNoConflictGlobalLocalToolPathOption();
 
-            return _toolListGlobalOrToolPathCommand.Execute();
+            if (_global || !string.IsNullOrWhiteSpace(_toolPath))
+            {
+                return _toolListGlobalOrToolPathCommand.Execute();
+            }
+            else
+            {
+                return _toolListLocalCommand.Execute();
+            }
         }
 
         private void EnsureNoConflictGlobalLocalToolPathOption()

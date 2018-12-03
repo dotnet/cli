@@ -14,8 +14,6 @@ namespace Microsoft.DotNet.Tests.Commands
 {
     public class ToolListCommandTests
     {
-        private const string PackageId = "global.tool.console.demo";
-
         [Fact]
         public void WhenRunWithBothGlobalAndToolPathShowErrorMessage()
         {

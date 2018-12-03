@@ -9,7 +9,7 @@ using Microsoft.Extensions.EnvironmentAbstractions;
 
 namespace Microsoft.DotNet.ToolManifest
 {
-    internal class ToolManifestFinder : IToolManifestFinder
+    internal class ToolManifestFinder : IToolManifestFinder, IToolManifestInspector
     {
         private readonly DirectoryPath _probeStart;
         private readonly IFileSystem _fileSystem;
@@ -46,6 +46,24 @@ namespace Microsoft.DotNet.ToolManifest
             }
 
             return toolManifestPackageAndSource.Select(t => t.toolManifestPackage).ToArray();
+        }
+
+        public IReadOnlyCollection<(ToolManifestPackage toolManifestPackage, FilePath SourceManifest)> Inspect(
+            FilePath? filePath = null)
+        {
+            IEnumerable<(FilePath manifestfile, DirectoryPath _)> allPossibleManifests =
+                filePath != null
+                    ? new[] {(filePath.Value, filePath.Value.GetDirectoryPath())}
+                    : EnumerateDefaultAllPossibleManifests();
+
+
+            if (!TryFindToolManifestPackages(allPossibleManifests, out var toolManifestPackageAndSource))
+            {
+                toolManifestPackageAndSource =
+                    new List<(ToolManifestPackage toolManifestPackage, FilePath SourceManifest)>();
+            }
+
+            return toolManifestPackageAndSource.ToArray();
         }
 
         private bool TryFindToolManifestPackages(
