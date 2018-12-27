@@ -468,17 +468,21 @@ function Extract-Dotnet-Package([string]$ZipPath, [string]$OutPath) {
     }
 }
 
-function DownloadFile([Uri]$Uri, [string]$OutPath) {
+function DownloadFile([string]$Uri, [string]$OutPath) {
     if ($Uri -notlike "http*") {
-        Say-Verbose "Copying file from $Uri to $OutPath"
-        Copy-Item $Uri.AbsolutePath $OutPath
+        if (![System.IO.Path]::IsPathRooted($Uri)) {
+            $Uri = $(Join-Path -Path $pwd -ChildPath $Uri)
+        }
+        $Uri = Get-Absolute-Path $Uri
+        Say "Copying file from $Uri to $OutPath"
+        Copy-Item $Uri $OutPath
         return
     }
 
     $Stream = $null
 
     try {
-        $Response = GetHTTPResponse -Uri $Uri
+        $Response = GetHTTPResponse -Uri [Uri]$Uri
         $Stream = $Response.Content.ReadAsStreamAsync().Result
         $File = [System.IO.File]::Create($OutPath)
         $Stream.CopyTo($File)
