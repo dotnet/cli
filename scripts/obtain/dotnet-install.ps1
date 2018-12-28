@@ -470,7 +470,8 @@ function Extract-Dotnet-Package([string]$ZipPath, [string]$OutPath) {
 
 function DownloadFile([string]$Source, [string]$OutPath) {
     if ($Source -notlike "http*") {
-        #  $pwd gives the current directory
+        #  Using System.IO.Path.GetFullPath to get the current directory
+        #    does not work in this context - $pwd gives the current directory
         if (![System.IO.Path]::IsPathRooted($Source)) {
             $Source = $(Join-Path -Path $pwd -ChildPath $Source)
         }
