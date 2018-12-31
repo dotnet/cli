@@ -28,11 +28,7 @@ namespace Microsoft.DotNet.Cli
             return fullRestoreOptions.Concat(
                 new Option[] {
                     CommonOptions.VerbosityOption(),
-                    Create.Option(
-                        "--interactive",
-                        LocalizableStrings.CmdInteractiveRestoreOptionDescription,
-                        Accept.NoArguments()
-                            .ForwardAs(Utils.Constants.MsBuildInteractiveOption)),
+                    CommonOptions.InteractiveOption(),
                     Create.Option(
                         "--use-lock-file",
                         LocalizableStrings.CmdUseLockFileOptionDescription,
