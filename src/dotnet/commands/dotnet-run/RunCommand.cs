@@ -24,6 +24,7 @@ namespace Microsoft.DotNet.Tools.Run
         public string Project { get; private set; }
         public IEnumerable<string> Args { get; set; }
         public bool NoRestore { get; private set; }
+        public bool Interactive { get; private set; }
         public IEnumerable<string> RestoreArgs { get; private set; }
 
         private bool ShouldBuild => !NoBuild;
@@ -70,6 +71,7 @@ namespace Microsoft.DotNet.Tools.Run
             string launchProfile,
             bool noLaunchProfile,
             bool noRestore,
+            bool interactive,
             IEnumerable<string> restoreArgs,
             IEnumerable<string> args)
         {
@@ -83,6 +85,7 @@ namespace Microsoft.DotNet.Tools.Run
             Args = args;
             RestoreArgs = restoreArgs;
             NoRestore = noRestore;
+            Interactive = interactive;
         }
 
         private bool ApplyLaunchProfileSettingsIfNeeded(ref ICommand targetCommand)
@@ -154,7 +157,8 @@ namespace Microsoft.DotNet.Tools.Run
 
             if (!RestoreArgs.Any(a => a.StartsWith("-verbosity:")))
             {
-                args.Add("-verbosity:quiet");
+                var defaultVerbosity = Interactive ? "minimal" : "quiet";
+                args.Add($"-verbosity:{defaultVerbosity}");
             }
 
             args.AddRange(RestoreArgs);
