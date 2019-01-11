@@ -2,6 +2,8 @@
 
 [![Join the chat at https://gitter.im/dotnet/cli](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/dotnet/cli?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+[![Open Source Helpers](https://www.codetriage.com/dotnet/cli/badges/users.svg)](https://www.codetriage.com/dotnet/cli)
+
 This repo contains the source code for cross-platform [.NET Core](http://github.com/dotnet/core) command line toolchain. It contains the implementation of each command and the documentation.
 
 # Looking for the .NET Core SDK tooling?
