@@ -24,7 +24,7 @@
       </trans-unit>
       <trans-unit id="CommandDescription">
         <source>Update a global tool.</source>
-        <target state="needs-review-translation">Bir aracı en son kararlı sürüme güncelleştirir.</target>
+        <target state="translated">Genel bir aracı güncelleştirin.</target>
         <note />
       </trans-unit>
       <trans-unit id="ConfigFileOptionDescription">

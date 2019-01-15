@@ -24,7 +24,7 @@
       </trans-unit>
       <trans-unit id="CommandDescription">
         <source>Update a global tool.</source>
-        <target state="needs-review-translation">Aktualizuje nástroj na nejnovější stabilní verzi.</target>
+        <target state="translated">Umožňuje aktualizovat globální nástroj.</target>
         <note />
       </trans-unit>
       <trans-unit id="ConfigFileOptionDescription">
