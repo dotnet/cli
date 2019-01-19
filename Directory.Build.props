@@ -36,6 +36,8 @@ tools\TestAssetsDependencies\TestAssetsDependencies.csproj
     <EnableSourceControlManagerQueries Condition=" '$(Rid)' == 'rhel.6-x64' ">false</EnableSourceControlManagerQueries>
     <DeterministicSourcePaths Condition=" '$(Rid)' == 'rhel.6-x64' ">false</DeterministicSourcePaths>
     <UsingToolMicrosoftNetCompilers>false</UsingToolMicrosoftNetCompilers>
+
+    <TestCaptureOutput>false</TestCaptureOutput>
   </PropertyGroup>
 
   <PropertyGroup>
