@@ -27,7 +27,7 @@
     - 3-part version in a format A.B.C - represents specific version of build
           examples: 2.0.0-preview2-006120, 1.1.0
 .PARAMETER InstallDir
-    Default: %LocalAppData%\Microsoft\dotnet
+    Default: %LocalAppData%\Microsoft\dotnet (Windows), $HOME/.dotnet (Unix)
     Path to where to install dotnet. Note that binaries will be placed directly in a given directory.
 .PARAMETER Architecture
     Default: <auto> - this value represents currently running OS architecture
@@ -101,6 +101,17 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference="Stop"
 $ProgressPreference="SilentlyContinue"
 
+# As a courtesy, allow case variations of abstract -Channel and -Runtime values.
+# (For abstract -Runtime values, the ValidateSet attribute reliably prevents case varations.
+#  For abstract -Version values, case doesn't matter.)
+if ($Channel) {
+    $caseExactValue = @{
+        current = 'Current'
+        lts = 'LTS'
+    }[$Channel]
+    if ($caseExactValue) { $Channel = $caseExactValue }
+}
+
 if ($NoCdn) {
     $AzureFeed = $UncachedFeed
 }
@@ -152,7 +163,15 @@ function Get-Machine-Architecture() {
     Say-Invocation $MyInvocation
 
     # possible values: amd64, x64, x86, arm64, arm
-    return $ENV:PROCESSOR_ARCHITECTURE
+    if ($env:OS -eq 'Windows_NT') {
+        $ENV:PROCESSOR_ARCHITECTURE
+    } else { # Unix-like platforms.
+        switch($(try { uname -m } catch {})) {
+            'armv7l'  { return 'arm' }
+            'aarch64' { return 'arm64' }
+            default   { return 'x64' } # Always default to 'x64'
+        }
+    }
 }
 
 function Get-CLIArchitecture-From-Architecture([string]$Architecture) {
@@ -164,7 +183,7 @@ function Get-CLIArchitecture-From-Architecture([string]$Architecture) {
         { $_ -eq "x86" } { return "x86" }
         { $_ -eq "arm" } { return "arm" }
         { $_ -eq "arm64" } { return "arm64" }
-        default { throw "Architecture not supported. If you think this is a bug, please report it at https://github.com/dotnet/cli/issues" }
+        default { throw "Architecture '$Architecture' not supported. If you think this is a bug, please report it at https://github.com/dotnet/cli/issues" }
     }
 }
 
@@ -348,7 +367,11 @@ function Get-User-Share-Path() {
 
     $InstallRoot = $env:DOTNET_INSTALL_DIR
     if (!$InstallRoot) {
-        $InstallRoot = "$env:LocalAppData\Microsoft\dotnet"
+        $InstallRoot = if ($env:OS -eq 'Windows_NT') {
+                         "$env:LocalAppData\Microsoft\dotnet"
+                       } else { # Unix-like platforms
+                         "$HOME/.dotnet"
+                       }
     }
     return $InstallRoot
 }
@@ -427,16 +450,16 @@ function Get-List-Of-Directories-And-Versions-To-Unpack-From-Dotnet-Package([Sys
 
 # Example zip content and extraction algorithm:
 # Rule: files if extracted are always being extracted to the same relative path locally
-# .\
+# ./
 #       a.exe   # file does not exist locally, extract
 #       b.dll   # file exists locally, override only if $OverrideFiles set
-#       aaa\    # same rules as for files
+#       aaa/    # same rules as for files
 #           ...
-#       abc\1.0.0\  # directory contains version and exists locally
+#       abc/1.0.0/  # directory contains version and exists locally
 #           ...     # do not extract content under versioned part
-#       abc\asd\    # same rules as for files
+#       abc/asd/    # same rules as for files
 #            ...
-#       def\ghi\1.0.1\  # directory contains version and does not exist locally
+#       def/ghi/1.0.1/  # directory contains version and does not exist locally
 #           ...         # extract content
 function Extract-Dotnet-Package([string]$ZipPath, [string]$OutPath) {
     Say-Invocation $MyInvocation
@@ -454,7 +477,7 @@ function Extract-Dotnet-Package([string]$ZipPath, [string]$OutPath) {
                 $DestinationPath = Get-Absolute-Path $(Join-Path -Path $OutPath -ChildPath $entry.FullName)
                 $DestinationDir = Split-Path -Parent $DestinationPath
                 $OverrideFiles=$OverrideNonVersionedFiles -Or (-Not (Test-Path $DestinationPath))
-                if ((-Not $DestinationPath.EndsWith("\")) -And $OverrideFiles) {
+                if ((-Not $DestinationPath.EndsWith([IO.Path]::DirectorySeparatorChar)) -And $OverrideFiles) {
                     New-Item -ItemType Directory -Force -Path $DestinationDir | Out-Null
                     [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $DestinationPath, $OverrideNonVersionedFiles)
                 }
@@ -500,10 +523,10 @@ function DownloadFile($Source, [string]$OutPath) {
 function Prepend-Sdk-InstallRoot-To-Path([string]$InstallRoot, [string]$BinFolderRelativePath) {
     $BinPath = Get-Absolute-Path $(Join-Path -Path $InstallRoot -ChildPath $BinFolderRelativePath)
     if (-Not $NoPath) {
-        $SuffixedBinPath = "$BinPath;"
-        if (-Not $env:path.Contains($SuffixedBinPath)) {
+        $SuffixedBinPath = "$BinPath" + [IO.Path]::PathSeparator
+        if (-Not $env:PATH.Contains($SuffixedBinPath)) {
             Say "Adding to current process PATH: `"$BinPath`". Note: This change will not be visible if PowerShell was run as a child process."
-            $env:path = $SuffixedBinPath + $env:path
+            $env:PATH = $SuffixedBinPath + $env:PATH
         } else {
             Say-Verbose "Current process PATH already contains `"$BinPath`""
         }
@@ -524,7 +547,7 @@ if ($DryRun) {
     if ($LegacyDownloadLink) {
         Say "Legacy - $LegacyDownloadLink"
     }
-    Say "Repeatable invocation: .\$($MyInvocation.Line)"
+    Say "Repeatable invocation: $($MyInvocation.Line)"
     exit 0
 }
 
@@ -533,11 +556,11 @@ Say-Verbose "InstallRoot: $InstallRoot"
 
 if ($Runtime -eq "dotnet") {
     $assetName = ".NET Core Runtime"
-    $dotnetPackageRelativePath = "shared\Microsoft.NETCore.App"
+    $dotnetPackageRelativePath = "shared/Microsoft.NETCore.App"
 }
 elseif ($Runtime -eq "aspnetcore") {
     $assetName = "ASP.NET Core Runtime"
-    $dotnetPackageRelativePath = "shared\Microsoft.AspNetCore.App"
+    $dotnetPackageRelativePath = "shared/Microsoft.AspNetCore.App"
 }
 elseif (-not $Runtime) {
     $assetName = ".NET Core SDK"
@@ -557,7 +580,7 @@ if ($isAssetInstalled) {
 
 New-Item -ItemType Directory -Force -Path $InstallRoot | Out-Null
 
-$installDrive = $((Get-Item $InstallRoot).PSDrive.Name);
+$installDrive = $((Get-Item -Force $InstallRoot).PSDrive.Name);
 $diskInfo = Get-PSDrive -Name $installDrive
 if ($diskInfo.Free / 1MB -le 100) {
     Say "There is not enough disk space on drive ${installDrive}:"
