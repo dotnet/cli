@@ -4,9 +4,12 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
 using FluentAssertions;
+using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Tools.Common;
+using Microsoft.VisualBasic.CompilerServices;
 using Xunit;
 using Xunit.Abstractions;
 using Parser = Microsoft.DotNet.Cli.Parser;
@@ -34,6 +37,22 @@ namespace Microsoft.DotNet.Tests.ParserTests
                 .Should()
                 .BeEquivalentTo(
                     PathUtility.EnsureTrailingSlash(Directory.GetCurrentDirectory()));
+        }
+
+        [Fact]
+        public void AddReferenceHasInteractiveFlag()
+        {
+            var command = Parser.Instance;
+
+            var result = command.Parse("dotnet add reference my.csproj --interactive");
+
+            AppliedOption appliedOption = result["dotnet"]["add"];
+            CommonOptionResult.GetInteractive(appliedOption).Should().BeTrue();
+        }
+
+        private static bool GetInteractive(AppliedOption appliedOption)
+        {
+            return appliedOption["interactive"].Value<bool>();
         }
 
         [Fact]
