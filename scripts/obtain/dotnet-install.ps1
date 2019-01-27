@@ -29,11 +29,11 @@
     - coherent - most latest coherent build on specific channel
           coherent applies only to SDK downloads and is treated the same as
           latest when using -Runtime / -SharedRuntime
-    - 3-part version in a format A.B.C - represents specific version of build
+    - 3-part version in format A.B.C, representing a specific build version
           examples: 2.0.0-preview2-006120, 1.1.0
 .PARAMETER InstallDir
-    Default: $env:LocalAppData\Microsoft\dotnet (Windows); $HOME/.dotnet (Unix)
-             or, if preset, the value of environment var. DOTNET_INSTALL_DIR
+    Default: %LOCALAPPDATA%\Microsoft\dotnet (Windows); $HOME/.dotnet (Unix).
+             Or, if defined, the value of environment var. DOTNET_INSTALL_DIR.
     The path of the local target directory for the installation.
     Note that the dotnet CLI will be placed directly in that directory.
 .PARAMETER Architecture
@@ -559,7 +559,7 @@ function Resolve-InstallationPath([string]$InstallDir) {
 }
 
 function Get-RepeatableInvocationCommandLine([string]$SpecificVersion) {
-    $thisScriptName = Split-Path -Leaf -Path $PSCommandPath
+    $scriptNameOrPath = (-split $script:MyInvocation.Line -ne '.')[0]
 
     # Retain all explicitly bound parameters, except -WhatIf.
     # Always include the resolved -Version.
@@ -584,7 +584,7 @@ function Get-RepeatableInvocationCommandLine([string]$SpecificVersion) {
         $paramTokens += '-Version', $SpecificVersion
     }
 
-    return "$thisScriptName $paramTokens"
+    return "$scriptNameOrPath $paramTokens"
 }
 
 # Note: Appears to be unused.
