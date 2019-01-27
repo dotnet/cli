@@ -160,6 +160,11 @@ Im aktuellen Verzeichnis wird eine Datei namens "Sequence.xml" ausgegeben, in de
         <target state="translated">Die für die Testausführung zu verwendende Konfiguration. Standard für die meisten Projekte ist "Debug".</target>
         <note />
       </trans-unit>
+      <trans-unit id="CmdNoLogo">
+        <source>Run the test, without displaying Microsoft Testplatform banner</source>
+        <target state="new">Run the test, without displaying Microsoft Testplatform banner</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

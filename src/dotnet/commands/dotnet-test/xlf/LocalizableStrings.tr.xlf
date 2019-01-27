@@ -160,6 +160,11 @@ Geçerli dizinde testin kilitlenmeden önceki test yürütme sırasını yakalay
         <target state="translated">Testleri çalıştırmak için kullanılacak yapılandırma. Çoğu proje için varsayılan, ‘Hata Ayıklama’ seçeneğidir.</target>
         <note />
       </trans-unit>
+      <trans-unit id="CmdNoLogo">
+        <source>Run the test, without displaying Microsoft Testplatform banner</source>
+        <target state="new">Run the test, without displaying Microsoft Testplatform banner</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

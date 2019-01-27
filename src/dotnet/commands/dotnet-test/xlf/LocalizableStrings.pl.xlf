@@ -160,6 +160,11 @@ Tworzy w bieżącym katalogu plik wyjściowy „Sequence.xml”, który przechwy
         <target state="translated">Konfiguracja do użycia na potrzeby uruchamiania testów. W przypadku większości projektów ustawienie domyślne to „Debugowanie”.</target>
         <note />
       </trans-unit>
+      <trans-unit id="CmdNoLogo">
+        <source>Run the test, without displaying Microsoft Testplatform banner</source>
+        <target state="new">Run the test, without displaying Microsoft Testplatform banner</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

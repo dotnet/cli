@@ -160,6 +160,11 @@ Outputs a 'Sequence.xml' file in the current directory that captures the order o
         <target state="translated">要用於執行測試的組態。大部分的專案預設為「偵錯」。</target>
         <note />
       </trans-unit>
+      <trans-unit id="CmdNoLogo">
+        <source>Run the test, without displaying Microsoft Testplatform banner</source>
+        <target state="new">Run the test, without displaying Microsoft Testplatform banner</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

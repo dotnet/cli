@@ -160,6 +160,11 @@ Emite um arquivo 'Sequence.xml' no diretório atual que captura a ordem de execu
         <target state="translated">A configuração a ser usada para executar testes. O padrão para a maioria dos projetos é 'Debug'.</target>
         <note />
       </trans-unit>
+      <trans-unit id="CmdNoLogo">
+        <source>Run the test, without displaying Microsoft Testplatform banner</source>
+        <target state="new">Run the test, without displaying Microsoft Testplatform banner</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

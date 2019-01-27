@@ -160,6 +160,11 @@ Crea nella directory corrente un file di output denominato "Sequence.xml", in cu
         <target state="translated">Configurazione da usare per eseguire i test. L'impostazione predefinita per la maggior parte dei progetti è 'Debug'.</target>
         <note />
       </trans-unit>
+      <trans-unit id="CmdNoLogo">
+        <source>Run the test, without displaying Microsoft Testplatform banner</source>
+        <target state="new">Run the test, without displaying Microsoft Testplatform banner</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>
