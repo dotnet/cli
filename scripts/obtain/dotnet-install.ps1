@@ -87,6 +87,26 @@
     dotnet binary.
 .PARAMETER NoCdn
     Disable downloading from the Azure CDN, and use the uncached feed directly.
+.EXAMPLE
+    dotnet-install.ps1
+
+    Installs the latest LTS version of the SDK and all runtimes, appropriate
+    for the current OS architecture, in the default target directory.
+.EXAMPLE
+    dotnet-install.ps1 -Runtime dotnet
+
+    Installs the latest LTS dotnet runtime only (no SDK), in the default target
+    directory.
+.EXAMPLE
+        dotnet-install.ps1 -Channel LTS -Version 2.1.403
+    
+        Installs a specific LTS version.
+.EXAMPLE
+    dotnet-install.ps1 -WhatIf
+
+    Previews the download links and installation directory path, and prints a 
+    repeatable command line with implied or abstract version references
+    resolved.
 #>
 [cmdletbinding(PositionalBinding=$false)]
 param(
@@ -116,8 +136,8 @@ param(
 )
 
 Set-StrictMode -Version Latest
-$ErrorActionPreference="Stop"
-$ProgressPreference="SilentlyContinue"
+$ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
 
 function Say($str) {
     Write-Host "dotnet-install: $str"
