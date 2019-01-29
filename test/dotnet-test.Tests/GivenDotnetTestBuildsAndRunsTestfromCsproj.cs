@@ -336,7 +336,7 @@ namespace Microsoft.DotNet.Cli.Test.Tests
         public void ItAcceptsNoLogoAsCliArguments()
         {
             // Copy and restore VSTestCore project in output directory of project dotnet-vstest.Tests
-            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp("11");
+            var testProjectDirectory = this.CopyAndRestoreVSTestDotNetCoreTestApp("14");
 
             // Call test with logger enable
             CommandResult result = new DotnetTestCommand()
@@ -347,8 +347,7 @@ namespace Microsoft.DotNet.Cli.Test.Tests
             if (!DotnetUnderTest.IsLocalized())
             {
                 result.StdOut.Should().NotContain("Microsoft (R) Test Execution Command Line Tool Version");
-                result.StdOut.Should().Contain("Passed   VSTestPassTest");
-                result.StdOut.Should().Contain("Failed   VSTestFailTest");
+                result.StdOut.Should().Contain("Total tests: 2. Passed: 1. Failed: 1. Skipped: 0.");
             }
         }
 
