@@ -80,10 +80,10 @@ namespace Microsoft.DotNet.Tools.Test
                 msbuildPath);
         }
 
-        private static string DefaultVerbosity(AppliedOption parsedTest)
+        private static string DefaultVerbosity(AppliedOption options)
         {
             var defaultVerbosity = "quiet";
-            if (parsedTest.HasOption(Constants.RestoreInteractiveOption))
+            if (options.HasOption(Constants.RestoreInteractiveOption))
             {
                 defaultVerbosity = "minimal";
             }

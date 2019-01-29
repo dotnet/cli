@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.Cli
                         launchProfile: o.SingleArgumentOrDefault("--launch-profile"),
                         noLaunchProfile: o.HasOption("--no-launch-profile"),
                         noRestore: o.HasOption("--no-restore") || o.HasOption("--no-build"),
-                        interactive:o.HasOption(Utils.Constants.RestoreInteractiveOption),
+                        interactive: o.HasOption(Utils.Constants.RestoreInteractiveOption),
                         restoreArgs: o.OptionValuesToBeForwarded(),
                         args: o.Arguments
                     )),

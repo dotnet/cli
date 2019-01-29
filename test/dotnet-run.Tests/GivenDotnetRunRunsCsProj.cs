@@ -647,7 +647,7 @@ namespace Microsoft.DotNet.Cli.Run.Tests
         }
 
         [Fact]
-        public void ItDoesNotShowImportantMessageLevelByDefault()
+        public void ItDoesNotShowImportantLevelMessageByDefault()
         {
             var testAppName = "MSBuildTestApp";
             var testInstance = TestAssets.Get(testAppName)
@@ -664,7 +664,7 @@ namespace Microsoft.DotNet.Cli.Run.Tests
         }
 
         [Fact]
-        public void ItShowImportantMessageLevelWhenPassInteractive()
+        public void ItShowImportantLevelMessageWhenPassInteractive()
         {
             var testAppName = "MSBuildTestApp";
             var testInstance = TestAssets.Get(testAppName)

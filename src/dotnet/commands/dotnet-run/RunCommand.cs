@@ -155,6 +155,8 @@ namespace Microsoft.DotNet.Tools.Run
                 "-nologo"
             };
 
+            // --interactive need to output guide for auth. It cannot be
+            // completely "quiet"
             if (!RestoreArgs.Any(a => a.StartsWith("-verbosity:")))
             {
                 var defaultVerbosity = Interactive ? "minimal" : "quiet";

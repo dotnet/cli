@@ -11,11 +11,11 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
         {
             XNamespace ns = project.Root.Name.Namespace;
 
-            XElement itemGroup = new XElement(ns + "Target", new XAttribute("Name", "DisplayMessages"),
+            XElement target = new XElement(ns + "Target", new XAttribute("Name", "DisplayMessages"),
                 new XAttribute("BeforeTargets", beforeTargets));
-            project.Root.Add(itemGroup);
+            project.Root.Add(target);
 
-            itemGroup.Add(new XElement(ns + "Message", new XAttribute("Text", "Important text"),
+            target.Add(new XElement(ns + "Message", new XAttribute("Text", "Important text"),
                 new XAttribute("Importance", "high")));
         }
 
