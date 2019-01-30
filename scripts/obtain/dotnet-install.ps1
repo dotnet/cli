@@ -367,12 +367,12 @@ function Get-CLIArchitectureFromArchitecture([string]$Architecture) {
     }
 }
 
-# The version text returned from the feeds is 1- to 2-line string:
-# for the SDK and the dotnet runtime (2 lines):
+# The version text returned from the feeds is a 1- to 2-line string:
+# For the SDK and the dotnet runtime (2 lines):
 #   Line 1: # commit_hash (e.g., '4c506e0f35ce663f28fcb758387a98daa544e070')
 #   Line 2: # 3-component version number (e.g., 2.1.503)
-# for the aspnetcore runtime (1 line):
-#   Line 1: # 3-compontent version number
+# For the aspnetcore runtime (1 line):
+#   Line 1: # 3-component version number
 function Get-VersionInfoFromVersionText([string]$VersionText) {
     SayInvocation $MyInvocation
 
@@ -584,7 +584,7 @@ function Get-RepeatableInvocationCommandLine([string]$SpecificVersion) {
     # Retain all explicitly bound parameters, except -WhatIf.
     # Always include the resolved -Version.
     $versionPresent = $false
-    $paramTokens = foreach ($p in $script:PSBoundParameters.GetEnumerator()) {
+    $paramTokens = @(foreach ($p in $script:PSBoundParameters.GetEnumerator()) {
         if ($p.Value -is [switch]) {
             if ($p.Key -ne 'WhatIf') {
                 if ($p.Value) { "-$($p.Key)" }
@@ -599,7 +599,8 @@ function Get-RepeatableInvocationCommandLine([string]$SpecificVersion) {
             if ($value -match ' ') { $value = '"{0}"' -f $value }
             "-$($p.Key)", $value
         }
-    }
+    })
+    
     if (-not $versionPresent) {
         $paramTokens += '-Version', $SpecificVersion
     }
