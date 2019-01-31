@@ -46,8 +46,19 @@ namespace Microsoft.DotNet.Tests.ParserTests
 
             var result = command.Parse("dotnet add reference my.csproj --interactive");
 
-            AppliedOption appliedOption = result["dotnet"]["add"];
+            AppliedOption appliedOption = result["dotnet"]["add"]["reference"];
             CommonOptionResult.GetInteractive(appliedOption).Should().BeTrue();
+        }
+
+        [Fact]
+        public void AddReferenceDoesNotHaveInteractiveFlagByDefault()
+        {
+            var command = Parser.Instance;
+
+            var result = command.Parse("dotnet add reference my.csproj");
+
+            AppliedOption appliedOption = result["dotnet"]["add"]["reference"];
+            CommonOptionResult.GetInteractive(appliedOption).Should().BeFalse();
         }
 
         private static bool GetInteractive(AppliedOption appliedOption)

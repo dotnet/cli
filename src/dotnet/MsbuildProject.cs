@@ -214,15 +214,13 @@ namespace Microsoft.DotNet.Tools
                 {
                     // NuGet need this environment variable to call plugin dll
                     Environment.SetEnvironmentVariable("DOTNET_HOST_PATH", new Muxer().MuxerPath);
-                    // Even it is during msbuild evaluation time, it need to output auth guide. So the logger need to be set. 
+                    // Even during evaluation time, the SDK resolver may need to output auth instructions, so set a logger.
                     _projects.RegisterLogger(new ConsoleLogger(LoggerVerbosity.Minimal));
                     project = _projects.LoadProject(
                         ProjectRootElement.FullPath,
                         new Dictionary<string, string>
                             {[Constants.MsBuildInteractivePropertyName] = "true"},
                         null);
-
-                    Environment.SetEnvironmentVariable("DOTNET_HOST_PATH", null);
                 }
                 else
                 {
@@ -236,6 +234,10 @@ namespace Microsoft.DotNet.Tools
                 throw new GracefulException(string.Format(
                     CommonLocalizableStrings.ProjectCouldNotBeEvaluated,
                     ProjectRootElement.FullPath, e.Message));
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable("DOTNET_HOST_PATH", null);
             }
         }
 
