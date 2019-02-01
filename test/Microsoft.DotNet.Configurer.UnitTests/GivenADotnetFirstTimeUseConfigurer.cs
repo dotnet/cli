@@ -58,31 +58,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
         }
 
         [Fact]
-        public void It_does_not_print_the_first_time_use_notice_when_the_user_has_set_the_DOTNET_SKIP_FIRST_TIME_EXPERIENCE_environment_variable()
-        {
-            _firstTimeUseNoticeSentinelMock.Setup(n => n.Exists()).Returns(false);
-
-            var dotnetFirstTimeUseConfigurer = new DotnetFirstTimeUseConfigurer(
-                _firstTimeUseNoticeSentinelMock.Object,
-                _aspNetCertificateSentinelMock.Object,
-                _aspNetCoreCertificateGeneratorMock.Object,
-                _toolPathSentinelMock.Object,
-                new DotnetFirstRunConfiguration
-                (
-                    generateAspNetCertificate: true,
-                    telemetryOptout: false
-                ),
-                _reporterMock.Object,
-                CliFallbackFolderPath,
-                _pathAdderMock.Object);
-
-            dotnetFirstTimeUseConfigurer.Configure();
-
-            _reporterMock.Verify(r => r.WriteLine(It.Is<string>(str => str == LocalizableStrings.FirstTimeWelcomeMessage)), Times.Never);
-            _reporterMock.Verify(r => r.Write(It.IsAny<string>()), Times.Never);
-        }
-
-        [Fact]
         public void It_prints_the_telemetry_if_the_sentinel_does_not_exist()
         {
             _firstTimeUseNoticeSentinelMock.Setup(n => n.Exists()).Returns(false);
@@ -183,31 +158,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
         }
 
         [Fact]
-        public void It_does_not_generate_the_aspnet_https_development_certificate_when_the_user_has_set_the_DOTNET_SKIP_FIRST_TIME_EXPERIENCE_environment_variable()
-        {
-            _aspNetCertificateSentinelMock.Setup(n => n.Exists()).Returns(false);
-
-            var dotnetFirstTimeUseConfigurer = new DotnetFirstTimeUseConfigurer(
-                _firstTimeUseNoticeSentinelMock.Object,
-                _aspNetCertificateSentinelMock.Object,
-                _aspNetCoreCertificateGeneratorMock.Object,
-                _toolPathSentinelMock.Object,
-                new DotnetFirstRunConfiguration
-                (
-                    generateAspNetCertificate: true,
-                    telemetryOptout: false
-                ),
-                _reporterMock.Object,
-                CliFallbackFolderPath,
-                _pathAdderMock.Object);
-
-            dotnetFirstTimeUseConfigurer.Configure();
-
-            _reporterMock.Verify(r => r.WriteLine(It.Is<string>(str => str == LocalizableStrings.AspNetCertificateInstalled)), Times.Never);
-            _aspNetCoreCertificateGeneratorMock.Verify(s => s.GenerateAspNetCoreDevelopmentCertificate(), Times.Never);
-        }
-
-        [Fact]
         public void It_does_not_generate_the_aspnet_https_development_certificate_when_the_user_has_set_the_DOTNET_GENERATE_ASPNET_CERTIFICATE_environment_variable()
         {
             _aspNetCertificateSentinelMock.Setup(n => n.Exists()).Returns(false);
@@ -278,28 +228,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
             dotnetFirstTimeUseConfigurer.Configure();
 
             _pathAdderMock.Verify(p => p.AddPackageExecutablePathToUserPath(), Times.Once);
-        }
-
-        [Fact]
-        public void It_does_not_add_the_tool_path_to_the_environment_if_the_first_run_experience_is_skipped()
-        {
-            var dotnetFirstTimeUseConfigurer = new DotnetFirstTimeUseConfigurer(
-                _firstTimeUseNoticeSentinelMock.Object,
-                _aspNetCertificateSentinelMock.Object,
-                _aspNetCoreCertificateGeneratorMock.Object,
-                _toolPathSentinelMock.Object,
-                new DotnetFirstRunConfiguration
-                (
-                    generateAspNetCertificate: true,
-                    telemetryOptout: false
-                ),
-                _reporterMock.Object,
-                CliFallbackFolderPath,
-                _pathAdderMock.Object);
-
-            dotnetFirstTimeUseConfigurer.Configure();
-
-            _pathAdderMock.Verify(p => p.AddPackageExecutablePathToUserPath(), Times.Never);
         }
     }
 }
