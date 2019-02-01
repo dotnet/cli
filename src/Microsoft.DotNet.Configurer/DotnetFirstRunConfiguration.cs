@@ -7,17 +7,13 @@ namespace Microsoft.DotNet.Configurer
     {
         public bool GenerateAspNetCertificate { get; }
 
-        public bool SkipFirstRunExperience { get; }
-
         public bool TelemetryOptout { get; }
 
         public DotnetFirstRunConfiguration(
             bool generateAspNetCertificate,
-            bool skipFirstRunExperience,
             bool telemetryOptout)
         {
             GenerateAspNetCertificate = generateAspNetCertificate;
-            SkipFirstRunExperience = skipFirstRunExperience;
             TelemetryOptout = telemetryOptout;
         }
     }

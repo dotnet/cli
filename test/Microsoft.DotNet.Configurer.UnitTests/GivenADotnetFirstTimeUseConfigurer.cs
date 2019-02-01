@@ -45,7 +45,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 new DotnetFirstRunConfiguration
                 (
                     generateAspNetCertificate: true,
-                    skipFirstRunExperience: false,
                     telemetryOptout: false
                 ),
                 _reporterMock.Object,
@@ -71,7 +70,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 new DotnetFirstRunConfiguration
                 (
                     generateAspNetCertificate: true,
-                    skipFirstRunExperience: true,
                     telemetryOptout: false
                 ),
                 _reporterMock.Object,
@@ -97,7 +95,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 new DotnetFirstRunConfiguration
                 (
                     generateAspNetCertificate: true,
-                    skipFirstRunExperience: false,
                     telemetryOptout: false
                 ),
                 _reporterMock.Object,
@@ -123,7 +120,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 new DotnetFirstRunConfiguration
                 (
                     generateAspNetCertificate: true,
-                    skipFirstRunExperience: false,
                     telemetryOptout: false
                 ),
                 _reporterMock.Object,
@@ -149,7 +145,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 new DotnetFirstRunConfiguration
                 (
                     generateAspNetCertificate: true,
-                    skipFirstRunExperience: false,
                     telemetryOptout: false
                 ),
                 _reporterMock.Object,
@@ -175,7 +170,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 new DotnetFirstRunConfiguration
                 (
                     generateAspNetCertificate: true,
-                    skipFirstRunExperience: false,
                     telemetryOptout: false
                 ),
                 _reporterMock.Object,
@@ -201,7 +195,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 new DotnetFirstRunConfiguration
                 (
                     generateAspNetCertificate: true,
-                    skipFirstRunExperience: true,
                     telemetryOptout: false
                 ),
                 _reporterMock.Object,
@@ -227,7 +220,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 new DotnetFirstRunConfiguration
                 (
                     generateAspNetCertificate: false,
-                    skipFirstRunExperience: false,
                     telemetryOptout: false
                 ),
                 _reporterMock.Object,
@@ -253,7 +245,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 new DotnetFirstRunConfiguration
                 (
                     generateAspNetCertificate: true,
-                    skipFirstRunExperience: false,
                     telemetryOptout: false
                 ),
                 _reporterMock.Object,
@@ -278,7 +269,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 new DotnetFirstRunConfiguration
                 (
                     generateAspNetCertificate: true,
-                    skipFirstRunExperience: false,
                     telemetryOptout: false
                 ),
                 _reporterMock.Object,
@@ -301,7 +291,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 new DotnetFirstRunConfiguration
                 (
                     generateAspNetCertificate: true,
-                    skipFirstRunExperience: true,
                     telemetryOptout: false
                 ),
                 _reporterMock.Object,

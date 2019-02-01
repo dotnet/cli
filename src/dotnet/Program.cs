@@ -144,8 +144,6 @@ namespace Microsoft.DotNet.Cli
 
                         bool generateAspNetCertificate =
                             environmentProvider.GetEnvironmentVariableAsBool("DOTNET_GENERATE_ASPNET_CERTIFICATE", true);
-                        bool skipFirstRunExperience =
-                            environmentProvider.GetEnvironmentVariableAsBool("DOTNET_SKIP_FIRST_TIME_EXPERIENCE", false);
                         bool telemetryOptout =
                             environmentProvider.GetEnvironmentVariableAsBool("DOTNET_CLI_TELEMETRY_OPTOUT", false);
 
@@ -162,12 +160,10 @@ namespace Microsoft.DotNet.Cli
 
                             // When running through a native installer, we want the cache expansion to happen, so
                             // we need to override this.
-                            skipFirstRunExperience = false;
                         }
 
                         var dotnetFirstRunConfiguration = new DotnetFirstRunConfiguration(
                             generateAspNetCertificate: generateAspNetCertificate,
-                            skipFirstRunExperience: skipFirstRunExperience,
                             telemetryOptout: telemetryOptout);
 
                         ConfigureDotNetForFirstTimeUse(
