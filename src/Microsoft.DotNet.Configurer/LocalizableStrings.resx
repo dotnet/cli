@@ -123,16 +123,6 @@
 Learn more about .NET Core: https://aka.ms/dotnet-docs
 Use 'dotnet --help' to see available commands or visit: https://aka.ms/dotnet-cli-docs</value>
   </data>
-  <data name="UnauthorizedAccessMessage" xml:space="preserve">
-    <value>Permission denied to modify the '{0}' folder.
-
-Here are some options to fix this error:
-----------------------------------------
-1. Re-run this command with elevated access.
-2. Disable the first run experience by setting the environment variable DOTNET_SKIP_FIRST_TIME_EXPERIENCE to true.
-3. Copy the .NET Core SDK to a non-protected location and use it from there.
-    </value>
-  </data>
   <data name="AspNetCertificateInstalled" xml:space="preserve">
     <value>ASP.NET Core
 ------------

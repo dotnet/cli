@@ -89,15 +89,14 @@ namespace Microsoft.DotNet.Configurer
 #if EXCLUDE_ASPNETCORE
             return false;
 #else
-            return ShouldRunFirstRunExperience() &&
-                _dotnetFirstRunConfiguration.GenerateAspNetCertificate &&
+            return _dotnetFirstRunConfiguration.GenerateAspNetCertificate &&
                 !_aspNetCertificateSentinel.Exists();
 #endif
         }
 
         private bool ShouldAddPackageExecutablePath()
         {
-            return ShouldRunFirstRunExperience() && !_toolPathSentinel.Exists();
+            return !_toolPathSentinel.Exists();
         }
 
         private void AddPackageExecutablePath()
@@ -109,8 +108,7 @@ namespace Microsoft.DotNet.Configurer
 
         private bool ShouldPrintFirstTimeUseNotice()
         {
-            return ShouldRunFirstRunExperience() &&
-                !_firstTimeUseNoticeSentinel.Exists();
+            return !_firstTimeUseNoticeSentinel.Exists();
         }
 
         private bool ShouldPrintShortFirstTimeUseNotice()
@@ -145,19 +143,6 @@ namespace Microsoft.DotNet.Configurer
         {
             _reporter.WriteLine();
             _reporter.WriteLine(LocalizableStrings.ShortTelemetryMessage);
-        }
-
-        private void PrintUnauthorizedAccessMessage()
-        {
-            _reporter.WriteLine();
-            _reporter.WriteLine(string.Format(
-                LocalizableStrings.UnauthorizedAccessMessage,
-                _cliFallbackFolderPath));
-        }
-
-        private bool ShouldRunFirstRunExperience()
-        {
-            return !_dotnetFirstRunConfiguration.SkipFirstRunExperience;
         }
     }
 }
