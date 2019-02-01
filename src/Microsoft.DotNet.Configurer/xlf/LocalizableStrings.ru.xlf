@@ -13,24 +13,6 @@ Use 'dotnet --help' to see available commands or visit: https://aka.ms/dotnet-cl
 Для просмотра списка доступных команд, выполните команду 'dotnet --help', или зайдите на страницу https://aka.ms/dotnet-cli-docs</target>
         <note />
       </trans-unit>
-      <trans-unit id="UnauthorizedAccessMessage">
-        <source>Permission denied to modify the '{0}' folder.
-
-Here are some options to fix this error:
-----------------------------------------
-1. Re-run this command with elevated access.
-2. Disable the first run experience by setting the environment variable DOTNET_SKIP_FIRST_TIME_EXPERIENCE to true.
-3. Copy the .NET Core SDK to a non-protected location and use it from there.
-    </source>
-        <target state="translated">Отсутствует разрешение на изменение папки '{0}'.
-
-Чтобы исправить эту ошибку, попробуйте выполнить одно из указанных действий:
-----------------------------------------
-1. Повторно запустите эту команду с расширенными разрешениями.
-2. Отключите поведение при первом запуске, установив значение true для переменной среды DOTNET_SKIP_FIRST_TIME_EXPERIENCE.
-3. Скопируйте пакет SDK для .NET Core в незащищенное расположение и используйте его оттуда.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="AspNetCertificateInstalled">
         <source>ASP.NET Core
 ------------

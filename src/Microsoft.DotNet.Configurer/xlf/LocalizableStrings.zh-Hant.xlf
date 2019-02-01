@@ -13,24 +13,6 @@ Use 'dotnet --help' to see available commands or visit: https://aka.ms/dotnet-cl
 使用 'dotnet --help' 查看可用的命令，或前往: https://aka.ms/dotnet-cli-docs</target>
         <note />
       </trans-unit>
-      <trans-unit id="UnauthorizedAccessMessage">
-        <source>Permission denied to modify the '{0}' folder.
-
-Here are some options to fix this error:
-----------------------------------------
-1. Re-run this command with elevated access.
-2. Disable the first run experience by setting the environment variable DOTNET_SKIP_FIRST_TIME_EXPERIENCE to true.
-3. Copy the .NET Core SDK to a non-protected location and use it from there.
-    </source>
-        <target state="translated">沒有修改 '{0}' 資料夾的權限。
-
-以下幾個選項可修正這項錯誤:
-----------------------------------------
-1. 以較高的存取權重新執行此命令。
-2. 將環境變數 DOTNET_SKIP_FIRST_TIME_EXPERIENCE 設為 true，以停用初次執行體驗。
-3. 將 .NET Core SDK 複製到未保護的位置，並從該處使用。</target>
-        <note />
-      </trans-unit>
       <trans-unit id="AspNetCertificateInstalled">
         <source>ASP.NET Core
 ------------

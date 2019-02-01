@@ -13,24 +13,6 @@ Use 'dotnet --help' to see available commands or visit: https://aka.ms/dotnet-cl
 'dotnet--help' で利用可能なコマンドを参照することができます。または、https://aka.ms/dotnet-cli-docs を参照してください。</target>
         <note />
       </trans-unit>
-      <trans-unit id="UnauthorizedAccessMessage">
-        <source>Permission denied to modify the '{0}' folder.
-
-Here are some options to fix this error:
-----------------------------------------
-1. Re-run this command with elevated access.
-2. Disable the first run experience by setting the environment variable DOTNET_SKIP_FIRST_TIME_EXPERIENCE to true.
-3. Copy the .NET Core SDK to a non-protected location and use it from there.
-    </source>
-        <target state="translated">アクセス許可により、フォルダ '{0}' の変更が拒否されました。
-
-このエラーを修正するためのオプションは次のとおりです。
-----------------------------------------
-1. 昇格させたアクセス権でこのコマンドを再実行します。
-2. 環境変数 DOTNET_SKIP_FIRST_TIME_EXPERIENCE を true に設定し、最初のエクスペリエンスの実行を無効にします。
-3. .NET Core SDK を保護されていない場所にコピーし、そこから利用します。</target>
-        <note />
-      </trans-unit>
       <trans-unit id="AspNetCertificateInstalled">
         <source>ASP.NET Core
 ------------

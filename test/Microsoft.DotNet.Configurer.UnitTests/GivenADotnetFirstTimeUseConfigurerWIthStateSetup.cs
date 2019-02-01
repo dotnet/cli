@@ -261,7 +261,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                  dotnetFirstRunConfiguration: new DotnetFirstRunConfiguration
                  (
                      generateAspNetCertificate: generateAspNetCertificate,
-                     skipFirstRunExperience: skipFirstRunExperience,
                      telemetryOptout: telemetryOptout
                  ),
                  reporter: _reporterMock,

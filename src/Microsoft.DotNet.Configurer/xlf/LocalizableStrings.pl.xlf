@@ -13,24 +13,6 @@ Dowiedz się więcej na temat platformy .NET Core: https://aka.ms/dotnet-docs
 Aby zobaczyć dostępne polecenia, wydaj polecenie „dotnet --help” lub odwiedź witrynę: https://aka.ms/dotnet-cli-docs</target>
         <note />
       </trans-unit>
-      <trans-unit id="UnauthorizedAccessMessage">
-        <source>Permission denied to modify the '{0}' folder.
-
-Here are some options to fix this error:
-----------------------------------------
-1. Re-run this command with elevated access.
-2. Disable the first run experience by setting the environment variable DOTNET_SKIP_FIRST_TIME_EXPERIENCE to true.
-3. Copy the .NET Core SDK to a non-protected location and use it from there.
-    </source>
-        <target state="translated">Odmowa uprawnień do modyfikowania folderu „{0}”.
-
-Oto kilka możliwości usunięcia tego błędu:
-----------------------------------------
-1. Ponownie uruchom to polecenie z podniesionym poziomem uprawnień.
-2. Wyłącz środowisko pierwszego uruchomienia, ustawiając zmienną środowiskową DOTNET_SKIP_FIRST_TIME_EXPERIENCE na wartość true.
-3. Skopiuj zestaw .NET Core SDK do niechronionej lokalizacji i tam z niego korzystaj.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="AspNetCertificateInstalled">
         <source>ASP.NET Core
 ------------
