@@ -143,9 +143,13 @@ namespace Microsoft.DotNet.Cli
                         var environmentProvider = new EnvironmentProvider();
 
                         bool generateAspNetCertificate =
-                            environmentProvider.GetEnvironmentVariableAsBool("DOTNET_GENERATE_ASPNET_CERTIFICATE", true);
+                            environmentProvider.GetEnvironmentVariableAsBool("DOTNET_GENERATE_ASPNET_CERTIFICATE", defaultValue: true);
                         bool telemetryOptout =
-                            environmentProvider.GetEnvironmentVariableAsBool("DOTNET_CLI_TELEMETRY_OPTOUT", false);
+                          environmentProvider.GetEnvironmentVariableAsBool("DOTNET_CLI_TELEMETRY_OPTOUT", defaultValue: false);
+                        bool addGlobalToolsToPath =
+                            environmentProvider.GetEnvironmentVariableAsBool("DOTNET_ADD_GLOBAL_TOOLS_TO_PATH", defaultValue: true);
+                        bool useShortFirstRunMessage =
+                            environmentProvider.GetEnvironmentVariableAsBool("DOTNET_USE_SHORT_FIRST_RUN_MESSAGE", defaultValue: false);
 
                         ReportDotnetHomeUsage(environmentProvider);
 
@@ -157,14 +161,14 @@ namespace Microsoft.DotNet.Cli
                             firstTimeUseNoticeSentinel = new NoOpFirstTimeUseNoticeSentinel();
                             toolPathSentinel = new NoOpFileSentinel(exists: false);
                             hasSuperUserAccess = true;
-
-                            // When running through a native installer, we want the cache expansion to happen, so
-                            // we need to override this.
                         }
 
                         var dotnetFirstRunConfiguration = new DotnetFirstRunConfiguration(
                             generateAspNetCertificate: generateAspNetCertificate,
-                            telemetryOptout: telemetryOptout);
+                            telemetryOptout: telemetryOptout,
+                            addGlobalToolsToPath: addGlobalToolsToPath,
+                            useShortFirstRunMessage: useShortFirstRunMessage
+                            );
 
                         ConfigureDotNetForFirstTimeUse(
                             firstTimeUseNoticeSentinel,

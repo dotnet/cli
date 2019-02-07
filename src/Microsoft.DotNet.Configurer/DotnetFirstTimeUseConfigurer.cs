@@ -96,7 +96,8 @@ namespace Microsoft.DotNet.Configurer
 
         private bool ShouldAddPackageExecutablePath()
         {
-            return !_toolPathSentinel.Exists();
+            return _dotnetFirstRunConfiguration.AddGlobalToolsToPath &&
+                !_toolPathSentinel.Exists();
         }
 
         private void AddPackageExecutablePath()
@@ -108,7 +109,8 @@ namespace Microsoft.DotNet.Configurer
 
         private bool ShouldPrintFirstTimeUseNotice()
         {
-            return !_firstTimeUseNoticeSentinel.Exists();
+            return !_dotnetFirstRunConfiguration.UseShortFirstRunMessage &&
+                !_firstTimeUseNoticeSentinel.Exists();
         }
 
         private bool ShouldPrintShortFirstTimeUseNotice()
