@@ -44,7 +44,10 @@ namespace Microsoft.DotNet.Cli
                               LocalizableStrings.CmdSourceDescription,
                               Accept.OneOrMoreArguments()
                                     .With(name: LocalizableStrings.CmdSource)
-                                    .ForwardAsMany(o => ForwardedArguments("--source", o.Arguments))));
+                                    .ForwardAsMany(o => ForwardedArguments("--source", o.Arguments))),
+                Create.Option("--interactive", 
+                             LocalizableStrings.CmdInteractiveDescription,
+                             Accept.NoArguments().ForwardAs("--interactive")));
 
         private static IEnumerable<string> ForwardedArguments(string token, IEnumerable<string> arguments)
         {

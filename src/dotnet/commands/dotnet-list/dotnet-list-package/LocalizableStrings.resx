@@ -162,4 +162,7 @@
   <data name="FileNotFound" xml:space="preserve">
     <value>Could not find file or directory '{0}'.</value>
   </data>
+  <data name="CmdInteractiveDescription" xml:space="preserve">
+    <value>Allows the command to stop and wait for user input or action (for example to complete authentication).</value>
+  </data>
 </root>
