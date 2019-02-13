@@ -20,6 +20,7 @@ If you don't find your issue, please file one! However, given that this is a ver
 
 This project has adopted the code of conduct defined by the [Contributor Covenant](http://contributor-covenant.org/) to clarify expected behavior in our community. For more information, see the [.NET Foundation Code of Conduct](http://www.dotnetfoundation.org/code-of-conduct).
 
+
 Build Status
 ------------
 
