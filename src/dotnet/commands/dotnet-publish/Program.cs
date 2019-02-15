@@ -1,12 +1,12 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.DotNet.Cli;
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.DotNet.Cli.Utils;
-using Microsoft.DotNet.Tools;
-using Microsoft.DotNet.Tools.MSBuild;
 using Parser = Microsoft.DotNet.Cli.Parser;
 
 namespace Microsoft.DotNet.Tools.Publish
@@ -28,6 +28,16 @@ namespace Microsoft.DotNet.Tools.Publish
             DebugHelper.HandleDebugSwitch(ref args);
 
             var msbuildArgs = new List<string>();
+
+            var hasQuietVerbosity = args.Any(arg =>
+                arg.Equals("-verbosity:q", StringComparison.Ordinal) ||
+                arg.Equals("-verbosity:quiet", StringComparison.Ordinal) ||
+                arg.Equals("-verbosity:m", StringComparison.Ordinal) ||
+                arg.Equals("-verbosity:minimal", StringComparison.Ordinal)); 
+
+            if (hasQuietVerbosity) {
+                msbuildArgs.Add("-nologo");
+            }
 
             var parser = Parser.Instance;
 

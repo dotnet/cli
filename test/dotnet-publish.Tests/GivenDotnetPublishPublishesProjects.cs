@@ -296,5 +296,52 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
                 .Should()
                 .Fail();
         }
+
+        [Fact]
+        public void OnlyQuietAndMinimalPublishDoesNotPrintVersionHeader()
+        {
+            var testInstance = TestAssets.Get("TestAppSimple")
+                .CreateInstance()
+                .WithSourceFiles();
+
+            var rootPath = testInstance.Root;
+
+            new BuildCommand()
+                .WithWorkingDirectory(rootPath)
+                .ExecuteWithCapturedOutput()
+                .Should()
+                .Pass();
+
+            foreach (var level in new[] { "quiet", "minimal" })
+            {
+                Validate(level, true);
+            }
+
+            foreach (var level in new[] { "normal", "detailed" })
+            {
+                Validate(level, false);
+            }
+
+            void Validate(string level, bool quiet)
+            {
+                const string header = "Microsoft (R) Build Engine version";
+
+                var cmd = new PublishCommand()
+                    .WithWorkingDirectory(rootPath)
+                    .ExecuteWithCapturedOutput($"--verbosity {level}");
+
+                cmd.Should().Pass();
+                cmd.StdErr.Should().BeEmpty();
+
+                if (quiet)
+                {
+                    cmd.StdOut.Should().NotContain(header);
+                }
+                else
+                {
+                    cmd.StdOut.Should().Contain(header);
+                }
+            }
+        }
     }
 }
