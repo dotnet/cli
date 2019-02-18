@@ -23,12 +23,12 @@
         <note />
       </trans-unit>
       <trans-unit id="UpdateToLowerVersion">
-        <source>The version to update to {0} is lower than existing version {1}.</source>
-        <target state="new">The version to update to {0} is lower than existing version {1}.</target>
+        <source>The requested version {0} is lower than existing version {1}.</source>
+        <target state="new">The requested version {0} is lower than existing version {1}.</target>
         <note />
       </trans-unit>
       <trans-unit id="VersionOptionDescription">
-        <source>The specific version of the tool package to update to.</source>
+        <source>The version range of the tool package to update to.</source>
         <target state="needs-review-translation">Версия пакета инструмента в NuGet.</target>
         <note />
       </trans-unit>

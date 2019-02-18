@@ -187,12 +187,12 @@
     <value>VERSION</value>
   </data>
   <data name="VersionOptionDescription" xml:space="preserve">
-    <value>The specific version of the tool package to update to.</value>
+    <value>The version range of the tool package to update to.</value>
   </data>
   <data name="InvalidNuGetVersionRange" xml:space="preserve">
     <value>Specified version '{0}' is not a valid NuGet version range.</value>
   </data>
   <data name="UpdateToLowerVersion" xml:space="preserve">
-    <value>The version to update to {0} is lower than existing version {1}.</value>
+    <value>The requested version {0} is lower than existing version {1}.</value>
   </data>
 </root>
