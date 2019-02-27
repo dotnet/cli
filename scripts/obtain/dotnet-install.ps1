@@ -75,6 +75,10 @@
     Skips installing non-versioned files if they already exist, such as dotnet.exe.
 .PARAMETER NoCdn
     Disable downloading from the Azure CDN, and use the uncached feed directly.
+.PARAMETER DownloadDir
+    An optional directory to cache installer downloads to.  This can be useful if you will be installing the
+    same version multiple times on the same machine. By default, the downloaded file is deleted after it is
+    extracted.
 #>
 [cmdletbinding()]
 param(
@@ -94,7 +98,8 @@ param(
    [string]$ProxyAddress,
    [switch]$ProxyUseDefaultCredentials,
    [switch]$SkipNonVersionedFiles,
-   [switch]$NoCdn
+   [switch]$NoCdn,
+   [string]$DownloadDir="<auto>"
 )
 
 Set-StrictMode -Version Latest
@@ -469,6 +474,11 @@ function Extract-Dotnet-Package([string]$ZipPath, [string]$OutPath) {
 }
 
 function DownloadFile($Source, [string]$OutPath) {
+    if(Test-Path $OutPath) {
+        Say "File is already downloaded to $OutPath"
+        return
+    }
+
     if ($Source -notlike "http*") {
         #  Using System.IO.Path.GetFullPath to get the current directory
         #    does not work in this context - $pwd gives the current directory
@@ -483,6 +493,8 @@ function DownloadFile($Source, [string]$OutPath) {
 
     $Stream = $null
 
+    $DeleteFile = $false
+
     try {
         $Response = GetHTTPResponse -Uri $Source
         $Stream = $Response.Content.ReadAsStreamAsync().Result
@@ -490,9 +502,16 @@ function DownloadFile($Source, [string]$OutPath) {
         $Stream.CopyTo($File)
         $File.Close()
     }
+    catch {
+        $DeleteFile = $true
+    }
     finally {
         if ($Stream -ne $null) {
             $Stream.Dispose()
+        }
+
+        if($DeleteFile -eq $true) {
+            Remove-Item $OutPath -ErrorAction SilentlyContinue
         }
     }
 }
@@ -511,6 +530,14 @@ function Prepend-Sdk-InstallRoot-To-Path([string]$InstallRoot, [string]$BinFolde
     else {
         Say "Binaries of dotnet can be found in $BinPath"
     }
+}
+
+function Get-ZipPath([string]$DownloadLink, [string] $RootDir) {
+    if($RootDir -eq "<auto>") {
+        return [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), [System.IO.Path]::GetRandomFileName())
+    }
+
+    return [System.IO.Path]::Combine($RootDir, [System.IO.Path]::GetFileName($DownloadLink))
 }
 
 $CLIArchitecture = Get-CLIArchitecture-From-Architecture $Architecture
@@ -564,11 +591,12 @@ if ($diskInfo.Free / 1MB -le 100) {
     exit 0
 }
 
-$ZipPath = [System.IO.Path]::combine([System.IO.Path]::GetTempPath(), [System.IO.Path]::GetRandomFileName())
+$ZipPath = Get-ZipPath -DownloadLink $DownloadLink -RootDir $DownloadDir
 Say-Verbose "Zip path: $ZipPath"
 
 $DownloadFailed = $false
 Say "Downloading link: $DownloadLink"
+
 try {
     DownloadFile -Source $DownloadLink -OutPath $ZipPath
 }
@@ -576,7 +604,7 @@ catch {
     Say "Cannot download: $DownloadLink"
     if ($LegacyDownloadLink) {
         $DownloadLink = $LegacyDownloadLink
-        $ZipPath = [System.IO.Path]::combine([System.IO.Path]::GetTempPath(), [System.IO.Path]::GetRandomFileName())
+        $ZipPath = Get-ZipPath -DownloadLink $DownloadLink -RootDir $DownloadDir
         Say-Verbose "Legacy zip path: $ZipPath"
         Say "Downloading legacy link: $DownloadLink"
         try {
@@ -605,7 +633,12 @@ if (!$isAssetInstalled) {
     throw "`"$assetName`" with version = $SpecificVersion failed to install with an unknown error."
 }
 
-Remove-Item $ZipPath
+if($DownloadDir -eq "<auto>") {
+    Remove-Item $ZipPath
+}
+else {
+    Say "Not deleting file $ZipPath so it can be used for installation again."
+}
 
 Prepend-Sdk-InstallRoot-To-Path -InstallRoot $InstallRoot -BinFolderRelativePath $BinFolderRelativePath
 
