@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.TemplateEngine.Cli" Version="1.0.2-beta5.19112.1">
+    <Dependency Name="Microsoft.TemplateEngine.Cli" Version="1.0.2-beta5.19115.3">
       <Uri>https://github.com/dotnet/templating</Uri>
-      <Sha>f23f22851110aadfe89a1717aff63156d2950493</Sha>
+      <Sha>42a212514e375a0821baab69fbac462e39590cfb</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
@@ -13,9 +13,9 @@
     </Dependency>
   </ToolsetDependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.NET.Sdk" Version="3.0.100-preview4.19113.1">
+    <Dependency Name="Microsoft.NET.Sdk" Version="3.0.100-preview4.19125.2">
       <Uri>https://github.com/dotnet/sdk</Uri>
-      <Sha>a1a67301684b7c04a0c37e0dd17c702ec855852e</Sha>
+      <Sha>858a1e5facde95a2cad7bbbce8bc6426c56f39b5</Sha>
     </Dependency>
     <!-- We don't want migrate being updated by DARC just yet due to the NuGet
     discrepancy between it and the CLI. We will fix that for P3 -->
@@ -23,9 +23,9 @@
       <Uri>https://github.com/dotnet/cli-migrate</Uri>
       <Sha>37e3a01aa1df320a286b0a858876f9994fb6bb18</Sha>
     </Dependency> -->
-    <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19113.1">
+    <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19126.1">
       <Uri>https://github.com/dotnet/cliCommandLineParser</Uri>
-      <Sha>4676aa94e4659729f997dffab2b83ff40f68066c</Sha>
+      <Sha>c2b16b76dde581e8ff345ca5ee152fcd70f184ec</Sha>
     </Dependency>
   </ProductDependencies>
 </Dependencies>
