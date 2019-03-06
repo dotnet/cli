@@ -43,7 +43,7 @@ L'outil '{1}' (version '{2}') a été installé. L'entrée est ajoutée au fichi
       </trans-unit>
       <trans-unit id="NoManifestGuide">
         <source>If you intended to install a global tool, add `--global` to the command.
-If you would like to create a manifest, use `dotnet new tool-manifest` first, usually in the repo root directory.</source>
+If you would like to create a manifest, use `dotnet new tool-manifest`, usually in the repo root directory.</source>
         <target state="needs-review-translation">Si vous voulez installer un outil global, ajoutez '-g'. Si vous voulez utiliser un manifeste d'outil, vous devez d'abord le créer avec 'dotnet new tool-manifest'.</target>
         <note />
       </trans-unit>

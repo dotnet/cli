@@ -43,7 +43,7 @@ Das Tool "{1}" (Version "{2}") wurde erfolgreich installiert. Der Eintrag wird z
       </trans-unit>
       <trans-unit id="NoManifestGuide">
         <source>If you intended to install a global tool, add `--global` to the command.
-If you would like to create a manifest, use `dotnet new tool-manifest` first, usually in the repo root directory.</source>
+If you would like to create a manifest, use `dotnet new tool-manifest`, usually in the repo root directory.</source>
         <target state="needs-review-translation">Wenn Sie ein globales Tool installieren möchten, fügen Sie "-g" hinzu. Wenn Sie ein Toolmanifest verwenden möchten, müssen Sie es zunächst mit "dotnet new tool-manifest" erstellen.</target>
         <note />
       </trans-unit>

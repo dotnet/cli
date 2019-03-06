@@ -43,7 +43,7 @@ Lo strumento '{1}' (versione '{2}') è stato installato. La voce è stata aggiun
       </trans-unit>
       <trans-unit id="NoManifestGuide">
         <source>If you intended to install a global tool, add `--global` to the command.
-If you would like to create a manifest, use `dotnet new tool-manifest` first, usually in the repo root directory.</source>
+If you would like to create a manifest, use `dotnet new tool-manifest`, usually in the repo root directory.</source>
         <target state="needs-review-translation">Se si vuole installare uno strumento globale, aggiungere '-g'. Se si vuole usare un manifesto dello strumento, è prima necessario crearlo con 'dotnet new tool-manifest'.</target>
         <note />
       </trans-unit>

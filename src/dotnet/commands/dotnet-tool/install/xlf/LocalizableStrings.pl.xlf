@@ -43,7 +43,7 @@ Narzędzie „{1}” (wersja „{2}”) zostało pomyślnie zainstalowane. Dodan
       </trans-unit>
       <trans-unit id="NoManifestGuide">
         <source>If you intended to install a global tool, add `--global` to the command.
-If you would like to create a manifest, use `dotnet new tool-manifest` first, usually in the repo root directory.</source>
+If you would like to create a manifest, use `dotnet new tool-manifest`, usually in the repo root directory.</source>
         <target state="needs-review-translation">Jeśli chcesz zainstalować narzędzie globalne, dodaj opcję „-g”. Jeśli chcesz użyć manifestu narzędzi, najpierw utwórz go za pomocą polecenia „dotnet new tool-manifest”.</target>
         <note />
       </trans-unit>

@@ -4,9 +4,9 @@
     <body>
       <trans-unit id="CannotFindAManifestFile">
         <source>Cannot find a manifest file.
-For a list of locations searched, use `dotnet -d tool install &lt;toolname&gt;`</source>
+For a list of locations searched, specify the "-d" option before the tool name.</source>
         <target state="new">Cannot find a manifest file.
-For a list of locations searched, use `dotnet -d tool install &lt;toolname&gt;`</target>
+For a list of locations searched, specify the "-d" option before the tool name.</target>
         <note />
       </trans-unit>
       <trans-unit id="CannotFindPackageIdInManifest">

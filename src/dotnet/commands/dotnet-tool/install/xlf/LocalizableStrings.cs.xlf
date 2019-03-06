@@ -43,7 +43,7 @@ Nástroj {1} (verze {2}) se úspěšně nainstaloval. Položka se přidala do so
       </trans-unit>
       <trans-unit id="NoManifestGuide">
         <source>If you intended to install a global tool, add `--global` to the command.
-If you would like to create a manifest, use `dotnet new tool-manifest` first, usually in the repo root directory.</source>
+If you would like to create a manifest, use `dotnet new tool-manifest`, usually in the repo root directory.</source>
         <target state="needs-review-translation">Pokud chcete nainstalovat globální nástroj, přidejte přepínač -g. Pokud chcete použít manifest nástroje, musíte ho napřed vytvořit pomocí příkazu dotnet new tool-manifest.</target>
         <note />
       </trans-unit>
