@@ -119,7 +119,7 @@
   </resheader>
   <data name="CannotFindAManifestFile" xml:space="preserve">
     <value>Cannot find a manifest file.
-For a list of locations searched, use `dotnet -d tool install &lt;toolname&gt;`</value>
+For a list of locations searched, specify the "-d" option before the tool name.</value>
   </data>
   <data name="FieldCommandsIsMissing" xml:space="preserve">
     <value>Missing 'commands' entry.</value>

@@ -225,6 +225,6 @@ Tool '{1}' (version '{2}') was successfully installed. Entry is added to the man
   </data>
   <data name="NoManifestGuide" xml:space="preserve">
     <value>If you intended to install a global tool, add `--global` to the command.
-If you would like to create a manifest, use `dotnet new tool-manifest` first, usually in the repo root directory.</value>
+If you would like to create a manifest, use `dotnet new tool-manifest`, usually in the repo root directory.</value>
   </data>
 </root>
