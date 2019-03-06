@@ -206,7 +206,7 @@ Commands:
 {Path.Combine("Lib", "Lib.csproj")}";
 
             var projectDirectory = TestAssets
-                .Get("TestAppWithReadonlySlnAndExistingCsprojReferences")
+                .Get("TestAppWithSlnAndExistingCsprojReferences")
                 .CreateInstance()
                 .WithSourceFiles()
                 .Root
