@@ -15,9 +15,9 @@ For a list of locations searched, specify the "-d" option before the tool name.<
         <note />
       </trans-unit>
       <trans-unit id="ListOfSearched">
-        <source>The list of searched path:
+        <source>The list of searched paths:
 {0}</source>
-        <target state="new">The list of searched path:
+        <target state="new">The list of searched paths:
 {0}</target>
         <note />
       </trans-unit>

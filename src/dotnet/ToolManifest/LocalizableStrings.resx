@@ -160,7 +160,7 @@ For a list of locations searched, specify the "-d" option before the tool name.<
     <value>File {0} came from another computer and might be blocked to help protect this computer. For more information, including how to unblock, see https://aka.ms/motw</value>
   </data>
   <data name="ListOfSearched" xml:space="preserve">
-    <value>The list of searched path:
+    <value>The list of searched paths:
 {0}</value>
   </data>
 </root>
