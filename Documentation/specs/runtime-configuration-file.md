@@ -2,8 +2,6 @@
 
 The runtime configuration files store the dependencies of an application (formerly stored in the `.deps` file). They also include runtime configuration options, such as the Garbage Collector mode. Optionally they can also include data for runtime compilation (compilation settings used to compile the original application, and reference assemblies used by the application).
 
-**Note:** This document doesn't provide full explanations as to why individual items are needed in this file. That is covered in the [host documentation](https://github.com/dotnet/core-setup/blob/master/Documentation/design-docs/host-component-dependencies-resolution.md) and via the `Microsoft.Extensions.DependencyModel` assembly.
-
 ## What produces the files and where are they?
 
 There are two runtime configuration files for a particular application. Given a project named `MyApp`, the compilation process produces the following files (on Windows, other platforms are similar):
@@ -207,7 +205,7 @@ This section is only present in the root framework's (so `Microsoft.NETCore.App`
 
 The file is read by two different components:
 
-* The host uses it to determine what to place on the TPA and Native Library Search Path lists, as well as what runtime settings to apply (GC type, etc.). See the host [resolution](https://github.com/dotnet/core-setup/blob/master/Documentation/design-docs/host-component-dependencies-resolution.md) and [probing](https://github.com/dotnet/core-setup/blob/master/Documentation/design-docs/host-probing.md) documentation.
+* The host uses it to determine what to place on the TPA and Native Library Search Path lists, as well as what runtime settings to apply (GC type, etc.). 
 * `Microsoft.Extensions.DependencyModel` uses it to allow a running managed application to query various data about it's dependencies. For example:
   * To find all dependencies that depend on a particular package (used by ASP.NET MVC and other plugin-based systems to identify assemblies that should be searched for possible plugin implementations)
   * To determine the reference assemblies used by the application when it was compiled in order to allow runtime compilation to use the same reference assemblies (used by ASP.NET Razor to compile views)
