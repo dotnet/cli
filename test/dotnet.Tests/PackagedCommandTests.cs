@@ -208,7 +208,7 @@ namespace Microsoft.DotNet.Tests
                 .WithWorkingDirectory(testInstance.Root)
                 .ExecuteWithCapturedOutput("nonexistingtool")
                 .Should().Fail()
-                    .And.HaveStdErrContaining(string.Format(LocalizableStrings.NoExecutableFoundMatchingCommand, "dotnet-nonexistingtool"));
+                    .And.HaveStdErrContaining(string.Format(LocalizableStrings.NoExecutableFoundMatchingCommand, "nonexistingtool", "dotnet-nonexistingtool"));
         }
 
         [Fact]
@@ -295,7 +295,7 @@ namespace Microsoft.DotNet.Tests
                 .WithWorkingDirectory(testInstance.Root)
                 .ExecuteWithCapturedOutput();
 
-            result.StdErr.Should().Contain(string.Format(LocalizableStrings.NoExecutableFoundMatchingCommand, "dotnet-hello"));
+            result.StdErr.Should().Contain(string.Format(LocalizableStrings.NoExecutableFoundMatchingCommand, "hello", "dotnet-hello"));
             
             result.Should().Fail();        
         }

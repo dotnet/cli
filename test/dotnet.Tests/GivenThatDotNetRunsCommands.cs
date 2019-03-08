@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.Tests
                 .WithWorkingDirectory(testInstance)
                 .ExecuteWithCapturedOutput("crash")
                 .Should().Fail()
-                     .And.HaveStdErrContaining(string.Format(LocalizableStrings.NoExecutableFoundMatchingCommand, "dotnet-crash"));
+                     .And.HaveStdErrContaining(string.Format(LocalizableStrings.NoExecutableFoundMatchingCommand, "crash", "dotnet-crash"));
         }
 
         [Theory]

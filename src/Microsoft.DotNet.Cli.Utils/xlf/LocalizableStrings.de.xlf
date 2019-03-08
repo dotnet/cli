@@ -23,8 +23,11 @@
         <note />
       </trans-unit>
       <trans-unit id="NoExecutableFoundMatchingCommand">
-        <source>No executable found matching command "{0}". See https://aka.ms/missing-command for more information.</source>
-        <target state="translated">Es wurde keine ausführbare Datei gefunden, die dem Befehl "{0}" entspricht. Weitere Informationen finden Sie unter https://aka.ms/missing-command.</target>
+        <source>Could not run anything - file not found.
+	If you passed path '{0}' it was not found.
+	If you intended to call a dotnet command, you may have misspelled it.
+	If you were calling a global tool, '{1}' was not found.</source>
+        <target state="needs-review-translation">Es wurde keine ausführbare Datei gefunden, die dem Befehl "{0}" entspricht. Weitere Informationen finden Sie unter https://aka.ms/missing-command.</target>
         <note />
       </trans-unit>
       <trans-unit id="WaitingForDebuggerToAttach">
