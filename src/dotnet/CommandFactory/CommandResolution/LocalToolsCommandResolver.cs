@@ -32,7 +32,7 @@ namespace Microsoft.DotNet.CommandFactory
             _fileSystem = fileSystem ?? new FileSystemWrapper();
         }
 
-        public CommandSpec Resolve(CommandResolverArguments arguments)
+        public CommandSpec ResolveStrict(CommandResolverArguments arguments)
         {
             if (arguments == null || string.IsNullOrWhiteSpace(arguments.CommandName))
             {
@@ -48,6 +48,33 @@ namespace Microsoft.DotNet.CommandFactory
                 new ToolCommandName(arguments.CommandName.Substring(LeadingDotnetPrefix.Length)));
 
             return resolveResult;
+        }
+
+        public CommandSpec Resolve(CommandResolverArguments arguments)
+        {
+            if (arguments == null || string.IsNullOrWhiteSpace(arguments.CommandName))
+            {
+                return null;
+            }
+
+            if (!arguments.CommandName.StartsWith(LeadingDotnetPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            var resolveResultWithoutLeadingDotnet = GetPackageCommandSpecUsingMuxer(arguments,
+                new ToolCommandName(arguments.CommandName.Substring(LeadingDotnetPrefix.Length)));
+
+            var resolveResultWithLeadingDotnet = GetPackageCommandSpecUsingMuxer(arguments, new ToolCommandName(arguments.CommandName));
+
+            if (resolveResultWithoutLeadingDotnet != null && resolveResultWithLeadingDotnet != null)
+            {
+                return resolveResultWithoutLeadingDotnet;
+            }
+            else
+            {
+                return resolveResultWithoutLeadingDotnet ?? resolveResultWithLeadingDotnet;
+            }
         }
 
         private CommandSpec GetPackageCommandSpecUsingMuxer(CommandResolverArguments arguments,
