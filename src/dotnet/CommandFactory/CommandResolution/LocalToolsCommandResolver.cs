@@ -62,19 +62,18 @@ namespace Microsoft.DotNet.CommandFactory
                 return null;
             }
 
-            var resolveResultWithoutLeadingDotnet = GetPackageCommandSpecUsingMuxer(arguments,
+            // Try resolving without prefix first
+            var result = GetPackageCommandSpecUsingMuxer(
+                arguments,
                 new ToolCommandName(arguments.CommandName.Substring(LeadingDotnetPrefix.Length)));
 
-            var resolveResultWithLeadingDotnet = GetPackageCommandSpecUsingMuxer(arguments, new ToolCommandName(arguments.CommandName));
+            if (result != null)
+            {
+                return result;
+            }
 
-            if (resolveResultWithoutLeadingDotnet != null && resolveResultWithLeadingDotnet != null)
-            {
-                return resolveResultWithoutLeadingDotnet;
-            }
-            else
-            {
-                return resolveResultWithoutLeadingDotnet ?? resolveResultWithLeadingDotnet;
-            }
+            // Fallback to resolving with the prefix
+            return GetPackageCommandSpecUsingMuxer(arguments, new ToolCommandName(arguments.CommandName));
         }
 
         private CommandSpec GetPackageCommandSpecUsingMuxer(CommandResolverArguments arguments,
