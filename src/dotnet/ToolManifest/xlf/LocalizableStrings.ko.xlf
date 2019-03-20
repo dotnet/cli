@@ -14,6 +14,11 @@ For a list of locations searched, specify the "-d" option before the tool name.<
         <target state="translated">매니페스트 파일에서 패키지 ID가 {0}인 패키지를 찾을 수 없습니다.</target>
         <note />
       </trans-unit>
+      <trans-unit id="FailedToReadProperty">
+        <source>Failed to read property '{0}': {1}</source>
+        <target state="new">Failed to read property '{0}': {1}</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ListOfSearched">
         <source>The list of searched paths:
 {0}</source>

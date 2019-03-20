@@ -14,6 +14,11 @@ For a list of locations searched, specify the "-d" option before the tool name.<
         <target state="translated">Nel file manifesto non è possibile trovare un pacchetto con ID {0}.</target>
         <note />
       </trans-unit>
+      <trans-unit id="FailedToReadProperty">
+        <source>Failed to read property '{0}': {1}</source>
+        <target state="new">Failed to read property '{0}': {1}</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ListOfSearched">
         <source>The list of searched paths:
 {0}</source>

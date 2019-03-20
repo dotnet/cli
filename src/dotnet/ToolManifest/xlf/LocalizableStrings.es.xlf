@@ -14,6 +14,11 @@ For a list of locations searched, specify the "-d" option before the tool name.<
         <target state="translated">No puede encontrar un paquete con el id. de paquete {0} en el archivo de manifiesto.</target>
         <note />
       </trans-unit>
+      <trans-unit id="FailedToReadProperty">
+        <source>Failed to read property '{0}': {1}</source>
+        <target state="new">Failed to read property '{0}': {1}</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ListOfSearched">
         <source>The list of searched paths:
 {0}</source>

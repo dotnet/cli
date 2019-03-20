@@ -163,4 +163,7 @@ For a list of locations searched, specify the "-d" option before the tool name.<
     <value>The list of searched paths:
 {0}</value>
   </data>
+  <data name="FailedToReadProperty" xml:space="preserve">
+    <value>Failed to read property '{0}': {1}</value>
+  </data>
 </root>
