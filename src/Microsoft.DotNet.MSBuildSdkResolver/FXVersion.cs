@@ -22,6 +22,13 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
             Build = build;
         }
 
+        private static string GetId(string ids, int idStart)
+        {
+            int next = ids.IndexOf('.', idStart);
+
+            return next == -1 ? ids.Substring(idStart) : ids.Substring(idStart, next - idStart);
+        }
+
         public static int Compare(FXVersion s1, FXVersion s2)
         {
             if (s1.Major != s2.Major)
@@ -45,46 +52,88 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
                 return string.IsNullOrEmpty(s1.Pre) ? (string.IsNullOrEmpty(s2.Pre) ? 0 : 1) : -1;
             }
 
-            string [] ids1 = s1.Pre.Substring(1).Split('.');
-            string [] ids2 = s2.Pre.Substring(1).Split('.');
-
-            for (int i = 0; true ; ++i)
+            // First idenitifier starts at position 1
+            int idStart = 1;
+            for (int i = idStart; true; ++i)
             {
-                if ((i >= ids1.Length) || (i >= ids2.Length))
+                // C# strings are not null terminated. Pretend to make code similar to fx_ver.cpp
+                char s1char = (s1.Pre.Length  == i) ? '\0' : s1.Pre[i];
+                char s2char = (s2.Pre.Length  == i) ? '\0' : s2.Pre[i];
+                if (s1char != s2char)
                 {
-                    // One or both of the identifier lists has terminated
-                    // Longest list of identifiers has highest precedecnce
-                    return ids1.Length == ids2.Length ? 0 : ids1.Length >= ids2.Length ? 1 : -1;
+                    // Found first character with a difference
+                    if (s1char == '\0' && s2char == '.')
+                    {
+                        // identifiers both complete, b has an additional identifier
+                        return -1;
+                    }
+
+                    if (s2char == '\0' && s1char == '.')
+                    {
+                        // identifiers both complete, a has an additional identifier
+                        return 1;
+                    }
+
+                    // identifiers must not be empty
+                    string id1 = GetId(s1.Pre, idStart);
+                    string id2 = GetId(s2.Pre, idStart);
+
+                    int id1num = 0;
+                    bool id1IsNum = int.TryParse(id1, out id1num);
+                    int id2num = 0;
+                    bool id2IsNum = int.TryParse(id2, out id2num);
+
+                    if (id1IsNum && id2IsNum)
+                    {
+                        // Numeric comparison
+                        return (id1num > id2num) ? 1 : -1;
+                    }
+                    else if (id1IsNum || id2IsNum)
+                    {
+                        // Mixed compare.  Spec: Number < Text
+                        return id2IsNum ? 1 : -1;
+                    }
+                    // Both are alphanumeric, use ascii sort order
+                    // Since we are using only ascii characters, unicode ordinal sort == ascii sort
+                    return (s1char > s2char) ? 1 : -1;
                 }
-
-                int preCompare = string.CompareOrdinal(ids1[i], ids2[i]);
-
-                if (preCompare != 0)
+                else
                 {
-                    int n1;
-                    bool b1 = int.TryParse(ids1[i], out n1);
-                    int n2;
-                    bool b2 = int.TryParse(ids2[i], out n2);
-
-                    if (b1 && b2)
+                    // s1char == s2char
+                    if (s1char == '\0')
                     {
-                        // Both are numeric use numeric ordering (note never equal)
-                        return n1 > n2 ? 1 : -1;
+                        break;
                     }
-                    else if (b1 || b2)
+                    if (s1char == '.')
                     {
-                        // Exactly one is numeric
-                        // Numeric has lower precedence
-                        return b2 ? 1 : -1;
-                    }
-                    else
-                    {
-                        // Both are alphanumeric, use ascii sort order
-                        // Since we are using only ascii characters, unicode ordinal sort == ascii sort
-                        return preCompare > 0 ? 1 : -1;
+                        idStart = i + 1;
                     }
                 }
             }
+            return 0;
+        }
+
+        static bool ValidIdentifierCharSet(string id)
+        {
+            // ids must be of the set [0-9a-zA-Z-]
+            for (int i = 0; i < id.Length; ++i)
+            {
+                if (id[i] >= 'A')
+                {
+                    if ((id[i] > 'Z' && id[i] < 'a') || id[i] > 'z')
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if ((id[i] < '0' && id[i] != '-') || id[i] > '9')
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 
         private static bool ValidIdentifier(string id, bool buildMeta)
@@ -95,13 +144,13 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
                 return false;
             }
 
-            if (id.FindFirstNotOf("-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", 0) != -1)
+            if (!ValidIdentifierCharSet(id))
             {
-                // ids must be of the set [0-9a-zA-Z.-]
                 return false;
             }
 
-            if (!buildMeta && id.Substring(0,1) == "0" && id.Length > 1 && id.FindFirstNotOf("0123456789", 1) == -1)
+            int ignored;
+            if (!buildMeta && id[0] == '0' && id.Length > 1 && int.TryParse(id, out ignored))
             {
                 // numeric identifiers must not be padded with 0s
                 return false;
@@ -116,8 +165,8 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
                 return true;
             }
 
-            bool prerelease = ids.Substring(0, 1) == "-";
-            bool buildMeta = ids.Substring(0, 1) == "+";
+            bool prerelease = ids[0] == '-';
+            bool buildMeta = ids[0] == '+';
 
             if (!(prerelease || buildMeta))
             {
@@ -155,7 +204,7 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
             {
                 return false;
             }
-            if (majorSeparator > 1 && fxVersionString.Substring(0, 1) == "0")
+            if (majorSeparator > 1 && fxVersionString[0] == '0')
             {
                 return false;
             }
@@ -172,7 +221,7 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
             {
                 return false;
             }
-            if (minorSeparator - minorStart > 1 && fxVersionString.Substring(minorStart, 1) == "0")
+            if (minorSeparator - minorStart > 1 && fxVersionString[minorStart] == '0')
             {
                 return false;
             }
@@ -186,7 +235,7 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
                 {
                     return false;
                 }
-                if (patchStart + 1 < fxVersionString.Length && fxVersionString.Substring(patchStart, 1) == "0")
+                if (patchStart + 1 < fxVersionString.Length && fxVersionString[patchStart] == '0')
                 {
                     return false;
                 }
@@ -199,7 +248,7 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
             {
                 return false;
             }
-            if (patchSeparator - patchStart > 1 && fxVersionString.Substring(patchStart, 1) == "0")
+            if (patchSeparator - patchStart > 1 && fxVersionString[patchStart] == '0')
             {
                 return false;
             }

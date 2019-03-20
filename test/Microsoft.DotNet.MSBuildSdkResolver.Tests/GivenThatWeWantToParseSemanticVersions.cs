@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.Cli.Utils.Tests
         [InlineData("1.1.1-A:B")]
         [InlineData("1.1.1-A^B")]
         [InlineData("1.1.1-A|B")]
-        public void ReturnsNullGivenInvalidVersion(string s1)
+        public void ReturnsFalseGivenInvalidVersion(string s1)
         {
             FXVersion fxVersion;
             FXVersion.TryParse(s1, out fxVersion).Should().BeFalse();
