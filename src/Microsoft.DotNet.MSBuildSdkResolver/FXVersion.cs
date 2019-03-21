@@ -31,6 +31,7 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
 
         public static int Compare(FXVersion s1, FXVersion s2)
         {
+            // compare(u.v.w-p+b, x.y.z-q+c)
             if (s1.Major != s2.Major)
             {
                 return s1.Major > s2.Major ? 1 : -1;
@@ -51,6 +52,10 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
                 // Empty (release) is higher precedence than prerelease
                 return string.IsNullOrEmpty(s1.Pre) ? (string.IsNullOrEmpty(s2.Pre) ? 0 : 1) : -1;
             }
+
+            // Both are non-empty (may be equal)
+
+            // First character of pre is '-' when it is not empty
 
             // First idenitifier starts at position 1
             int idStart = 1;
@@ -93,7 +98,7 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
                         // Mixed compare.  Spec: Number < Text
                         return id2IsNum ? 1 : -1;
                     }
-                    // Both are alphanumeric, use ascii sort order
+                    // Ascii compare
                     // Since we are using only ascii characters, unicode ordinal sort == ascii sort
                     return (s1char > s2char) ? 1 : -1;
                 }
@@ -113,9 +118,11 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
             return 0;
         }
 
-        static bool ValidIdentifierCharSet(string id)
+        private static bool ValidIdentifierCharSet(string id)
         {
             // ids must be of the set [0-9a-zA-Z-]
+
+            // ASCII and Unicode ordering
             for (int i = 0; i < id.Length; ++i)
             {
                 if (id[i] >= 'A')
@@ -146,6 +153,7 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
 
             if (!ValidIdentifierCharSet(id))
             {
+                // ids must be of the set [0-9a-zA-Z-]
                 return false;
             }
 
@@ -174,15 +182,35 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
                 return false;
             }
 
-            foreach (string id in ids.Substring(1).Split('.'))
+            int idStart = 1;
+            int nextId;
+            while ((nextId = ids.IndexOf('.', idStart)) != -1)
             {
-                if (!ValidIdentifier(id, buildMeta))
+                if (!ValidIdentifier(ids.Substring(idStart, nextId - idStart), buildMeta))
                 {
                     return false;
                 }
+                idStart = nextId + 1;
+            }
+
+            if (!ValidIdentifier(ids.Substring(idStart), buildMeta))
+            {
+                return false;
             }
 
             return true;
+        }
+
+        private static int IndexOfNonNumeric(string s, int startIndex)
+        {
+            for (int i = startIndex; i < s.Length; ++i)
+            {
+                if ((s[i] < '0') || (s[i] > '9'))
+                {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         public static bool TryParse(string fxVersionString, out FXVersion FXVersion)
@@ -206,6 +234,8 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
             }
             if (majorSeparator > 1 && fxVersionString[0] == '0')
             {
+                // if leading character is 0, and strlen > 1
+                // then the numeric substring has leading zeroes which is prohibited by the specification.
                 return false;
             }
 
@@ -223,12 +253,14 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
             }
             if (minorSeparator - minorStart > 1 && fxVersionString[minorStart] == '0')
             {
+                // if leading character is 0, and strlen > 1
+                // then the numeric substring has leading zeroes which is prohibited by the specification.
                 return false;
             }
 
             int patch = 0;
             int patchStart = minorSeparator + 1;
-            int patchSeparator = fxVersionString.FindFirstNotOf("0123456789", patchStart);
+            int patchSeparator = IndexOfNonNumeric(fxVersionString, patchStart);
             if (patchSeparator == -1)
             {
                 if (!int.TryParse(fxVersionString.Substring(patchStart), out patch))
@@ -237,6 +269,8 @@ namespace Microsoft.DotNet.MSBuildSdkResolver
                 }
                 if (patchStart + 1 < fxVersionString.Length && fxVersionString[patchStart] == '0')
                 {
+                    // if leading character is 0, and strlen != 1
+                    // then the numeric substring has leading zeroes which is prohibited by the specification.
                     return false;
                 }
 
