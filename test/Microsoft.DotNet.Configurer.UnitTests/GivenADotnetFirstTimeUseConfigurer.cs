@@ -46,8 +46,7 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 (
                     generateAspNetCertificate: true,
                     telemetryOptout: false,
-                    addGlobalToolsToPath: true,
-                    useShortFirstRunMessage: false
+                    addGlobalToolsToPath: true
                 ),
                 _reporterMock.Object,
                 CliFallbackFolderPath,
@@ -73,8 +72,7 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 (
                     generateAspNetCertificate: true,
                     telemetryOptout: false,
-                    addGlobalToolsToPath: true,
-                    useShortFirstRunMessage: false
+                    addGlobalToolsToPath: true
                 ),
                 _reporterMock.Object,
                 CliFallbackFolderPath,
@@ -100,8 +98,7 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 (
                     generateAspNetCertificate: true,
                     telemetryOptout: false,
-                    addGlobalToolsToPath: true,
-                    useShortFirstRunMessage: false
+                    addGlobalToolsToPath: true
                 ),
                 _reporterMock.Object,
                 CliFallbackFolderPath,
@@ -127,8 +124,7 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 (
                     generateAspNetCertificate: true,
                     telemetryOptout: false,
-                    addGlobalToolsToPath: true,
-                    useShortFirstRunMessage: false
+                    addGlobalToolsToPath: true
                 ),
                 _reporterMock.Object,
                 CliFallbackFolderPath,
@@ -154,8 +150,7 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 (
                     generateAspNetCertificate: true,
                     telemetryOptout: false,
-                    addGlobalToolsToPath: true,
-                    useShortFirstRunMessage: false
+                    addGlobalToolsToPath: true
                 ),
                 _reporterMock.Object,
                 CliFallbackFolderPath,
@@ -181,8 +176,7 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 (
                     generateAspNetCertificate: false,
                     telemetryOptout: false,
-                    addGlobalToolsToPath: true,
-                    useShortFirstRunMessage: false
+                    addGlobalToolsToPath: true
                 ),
                 _reporterMock.Object,
                 CliFallbackFolderPath,
@@ -208,8 +202,7 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 (
                     generateAspNetCertificate: true,
                     telemetryOptout: false,
-                    addGlobalToolsToPath: true,
-                    useShortFirstRunMessage: false
+                    addGlobalToolsToPath: true
                 ),
                 _reporterMock.Object,
                 CliFallbackFolderPath,
@@ -234,8 +227,7 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 (
                     generateAspNetCertificate: true,
                     telemetryOptout: false,
-                    addGlobalToolsToPath: true,
-                    useShortFirstRunMessage: false
+                    addGlobalToolsToPath: true
                 ),
                 _reporterMock.Object,
                 CliFallbackFolderPath,
@@ -258,8 +250,7 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 (
                     generateAspNetCertificate: true,
                     telemetryOptout: false,
-                    addGlobalToolsToPath: false,
-                    useShortFirstRunMessage: false
+                    addGlobalToolsToPath: false
                 ),
                 _reporterMock.Object,
                 CliFallbackFolderPath,

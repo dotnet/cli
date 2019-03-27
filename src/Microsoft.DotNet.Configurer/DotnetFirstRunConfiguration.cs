@@ -9,18 +9,15 @@ namespace Microsoft.DotNet.Configurer
 
         public bool TelemetryOptout { get; }
         public bool AddGlobalToolsToPath { get; }
-        public bool UseShortFirstRunMessage { get; }
 
         public DotnetFirstRunConfiguration(
             bool generateAspNetCertificate,
             bool telemetryOptout,
-            bool addGlobalToolsToPath,
-            bool useShortFirstRunMessage)
+            bool addGlobalToolsToPath)
         {
             GenerateAspNetCertificate = generateAspNetCertificate;
             TelemetryOptout = telemetryOptout;
             AddGlobalToolsToPath = addGlobalToolsToPath;
-            UseShortFirstRunMessage = useShortFirstRunMessage;
         }
     }
 }

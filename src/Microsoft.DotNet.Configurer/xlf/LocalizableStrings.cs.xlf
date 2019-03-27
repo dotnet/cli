@@ -31,19 +31,6 @@ Další informace o konfiguraci protokolu HTTPS najdete na webu https://go.micro
         <target state="translated">Nešlo určit domovský adresář uživatele. Nastavte proměnnou prostředí {0}, která určí adresář, který se má použít.</target>
         <note />
       </trans-unit>
-      <trans-unit id="ShortFirstTimeWelcomeMessage">
-        <source>Welcome to .NET Core!
----------------------
-GitHub: https://github.com/dotnet/core
-Docs: https://aka.ms/dotnet-docs
-HTTPS: https://aka.ms/aspnet-core-https</source>
-        <target state="translated">Vítejte v .NET Core!
----------------------
-GitHub: https://github.com/dotnet/core
-Docs: https://aka.ms/dotnet-docs
-HTTPS: https://aka.ms/aspnet-core-https</target>
-        <note />
-      </trans-unit>
       <trans-unit id="TelemetryMessage">
         <source>Telemetry
 ---------
@@ -55,11 +42,6 @@ Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemet
 Nástroje .NET Core shromažďují data o využití, která nám pomáhají zlepšovat naše produkty. Tato data jsou anonymní. Shromažďuje je Microsoft a sdílí je s komunitou. Výslovný nesouhlas s telemetrií můžete vyjádřit tak, že ve svém oblíbeném nástroji nastavíte proměnnou prostředí DOTNET_CLI_TELEMETRY_OPTOUT na hodnotu 1 nebo true.
 
 Další informace o telemetrii nástrojů příkazového řádku .NET Core: https://aka.ms/dotnet-cli-telemetry</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="ShortTelemetryMessage">
-        <source>Telemetry statement: https://aka.ms/dotnet-cli-telemetry</source>
-        <target state="translated">Telemetrický příkaz: https://aka.ms/dotnet-cli-telemetry</target>
         <note />
       </trans-unit>
     </body>

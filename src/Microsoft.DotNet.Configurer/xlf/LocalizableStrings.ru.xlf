@@ -31,19 +31,6 @@ For more information on configuring HTTPS see https://go.microsoft.com/fwlink/?l
         <target state="translated">Не удалось определить домашний каталог пользователя. Чтобы указать нужный каталог, задайте переменную среды "{0}".</target>
         <note />
       </trans-unit>
-      <trans-unit id="ShortFirstTimeWelcomeMessage">
-        <source>Welcome to .NET Core!
----------------------
-GitHub: https://github.com/dotnet/core
-Docs: https://aka.ms/dotnet-docs
-HTTPS: https://aka.ms/aspnet-core-https</source>
-        <target state="translated">Добро пожаловать в .NET Core!
----------------------
-GitHub: https://github.com/dotnet/core
-Документация: https://aka.ms/dotnet-docs
-HTTPS: https://aka.ms/aspnet-core-https</target>
-        <note />
-      </trans-unit>
       <trans-unit id="TelemetryMessage">
         <source>Telemetry
 ---------
@@ -55,11 +42,6 @@ Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemet
 Средства .NET Core собирают данные об использовании, которые необходимы для улучшения работы с приложением. Эти данные являются анонимными. Они собираются корпорацией Майкрософт и предоставляются сообществу. Вы можете отказаться от отправки данных телеметрии, установив переменную среды DOTNET_CLI_TELEMETRY_OPTOUT в значение '1' или 'true' в оболочке, которой вы пользуетесь.
 
 Дополнительные сведения о телеметрии средств CLI .NET Core см. на странице https://aka.ms/dotnet-cli-telemetry</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="ShortTelemetryMessage">
-        <source>Telemetry statement: https://aka.ms/dotnet-cli-telemetry</source>
-        <target state="translated">Заявление об использовании данных телеметрии: https://aka.ms/dotnet-cli-telemetry</target>
         <note />
       </trans-unit>
     </body>

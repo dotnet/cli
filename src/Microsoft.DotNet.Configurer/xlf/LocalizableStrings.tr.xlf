@@ -31,19 +31,6 @@ HTTPS yapılandırması hakkında daha fazla bilgi edinmek için bkz. https://go
         <target state="translated">Kullanıcının giriş dizini belirlenemedi. Kullanılacak dizini belirtmek için '{0}' ortam değişkenini ayarlayın.</target>
         <note />
       </trans-unit>
-      <trans-unit id="ShortFirstTimeWelcomeMessage">
-        <source>Welcome to .NET Core!
----------------------
-GitHub: https://github.com/dotnet/core
-Docs: https://aka.ms/dotnet-docs
-HTTPS: https://aka.ms/aspnet-core-https</source>
-        <target state="translated">.NET Core'a hoş geldiniz!
----------------------
-GitHub: https://github.com/dotnet/core
-Belgeler: https://aka.ms/dotnet-docs
-HTTPS: https://aka.ms/aspnet-core-https</target>
-        <note />
-      </trans-unit>
       <trans-unit id="TelemetryMessage">
         <source>Telemetry
 ---------
@@ -55,11 +42,6 @@ Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemet
 .NET Core araçları, deneyiminizi geliştirmemize yardımcı olmak için kullanım verilerini toplar. Veriler anonimdir. Microsoft tarafından toplanır ve toplulukla paylaşılır. Tercih ettiğiniz kabukla DOTNET_CLI_TELEMETRY_OPTOUT ortam değişkenini '1' veya 'true' değerine ayarlayarak telemetriyi geri çevirebilirsiniz.
 
 .NET Core CLI Araçları telemetrisi hakkında daha fazla bilgi edinin: https://aka.ms/dotnet-cli-telemetry</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="ShortTelemetryMessage">
-        <source>Telemetry statement: https://aka.ms/dotnet-cli-telemetry</source>
-        <target state="translated">Telemetri deyimi: https://aka.ms/dotnet-cli-telemetry</target>
         <note />
       </trans-unit>
     </body>

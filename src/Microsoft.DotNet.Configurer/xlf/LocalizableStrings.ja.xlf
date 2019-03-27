@@ -31,19 +31,6 @@ HTTPS を構成する方法の詳細については、https://go.microsoft.com/f
         <target state="translated">ユーザーのホーム ディレクトリを特定できませんでした。使用するディレクトリを指定するには、'{0}' 環境変数を設定してください。</target>
         <note />
       </trans-unit>
-      <trans-unit id="ShortFirstTimeWelcomeMessage">
-        <source>Welcome to .NET Core!
----------------------
-GitHub: https://github.com/dotnet/core
-Docs: https://aka.ms/dotnet-docs
-HTTPS: https://aka.ms/aspnet-core-https</source>
-        <target state="translated">.NET Core へようこそ!
----------------------
-GitHub: https://github.com/dotnet/core
-Docs: https://aka.ms/dotnet-docs
-HTTPS: https://aka.ms/aspnet-core-https</target>
-        <note />
-      </trans-unit>
       <trans-unit id="TelemetryMessage">
         <source>Telemetry
 ---------
@@ -55,11 +42,6 @@ Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemet
 .NET Core ツールによって、お客様のエクスペリエンスを向上させるための利用状況データが収集されます。データは匿名です。Microsoft が収集を行い、コミュティで共有します。DOTNET_CLI_TELEMETRY_OPTOUT 環境変数をお気に入りのシェルで '1' または 'true' に設定して製品利用統計情報をオプトアプトできます。
 
 .NET Core CLI ツールの製品利用統計情報の詳細については、https://aka.ms/dotnet-cli-telemetry をご覧ください</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="ShortTelemetryMessage">
-        <source>Telemetry statement: https://aka.ms/dotnet-cli-telemetry</source>
-        <target state="translated">利用統計情報に関する詳細: https://aka.ms/dotnet-cli-telemetry</target>
         <note />
       </trans-unit>
     </body>

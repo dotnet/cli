@@ -31,19 +31,6 @@ Per altre informazioni sulla configurazione di HTTPS, vedere https://go.microsof
         <target state="translated">Non è stato possibile determinare la home directory dell'utente. Impostare la variabile di ambiente '{0}' per specificare la directory da usare.</target>
         <note />
       </trans-unit>
-      <trans-unit id="ShortFirstTimeWelcomeMessage">
-        <source>Welcome to .NET Core!
----------------------
-GitHub: https://github.com/dotnet/core
-Docs: https://aka.ms/dotnet-docs
-HTTPS: https://aka.ms/aspnet-core-https</source>
-        <target state="translated">Benvenuti a .NET Core
----------------------
-GitHub: https://github.com/dotnet/core
-Documentazione: https://aka.ms/dotnet-docs
-HTTPS: https://aka.ms/aspnet-core-https</target>
-        <note />
-      </trans-unit>
       <trans-unit id="TelemetryMessage">
         <source>Telemetry
 ---------
@@ -55,11 +42,6 @@ Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemet
 Gli strumenti .NET Core consentono di raccogliere i dati sull'utilizzo consentendo a Microsoft di migliorare l'esperienza. I dati vengono raccolti in forma anonima da Microsoft e condivisi con la community. È possibile rifiutare esplicitamente la telemetria impostando la variabile di ambiente DOTNET_CLI_TELEMETRY_OPTOUT su '1' o 'true' nella shell preferita.
 
 Altre informazioni sulla telemetria degli strumenti dell'interfaccia della riga di comando di .NET Core: https://aka.ms/dotnet-cli-telemetry</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="ShortTelemetryMessage">
-        <source>Telemetry statement: https://aka.ms/dotnet-cli-telemetry</source>
-        <target state="translated">Dichiarazione sulla telemetria: https://aka.ms/dotnet-cli-telemetry</target>
         <note />
       </trans-unit>
     </body>

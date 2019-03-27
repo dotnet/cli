@@ -57,16 +57,6 @@ namespace Microsoft.DotNet.Configurer
 
                 _firstTimeUseNoticeSentinel.CreateIfNotExists();
             }
-            else if (ShouldPrintShortFirstTimeUseNotice())
-            {
-                PrintShortFirstTimeUseNotice();
-                if (ShouldPrintTelemetryMessageWhenFirstTimeUseNoticeIsEnabled())
-                {
-                    PrintShorTelemetryMessage();
-                }
-
-                _firstTimeUseNoticeSentinel.CreateIfNotExists();
-            }
 
             if (ShouldGenerateAspNetCertificate())
             {
@@ -109,12 +99,6 @@ namespace Microsoft.DotNet.Configurer
 
         private bool ShouldPrintFirstTimeUseNotice()
         {
-            return !_dotnetFirstRunConfiguration.UseShortFirstRunMessage &&
-                !_firstTimeUseNoticeSentinel.Exists();
-        }
-
-        private bool ShouldPrintShortFirstTimeUseNotice()
-        {
             return !_firstTimeUseNoticeSentinel.Exists();
         }
 
@@ -129,22 +113,10 @@ namespace Microsoft.DotNet.Configurer
             _reporter.WriteLine(LocalizableStrings.FirstTimeWelcomeMessage);
         }
 
-        private void PrintShortFirstTimeUseNotice()
-        {
-            _reporter.WriteLine();
-            _reporter.WriteLine(LocalizableStrings.ShortFirstTimeWelcomeMessage);
-        }
-
         private void PrintTelemetryMessage()
         {
             _reporter.WriteLine();
             _reporter.WriteLine(LocalizableStrings.TelemetryMessage);
-        }
-
-        private void PrintShorTelemetryMessage()
-        {
-            _reporter.WriteLine();
-            _reporter.WriteLine(LocalizableStrings.ShortTelemetryMessage);
         }
     }
 }

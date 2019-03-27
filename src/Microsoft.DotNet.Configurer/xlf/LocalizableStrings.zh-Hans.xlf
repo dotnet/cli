@@ -31,19 +31,6 @@ For more information on configuring HTTPS see https://go.microsoft.com/fwlink/?l
         <target state="translated">无法确定用户的主目录。设置“{0}”环境变量以指定要使用的目录。</target>
         <note />
       </trans-unit>
-      <trans-unit id="ShortFirstTimeWelcomeMessage">
-        <source>Welcome to .NET Core!
----------------------
-GitHub: https://github.com/dotnet/core
-Docs: https://aka.ms/dotnet-docs
-HTTPS: https://aka.ms/aspnet-core-https</source>
-        <target state="translated">欢迎使用 .NET Core!
----------------------
-GitHub: https://github.com/dotnet/core
-Docs: https://aka.ms/dotnet-docs
-HTTPS: https://aka.ms/aspnet-core-https</target>
-        <note />
-      </trans-unit>
       <trans-unit id="TelemetryMessage">
         <source>Telemetry
 ---------
@@ -55,11 +42,6 @@ Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemet
 ..NET Core 工具可收集使用情况，以帮助我们改进你的体验。数据是匿名的。该数据由 Microsoft 并与社区成员共享。你可选择退出遥测，方式是使用你喜欢的 shell 将 DOTNET_CLI_TELEMETRY_OPTOUT 环境变量设置为 "1" 或 "true"。
 
 详细了解 .NET Core CLI Tools 遥测: https://aka.ms/dotnet-cli-telemetry</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="ShortTelemetryMessage">
-        <source>Telemetry statement: https://aka.ms/dotnet-cli-telemetry</source>
-        <target state="translated">遥测声明: https://aka.ms/dotnet-cli-telemetry</target>
         <note />
       </trans-unit>
     </body>
