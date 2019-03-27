@@ -117,11 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="FirstTimeWelcomeMessage" xml:space="preserve">
-    <value>Welcome to .NET Core!
+  <data name="FirstTimeMessageWelcome" xml:space="preserve">
+    <value>Welcome to .NET Core 3.0!
 ---------------------
-Learn more about .NET Core: https://aka.ms/dotnet-docs
-Use 'dotnet --help' to see available commands or visit: https://aka.ms/dotnet-cli-docs</value>
+SDK Version: {0}</value>
   </data>
   <data name="FailedToDetermineUserHomeDirectory" xml:space="preserve">
     <value>The user's home directory could not be determined. Set the '{0}' environment variable to specify the directory to use.</value>
@@ -132,5 +131,16 @@ Use 'dotnet --help' to see available commands or visit: https://aka.ms/dotnet-cl
 The .NET Core tools collect usage data in order to help us improve your experience. The data is anonymous. It is collected by Microsoft and shared with the community. You can opt-out of telemetry by setting the DOTNET_CLI_TELEMETRY_OPTOUT environment variable to '1' or 'true' using your favorite shell.
 
 Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemetry</value>
+  </data>
+  <data name="FirstTimeMessageMoreInformation" xml:space="preserve">
+    <value>----------------
+More about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemetry
+Explore documentation: https://aka.ms/dotnet-docs
+Report issues and find source on GitHub: https://github.com/dotnet/core
+Find out what's new: https://aka.ms/dotnet-whats-new
+Learn about the installed HTTPS developer cert: https://aka.ms/aspnet-core-https
+Use 'dotnet --help' to see available commands or visit: https://aka.ms/dotnet-cli-docs
+Write your first app: https://aka.ms/first-net-core-app
+--------------------------------------------------------------------------------------</value>
   </data>
 </root>
