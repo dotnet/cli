@@ -72,7 +72,8 @@ namespace Microsoft.DotNet.Tests
         {
             _firstDotnetVerbUseCommandResult.StdOut
                 .Should()
-                .ContainVisuallySameFragment(Configurer.LocalizableStrings.FirstTimeWelcomeMessage)
+                .ContainVisuallySameFragment(string.Format(Configurer.LocalizableStrings.FirstTimeMessageWelcome, Product.Version))
+                .And.ContainVisuallySameFragment(Configurer.LocalizableStrings.FirstTimeMessageMoreInformation)
                 .And.NotContain("Restore completed in");
         }
 
@@ -144,7 +145,8 @@ namespace Microsoft.DotNet.Tests
 
             result.StdOut
                 .Should()
-                .ContainVisuallySameFragment(Configurer.LocalizableStrings.FirstTimeWelcomeMessage);
+                .ContainVisuallySameFragment(string.Format(Configurer.LocalizableStrings.FirstTimeMessageWelcome, Product.Version))
+                .And.ContainVisuallySameFragment(Configurer.LocalizableStrings.FirstTimeMessageMoreInformation);
         }
 
         [Fact]

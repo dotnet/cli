@@ -49,12 +49,13 @@ namespace Microsoft.DotNet.Configurer
 
             if (ShouldPrintFirstTimeUseNotice())
             {
-                PrintFirstTimeUseNotice();
+                PrintFirstTimeMessageWelcome();
                 if (ShouldPrintTelemetryMessageWhenFirstTimeUseNoticeIsEnabled())
                 {
                     PrintTelemetryMessage();
                 }
 
+                PrintFirstTimeMessageMoreInformation();
                 _firstTimeUseNoticeSentinel.CreateIfNotExists();
             }
 
@@ -104,10 +105,15 @@ namespace Microsoft.DotNet.Configurer
             return !_dotnetFirstRunConfiguration.TelemetryOptout;
         }
 
-        private void PrintFirstTimeUseNotice()
+        private void PrintFirstTimeMessageWelcome()
         {
             _reporter.WriteLine();
-            _reporter.WriteLine(LocalizableStrings.FirstTimeWelcomeMessage);
+            _reporter.WriteLine(string.Format(LocalizableStrings.FirstTimeMessageWelcome, Product.Version));
+        }
+        private void PrintFirstTimeMessageMoreInformation()
+        {
+            _reporter.WriteLine();
+            _reporter.WriteLine(LocalizableStrings.FirstTimeMessageMoreInformation);
         }
 
         private void PrintTelemetryMessage()

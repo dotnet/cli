@@ -95,7 +95,8 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                     "aspnetCertInstalledTime");
             var printFirstTimeWelcomeMessage
                 = new FirstRunExperienceAction(
-                    () => _reporterMock.Lines.Contains(LocalizableStrings.FirstTimeWelcomeMessage),
+                    () => _reporterMock.Lines.Contains(string.Format(LocalizableStrings.FirstTimeMessageWelcome, Product.Version))
+                            && _reporterMock.Lines.Contains(LocalizableStrings.FirstTimeMessageMoreInformation),
                     "printFirstTimeWelcomeMessage");
             var printTelemetryMessage
                 = new FirstRunExperienceAction(
