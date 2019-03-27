@@ -47,14 +47,14 @@ namespace Microsoft.DotNet.Configurer.UnitTests
         }
 
         [Theory]
-        [InlineData(false, false, false, Never, FirstRun, FirstRun, Never, true, true)]
-        [InlineData(true, false, false, FirstRun, FirstRun, FirstRun, FirstRun, true, true)]
-        [InlineData(false, true, false, Never, FirstRun, Never, Never, false, false)]
-        [InlineData(true, true, false, FirstRun, FirstRun, Never, FirstRun, false, false)]
-        [InlineData(false, false, true, Never, SecondRun, SecondRun, Never, true, true)]
-        [InlineData(true, false, true, SecondRun, SecondRun, SecondRun, SecondRun, true, true)]
-        [InlineData(false, true, true, Never, SecondRun, Never, Never, false, false)]
-        [InlineData(true, true, true, SecondRun, SecondRun, Never, SecondRun, false, false)]
+        [InlineData(false, false, false, Never, FirstRun, FirstRun, true, true)]
+        [InlineData(true, false, false, FirstRun, FirstRun, FirstRun, true, true)]
+        [InlineData(false, true, false, Never, FirstRun, Never, false, false)]
+        [InlineData(true, true, false, FirstRun, FirstRun, Never, false, false)]
+        [InlineData(false, false, true, Never, SecondRun, SecondRun, true, true)]
+        [InlineData(true, false, true, SecondRun, SecondRun, SecondRun, true, true)]
+        [InlineData(false, true, true, Never, SecondRun, Never, false, false)]
+        [InlineData(true, true, true, SecondRun, SecondRun, Never, false, false)]
         public void FlagsCombinationAndAction(
             // Inputs
             bool DOTNET_GENERATE_ASPNET_CERTIFICATE,
@@ -67,7 +67,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
             ActionCalledTime aspnetCertInstalledTimeShouldBeCalledAt,
             ActionCalledTime printFirstTimeWelcomeMessageShouldBeCalledAt,
             ActionCalledTime printTelemetryMessageShouldBeCalledAt,
-            ActionCalledTime printAspNetCertificateInstalledMessageShouldBeCalledAt,
             bool telemetryFirstRunShouldBeEnabled,
             bool telemetrySecondRunShouldBeEnabled
             )
@@ -102,17 +101,12 @@ namespace Microsoft.DotNet.Configurer.UnitTests
                 = new FirstRunExperienceAction(
                     () => _reporterMock.Lines.Contains(LocalizableStrings.TelemetryMessage),
                     "printTelemetryMessage");
-            var printAspNetCertificateInstalledMessage
-                = new FirstRunExperienceAction(
-                    () => _reporterMock.Lines.Contains(LocalizableStrings.AspNetCertificateInstalled),
-                    "printAspNetCertificateInstalledMessage");
 
             List<FirstRunExperienceAction> firstRunExperienceActions
                 = new List<FirstRunExperienceAction>() {
                     aspnetCertInstalledTime,
                     printFirstTimeWelcomeMessage,
-                    printTelemetryMessage,
-                    printAspNetCertificateInstalledMessage };
+                    printTelemetryMessage };
 
             // First run
             var telemetryFirstRun = RunConfigUsingMocks(isFirstRunInstallerRun);
@@ -128,7 +122,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
             aspnetCertInstalledTime.Assert(aspnetCertInstalledTimeShouldBeCalledAt);
             printFirstTimeWelcomeMessage.Assert(printFirstTimeWelcomeMessageShouldBeCalledAt);
             printTelemetryMessage.Assert(printTelemetryMessageShouldBeCalledAt);
-            printAspNetCertificateInstalledMessage.Assert(printAspNetCertificateInstalledMessageShouldBeCalledAt);
             telemetryFirstRun.Enabled.Should().Be(telemetryFirstRunShouldBeEnabled);
             telemetrySecondRun.Enabled.Should().Be(telemetrySecondRunShouldBeEnabled);
         }

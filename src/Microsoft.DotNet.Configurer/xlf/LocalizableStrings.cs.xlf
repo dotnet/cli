@@ -13,19 +13,6 @@ Další informace o .NET Core: https://aka.ms/dotnet-docs
 Pomocí příkazu dotnet --help můžete zobrazit dostupné příkazy nebo navštivte tuto adresu: https://aka.ms/dotnet-cli-docs</target>
         <note />
       </trans-unit>
-      <trans-unit id="AspNetCertificateInstalled">
-        <source>ASP.NET Core
-------------
-Successfully installed the ASP.NET Core HTTPS Development Certificate.
-To trust the certificate run 'dotnet dev-certs https --trust' (Windows and macOS only). For establishing trust on other platforms refer to the platform specific documentation.
-For more information on configuring HTTPS see https://go.microsoft.com/fwlink/?linkid=848054.</source>
-        <target state="translated">ASP.NET Core
-------------
-Úspěšně se podařilo nainstalovat certifikát pro vývoj ASP.NET Core HTTPS Development Certificate.
-Pokud chcete certifikátu důvěřovat, spusťte dotnet dev-certs https --trust (platí jenom pro Windows a macOS). Informace o vytvoření vztahu důvěryhodnosti na jiných platformách najdete v dokumentaci k příslušné platformě.
-Další informace o konfiguraci protokolu HTTPS najdete na webu https://go.microsoft.com/fwlink/?linkid=848054.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="FailedToDetermineUserHomeDirectory">
         <source>The user's home directory could not be determined. Set the '{0}' environment variable to specify the directory to use.</source>
         <target state="translated">Nešlo určit domovský adresář uživatele. Nastavte proměnnou prostředí {0}, která určí adresář, který se má použít.</target>

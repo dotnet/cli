@@ -158,7 +158,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
 
             dotnetFirstTimeUseConfigurer.Configure();
 
-            _reporterMock.Verify(r => r.WriteLine(It.Is<string>(str => str == LocalizableStrings.AspNetCertificateInstalled)), Times.Never);
             _aspNetCoreCertificateGeneratorMock.Verify(s => s.GenerateAspNetCoreDevelopmentCertificate(), Times.Never);
         }
 
@@ -184,7 +183,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
 
             dotnetFirstTimeUseConfigurer.Configure();
 
-            _reporterMock.Verify(r => r.WriteLine(It.Is<string>(str => str == LocalizableStrings.AspNetCertificateInstalled)), Times.Never);
             _aspNetCoreCertificateGeneratorMock.Verify(s => s.GenerateAspNetCoreDevelopmentCertificate(), Times.Never);
         }
 
@@ -211,7 +209,6 @@ namespace Microsoft.DotNet.Configurer.UnitTests
             dotnetFirstTimeUseConfigurer.Configure();
 
             _reporterMock.Verify(r => r.WriteLine(It.Is<string>(str => str == LocalizableStrings.FirstTimeWelcomeMessage)));
-            _reporterMock.Verify(r => r.WriteLine(It.Is<string>(str => str == LocalizableStrings.AspNetCertificateInstalled)));
             _aspNetCoreCertificateGeneratorMock.Verify(s => s.GenerateAspNetCoreDevelopmentCertificate(), Times.Once);
         }
 

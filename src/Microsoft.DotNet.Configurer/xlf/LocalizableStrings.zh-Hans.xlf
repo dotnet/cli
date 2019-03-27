@@ -13,19 +13,6 @@ Use 'dotnet --help' to see available commands or visit: https://aka.ms/dotnet-cl
 请使用 "dotnet --help"来查看可用命令或访问 https://aka.ms/dotnet-cli-docs</target>
         <note />
       </trans-unit>
-      <trans-unit id="AspNetCertificateInstalled">
-        <source>ASP.NET Core
-------------
-Successfully installed the ASP.NET Core HTTPS Development Certificate.
-To trust the certificate run 'dotnet dev-certs https --trust' (Windows and macOS only). For establishing trust on other platforms refer to the platform specific documentation.
-For more information on configuring HTTPS see https://go.microsoft.com/fwlink/?linkid=848054.</source>
-        <target state="translated">ASP.NET Core
-------------
-已成功安装 ASP.NET Core HTTPS 开发证书。
-要信任证书，请运行 "dotnet dev-certs https --trust"(仅限 Windows 和 macOS)。要在其他平台上建立信任，请参阅特定于平台的文档。
-有关配置 HTTPS 的详细信息，请参阅 https://go.microsoft.com/fwlink/?linkid=848054。</target>
-        <note />
-      </trans-unit>
       <trans-unit id="FailedToDetermineUserHomeDirectory">
         <source>The user's home directory could not be determined. Set the '{0}' environment variable to specify the directory to use.</source>
         <target state="translated">无法确定用户的主目录。设置“{0}”环境变量以指定要使用的目录。</target>

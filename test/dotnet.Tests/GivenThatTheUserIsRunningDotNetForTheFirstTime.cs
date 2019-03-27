@@ -77,15 +77,6 @@ namespace Microsoft.DotNet.Tests
         }
 
         [Fact]
-        public void ItShowsTheAspNetCertificateGenerationMessageToTheUser()
-        {
-            _firstDotnetVerbUseCommandResult.StdOut
-                .Should()
-                .ContainVisuallySameFragment(Configurer.LocalizableStrings.AspNetCertificateInstalled)
-                .And.NotContain("Restore completed in");
-        }
-
-        [Fact]
         public void ItCreatesAFirstUseSentinelFileUnderTheDotDotNetFolder()
         {
             _dotDotnetFolder
@@ -176,11 +167,7 @@ namespace Microsoft.DotNet.Tests
 
             command.ExecuteWithCapturedOutput("internal-reportinstallsuccess test").Should().Pass();
 
-            var result = command.ExecuteWithCapturedOutput("new --debug:ephemeral-hive");
-
-            result.StdOut
-                .Should()
-                .ContainVisuallySameFragment(Configurer.LocalizableStrings.AspNetCertificateInstalled);
+            command.ExecuteWithCapturedOutput("new --debug:ephemeral-hive");
         }
 
         [LinuxOnlyFact]

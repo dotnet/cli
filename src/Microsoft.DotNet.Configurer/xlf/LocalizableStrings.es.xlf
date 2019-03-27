@@ -13,19 +13,6 @@ Más información sobre .NET Core: https://aka.ms/dotnet-docs
 Use "dotnet --help" para ver los comandos disponibles o visite: https://aka.ms/dotnet-cli-docs</target>
         <note />
       </trans-unit>
-      <trans-unit id="AspNetCertificateInstalled">
-        <source>ASP.NET Core
-------------
-Successfully installed the ASP.NET Core HTTPS Development Certificate.
-To trust the certificate run 'dotnet dev-certs https --trust' (Windows and macOS only). For establishing trust on other platforms refer to the platform specific documentation.
-For more information on configuring HTTPS see https://go.microsoft.com/fwlink/?linkid=848054.</source>
-        <target state="translated">ASP.NET Core
-------------
-El certificado de desarrollo HTTPS de ASP.NET Core se ha instalado correctamente.
-Para confiar en el certificado, ejecute "dotnet dev-certs https --trust (solo Windows y macOS). Para establecer la confianza en otras plataformas, consulte la documentación específica de la plataforma.
-Para obtener más información sobre la configuración HTTPS, vea https://go.microsoft.com/fwlink/?linkid=848054.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="FailedToDetermineUserHomeDirectory">
         <source>The user's home directory could not be determined. Set the '{0}' environment variable to specify the directory to use.</source>
         <target state="translated">No se puede determinar el directorio raíz del usuario. Establezca la variable de entorno “{0}” para especificar el directorio que debe usarse.</target>

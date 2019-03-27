@@ -68,9 +68,6 @@ namespace Microsoft.DotNet.Configurer
         {
             _aspNetCoreCertificateGenerator.GenerateAspNetCoreDevelopmentCertificate();
 
-            _reporter.WriteLine();
-            _reporter.WriteLine(LocalizableStrings.AspNetCertificateInstalled);
-
             _aspNetCertificateSentinel.CreateIfNotExists();
         }
 
