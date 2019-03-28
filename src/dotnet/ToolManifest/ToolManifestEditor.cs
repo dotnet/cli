@@ -303,42 +303,44 @@ namespace Microsoft.DotNet.ToolManifest
             public string ToJson()
             {
                 var state = new JsonWriterState(options: new JsonWriterOptions { Indented = true });
-                var arrayBufferWriter = new ArrayBufferWriter<byte>();
-                var writer = new Utf8JsonWriter(arrayBufferWriter, state);
-
-                writer.WriteStartObject();
-
-                if (Version.HasValue)
+                using (var arrayBufferWriter = new ArrayBufferWriter<byte>())
                 {
-                    writer.WriteNumber(propertyName: JsonPropertyVersion, value: Version.Value);
-                }
+                    var writer = new Utf8JsonWriter(arrayBufferWriter, state);
 
-                if (IsRoot.HasValue)
-                {
-                    writer.WriteBoolean(JsonPropertyIsRoot, IsRoot.Value);
-                }
+                    writer.WriteStartObject();
 
-                writer.WriteStartObject(JsonPropertyTools);
-
-                foreach (var tool in Tools)
-                {
-                    writer.WriteStartObject(tool.Key);
-                    writer.WriteString(JsonPropertyVersion, tool.Value.Version);
-                    writer.WriteStartArray(JsonPropertyCommands);
-                    foreach (var toolCommandName in tool.Value.Commands)
+                    if (Version.HasValue)
                     {
-                        writer.WriteStringValue(toolCommandName);
+                        writer.WriteNumber(propertyName: JsonPropertyVersion, value: Version.Value);
                     }
 
-                    writer.WriteEndArray();
+                    if (IsRoot.HasValue)
+                    {
+                        writer.WriteBoolean(JsonPropertyIsRoot, IsRoot.Value);
+                    }
+
+                    writer.WriteStartObject(JsonPropertyTools);
+
+                    foreach (var tool in Tools)
+                    {
+                        writer.WriteStartObject(tool.Key);
+                        writer.WriteString(JsonPropertyVersion, tool.Value.Version);
+                        writer.WriteStartArray(JsonPropertyCommands);
+                        foreach (var toolCommandName in tool.Value.Commands)
+                        {
+                            writer.WriteStringValue(toolCommandName);
+                        }
+
+                        writer.WriteEndArray();
+                        writer.WriteEndObject();
+                    }
+
                     writer.WriteEndObject();
+                    writer.WriteEndObject();
+                    writer.Flush(true);
+
+                    return Encoding.UTF8.GetString(arrayBufferWriter.WrittenMemory.ToArray());
                 }
-
-                writer.WriteEndObject();
-                writer.WriteEndObject();
-                writer.Flush(true);
-
-                return Encoding.UTF8.GetString(arrayBufferWriter.WrittenMemory.ToArray());
             }
         }
 
