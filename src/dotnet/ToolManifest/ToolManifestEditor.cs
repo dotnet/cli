@@ -107,11 +107,11 @@ namespace Microsoft.DotNet.ToolManifest
 
         private SerializableLocalToolsManifest DeserializeLocalToolsManifest(FilePath possibleManifest)
         {
-            var json = _fileSystem.File.ReadAllText(possibleManifest.Value);
             var serializableLocalToolsManifest = new SerializableLocalToolsManifest();
             try
             {
-                using (JsonDocument doc = JsonDocument.Parse(json))
+                using (Stream jsonStream = _fileSystem.File.OpenRead(possibleManifest.Value))
+                using (JsonDocument doc = JsonDocument.Parse(jsonStream))
                 {
                     JsonElement root = doc.RootElement;
 
