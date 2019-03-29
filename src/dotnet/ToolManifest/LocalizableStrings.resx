@@ -164,6 +164,6 @@ For a list of locations searched, specify the "-d" option before the tool name.<
 {0}</value>
   </data>
   <data name="UnexpectedTypeInJson" xml:space="preserve">
-    <value>Expected a {0} for property {1}.</value>
+    <value>Expected a {0} for property '{1}'.</value>
   </data>
 </root>

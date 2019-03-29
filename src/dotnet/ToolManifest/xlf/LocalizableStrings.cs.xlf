@@ -32,8 +32,8 @@ For a list of locations searched, specify the "-d" option before the tool name.<
         <note />
       </trans-unit>
       <trans-unit id="UnexpectedTypeInJson">
-        <source>Expected a {0} for property {1}.</source>
-        <target state="new">Expected a {0} for property {1}.</target>
+        <source>Expected a {0} for property '{1}'.</source>
+        <target state="new">Expected a {0} for property '{1}'.</target>
         <note />
       </trans-unit>
       <trans-unit id="VersionIsInvalid">
