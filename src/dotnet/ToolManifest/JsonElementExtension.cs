@@ -9,39 +9,65 @@ namespace Microsoft.DotNet.ToolManifest
     internal static class JsonElementExtension
     {
         // this is needed due to https://github.com/dotnet/corefx/issues/36109
-        internal static bool TryGetPropertyValue<T>(this JsonElement element, string propertyName, out T result)
+
+        internal static bool TryGetStringValue(this JsonElement element, string name, out string value)
         {
-            Type t = typeof(T);
-            if (!element.TryGetProperty(propertyName, out JsonElement value))
+            value = null;
+            if (element.TryGetProperty(name, out JsonElement jsonValue))
             {
-                result = default;
-                return false;
+                if (jsonValue.Type != JsonValueType.String)
+                {
+                    throw new ToolManifestException(
+                        string.Format(
+                            LocalizableStrings.UnexpectedTypeInJson,
+                            JsonValueType.String.ToString(),
+                            name));
+                }
+                value = jsonValue.GetString();
+                return true;
             }
-            try
+
+            return false;
+        }
+
+        internal static bool TryGetInt32Value(this JsonElement element, string name, out int value)
+        {
+            value = default;
+            if (element.TryGetProperty(name, out JsonElement jsonValue))
             {
-                if (t == typeof(bool))
+                if (jsonValue.Type != JsonValueType.Number)
                 {
-                    result = (T)(object)value.GetBoolean();
-                    return true;
+                    throw new ToolManifestException(
+                        string.Format(
+                            LocalizableStrings.UnexpectedTypeInJson,
+                            JsonValueType.Number.ToString(),
+                            name));
                 }
-                if (t == typeof(int))
-                {
-                    result =(T)(object)value.GetInt32();
-                    return true;
-                }
-                if (t == typeof(string))
-                {
-                    result = (T)(object)value.GetString();
-                    return true;
-                }
-                throw new ArgumentOutOfRangeException(
-                    nameof(T),
-                    string.Format("Destination type {0} is not supported.", t.FullName));
+                value = jsonValue.GetInt32();
+                return true;
             }
-            catch (InvalidOperationException e)
+
+            return false;
+        }
+
+        internal static bool TryGetBooleanValue(this JsonElement element, string name, out bool value)
+        {
+            value = default;
+            if (element.TryGetProperty(name, out JsonElement jsonValue))
             {
-                throw new ToolManifestException(string.Format(LocalizableStrings.FailedToReadProperty, propertyName, e.Message));
+                if (!(jsonValue.Type == JsonValueType.True || jsonValue.Type == JsonValueType.False))
+                {
+                    throw new ToolManifestException(
+                        string.Format(
+                            LocalizableStrings.UnexpectedTypeInJson,
+                            JsonValueType.True.ToString() + "|" + JsonValueType.False.ToString(),
+                            name));
+                }
+                value = jsonValue.GetBoolean();
+                return true;
             }
+
+            return false;
         }
     }
 }

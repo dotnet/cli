@@ -227,7 +227,7 @@ namespace Microsoft.DotNet.Tests.Commands
             Action a = () => toolManifest.Find();
 
             a.ShouldThrow<ToolManifestException>()
-                .And.Message.Should().Contain(string.Format(LocalizableStrings.FailedToReadProperty, "isRoot", ""));
+                .And.Message.Should().Contain(string.Format(LocalizableStrings.UnexpectedTypeInJson, "True|False" ,"isRoot"));
         }
 
         [Fact]

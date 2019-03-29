@@ -14,11 +14,6 @@ For a list of locations searched, specify the "-d" option before the tool name.<
         <target state="translated">未在清单文件中找到包 ID 为 {0} 的包。</target>
         <note />
       </trans-unit>
-      <trans-unit id="FailedToReadProperty">
-        <source>Failed to read property '{0}': {1}</source>
-        <target state="new">Failed to read property '{0}': {1}</target>
-        <note />
-      </trans-unit>
       <trans-unit id="ListOfSearched">
         <source>The list of searched paths:
 {0}</source>
@@ -34,6 +29,11 @@ For a list of locations searched, specify the "-d" option before the tool name.<
       <trans-unit id="ManifestPackageIdCollision">
         <source>Cannot add package. Manifest file already contains version {0} of the package {1}. Uninstall/install or edit manifest file {2} to specify the new version {3}.</source>
         <target state="translated">无法添加包。清单文件已包含包 {1} 的版本 {0}。卸载/安装或编辑清单文件 {2} 以指定新版本 {3}。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="UnexpectedTypeInJson">
+        <source>Expected a {0} for property {1}.</source>
+        <target state="new">Expected a {0} for property {1}.</target>
         <note />
       </trans-unit>
       <trans-unit id="VersionIsInvalid">

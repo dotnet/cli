@@ -115,12 +115,12 @@ namespace Microsoft.DotNet.ToolManifest
                 {
                     JsonElement root = doc.RootElement;
 
-                    if (root.TryGetPropertyValue<int>(JsonPropertyVersion, out var version))
+                    if (root.TryGetInt32Value(JsonPropertyVersion, out var version))
                     {
                         serializableLocalToolsManifest.Version = version;
                     }
 
-                    if (root.TryGetPropertyValue<bool>(JsonPropertyIsRoot, out var isRoot))
+                    if (root.TryGetBooleanValue(JsonPropertyIsRoot, out var isRoot))
                     {
                         serializableLocalToolsManifest.IsRoot = isRoot;
                     }
@@ -130,10 +130,18 @@ namespace Microsoft.DotNet.ToolManifest
                         serializableLocalToolsManifest.Tools =
                             new Dictionary<string, SerializableLocalToolSinglePackage>();
 
+                        if (tools.Type != JsonValueType.Object)
+                        {
+                            throw new ToolManifestException(
+                                string.Format(LocalizableStrings.UnexpectedTypeInJson,
+                                    JsonValueType.Object.ToString(),
+                                    JsonPropertyTools));
+                        }
+
                         foreach (var toolJson in tools.EnumerateObject())
                         {
                             var serializableLocalToolSinglePackage = new SerializableLocalToolSinglePackage();
-                            if (toolJson.Value.TryGetPropertyValue<string>(JsonPropertyVersion, out var versionJson))
+                            if (toolJson.Value.TryGetStringValue(JsonPropertyVersion, out var versionJson))
                             {
                                 serializableLocalToolSinglePackage.Version = versionJson;
                             }
@@ -141,17 +149,25 @@ namespace Microsoft.DotNet.ToolManifest
                             var commands = new List<string>();
                             if (toolJson.Value.TryGetProperty(JsonPropertyCommands, out var commandsJson))
                             {
+                                if (commandsJson.Type != JsonValueType.Array)
+                                {
+                                    throw new ToolManifestException(
+                                        string.Format(LocalizableStrings.UnexpectedTypeInJson,
+                                            JsonValueType.Array.ToString(),
+                                            JsonPropertyCommands));
+                                }
+
                                 foreach (var command in commandsJson.EnumerateArray())
                                 {
-                                    try
-                                    {
-                                        commands.Add(command.GetString());
-                                    }
-                                    catch (InvalidOperationException e)
+                                    if (command.Type != JsonValueType.String)
                                     {
                                         throw new ToolManifestException(
-                                            string.Format(LocalizableStrings.FailedToReadProperty, e.Message));
+                                            string.Format(LocalizableStrings.UnexpectedTypeInJson,
+                                                JsonValueType.String.ToString(),
+                                                "command"));
                                     }
+
+                                    commands.Add(command.GetString());
                                 }
 
                                 serializableLocalToolSinglePackage.Commands = commands.ToArray();
@@ -166,8 +182,7 @@ namespace Microsoft.DotNet.ToolManifest
             }
             catch (Exception e) when (
                 e is JsonReaderException ||
-                e is ArgumentException || // "duplicated key"
-                e is InvalidOperationException) // field type mismatch
+                e is ArgumentException) // "duplicated key"
             {
                 throw new ToolManifestException(string.Format(LocalizableStrings.JsonParsingError,
                     possibleManifest.Value, e.Message));
