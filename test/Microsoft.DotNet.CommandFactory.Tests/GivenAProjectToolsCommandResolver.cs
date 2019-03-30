@@ -286,30 +286,6 @@ namespace Microsoft.DotNet.Tests
         }
 
         [Fact]
-        public void ItAddsFxVersionAsAParamWhenTheToolHasThePrefercliruntimeFile()
-        {
-            var projectToolsCommandResolver = SetupProjectToolsCommandResolver();
-
-            var testInstance = TestAssets.Get("MSBuildTestApp")
-                .CreateInstance()
-                .WithSourceFiles()
-                .WithRestoreFiles();
-
-            var commandResolverArguments = new CommandResolverArguments()
-            {
-                CommandName = "dotnet-prefercliruntime",
-                CommandArguments = null,
-                ProjectDirectory = testInstance.Root.FullName
-            };
-
-            var result = projectToolsCommandResolver.Resolve(commandResolverArguments);
-
-            result.Should().NotBeNull();
-
-            result.Args.Should().Contain("--fx-version 3.0.0");
-        }
-
-        [Fact]
         public void ItDoesNotAddFxVersionAsAParamWhenTheToolDoesNotHaveThePrefercliruntimeFile()
         {
             var projectToolsCommandResolver = SetupProjectToolsCommandResolver();
@@ -372,7 +348,7 @@ namespace Microsoft.DotNet.Tests
                 "dotnet-fallbackfoldertool",
                 "1.0.0",
                 "lib",
-                "netcoreapp3.0",
+                "netcoreapp2.2",
                 "dotnet-fallbackfoldertool.dll"));
         }
 
