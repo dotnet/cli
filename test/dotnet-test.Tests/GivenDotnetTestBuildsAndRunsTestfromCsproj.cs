@@ -38,6 +38,42 @@ namespace Microsoft.DotNet.Cli.Test.Tests
         }
 
         [Fact]
+        public void ItRunsTestsIfValidTestContainerIsProvidedInArgs()
+        {
+            var testAppName = "VSTestCore";
+            var testRoot = TestAssets.Get(testAppName)
+                .CreateInstance()
+                .WithSourceFiles()
+                .WithRestoreFiles()
+                .Root;
+
+            var configuration = Environment.GetEnvironmentVariable("CONFIGURATION") ?? "Debug";
+
+            new BuildCommand()
+                .WithWorkingDirectory(testRoot)
+                .Execute()
+                .Should().Pass();
+
+            var outputDll = testRoot
+                .GetDirectory("bin", configuration, "netcoreapp2.2")
+                .GetFile($"{testAppName}.dll");
+
+            var argsForVstest = $"\"{outputDll.FullName}\" --logger:console;verbosity=normal";
+
+            // Call vstest
+            var result = new DotnetTestCommand().ExecuteWithCapturedOutput(argsForVstest);
+            if (!DotnetUnderTest.IsLocalized())
+            {
+                result.StdOut
+                    .Should().Contain("Total tests: 2. Passed: 1. Failed: 1. Skipped: 0.")
+                    .And.Contain("Passed   VSTestPassTest")
+                    .And.Contain("Failed   VSTestFailTest");
+            }
+
+            result.ExitCode.Should().Be(1);
+        }
+
+        [Fact]
         public void ItImplicitlyRestoresAProjectWhenTesting()
         {
             string testAppName = "VSTestCore";
