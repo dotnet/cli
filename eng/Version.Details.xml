@@ -13,9 +13,9 @@
     </Dependency>
   </ToolsetDependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.NET.Sdk" Version="3.0.100-preview5.19215.3">
+    <Dependency Name="Microsoft.NET.Sdk" Version="3.0.100-preview5.19217.12">
       <Uri>https://github.com/dotnet/sdk</Uri>
-      <Sha>8cb31b0fd0bb5d36b9781442865f2e26cf6fbedc</Sha>
+      <Sha>b25441a3e53a2953edf634d5bd310a4ace955b25</Sha>
     </Dependency>
     <!-- We don't want migrate being updated by DARC just yet due to the NuGet
     discrepancy between it and the CLI. We will fix that for P3 -->
