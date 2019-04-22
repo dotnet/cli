@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.TemplateEngine.Cli" Version="1.0.2-beta5.19208.4">
+    <Dependency Name="Microsoft.TemplateEngine.Cli" Version="1.0.2-beta5.19219.1">
       <Uri>https://github.com/dotnet/templating</Uri>
-      <Sha>0fd9a865045026041f2ea4942eb8c91782193078</Sha>
+      <Sha>c01de3fd223affb9f861260f41ebcc12e473a9ad</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="1.0.0-beta.19205.6">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="1.0.0-beta.19218.7">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>4217db4a23ffd15abb3771d635b66162994fb9e4</Sha>
+      <Sha>5e7ce5b394f3477bb0a485a4b761b7742e95be37</Sha>
     </Dependency>
   </ToolsetDependencies>
   <ProductDependencies>
