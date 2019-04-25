@@ -75,7 +75,7 @@
     Skips installing non-versioned files if they already exist, such as dotnet.exe.
 .PARAMETER NoCdn
     Disable downloading from the Azure CDN, and use the uncached feed directly.
-.PARAMETER DownloadDir
+.PARAMETER KeepDownloadedInstallerDirectory
     An optional directory to cache installer downloads to.  This can be useful if you will be installing the
     same version multiple times on the same machine. By default, the downloaded file is deleted after it is
     extracted.
@@ -99,7 +99,7 @@ param(
    [switch]$ProxyUseDefaultCredentials,
    [switch]$SkipNonVersionedFiles,
    [switch]$NoCdn,
-   [string]$DownloadDir="<auto>"
+   [string]$KeepDownloadedInstallerDirectory="<auto>"
 )
 
 Set-StrictMode -Version Latest
@@ -591,7 +591,7 @@ if ($diskInfo.Free / 1MB -le 100) {
     exit 0
 }
 
-$ZipPath = Get-ZipPath -DownloadLink $DownloadLink -RootDir $DownloadDir
+$ZipPath = Get-ZipPath -DownloadLink $DownloadLink -RootDir $KeepDownloadedInstallerDirectory
 Say-Verbose "Zip path: $ZipPath"
 
 $DownloadFailed = $false
@@ -604,7 +604,7 @@ catch {
     Say "Cannot download: $DownloadLink"
     if ($LegacyDownloadLink) {
         $DownloadLink = $LegacyDownloadLink
-        $ZipPath = Get-ZipPath -DownloadLink $DownloadLink -RootDir $DownloadDir
+        $ZipPath = Get-ZipPath -DownloadLink $DownloadLink -RootDir $KeepDownloadedInstallerDirectory
         Say-Verbose "Legacy zip path: $ZipPath"
         Say "Downloading legacy link: $DownloadLink"
         try {
@@ -633,7 +633,7 @@ if (!$isAssetInstalled) {
     throw "`"$assetName`" with version = $SpecificVersion failed to install with an unknown error."
 }
 
-if($DownloadDir -eq "<auto>") {
+if($KeepDownloadedInstallerDirectory -eq "<auto>") {
     Remove-Item $ZipPath
 }
 else {
