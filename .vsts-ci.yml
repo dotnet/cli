@@ -56,8 +56,8 @@ jobs:
     vs2017-win2016
   steps:
   - script: |
-    set DOTNET_CLI_UI_LANGUAGE=es
-    .\build.cmd -Configuration Debug -Architecture x64 -Targets Default
+      set DOTNET_CLI_UI_LANGUAGE=es
+      .\build.cmd -Configuration Debug -Architecture x64 -Targets Default
 
 - job: debug_linux-musl_x64_prtest
   pool:
@@ -100,8 +100,8 @@ jobs:
     vmImage: ubuntu-16.04
   steps:
   - script: |
-    export DropSuffix=true
-    ./build.sh --skip-prereqs --configuration Release --targets Default --linux-portable --architecture arm /p:CLIBUILD_SKIP_TESTS=true
+      export DropSuffix=true
+      ./build.sh --skip-prereqs --configuration Release --targets Default --linux-portable --architecture arm /p:CLIBUILD_SKIP_TESTS=true
 
 - job: debug_centos7.1_x64_prtest
   pool:
@@ -114,8 +114,8 @@ jobs:
     vmImage: ubuntu-16.04
   steps:
   - script: |
-    export DropSuffix=true
-    ./build.sh --skip-prereqs --configuration Release --targets Default --linux-portable
+      export DropSuffix=true
+      ./build.sh --skip-prereqs --configuration Release --targets Default --linux-portable
 
 - job: debug_opensuse.42.3_x64_prtest
   pool:
@@ -128,8 +128,8 @@ jobs:
     vs2017-win2016
   steps:
   - script: |
-    set DropSuffix=true
-    .\build.cmd -Configuration Release -Architecture x64 -Targets Default
+      set DropSuffix=true
+      .\build.cmd -Configuration Release -Architecture x64 -Targets Default
 
 - job: debug_ubuntu16.04_x64_prtest
   pool:
