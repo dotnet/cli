@@ -41,7 +41,7 @@ jobs:
 
 - job: debug_windows_nt_x86
   pool:
-    vs2017-win2016
+    vmImage: vs2017-win2016
   steps:
   - script: .\build.cmd -Configuration Debug -Architecture x86 -Targets Default
 
@@ -53,7 +53,7 @@ jobs:
 
 - job: debug_windows_nt_es_x64
   pool:
-    vs2017-win2016
+    vmImage: vs2017-win2016
   steps:
   - script: |
       set DOTNET_CLI_UI_LANGUAGE=es
@@ -85,7 +85,7 @@ jobs:
 
 - job: release_windows_nt_x64
   pool:
-    vs2017-win2016
+    vmImage: vs2017-win2016
   steps:
   - script: .\build.cmd -Configuration Release -Architecture x64 -Targets Default
 
@@ -125,7 +125,7 @@ jobs:
 
 - job: release_windows_nt_nosuffix_x64
   pool:
-    vs2017-win2016
+    vmImage: vs2017-win2016
   steps:
   - script: |
       set DropSuffix=true
