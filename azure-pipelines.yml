@@ -1,0 +1,138 @@
+variables:
+- name:  Build.Repository.Clean
+  value: true
+
+trigger:
+- test-azdo-move
+
+pr:
+- release/2.1.7xx
+
+jobs:
+- job: release_rhel7.2_x64_prtest
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: ./build.sh --skip-prereqs --configuration Release --targets Default
+
+- job: debug_debian8.2_x64_prtest
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: ./build.sh --skip-prereqs --configuration Debug --targets Default
+
+- job: release_linux_x64_prtest
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: ./build.sh --skip-prereqs --configuration Release --targets Default --linux-portable
+
+- job: debug_linux_arm64_prtest
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --linux-portable --architecture arm64 /p:CLIBUILD_SKIP_TESTS=true
+
+- job: release_osx10.12_x64_prtest
+  pool:
+    vmImage: macOS-10.13
+  steps:
+  - script: ./build.sh --skip-prereqs --configuration Release --targets Default
+
+- job: debug_windows_nt_x86_prtest
+  pool:
+    vs2017-win2016
+  steps:
+  - script: .\build.cmd -Configuration Debug -Architecture x86 -Targets Default
+
+- job: debug_rhel6_x64_prtest
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --runtime-id rhel.6-x64 --docker rhel.6
+
+- job: debug_windows_nt_es_x64_prtest
+  pool:
+    vs2017-win2016
+  steps:
+  - script: |
+    set DOTNET_CLI_UI_LANGUAGE=es
+    .\build.cmd -Configuration Debug -Architecture x64 -Targets Default
+
+- job: debug_linux-musl_x64_prtest
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --runtime-id linux-musl-x64 --docker alpine.3.6
+
+- job: debug_ubuntu.18.04_x64_prtest
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --docker ubuntu.18.04 --linux-portable
+
+- job: release_ubuntu_x64_prtest
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: ./build.sh --skip-prereqs --configuration Release --targets Default --docker ubuntu.14.04
+
+- job: debug_fedora.27_x64_prtest
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --docker fedora.27 --linux-portable
+
+- job: release_windows_nt_x64_prtest
+  pool:
+    vs2017-win2016
+  steps:
+  - script: .\build.cmd -Configuration Release -Architecture x64 -Targets Default
+
+- job: debug_linux_arm_prtest
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --linux-portable --architecture arm /p:CLIBUILD_SKIP_TESTS=true
+
+- job: release_linux_nosuffix_arm_prtest
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: |
+    export DropSuffix=true
+    ./build.sh --skip-prereqs --configuration Release --targets Default --linux-portable --architecture arm /p:CLIBUILD_SKIP_TESTS=true
+
+- job: debug_centos7.1_x64_prtest
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: ./build.sh --skip-prereqs --configuration Debug --targets Default
+
+- job: release_linux_nosuffix_x64_prtest
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: |
+    export DropSuffix=true
+    ./build.sh --skip-prereqs --configuration Release --targets Default --linux-portable
+
+- job: debug_opensuse.42.3_x64_prtest
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --docker opensuse.42.3 --linux-portable
+
+- job: release_windows_nt_nosuffix_x64_prtest
+  pool:
+    vs2017-win2016
+  steps:
+  - script: |
+    set DropSuffix=true
+    .\build.cmd -Configuration Release -Architecture x64 -Targets Default
+
+- job: debug_ubuntu16.04_x64_prtest
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: ./build.sh --skip-prereqs --configuration Debug --targets Default
