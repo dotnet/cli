@@ -10,6 +10,7 @@ pr:
 
 jobs:
 - job: release_rhel72_x64
+  displayName: RHEL7.2 x64 Release Build
   pool:
     vmImage: ubuntu-16.04
   steps:
@@ -24,6 +25,7 @@ jobs:
       artifactName: release_rhel72_x64
 
 - job: debug_debian82_x64
+  displayName: Debian8.2 x64 Debug Build
   pool:
     vmImage: ubuntu-16.04
   steps:
@@ -38,6 +40,7 @@ jobs:
       artifactName: debug_debian82_x64
 
 - job: release_linux_x64
+  displayName: Linux x64 Release Build
   pool:
     vmImage: ubuntu-16.04
   steps:
@@ -52,6 +55,7 @@ jobs:
       artifactName: release_linux_x64
 
 - job: debug_linux_arm64
+  displayName: Linux arm64 Debug Build
   pool:
     vmImage: ubuntu-16.04
   steps:
@@ -62,6 +66,7 @@ jobs:
       artifactName: debug_linux_arm64
 
 - job: release_osx1012_x64
+  displayName: OSX10.12 x64 Release Build
   pool:
     vmImage: macOS-10.13
   steps:
@@ -76,6 +81,7 @@ jobs:
       artifactName: release_osx1012_x64
 
 - job: debug_windows_nt_x86
+  displayName: Windows_NT x86 Debug Build
   pool:
     vmImage: vs2017-win2016
   steps:
@@ -90,6 +96,7 @@ jobs:
       artifactName: debug_windows_nt_x86
 
 - job: debug_rhel6_x64
+  displayName: RHEL6 x64 Debug Build
   pool:
     vmImage: ubuntu-16.04
   steps:
@@ -104,6 +111,7 @@ jobs:
       artifactName: debug_rhel6_x64
 
 - job: debug_windows_nt_es_x64
+  displayName: Windows_NT_ES x64 Debug Build
   pool:
     vmImage: vs2017-win2016
   steps:
@@ -120,6 +128,7 @@ jobs:
       artifactName: debug_windows_nt_es_x64
 
 - job: debug_linux_musl_x64
+  displayName: Linux-musl x64 Debug Build
   pool:
     vmImage: ubuntu-16.04
   steps:
@@ -134,6 +143,7 @@ jobs:
       artifactName: debug_linux_musl_x64
 
 - job: debug_ubuntu1804_x64
+  displayName: ubuntu.18.04 x64 Debug Build
   pool:
     vmImage: ubuntu-16.04
   steps:
@@ -148,6 +158,7 @@ jobs:
       artifactName: debug_ubuntu1804_x64
 
 - job: release_ubuntu_x64
+  displayName: Ubuntu x64 Release Build
   pool:
     vmImage: ubuntu-16.04
   steps:
@@ -162,6 +173,7 @@ jobs:
       artifactName: release_ubuntu_x64
 
 - job: debug_fedora27_x64
+  displayName: fedora.27 x64 Debug Build
   pool:
     vmImage: ubuntu-16.04
   steps:
@@ -176,6 +188,7 @@ jobs:
       artifactName: debug_fedora27_x64
 
 - job: release_windows_nt_x64
+  displayName: Windows_NT x64 Release Build
   pool:
     vmImage: vs2017-win2016
   steps:
@@ -190,6 +203,7 @@ jobs:
       artifactName: release_windows_nt_x64
 
 - job: debug_linux_arm
+  displayName: Linux arm Debug Build
   pool:
     vmImage: ubuntu-16.04
   steps:
@@ -200,6 +214,7 @@ jobs:
       artifactName: debug_linux_arm
 
 - job: release_linux_nosuffix_arm
+  displayName: Linux_NoSuffix arm Release Build
   pool:
     vmImage: ubuntu-16.04
   steps:
@@ -212,6 +227,7 @@ jobs:
       artifactName: release_linux_nosuffix_arm
 
 - job: debug_centos71_x64
+  displayName: CentOS7.1 x64 Debug Build
   pool:
     vmImage: ubuntu-16.04
   steps:
@@ -226,6 +242,7 @@ jobs:
       artifactName: debug_centos71_x64
 
 - job: release_linux_nosuffix_x64
+  displayName: Linux_NoSuffix x64 Release Build
   pool:
     vmImage: ubuntu-16.04
   steps:
@@ -242,6 +259,7 @@ jobs:
       artifactName: release_linux_nosuffix_x64
 
 - job: debug_opensuse423_x64
+  displayName: opensuse.42.3 x64 Debug Build
   pool:
     vmImage: ubuntu-16.04
   steps:
@@ -256,6 +274,7 @@ jobs:
       artifactName: debug_opensuse423_x64
 
 - job: release_windows_nt_nosuffix_x64
+  displayName: Windows_NT_NoSuffix x64 Release Build
   pool:
     vmImage: vs2017-win2016
   steps:
@@ -272,6 +291,7 @@ jobs:
       artifactName: release_windows_nt_nosuffix_x64
 
 - job: debug_ubuntu1604_x64
+  displayName: Ubuntu16.04 x64 Debug Build
   pool:
     vmImage: ubuntu-16.04
   steps:
