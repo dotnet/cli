@@ -18,7 +18,7 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx''
+      testResultsFiles: '**/*.trx'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: 'test/**/*.trx'
@@ -33,7 +33,7 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx''
+      testResultsFiles: '**/*.trx'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: 'test/**/*.trx'
@@ -48,7 +48,7 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx''
+      testResultsFiles: '**/*.trx'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: 'test/**/*.trx'
@@ -74,7 +74,7 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx''
+      testResultsFiles: '**/*.trx'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: 'test/**/*.trx'
@@ -89,7 +89,7 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx''
+      testResultsFiles: '**/*.trx'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: 'test/**/*.trx'
@@ -104,7 +104,7 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx''
+      testResultsFiles: '**/*.trx'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: 'test/**/*.trx'
@@ -121,7 +121,7 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx''
+      testResultsFiles: '**/*.trx'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: 'test/**/*.trx'
@@ -136,7 +136,7 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx''
+      testResultsFiles: '**/*.trx'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: 'test/**/*.trx'
@@ -151,7 +151,7 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx''
+      testResultsFiles: '**/*.trx'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: 'test/**/*.trx'
@@ -166,7 +166,7 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx''
+      testResultsFiles: '**/*.trx'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: 'test/**/*.trx'
@@ -181,7 +181,7 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx''
+      testResultsFiles: '**/*.trx'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: 'test/**/*.trx'
@@ -196,7 +196,7 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx''
+      testResultsFiles: '**/*.trx'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: 'test/**/*.trx'
@@ -235,7 +235,7 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx''
+      testResultsFiles: '**/*.trx'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: 'test/**/*.trx'
@@ -252,7 +252,7 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx''
+      testResultsFiles: '**/*.trx'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: 'test/**/*.trx'
@@ -267,7 +267,7 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx''
+      testResultsFiles: '**/*.trx'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: 'test/**/*.trx'
@@ -284,7 +284,7 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx''
+      testResultsFiles: '**/*.trx'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: 'test/**/*.trx'
@@ -299,7 +299,7 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx''
+      testResultsFiles: '**/*.trx'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: 'test/**/*.trx'
