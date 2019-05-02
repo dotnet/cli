@@ -3,7 +3,7 @@ variables:
   value: true
 
 trigger:
-- test-azdo-move
+- release/2.1.7xx
 
 pr:
 - release/2.1.7xx
@@ -14,42 +14,94 @@ jobs:
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Release --targets Default
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: **/*.trx
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: release_rhel72_x64
 
 - job: debug_debian82_x64
   pool:
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: **/*.trx
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: debug_debian82_x64
 
 - job: release_linux_x64
   pool:
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Release --targets Default --linux-portable
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: **/*.trx
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: release_linux_x64
 
 - job: debug_linux_arm64
   pool:
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --linux-portable --architecture arm64 /p:CLIBUILD_SKIP_TESTS=true
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: debug_linux_arm64
 
 - job: release_osx1012_x64
   pool:
     vmImage: macOS-10.13
   steps:
   - script: ./build.sh --skip-prereqs --configuration Release --targets Default
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: **/*.trx
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: release_osx1012_x64
 
 - job: debug_windows_nt_x86
   pool:
     vmImage: vs2017-win2016
   steps:
   - script: .\build.cmd -Configuration Debug -Architecture x86 -Targets Default
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: **/*.trx
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: debug_windows_nt_x86
 
 - job: debug_rhel6_x64
   pool:
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --runtime-id rhel.6-x64 --docker rhel.6
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: **/*.trx
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: debug_rhel6_x64
 
 - job: debug_windows_nt_es_x64
   pool:
@@ -58,42 +110,94 @@ jobs:
   - script: |
       set DOTNET_CLI_UI_LANGUAGE=es
       .\build.cmd -Configuration Debug -Architecture x64 -Targets Default
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: **/*.trx
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: debug_windows_nt_es_x64
 
 - job: debug_linux_musl_x64
   pool:
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --runtime-id linux-musl-x64 --docker alpine.3.6
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: **/*.trx
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: debug_linux_musl_x64
 
 - job: debug_ubuntu1804_x64
   pool:
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --docker ubuntu.18.04 --linux-portable
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: **/*.trx
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: debug_ubuntu1804_x64
 
 - job: release_ubuntu_x64
   pool:
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Release --targets Default --docker ubuntu.14.04
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: **/*.trx
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: release_ubuntu_x64
 
 - job: debug_fedora27_x64
   pool:
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --docker fedora.27 --linux-portable
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: **/*.trx
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: debug_fedora27_x64
 
 - job: release_windows_nt_x64
   pool:
     vmImage: vs2017-win2016
   steps:
   - script: .\build.cmd -Configuration Release -Architecture x64 -Targets Default
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: **/*.trx
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: release_windows_nt_x64
 
 - job: debug_linux_arm
   pool:
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --linux-portable --architecture arm /p:CLIBUILD_SKIP_TESTS=true
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: debug_linux_arm
 
 - job: release_linux_nosuffix_arm
   pool:
@@ -102,12 +206,24 @@ jobs:
   - script: |
       export DropSuffix=true
       ./build.sh --skip-prereqs --configuration Release --targets Default --linux-portable --architecture arm /p:CLIBUILD_SKIP_TESTS=true
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: release_linux_nosuffix_arm
 
 - job: debug_centos71_x64
   pool:
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: **/*.trx
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: debug_centos71_x64
 
 - job: release_linux_nosuffix_x64
   pool:
@@ -116,12 +232,28 @@ jobs:
   - script: |
       export DropSuffix=true
       ./build.sh --skip-prereqs --configuration Release --targets Default --linux-portable
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: **/*.trx
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: release_linux_nosuffix_x64
 
 - job: debug_opensuse423_x64
   pool:
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --docker opensuse.42.3 --linux-portable
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: **/*.trx
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: debug_opensuse423_x64
 
 - job: release_windows_nt_nosuffix_x64
   pool:
@@ -130,9 +262,25 @@ jobs:
   - script: |
       set DropSuffix=true
       .\build.cmd -Configuration Release -Architecture x64 -Targets Default
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: **/*.trx
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: release_windows_nt_nosuffix_x64
 
 - job: debug_ubuntu1604_x64
   pool:
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: **/*.trx
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: 'test/**/*.trx'
+      artifactName: debug_ubuntu1604_x64
