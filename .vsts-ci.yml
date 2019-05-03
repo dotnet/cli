@@ -19,11 +19,6 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: debug_centos71_x64
-    condition: failed()
 
 - job: debug_debian82_x64
   displayName: Debian8.2 x64 Debug Build
@@ -35,11 +30,6 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: debug_debian82_x64
-    condition: failed()
 
 - job: debug_fedora27_x64
   displayName: fedora.27 x64 Debug Build
@@ -51,11 +41,6 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: debug_fedora27_x64
-    condition: failed()
 
 - job: debug_linux_arm
   displayName: Linux arm Debug Build
@@ -63,11 +48,6 @@ jobs:
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --linux-portable --architecture arm /p:CLIBUILD_SKIP_TESTS=true
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: debug_linux_arm
-    condition: failed()
 
 - job: debug_linux_arm64
   displayName: Linux arm64 Debug Build
@@ -75,11 +55,6 @@ jobs:
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --linux-portable --architecture arm64 /p:CLIBUILD_SKIP_TESTS=true
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: debug_linux_arm64
-    condition: failed()
 
 - job: debug_linux_musl_x64
   displayName: Linux-musl x64 Debug Build
@@ -91,11 +66,6 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: debug_linux_musl_x64
-    condition: failed()
 
 - job: debug_opensuse423_x64
   displayName: opensuse.42.3 x64 Debug Build
@@ -107,11 +77,6 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: debug_opensuse423_x64
-    condition: failed()
 
 - job: debug_rhel6_x64
   displayName: RHEL6 x64 Debug Build
@@ -123,11 +88,6 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: debug_rhel6_x64
-    condition: failed()
 
 - job: debug_ubuntu1604_x64
   displayName: Ubuntu16.04 x64 Debug Build
@@ -139,11 +99,6 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: debug_ubuntu1604_x64
-    condition: failed()
 
 - job: debug_ubuntu1804_x64
   displayName: ubuntu.18.04 x64 Debug Build
@@ -155,11 +110,6 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: debug_ubuntu1804_x64
-    condition: failed()
 
 - job: debug_windows_nt_es_x64
   displayName: Windows_NT_ES x64 Debug Build
@@ -173,11 +123,6 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: debug_windows_nt_es_x64
-    condition: failed()
 
 - job: debug_windows_nt_x86
   displayName: Windows_NT x86 Debug Build
@@ -189,11 +134,6 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: debug_windows_nt_x86
-    condition: failed()
 
 - job: release_linux_nosuffix_arm
   displayName: Linux_NoSuffix arm Release Build
@@ -203,11 +143,6 @@ jobs:
   - script: |
       export DropSuffix=true
       ./build.sh --skip-prereqs --configuration Release --targets Default --linux-portable --architecture arm /p:CLIBUILD_SKIP_TESTS=true
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: release_linux_nosuffix_arm
-    condition: failed()
 
 - job: release_linux_nosuffix_x64
   displayName: Linux_NoSuffix x64 Release Build
@@ -221,11 +156,6 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: release_linux_nosuffix_x64
-    condition: failed()
 
 - job: release_linux_x64
   displayName: Linux x64 Release Build
@@ -237,11 +167,6 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: release_linux_x64
-    condition: failed()
 
 - job: release_osx_x64
   displayName: OSX x64 Release Build
@@ -253,11 +178,6 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: release_osx_x64
-    condition: failed()
 
 - job: release_rhel72_x64
   displayName: RHEL7.2 x64 Release Build
@@ -269,11 +189,6 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: release_rhel72_x64
-    condition: failed()
 
 - job: release_ubuntu_x64
   displayName: Ubuntu x64 Release Build
@@ -285,11 +200,6 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: release_ubuntu_x64
-    condition: failed()
 
 - job: release_windows_nt_nosuffix_x64
   displayName: Windows_NT_NoSuffix x64 Release Build
@@ -303,11 +213,6 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: release_windows_nt_nosuffix_x64
-    condition: failed()
 
 - job: release_windows_nt_x64
   displayName: Windows_NT x64 Release Build
@@ -319,8 +224,3 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: 'test/**/*.trx'
-      artifactName: release_windows_nt_x64
-    condition: failed()
