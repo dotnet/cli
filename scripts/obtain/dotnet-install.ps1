@@ -83,7 +83,7 @@ param(
    [string]$Version="Latest",
    [string]$InstallDir="<auto>",
    [string]$Architecture="<auto>",
-   [ValidateSet("dotnet", "aspnetcore", "windowsdesktop" IgnoreCase = $false)]
+   [ValidateSet("dotnet", "aspnetcore", "windowsdesktop", IgnoreCase = $false)]
    [string]$Runtime,
    [Obsolete("This parameter may be removed in a future version of this script. The recommended alternative is '-Runtime dotnet'.")]
    [switch]$SharedRuntime,
