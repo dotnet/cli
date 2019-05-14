@@ -10,9 +10,10 @@ FROM centos:7.1.1503
 # The CentOS Docker image uses fakesystemd instead of systemd to reduce disk space.
 RUN yum -q -y swap -- remove fakesystemd -- install systemd systemd-libs
 
-RUN yum -q -y install deltarpm
+RUN yum -q -y install deltarpm yum-plugin-ovl
+RUN yum -y update ca-certificates
+RUN yum -y update
 RUN yum -q -y install epel-release
-# RUN yum -y update
 
 # This could become a "microsoft/coreclr" image, since it just installs the dependencies for CoreCLR (and stdlib)
 # Install CoreCLR and CoreFx dependencies
