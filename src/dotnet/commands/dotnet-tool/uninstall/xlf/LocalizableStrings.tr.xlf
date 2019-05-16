@@ -38,7 +38,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyExactlyOnePackageId">
-        <source>Please specify one tool Package Id to uninstall.</source>
+        <source>Specify one tool Package Id to uninstall.</source>
         <target state="translated">Lütfen kaldırılacak aracın Paket Kimliğini belirtin.</target>
         <note />
       </trans-unit>
@@ -78,7 +78,7 @@ and the corresponding package Ids for installed tools using the command
         <note />
       </trans-unit>
       <trans-unit id="UninstallToolCommandInvalidGlobalAndLocalAndToolPath">
-        <source>The local option(--local), the global option (--global), the tool path option (--tool-path), can only have one at a time. Please specify only one of the options: {0}.</source>
+        <source>The local option(--local), the global option (--global), the tool path option (--tool-path), can only have one at a time. Specify only one of the options: {0}.</source>
         <target state="translated">Yerel seçeneği (--local), genel seçeneği (--global), araç yolu seçeneği (--tool-path) arasından yalnızca biri seçilebilir. Lütfen seçeneklerden yalnızca birini belirtin: {0}.</target>
         <note />
       </trans-unit>

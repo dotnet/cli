@@ -132,7 +132,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="CommandDoesNotExist">
-        <source>Specified command '{0}' is not a valid CLI command. Please specify a valid CLI commands. For more information, run dotnet help.</source>
+        <source>Specified command '{0}' is not a valid CLI command. Specify a valid CLI commands. For more information, run dotnet help.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="AppFullName">

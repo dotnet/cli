@@ -8,7 +8,7 @@
         <note />
       </trans-unit>
       <trans-unit id="InvalidPackageWarning">
-        <source>Warning: tool package '{0}' is invalid, please contact tool author:
+        <source>Warning: tool package '{0}' is invalid, contact tool author:
 {1}</source>
         <target state="translated">Avviso: il pacchetto strumenti '{0}' non è valido. Contattare l'autore dello strumento:
 {1}</target>

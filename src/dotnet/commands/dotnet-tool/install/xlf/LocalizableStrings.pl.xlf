@@ -3,7 +3,7 @@
   <file datatype="xml" source-language="en" target-language="pl" original="../LocalizableStrings.resx">
     <body>
       <trans-unit id="InstallToolCommandInvalidGlobalAndLocalAndToolPath">
-        <source>The local option(--local), the global option (--global), the tool path option (--tool-path), can only have one at a time. Please specify only one of the options: {0}.</source>
+        <source>The local option(--local), the global option (--global), the tool path option (--tool-path), can only have one at a time. Specify only one of the options: {0}.</source>
         <target state="translated">Można określić tylko jedną opcję jednocześnie: opcję lokalną (--local), opcję globalną (--global) lub opcję ścieżki do narzędzia (--tool-path). Podaj tylko jedną z opcji: {0}.</target>
         <note />
       </trans-unit>
@@ -79,7 +79,7 @@ Jeśli chcesz utworzyć manifest, użyj polecenia „dotnet new tool-manifest”
         <note />
       </trans-unit>
       <trans-unit id="SpecifyExactlyOnePackageId">
-        <source>Please specify one tool Package Id to install.</source>
+        <source>Specify one tool Package Id to install.</source>
         <target state="translated">Określ jeden identyfikator pakietu narzędzia do zainstalowania.</target>
         <note />
       </trans-unit>
@@ -99,7 +99,7 @@ Jeśli chcesz utworzyć manifest, użyj polecenia „dotnet new tool-manifest”
         <note />
       </trans-unit>
       <trans-unit id="ToolInstallationFailedContactAuthor">
-        <source>Tool '{0}' failed to install. Please contact the tool author for assistance.</source>
+        <source>Tool '{0}' failed to install. Contact the tool author for assistance.</source>
         <target state="translated">Zainstalowanie narzędzia „{0}” nie powiodło się. Skontaktuj się z autorem narzędzia w celu uzyskania pomocy.</target>
         <note />
       </trans-unit>

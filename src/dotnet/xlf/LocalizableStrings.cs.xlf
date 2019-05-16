@@ -9,7 +9,7 @@
         <note />
       </trans-unit>
       <trans-unit id="MoreThanOneProjectInDirectory">
-        <source>Found more than one project in `{0}`. Please specify which one to use.</source>
+        <source>Found more than one project in `{0}`. Specify which one to use.</source>
         <target state="translated">V {0} se našlo několik projektů. Vyberte prosím, jaký chcete použít.</target>
         <note />
       </trans-unit>
@@ -309,7 +309,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOne">
-        <source>Please specify at least one {0}.</source>
+        <source>Specify at least one {0}.</source>
         <target state="translated">Zadejte prosím aspoň jednu položku {0}.</target>
         <note />
       </trans-unit>
@@ -349,7 +349,7 @@
         <note />
       </trans-unit>
       <trans-unit id="FoundMoreThanOneProjectIn">
-        <source>Found more than one project in `{0}`. Please specify which one to use.</source>
+        <source>Found more than one project in `{0}`. Specify which one to use.</source>
         <target state="translated">V {0} se našlo několik projektů. Vyberte prosím, jaký chcete použít.</target>
         <note />
       </trans-unit>
@@ -374,12 +374,12 @@
         <note />
       </trans-unit>
       <trans-unit id="FoundMoreThanOneSolutionIn">
-        <source>Found more than one solution file in {0}. Please specify which one to use.</source>
+        <source>Found more than one solution file in {0}. Specify which one to use.</source>
         <target state="translated">V {0} se našlo několik souborů řešení. Vyberte prosím, jaký chcete použít.</target>
         <note />
       </trans-unit>
       <trans-unit id="FoundInvalidSolution">
-        <source>The solution file {0} seems to be invalid. Please check if it is a valid solution file.</source>
+        <source>The solution file {0} seems to be invalid. Check if it is a valid solution file.</source>
         <target state="translated">Zdá se, že soubor řešení {0} není platný. Zkontrolujte prosím, jestli je soubor řešení platný.</target>
         <note />
       </trans-unit>
@@ -399,7 +399,7 @@
         <note />
       </trans-unit>
       <trans-unit id="ReferenceDoesNotExist">
-        <source>Reference {0} does not exist. If you still want to add it, please use --force option. Please note that this may have adverse effects on the project. </source>
+        <source>Reference {0} does not exist. If you still want to add it, use --force option. Note that this may have adverse effects on the project. </source>
         <target state="translated">Odkaz na {0} neexistuje. Pokud ho přesto chcete přidat, použijte prosím možnost --force. Upozorňujeme, že tento krok může projekt negativně ovlivnit. </target>
         <note />
       </trans-unit>
@@ -409,7 +409,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToAdd">
-        <source>You must specify at least one reference to add. Please run dotnet add --help for more information.</source>
+        <source>You must specify at least one reference to add. run dotnet add --help for more information.</source>
         <target state="translated">Musíte zadat aspoň jeden odkaz, který chcete přidat. Další informace získáte spuštěním příkazu dotnet add --help.</target>
         <note />
       </trans-unit>
@@ -434,7 +434,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOnePackageReferenceToAdd">
-        <source>You must specify at least one reference to add. Please run dotnet add --help for more information.</source>
+        <source>You must specify at least one reference to add. run dotnet add --help for more information.</source>
         <target state="translated">Musíte zadat aspoň jeden odkaz, který chcete přidat. Další informace získáte spuštěním příkazu dotnet add --help.</target>
         <note />
       </trans-unit>
@@ -449,7 +449,7 @@
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyVersion">
-        <source>Please specify a version of the package.</source>
+        <source>Specify a version of the package.</source>
         <target state="translated">Zadejte prosím verzi balíčku.</target>
         <note />
       </trans-unit>
@@ -464,7 +464,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneProjectToAdd">
-        <source>You must specify at least one project to add. Please run dotnet add --help for more information.</source>
+        <source>You must specify at least one project to add. run dotnet add --help for more information.</source>
         <target state="translated">Musíte zadat aspoň jeden projekt, který chcete přidat. Další informace získáte spuštěním příkazu dotnet add --help.</target>
         <note />
       </trans-unit>
@@ -489,7 +489,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToRemove">
-        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
         <target state="translated">Musíte zadat aspoň jeden odkaz, který chcete odstranit. Další informace najdete po spuštění příkazu dotnet delete --help.</target>
         <note />
       </trans-unit>
@@ -499,7 +499,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToDelete">
-        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
         <target state="translated">Musíte zadat aspoň jeden odkaz, který chcete odstranit. Další informace najdete po spuštění příkazu dotnet delete --help.</target>
         <note />
       </trans-unit>
@@ -514,7 +514,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOnePackageReferenceToRemove">
-        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
         <target state="translated">Musíte zadat aspoň jeden odkaz, který chcete odstranit. Další informace najdete po spuštění příkazu dotnet delete --help.</target>
         <note />
       </trans-unit>
@@ -564,12 +564,12 @@
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyNewVersion">
-        <source>Please specify new version of the package.</source>
+        <source>Specify new version of the package.</source>
         <target state="translated">Zadejte prosím novou verzi balíčku.</target>
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyWhichPackageToUpdate">
-        <source>Please specify which package to update.</source>
+        <source>Specify which package to update.</source>
         <target state="translated">Zadejte prosím, jaký balíček chcete aktualizovat.</target>
         <note />
       </trans-unit>
@@ -599,7 +599,7 @@
         <note />
       </trans-unit>
       <trans-unit id="TemplateCreatedSuccessfully">
-        <source>The template {0} created successfully. Please run "dotnet restore" to get started!</source>
+        <source>The template {0} created successfully. run "dotnet restore" to get started!</source>
         <target state="translated">Šablona {0} byla úspěšně vytvořena. Začněte prosím spuštěním příkazu dotnet restore.</target>
         <note />
       </trans-unit>
@@ -619,12 +619,12 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedNameExists">
-        <source>Specified name {0} already exists. Please specify a different name.</source>
+        <source>Specified name {0} already exists. Specify a different name.</source>
         <target state="translated">Zadaný název {0} už existuje. Zadejte prosím jiný název.</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedAliasExists">
-        <source>Specified alias {0} already exists. Please specify a different alias.</source>
+        <source>Specified alias {0} already exists. Specify a different alias.</source>
         <target state="translated">Zadaný alias {0} už existuje. Zadejte prosím jiný alias.</target>
         <note />
       </trans-unit>

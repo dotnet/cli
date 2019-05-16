@@ -16,7 +16,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyExactlyOnePackageReference">
-        <source>Please specify only one package reference to remove.</source>
+        <source>Specify only one package reference to remove.</source>
         <note />
       </trans-unit>
     </body>

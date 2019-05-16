@@ -13,7 +13,7 @@
         <note />
       </trans-unit>
       <trans-unit id="MoreThanOneProjectInDirectory">
-        <source>Found more than one project in `{0}`. Please specify which one to use.</source>
+        <source>Found more than one project in `{0}`. Specify which one to use.</source>
         <target state="translated">`{0}` に複数のプロジェクトが見つかりました。使用するプロジェクトを指定してください。</target>
         <note />
       </trans-unit>
@@ -298,7 +298,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOne">
-        <source>Please specify at least one {0}.</source>
+        <source>Specify at least one {0}.</source>
         <target state="translated">少なくとも 1 つの {0} を指定してください。</target>
         <note />
       </trans-unit>
@@ -393,7 +393,7 @@
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyVersion">
-        <source>Please specify a version of the package.</source>
+        <source>Specify a version of the package.</source>
         <target state="translated">パッケージのバージョンを指定してください。</target>
         <note />
       </trans-unit>
@@ -488,12 +488,12 @@
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyNewVersion">
-        <source>Please specify new version of the package.</source>
+        <source>Specify new version of the package.</source>
         <target state="translated">パッケージの新しいバージョンを指定してください。</target>
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyWhichPackageToUpdate">
-        <source>Please specify which package to update.</source>
+        <source>Specify which package to update.</source>
         <target state="translated">更新するパッケージを指定してください。</target>
         <note />
       </trans-unit>
@@ -523,7 +523,7 @@
         <note />
       </trans-unit>
       <trans-unit id="TemplateCreatedSuccessfully">
-        <source>The template {0} created successfully. Please run "dotnet restore" to get started!</source>
+        <source>The template {0} created successfully. run "dotnet restore" to get started!</source>
         <target state="translated">テンプレート {0} が正常に作成されました。"dotnet restore" を実行して開始してください。</target>
         <note />
       </trans-unit>
@@ -543,12 +543,12 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedNameExists">
-        <source>Specified name {0} already exists. Please specify a different name.</source>
+        <source>Specified name {0} already exists. Specify a different name.</source>
         <target state="translated">指定した名前 {0} は既に存在します。別の名前を指定してください。</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedAliasExists">
-        <source>Specified alias {0} already exists. Please specify a different alias.</source>
+        <source>Specified alias {0} already exists. Specify a different alias.</source>
         <target state="translated">指定したエイリアス {0} は既に存在します。別のエイリアスを指定してください。</target>
         <note />
       </trans-unit>
@@ -568,7 +568,7 @@
         <note />
       </trans-unit>
       <trans-unit id="MoreThanOneSolutionInDirectory">
-        <source>Found more than one solution file in {0}. Please specify which one to use.</source>
+        <source>Found more than one solution file in {0}. Specify which one to use.</source>
         <target state="translated">{0} に複数のソリューションが見つかりました。どれを使用するか指定してください。</target>
         <note />
       </trans-unit>
@@ -588,7 +588,7 @@
         <note />
       </trans-unit>
       <trans-unit id="ProjectNotCompatibleWithFrameworks">
-        <source>Project `{0}` cannot be added due to incompatible targeted frameworks between the two projects. Please review the project you are trying to add and verify that is compatible with the following targets:</source>
+        <source>Project `{0}` cannot be added due to incompatible targeted frameworks between the two projects. Review the project you are trying to add and verify that is compatible with the following targets:</source>
         <target state="translated">2 つのプロジェクト間のターゲット フレームワークに互換性がないため、プロジェクト `{0}` を追加できません。追加しようとしているプロジェクトを確認し、次のターゲットと互換性があることを確認してください:</target>
         <note />
       </trans-unit>
@@ -605,7 +605,7 @@
         <note />
       </trans-unit>
       <trans-unit id="UnsupportedProjectType">
-        <source>Project '{0}' has an unknown project type and cannot be added to the solution file. Please contact your SDK provider for support.</source>
+        <source>Project '{0}' has an unknown project type and cannot be added to the solution file. Contact your SDK provider for support.</source>
         <target state="translated">プロジェクト '{0}' のプロジェクト タイプは不明であるため、ソリューション ファイルに追加することができません。サポートが必要な場合は、SDK プロバイダーにお問い合わせください。</target>
         <note />
       </trans-unit>
@@ -834,22 +834,22 @@ setx PATH "%PATH%;{0}"
         <note />
       </trans-unit>
       <trans-unit id="FormatVersionIsHigher">
-        <source>Format version is higher than supported. This tool may not be supported in this SDK version. Please update your SDK.</source>
+        <source>Format version is higher than supported. This tool may not be supported in this SDK version. Update your SDK.</source>
         <target state="translated">形式のバージョンがサポートされているものを超えています。このツールはこのバージョンの SDK ではサポートされていない可能性があります。SDK を更新してください。</target>
         <note />
       </trans-unit>
       <trans-unit id="FormatVersionIsMalformed">
-        <source>Format version is malformed. This tool may not be supported in this SDK version. Please contact the author of the tool.</source>
+        <source>Format version is malformed. This tool may not be supported in this SDK version. Contact the author of the tool.</source>
         <target state="translated">形式のバージョンが無効です。このツールはこのバージョンの SDK ではサポートされていない可能性があります。ツールの作成者にお問い合わせください。</target>
         <note />
       </trans-unit>
       <trans-unit id="FormatVersionIsMissing">
-        <source>Format version is missing. This tool may not be supported in this SDK version. Please contact the author of the tool.</source>
+        <source>Format version is missing. This tool may not be supported in this SDK version. Contact the author of the tool.</source>
         <target state="translated">形式のバージョンが見つかりません。このツールはこのバージョンの SDK ではサポートされていない可能性があります。ツールの作成者にお問い合わせください。</target>
         <note />
       </trans-unit>
       <trans-unit id="FailedToSetToolsPathEnvironmentVariable">
-        <source>Failed to add '{0}' to the PATH environment variable. Please add this directory to your PATH to use tools installed with 'dotnet tool install'.</source>
+        <source>Failed to add '{0}' to the PATH environment variable. Add this directory to your PATH to use tools installed with 'dotnet tool install'.</source>
         <target state="translated">'{0}' を PATH 環境変数に追加できませんでした。'dotnet tool install' でインストールしたツールを使用するには、このディレクトリを PATH に追加してください。</target>
         <note />
       </trans-unit>
