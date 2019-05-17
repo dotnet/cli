@@ -32,7 +32,7 @@
         <note />
       </trans-unit>
       <trans-unit id="CmdServiceableDescription">
-        <source>Set the serviceable flag in the package. For more information, see https://aka.ms/nupkgservicing.</source>
+        <source>Set the serviceable flag in the package. For more information, please see https://aka.ms/nupkgservicing.</source>
         <note />
       </trans-unit>
       <trans-unit id="CmdArgumentProject">

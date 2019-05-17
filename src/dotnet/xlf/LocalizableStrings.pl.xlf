@@ -9,7 +9,7 @@
         <note />
       </trans-unit>
       <trans-unit id="MoreThanOneProjectInDirectory">
-        <source>Found more than one project in `{0}`. Specify which one to use.</source>
+        <source>Found more than one project in `{0}`. Please specify which one to use.</source>
         <target state="translated">Znaleziono więcej niż jeden projekt w lokalizacji „{0}”. Określ, który ma zostać użyty.</target>
         <note />
       </trans-unit>
@@ -309,7 +309,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOne">
-        <source>Specify at least one {0}.</source>
+        <source>Please specify at least one {0}.</source>
         <target state="translated">Określ co najmniej jeden element {0}.</target>
         <note />
       </trans-unit>
@@ -349,7 +349,7 @@
         <note />
       </trans-unit>
       <trans-unit id="FoundMoreThanOneProjectIn">
-        <source>Found more than one project in `{0}`. Specify which one to use.</source>
+        <source>Found more than one project in `{0}`. Please specify which one to use.</source>
         <target state="translated">Znaleziono więcej niż jeden projekt w lokalizacji „{0}”. Określ, który ma zostać użyty.</target>
         <note />
       </trans-unit>
@@ -374,12 +374,12 @@
         <note />
       </trans-unit>
       <trans-unit id="FoundMoreThanOneSolutionIn">
-        <source>Found more than one solution file in {0}. Specify which one to use.</source>
+        <source>Found more than one solution file in {0}. Please specify which one to use.</source>
         <target state="translated">Znaleziono więcej niż jeden plik rozwiązania w lokalizacji {0}. Określ, który ma zostać użyty.</target>
         <note />
       </trans-unit>
       <trans-unit id="FoundInvalidSolution">
-        <source>The solution file {0} seems to be invalid. Check if it is a valid solution file.</source>
+        <source>The solution file {0} seems to be invalid. Please check if it is a valid solution file.</source>
         <target state="translated">Prawdopodobnie plik rozwiązania {0} jest nieprawidłowy. Sprawdź, czy jest to prawidłowy plik rozwiązania.</target>
         <note />
       </trans-unit>
@@ -399,7 +399,7 @@
         <note />
       </trans-unit>
       <trans-unit id="ReferenceDoesNotExist">
-        <source>Reference {0} does not exist. If you still want to add it, use --force option. Note that this may have adverse effects on the project. </source>
+        <source>Reference {0} does not exist. If you still want to add it, please use --force option. Please note that this may have adverse effects on the project. </source>
         <target state="translated">Odwołanie {0} nie istnieje. Jeśli mimo to chcesz je dodać, użyj opcji --force. Pamiętaj, że może to negatywnie wpłynąć na projekt. </target>
         <note />
       </trans-unit>
@@ -409,7 +409,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToAdd">
-        <source>You must specify at least one reference to add. run dotnet add --help for more information.</source>
+        <source>You must specify at least one reference to add. Please run dotnet add --help for more information.</source>
         <target state="translated">Musisz określić co najmniej jedno odwołanie do dodania. Uruchom polecenie dotnet add --help, aby uzyskać więcej informacji.</target>
         <note />
       </trans-unit>
@@ -434,7 +434,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOnePackageReferenceToAdd">
-        <source>You must specify at least one reference to add. run dotnet add --help for more information.</source>
+        <source>You must specify at least one reference to add. Please run dotnet add --help for more information.</source>
         <target state="translated">Musisz określić co najmniej jedno odwołanie do dodania. Uruchom polecenie dotnet add --help, aby uzyskać więcej informacji.</target>
         <note />
       </trans-unit>
@@ -449,7 +449,7 @@
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyVersion">
-        <source>Specify a version of the package.</source>
+        <source>Please specify a version of the package.</source>
         <target state="translated">Określ wersję pakietu.</target>
         <note />
       </trans-unit>
@@ -464,7 +464,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneProjectToAdd">
-        <source>You must specify at least one project to add. run dotnet add --help for more information.</source>
+        <source>You must specify at least one project to add. Please run dotnet add --help for more information.</source>
         <target state="translated">Musisz określić co najmniej jeden projekt do dodania. Uruchom polecenie dotnet add --help, aby uzyskać więcej informacji.</target>
         <note />
       </trans-unit>
@@ -489,7 +489,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToRemove">
-        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
         <target state="translated">Musisz określić co najmniej jedno odwołanie do usunięcia. Uruchom polecenie dotnet delete --help, aby uzyskać więcej informacji.</target>
         <note />
       </trans-unit>
@@ -499,7 +499,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToDelete">
-        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
         <target state="translated">Musisz określić co najmniej jedno odwołanie do usunięcia. Uruchom polecenie dotnet delete --help, aby uzyskać więcej informacji.</target>
         <note />
       </trans-unit>
@@ -514,7 +514,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOnePackageReferenceToRemove">
-        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
         <target state="translated">Musisz określić co najmniej jedno odwołanie do usunięcia. Uruchom polecenie dotnet delete --help, aby uzyskać więcej informacji.</target>
         <note />
       </trans-unit>
@@ -564,12 +564,12 @@
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyNewVersion">
-        <source>Specify new version of the package.</source>
+        <source>Please specify new version of the package.</source>
         <target state="translated">Określ nową wersję pakietu.</target>
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyWhichPackageToUpdate">
-        <source>Specify which package to update.</source>
+        <source>Please specify which package to update.</source>
         <target state="translated">Określ, który pakiet ma zostać zaktualizowany.</target>
         <note />
       </trans-unit>
@@ -599,7 +599,7 @@
         <note />
       </trans-unit>
       <trans-unit id="TemplateCreatedSuccessfully">
-        <source>The template {0} created successfully. run "dotnet restore" to get started!</source>
+        <source>The template {0} created successfully. Please run "dotnet restore" to get started!</source>
         <target state="translated">Pomyślnie utworzono szablon {0}. Uruchom polecenie „dotnet restore”, aby rozpocząć pracę.</target>
         <note />
       </trans-unit>
@@ -619,12 +619,12 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedNameExists">
-        <source>Specified name {0} already exists. Specify a different name.</source>
+        <source>Specified name {0} already exists. Please specify a different name.</source>
         <target state="translated">Podana nazwa {0} już istnieje. Podaj inną nazwę.</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedAliasExists">
-        <source>Specified alias {0} already exists. Specify a different alias.</source>
+        <source>Specified alias {0} already exists. Please specify a different alias.</source>
         <target state="translated">Podany alias {0} już istnieje. Podaj inny alias.</target>
         <note />
       </trans-unit>

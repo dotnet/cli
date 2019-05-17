@@ -13,7 +13,7 @@
         <note />
       </trans-unit>
       <trans-unit id="MoreThanOneProjectInDirectory">
-        <source>Found more than one project in `{0}`. Specify which one to use.</source>
+        <source>Found more than one project in `{0}`. Please specify which one to use.</source>
         <target state="translated">Znaleziono więcej niż jeden projekt w lokalizacji „{0}”. Określ, który ma zostać użyty.</target>
         <note />
       </trans-unit>
@@ -298,7 +298,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOne">
-        <source>Specify at least one {0}.</source>
+        <source>Please specify at least one {0}.</source>
         <target state="translated">Określ co najmniej jeden element {0}.</target>
         <note />
       </trans-unit>
@@ -393,7 +393,7 @@
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyVersion">
-        <source>Specify a version of the package.</source>
+        <source>Please specify a version of the package.</source>
         <target state="translated">Określ wersję pakietu.</target>
         <note />
       </trans-unit>
@@ -488,12 +488,12 @@
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyNewVersion">
-        <source>Specify new version of the package.</source>
+        <source>Please specify new version of the package.</source>
         <target state="translated">Określ nową wersję pakietu.</target>
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyWhichPackageToUpdate">
-        <source>Specify which package to update.</source>
+        <source>Please specify which package to update.</source>
         <target state="translated">Określ, który pakiet ma zostać zaktualizowany.</target>
         <note />
       </trans-unit>
@@ -523,7 +523,7 @@
         <note />
       </trans-unit>
       <trans-unit id="TemplateCreatedSuccessfully">
-        <source>The template {0} created successfully. run "dotnet restore" to get started!</source>
+        <source>The template {0} created successfully. Please run "dotnet restore" to get started!</source>
         <target state="translated">Pomyślnie utworzono szablon {0}. Uruchom polecenie „dotnet restore”, aby rozpocząć pracę.</target>
         <note />
       </trans-unit>
@@ -543,12 +543,12 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedNameExists">
-        <source>Specified name {0} already exists. Specify a different name.</source>
+        <source>Specified name {0} already exists. Please specify a different name.</source>
         <target state="translated">Podana nazwa {0} już istnieje. Podaj inną nazwę.</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedAliasExists">
-        <source>Specified alias {0} already exists. Specify a different alias.</source>
+        <source>Specified alias {0} already exists. Please specify a different alias.</source>
         <target state="translated">Podany alias {0} już istnieje. Podaj inny alias.</target>
         <note />
       </trans-unit>
@@ -568,7 +568,7 @@
         <note />
       </trans-unit>
       <trans-unit id="MoreThanOneSolutionInDirectory">
-        <source>Found more than one solution file in {0}. Specify which one to use.</source>
+        <source>Found more than one solution file in {0}. Please specify which one to use.</source>
         <target state="translated">Znaleziono więcej niż jeden plik rozwiązania w lokalizacji {0}. Określ, który ma zostać użyty.</target>
         <note />
       </trans-unit>
@@ -588,7 +588,7 @@
         <note />
       </trans-unit>
       <trans-unit id="ProjectNotCompatibleWithFrameworks">
-        <source>Project `{0}` cannot be added due to incompatible targeted frameworks between the two projects. Review the project you are trying to add and verify that is compatible with the following targets:</source>
+        <source>Project `{0}` cannot be added due to incompatible targeted frameworks between the two projects. Please review the project you are trying to add and verify that is compatible with the following targets:</source>
         <target state="translated">Nie można dodać projektu „{0}” z powodu niezgodnych platform docelowych dwóch projektów. Sprawdź projekt, który próbujesz dodać, i zweryfikuj, czy jest zgodny z następującymi platformami docelowymi:</target>
         <note />
       </trans-unit>
@@ -605,7 +605,7 @@
         <note />
       </trans-unit>
       <trans-unit id="UnsupportedProjectType">
-        <source>Project '{0}' has an unknown project type and cannot be added to the solution file. Contact your SDK provider for support.</source>
+        <source>Project '{0}' has an unknown project type and cannot be added to the solution file. Please contact your SDK provider for support.</source>
         <target state="translated">Projekt „{0}” ma nieznany typ projektu i nie można go dodać do pliku rozwiązania. Skontaktuj się z dostawcą zestawu SDK w celu uzyskania pomocy technicznej.</target>
         <note />
       </trans-unit>
@@ -834,22 +834,22 @@ setx PATH "%PATH%;{0}"
         <note />
       </trans-unit>
       <trans-unit id="FormatVersionIsHigher">
-        <source>Format version is higher than supported. This tool may not be supported in this SDK version. Update your SDK.</source>
+        <source>Format version is higher than supported. This tool may not be supported in this SDK version. Please update your SDK.</source>
         <target state="translated">Wersja formatu jest nowsza niż obsługiwana. To narzędzie może nie być obsługiwane w tej wersji zestawu SDK. Zaktualizuj zestaw SDK.</target>
         <note />
       </trans-unit>
       <trans-unit id="FormatVersionIsMalformed">
-        <source>Format version is malformed. This tool may not be supported in this SDK version. Contact the author of the tool.</source>
+        <source>Format version is malformed. This tool may not be supported in this SDK version. Please contact the author of the tool.</source>
         <target state="translated">Wersja formatu jest nieprawidłowo sformułowana. To narzędzie może nie być obsługiwane w tej wersji zestawu SDK. Skontaktuj się z autorem narzędzia.</target>
         <note />
       </trans-unit>
       <trans-unit id="FormatVersionIsMissing">
-        <source>Format version is missing. This tool may not be supported in this SDK version. Contact the author of the tool.</source>
+        <source>Format version is missing. This tool may not be supported in this SDK version. Please contact the author of the tool.</source>
         <target state="translated">Brak wersji formatu. To narzędzie może nie być obsługiwane w tej wersji zestawu SDK. Skontaktuj się z autorem narzędzia.</target>
         <note />
       </trans-unit>
       <trans-unit id="FailedToSetToolsPathEnvironmentVariable">
-        <source>Failed to add '{0}' to the PATH environment variable. Add this directory to your PATH to use tools installed with 'dotnet tool install'.</source>
+        <source>Failed to add '{0}' to the PATH environment variable. Please add this directory to your PATH to use tools installed with 'dotnet tool install'.</source>
         <target state="translated">Nie można dodać katalogu „{0}” do zmiennej środowiskowej PATH. Dodaj ten katalog do zmiennej PATH, aby używać narzędzi zainstalowanych za pomocą polecenia „dotnet tool install”.</target>
         <note />
       </trans-unit>

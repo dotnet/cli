@@ -9,7 +9,7 @@
         <note />
       </trans-unit>
       <trans-unit id="MoreThanOneProjectInDirectory">
-        <source>Found more than one project in `{0}`. Specify which one to use.</source>
+        <source>Found more than one project in `{0}`. Please specify which one to use.</source>
         <target state="translated">'{0}'에서 프로젝트를 두 개 이상 찾았습니다. 사용할 프로젝트를 지정하세요.</target>
         <note />
       </trans-unit>
@@ -309,7 +309,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOne">
-        <source>Specify at least one {0}.</source>
+        <source>Please specify at least one {0}.</source>
         <target state="translated">{0}을(를) 하나 이상 지정하세요.</target>
         <note />
       </trans-unit>
@@ -349,7 +349,7 @@
         <note />
       </trans-unit>
       <trans-unit id="FoundMoreThanOneProjectIn">
-        <source>Found more than one project in `{0}`. Specify which one to use.</source>
+        <source>Found more than one project in `{0}`. Please specify which one to use.</source>
         <target state="translated">'{0}'에서 프로젝트를 두 개 이상 찾았습니다. 사용할 프로젝트를 지정하세요.</target>
         <note />
       </trans-unit>
@@ -374,12 +374,12 @@
         <note />
       </trans-unit>
       <trans-unit id="FoundMoreThanOneSolutionIn">
-        <source>Found more than one solution file in {0}. Specify which one to use.</source>
+        <source>Found more than one solution file in {0}. Please specify which one to use.</source>
         <target state="translated">{0}에서 솔루션 파일을 두 개 이상 찾았습니다. 사용할 파일을 지정하세요.</target>
         <note />
       </trans-unit>
       <trans-unit id="FoundInvalidSolution">
-        <source>The solution file {0} seems to be invalid. Check if it is a valid solution file.</source>
+        <source>The solution file {0} seems to be invalid. Please check if it is a valid solution file.</source>
         <target state="translated">솔루션 파일 {0}이(가) 잘못된 것 같습니다. 올바른 솔루션 파일인지 확인하세요.</target>
         <note />
       </trans-unit>
@@ -399,7 +399,7 @@
         <note />
       </trans-unit>
       <trans-unit id="ReferenceDoesNotExist">
-        <source>Reference {0} does not exist. If you still want to add it, use --force option. Note that this may have adverse effects on the project. </source>
+        <source>Reference {0} does not exist. If you still want to add it, please use --force option. Please note that this may have adverse effects on the project. </source>
         <target state="translated">{0} 참조가 없습니다. 계속 추가하려면 --force 옵션을 ;사용하세요. 이 경우 프로젝트에 부정적인 영향을 줄 수 있습니다. </target>
         <note />
       </trans-unit>
@@ -409,7 +409,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToAdd">
-        <source>You must specify at least one reference to add. run dotnet add --help for more information.</source>
+        <source>You must specify at least one reference to add. Please run dotnet add --help for more information.</source>
         <target state="translated">추가할 참조를 하나 이상 지정해야 합니다. 자세한 정보를 보려면 dotnet add --help를 실행하세요.</target>
         <note />
       </trans-unit>
@@ -434,7 +434,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOnePackageReferenceToAdd">
-        <source>You must specify at least one reference to add. run dotnet add --help for more information.</source>
+        <source>You must specify at least one reference to add. Please run dotnet add --help for more information.</source>
         <target state="translated">추가할 참조를 하나 이상 지정해야 합니다. 자세한 정보를 보려면 dotnet add --help를 실행하세요.</target>
         <note />
       </trans-unit>
@@ -449,7 +449,7 @@
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyVersion">
-        <source>Specify a version of the package.</source>
+        <source>Please specify a version of the package.</source>
         <target state="translated">패키지 버전을 지정하세요.</target>
         <note />
       </trans-unit>
@@ -464,7 +464,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneProjectToAdd">
-        <source>You must specify at least one project to add. run dotnet add --help for more information.</source>
+        <source>You must specify at least one project to add. Please run dotnet add --help for more information.</source>
         <target state="translated">추가할 프로젝트를 하나 이상 지정해야 합니다. 자세한 정보를 보려면 dotnet add --help를 실행하세요.</target>
         <note />
       </trans-unit>
@@ -489,7 +489,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToRemove">
-        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
         <target state="translated">삭제할 참조를 하나 이상 지정해야 합니다. 자세한 정보를 보려면 dotnet delete --help를 실행하세요.</target>
         <note />
       </trans-unit>
@@ -499,7 +499,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToDelete">
-        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
         <target state="translated">삭제할 참조를 하나 이상 지정해야 합니다. 자세한 정보를 보려면 dotnet delete --help를 실행하세요.</target>
         <note />
       </trans-unit>
@@ -514,7 +514,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOnePackageReferenceToRemove">
-        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
         <target state="translated">삭제할 참조를 하나 이상 지정해야 합니다. 자세한 정보를 보려면 dotnet delete --help를 실행하세요.</target>
         <note />
       </trans-unit>
@@ -564,12 +564,12 @@
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyNewVersion">
-        <source>Specify new version of the package.</source>
+        <source>Please specify new version of the package.</source>
         <target state="translated">패키지의 새 버전을 지정하세요.</target>
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyWhichPackageToUpdate">
-        <source>Specify which package to update.</source>
+        <source>Please specify which package to update.</source>
         <target state="translated">업데이트할 패키지를 지정하세요.</target>
         <note />
       </trans-unit>
@@ -599,7 +599,7 @@
         <note />
       </trans-unit>
       <trans-unit id="TemplateCreatedSuccessfully">
-        <source>The template {0} created successfully. run "dotnet restore" to get started!</source>
+        <source>The template {0} created successfully. Please run "dotnet restore" to get started!</source>
         <target state="translated">{0} 템플릿을 만들었습니다. 시작하려면 "dotnet restore"를 실행하세요.</target>
         <note />
       </trans-unit>
@@ -619,12 +619,12 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedNameExists">
-        <source>Specified name {0} already exists. Specify a different name.</source>
+        <source>Specified name {0} already exists. Please specify a different name.</source>
         <target state="translated">지정한 이름 {0}이(가) 이미 있습니다. 다른 이름을 지정하세요.</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedAliasExists">
-        <source>Specified alias {0} already exists. Specify a different alias.</source>
+        <source>Specified alias {0} already exists. Please specify a different alias.</source>
         <target state="translated">지정한 별칭 {0}이(가) 이미 있습니다. 다른 별칭을 지정하세요.</target>
         <note />
       </trans-unit>

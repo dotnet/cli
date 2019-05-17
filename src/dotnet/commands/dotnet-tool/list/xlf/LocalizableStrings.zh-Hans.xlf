@@ -13,7 +13,7 @@
         <note />
       </trans-unit>
       <trans-unit id="ListToolCommandInvalidGlobalAndLocalAndToolPath">
-        <source>The local option(--local), the global option (--global), the tool path option (--tool-path), can only have one at a time. Specify only one of the options: {0}.</source>
+        <source>The local option(--local), the global option (--global), the tool path option (--tool-path), can only have one at a time. Please specify only one of the options: {0}.</source>
         <target state="translated">本地选项(--local)、全局选项(--global)和工具路径选项(--tool-path)一次只能有一个。请仅指定其中一个选项: {0}。</target>
         <note />
       </trans-unit>
@@ -43,7 +43,7 @@
         <note />
       </trans-unit>
       <trans-unit id="InvalidPackageWarning">
-        <source>Warning: tool package '{0}' is invalid, contact tool author:
+        <source>Warning: tool package '{0}' is invalid, please contact tool author:
 {1}</source>
         <target state="translated">警告: 工具包“{0}”无效。请联系工具作者:
 {1}</target>

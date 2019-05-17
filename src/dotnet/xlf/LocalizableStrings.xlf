@@ -8,7 +8,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="MoreThanOneProjectInDirectory">
-        <source>Found more than one project in `{0}`. Specify which one to use.</source>
+        <source>Found more than one project in `{0}`. Please specify which one to use.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="ProjectAlreadyHasAreference">
@@ -248,7 +248,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOne">
-        <source>Specify at least one {0}.</source>
+        <source>Please specify at least one {0}.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="CouldNotConnectWithTheServer">
@@ -280,7 +280,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="FoundMoreThanOneProjectIn">
-        <source>Found more than one project in `{0}`. Specify which one to use.</source>
+        <source>Found more than one project in `{0}`. Please specify which one to use.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="FoundInvalidProject">
@@ -300,11 +300,11 @@
         <note></note>
       </trans-unit>
       <trans-unit id="FoundMoreThanOneSolutionIn">
-        <source>Found more than one solution file in {0}. Specify which one to use.</source>
+        <source>Found more than one solution file in {0}. Please specify which one to use.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="FoundInvalidSolution">
-        <source>The solution file {0} seems to be invalid. Check if it is a valid solution file.</source>
+        <source>The solution file {0} seems to be invalid. Please check if it is a valid solution file.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidSolution">
@@ -320,7 +320,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="ReferenceDoesNotExist">
-        <source>Reference {0} does not exist. If you still want to add it, use --force option. Note that this may have adverse effects on the project. </source>
+        <source>Reference {0} does not exist. If you still want to add it, please use --force option. Please note that this may have adverse effects on the project. </source>
         <note></note>
       </trans-unit>
       <trans-unit id="ReferenceIsInvalid">
@@ -328,7 +328,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToAdd">
-        <source>You must specify at least one reference to add. run dotnet add --help for more information.</source>
+        <source>You must specify at least one reference to add. Please run dotnet add --help for more information.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="ReferenceAddedToTheProject">
@@ -348,7 +348,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOnePackageReferenceToAdd">
-        <source>You must specify at least one reference to add. run dotnet add --help for more information.</source>
+        <source>You must specify at least one reference to add. Please run dotnet add --help for more information.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="PackageReferenceAddedToTheProject">
@@ -360,7 +360,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="PleaseSpecifyVersion">
-        <source>Specify a version of the package.</source>
+        <source>Please specify a version of the package.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="ProjectDoesNotExist">
@@ -372,7 +372,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneProjectToAdd">
-        <source>You must specify at least one project to add. run dotnet add --help for more information.</source>
+        <source>You must specify at least one project to add. Please run dotnet add --help for more information.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="ProjectAddedToTheSolution">
@@ -392,7 +392,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToRemove">
-        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="ReferenceDeleted">
@@ -400,7 +400,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToDelete">
-        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="PackageReferenceNotFoundInTheProject">
@@ -412,7 +412,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOnePackageReferenceToRemove">
-        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="PackageReferenceDeleted">
@@ -452,11 +452,11 @@
         <note></note>
       </trans-unit>
       <trans-unit id="PleaseSpecifyNewVersion">
-        <source>Specify new version of the package.</source>
+        <source>Please specify new version of the package.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="PleaseSpecifyWhichPackageToUpdate">
-        <source>Specify which package to update.</source>
+        <source>Please specify which package to update.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="NothingToUpdate">
@@ -480,7 +480,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="TemplateCreatedSuccessfully">
-        <source>The template {0} created successfully. run "dotnet restore" to get started!</source>
+        <source>The template {0} created successfully. Please run "dotnet restore" to get started!</source>
         <note></note>
       </trans-unit>
       <trans-unit id="TemplateInstalledSuccesfully">
@@ -496,11 +496,11 @@
         <note></note>
       </trans-unit>
       <trans-unit id="SpecifiedNameExists">
-        <source>Specified name {0} already exists. Specify a different name.</source>
+        <source>Specified name {0} already exists. Please specify a different name.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="SpecifiedAliasExists">
-        <source>Specified alias {0} already exists. Specify a different alias.</source>
+        <source>Specified alias {0} already exists. Please specify a different alias.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="MandatoryParameterMissing">

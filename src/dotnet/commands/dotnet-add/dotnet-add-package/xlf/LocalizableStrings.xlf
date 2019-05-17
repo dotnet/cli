@@ -12,7 +12,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyExactlyOnePackageReference">
-        <source>Specify one package reference to add.</source>
+        <source>Please specify one package reference to add.</source>
         <note />
       </trans-unit>
       <trans-unit id="CmdFrameworkDescription">

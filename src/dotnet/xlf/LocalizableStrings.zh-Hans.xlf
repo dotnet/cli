@@ -9,7 +9,7 @@
         <note />
       </trans-unit>
       <trans-unit id="MoreThanOneProjectInDirectory">
-        <source>Found more than one project in `{0}`. Specify which one to use.</source>
+        <source>Found more than one project in `{0}`. Please specify which one to use.</source>
         <target state="translated">“{0}”中找到多个项目。请指定使用哪一个。</target>
         <note />
       </trans-unit>
@@ -309,7 +309,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOne">
-        <source>Specify at least one {0}.</source>
+        <source>Please specify at least one {0}.</source>
         <target state="translated">请至少指定一个 {0}。</target>
         <note />
       </trans-unit>
@@ -349,7 +349,7 @@
         <note />
       </trans-unit>
       <trans-unit id="FoundMoreThanOneProjectIn">
-        <source>Found more than one project in `{0}`. Specify which one to use.</source>
+        <source>Found more than one project in `{0}`. Please specify which one to use.</source>
         <target state="translated">“{0}”中找到多个项目。请指定使用哪一个。</target>
         <note />
       </trans-unit>
@@ -374,12 +374,12 @@
         <note />
       </trans-unit>
       <trans-unit id="FoundMoreThanOneSolutionIn">
-        <source>Found more than one solution file in {0}. Specify which one to use.</source>
+        <source>Found more than one solution file in {0}. Please specify which one to use.</source>
         <target state="translated">在 {0} 中找到多个解决方案文件。请指定使用哪一个。</target>
         <note />
       </trans-unit>
       <trans-unit id="FoundInvalidSolution">
-        <source>The solution file {0} seems to be invalid. Check if it is a valid solution file.</source>
+        <source>The solution file {0} seems to be invalid. Please check if it is a valid solution file.</source>
         <target state="translated">解决方案文件 {0} 似乎无效。请检查它是否是有效的解决方案文件。</target>
         <note />
       </trans-unit>
@@ -399,7 +399,7 @@
         <note />
       </trans-unit>
       <trans-unit id="ReferenceDoesNotExist">
-        <source>Reference {0} does not exist. If you still want to add it, use --force option. Note that this may have adverse effects on the project. </source>
+        <source>Reference {0} does not exist. If you still want to add it, please use --force option. Please note that this may have adverse effects on the project. </source>
         <target state="translated">引用 {0} 不存在。如果仍想添加它，请使用 --force 选项。请注意，这可能会对项目产生负面影响。 </target>
         <note />
       </trans-unit>
@@ -409,7 +409,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToAdd">
-        <source>You must specify at least one reference to add. run dotnet add --help for more information.</source>
+        <source>You must specify at least one reference to add. Please run dotnet add --help for more information.</source>
         <target state="translated">必须至少指定一个要添加的引用。请运行 dotnet add --help，获取更多信息。</target>
         <note />
       </trans-unit>
@@ -434,7 +434,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOnePackageReferenceToAdd">
-        <source>You must specify at least one reference to add. run dotnet add --help for more information.</source>
+        <source>You must specify at least one reference to add. Please run dotnet add --help for more information.</source>
         <target state="translated">必须至少指定一个要添加的引用。请运行 dotnet add --help，获取更多信息。</target>
         <note />
       </trans-unit>
@@ -449,7 +449,7 @@
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyVersion">
-        <source>Specify a version of the package.</source>
+        <source>Please specify a version of the package.</source>
         <target state="translated">请指定包的版本。</target>
         <note />
       </trans-unit>
@@ -464,7 +464,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneProjectToAdd">
-        <source>You must specify at least one project to add. run dotnet add --help for more information.</source>
+        <source>You must specify at least one project to add. Please run dotnet add --help for more information.</source>
         <target state="translated">必须至少指定一个要添加的项目。请运行 dotnet add --help，获取更多信息。</target>
         <note />
       </trans-unit>
@@ -489,7 +489,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToRemove">
-        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
         <target state="translated">必须至少指定一个要删除的引用。请运行 dotnet delete --help，获取更多信息。</target>
         <note />
       </trans-unit>
@@ -499,7 +499,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToDelete">
-        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
         <target state="translated">必须至少指定一个要删除的引用。请运行 dotnet delete --help，获取更多信息。</target>
         <note />
       </trans-unit>
@@ -514,7 +514,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOnePackageReferenceToRemove">
-        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
         <target state="translated">必须至少指定一个要删除的引用。请运行 dotnet delete --help，获取更多信息。</target>
         <note />
       </trans-unit>
@@ -564,12 +564,12 @@
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyNewVersion">
-        <source>Specify new version of the package.</source>
+        <source>Please specify new version of the package.</source>
         <target state="translated">请指定包的新版本。</target>
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyWhichPackageToUpdate">
-        <source>Specify which package to update.</source>
+        <source>Please specify which package to update.</source>
         <target state="translated">请指定要更新的包。</target>
         <note />
       </trans-unit>
@@ -599,7 +599,7 @@
         <note />
       </trans-unit>
       <trans-unit id="TemplateCreatedSuccessfully">
-        <source>The template {0} created successfully. run "dotnet restore" to get started!</source>
+        <source>The template {0} created successfully. Please run "dotnet restore" to get started!</source>
         <target state="translated">已成功创建模板 {0}。请运行 "dotnet restore" 以开始使用!</target>
         <note />
       </trans-unit>
@@ -619,12 +619,12 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedNameExists">
-        <source>Specified name {0} already exists. Specify a different name.</source>
+        <source>Specified name {0} already exists. Please specify a different name.</source>
         <target state="translated">已存在指定的名称 {0}。请指定不同的名称。</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedAliasExists">
-        <source>Specified alias {0} already exists. Specify a different alias.</source>
+        <source>Specified alias {0} already exists. Please specify a different alias.</source>
         <target state="translated">已存在指定的别名 {0}。请指定不同的别名。</target>
         <note />
       </trans-unit>

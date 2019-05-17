@@ -18,7 +18,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyExactlyOnePackageReference">
-        <source>Specify only one package reference to remove.</source>
+        <source>Please specify only one package reference to remove.</source>
         <target state="translated">Specificare un solo riferimento al pacchetto da rimuovere.</target>
         <note />
       </trans-unit>

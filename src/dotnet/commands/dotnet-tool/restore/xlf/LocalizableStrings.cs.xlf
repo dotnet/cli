@@ -8,7 +8,7 @@
         <note />
       </trans-unit>
       <trans-unit id="InvalidPackageWarning">
-        <source>Warning: tool package '{0}' is invalid, contact tool author:
+        <source>Warning: tool package '{0}' is invalid, please contact tool author:
 {1}</source>
         <target state="translated">Upozornění: Balíček nástroje {0} je neplatný, obraťte se na autora nástroje:
 {1}</target>

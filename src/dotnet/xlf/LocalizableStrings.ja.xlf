@@ -9,7 +9,7 @@
         <note />
       </trans-unit>
       <trans-unit id="MoreThanOneProjectInDirectory">
-        <source>Found more than one project in `{0}`. Specify which one to use.</source>
+        <source>Found more than one project in `{0}`. Please specify which one to use.</source>
         <target state="translated">`{0}` に複数のプロジェクトが見つかりました。使用するプロジェクトを指定してください。</target>
         <note />
       </trans-unit>
@@ -309,7 +309,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOne">
-        <source>Specify at least one {0}.</source>
+        <source>Please specify at least one {0}.</source>
         <target state="translated">少なくとも 1 つの {0} を指定してください。</target>
         <note />
       </trans-unit>
@@ -349,7 +349,7 @@
         <note />
       </trans-unit>
       <trans-unit id="FoundMoreThanOneProjectIn">
-        <source>Found more than one project in `{0}`. Specify which one to use.</source>
+        <source>Found more than one project in `{0}`. Please specify which one to use.</source>
         <target state="translated">`{0}` に複数のプロジェクトが見つかりました。使用するプロジェクトを指定してください。</target>
         <note />
       </trans-unit>
@@ -374,12 +374,12 @@
         <note />
       </trans-unit>
       <trans-unit id="FoundMoreThanOneSolutionIn">
-        <source>Found more than one solution file in {0}. Specify which one to use.</source>
+        <source>Found more than one solution file in {0}. Please specify which one to use.</source>
         <target state="translated">{0} に複数のソリューションが見つかりました。どれを使用するか指定してください。</target>
         <note />
       </trans-unit>
       <trans-unit id="FoundInvalidSolution">
-        <source>The solution file {0} seems to be invalid. Check if it is a valid solution file.</source>
+        <source>The solution file {0} seems to be invalid. Please check if it is a valid solution file.</source>
         <target state="translated">ソリューション ファイル {0} は無効な可能性があります。有効なソリューション ファイルであるか確認してください。</target>
         <note />
       </trans-unit>
@@ -399,7 +399,7 @@
         <note />
       </trans-unit>
       <trans-unit id="ReferenceDoesNotExist">
-        <source>Reference {0} does not exist. If you still want to add it, use --force option. Note that this may have adverse effects on the project. </source>
+        <source>Reference {0} does not exist. If you still want to add it, please use --force option. Please note that this may have adverse effects on the project. </source>
         <target state="translated">参照 {0} は存在しません。それでも追加したい場合は、--force オプションを使用してください。これにより、プロジェクトに悪影響がある可能性がありますので注意してください。 </target>
         <note />
       </trans-unit>
@@ -409,7 +409,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToAdd">
-        <source>You must specify at least one reference to add. run dotnet add --help for more information.</source>
+        <source>You must specify at least one reference to add. Please run dotnet add --help for more information.</source>
         <target state="translated">追加する参照を少なくとも 1 つ指定する必要があります。詳細については、dotnet add --help を実行してください。</target>
         <note />
       </trans-unit>
@@ -434,7 +434,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOnePackageReferenceToAdd">
-        <source>You must specify at least one reference to add. run dotnet add --help for more information.</source>
+        <source>You must specify at least one reference to add. Please run dotnet add --help for more information.</source>
         <target state="translated">追加する参照を少なくとも 1 つ指定する必要があります。詳細については、dotnet add --help を実行してください。</target>
         <note />
       </trans-unit>
@@ -449,7 +449,7 @@
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyVersion">
-        <source>Specify a version of the package.</source>
+        <source>Please specify a version of the package.</source>
         <target state="translated">パッケージのバージョンを指定してください。</target>
         <note />
       </trans-unit>
@@ -464,7 +464,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneProjectToAdd">
-        <source>You must specify at least one project to add. run dotnet add --help for more information.</source>
+        <source>You must specify at least one project to add. Please run dotnet add --help for more information.</source>
         <target state="translated">追加するプロジェクトを少なくとも 1 つ指定する必要があります。詳細については、dotnet add --help を実行してください。</target>
         <note />
       </trans-unit>
@@ -489,7 +489,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToRemove">
-        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
         <target state="translated">削除する参照を少なくとも 1 つ指定する必要があります。詳細については、dotnet delete --help を実行してください。</target>
         <note />
       </trans-unit>
@@ -499,7 +499,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOneReferenceToDelete">
-        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
         <target state="translated">削除する参照を少なくとも 1 つ指定する必要があります。詳細については、dotnet delete --help を実行してください。</target>
         <note />
       </trans-unit>
@@ -514,7 +514,7 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifyAtLeastOnePackageReferenceToRemove">
-        <source>You must specify at least one reference to delete. run dotnet delete --help for more information.</source>
+        <source>You must specify at least one reference to delete. Please run dotnet delete --help for more information.</source>
         <target state="translated">削除する参照を少なくとも 1 つ指定する必要があります。詳細については、dotnet delete --help を実行してください。</target>
         <note />
       </trans-unit>
@@ -564,12 +564,12 @@
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyNewVersion">
-        <source>Specify new version of the package.</source>
+        <source>Please specify new version of the package.</source>
         <target state="translated">パッケージの新しいバージョンを指定してください。</target>
         <note />
       </trans-unit>
       <trans-unit id="PleaseSpecifyWhichPackageToUpdate">
-        <source>Specify which package to update.</source>
+        <source>Please specify which package to update.</source>
         <target state="translated">更新するパッケージを指定してください。</target>
         <note />
       </trans-unit>
@@ -599,7 +599,7 @@
         <note />
       </trans-unit>
       <trans-unit id="TemplateCreatedSuccessfully">
-        <source>The template {0} created successfully. run "dotnet restore" to get started!</source>
+        <source>The template {0} created successfully. Please run "dotnet restore" to get started!</source>
         <target state="translated">テンプレート {0} が正常に作成されました。"dotnet restore" を実行して開始してください。</target>
         <note />
       </trans-unit>
@@ -619,12 +619,12 @@
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedNameExists">
-        <source>Specified name {0} already exists. Specify a different name.</source>
+        <source>Specified name {0} already exists. Please specify a different name.</source>
         <target state="translated">指定した名前 {0} は既に存在します。別の名前を指定してください。</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedAliasExists">
-        <source>Specified alias {0} already exists. Specify a different alias.</source>
+        <source>Specified alias {0} already exists. Please specify a different alias.</source>
         <target state="translated">指定したエイリアス {0} は既に存在します。別のエイリアスを指定してください。</target>
         <note />
       </trans-unit>
