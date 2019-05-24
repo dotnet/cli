@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.InstallationScript.Tests
         [InlineData("-nocdn", "")]
         [InlineData("-azurefeed", "https://dotnetcli.azureedge.net/dotnet")]
         [InlineData("-uncachedfeed", "https://dotnetcli.blob.core.windows.net/dotnet")]
-        public void WhenVariousParametersArePassedToBashshellInstallScripts(string parameter, string value)
+        public void WhenVariousParametersArePassedToInstallScripts(string parameter, string value)
         {
             var args = new List<string> { "-dryrun", parameter };
             if (!string.IsNullOrEmpty(value))
@@ -45,9 +45,68 @@ namespace Microsoft.DotNet.InstallationScript.Tests
 
             //  Non-dynamic input parameters should always be on the ouput line
             commandResult.Should().HaveStdOutContainingIgnoreCase(parameter);
-
         }
 
+        [Theory]
+        [InlineData("-runtime dotnet", "dotnet")]
+        [InlineData("-runtime aspnetcore", "aspnetcore")]
+        [InlineData("-sharedruntime", "dotnet")]
+        public void WhenRuntimeParametersArePassedToInstallScripts(string runtimeParameters, string resolvedRuntimeType)
+        {
+            var args = new List<string> { "-dryrun", runtimeParameters };
+
+            var commandResult = CreateInstallCommand(args)
+                            .CaptureStdOut()
+                            .CaptureStdErr()
+                            .Execute();
+
+            Console.WriteLine(commandResult.StdOut);
+
+            //  Standard 'dryrun' criterium
+            commandResult.Should().Pass();
+            commandResult.Should().NotHaveStdOutContaining("dryrun");
+            commandResult.Should().HaveStdOutContaining("Repeatable invocation:");
+
+            //  Runtime should resolve to the correct 'type'
+            commandResult.Should().HaveStdOutContainingIgnoreCase("-runtime");
+            commandResult.Should().HaveStdOutContainingIgnoreCase(resolvedRuntimeType);
+        }
+
+        [Theory]
+        [InlineData("1.0", "dotnet")]
+        [InlineData("1.1", "dotnet")]
+        [InlineData("2.0", "dotnet")]
+        [InlineData("2.2", "dotnet")]
+        [InlineData("Current", "dotnet")]
+        [InlineData("LTS", "dotnet")]
+        [InlineData("master", "dotnet")]
+        [InlineData("release/2.1", "dotnet")]
+        [InlineData("release /2.2", "dotnet")]
+        [InlineData("release /3.0", "dotnet")]
+        [InlineData("Current", "aspnetcore")]
+        [InlineData("LTS", "aspnetcore")]
+        [InlineData("master", "aspnetcore")]
+        [InlineData("release/2.1", "aspnetcore")]
+        [InlineData("release /2.2", "aspnetcore")]
+        public void WhenChannelResolvesToASpecificRuntimeVersion(string channel, string runtimeType)
+        {
+            var args = new string[] { "-dryrun", "-channel", channel, "-runtime", runtimeType };
+
+            var commandResult = CreateInstallCommand(args)
+                            .CaptureStdOut()
+                            .CaptureStdErr()
+                            .Execute();
+
+            Console.WriteLine(commandResult.StdOut);
+
+            //  Standard 'dryrun' criterium
+            commandResult.Should().Pass();
+            commandResult.Should().NotHaveStdOutContaining("dryrun");
+            commandResult.Should().HaveStdOutContaining("Repeatable invocation:");
+
+            //  Channel should be translated to a specific Runtime version
+            commandResult.Should().HaveStdOutContainingIgnoreCase("-version");
+        }
 
         [Theory]
         [InlineData("1.0")]
@@ -75,7 +134,7 @@ namespace Microsoft.DotNet.InstallationScript.Tests
         [InlineData("release/2.2.3xx")]
         [InlineData("release/2.2.4xx")]
         [InlineData("release/3.0.1xx")]
-        public void WhenChannelResolvesToASpecificVersion(string channel)
+        public void WhenChannelResolvesToASpecificSDKVersion(string channel)
         {
             var args = new string[] { "-dryrun", "-channel", channel };
 
@@ -91,11 +150,9 @@ namespace Microsoft.DotNet.InstallationScript.Tests
             commandResult.Should().NotHaveStdOutContaining("dryrun");
             commandResult.Should().HaveStdOutContaining("Repeatable invocation:");
 
-            //  Channel should be translated to a specific version
-            commandResult.Should().HaveStdOutContainingIgnoreCase("version");
-
+            //  Channel should be translated to a specific SDK version
+            commandResult.Should().HaveStdOutContainingIgnoreCase("-version");
         }
-
 
         private static Command CreateInstallCommand(IEnumerable<string> args)
         {
