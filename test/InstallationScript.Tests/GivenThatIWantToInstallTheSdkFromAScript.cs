@@ -36,8 +36,6 @@ namespace Microsoft.DotNet.InstallationScript.Tests
                             .CaptureStdErr()
                             .Execute();
 
-            Console.WriteLine(commandResult.StdOut);
-
             //  Standard 'dryrun' criterium
             commandResult.Should().Pass();
             commandResult.Should().NotHaveStdOutContaining("dryrun");
@@ -59,8 +57,6 @@ namespace Microsoft.DotNet.InstallationScript.Tests
                             .CaptureStdOut()
                             .CaptureStdErr()
                             .Execute();
-
-            Console.WriteLine(commandResult.StdOut);
 
             //  Standard 'dryrun' criterium
             commandResult.Should().Pass();
@@ -96,8 +92,6 @@ namespace Microsoft.DotNet.InstallationScript.Tests
                             .CaptureStdOut()
                             .CaptureStdErr()
                             .Execute();
-
-            Console.WriteLine(commandResult.StdOut);
 
             //  Standard 'dryrun' criterium
             commandResult.Should().Pass();
@@ -142,8 +136,6 @@ namespace Microsoft.DotNet.InstallationScript.Tests
                             .CaptureStdOut()
                             .CaptureStdErr()
                             .Execute();
-
-            Console.WriteLine(commandResult.StdOut);
 
             //  Standard 'dryrun' criterium
             commandResult.Should().Pass();
