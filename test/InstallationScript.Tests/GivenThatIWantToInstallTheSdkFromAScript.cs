@@ -46,12 +46,16 @@ namespace Microsoft.DotNet.InstallationScript.Tests
         }
 
         [Theory]
-        [InlineData("-runtime dotnet", "dotnet")]
-        [InlineData("-runtime aspnetcore", "aspnetcore")]
+        [InlineData("-runtime", "dotnet")]
+        [InlineData("-runtime", "aspnetcore")]
         [InlineData("-sharedruntime", "dotnet")]
-        public void WhenRuntimeParametersArePassedToInstallScripts(string runtimeParameters, string resolvedRuntimeType)
+        public void WhenRuntimeParametersArePassedToInstallScripts(string runtime, string runtimeType)
         {
-            var args = new List<string> { "-dryrun", runtimeParameters };
+            var args = new List<string> { "-dryrun", runtime };
+            if (!runtime.Equals("-sharedruntime", StringComparison.OrdinalIgnoreCase))
+            {
+                args.Add(runtimeType);
+            }
 
             var commandResult = CreateInstallCommand(args)
                             .CaptureStdOut()
@@ -65,7 +69,7 @@ namespace Microsoft.DotNet.InstallationScript.Tests
 
             //  Runtime should resolve to the correct 'type'
             commandResult.Should().HaveStdOutContainingIgnoreCase("-runtime");
-            commandResult.Should().HaveStdOutContainingIgnoreCase(resolvedRuntimeType);
+            commandResult.Should().HaveStdOutContainingIgnoreCase(runtimeType);
         }
 
         [Theory]
@@ -77,13 +81,13 @@ namespace Microsoft.DotNet.InstallationScript.Tests
         [InlineData("LTS", "dotnet")]
         [InlineData("master", "dotnet")]
         [InlineData("release/2.1", "dotnet")]
-        [InlineData("release /2.2", "dotnet")]
-        [InlineData("release /3.0", "dotnet")]
+        [InlineData("release/2.2", "dotnet")]
+        [InlineData("release/3.0", "dotnet")]
         [InlineData("Current", "aspnetcore")]
         [InlineData("LTS", "aspnetcore")]
         [InlineData("master", "aspnetcore")]
         [InlineData("release/2.1", "aspnetcore")]
-        [InlineData("release /2.2", "aspnetcore")]
+        [InlineData("release/2.2", "aspnetcore")]
         public void WhenChannelResolvesToASpecificRuntimeVersion(string channel, string runtimeType)
         {
             var args = new string[] { "-dryrun", "-channel", channel, "-runtime", runtimeType };
