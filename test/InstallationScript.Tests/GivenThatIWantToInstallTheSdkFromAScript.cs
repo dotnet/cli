@@ -17,13 +17,12 @@ namespace Microsoft.DotNet.InstallationScript.Tests
     public class GivenThatIWantToInstallTheSdkFromAScript : TestBase
     {
 
-        [WindowsOnlyTheoryAttribute]
-        [InlineData("-NoPath", "")]
-        [InlineData("-Verbose", "")]
-        [InlineData("-NoCdn", "")]
-        [InlineData("-ProxyUseDefaultCredentials", "")]
-        [InlineData("-AzureFeed", "https://dotnetcli.azureedge.net/dotnet")]
-        [InlineData("-UncachedFeed", "https://dotnetcli.blob.core.windows.net/dotnet")]
+        [Theory]
+        [InlineData("-nopath", "")]
+        [InlineData("-verbose", "")]
+        [InlineData("-nocdn", "")]
+        [InlineData("-azurefeed", "https://dotnetcli.azureedge.net/dotnet")]
+        [InlineData("-uncachedfeed", "https://dotnetcli.blob.core.windows.net/dotnet")]
         public void WhenVariousParametersArePassedToBashshellInstallScripts(string parameter, string value)
         {
             var args = new List<string> { "-dryrun", parameter };
@@ -39,7 +38,7 @@ namespace Microsoft.DotNet.InstallationScript.Tests
 
             Console.WriteLine(commandResult.StdOut);
 
-            //  Standard criterium
+            //  Standard 'dryrun' criterium
             commandResult.Should().Pass();
             commandResult.Should().NotHaveStdOutContaining("dryrun");
             commandResult.Should().HaveStdOutContaining("Repeatable invocation:");
@@ -50,39 +49,7 @@ namespace Microsoft.DotNet.InstallationScript.Tests
         }
 
 
-        [NonWindowsOnlyTheoryAttribute]
-        [InlineData("-no-path", "")]
-        [InlineData("-verbose", "")]
-        [InlineData("-no-cdn", "")]
-        [InlineData("-azure-feed", "https://dotnetcli.azureedge.net/dotnet")]
-        [InlineData("-uncached-feed", "https://dotnetcli.blob.core.windows.net/dotnet")]
-        public void WhenVariousParametersArePassedToPowershellInstallScripts(string parameter, string value)
-        {
-            var args = new List<string> { "-dryrun", parameter };
-            if (!string.IsNullOrEmpty(value))
-            {
-                args.Add(value);
-            }
-
-            var commandResult = CreateInstallCommand(args)
-                            .CaptureStdOut()
-                            .CaptureStdErr()
-                            .Execute();
-
-            Console.WriteLine(commandResult.StdOut);
-
-            //  Standard criterium
-            commandResult.Should().Pass();
-            commandResult.Should().NotHaveStdOutContaining("dryrun");
-            commandResult.Should().HaveStdOutContaining("Repeatable invocation:");
-
-            //  Non-dynamic input parameters should always be on the ouput line
-            commandResult.Should().HaveStdOutContainingIgnoreCase(parameter);
-
-        }
-
-
-        [Theory(Skip = "https://github.com/dotnet/cli/issues/2073")]
+        [Theory]
         [InlineData("1.0")]
         [InlineData("1.1")]
         [InlineData("2.0")]
@@ -119,7 +86,7 @@ namespace Microsoft.DotNet.InstallationScript.Tests
 
             Console.WriteLine(commandResult.StdOut);
 
-            //  Standard criterium
+            //  Standard 'dryrun' criterium
             commandResult.Should().Pass();
             commandResult.Should().NotHaveStdOutContaining("dryrun");
             commandResult.Should().HaveStdOutContaining("Repeatable invocation:");
