@@ -16,6 +16,8 @@ namespace Microsoft.DotNet.InstallationScript.Tests
 {
     public class GivenThatIWantToInstallTheSdkFromAScript : TestBase
     {
+        private readonly string testBranch = "master";
+        private readonly string ciTargetBranch = GetEnvironmentVariable("SYSTEM_PULLREQUEST_TARGETBRANCH");
 
         [Theory]
         [InlineData("-nopath", "")]
@@ -25,6 +27,12 @@ namespace Microsoft.DotNet.InstallationScript.Tests
         [InlineData("-uncachedfeed", "https://dotnetcli.blob.core.windows.net/dotnet")]
         public void WhenVariousParametersArePassedToInstallScripts(string parameter, string value)
         {
+            //  Run these tests only when targeting the master branch
+            if (!ciTargetBranch.Equals(testBranch, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
             var args = new List<string> { "-dryrun", parameter };
             if (!string.IsNullOrEmpty(value))
             {
@@ -51,6 +59,12 @@ namespace Microsoft.DotNet.InstallationScript.Tests
         [InlineData("-sharedruntime", "dotnet")]
         public void WhenRuntimeParametersArePassedToInstallScripts(string runtime, string runtimeType)
         {
+            //  Run these tests only when targeting the master branch
+            if (!ciTargetBranch.Equals(testBranch, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
             var args = new List<string> { "-dryrun", runtime };
             if (!runtime.Equals("-sharedruntime", StringComparison.OrdinalIgnoreCase))
             {
@@ -90,6 +104,12 @@ namespace Microsoft.DotNet.InstallationScript.Tests
         [InlineData("release/2.2", "aspnetcore")]
         public void WhenChannelResolvesToASpecificRuntimeVersion(string channel, string runtimeType)
         {
+            //  Run these tests only when targeting the master branch
+            if (!ciTargetBranch.Equals(testBranch, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
             var args = new string[] { "-dryrun", "-channel", channel, "-runtime", runtimeType };
 
             var commandResult = CreateInstallCommand(args)
@@ -134,6 +154,12 @@ namespace Microsoft.DotNet.InstallationScript.Tests
         [InlineData("release/3.0.1xx")]
         public void WhenChannelResolvesToASpecificSDKVersion(string channel)
         {
+            //  Run these tests only when targeting the master branch
+            if (!ciTargetBranch.Equals(testBranch, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
             var args = new string[] { "-dryrun", "-channel", channel };
 
             var commandResult = CreateInstallCommand(args)
