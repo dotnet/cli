@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.InstallationScript.Tests
     public class GivenThatIWantToInstallTheSdkFromAScript : TestBase
     {
         private static string targetBranch = new EnvironmentProvider().GetEnvironmentVariable("SYSTEM_PULLREQUEST_TARGETBRANCH");
-        private readonly bool targetingMaster = (string.IsNullOrEmpty(targetBranch) && targetBranch.Equals("master", StringComparison.OrdinalIgnoreCase));
+        private readonly bool targetingMaster = (!string.IsNullOrEmpty(targetBranch) && targetBranch.Equals("master", StringComparison.OrdinalIgnoreCase));
         private static string message = "InstallationScript tests are designed to run only in a CI context and only when the PR targets 'master'.";
 
         [Theory]
