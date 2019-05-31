@@ -16,7 +16,8 @@ namespace Microsoft.DotNet.InstallationScript.Tests
 {
     public class GivenThatIWantToInstallTheSdkFromAScript : TestBase
     {
-        private readonly bool targetingMaster = new EnvironmentProvider().GetEnvironmentVariable("SYSTEM_PULLREQUEST_TARGETBRANCH").Equals("master", StringComparison.OrdinalIgnoreCase);
+        private static IEnvironmentProvider env = new EnvironmentProvider();
+        private readonly bool targetingMaster = env.GetEnvironmentVariable("SYSTEM_PULLREQUEST_TARGETBRANCH").Equals("master", StringComparison.OrdinalIgnoreCase);
 
         [Theory]
         [InlineData("-nopath", "")]
