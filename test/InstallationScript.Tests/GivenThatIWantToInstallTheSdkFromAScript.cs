@@ -132,6 +132,7 @@ namespace Microsoft.DotNet.InstallationScript.Tests
         [InlineData("1.1")]
         [InlineData("2.0")]
         [InlineData("2.1")]
+        [InlineData("2.2")]
         [InlineData("Current")]
         [InlineData("LTS")]
         [InlineData("master")]
