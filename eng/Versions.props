@@ -30,7 +30,7 @@
     <MicrosoftTemplateEngineUtilsPackageVersion>$(MicrosoftTemplateEngineCliPackageVersion)</MicrosoftTemplateEngineUtilsPackageVersion>
     <MicrosoftDotNetPlatformAbstractionsPackageVersion>2.2.0-preview1-26620-03</MicrosoftDotNetPlatformAbstractionsPackageVersion>
     <MicrosoftExtensionsDependencyModelPackageVersion>2.2.0-preview1-26620-03</MicrosoftExtensionsDependencyModelPackageVersion>
-    <MicrosoftDotNetCliCommandLinePackageVersion>1.0.0-preview.19306.1</MicrosoftDotNetCliCommandLinePackageVersion>
+    <MicrosoftDotNetCliCommandLinePackageVersion>1.0.0-preview.19313.1</MicrosoftDotNetCliCommandLinePackageVersion>
     <NewtonsoftJsonPackageVersion>10.0.3</NewtonsoftJsonPackageVersion>
     <NuGetBuildTasksPackageVersion>5.2.0-preview2.6020</NuGetBuildTasksPackageVersion>
     <NuGetCommonPackageVersion>$(NuGetBuildTasksPackageVersion)</NuGetCommonPackageVersion>
