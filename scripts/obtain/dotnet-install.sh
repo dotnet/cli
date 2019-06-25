@@ -168,7 +168,7 @@ get_current_os_name() {
         return 0
     elif [ "$uname" = "FreeBSD" ]; then
         echo "freebsd"
-        return 0        
+        return 0
     elif [ "$uname" = "Linux" ]; then
         local linux_platform_name
         linux_platform_name="$(get_linux_platform_name)" || { echo "linux" && return 0 ; }
@@ -228,10 +228,12 @@ check_min_reqs() {
         hasMinimum=true
     elif machine_has "wget"; then
         hasMinimum=true
+    elif machine_has "aria2c"; then
+        hasMinimum=true
     fi
 
     if [ "$hasMinimum" = "false" ]; then
-        say_err "curl (recommended) or wget are required to download dotnet. Install missing prerequisite to proceed."
+        say_err "curl (recommended), wget or aria2 are required to download dotnet. Install missing prerequisite to proceed."
         return 1
     fi
     return 0
@@ -658,7 +660,9 @@ download() {
     fi
 
     local failed=false
-    if machine_has "curl"; then
+    if machine_has "aria2c"; then
+        downloadaria2 "$remote_path" "$out_path" || failed=true
+    elif machine_has "curl"; then
         downloadcurl "$remote_path" "$out_path" || failed=true
     elif machine_has "wget"; then
         downloadwget "$remote_path" "$out_path" || failed=true
@@ -709,6 +713,31 @@ downloadwget() {
     fi
     if [ "$failed" = true ]; then
         say_verbose "Wget download failed"
+        return 1
+    fi
+    return 0
+}
+
+downloadaria2() {
+    eval $invocation
+    local remote_path="$1"
+    local out_path="${2:-}"
+
+    # Append feed_credential as late as possible before calling curl to avoid logging feed_credential
+    remote_path="${remote_path}${feed_credential}"
+
+    local failed=false
+    if [ -z "$out_path" ]; then
+        local aria2c_temp=$(mktemp -d)
+        (cd "$aria2c_temp" && aria2c -q --max-tries=10 "$remote_path" && downloaded_filename=$(ls | head -1) && cat $downloaded_filename) || failed=true
+        rm -rf "$aria2c_temp"
+    else
+        local aria2c_temp=$(mktemp -d)
+        (cd "$aria2c_temp" && aria2c -q -x 4 -j 4 --max-tries=10  "$remote_path" && downloaded_filename=$(ls | head -1) && mv $downloaded_filename $out_path) || failed=true
+        rm -rf "$aria2c_temp"
+    fi
+    if [ "$failed" = true ]; then
+        say_verbose "aria2 download failed"
         return 1
     fi
     return 0
