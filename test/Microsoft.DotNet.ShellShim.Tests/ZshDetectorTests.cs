@@ -21,8 +21,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
                 .Setup(p => p.GetEnvironmentVariable("SHELL"))
                 .Returns(environmentVariableValue);
 
-            ZshDetector zshDetector = new ZshDetector(provider.Object);
-            zshDetector.IsZshTheUsersShell().Should().BeTrue();
+            ZshDetector.IsZshTheUsersShell(provider.Object).Should().BeTrue();
         }
 
         [Theory]
@@ -37,8 +36,7 @@ namespace Microsoft.DotNet.ShellShim.Tests
                 .Setup(p => p.GetEnvironmentVariable("SHELL"))
                 .Returns(environmentVariableValue);
 
-            ZshDetector zshDetector = new ZshDetector(provider.Object);
-            zshDetector.IsZshTheUsersShell().Should().BeFalse();
+            ZshDetector.IsZshTheUsersShell(provider.Object).Should().BeFalse();
         }
     }
 }

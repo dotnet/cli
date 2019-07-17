@@ -58,8 +58,7 @@ namespace Microsoft.DotNet.ShellShim
                 environmentProvider = new EnvironmentProvider();
             }
 
-            var zshDetector = new ZshDetector(environmentProvider);
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && zshDetector.IsZshTheUsersShell())
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && ZshDetector.IsZshTheUsersShell(environmentProvider))
             {
                 return new OsxZshEnvironmentPathInstruction(
                     executablePath: CliFolderPathCalculator.ToolsShimPathInUnix,

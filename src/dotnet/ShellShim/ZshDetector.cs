@@ -7,23 +7,15 @@ using Microsoft.DotNet.Cli.Utils;
 
 namespace Microsoft.DotNet.ShellShim
 {
-    internal class ZshDetector
+    internal static class ZshDetector
     {
-        private readonly IEnvironmentProvider _environmentProvider;
         private const string ZshFileName = "zsh";
-
-        public ZshDetector(IEnvironmentProvider environmentProvider = null)
-        {
-            _environmentProvider = environmentProvider;
-        }
-
         /// <summary>
         /// Returns true if the `SHELL` environment variable ends with `zsh` for the filename.
-        ///     By detecting $SHELL's value
         /// </summary>
-        public bool IsZshTheUsersShell()
+        public static bool IsZshTheUsersShell(IEnvironmentProvider environmentProvider)
         {
-            string environmentVariable = _environmentProvider.GetEnvironmentVariable("SHELL");
+            string environmentVariable = environmentProvider.GetEnvironmentVariable("SHELL");
             if (string.IsNullOrWhiteSpace(environmentVariable))
             {
                 return false;
