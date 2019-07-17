@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.ShellShim
         }
 
         /// <summary>
-        ///     Return if the user use zsh as "The user's shell" instead of the current shell.
+        /// Returns true if the `SHELL` environment variable ends with `zsh` for the filename.
         ///     By detecting $SHELL's value
         /// </summary>
         public bool IsZshTheUsersShell()
