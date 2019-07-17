@@ -568,7 +568,7 @@ export PATH="$PATH:{0}"
   </data>
   <data name="EnvironmentPathOSXZshManualInstructions" xml:space="preserve">
     <value>Tools directory '{0}' is not currently on the PATH environment variable.
-If you are using bash, you can add it to your profile by running the following command:
+If you are using zsh, you can add it to your profile by running the following command:
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.zprofile
 # Add .NET Core SDK tools
