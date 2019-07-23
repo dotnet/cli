@@ -57,7 +57,7 @@ namespace Microsoft.DotNet.ShellShim
             }
             else
             {
-                // by passing null to assemblyToCopyResorcesFrom, it will skip coping resorces,
+                // by passing null to assemblyToCopyResorcesFrom, it will skip copying resources,
                 // which is only supported on Windows
                 HostWriter.CreateAppHost(appHostSourceFilePath: appHostSourcePath,
                                          appHostDestinationFilePath: appHostDestinationFilePath,
