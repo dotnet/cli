@@ -154,13 +154,6 @@ get_linux_platform_name() {
             fi
         fi
     fi
-    Workstation release 6.5
-Client:
-/etc/redhat-release
-Red Hat Enterprise Linux Client release 6.0
-Server:
-/etc/redhat-release
-Red Hat Enterprise Linux Server release 6.0
     say_verbose "Linux specific platform name and version could not be detected: UName = $uname"
     return 1
 }
