@@ -148,13 +148,19 @@ get_linux_platform_name() {
             return 0
         elif [ -e /etc/redhat-release ]; then
             local redhatRelease=$(</etc/redhat-release)
-            if [[ $redhatRelease =~ '^CentOS release 6\..*' || $redhatRelease =~ '^Red Hat Enterprise Linux .* release 6\..*' ]]; then
+            if [[ $redhatRelease == "CentOS release 6."* || $redhatRelease =~ '^Red Hat Enterprise Linux [Client|Server|Workstation] release 6\.' ]]; then
                 echo "rhel.6"
                 return 0
             fi
         fi
     fi
-
+    Workstation release 6.5
+Client:
+/etc/redhat-release
+Red Hat Enterprise Linux Client release 6.0
+Server:
+/etc/redhat-release
+Red Hat Enterprise Linux Server release 6.0
     say_verbose "Linux specific platform name and version could not be detected: UName = $uname"
     return 1
 }
