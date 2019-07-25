@@ -154,6 +154,7 @@ get_linux_platform_name() {
             fi
         fi
     fi
+
     say_verbose "Linux specific platform name and version could not be detected: UName = $uname"
     return 1
 }
