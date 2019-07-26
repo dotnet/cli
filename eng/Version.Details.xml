@@ -41,9 +41,9 @@
       <Uri>https://github.com/dotnet/sdk</Uri>
       <Sha>33a21e560d71f4d3364c501a353bfeda95ea36fa</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19208.1">
-      <Uri>https://github.com/dotnet/CliCommandLineParser</Uri>
-      <Sha>0e89c2116ad28e404ba56c14d1c3f938caa25a01</Sha>
+    <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19313.1">
+      <Uri>https://github.com/dotnet/cliCommandLineParser</Uri>
+      <Sha>b788973a620e6db7bc0458d37b449f160e40842f</Sha>
     </Dependency>
   </ProductDependencies>
 </Dependencies>
