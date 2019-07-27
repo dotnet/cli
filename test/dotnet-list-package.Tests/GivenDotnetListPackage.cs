@@ -1,13 +1,13 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Linq;
 using System.Xml.Linq;
 using FluentAssertions;
 using Microsoft.DotNet.Tools.Test.Utilities;
 using Xunit;
 using Xunit.Abstractions;
+using LocalizableStrings = Microsoft.DotNet.Tools.List.PackageReferences.LocalizableStrings;
 
 namespace Microsoft.DotNet.Cli.List.Package.Tests
 {
@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.Cli.List.Package.Tests
                 .Should()
                 .Pass()
                 .And.NotHaveStdErr()
-                .And.HaveStdOutContainingIgnoreSpaces(packageName+packageVersion+packageVersion);
+                .And.HaveStdOutContainingIgnoreSpaces(packageName + packageVersion + packageVersion);
         }
 
         [Fact]
@@ -164,7 +164,7 @@ namespace Microsoft.DotNet.Cli.List.Package.Tests
 
             new ListPackageCommand()
                 .WithPath(projectDirectory)
-                .Execute(args:"--include-transitive")
+                .Execute(args: "--include-transitive")
                 .Should()
                 .Pass()
                 .And.NotHaveStdErr()
@@ -216,7 +216,7 @@ namespace Microsoft.DotNet.Cli.List.Package.Tests
                     .And.HaveStdOutContainingIgnoreSpaces(shouldInclude.Replace(" ", ""))
                     .And.NotHaveStdOutContaining(shouldntInclude.Replace(" ", ""));
             }
-            
+
         }
 
         [Fact]
@@ -269,5 +269,23 @@ namespace Microsoft.DotNet.Cli.List.Package.Tests
                 .And.NotHaveStdErr();
         }
 
+        [Fact]
+        public void DoesNotAllowCombiningOutdatedAndDeprecatedOptions()
+        {
+            var testAsset = "TestAppSimple";
+            var projectDirectory = TestAssets
+                .Get(testAsset)
+                .CreateInstance()
+                .WithSourceFiles()
+                .Root
+                .FullName;
+
+            new ListPackageCommand()
+                .WithPath(projectDirectory)
+                .Execute(args: "--deprecated --outdated")
+                .Should()
+                .Fail()
+                .And.HaveStdErrContaining(LocalizableStrings.OutdatedAndDeprecatedOptionsCannotBeCombined);
+        }
     }
 }
