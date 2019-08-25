@@ -3,7 +3,7 @@
   <ProductDependencies>
     <Dependency Name="Microsoft.TemplateEngine.Cli" Version="3.0.0-preview8.19381.4">
       <Uri>https://github.com/dotnet/templating</Uri>
-      <Sha>dc3de384829410500748023c862bab291ab0492d</Sha>
+      <Sha>e8d6da33000a416b2b36b4f04b1756dcc99f671d</Sha>
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App" Version="3.0.0-rc1-19423-11" CoherentParentDependency="Microsoft.NET.Sdk">
       <Uri>https://github.com/dotnet/core-setup</Uri>
@@ -35,7 +35,7 @@
     </Dependency>
     <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19208.1">
       <Uri>https://github.com/dotnet/CliCommandLineParser</Uri>
-      <Sha>b788973a620e6db7bc0458d37b449f160e40842f</Sha>
+      <Sha>0e89c2116ad28e404ba56c14d1c3f938caa25a01</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
