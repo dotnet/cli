@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.TemplateEngine.Cli" Version="3.0.0-preview8.19381.4">
+    <Dependency Name="Microsoft.TemplateEngine.Cli" Version="5.0.0-alpha1.19401.1">
       <Uri>https://github.com/dotnet/templating</Uri>
-      <Sha>e8d6da33000a416b2b36b4f04b1756dcc99f671d</Sha>
+      <Sha>dc3de384829410500748023c862bab291ab0492d</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App" Version="3.0.0-rc1-19423-11">
+    <Dependency Name="Microsoft.NETCore.App" Version="3.0.0-preview9-19419-06" CoherentParentDependency="Microsoft.NET.Sdk">
       <Uri>https://github.com/dotnet/core-setup</Uri>
-      <Sha>abecfcd748e6b8850e1111184bf34c93e9277f90</Sha>
+      <Sha>5b508e86c9ce66af8b41bbc1f3b756e7724bcaa0</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.DotNet.PlatformAbstractions" Version="3.0.0-rc1-19423-11">
+    <Dependency Name="Microsoft.DotNet.PlatformAbstractions" Version="3.0.0-preview9-19419-06" CoherentParentDependency="Microsoft.NET.Sdk">
       <Uri>https://github.com/dotnet/core-setup</Uri>
-      <Sha>abecfcd748e6b8850e1111184bf34c93e9277f90</Sha>
+      <Sha>5b508e86c9ce66af8b41bbc1f3b756e7724bcaa0</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NET.HostModel" Version="3.0.0-rc1-19423-11">
+    <Dependency Name="Microsoft.NET.HostModel" Version="3.0.0-preview9-19419-06" CoherentParentDependency="Microsoft.NET.Sdk">
       <Uri>https://github.com/dotnet/core-setup</Uri>
-      <Sha>abecfcd748e6b8850e1111184bf34c93e9277f90</Sha>
+      <Sha>5b508e86c9ce66af8b41bbc1f3b756e7724bcaa0</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.DependencyModel" Version="3.0.0-rc1-19423-11">
+    <Dependency Name="Microsoft.Extensions.DependencyModel" Version="3.0.0-preview9-19419-06" CoherentParentDependency="Microsoft.NET.Sdk">
       <Uri>https://github.com/dotnet/core-setup</Uri>
-      <Sha>abecfcd748e6b8850e1111184bf34c93e9277f90</Sha>
+      <Sha>5b508e86c9ce66af8b41bbc1f3b756e7724bcaa0</Sha>
     </Dependency>
     <Dependency Name="Microsoft.NETCore.DotNetHostResolver" Version="3.0.0-rc1-19423-11">
       <Uri>https://github.com/dotnet/core-setup</Uri>
@@ -29,6 +29,14 @@
       <Uri>https://github.com/aspnet/AspNetCore</Uri>
       <Sha>ec52b9d4d0a34e08768da3b5b4090a8c42351f99</Sha>
     </Dependency>
+    <Dependency Name="Microsoft.NET.Sdk" Version="3.0.100-rc1.19422.1">
+      <Uri>https://github.com/dotnet/sdk</Uri>
+      <Sha>83dffb6faab234c0c878e92c1679fa47c0cab3dd</Sha>
+    </Dependency>
+    <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19313.1">
+      <Uri>https://github.com/dotnet/CliCommandLineParser</Uri>
+      <Sha>b788973a620e6db7bc0458d37b449f160e40842f</Sha>
+    </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
     <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="1.0.0-beta.19424.1">
@@ -36,14 +44,4 @@
       <Sha>a7b5eb8de300b6a30bd797c4ecc8769f7028aeec</Sha>
     </Dependency>
   </ToolsetDependencies>
-  <ProductDependencies>
-    <Dependency Name="Microsoft.NET.Sdk" Version="3.0.100-rc1.19422.1">
-      <Uri>https://github.com/dotnet/sdk</Uri>
-      <Sha>83dffb6faab234c0c878e92c1679fa47c0cab3dd</Sha>
-    </Dependency>
-    <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19208.1">
-      <Uri>https://github.com/dotnet/CliCommandLineParser</Uri>
-      <Sha>0e89c2116ad28e404ba56c14d1c3f938caa25a01</Sha>
-    </Dependency>
-  </ProductDependencies>
 </Dependencies>
