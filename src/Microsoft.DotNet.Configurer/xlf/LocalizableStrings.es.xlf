@@ -30,10 +30,10 @@ Escriba su primera aplicación: https://aka.ms/first-net-core-app
         <note />
       </trans-unit>
       <trans-unit id="FirstTimeMessageWelcome">
-        <source>Welcome to .NET Core 3.0!
+        <source>Welcome to .NET Core 5.0!
 ---------------------
 SDK Version: {0}</source>
-        <target state="translated">Bienvenido a .NET Core 3.0!
+        <target state="needs-review-translation">Bienvenido a .NET Core 3.0!
 ---------------------
 Versión del SDK: {0}</target>
         <note />

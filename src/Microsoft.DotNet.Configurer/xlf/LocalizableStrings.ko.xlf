@@ -30,10 +30,10 @@ GitHub에서 문제 보고 및 소스 찾기: https://github.com/dotnet/core
         <note />
       </trans-unit>
       <trans-unit id="FirstTimeMessageWelcome">
-        <source>Welcome to .NET Core 3.0!
+        <source>Welcome to .NET Core 5.0!
 ---------------------
 SDK Version: {0}</source>
-        <target state="translated">.NET Core 3.0을 시작합니다!
+        <target state="needs-review-translation">.NET Core 3.0을 시작합니다!
 ---------------------
 SDK 버전: {0}</target>
         <note />

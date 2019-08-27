@@ -30,10 +30,10 @@ Utilisez 'dotnet --help' pour voir les commandes disponibles, ou accédez à htt
         <note />
       </trans-unit>
       <trans-unit id="FirstTimeMessageWelcome">
-        <source>Welcome to .NET Core 3.0!
+        <source>Welcome to .NET Core 5.0!
 ---------------------
 SDK Version: {0}</source>
-        <target state="translated">Bienvenue dans .NET Core 3.0 !
+        <target state="needs-review-translation">Bienvenue dans .NET Core 3.0 !
 ---------------------
 Version du kit SDK : {0}</target>
         <note />
