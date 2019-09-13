@@ -159,6 +159,10 @@ get_linux_platform_name() {
     return 1
 }
 
+is_musl_based_distro() {
+    (ldd 2>&1 || true) | grep -q musl
+}
+
 get_current_os_name() {
     eval $invocation
 
@@ -173,10 +177,10 @@ get_current_os_name() {
         local linux_platform_name
         linux_platform_name="$(get_linux_platform_name)" || { echo "linux" && return 0 ; }
 
-        if [[ $linux_platform_name == "rhel.6" ]]; then
+        if [ "$linux_platform_name" = "rhel.6" ]; then
             echo $linux_platform_name
             return 0
-        elif [[ $linux_platform_name == alpine* ]]; then
+        elif is_musl_based_distro; then
             echo "linux-musl"
             return 0
         else
@@ -245,15 +249,22 @@ check_pre_reqs() {
     fi
 
     if [ "$(uname)" = "Linux" ]; then
-        if [ ! -x "$(command -v ldconfig)" ]; then
-            echo "ldconfig is not in PATH, trying /sbin/ldconfig."
-            LDCONFIG_COMMAND="/sbin/ldconfig"
+        if is_musl_based_distro; then
+            if ! command -v scanelf > /dev/null; then
+                say_warning "scanelf not found, please install pax-utils package."
+                return 0
+            fi
+            LDCONFIG_COMMAND="scanelf --ldpath -BF '%f'"
         else
-            LDCONFIG_COMMAND="ldconfig"
+            if [ ! -x "$(command -v ldconfig)" ]; then
+                echo "ldconfig is not in PATH, trying /sbin/ldconfig."
+                LDCONFIG_COMMAND="/sbin/ldconfig"
+            else
+                LDCONFIG_COMMAND="ldconfig"
+            fi
+            local librarypath=${LD_LIBRARY_PATH:-}
+            LDCONFIG_COMMAND="$LDCONFIG_COMMAND -NXv ${librarypath//:/ }"
         fi
-
-        local librarypath=${LD_LIBRARY_PATH:-}
-        LDCONFIG_COMMAND="$LDCONFIG_COMMAND -NXv ${librarypath//:/ }"
 
         [ -z "$($LDCONFIG_COMMAND 2>/dev/null | grep libunwind)" ] && say_warning "Unable to locate libunwind. Probable prerequisite missing; install libunwind."
         [ -z "$($LDCONFIG_COMMAND 2>/dev/null | grep libssl)" ] && say_warning "Unable to locate libssl. Probable prerequisite missing; install libssl."
@@ -600,7 +611,7 @@ copy_files_or_dirs_from_list() {
     local osname="$(get_current_os_name)"
     local override_switch=$(
         if [ "$override" = false ]; then
-            if [[ "$osname" == "linux-musl" ]]; then
+            if [ "$osname" = "linux-musl" ]; then
                 printf -- "-u";
             else
                 printf -- "-n";
