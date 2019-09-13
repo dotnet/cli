@@ -9,6 +9,11 @@
   <PropertyGroup>
     <VersionPrefix>3.0.100</VersionPrefix>
     <PreReleaseVersionLabel>rc2</PreReleaseVersionLabel>
+    <!--
+        When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages
+    -->
+    <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">true</StabilizePackageVersion>
+    <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
   </PropertyGroup>
   <!-- Production Dependencies -->
   <PropertyGroup>
