@@ -25,6 +25,12 @@
       <Uri>https://github.com/dotnet/core-setup</Uri>
       <Sha>7d57652f33493fa022125b7f63aad0d70c52d810</Sha>
     </Dependency>
+    <!-- Specific version here is not interesting, but we want Maestro to add corefx
+         private feeds -->
+    <Dependency Name="System.Text.Json" Version="4.6.0" CoherentParentDependency="Microsoft.NETCore.App.Runtime.win-x64">
+      <Uri>https://github.com/dotnet/corefx</Uri>
+      <Sha>4ac4c0367003fe3973a3648eb0715ddb0e3bbcea</Sha>
+    </Dependency>
     <Dependency Name="Microsoft.AspNetCore.DeveloperCertificates.XPlat" Version="3.0.0-rc2.19460.8">
       <Uri>https://github.com/aspnet/AspNetCore</Uri>
       <Sha>04705ee4f1ae72c839c63af2e281ad9526602b5e</Sha>
