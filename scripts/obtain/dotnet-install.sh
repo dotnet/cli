@@ -265,6 +265,7 @@ check_pre_reqs() {
                 return 0
             fi
             LDCONFIG_COMMAND="scanelf --ldpath -BF '%f'"
+            [ -z "$($LDCONFIG_COMMAND 2>/dev/null | grep libintl)" ] && say_warning "Unable to locate libintl. Probable prerequisite missing; install libintl (or gettext)."
         else
             if [ ! -x "$(command -v ldconfig)" ]; then
                 echo "ldconfig is not in PATH, trying /sbin/ldconfig."
