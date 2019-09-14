@@ -74,15 +74,4 @@
     <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
     <UsingToolSymbolUploader>true</UsingToolSymbolUploader>
   </PropertyGroup>
-  <PropertyGroup>
-    <RestoreSources>
-      $(RestoreSources);
-      https://dotnet.myget.org/F/nuget-build/api/v3/index.json;
-      https://api.nuget.org/v3/index.json;
-      https://dotnet.myget.org/F/msbuild/api/v3/index.json;
-      https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json;
-      https://dotnetfeed.blob.core.windows.net/aspnet-aspnetcore/index.json;
-      https://dotnetfeed.blob.core.windows.net/aspnet-aspnetcore-tooling/index.json;
-    </RestoreSources>
-  </PropertyGroup>
 </Project>
