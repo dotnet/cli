@@ -13,7 +13,7 @@
 .nf
 \f[C]
 dotnet build [<PROJECT>|<SOLUTION>] [-c|--configuration] [-f|--framework] [--force] [--interactive] [--no-dependencies]
-    [--no-incremental] [--nologo] [--no-restore] [-o|--output] [-r|--runtime] [-v|--verbosity] [--version-suffix]
+    [--no-incremental] [--no-restore] [--nologo] [-o|--output] [-r|--runtime] [-v|--verbosity] [--version-suffix]
 
 dotnet build [-h|--help]
 \f[R]
@@ -22,8 +22,8 @@ dotnet build [-h|--help]
 .PP
 The \f[C]dotnet build\f[R] command builds the project and its dependencies into a set of binaries.
 The binaries include the project\[cq]s code in Intermediate Language (IL) files with a \f[I].dll\f[R] extension and symbol files used for debugging with a \f[I].pdb\f[R] extension.
-A dependencies JSON file (\f[I]*.deps.json\f[R]) is produced that lists the dependencies of the application.
-A \f[I]*.runtimeconfig.json\f[R] file is produced, which specifies the shared runtime and its version for the application.
+A dependencies JSON file (\f[I].deps.json\f[R]) is produced that lists the dependencies of the application.
+A \f[I].runtimeconfig.json\f[R] file is produced, which specifies the shared runtime and its version for the application.
 .PP
 If the project has third-party dependencies, such as libraries from NuGet, they\[cq]re resolved from the NuGet cache and aren\[cq]t available with the project\[cq]s built output.
 With that in mind, the product of \f[C]dotnet build\f[R] isn\[cq]t ready to be transferred to another machine to run.
@@ -119,18 +119,18 @@ Marks the build as unsafe for incremental build.
 This flag turns off incremental compilation and forces a clean rebuild of the project\[cq]s dependency graph.
 .RE
 .IP \[bu] 2
-\f[B]\f[CB]--no-logo\f[B]\f[R]
-.RS 2
-.PP
-Doesn\[cq]t display the startup banner or the copyright message.
-Available since .NET Core 3.0 SDK.
-.RE
-.IP \[bu] 2
 \f[B]\f[CB]--no-restore\f[B]\f[R]
 .RS 2
 .PP
 Doesn\[cq]t execute an implicit restore during build.
 Available since .NET Core 2.0 SDK.
+.RE
+.IP \[bu] 2
+\f[B]\f[CB]--nologo\f[B]\f[R]
+.RS 2
+.PP
+Doesn\[cq]t display the startup banner or the copyright message.
+Available since .NET Core 3.0 SDK.
 .RE
 .IP \[bu] 2
 \f[B]\f[CB]-o|--output <OUTPUT_DIRECTORY>\f[B]\f[R]
@@ -205,7 +205,7 @@ dotnet build --source c:\[rs]packages\[rs]mypackages
 .fi
 .RE
 .IP \[bu] 2
-Build the project and set 1.2.3.4 version as a build parameter:
+Build the project and set version 1.2.3.4 as a build parameter using the \f[C]-p\f[R] MSBuild option:
 .RS 2
 .IP
 .nf
