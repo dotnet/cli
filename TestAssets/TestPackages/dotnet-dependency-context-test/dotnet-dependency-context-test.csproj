@@ -6,6 +6,7 @@
     <!-- netcoreapp2.2 is the maximum TFM project tools support -->
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <OutputType>Exe</OutputType>
+    <ExcludeFromSourceBuild>true</ExcludeFromSourceBuild>
   </PropertyGroup>
 
   <ItemGroup>
