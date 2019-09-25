@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.TemplateEngine.Cli" Version="3.0.0-rc1.19464.2">
+    <Dependency Name="Microsoft.TemplateEngine.Cli" Version="3.0.1-servicing.19475.2">
       <Uri>https://github.com/dotnet/templating</Uri>
-      <Sha>b2663fb07294f5d6cf3caa927d58f7cbebf7d626</Sha>
+      <Sha>bf9d79d8a0480e569712839b8b8d38bfbf14ea37</Sha>
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="3.0.0">
       <Uri>https://github.com/dotnet/core-setup</Uri>
@@ -31,9 +31,9 @@
       <Uri>https://github.com/dotnet/corefx</Uri>
       <Sha>4ac4c0367003fe3973a3648eb0715ddb0e3bbcea</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.AspNetCore.DeveloperCertificates.XPlat" Version="3.0.0-rc2.19465.2">
+    <Dependency Name="Microsoft.AspNetCore.DeveloperCertificates.XPlat" Version="3.0.0-rc2.19475.14">
       <Uri>https://github.com/aspnet/AspNetCore</Uri>
-      <Sha>aee5e4080331553ea9dfb7fb388b6d72f715bf6a</Sha>
+      <Sha>f3b70774443dd39f9b96bbcc59cf7c8a6c7a8858</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
