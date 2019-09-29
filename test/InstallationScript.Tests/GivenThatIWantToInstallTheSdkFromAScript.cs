@@ -14,32 +14,25 @@ using System.Collections.Generic;
 
 namespace Microsoft.DotNet.InstallationScript.Tests
 {
-    public var InstallationScriptTestsJsonFile= Path.Combine(RepoDirectoriesProvider.RepoRoot, "TestAssets", "InstallationScriptTests", "InstallationScriptTests.json");
-
     public class GivenThatIWantToInstallTheSdkFromAScript : TestBase
     {
-        [Theory]
-        [InlineData("-jsonfile", InstallationScriptTestsJsonFile)]
-        public void WhenJsonFileIsPassedToInstallScripts(string parameter, string value)
+        private static string InstallationScriptTestsJsonFile = Path.Combine(RepoDirectoriesProvider.RepoRoot, "TestAssets", "InstallationScriptTests", "InstallationScriptTests.json").ToString();
+
+        [Fact]
+        public void WhenJsonFileIsPassedToInstallScripts()
         {
-            var args = new List<string> { "-dryrun", parameter };
-            if (!string.IsNullOrEmpty(value))
-            {
-                args.Add(value);
-            }
+            var args = new List<string> { "-dryrun", "-jsonfile", InstallationScriptTestsJsonFile };
 
             var commandResult = CreateInstallCommand(args)
                             .CaptureStdOut()
                             .CaptureStdErr()
                             .Execute();
 
-            //  Standard 'dryrun' criterium
             commandResult.Should().Pass();
             commandResult.Should().NotHaveStdOutContaining("dryrun");
             commandResult.Should().NotHaveStdOutContaining("jsonfile");
             commandResult.Should().HaveStdOutContaining("Repeatable invocation:");
             commandResult.Should().HaveStdOutContaining("1.0.0-beta.19463.3");
-
         }
 
         [Theory]
