@@ -857,6 +857,7 @@ temporary_file_template="${TMPDIR:-/tmp}/dotnet.XXXXXXXXX"
 
 channel="LTS"
 version="Latest"
+json_file=""
 install_dir="<auto>"
 architecture="<auto>"
 dry_run=false
