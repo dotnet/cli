@@ -82,6 +82,7 @@
 param(
    [string]$Channel="LTS",
    [string]$Version="Latest",
+   [string]$JSonFile,
    [string]$InstallDir="<auto>",
    [string]$Architecture="<auto>",
    [ValidateSet("dotnet", "aspnetcore", "windowsdesktop", IgnoreCase = $false)]
@@ -96,8 +97,7 @@ param(
    [string]$ProxyAddress,
    [switch]$ProxyUseDefaultCredentials,
    [switch]$SkipNonVersionedFiles,
-   [switch]$NoCdn,
-   [string]$JSonFile
+   [switch]$NoCdn
 )
 
 Set-StrictMode -Version Latest
@@ -347,7 +347,7 @@ function Parse-Jsonfile-For-Version([string]$JSonFile) {
 function Get-Specific-Version-From-Version([string]$AzureFeed, [string]$Channel, [string]$Version, [string]$JSonFile) {
     Say-Invocation $MyInvocation
 
-    if ($JSonFile -eq $null) {
+    if (-not $JSonFile) {
         switch ($Version.ToLower()) {
             { $_ -eq "latest" } {
                 $LatestVersionInfo = Get-Latest-Version-Info -AzureFeed $AzureFeed -Channel $Channel -Coherent $False
