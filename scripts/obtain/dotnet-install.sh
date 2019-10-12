@@ -144,7 +144,7 @@ get_linux_platform_name() {
     else
         if [ -e /etc/os-release ]; then
             . /etc/os-release
-            echo "$ID.$VERSION_ID"
+            echo "$ID${VERSION_ID:+.${VERSION_ID}}"
             return 0
         elif [ -e /etc/redhat-release ]; then
             local redhatRelease=$(</etc/redhat-release)
@@ -202,7 +202,7 @@ get_legacy_os_name() {
     else
         if [ -e /etc/os-release ]; then
             . /etc/os-release
-            os=$(get_legacy_os_name_from_platform "$ID.$VERSION_ID" || echo "")
+            os=$(get_legacy_os_name_from_platform "$ID${VERSION_ID:+.${VERSION_ID}}" || echo "")
             if [ -n "$os" ]; then
                 echo "$os"
                 return 0
