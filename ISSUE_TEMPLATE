@@ -1,16 +1,6 @@
-## Steps to reproduce
+## PLEASE DO NOT FILE ISSUES IN THIS REPO
 
-
-## Expected  behavior
-
-
-## Actual behavior
-
-
-## Environment data
-`dotnet --info` output:
-
-
+File them in https://github.com/dotnet/sdk instead.
 
 
 
