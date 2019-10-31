@@ -58,6 +58,8 @@ namespace Microsoft.DotNet.Cli.Utils
             {
                 fs.Write(array, 0, array.Length);
             }
+
+            MachOUtils.RemoveSignature(appHostDestinationFilePath);
         }
 
         // See: https://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm
