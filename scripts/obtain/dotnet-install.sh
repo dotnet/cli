@@ -165,7 +165,7 @@ get_linux_platform_name() {
 }
 
 is_musl_based_distro() {
-    (ldd 2>&1 || true) | grep -q musl
+    (ldd --version 2>&1 || true) | grep -q musl
 }
 
 get_current_os_name() {
