@@ -262,7 +262,6 @@ check_pre_reqs() {
                 say_verbose "$LDCONFIG_COMMAND is not in PATH, trying /sbin/$LDCONFIG_COMMAND."
                 LDCONFIG_COMMAND="/sbin/$LDCONFIG_COMMAND"
             fi
-
             local librarypath=${LD_LIBRARY_PATH:-}
             LDCONFIG_COMMAND="$LDCONFIG_COMMAND -NXv ${librarypath//:/ }"
         fi
