@@ -144,12 +144,7 @@ get_linux_platform_name() {
     else
         if [ -e /etc/os-release ]; then
             . /etc/os-release
-            # in some distros such as Void Linux, VERSION_ID is not available in /etc/os-release
-            if [ -z ${VERSION_ID+x} ]; then
-                echo "$ID"
-            else
-                echo "$ID.$VERSION_ID"
-            fi
+            echo "$ID${VERSION_ID:+.${VERSION_ID}}"
             return 0
         elif [ -e /etc/redhat-release ]; then
             local redhatRelease=$(</etc/redhat-release)
