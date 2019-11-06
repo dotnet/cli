@@ -225,7 +225,6 @@ machine_has() {
     return $?
 }
 
-
 check_min_reqs() {
     local hasMinimum=false
     if machine_has "curl"; then
@@ -257,10 +256,11 @@ check_pre_reqs() {
             LDCONFIG_COMMAND="scanelf --ldpath -BF '%f'"
             [ -z "$($LDCONFIG_COMMAND 2>/dev/null | grep libintl)" ] && say_warning "Unable to locate libintl. Probable prerequisite missing; install libintl (or gettext)."
         else
-            LDCONFIG_COMMAND="ldconfig"
-            if [ ! -x "$(command -v $LDCONFIG_COMMAND)" ]; then
-                say_verbose "$LDCONFIG_COMMAND is not in PATH, trying /sbin/$LDCONFIG_COMMAND."
-                LDCONFIG_COMMAND="/sbin/$LDCONFIG_COMMAND"
+            if [ ! -x "$(command -v ldconfig)" ]; then
+                say_verbose "ldconfig is not in PATH, trying /sbin/ldconfig."
+                LDCONFIG_COMMAND="/sbin/ldconfig"
+            else
+                LDCONFIG_COMMAND="ldconfig"
             fi
             local librarypath=${LD_LIBRARY_PATH:-}
             LDCONFIG_COMMAND="$LDCONFIG_COMMAND -NXv ${librarypath//:/ }"
