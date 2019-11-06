@@ -206,12 +206,7 @@ get_legacy_os_name() {
     else
         if [ -e /etc/os-release ]; then
             . /etc/os-release
-            # in some distros such as Void Linux, VERSION_ID is not available in /etc/os-release
-            if [ -z ${VERSION_ID+x} ]; then
-                os=$(get_legacy_os_name_from_platform "$ID" || echo "")
-            else
-                os=$(get_legacy_os_name_from_platform "$ID.$VERSION_ID" || echo "")
-            fi
+            os=$(get_legacy_os_name_from_platform "$ID${VERSION_ID:+.${VERSION_ID}}" || echo "")
             if [ -n "$os" ]; then
                 echo "$os"
                 return 0
