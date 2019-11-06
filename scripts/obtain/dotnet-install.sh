@@ -258,7 +258,7 @@ check_pre_reqs() {
             [ -z "$($LDCONFIG_COMMAND 2>/dev/null | grep libintl)" ] && say_warning "Unable to locate libintl. Probable prerequisite missing; install libintl (or gettext)."
         else
             if [ ! -x "$(command -v ldconfig)" ]; then
-                echo "ldconfig is not in PATH, trying /sbin/ldconfig."
+                say_verbose "ldconfig is not in PATH, trying /sbin/ldconfig."
                 LDCONFIG_COMMAND="/sbin/ldconfig"
             else
                 LDCONFIG_COMMAND="ldconfig"
