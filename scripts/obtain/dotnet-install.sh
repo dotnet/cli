@@ -225,6 +225,7 @@ machine_has() {
     return $?
 }
 
+
 check_min_reqs() {
     local hasMinimum=false
     if machine_has "curl"; then
