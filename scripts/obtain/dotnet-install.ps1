@@ -77,6 +77,9 @@
 .PARAMETER JSonFile
     Determines the SDK version from a user specified global.json file
     Note: global.json must have a value for 'SDK:Version'
+.PARAMETER SkipIfInGlobal
+    Default: false
+    Skips installing SDK if it is installed globally
 #>
 [cmdletbinding()]
 param(
@@ -97,7 +100,8 @@ param(
    [string]$ProxyAddress,
    [switch]$ProxyUseDefaultCredentials,
    [switch]$SkipNonVersionedFiles,
-   [switch]$NoCdn
+   [switch]$NoCdn,
+   [switch]$SkipIfInGlobal
 )
 
 Set-StrictMode -Version Latest
@@ -429,9 +433,24 @@ function Resolve-Installation-Path([string]$InstallDir) {
 function Is-Dotnet-Package-Installed([string]$InstallRoot, [string]$RelativePathToPackage, [string]$SpecificVersion) {
     Say-Invocation $MyInvocation
 
+    if ($SkipIfInGlobal.IsPresent) {
+        # Look in global directory
+        $DotnetPackagePath = Join-Path -Path $env:ProgramFiles -ChildPath "dotnet\sdk" | Join-Path -ChildPath $SpecificVersion
+        Say-Verbose "Is-Dotnet-Package-Installed: Path to a package: $DotnetPackagePath"
+
+        if (Test-Path $DotnetPackagePath -PathType Container) {
+            return $DotnetPackagePath
+        }
+    }
+
     $DotnetPackagePath = Join-Path -Path $InstallRoot -ChildPath $RelativePathToPackage | Join-Path -ChildPath $SpecificVersion
     Say-Verbose "Is-Dotnet-Package-Installed: Path to a package: $DotnetPackagePath"
-    return Test-Path $DotnetPackagePath -PathType Container
+
+    if (Test-Path $DotnetPackagePath -PathType Container) {
+        return $DotnetPackagePath
+    } else {
+        return $null
+    }
 }
 
 function Get-Absolute-Path([string]$RelativeOrAbsolutePath) {
@@ -615,7 +634,10 @@ else {
 $isAssetInstalled = Is-Dotnet-Package-Installed -InstallRoot $InstallRoot -RelativePathToPackage $dotnetPackageRelativePath -SpecificVersion $SpecificVersion
 if ($isAssetInstalled) {
     Say "$assetName version $SpecificVersion is already installed."
-    Prepend-Sdk-InstallRoot-To-Path -InstallRoot $InstallRoot -BinFolderRelativePath $BinFolderRelativePath
+
+    if ($isAssetInstalled.StartsWith($InstallRoot)) {
+        Prepend-Sdk-InstallRoot-To-Path -InstallRoot $InstallRoot -BinFolderRelativePath $BinFolderRelativePath
+    }
     exit 0
 }
 
