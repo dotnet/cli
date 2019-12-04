@@ -435,11 +435,16 @@ function Is-Dotnet-Package-Installed([string]$InstallRoot, [string]$RelativePath
 
     if ($SkipIfInGlobal.IsPresent) {
         # Look in global directory
-        $DotnetPackagePath = Join-Path -Path $env:ProgramFiles -ChildPath "dotnet\sdk" | Join-Path -ChildPath $SpecificVersion
-        Say-Verbose "Is-Dotnet-Package-Installed: Path to a package: $DotnetPackagePath"
+        $DotnetCmd = Get-Command "dotnet.exe" -ErrorAction Ignore
+        if ($DotnetCmd) {
+            $DotnetCmdInstallDir = Split-Path $DotnetCmd.Path -Parent
 
-        if (Test-Path $DotnetPackagePath -PathType Container) {
-            return $DotnetPackagePath
+            $DotnetPackagePath = Join-Path -Path $DotnetCmdInstallDir -ChildPath "sdk" | Join-Path -ChildPath $SpecificVersion
+            Say-Verbose "Is-Dotnet-Package-Installed: Path to a package: $DotnetPackagePath"
+    
+            if (Test-Path $DotnetPackagePath -PathType Container) {
+                return $DotnetPackagePath
+            }
         }
     }
 
