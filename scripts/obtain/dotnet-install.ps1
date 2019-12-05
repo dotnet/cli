@@ -10,7 +10,7 @@
 .SYNOPSIS
     Installs the dotnet CLI and .NET Core SDK and/or runtime(s).
 .DESCRIPTION
-    If the implied or specified version already exists in the target directory, 
+    If the implied or specified version already exists in the target directory,
     no action is taken.
     However, you can install additional versions, side by side.
 .PARAMETER Channel
@@ -41,29 +41,32 @@
     The architecture of the dotnet binaries to be installed.
     Possible values are: amd64, x64, x86, arm64, arm, x86 (Windows only)
 .PARAMETER SharedRuntime
-    This parameter is obsolete and may be removed in a future version of this 
-    script. Please use '-Runtime dotnet' instead.
+    This parameter is obsolete and may be removed in a future version of this
+    script.
+    The recommended alternative is '-Runtime dotnet'.
+    Installs just the shared runtime bits, not the entire SDK.
 .PARAMETER Runtime
     Installs just a shared runtime, not the entire SDK.
     Possible values:
         - dotnet     - the Microsoft.NETCore.App shared runtime
         - aspnetcore - the Microsoft.AspNetCore.App shared runtime
+        - windowsdesktop - the Microsoft.WindowsDesktop.App shared runtime
 .PARAMETER RID
     Unix-like platforms only: Installs the binaries for the given
     platform RID (use linux-x64 for portable linux).
 .PARAMETER WhatIf
-    If specified, will not perform installation and instead display what 
+    If specified, will not perform installation and instead display what
     command line to use to consistently to install the  implied or requested
     version. For example, if you specify version 'latest' it will display a
     command line with a specific version that can be used deterministically in
     a build script.
-    It also displays the download URLs and target installation directory, if 
+    It also displays the download URLs and target installation directory, if
     you prefer to download and install yourself.
 .PARAMETER NoPath
     If specified, this script will only display the binaries location after
     installation, without updating the PATH environment variable.
     By default, this script will update PATH by prepending the binaries folder,
-    but only for the current process. 
+    but only for the current process.
     Important: Persistently adding this folder to your PATH variable requires
     manual action, as appropriate for your platform or shell.
 .PARAMETER Verbose
@@ -83,10 +86,13 @@
 .PARAMETER ProxyUseDefaultCredentials
     Use default credentials for the given proxy.
 .PARAMETER SkipNonVersionedFiles
-    Skips installing non-versioned files if they already exist, such as the 
+    Skips installing non-versioned files if they already exist, such as the
     dotnet binary.
 .PARAMETER NoCdn
     Disable downloading from the Azure CDN, and use the uncached feed directly.
+.PARAMETER JSonFile
+    Determines the SDK version from a user-specified global.json file
+    Note: global.json must have a value for 'SDK:Version'
 .EXAMPLE
     dotnet-install.ps1
 
@@ -99,25 +105,26 @@
     directory.
 .EXAMPLE
         dotnet-install.ps1 -Channel LTS -Version 2.1.403
-    
+
         Installs a specific LTS version.
 .EXAMPLE
     dotnet-install.ps1 -WhatIf
 
-    Previews the download links and installation directory path, and prints a 
+    Previews the download links and installation directory path, and prints a
     repeatable command line with implied or abstract version references
     resolved.
 #>
-[cmdletbinding(PositionalBinding=$false)]
+[cmdletbinding(PositionalBinding = $false)]
 param(
-    [ArgumentCompleter({ param($cmd, $param, $wordToComplete) 'Current', 'LTS' -like "$wordToComplete*" })]
-    [string]$Channel='LTS',
-    [ArgumentCompleter({ param($cmd, $param, $wordToComplete) 'latest', 'coherent' -like "$wordToComplete*" })]
-    [string]$Version='latest',
+    [ArgumentCompleter( { param($cmd, $param, $wordToComplete) 'Current', 'LTS' -like "$wordToComplete*" })]
+    [string]$Channel = 'LTS',
+    [ArgumentCompleter( { param($cmd, $param, $wordToComplete) 'latest', 'coherent' -like "$wordToComplete*" })]
+    [string]$Version = 'latest',
+    [string]$JSonFile,
     [string]$InstallDir,
-    [ArgumentCompleter({ param($cmd, $param, $wordToComplete) $vals = 'amd64', 'x64', 'arm64', 'arm'; if ($env:OS -eq 'Windows_NT') { $vals += 'x86' }; $vals -like "$wordToComplete*" })]
+    [ArgumentCompleter( { param($cmd, $param, $wordToComplete) $vals = 'amd64', 'x64', 'arm64', 'arm'; if ($env:OS -eq 'Windows_NT') { $vals += 'x86' }; $vals -like "$wordToComplete*" })]
     [string]$Architecture,
-    [ValidateSet('dotnet', 'aspnetcore')]
+    [ValidateSet('dotnet', 'aspnetcore', 'windowsdesktop', IgnoreCase = $false)]
     [string]$Runtime,
     [Alias('RuntimeId')]
     [string]$RID,
@@ -126,8 +133,8 @@ param(
     [Alias('DryRun')]
     [switch]$WhatIf,
     [switch]$NoPath,
-    [string]$AzureFeed='https://dotnetcli.azureedge.net/dotnet',
-    [string]$UncachedFeed='https://dotnetcli.blob.core.windows.net/dotnet',
+    [string]$AzureFeed = 'https://dotnetcli.azureedge.net/dotnet',
+    [string]$UncachedFeed = 'https://dotnetcli.blob.core.windows.net/dotnet',
     [string]$FeedCredential,
     [string]$ProxyAddress,
     [switch]$ProxyUseDefaultCredentials,
@@ -166,7 +173,7 @@ if (-not (Get-Variable -ErrorAction SilentlyContinue -Scope Global IsWindows)) {
 if ($Channel) {
     $caseExactValue = @{
         current = 'Current'
-        lts = 'LTS'
+        lts     = 'LTS'
     }[$Channel]
     if ($caseExactValue) { $Channel = $caseExactValue }
 }
@@ -181,19 +188,20 @@ if ($InstallDir -eq '<auto>') { $InstallDir = $null }
 
 if ($SharedRuntime) {
     if ($Runtime) {
-        SayWarning "-Runtime overrides -SharedRuntime."
-    } else {
-        $Runtime = "dotnet"
+        SayWarning '-Runtime overrides -SharedRuntime.'
+    }
+    else {
+        $Runtime = 'dotnet'
     }
 }
 
 if ($RID -and $IsWindows) {
-    SayWarning "Ignoring -RID argument, because it isn't supported on Windows."
+    SayWarning 'Ignoring -RID argument, because it isn''t supported on Windows.'
 }
 
 # example path with regex: shared/1.0.0-beta-12345/somepath
-$VersionRegEx="/\d+\.\d+[^/]+/"
-$OverrideNonVersionedFiles = !$SkipNonVersionedFiles
+$VersionRegEx = '/\d+\.\d+[^/]+/'
+$OverrideNonVersionedFiles = -not $SkipNonVersionedFiles
 
 function Invoke-WithRetry([ScriptBlock]$ScriptBlock, [int]$MaxAttempts = 3, [int]$SecondsBetweenAttempts = 1) {
     $Attempts = 0
@@ -219,22 +227,22 @@ function Invoke-WithRetry([ScriptBlock]$ScriptBlock, [int]$MaxAttempts = 3, [int
 # Adding a Linux distribution to this list does not imply distribution-specific support.
 function Get-LegacyOsNameFromPlatform($Platform) {
     switch -wildcard ($Platform) {
-        'centos.7'      { return 'centos' }
-        'debian.8'      { return 'debian' }
-        'debian.9'      { return 'debian.9' }
-        'fedora.23'     { return 'fedora.23' }
-        'fedora.24'     { return 'fedora.24' }
-        'fedora.27'     { return 'fedora.27' }
-        'fedora.28'     { return 'fedora.28' }
+        'centos.7' { return 'centos' }
+        'debian.8' { return 'debian' }
+        'debian.9' { return 'debian.9' }
+        'fedora.23' { return 'fedora.23' }
+        'fedora.24' { return 'fedora.24' }
+        'fedora.27' { return 'fedora.27' }
+        'fedora.28' { return 'fedora.28' }
         'opensuse.13.2' { return 'opensuse.13.2' }
         'opensuse.42.1' { return 'opensuse.42.1' }
         'opensuse.42.3' { return 'opensuse.42.3' }
-        'rhel.7*'       { return 'rhel' }
-        'ubuntu.14.04'  { return 'ubuntu' }
-        'ubuntu.16.04'  { return 'ubuntu.16.04' }
-        'ubuntu.16.10'  { return 'ubuntu.16.10' }
-        'ubuntu.18.04'  { return 'ubuntu.18.04' }
-        'alpine.3.4.3'  { return 'alpine' }
+        'rhel.7*' { return 'rhel' }
+        'ubuntu.14.04' { return 'ubuntu' }
+        'ubuntu.16.04' { return 'ubuntu.16.04' }
+        'ubuntu.16.10' { return 'ubuntu.16.10' }
+        'ubuntu.18.04' { return 'ubuntu.18.04' }
+        'alpine.3.4.3' { return 'alpine' }
     }
 }
 
@@ -243,10 +251,12 @@ function Get-LinuxPlatformName {
 
     if ($RID) {
         return $RID -replace '^(.+)-.*', '$1'
-    } else {
+    }
+    else {
         if (Test-Path /etc/os-release) {
             return sh -c '. /etc/os-release; printf %s "$ID.$VERSION_ID"'
-        } elseif (Test/etc/redhat-release) {
+        }
+        elseif (Test/etc/redhat-release) {
             $redHatRelease = Get-Content /etc/redhat-release
             if ($redHatRelease -like "CentOS release 6.*" -or $redHatRelease -like "Red Hat Enterprise Linux Server release 6.*") {
                 return "rhel.6"
@@ -257,23 +267,37 @@ function Get-LinuxPlatformName {
     SayVerbose "Linux specific platform name and version could not be detected: uname -a = $(uname -a)"
 }
 
+function Test-MuslBasedDistro() {
+    return [bool] $(
+        try {
+            # Note: In combination with $ErrorActionPreference = 'Stop', 2>$null would trigger a terminating error if there is stderr output.
+            $ErrorActionPreference = 'Continue'
+            ldd --version 2>&1 | Select-String -Quiet -SimpleMatch -CaseSensitive musl
+        }
+        catch {
+            $false
+        }
+    )
+}
+
 function Get-CurrentOsName {
     SayInvocation $MyInvocation
 
     if ($IsWindows) {
         return 'win'
-    } else { # Unix
+    }
+    else {
+        # Unix
         switch (uname) {
-            'Darwin'  { return 'osx' }
+            'Darwin' { return 'osx' }
             'FreeBSD' { return 'freebsd' }
             'Linux' {
                 $linuxPlatformName = Get-LinuxPlatformName
                 if (-not $linuxPlatformName) { return 'linux' }
-                
+
                 switch -wildcard ($linuxPlatformName) {
-                    'rhel.6'  { return $_ }
-                    'alpine*' { return 'linux-musl' }
-                    default   { return 'linux' }
+                    'rhel.6' { return $_ }
+                    default { return ('linux', 'linux-musl')[(Test-MuslBasedDistro) -eq $true] }
                 }
             }
         }
@@ -287,22 +311,27 @@ function Get-LegacyOSName {
 
     if ($IsWindows) {
         return 'win'
-    } else { # Unix
+    }
+    else {
+        # Unix
         if ((uname) -eq 'Darwin') {
-            return 'osx' 
-        } elseif ($RID) {
+            return 'osx'
+        }
+        elseif ($RID) {
             $platform = $RID -replace '(.+)-.*', '$1'
             $legacyOsNameFromPlatform = Get-LegacyOsNameFromPlatform $platform
-            if ($legacyOsNameFromPlatform) { 
+            if ($legacyOsNameFromPlatform) {
                 return $legacyOsNameFromPlatform
-            } else {
+            }
+            else {
                 return $platform
             }
-        } else {
+        }
+        else {
             if (Test-Path /etc/os-release) {
                 $platform = sh -c '. /etc/os-release; printf %s "$ID.$VERSION_ID"'
                 $legacyOsNameFromPlatform = Get-LegacyOsNameFromPlatform $platform
-                if ($legacyOsNameFromPlatform) { 
+                if ($legacyOsNameFromPlatform) {
                     return $legacyOsNameFromPlatform
                 }
             }
@@ -319,21 +348,47 @@ function Test-PreReqs {
 
     if ($IsWindows) {
         # Min. PS version is enforced via the `#requires -version` directive.
-    } else { # Unix
+    }
+    else {
+        # Unix
         if ((uname) -eq 'Linux') {
-            try {
-                $ldconfigBin = (Get-Command -ErrorAction SilentlyContinue ldconfig, /sbin/ldconfig)[0].Source
-            } catch {
-                SayWarning "Cannot locate utility ldconfig, skipping prerequisites check."
-                return
+
+            $isMuslBasedDistro = Test-MuslBasedDistro
+            if ($isMuslBasedDistro) {
+                try {
+                    Get-Command -ErrorAction SilentlyContinue scanelf
+                }
+                catch {
+                    SayWarning 'Unable to locate utility scanelf, please install pax-utils package; skipping prerequisites check.'
+                    return
+                }
+                $ldConfigCmd = { scanelf --ldpath -BF '%f' }
+            }
+            else {
+                try {
+                    $ldconfigBin = (Get-Command -ErrorAction SilentlyContinue ldconfig, /sbin/ldconfig)[0].Source
+                }
+                catch {
+                    SayWarning 'Unable to locate utility ldconfig, skipping prerequisites check.'
+                    return
+                }
+                $libPathList = $env:LD_LIBRARY_PATH -replace ':', ' '
+                $ldConfigCmd = { & $ldconfigBin -NXv $libPathList }
             }
 
-            $libPathList = $env:LD_LIBRARY_PATH -replace ':', ' '
-            # Note: In combination with $ErrorActionPreference = 'Stop', 2>$null would trigger a terminating error if there is stderr output.
-            $availableLibs = & { $ErrorActionPreference = 'Continue'; (& $ldconfigBin -NXv $libPathList 2>$null) -join "`n" }
-            foreach ($lib in 'libunwind', 'libssl', 'libicu', 'libcurl.so') {
+            $availableLibs = & {
+                # Note: In combination with $ErrorActionPreference = 'Stop', 2>$null would trigger a terminating error if there is stderr output.
+                $ErrorActionPreference = 'Continue'
+                (& $ldConfigCmd 2>$null) -join "`n"
+            }
+
+            if ($isMuslBasedDistro -and $availableLibs -notlike '*libintl*') {
+                SayWarning "Unable to locate libintl. Probable prerequisite missing; install libintl (or gettext)."
+            }
+            foreach ($lib in 'zlib', 'ssl', 'libicu', 'lttng', 'libcurl') {
                 if ($availableLibs -notlike "*$lib*") { SayWarning "Unable to locate $lib. Probable prerequisite missing; please install $lib." }
             }
+
         }
     }
 }
@@ -342,12 +397,14 @@ function Get-MachineArchitecture {
     SayInvocation $MyInvocation
 
     if ($IsWindows) {
-        $ENV:PROCESSOR_ARCHITECTURE
-    } else { # Unix-like platforms.
-        switch($(try { uname -m } catch {})) {
-            'armv7l'  { return 'arm' }
+        return $ENV:PROCESSOR_ARCHITECTURE
+    }
+    else {
+        # Unix-like platforms.
+        switch ($(try { uname -m } catch { })) {
+            'armv7l' { return 'arm' }
             'aarch64' { return 'arm64' }
-            default   { return 'x64' } # Always default to 'x64'
+            default { return 'x64' } # Always default to 'x64'
         }
     }
 }
@@ -357,12 +414,13 @@ function Get-CLIArchitectureFromArchitecture([string]$Architecture) {
 
     if (-not $Architecture) { $Architecture = Get-MachineArchitecture }
 
-    switch ($Architecture) { # Note: input may be uppercase.
-        'amd64'  { return 'x64' }
-        'x64'    { return 'x64' }
-        'x86'    { return 'x86' } # Windows only
-        'arm'    { return 'arm' }
-        'arm64'  { return 'arm64' }
+    switch ($Architecture) {
+        # Note: input may be uppercase.
+        'amd64' { return 'x64' }
+        'x64' { return 'x64' }
+        'x86' { return 'x86' } # Windows only
+        'arm' { return 'arm' }
+        'arm64' { return 'arm64' }
         default { throw "Architecture '$Architecture' not supported. If you think this is a bug, please report it at https://github.com/dotnet/cli/issues" }
     }
 }
@@ -380,9 +438,39 @@ function Get-VersionInfoFromVersionText([string]$VersionText) {
 
     $VersionInfo = @{
         CommitHash = $(if ($Data.Count -gt 1) { $Data[0] })
-        Version = $Data[-1] # last line is always the version number.
+        Version    = $Data[-1] # last line is always the version number.
     }
     return $VersionInfo
+}
+
+function Get-VersionFromJsonfile([string]$JSonFile) {
+    SayInvocation $MyInvocation
+
+    If (-Not (Test-Path $JSonFile)) {
+        throw "Unable to find '$JSonFile'"
+    }
+    try {
+        $JSonContent = Get-Content $JSonFile -Raw | ConvertFrom-Json | Select-Object -ExpandProperty 'sdk' -ErrorAction SilentlyContinue
+    }
+    catch {
+        throw "Json file unreadable: '$JSonFile'"
+    }
+    if ($JSonContent) {
+        $Version = try {
+            $JSonContent.version
+            SayVerbose "Version = $Version"
+        }
+        catch {
+            throw "Unable to parse the SDK node in '$JSonFile'"
+        }
+    }
+    else {
+        throw "Unable to find the SDK node in '$JSonFile'"
+    }
+    If ($null -eq $Version) {
+        throw "Unable to find the SDK:version node in '$JSonFile'"
+    }
+    return $Version
 }
 
 function Add-Assembly([string] $Name) {
@@ -395,64 +483,64 @@ function Add-Assembly([string] $Name) {
     }
 }
 
-function GetHTTPResponse([Uri] $Uri)
-{
+function GetHTTPResponse([Uri] $Uri) {
     Invoke-WithRetry(
-    {
+        {
 
-        $HttpClient = $null
+            $HttpClient = $null
 
-        try {
-            # HttpClient is used vs Invoke-WebRequest in order to support Nano Server which doesn't support the Invoke-WebRequest cmdlet.
-            Add-Assembly -Name System.Net.Http
+            try {
+                # HttpClient is used vs Invoke-WebRequest in order to support Nano Server which doesn't support the Invoke-WebRequest cmdlet.
+                Add-Assembly -Name System.Net.Http
 
-            if(-not $ProxyAddress) {
-                try {
-                    # Despite no proxy being explicitly specified, we may still be behind a default proxy
-                    $DefaultProxy = [System.Net.WebRequest]::DefaultWebProxy;
-                    if($DefaultProxy -and (-not $DefaultProxy.IsBypassed($Uri))) {
-                        $ProxyAddress = $DefaultProxy.GetProxy($Uri).OriginalString
-                        $ProxyUseDefaultCredentials = $true
+                if (-not $ProxyAddress) {
+                    try {
+                        # Despite no proxy being explicitly specified, we may still be behind a default proxy
+                        $DefaultProxy = [System.Net.WebRequest]::DefaultWebProxy;
+                        if ($DefaultProxy -and (-not $DefaultProxy.IsBypassed($Uri))) {
+                            $ProxyAddress = $DefaultProxy.GetProxy($Uri).OriginalString
+                            $ProxyUseDefaultCredentials = $true
+                        }
                     }
-                } catch {
-                    # Eat the exception and move forward as the above code is an attempt
-                    #    at resolving the DefaultProxy that may not have been a problem.
-                    $ProxyAddress = $null
-                    SayVerbose "Exception ignored: $_.Exception.Message - moving forward..."
-                }
-            }
-
-            if($ProxyAddress) {
-                $HttpClientHandler = New-Object System.Net.Http.HttpClientHandler
-                $HttpClientHandler.Proxy =  New-Object System.Net.WebProxy -Property @{Address=$ProxyAddress;UseDefaultCredentials=$ProxyUseDefaultCredentials}
-                $HttpClient = New-Object System.Net.Http.HttpClient -ArgumentList $HttpClientHandler
-            }
-            else {
-
-                $HttpClient = New-Object System.Net.Http.HttpClient
-            }
-            # Default timeout for HttpClient is 100s.  For a 50 MB download this assumes 500 KB/s average, any less will time out
-            # 10 minutes allows it to work over much slower connections.
-            $HttpClient.Timeout = New-TimeSpan -Minutes 20
-            $Response = $HttpClient.GetAsync("${Uri}${FeedCredential}").Result
-            if (-not $Response -or -not $Response.IsSuccessStatusCode) {
-                 # The feed credential is potentially sensitive info. Do not log FeedCredential to console output.
-                $ErrorMsg = "Failed to download $Uri."
-                if ($Response) {
-                    $ErrorMsg += "  $Response"
+                    catch {
+                        # Eat the exception and move forward as the above code is an attempt
+                        #    at resolving the DefaultProxy that may not have been a problem.
+                        $ProxyAddress = $null
+                        SayVerbose "Exception ignored: $($_.Exception.Message) - moving forward..."
+                    }
                 }
 
-                throw $ErrorMsg
-            }
+                if ($ProxyAddress) {
+                    $HttpClientHandler = New-Object System.Net.Http.HttpClientHandler
+                    $HttpClientHandler.Proxy = New-Object System.Net.WebProxy -Property @{Address = $ProxyAddress; UseDefaultCredentials = $ProxyUseDefaultCredentials }
+                    $HttpClient = New-Object System.Net.Http.HttpClient -ArgumentList $HttpClientHandler
+                }
+                else {
 
-             return $Response
-        }
-        finally {
-             if ($HttpClient) {
-                $HttpClient.Dispose()
+                    $HttpClient = New-Object System.Net.Http.HttpClient
+                }
+                # Default timeout for HttpClient is 100s.  For a 50 MB download this assumes 500 KB/s average, any less will time out
+                # 10 minutes allows it to work over much slower connections.
+                $HttpClient.Timeout = New-TimeSpan -Minutes 20
+                $Response = $HttpClient.GetAsync("${Uri}${FeedCredential}").Result
+                if (-not $Response -or -not $Response.IsSuccessStatusCode) {
+                    # The feed credential is potentially sensitive info. Do not log FeedCredential to console output.
+                    $ErrorMsg = "Failed to download $Uri."
+                    if ($Response) {
+                        $ErrorMsg += "  $Response"
+                    }
+
+                    throw $ErrorMsg
+                }
+
+                return $Response
             }
-        }
-    })
+            finally {
+                if ($HttpClient) {
+                    $HttpClient.Dispose()
+                }
+            }
+        })
 }
 
 
@@ -460,25 +548,39 @@ function Get-LatestVersionInfo([string]$AzureFeed, [string]$Channel, [switch]$Co
     SayInvocation $MyInvocation
 
     $VersionFileUrl = $null
-    if ($Runtime -eq "dotnet") {
-        $VersionFileUrl = "$UncachedFeed/Runtime/$Channel/latest.version"
-    }
-    elseif ($Runtime -eq "aspnetcore") {
-        $VersionFileUrl = "$UncachedFeed/aspnetcore/Runtime/$Channel/latest.version"
-    }
-    elseif (-not $Runtime) { # SDK with both runtimes
-        if ($Coherent) {
-            $VersionFileUrl = "$UncachedFeed/Sdk/$Channel/latest.coherent.version"
+
+    $VersionFileUrl = switch ($Runtime) {
+        'dotnet' {
+            "$UncachedFeed/Runtime/$Channel/latest.version"; break
         }
-        else {
-            $VersionFileUrl = "$UncachedFeed/Sdk/$Channel/latest.version"
+        'aspnetcore' {
+            "$UncachedFeed/aspnetcore/Runtime/$Channel/latest.version"; break
         }
-    }
-    else {
-        throw "Invalid value for `$Runtime"
+        'windowsdesktop' {
+            # Currently, the WindowsDesktop runtime is manufactured with the .Net core runtime
+            "$UncachedFeed/Runtime/$Channel/latest.version"; break
+        }
+        '' {
+            if ($Coherent) {
+                "$UncachedFeed/Sdk/$Channel/latest.coherent.version"
+            }
+            else {
+                "$UncachedFeed/Sdk/$Channel/latest.version"
+            }
+            break
+        }
+        default {
+            throw "Invalid value for -Runtime: $Runtime"
+        }
     }
 
-    $Response = GetHTTPResponse -Uri $VersionFileUrl
+    try {
+        $Response = GetHTTPResponse -Uri $VersionFileUrl
+    }
+    catch {
+        throw "Could not resolve version information: $VersionFileUrl"
+    }
+
     $StringContent = $Response.Content.ReadAsStringAsync().Result
 
     switch ($Response.Content.Headers.ContentType) {
@@ -495,17 +597,24 @@ function Get-LatestVersionInfo([string]$AzureFeed, [string]$Channel, [switch]$Co
 function Get-SpecificVersionFromVersion([string]$AzureFeed, [string]$Channel, [string]$Version) {
     SayInvocation $MyInvocation
 
-    switch ($Version) {
-        'latest' {
-            $LatestVersionInfo = Get-LatestVersionInfo -AzureFeed $AzureFeed -Channel $Channel
-            return $LatestVersionInfo.Version
+    if (-not $JSonFile) {
+
+        switch ($Version) {
+            'latest' {
+                $LatestVersionInfo = Get-LatestVersionInfo -AzureFeed $AzureFeed -Channel $Channel
+                return $LatestVersionInfo.Version
+            }
+            'coherent' {
+                $LatestVersionInfo = Get-LatestVersionInfo -AzureFeed $AzureFeed -Channel $Channel -Coherent
+                return $LatestVersionInfo.Version
+            }
+            default { return $Version }
         }
-        'coherent' {
-            $LatestVersionInfo = Get-LatestVersionInfo -AzureFeed $AzureFeed -Channel $Channel -Coherent
-            return $LatestVersionInfo.Version
-        }
-        default { return $Version }
     }
+    else {
+        return Get-VersionFromJsonfile $JSonFile
+    }
+
 }
 
 function Get-DownloadLink([string]$AzureFeed, [string]$SpecificVersion, [string]$CLIArchitecture) {
@@ -513,22 +622,31 @@ function Get-DownloadLink([string]$AzureFeed, [string]$SpecificVersion, [string]
 
     $osName = Get-CurrentOsName
 
-    $archiveExtension = if ($IsWindows) { 'zip' } else { 'tar.gz'}
+    $archiveExtension = if ($IsWindows) { 'zip' } else { 'tar.gz' }
 
-    if ($Runtime -eq "dotnet") {
-        $PayloadURL = "$AzureFeed/Runtime/$SpecificVersion/dotnet-runtime-$SpecificVersion-$osName-$CLIArchitecture.$archiveExtension"
-    }
-    elseif ($Runtime -eq "aspnetcore") {
-        $PayloadURL = "$AzureFeed/aspnetcore/Runtime/$SpecificVersion/aspnetcore-runtime-$SpecificVersion-$osName-$CLIArchitecture.$archiveExtension"
-    }
-    elseif (-not $Runtime) {
-        $PayloadURL = "$AzureFeed/Sdk/$SpecificVersion/dotnet-sdk-$SpecificVersion-$osName-$CLIArchitecture.$archiveExtension"
-    }
-    else {
-        throw "Invalid value for `$Runtime"
+    $PayloadURL = switch ($Runtime) {
+        'dotnet' {
+            "$AzureFeed/Runtime/$SpecificVersion/dotnet-runtime-$SpecificVersion-$osName-$CLIArchitecture.$archiveExtension"
+            break
+        }
+        'aspnetcore' {
+            "$AzureFeed/aspnetcore/Runtime/$SpecificVersion/aspnetcore-runtime-$SpecificVersion-$osName-$CLIArchitecture.$archiveExtension"
+            break
+        }
+        'windowsdesktop' {
+            "$AzureFeed/Runtime/$SpecificVersion/windowsdesktop-runtime-$SpecificVersion-win-$CLIArchitecture.zip"
+            break
+        }
+        '' {
+            "$AzureFeed/Sdk/$SpecificVersion/dotnet-sdk-$SpecificVersion-$osName-$CLIArchitecture.$archiveExtension"
+            break
+        }
+        default {
+            throw "Invalid value for -Runtime: $Runtime"
+        }
     }
 
-    SayVerbose "Constructed primary payload URL: $PayloadURL"
+    SayVerbose "Constructed primary named payload URL: $PayloadURL"
 
     return $PayloadURL
 }
@@ -538,7 +656,7 @@ function Get-LegacyDownloadLink([string]$AzureFeed, [string]$SpecificVersion, [s
 
     $distroSpecificOsName = Get-LegacyOSName
 
-    $archiveExtension = if ($IsWindows) { 'zip' } else { 'tar.gz'}
+    $archiveExtension = if ($IsWindows) { 'zip' } else { 'tar.gz' }
 
     if (-not $Runtime) {
         $PayloadURL = "$AzureFeed/Sdk/$SpecificVersion/dotnet-dev-$distroSpecificOsName-$CLIArchitecture.$SpecificVersion.$archiveExtension"
@@ -550,7 +668,7 @@ function Get-LegacyDownloadLink([string]$AzureFeed, [string]$SpecificVersion, [s
         return $null
     }
 
-    SayVerbose "Constructed legacy payload URL: $PayloadURL"
+    SayVerbose "Constructed legacy named payload URL: $PayloadURL"
 
     return $PayloadURL
 }
@@ -561,10 +679,12 @@ function Get-DefaultInstallationPath {
     $InstallRoot = $env:DOTNET_INSTALL_DIR
     if (-not $InstallRoot) {
         $InstallRoot = if ($IsWindows) {
-                         "$env:LocalAppData\Microsoft\dotnet"
-                       } else { # Unix-like platforms
-                         "$HOME/.dotnet"
-                       }
+            "$env:LocalAppData\Microsoft\dotnet"
+        }
+        else {
+            # Unix-like platforms
+            "$HOME/.dotnet"
+        }
     }
     return $InstallRoot
 }
@@ -585,45 +705,28 @@ function Get-RepeatableInvocationCommandLine([string]$SpecificVersion) {
     # Always include the resolved -Version.
     $versionPresent = $false
     $paramTokens = @(foreach ($p in $script:PSBoundParameters.GetEnumerator()) {
-        if ($p.Value -is [switch]) {
-            if ($p.Key -ne 'WhatIf') {
-                if ($p.Value) { "-$($p.Key)" }
+            if ($p.Value -is [switch]) {
+                if ($p.Key -ne 'WhatIf') {
+                    if ($p.Value) { "-$($p.Key)" }
+                }
             }
-        } else {
-            $value = $p.Value
-            if ($p.Key -eq 'Version') {
-                $versionPresent = $true
-                if ($value -notmatch '\d') { $value = $SpecificVersion }
+            else {
+                $value = $p.Value
+                if ($p.Key -eq 'Version') {
+                    $versionPresent = $true
+                    if ($value -notmatch '\d') { $value = $SpecificVersion }
+                }
+                # Quote the argument, if needed; this is fully robust, but should do for this script.
+                if ($value -match ' ') { $value = '"{0}"' -f $value }
+                "-$($p.Key)", $value
             }
-            # Quote the argument, if needed; this is fully robust, but should do for this script.
-            if ($value -match ' ') { $value = '"{0}"' -f $value }
-            "-$($p.Key)", $value
-        }
-    })
-    
+        })
+
     if (-not $versionPresent) {
         $paramTokens += '-Version', $SpecificVersion
     }
 
     return "$scriptNameOrPath $paramTokens"
-}
-
-# Note: Appears to be unused.
-function Get-VersionInfoFromVersionFile([string]$InstallRoot, [string]$RelativePathToVersionFile) {
-    SayInvocation $MyInvocation
-
-    $VersionFile = Join-Path -Path $InstallRoot -ChildPath $RelativePathToVersionFile
-    SayVerbose "Local version file: $VersionFile"
-
-    if (Test-Path $VersionFile) {
-        $VersionText = cat $VersionFile
-        SayVerbose "Local version file text: $VersionText"
-        return Get-VersionInfoFromVersionText $VersionText
-    }
-
-    SayVerbose "Local version file not found."
-
-    return $null
 }
 
 function Test-DotnetPackageInstalled([string]$InstallRoot, [string]$RelativePathToPackage, [string]$SpecificVersion) {
@@ -679,14 +782,15 @@ function Get-ListOfDirectoriesAndVersionsToUnpackFromDotnetZipPackage([System.IO
 function Expand-DotnetPackage([string]$ArchivePath, [string]$OutPath) {
     SayInvocation $MyInvocation
 
-    if ($IsWindows) { # Windows: .zip file
+    if ($IsWindows) {
+        # Windows: .zip file
         Add-Assembly -Name System.IO.Compression.FileSystem
         $Zip = $null
         try {
             $Zip = [System.IO.Compression.ZipFile]::OpenRead($ArchivePath)
-    
+
             $DirectoriesToUnpack = Get-ListOfDirectoriesAndVersionsToUnpackFromDotnetZipPackage -Zip $Zip -OutPath $OutPath
-    
+
             foreach ($entry in $Zip.Entries) {
                 $PathWithVersion = Get-PathPrefixWithVersion $entry.FullName
                 if ((-not $PathWithVersion) -or ($DirectoriesToUnpack -contains $PathWithVersion)) {
@@ -705,7 +809,9 @@ function Expand-DotnetPackage([string]$ArchivePath, [string]$OutPath) {
                 $Zip.Dispose()
             }
         }
-    } else {  # Unix: .tar.gz file
+    }
+    else {
+        # Unix: .tar.gz file
         $sharedTempDir = if ($env:TMPDIR) { $env:TMPDIR } else { '/tmp' }
         $tempOutPath = mktemp -d (Join-Path $sharedTempDir dotnet.XXXXXXXXX)
 
@@ -713,7 +819,7 @@ function Expand-DotnetPackage([string]$ArchivePath, [string]$OutPath) {
         $failed = $LASTEXITCODE -ne 0
 
         if (-not $failed) {
-            $foldersWithVersionRegex='(^.*/[0-9]+\.[0-9]+[^/]+/).*'
+            $foldersWithVersionRegex = '(^.*/[0-9]+\.[0-9]+[^/]+/).*'
             $files = @(find $tempOutPath -type f | sort)
             $uniqueFoldersWithVersionNumbers = @(foreach ($file in $files) { if ($file -match $foldersWithVersionRegex) { $Matches[1] } }) | Get-Unique
             Copy-FileOrDirsFromList -RootPath $tempOutPath -OutPath $OutPath -FilesOrDirs $uniqueFoldersWithVersionNumbers
@@ -737,12 +843,13 @@ function Copy-FileOrDirsFromList {
     )
 
     $RootPath = Remove-TrailingSlash $RootPath
-    $OutPath  = Remove-TrailingSlash $OutPath
+    $OutPath = Remove-TrailingSlash $OutPath
 
     $OverrideOption = if (-not $Override) {
         if ((Get-CurrentOsName) -eq 'linux-musl') {
-            '-u' 
-        } else {
+            '-u'
+        }
+        else {
             '-n'
         }
     }
@@ -791,7 +898,8 @@ function Add-SdkInstallRootToStartOfPath([string]$InstallRoot, [string]$BinFolde
         if (($env:PATH -split [IO.Path]::PathSeparator) -notcontains $BinPath) {
             Say "Prepending to current process PATH: `"$BinPath`". Note: This change will not be visible if PowerShell was run as a child process. Persisting this change must be done manually, as appropriate for your platform or shell."
             $env:PATH = $BinPath + [IO.Path]::PathSeparator + $env:PATH
-        } else {
+        }
+        else {
             SayVerbose "Current process PATH already contains `"$BinPath`""
         }
     }
@@ -800,7 +908,7 @@ function Add-SdkInstallRootToStartOfPath([string]$InstallRoot, [string]$BinFolde
     }
 }
 
-$BinFolderRelativePath="" # The `dotnet` executable is placed directly in the installation folder.
+$BinFolderRelativePath = "" # The `dotnet` executable is placed directly in the installation folder.
 $CLIArchitecture = Get-CLIArchitectureFromArchitecture $Architecture
 $SpecificVersion = Get-SpecificVersionFromVersion -AzureFeed $AzureFeed -Channel $Channel -Version $Version
 $DownloadLink = Get-DownloadLink -AzureFeed $AzureFeed -SpecificVersion $SpecificVersion -CLIArchitecture $CLIArchitecture
@@ -822,20 +930,30 @@ Test-PreReqs
 
 SayVerbose "InstallRoot: $InstallRoot"
 
-if ($Runtime -eq 'dotnet') {
-    $assetName = '.NET Core Runtime'
-    $dotnetPackageRelativePath = 'shared/Microsoft.NETCore.App'
-}
-elseif ($Runtime -eq 'aspnetcore') {
-    $assetName = 'ASP.NET Core Runtime'
-    $dotnetPackageRelativePath = 'shared/Microsoft.AspNetCore.App'
-}
-elseif (-not $Runtime) {
-    $assetName = '.NET Core SDK'
-    $dotnetPackageRelativePath = 'sdk'
-}
-else {
-    throw "Invalid value for `$Runtime"
+switch ($Runtime) {
+    'dotnet' {
+        $assetName = '.NET Core Runtime'
+        $dotnetPackageRelativePath = 'shared/Microsoft.NETCore.App'
+        break
+    }
+    'aspnetcore' {
+        $assetName = 'ASP.NET Core Runtime'
+        $dotnetPackageRelativePath = 'shared/Microsoft.AspNetCore.App'
+        break
+    }
+    'windowsdesktop' {
+        $assetName = '.NET Core Windows Desktop Runtime'
+        $dotnetPackageRelativePath = 'shared\Microsoft.WindowsDesktop.App'
+        break
+    }
+    '' {
+        $assetName = '.NET Core SDK'
+        $dotnetPackageRelativePath = 'sdk'
+        break
+    }
+    default {
+        throw "Invalid value for -Runtime: $Runtime"
+    }
 }
 
 #  Check if the SDK version is already installed.
@@ -893,7 +1011,7 @@ Expand-DotnetPackage -ArchivePath $ArchivePath -OutPath $InstallRoot
 
 #  Check if the SDK version is now installed; if not, fail the installation.
 $isAssetInstalled = Test-DotnetPackageInstalled -InstallRoot $InstallRoot -RelativePathToPackage $dotnetPackageRelativePath -SpecificVersion $SpecificVersion
-if (!$isAssetInstalled) {
+if (-not $isAssetInstalled) {
     throw "`"$assetName`" with version $SpecificVersion failed to install with an unknown error."
 }
 
