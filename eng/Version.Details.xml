@@ -5,10 +5,6 @@
       <Uri>https://github.com/dotnet/templating</Uri>
       <Sha>15b6aee2f5702a8d38bf9063e52f34d8e689ab72</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Ref" Version="3.0.0" Pinned="true">
-      <Uri>https://github.com/dotnet/core-setup</Uri>
-      <Sha>7d57652f33493fa022125b7f63aad0d70c52d810</Sha>
-    </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="3.0.2-servicing-19576-08">
       <Uri>https://github.com/dotnet/core-setup</Uri>
       <Sha>547ae1f5f072d130b32ec3089876711070b2dc4f</Sha>
@@ -39,14 +35,6 @@
       <Uri>https://github.com/aspnet/AspNetCore</Uri>
       <Sha>7891c8318f1026deb1c96054eebead058bb4f50f</Sha>
     </Dependency>
-  </ProductDependencies>
-  <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="1.0.0-beta.19577.5">
-      <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>99c6b59a8afff97fe891341b39abe985f1d3c565</Sha>
-    </Dependency>
-  </ToolsetDependencies>
-  <ProductDependencies>
     <Dependency Name="Microsoft.NET.Sdk" Version="3.0.101-servicing.19529.1">
       <Uri>https://github.com/dotnet/sdk</Uri>
       <Sha>5c9dd04241f307f1aa6b3643d5e07ea89a1dad4a</Sha>
@@ -59,5 +47,19 @@
       <Uri>https://github.com/NuGet/NuGet.Client</Uri>
       <Sha>f2c670b0b7cdc018dc708666b2d58699d9654e42</Sha>
     </Dependency>
+    <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.0.2-servicing-19576-08">
+      <Uri>https://github.com/dotnet/cli</Uri>
+      <Sha>547ae1f5f072d130b32ec3089876711070b2dc4f</Sha>
+    </Dependency>
+    <Dependency Name="Microsoft.NETCore.App.Ref" Version="3.0.0" Pinned="true">
+      <Uri>https://github.com/dotnet/core-setup</Uri>
+      <Sha>7d57652f33493fa022125b7f63aad0d70c52d810</Sha>
+    </Dependency>
   </ProductDependencies>
+  <ToolsetDependencies>
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="1.0.0-beta.19577.5">
+      <Uri>https://github.com/dotnet/arcade</Uri>
+      <Sha>99c6b59a8afff97fe891341b39abe985f1d3c565</Sha>
+    </Dependency>
+  </ToolsetDependencies>
 </Dependencies>
