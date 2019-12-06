@@ -46,14 +46,11 @@ jobs:
         - group: DotNet-HelixApi-Access
         - group: DotNet-Blob-Feed
         - _OfficialBuildIdArgs: /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
-        - _PublishArgs: /p:DotNetPublishBlobFeedKey=$(dotnetfeed-storage-access-key-1)
-                    /p:DotNetPublishBlobFeedUrl=$(PB_PublishBlobFeedUrl)
-                    /p:DotNetPublishToBlobFeed=$(_DotNetPublishToBlobFeed)
+        - _PublishArgs: /p:DotNetPublishToBlobFeed=$(_DotNetPublishToBlobFeed)
                     /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
                     /p:DotNetArtifactsCategory=$(_DotNetArtifactsCategory)
                     /p:DotNetSymbolServerTokenMsdl=$(microsoft-symbol-server-pat)
-                    /p:DotNetSymbolServerTokenSymWeb=$(symweb-symbol-server-pat)
-                    /p:PB_PublishType=$(_PublishType)
+                    /p:DotNetSymbolServerTokenSymWeb=$(symweb-symbol-server-pat)pe)
         - _SignArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
 
     steps:
@@ -69,8 +66,6 @@ jobs:
         env:
           DOTNET_CLI_UI_LANGUAGE: $(_DOTNET_CLI_UI_LANGUAGE)
           DropSuffix: $(_DropSuffix)
-          BlobFeedUrl: $(PB_PublishBlobFeedUrl)
-          PublishType: $(_PublishType)
 
     - ${{ if eq(parameters.agentOs, 'Linux') }}:
       - script: ./build.sh
