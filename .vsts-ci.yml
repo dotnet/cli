@@ -17,6 +17,8 @@ variables:
   - ${{ if ne(variables['System.TeamProject'], 'public') }}:
     - name: _DotNetPublishToBlobFeed
       value: true
+    - name: _DotNetPublishToBlobUrl
+      value: https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json
     - name: _PublishUsingPipelines
       value: true
     - name: _SignType

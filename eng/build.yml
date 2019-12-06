@@ -46,7 +46,9 @@ jobs:
         - group: DotNet-HelixApi-Access
         - group: DotNet-Blob-Feed
         - _OfficialBuildIdArgs: /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
-        - _PublishArgs: /p:DotNetPublishToBlobFeed=$(_DotNetPublishToBlobFeed)
+        - _PublishArgs: /p:DotNetPublishBlobFeedKey=$(dotnetfeed-storage-access-key-1)
+                    /p:DotNetPublishBlobFeedUrl=$(_DotNetPublishToBlobUrl)
+                    /p:DotNetPublishToBlobFeed=$(_DotNetPublishToBlobFeed)
                     /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
                     /p:DotNetArtifactsCategory=$(_DotNetArtifactsCategory)
                     /p:DotNetSymbolServerTokenMsdl=$(microsoft-symbol-server-pat)
