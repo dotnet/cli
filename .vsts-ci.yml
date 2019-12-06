@@ -7,14 +7,14 @@ variables:
     value: Roslyn-Project-System
   - name: _DotNetArtifactsCategory
     value: .NETCore
-  ${{ if eq(variables['System.TeamProject'], 'public') }}:
+  - ${{ if eq(variables['System.TeamProject'], 'public') }}:
     - name: _DotNetPublishToBlobFeed
       value: false
     - name: _PublishUsingPipelines
       value: false
     - name: _SignType
       value: test
-  ${{ if ne(variables['System.TeamProject'], 'public') }}:
+  - ${{ if ne(variables['System.TeamProject'], 'public') }}:
     - name: _DotNetPublishToBlobFeed
       value: true
     - name: _PublishUsingPipelines
