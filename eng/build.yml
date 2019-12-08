@@ -52,7 +52,7 @@ jobs:
                     /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
                     /p:DotNetArtifactsCategory=$(_DotNetArtifactsCategory)
                     /p:DotNetSymbolServerTokenMsdl=$(microsoft-symbol-server-pat)
-                    /p:DotNetSymbolServerTokenSymWeb=$(symweb-symbol-server-pat)pe)
+                    /p:DotNetSymbolServerTokenSymWeb=$(symweb-symbol-server-pat)
         - _SignArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
 
     steps:
