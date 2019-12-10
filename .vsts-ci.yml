@@ -4,21 +4,26 @@ trigger:
 - internal/release/*
 
 variables:
-  teamName: Roslyn-Project-System
-  _DotNetArtifactsCategory: .NETCore
-  ${{ if eq(variables['System.TeamProject'], 'public') }}:
-    PB_PublishBlobFeedKey:
-    PB_PublishBlobFeedUrl:
-    _DotNetPublishToBlobFeed: false
-    _PublishUsingPipelines: false
-    _PublishType: none
-    _SignType: test
-  ${{ if ne(variables['System.TeamProject'], 'public') }}:
-    PB_PublishBlobFeedUrl: https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json
-    _DotNetPublishToBlobFeed: true
-    _PublishUsingPipelines: true
-    _PublishType: blob
-    _SignType: real
+  - name: teamName
+    value: Roslyn-Project-System
+  - name: _DotNetArtifactsCategory
+    value: .NETCore
+  - ${{ if eq(variables['System.TeamProject'], 'public') }}:
+    - name: _DotNetPublishToBlobFeed
+      value: false
+    - name: _PublishUsingPipelines
+      value: false
+    - name: _SignType
+      value: test
+  - ${{ if ne(variables['System.TeamProject'], 'public') }}:
+    - name: _DotNetPublishToBlobFeed
+      value: true
+    - name: _DotNetPublishToBlobUrl
+      value: https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json
+    - name: _PublishUsingPipelines
+      value: true
+    - name: _SignType
+      value: real
 
 stages:
 - stage: build
