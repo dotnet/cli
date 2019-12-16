@@ -31,9 +31,9 @@
       <Uri>https://github.com/dotnet/corefx</Uri>
       <Sha>4ac4c0367003fe3973a3648eb0715ddb0e3bbcea</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.AspNetCore.DeveloperCertificates.XPlat" Version="3.0.2-servicing.19613.19">
+    <Dependency Name="Microsoft.AspNetCore.DeveloperCertificates.XPlat" Version="3.0.2-servicing.19615.7">
       <Uri>https://dev.azure.com/dnceng/internal/_git/aspnet-AspNetCore</Uri>
-      <Sha>8c9356268e71b355dc3911437234a2bd0461461d</Sha>
+      <Sha>561deb05ae2d6680206e3d4a6bc75de699585980</Sha>
     </Dependency>
     <Dependency Name="Microsoft.NET.Sdk" Version="3.0.102-servicing.19613.5">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-sdk</Uri>
