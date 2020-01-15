@@ -57,6 +57,14 @@ jobs:
 
     steps:
     - ${{ if eq(parameters.agentOs, 'Windows_NT') }}:
+      - ${{ if ne(variables['System.TeamProject'], 'public') }}:
+        - task: PowerShell@2
+          displayName: Setup Private Feeds Credentials
+          inputs:
+            filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.ps1
+            arguments: -ConfigFile $(Build.SourcesDirectory)/NuGet.config -Password $Env:Token
+          env:
+            Token: $(dn-bot-dnceng-artifact-feeds-rw)
       - script: build.cmd
                   -test -sign -pack -publish -ci
                   -Configuration $(BuildConfig)
@@ -64,12 +72,21 @@ jobs:
                   $(_PublishArgs)
                   $(_SignArgs)
                   $(_OfficialBuildIdArgs)
+                  $(_InternalRuntimeDownloadArgs)
         displayName: Build
         env:
           DOTNET_CLI_UI_LANGUAGE: $(_DOTNET_CLI_UI_LANGUAGE)
           DropSuffix: $(_DropSuffix)
 
     - ${{ if eq(parameters.agentOs, 'Linux') }}:
+      - ${{ if ne(variables['System.TeamProject'], 'public') }}:
+        - task: Bash@3
+          displayName: Setup Private Feeds Credentials
+          inputs:
+            filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
+            arguments: $(Build.SourcesDirectory)/NuGet.config $Token
+          env:
+            Token: $(dn-bot-dnceng-artifact-feeds-rw)
       - script: ./build.sh
                   --test --pack --publish --ci
                   --configuration $(BuildConfig)
@@ -77,14 +94,24 @@ jobs:
                   --architecture $(BuildArchitecture)
                   $(LinuxPortable)
                   $(RuntimeId)
+                  $(_InternalRuntimeDownloadArgs)
         displayName: Build
         env:
           DropSuffix: $(_DropSuffix)
 
     - ${{ if eq(parameters.agentOs, 'Darwin') }}:
+      - ${{ if ne(variables['System.TeamProject'], 'public') }}:
+        - task: Bash@3
+          displayName: Setup Private Feeds Credentials
+          inputs:
+            filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
+            arguments: $(Build.SourcesDirectory)/NuGet.config $Token
+          env:
+            Token: $(dn-bot-dnceng-artifact-feeds-rw)
       - script: ./build.sh
                   --test --pack --publish --ci
                   --configuration $(BuildConfig)
+                  $(_InternalRuntimeDownloadArgs)
         displayName: Build
 
     - ${{ if and(eq(parameters.enablePublishBuildAssets, true), eq(parameters.runAsPublic, 'false'), ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
