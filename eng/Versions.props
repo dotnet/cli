@@ -32,14 +32,14 @@
   </PropertyGroup>
   <PropertyGroup>
     <!-- Dependencies from https://github.com/microsoft/msbuild -->
-    <MicrosoftBuildPackageVersion>16.2.0-preview.19261.3</MicrosoftBuildPackageVersion>
+    <MicrosoftBuildPackageVersion>16.3.0</MicrosoftBuildPackageVersion>
     <MicrosoftBuildFrameworkPackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildFrameworkPackageVersion>
     <MicrosoftBuildRuntimePackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildRuntimePackageVersion>
     <MicrosoftBuildUtilitiesCorePackageVersion>$(MicrosoftBuildPackageVersion)</MicrosoftBuildUtilitiesCorePackageVersion>
   </PropertyGroup>
   <PropertyGroup>
     <!-- Dependencies from https://github.com/dotnet/sdk -->
-    <MicrosoftNETSdkPackageVersion>3.0.102-servicing.19613.13</MicrosoftNETSdkPackageVersion>
+    <MicrosoftNETSdkPackageVersion>3.0.103-servicing.20064.5</MicrosoftNETSdkPackageVersion>
     <MicrosoftNETBuildExtensionsPackageVersion>$(MicrosoftNETSdkPackageVersion)</MicrosoftNETBuildExtensionsPackageVersion>
   </PropertyGroup>
   <PropertyGroup>
