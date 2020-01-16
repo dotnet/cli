@@ -27,13 +27,13 @@
     </Dependency>
     <!-- Specific version here is not interesting, but we want Maestro to add corefx
          private feeds -->
-    <Dependency Name="System.Text.Json" Version="4.7.1" CoherentParentDependency="Microsoft.NETCore.App.Runtime.win-x64">
+    <Dependency Name="System.Text.Json" Version="4.7.0" CoherentParentDependency="Microsoft.NETCore.App.Runtime.win-x64">
       <Uri>https://github.com/dotnet/corefx</Uri>
-      <Sha>07080ceab1e5b305d8a5fecd9d5b793fb502d57a</Sha>
+      <Sha>0f7f38c4fd323b26da10cce95f857f77f0f09b48</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.AspNetCore.DeveloperCertificates.XPlat" Version="3.1.2-servicing.20065.6">
+    <Dependency Name="Microsoft.AspNetCore.DeveloperCertificates.XPlat" Version="3.1.2-servicing.20066.1">
       <Uri>https://github.com/dotnet/aspnetcore</Uri>
-      <Sha>36e79022bebf4974a3352a6e1dcc869ae67997fe</Sha>
+      <Sha>4682c2a6dcb52bd64bf4a81a724a878402619934</Sha>
     </Dependency>
     <!-- Keep this dependency at the bottom of ProductDependencies, else it will be picked as the parent for CoherentParentDependencies -->
     <Dependency Name="Microsoft.NETCore.App.Ref" Version="3.1.0" Pinned="true">
