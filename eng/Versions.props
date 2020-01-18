@@ -28,7 +28,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <!-- Dependencies from https://github.com/dotnet/corefx -->
-    <SystemTextJsonPackageVersion>4.7.0</SystemTextJsonPackageVersion>
+    <SystemTextJsonPackageVersion>4.7.1</SystemTextJsonPackageVersion>
   </PropertyGroup>
   <PropertyGroup>
     <!-- Dependencies from https://github.com/aspnet/AspNetCore -->
