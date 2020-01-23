@@ -20,9 +20,6 @@
       <VSNupkgsForPublishing
         Include="$(PackagesDirectory)/VS.Redist.Common.Net.Core.SDK.MSBuildExtensions.*.nupkg"
         Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' " />
-      <VSNupkgsForPublishing
-        Include="$(PackagesDirectory)/VS.Redist.Common.Net.Core.SDK.MSBuildExtensions.swr"
-        Condition=" '$(OS)' == 'Windows_NT' And '$(Architecture)' == 'x64' " />
 
       <NupkgsForPublishing Include="@(VSNupkgsForPublishing)">
         <ManifestArtifactData>NonShipping=true</ManifestArtifactData>
