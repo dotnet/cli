@@ -35,9 +35,9 @@
       <Uri>https://github.com/dotnet/aspnetcore</Uri>
       <Sha>bd1e14b7d16b798de8a874189c89afed755a266c</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NET.Sdk" Version="3.0.103-servicing.20070.2">
+    <Dependency Name="Microsoft.NET.Sdk" Version="3.0.103-servicing.20113.1">
       <Uri>https://github.com/dotnet/sdk</Uri>
-      <Sha>316fbdd10e8829faaf9157ecbb05795e75b618f7</Sha>
+      <Sha>8dcd59d6e006679f7c1932801f733a72e5a3f221</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19208.1">
       <Uri>https://github.com/dotnet/CliCommandLineParser</Uri>
