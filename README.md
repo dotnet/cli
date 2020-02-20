@@ -6,7 +6,7 @@ For more information, see [dotnet/announcements#119 "Consolidating .NET GitHub r
 
 # Looking for the .NET Core SDK tooling?
 
-If you are looking for the latest nightly of thegit  .NET Core SDK, see https://github.com/dotnet/core-sdk.
+If you are looking for the latest nightly of the .NET Core SDK, see https://github.com/dotnet/core-sdk.
 
 # Build status
 
