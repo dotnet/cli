@@ -10,6 +10,4 @@ If you are looking for the latest nightly of the .NET Core SDK, see https://gith
 
 # Build status
 
-|Windows x64|
-|:------:|
-|[![Build Status](https://dev.azure.com/dnceng/internal/_apis/build/status/224)](https://dev.azure.com/dnceng/internal/_build?definitionId=224)|
+[![Build Status](https://dev.azure.com/dnceng/internal/_apis/build/status/224)](https://dev.azure.com/dnceng/internal/_build?definitionId=224)
