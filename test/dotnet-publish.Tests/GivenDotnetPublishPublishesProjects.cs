@@ -120,6 +120,13 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
         {
             var testAppName = "MSBuildTestApp";
             var rid = DotnetLegacyRuntimeIdentifiers.InferLegacyRestoreRuntimeIdentifier();
+
+            // cap OSX rid 10.13 for 2.1.xxx
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                rid = "osx.10.13-x64"
+            }
+
             var outputDirectory = PublishApp(testAppName, rid, args);
 
             outputDirectory.Should().OnlyHaveFiles(new[] {
