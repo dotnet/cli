@@ -52,7 +52,7 @@
       <Uri>https://github.com/dotnet/sdk</Uri>
       <Sha>06bdc9ce0f3f21c365b998a34165c9c6a8019589</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.4-servicing.20181.2">
+    <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.4-servicing.20202.1">
       <Uri>https://github.com/dotnet/core-setup</Uri>
       <Sha>57d5bbb58f17a8cb3a82c81839c9379b4fcfe0d8</Sha>
     </Dependency>
