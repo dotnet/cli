@@ -83,6 +83,9 @@ $env:DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0
 $env:VSTEST_BUILD_TRACE=1
 $env:VSTEST_TRACE_BUILD=1
 
+# Enable TLS1.2
+[Net.ServicePointManager]::SecurityProtocol += [Net.SecurityProtocolType]::Tls12
+
 # install a stage0
 $dotnetInstallPath = Join-Path $RepoRoot "scripts\obtain\dotnet-install.ps1"
 
