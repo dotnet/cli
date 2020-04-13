@@ -76,7 +76,7 @@
 
   <!-- infrastructure and test only dependencies -->
   <PropertyGroup>
-    <BuildTasksFeedToolVersion>2.1.0-rc1-04626-02</BuildTasksFeedToolVersion>
+    <BuildTasksFeedToolVersion>2.1.0-rc1-05113-01</BuildTasksFeedToolVersion>
     <VersionToolsVersion>$(BuildTasksFeedToolVersion)</VersionToolsVersion>
     <DotnetDebToolVersion>2.0.0</DotnetDebToolVersion>
   </PropertyGroup>
