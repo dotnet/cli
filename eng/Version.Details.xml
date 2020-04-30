@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.TemplateEngine.Cli" Version="3.1.4-servicing.20177.1">
+    <Dependency Name="Microsoft.TemplateEngine.Cli" Version="3.1.2-servicing.20064.1">
       <Uri>https://github.com/dotnet/templating</Uri>
-      <Sha>55ff2d0d7b63a97b2e53dc2e94df8d1cae9858ac</Sha>
+      <Sha>247f60e9e34a03ed99e855eb1ea0c20931a968db</Sha>
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="3.1.4">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
@@ -31,9 +31,9 @@
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-corefx</Uri>
       <Sha>aa650a2cf7cad8f234926b5e374cb2f006065db2</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.AspNetCore.DeveloperCertificates.XPlat" Version="3.1.4-servicing.20205.4">
-      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-aspnetcore</Uri>
-      <Sha>a68e5e2c420ec6a733e5adcda0459ddcfadfe1a4</Sha>
+    <Dependency Name="Microsoft.AspNetCore.DeveloperCertificates.XPlat" Version="3.1.2-servicing.20068.1">
+      <Uri>https://github.com/dotnet/aspnetcore</Uri>
+      <Sha>c3acdcac86dad91c3d3fbc3b93ecc6b7ba494bdc</Sha>
     </Dependency>
     <!-- Keep this dependency at the bottom of ProductDependencies, else it will be picked as the parent for CoherentParentDependencies -->
     <Dependency Name="Microsoft.NETCore.App.Ref" Version="3.1.0" Pinned="true">
@@ -48,9 +48,9 @@
     </Dependency>
   </ToolsetDependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.NET.Sdk" Version="3.1.300-preview.20202.4">
+    <Dependency Name="Microsoft.NET.Sdk" Version="3.1.300-preview.20229.6">
       <Uri>https://github.com/dotnet/sdk</Uri>
-      <Sha>fa5992a1d50a0257c732dfd009f98d6da00aa067</Sha>
+      <Sha>42ea8278db4c13727a7ac5db923228716e986bfa</Sha>
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.4-servicing.20203.4">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
@@ -60,9 +60,9 @@
       <Uri>https://github.com/dotnet/CliCommandLineParser</Uri>
       <Sha>0e89c2116ad28e404ba56c14d1c3f938caa25a01</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Build.Tasks" Version="5.6.0-preview.2.6532">
+    <Dependency Name="NuGet.Build.Tasks" Version="5.6.0-rtm.6591">
       <Uri>https://github.com/NuGet/NuGet.Client</Uri>
-      <Sha>1c2681b16a0bb9be9271abe043a1cbf892761ef8</Sha>
+      <Sha>636570e68732c1f718ede9ca07802d7b1cc69aa0</Sha>
     </Dependency>
   </ProductDependencies>
 </Dependencies>
