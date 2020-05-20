@@ -75,6 +75,12 @@ jobs:
   displayName: opensuse.42.3 x64 Debug Build
   timeoutInMinutes: 90
   pool:
+    ${{ if eq(variables['System.TeamProject'], 'public') }}:
+      name: NetCorePublic-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64.Open
+    ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+      name: NetCoreInternal-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --docker opensuse.42.3 --linux-portable
@@ -88,6 +94,12 @@ jobs:
   displayName: RHEL6 x64 Debug Build
   timeoutInMinutes: 90
   pool:
+    ${{ if eq(variables['System.TeamProject'], 'public') }}:
+      name: NetCorePublic-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64.Open
+    ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+      name: NetCoreInternal-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --runtime-id rhel.6-x64 --docker rhel.6
@@ -210,6 +222,12 @@ jobs:
   displayName: Ubuntu x64 Release Build
   timeoutInMinutes: 90
   pool:
+    ${{ if eq(variables['System.TeamProject'], 'public') }}:
+      name: NetCorePublic-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64.Open
+    ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+      name: NetCoreInternal-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Release --targets Default --docker ubuntu.14.04
