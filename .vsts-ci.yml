@@ -73,6 +73,7 @@ jobs:
 
 - job: debug_opensuse423_x64
   displayName: opensuse.42.3 x64 Debug Build
+  timeoutInMinutes: 90
   pool:
     vmImage: ubuntu-16.04
   steps:
@@ -85,6 +86,7 @@ jobs:
 
 - job: debug_rhel6_x64
   displayName: RHEL6 x64 Debug Build
+  timeoutInMinutes: 90
   pool:
     vmImage: ubuntu-16.04
   steps:
@@ -206,6 +208,7 @@ jobs:
 
 - job: release_ubuntu_x64
   displayName: Ubuntu x64 Release Build
+  timeoutInMinutes: 90
   pool:
     vmImage: ubuntu-16.04
   steps:
