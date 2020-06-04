@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.Tests.ParserTests
             var restore =
                 Parser.Instance
                       .Parse(
-                          @"dotnet restore --no-cache --packages ""D:\OSS\corefx\packages"" --source https://dotnet.myget.org/F/dotnet-buildtools/api/v3/index.json --source https://dotnet.myget.org/F/dotnet-core/api/v3/index.json --source https://api.nuget.org/v3/index.json D:\OSS\corefx\external\runtime\runtime.depproj")
+                          @"dotnet restore --no-cache --packages ""D:\OSS\corefx\packages"" --source https://pkgs.dev.azure.com/dnceng/public/_packaging/myget-legacy/nuget/v3/index.json --source https://dotnetmygetlegacy.blob.core.windows.net/dotnet-core/index.json --source https://api.nuget.org/v3/index.json D:\OSS\corefx\external\runtime\runtime.depproj")
                       .AppliedCommand();
 
             restore
@@ -63,8 +63,8 @@ namespace Microsoft.DotNet.Tests.ParserTests
                 .Arguments
                 .Should()
                 .BeEquivalentTo(
-                    "https://dotnet.myget.org/F/dotnet-buildtools/api/v3/index.json",
-                    "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json",
+                    "https://pkgs.dev.azure.com/dnceng/public/_packaging/myget-legacy/nuget/v3/index.json",
+                    "https://dotnetmygetlegacy.blob.core.windows.net/dotnet-core/index.json",
                     "https://api.nuget.org/v3/index.json");
         }
     }
