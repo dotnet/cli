@@ -2,9 +2,11 @@
 
 _dotnet_zsh_complete() 
 {
-  local completions=("$(dotnet complete "$words")")
 
-  reply=( "${(ps:\n:)completions}" )
+    #compdef dotnet
+    local completions=("$(dotnet complete "$words")")
+    compadd "${(ps:\n:)completions}"
+    
 }
 
 compctl -K _dotnet_zsh_complete dotnet
