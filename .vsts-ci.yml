@@ -12,6 +12,12 @@ jobs:
 - job: debug_centos71_x64
   displayName: CentOS7.1 x64 Debug Build
   pool:
+    ${{ if eq(variables['System.TeamProject'], 'public') }}:
+      name: NetCorePublic-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64.Open
+    ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+      name: NetCoreInternal-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default
@@ -24,6 +30,12 @@ jobs:
 - job: debug_debian82_x64
   displayName: Debian8.2 x64 Debug Build
   pool:
+    ${{ if eq(variables['System.TeamProject'], 'public') }}:
+      name: NetCorePublic-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64.Open
+    ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+      name: NetCoreInternal-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default
@@ -36,6 +48,12 @@ jobs:
 - job: debug_fedora27_x64
   displayName: fedora.27 x64 Debug Build
   pool:
+    ${{ if eq(variables['System.TeamProject'], 'public') }}:
+      name: NetCorePublic-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64.Open
+    ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+      name: NetCoreInternal-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --docker fedora.27 --linux-portable
@@ -48,6 +66,12 @@ jobs:
 - job: debug_linux_arm
   displayName: Linux arm Debug Build
   pool:
+    ${{ if eq(variables['System.TeamProject'], 'public') }}:
+      name: NetCorePublic-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64.Open
+    ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+      name: NetCoreInternal-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --linux-portable --architecture arm /p:CLIBUILD_SKIP_TESTS=true
@@ -55,6 +79,12 @@ jobs:
 - job: debug_linux_arm64
   displayName: Linux arm64 Debug Build
   pool:
+    ${{ if eq(variables['System.TeamProject'], 'public') }}:
+      name: NetCorePublic-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64.Open
+    ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+      name: NetCoreInternal-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --linux-portable --architecture arm64 /p:CLIBUILD_SKIP_TESTS=true
@@ -62,6 +92,12 @@ jobs:
 - job: debug_linux_musl_x64
   displayName: Linux-musl x64 Debug Build
   pool:
+    ${{ if eq(variables['System.TeamProject'], 'public') }}:
+      name: NetCorePublic-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64.Open
+    ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+      name: NetCoreInternal-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --runtime-id linux-musl-x64 --docker alpine.3.6
@@ -112,6 +148,12 @@ jobs:
 - job: debug_ubuntu1604_x64
   displayName: Ubuntu16.04 x64 Debug Build
   pool:
+    ${{ if eq(variables['System.TeamProject'], 'public') }}:
+      name: NetCorePublic-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64.Open
+    ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+      name: NetCoreInternal-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default
@@ -124,6 +166,12 @@ jobs:
 - job: debug_ubuntu1804_x64
   displayName: ubuntu.18.04 x64 Debug Build
   pool:
+    ${{ if eq(variables['System.TeamProject'], 'public') }}:
+      name: NetCorePublic-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64.Open
+    ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+      name: NetCoreInternal-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --docker ubuntu.18.04 --linux-portable
@@ -162,6 +210,12 @@ jobs:
 - job: release_linux_nosuffix_arm
   displayName: Linux_NoSuffix arm Release Build
   pool:
+    ${{ if eq(variables['System.TeamProject'], 'public') }}:
+      name: NetCorePublic-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64.Open
+    ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+      name: NetCoreInternal-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: |
@@ -171,6 +225,12 @@ jobs:
 - job: release_linux_nosuffix_x64
   displayName: Linux_NoSuffix x64 Release Build
   pool:
+    ${{ if eq(variables['System.TeamProject'], 'public') }}:
+      name: NetCorePublic-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64.Open
+    ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+      name: NetCoreInternal-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: |
@@ -185,6 +245,12 @@ jobs:
 - job: release_linux_x64
   displayName: Linux x64 Release Build
   pool:
+    ${{ if eq(variables['System.TeamProject'], 'public') }}:
+      name: NetCorePublic-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64.Open
+    ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+      name: NetCoreInternal-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Release --targets Default --linux-portable
@@ -209,6 +275,12 @@ jobs:
 - job: release_rhel72_x64
   displayName: RHEL7.2 x64 Release Build
   pool:
+    ${{ if eq(variables['System.TeamProject'], 'public') }}:
+      name: NetCorePublic-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64.Open
+    ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+      name: NetCoreInternal-Pool
+      queue: BuildPool.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Release --targets Default
