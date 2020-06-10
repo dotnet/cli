@@ -2,7 +2,7 @@
   <PropertyGroup>
     <VersionMajor>2</VersionMajor>
     <VersionMinor>1</VersionMinor>
-    <VersionPatch>612</VersionPatch>
+    <VersionPatch>613</VersionPatch>
     <ReleaseSuffix Condition=" '$(ReleaseSuffix)' == '' ">preview</ReleaseSuffix>
 
     <MajorMinorVersion>$(VersionMajor).$(VersionMinor)</MajorMinorVersion>
