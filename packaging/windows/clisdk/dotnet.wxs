@@ -11,6 +11,7 @@
     <Feature Id="MainFeature" Title="Main Feature" Level="1">
       <ComponentGroupRef Id="InstallFiles" />
       <ComponentGroupRef Id="AuthoredRegistryKeys"/>
+      <ComponentGroupRef Id="DotnetToolSetup"/>
     </Feature>
     <Feature Id="Provider" Absent="disallow" AllowAdvertise="no" Description="Used for Ref Counting" Display="hidden" Level="1" InstallDefault="local" Title="RefCounting" TypicalDefault="install">
       <ComponentRef Id="$(var.DependencyKeyId)" />
@@ -53,5 +54,12 @@
         <Directory Id="DOTNETHOME" Name="dotnet"/>
       </Directory>
     </Directory>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="DotnetToolSetup">
+      <Component Id="AppendDotnetToolShimPath" Directory="TARGETDIR" Guid="{241B7B8D-7817-41C1-807F-5F4010BF583A}">
+        <Environment Id="E_PATH" Name="PATH" Value="%USERPROFILE%\.dotnet\tools" Part="last" Action="set" System="no" />
+      </Component>
+    </ComponentGroup>
   </Fragment>
 </Wix>
