@@ -195,7 +195,7 @@ namespace Microsoft.DotNet.Cli.Test.Tests
             }
         }
 
-        [Fact(Skip="https://github.com/microsoft/vstest/issues/2202")]
+        [Fact]
         public void TestWillNotBuildTheProjectIfNoBuildArgsIsGiven()
         {
             // Copy and restore VSTestCore project in output directory of project dotnet-vstest.Tests
