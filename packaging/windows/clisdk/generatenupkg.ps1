@@ -11,6 +11,8 @@ param(
     [Parameter(Mandatory=$true)][string]$NupkgFile
 )
 
+[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bOR [Net.SecurityProtocolType]::Tls12
+
 . "$PSScriptRoot\..\..\..\scripts\common\_common.ps1"
 $RepoRoot = Convert-Path "$PSScriptRoot\..\..\.."
 $NuGetDir = Join-Path $RepoRoot ".nuget"
@@ -27,6 +29,11 @@ function DownloadNugetExe
     if (-not (Test-Path $NuGetExe)) {
         Write-Output 'Downloading nuget.exe to ' + $NuGetExe
         wget https://dist.nuget.org/win-x86-commandline/v3.5.0-rc1/NuGet.exe -OutFile $NuGetExe
+    }
+
+    if (-not (Test-Path $NuGetExe)) {
+        Write-Error "Could not download nuget.exe"
+        Exit 1
     }
 }
 
