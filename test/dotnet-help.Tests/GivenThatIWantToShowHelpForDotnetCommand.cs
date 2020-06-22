@@ -16,30 +16,28 @@ namespace Microsoft.DotNet.Help.Tests
         private const string HelpText =
 @"Usage: dotnet [runtime-options] [path-to-application] [arguments]
 
-Execute a .NET application.
+Execute a .NET Core application.
 
 runtime-options:
   --additionalprobingpath <path>   Path containing probing policy and assemblies to probe for.
   --additional-deps <path>         Path to additional deps.json file.
-  --depsfile                       Path to <application>.deps.json file.
   --fx-version <version>           Version of the installed Shared Framework to use to run the application.
   --roll-forward <setting>         Roll forward to framework version  (LatestPatch, Minor, LatestMinor, Major, LatestMajor, Disable).
-  --runtimeconfig                  Path to <application>.runtimeconfig.json file.
 
 path-to-application:
   The path to an application .dll file to execute.
 
 Usage: dotnet [sdk-options] [command] [command-options] [arguments]
 
-Execute a .NET SDK command.
+Execute a .NET Core SDK command.
 
 sdk-options:
   -d|--diagnostics  Enable diagnostic output.
   -h|--help         Show command line help.
-  --info            Display .NET information.
+  --info            Display .NET Core information.
   --list-runtimes   Display the installed runtimes.
   --list-sdks       Display the installed SDKs.
-  --version         Display .NET SDK version in use.
+  --version         Display .NET Core SDK version in use.
 
 SDK commands:
   add               Add a package or reference to a .NET project.
