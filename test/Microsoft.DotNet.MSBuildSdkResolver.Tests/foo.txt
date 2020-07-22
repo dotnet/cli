@@ -1,0 +1,203 @@
+Test run for C:\git\cli\artifacts\bin\Microsoft.DotNet.MSBuildSdkResolver.Tests\Debug\net472\Microsoft.DotNet.MSBuildSdkResolver.Tests.dll(.NETFramework,Version=v4.7.2)
+Microsoft (R) Test Execution Command Line Tool Version 16.6.0
+Copyright (c) Microsoft Corporation.  All rights reserved.
+
+Starting test execution, please wait...
+
+A total of 1 test files matched the specified pattern.
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItReturnsNullWhenTheTheVSRequiredSDKVersionIsHigherThanTheSDKVersionAvailable [69ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItReturnsNullWhenTheTheVSRequiredSDKVersionIsHigherThanTheSDKVersionAvailable() in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 224
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItReturnsNullWhenTheDefaultVSRequiredSDKVersionIsHigherThanTheSDKVersionAvailable [7ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItReturnsNullWhenTheDefaultVSRequiredSDKVersionIsHigherThanTheSDKVersionAvailable() in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 202
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItDisallowsPreviewsBasedOnFile(disallowPreviews: False) [14ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItDisallowsPreviewsBasedOnFile(Boolean disallowPreviews) in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 319
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItDisallowsPreviewsBasedOnFile(disallowPreviews: True) [13ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItDisallowsPreviewsBasedOnFile(Boolean disallowPreviews) in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 319
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItDoesNotReturnHighestSdkAvailableThatIsCompatibleWithMSBuildWhenVersionInGlobalJsonCannotBeFound(disallowPreviews: True) [57ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItDoesNotReturnHighestSdkAvailableThatIsCompatibleWithMSBuildWhenVersionInGlobalJsonCannotBeFound(Boolean disallowPreviews) in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 177
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItDoesNotReturnHighestSdkAvailableThatIsCompatibleWithMSBuildWhenVersionInGlobalJsonCannotBeFound(disallowPreviews: False) [33ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItDoesNotReturnHighestSdkAvailableThatIsCompatibleWithMSBuildWhenVersionInGlobalJsonCannotBeFound(Boolean disallowPreviews) in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 177
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItDisallowsPreviewsBasedOnDefault(disallowPreviewsByDefault: True) [8ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItDisallowsPreviewsBasedOnDefault(Boolean disallowPreviewsByDefault) in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 292
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItDisallowsPreviewsBasedOnDefault(disallowPreviewsByDefault: False) [11ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItDisallowsPreviewsBasedOnDefault(Boolean disallowPreviewsByDefault) in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 292
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItRespectsAmbientVSSettings [8ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItRespectsAmbientVSSettings() in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 419
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItReturnsTheVersionIfItIsHigherThanTheMinVersionAndTheVSDefinedMinVersion [11ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItReturnsTheVersionIfItIsHigherThanTheMinVersionAndTheVSDefinedMinVersion() in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 266
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItReturnsNullWhenTheSDKRequiresAHigherVersionOfMSBuildThanAnyOneAvailable [6ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItReturnsNullWhenTheSDKRequiresAHigherVersionOfMSBuildThanAnyOneAvailable() in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 110
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItDoesNotFindMSBuildSdkThatIsMissingFromLocatedNETCoreSdk [6ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItDoesNotFindMSBuildSdkThatIsMissingFromLocatedNETCoreSdk() in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 46
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItReturnsHighestSdkAvailableThatIsCompatibleWithMSBuild(disallowPreviews: True) [16ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItReturnsHighestSdkAvailableThatIsCompatibleWithMSBuild(Boolean disallowPreviews) in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 143
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItReturnsHighestSdkAvailableThatIsCompatibleWithMSBuild(disallowPreviews: False) [13ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItReturnsHighestSdkAvailableThatIsCompatibleWithMSBuild(Boolean disallowPreviews) in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 143
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItAllowsPreviewWhenGlobalJsonHasPreviewIrrespectiveOfSetting [12ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItAllowsPreviewWhenGlobalJsonHasPreviewIrrespectiveOfSetting() in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 391
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItObservesChangesToVSSettingsFile [9ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.<ItObservesChangesToVSSettingsFile>g__Check|15_0(Boolean disallowPreviews, String message, <>c__DisplayClass15_0& ) in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 348
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItObservesChangesToVSSettingsFile() in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 364
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItReturnsTheVersionIfItIsEqualToTheMinVersionAndTheVSDefinedMinVersion [9ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItReturnsTheVersionIfItIsEqualToTheMinVersionAndTheVSDefinedMinVersion() in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 245
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItFindsTheVersionSpecifiedInGlobalJson [15ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItFindsTheVersionSpecifiedInGlobalJson() in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 69
+  X Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItReturnsNullIfTheVersionFoundDoesNotSatisfyTheMinVersion [13ms]
+  Error Message:
+   System.DllNotFoundException : Unable to load DLL 'hostfxr': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+  Stack Trace:
+     at Microsoft.DotNet.MSBuildSdkResolver.Interop.Windows.hostfxr_resolve_sdk2(String exe_dir, String working_dir, hostfxr_resolve_sdk2_flags_t flags, hostfxr_resolve_sdk2_result_fn result)
+   at Microsoft.DotNet.MSBuildSdkResolver.NETCoreSdkResolver.ResolveSdk(String dotnetExeDirectory, String globalJsonStartDirectory, Boolean disallowPrerelease) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\NETCoreSdkResolver.cs:line 45
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.ResolveNETCoreSdkDirectory(SdkResolverContext context, String dotnetExeDir) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 294
+   at Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver.Resolve(SdkReference sdkReference, SdkResolverContext context, SdkResultFactory factory) in C:\git\cli\src\Microsoft.DotNet.MSBuildSdkResolver\MSBuildSdkResolver.cs:line 78
+   at Microsoft.DotNet.Cli.Utils.Tests.GivenAnMSBuildSdkResolver.ItReturnsNullIfTheVersionFoundDoesNotSatisfyTheMinVersion() in C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\GivenAnMSBuildSdkResolver.cs:line 89
+
+Total tests: 100
+     Passed: 81
+     Failed: 19
+ Total time: 3.4882 Seconds
+C:\git\cli\artifacts\tmp\Debug\dotnet\sdk\3.1.400-preview-015138\Microsoft.TestPlatform.targets(32,5): error MSB4181: The "Microsoft.TestPlatform.Build.Tasks.VSTestTask" task returned false but did not log an error. [C:\git\cli\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\Microsoft.DotNet.MSBuildSdkResolver.Tests.csproj]
+Test run for C:\git\cli\artifacts\bin\Microsoft.DotNet.MSBuildSdkResolver.Tests\Debug\netcoreapp3.1\Microsoft.DotNet.MSBuildSdkResolver.Tests.dll(.NETCoreApp,Version=v3.1)
+Microsoft (R) Test Execution Command Line Tool Version 16.6.0
+Copyright (c) Microsoft Corporation.  All rights reserved.
+
+Starting test execution, please wait...
+
+A total of 1 test files matched the specified pattern.
+  98.98.98 [C:\git\cli\artifacts\tmp\Debug\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\ItDoesNotReturnHighest___True\temp\ProgramFilesX64\dotnet\sdk]
+  99.99.99-preview [C:\git\cli\artifacts\tmp\Debug\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\ItDoesNotReturnHighest___True\temp\ProgramFilesX64\dotnet\sdk]
+  100.100.100 [C:\git\cli\artifacts\tmp\Debug\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\ItDoesNotReturnHighest___True\temp\ProgramFilesX64\dotnet\sdk]
+  98.98.98 [C:\git\cli\artifacts\tmp\Debug\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\ItDoesNotReturnHighest___False\temp\ProgramFilesX64\dotnet\sdk]
+  99.99.99-preview [C:\git\cli\artifacts\tmp\Debug\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\ItDoesNotReturnHighest___False\temp\ProgramFilesX64\dotnet\sdk]
+  100.100.100 [C:\git\cli\artifacts\tmp\Debug\test\Microsoft.DotNet.MSBuildSdkResolver.Tests\ItDoesNotReturnHighest___False\temp\ProgramFilesX64\dotnet\sdk]
+
+Test Run Successful.
+Total tests: 100
+     Passed: 100
+ Total time: 5.4023 Seconds
