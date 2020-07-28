@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 <packageSources>
 <!--To inherit the global NuGet package sources remove the <clear/> line below -->
 <clear />
-<add key=""dotnet-core"" value=""https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"" />
+<add key=""dotnet-core"" value=""https://dotnetmygetlegacy.blob.core.windows.net/dotnet-core/index.json"" />
 <add key=""api.nuget.org"" value=""https://api.nuget.org/v3/index.json"" />
 </packageSources>
 </configuration>";
@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 <clear />
 <add key=""Test Source"" value=""{0}"" />
 <add key=""api.nuget.org"" value=""https://api.nuget.org/v3/index.json"" />
-<add key=""dotnet-core"" value=""https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"" />
+<add key=""dotnet-core"" value=""https://dotnetmygetlegacy.blob.core.windows.net/dotnet-core/index.json"" />
 </packageSources>
 </configuration>";
 
