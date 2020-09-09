@@ -5,9 +5,9 @@
       <Uri>https://github.com/dotnet/templating</Uri>
       <Sha>71adc404dea8fee00cdce403259342cf470791ca</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="3.1.8">
+    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="3.1.9">
       <Uri>https://github.com/dotnet/core-setup</Uri>
-      <Sha>9c1330deddc14e8c564e30402d6a644c43110778</Sha>
+      <Sha>9f4908fb7b083d83968071a5e18865e3a123e88d</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
@@ -21,9 +21,9 @@
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
       <Sha>bed381477994a1fc59f84b39b9e00d34324c858e</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.DotNetHostResolver" Version="3.1.8">
+    <Dependency Name="Microsoft.NETCore.DotNetHostResolver" Version="3.1.9">
       <Uri>https://github.com/dotnet/core-setup</Uri>
-      <Sha>9c1330deddc14e8c564e30402d6a644c43110778</Sha>
+      <Sha>9f4908fb7b083d83968071a5e18865e3a123e88d</Sha>
     </Dependency>
     <!-- Specific version here is not interesting, but we want Maestro to add corefx
          private feeds -->
@@ -52,9 +52,9 @@
       <Uri>https://github.com/NuGet/NuGet.Client</Uri>
       <Sha>6f8eb3a2e1db6b458451b9cfd2a4f5557769b041</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.8-servicing.20420.1">
+    <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.9-servicing.20458.4">
       <Uri>https://github.com/dotnet/core-setup</Uri>
-      <Sha>9c1330deddc14e8c564e30402d6a644c43110778</Sha>
+      <Sha>9f4908fb7b083d83968071a5e18865e3a123e88d</Sha>
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Ref" Version="3.0.0" Pinned="true">
       <Uri>https://github.com/dotnet/core-setup</Uri>
