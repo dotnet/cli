@@ -38,10 +38,10 @@ Verze sady SDK: {1}</target>
       <trans-unit id="TelemetryMessage">
         <source>Telemetry
 ---------
-The .NET Core tools collect usage data in order to help us improve your experience. The data is anonymous. It is collected by Microsoft and shared with the community. You can opt-out of telemetry by setting the DOTNET_CLI_TELEMETRY_OPTOUT environment variable to '1' or 'true' using your favorite shell.
+The .NET Core tools collect usage data in order to help us improve your experience. It is collected by Microsoft and shared with the community. You can opt-out of telemetry by setting the DOTNET_CLI_TELEMETRY_OPTOUT environment variable to '1' or 'true' using your favorite shell.
 
 Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemetry</source>
-        <target state="translated">Telemetrie
+        <target state="needs-review-translation">Telemetrie
 ---------
 Nástroje .NET Core shromažďují data o využití, která nám pomáhají dále vylepšovat prostředí a práci s produktem. Data jsou anonymní. Jsou shromažďována Microsoftem a sdílí se s komunitou. Výslovný nesouhlas s telemetrií můžete vyjádřit tak, že pomocí svého oblíbeného prostředí nastavíte proměnnou prostředí DOTNET_CLI_TELEMETRY_OPTOUT na hodnotu 1 nebo true.
 
