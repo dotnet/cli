@@ -69,7 +69,8 @@
             PropertyName="MSBuildExtensionsInstallerUpgradeCode" />
       </GenerateGuidFromName>
 
-      <GenerateGuidFromName Name="$(CombinedFrameworkSdkHostInstallerFile)">
+      <!-- Generate stable GUID to enable upgrades. The input would be "dotnet-sdk;2;1;500;x86" -->
+      <GenerateGuidFromName Name="$(ArtifactNameCombinedHostHostFxrFrameworkSdk);$(VersionMajor);$(VersionMinor);$(FeatureBand);$(Architecture)">
         <Output TaskParameter="OutputGuid"
             PropertyName="CombinedFrameworkSDKHostInstallerUpgradeCode" />
       </GenerateGuidFromName>

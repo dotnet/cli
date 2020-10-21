@@ -20,6 +20,86 @@
       <PayloadGroupRef Id="DotnetCoreBAPayloads" />
     </BootstrapperApplicationRef>
 
+    <?if $(var.Platform)=x86?>
+      <!--'Microsoft .NET Core SDK 2.1.519 (x86)'-->
+      <RelatedBundle Id="{F541790F-588E-7F06-A465-915196830AC4}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.518 (x86)'-->
+      <RelatedBundle Id="{DA380458-52FC-4A06-1AD8-63E8ADED70D8}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.517 (x86)'-->
+      <RelatedBundle Id="{880FA12A-5B0F-6CAA-D3AA-EE78546AFA0F}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.516 (x86)'-->
+      <RelatedBundle Id="{B560AFD3-5738-4A6C-D742-5459F522B189}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.515 (x86)'-->
+      <RelatedBundle Id="{DC836BB2-5A46-4756-1E8F-6154D89EEBBC}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.514 (x86)'-->
+      <RelatedBundle Id="{508CEBC3-5EDA-5D0C-595A-6D2685BB2765}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.513 (x86)'-->
+      <RelatedBundle Id="{1C32B8A1-5C46-72AF-7653-39D18A0B487B}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.512 (x86)'-->
+      <RelatedBundle Id="{92028CCC-55E5-7811-EBAF-B628882FE69B}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.511 (x86)'-->
+      <RelatedBundle Id="{7E8ECD30-5403-6A72-EDDB-85ACE5425459}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.510 (x86)'-->
+      <RelatedBundle Id="{F1B575D9-5C0A-4C35-35F2-DE5BA0A4C71B}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.509 (x86)'-->
+      <RelatedBundle Id="{3862E391-5373-53FD-06E9-0EB9E5FC5BC1}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.508 (x86)'-->
+      <RelatedBundle Id="{5AB5E45E-5B8E-659B-164D-28E4706E78A4}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.507 (x86)'-->
+      <RelatedBundle Id="{B201DA32-5687-5056-4881-7ABCFC4D081E}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.506 (x86)'-->
+      <RelatedBundle Id="{225A01C6-58AE-6E4A-2B85-6782733E75AF}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.505 (x86)'-->
+      <RelatedBundle Id="{8B69E8F5-500B-6C4F-777F-9DEF6B259DF5}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.504 (x86)'-->
+      <RelatedBundle Id="{339842FB-5DAD-48EE-7D0D-5112170E5EA1}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.503 (x86)'-->
+      <RelatedBundle Id="{CD983561-5C16-6950-4265-8D2396215D2C}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.502 (x86)'-->
+      <RelatedBundle Id="{B54EE829-56F5-5BA4-8788-186C72E08157}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.500 (x86)'-->
+      <RelatedBundle Id="{B03260DC-5964-6D95-137E-67F614A6C69D}" Action="Upgrade" />
+    <?elseif $(var.Platform)=x64?>
+      <!--'Microsoft .NET Core SDK 2.1.519 (x64)'-->
+      <RelatedBundle Id="{A803FD8D-50B5-7A69-7ACD-5D1A7F872BB8}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.518 (x64)'-->
+      <RelatedBundle Id="{2F7AB469-5945-44FD-CFA4-29467B449619}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.517 (x64)'-->
+      <RelatedBundle Id="{6D50454D-528B-55EE-2651-F35AC787E95C}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.516 (x64)'-->
+      <RelatedBundle Id="{A198FFE3-5D27-70D3-E071-92C14841F825}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.515 (x64)'-->
+      <RelatedBundle Id="{97E7BACE-5808-665E-C770-57C4C99B4772}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.514 (x64)'-->
+      <RelatedBundle Id="{CE5CFE78-5972-7519-4215-EA0A50F38419}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.513 (x64)'-->
+      <RelatedBundle Id="{628AB0DB-5B7D-565D-1EA4-37F6146CDE8C}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.512 (x64)'-->
+      <RelatedBundle Id="{239CAD19-59AE-657B-FFD4-A8235BE92FA2}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.511 (x64)'-->
+      <RelatedBundle Id="{8A47620B-55E0-746C-C324-E2D8A290B2F0}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.510 (x64)'-->
+      <RelatedBundle Id="{B012C515-5D80-5F23-A9A2-C1E9520939D2}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.509 (x64)'-->
+      <RelatedBundle Id="{41EF25EB-5093-5439-9441-F7E2462F2D04}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.508 (x64)'-->
+      <RelatedBundle Id="{CFDC735D-5FB6-4FF3-574D-A875C41E851C}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.507 (x64)'-->
+      <RelatedBundle Id="{E9ECF4BB-5FFD-7539-B7D6-4DCB3455D83B}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.506 (x64)'-->
+      <RelatedBundle Id="{3CD99468-5773-7BED-7199-8DF2E61B9D03}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.505 (x64)'-->
+      <RelatedBundle Id="{ED2F2005-5A36-68D6-39ED-77254D90AB6E}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.504 (x64)'-->
+      <RelatedBundle Id="{EEA4BAB3-58A6-5930-2483-679815BA8265}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.503 (x64)'-->
+      <RelatedBundle Id="{664F0593-5E53-7065-16AE-F0A46365F29C}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.502 (x64)'-->
+      <RelatedBundle Id="{C91E600E-5A6F-56CA-97FA-66EEA63F5B3F}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.500 (x64)'-->
+      <RelatedBundle Id="{32687B45-56E9-4ECE-9EEC-90D4E54AD3C9}" Action="Upgrade" />
+    <?endif?>
+
     <swid:Tag Regid="microsoft.com" InstallPath="[DOTNETHOME]" />
 
     <Variable Name="DOTNETHOME" Type="string" Value="[ProgramFiles6432Folder]dotnet" bal:Overridable="no" />
