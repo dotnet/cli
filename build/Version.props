@@ -2,7 +2,9 @@
   <PropertyGroup>
     <VersionMajor>2</VersionMajor>
     <VersionMinor>1</VersionMinor>
-    <VersionPatch>812</VersionPatch>
+    <FeatureBand>800</FeatureBand>
+    <PatchLevel>12</PatchLevel>
+    <VersionPatch>$([MSBuild]::Add($(FeatureBand),$(PatchLevel)))</VersionPatch>
     <ReleaseSuffix Condition=" '$(ReleaseSuffix)' == '' ">preview</ReleaseSuffix>
 
     <MajorMinorVersion>$(VersionMajor).$(VersionMinor)</MajorMinorVersion>

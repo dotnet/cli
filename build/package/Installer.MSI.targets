@@ -69,7 +69,7 @@
             PropertyName="MSBuildExtensionsInstallerUpgradeCode" />
       </GenerateGuidFromName>
 
-      <GenerateGuidFromName Name="$(CombinedFrameworkSdkHostInstallerFile)">
+      <GenerateGuidFromName Name="$(ArtifactNameCombinedHostHostFxrFrameworkSdk);$(VersionMajor);$(VersionMinor);$(FeatureBand);$(Architecture)">
         <Output TaskParameter="OutputGuid"
             PropertyName="CombinedFrameworkSDKHostInstallerUpgradeCode" />
       </GenerateGuidFromName>
