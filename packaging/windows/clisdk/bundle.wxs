@@ -21,6 +21,10 @@
     </BootstrapperApplicationRef>
 
     <?if $(var.Platform)=x86?>
+      <!--'Microsoft .NET Core SDK 2.1.811 (x86)'-->
+      <RelatedBundle Id="{CE805130-502E-73A8-317A-659885E6028D}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.810 (x86)'-->
+      <RelatedBundle Id="{0C34DE9A-5AA3-662A-4D9C-C64E4AE45F87}" Action="Upgrade" />
       <!--'Microsoft .NET Core SDK 2.1.809 (x86)'-->
       <RelatedBundle Id="{C7007D29-53FB-731A-CCBF-1D6525CC1641}" Action="Upgrade" />
       <!--'Microsoft .NET Core SDK 2.1.808 (x86)'-->
@@ -40,6 +44,10 @@
       <!--'Microsoft .NET Core SDK 2.1.801 (x86)'-->
       <RelatedBundle Id="{5BC19DE0-5BEC-645D-D002-7E2A79982C14}" Action="Upgrade" />
     <?elseif $(var.Platform)=x64?>
+      <!--'Microsoft .NET Core SDK 2.1.811 (x64)'-->
+      <RelatedBundle Id="{D4A9FC91-5BC6-4603-378A-A4795A4C7C61}" Action="Upgrade" />
+      <!--'Microsoft .NET Core SDK 2.1.810 (x64)'-->
+      <RelatedBundle Id="{E203F8E9-5670-690C-C89B-879A79F21A5B}" Action="Upgrade" />
       <!--'Microsoft .NET Core SDK 2.1.809 (x64)'-->
       <RelatedBundle Id="{DA0B1C91-5D48-621A-C9B6-0AD003E56CF6}" Action="Upgrade" />
       <!--'Microsoft .NET Core SDK 2.1.808 (x64)'-->
