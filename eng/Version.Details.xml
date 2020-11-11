@@ -48,7 +48,7 @@
     </Dependency>
   </ToolsetDependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.NET.Sdk" Version="3.1.404-servicing.20515.11">
+    <Dependency Name="Microsoft.NET.Sdk" Version="3.1.404-servicing.20561.3">
       <Uri>https://github.com/dotnet/sdk</Uri>
       <Sha>4f77b27cff967fd9abde1f94faae7f963c43170d</Sha>
     </Dependency>
