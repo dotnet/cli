@@ -222,7 +222,7 @@ export PATH="$PATH:{0}"
       </trans-unit>
       <trans-unit id="File">
         <source>File</source>
-        <target state="translated">archivo</target>
+        <target state="translated">Archivo</target>
         <note />
       </trans-unit>
       <trans-unit id="Directory">
