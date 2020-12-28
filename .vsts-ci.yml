@@ -138,13 +138,6 @@ stages:
               _RuntimeIdentifier: ''
               _BuildArchitecture: 'x64'
               _DropSuffix: ''
-            Build_Rhel_6_Debug_x64:
-              _BuildConfig: Debug
-              _DockerParameter: '--docker rhel.6'
-              _LinuxPortable: ''
-              _RuntimeIdentifier: '--runtime-id rhel.6-x64'
-              _BuildArchitecture: 'x64'
-              _DropSuffix: ''
             Build_Linux_musl_Debug_x64:
               _BuildConfig: Debug
               _DockerParameter: '--docker alpine.3.6'
