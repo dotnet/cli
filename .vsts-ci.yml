@@ -124,13 +124,6 @@ stages:
               _RuntimeIdentifier: ''
               _BuildArchitecture: 'x64'
               _DropSuffix: ''
-            Build_Debian_jessie_Debug_x64:
-              _BuildConfig: Debug
-              _DockerParameter: '--docker debian'
-              _LinuxPortable: ''
-              _RuntimeIdentifier: ''
-              _BuildArchitecture: 'x64'
-              _DropSuffix: ''
             Build_Rhel_7_2_Release_x64:
               _BuildConfig: Release
               _DockerParameter: '--docker rhel'
