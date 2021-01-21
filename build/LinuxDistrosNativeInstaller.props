@@ -1,7 +1,7 @@
 <Project>
   <ItemGroup>
-    <LinuxDistrosNeedNativeInstaller Include="debian.8-x64">
-      <DockerFolder>debian</DockerFolder>
+    <LinuxDistrosNeedNativeInstaller Include="ubuntu.18.04-x64">
+      <DockerFolder>ubuntu.18.04</DockerFolder>
       <InstallerExtension>deb</InstallerExtension>
       <DistroNameInInstaller>x64</DistroNameInInstaller>
     </LinuxDistrosNeedNativeInstaller>
