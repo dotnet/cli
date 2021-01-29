@@ -108,7 +108,7 @@ namespace Microsoft.DotNet.Cli.MSBuild.Tests
 
             var result = new DotnetCommand()
                 .WithWorkingDirectory(root)
-                .Execute($"msbuild {propertyFormat}:RestoreSources={somePathThatExists};https://api.nuget.org/v3/index.json /t:restore LibraryWithUnresolvablePackageReference.csproj");
+                .Execute($"msbuild {propertyFormat}:RestoreSources={somePathThatExists};https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-public/nuget/v3/index.json /t:restore LibraryWithUnresolvablePackageReference.csproj");
 
             _output.WriteLine($"[STDOUT]\n{result.StdOut}\n[STDERR]\n{result.StdErr}");
 
