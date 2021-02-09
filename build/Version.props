@@ -3,7 +3,7 @@
     <VersionMajor>2</VersionMajor>
     <VersionMinor>1</VersionMinor>
     <FeatureBand>800</FeatureBand>
-    <PatchLevel>13</PatchLevel>
+    <PatchLevel>14</PatchLevel>
     <VersionPatch>$([MSBuild]::Add($(FeatureBand),$(PatchLevel)))</VersionPatch>
     <ReleaseSuffix Condition=" '$(ReleaseSuffix)' == '' ">preview</ReleaseSuffix>
 
