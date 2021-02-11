@@ -14,8 +14,8 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 <packageSources>
 <!--To inherit the global NuGet package sources remove the <clear/> line below -->
 <clear />
-<add key=""dotnet-core"" value=""https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"" />
-<add key=""api.nuget.org"" value=""https://api.nuget.org/v3/index.json"" />
+<add key=""myget-legacy"" value=""https://pkgs.dev.azure.com/dnceng/public/_packaging/myget-legacy/nuget/v3/index.json"" />
+<add key=""dotnet-public"" value=""https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-public/nuget/v3/index.json"" />
 </packageSources>
 </configuration>";
 
@@ -39,8 +39,8 @@ namespace Microsoft.DotNet.Tools.Test.Utilities
 <!--To inherit the global NuGet package sources remove the <clear/> line below -->
 <clear />
 <add key=""Test Source"" value=""{0}"" />
-<add key=""api.nuget.org"" value=""https://api.nuget.org/v3/index.json"" />
-<add key=""dotnet-core"" value=""https://dotnet.myget.org/F/dotnet-core/api/v3/index.json"" />
+<add key=""myget-legacy"" value=""https://pkgs.dev.azure.com/dnceng/public/_packaging/myget-legacy/nuget/v3/index.json"" />
+<add key=""dotnet-public"" value=""https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-public/nuget/v3/index.json"" />
 </packageSources>
 </configuration>";
             return string.Format(template, localFeedPath);

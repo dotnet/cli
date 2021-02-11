@@ -177,15 +177,3 @@ stages:
   - template: /eng/common/templates/post-build/post-build.yml
     parameters:
       enableSymbolValidation: false
-      SDLValidationParameters:
-        enable: true
-        params: ' -SourceToolsList @("policheck","credscan")
-        -TsaInstanceURL $(_TsaInstanceURL)
-        -TsaProjectName $(_TsaProjectName)
-        -TsaNotificationEmail $(_TsaNotificationEmail)
-        -TsaCodebaseAdmin $(_TsaCodebaseAdmin)
-        -TsaBugAreaPath $(_TsaBugAreaPath)
-        -TsaIterationPath $(_TsaIterationPath)
-        -TsaRepositoryName "dotnet-cli"
-        -TsaCodebaseName "dotnet-cli"
-        -TsaPublish $True'
