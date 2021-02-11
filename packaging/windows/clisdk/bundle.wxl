@@ -71,6 +71,7 @@ Resources
   <String Id="SDKDocumentation">&lt;A HREF=&quot;https://aka.ms/dotnet-cli-docs&quot;&gt;SDK Documentation&lt;/A&gt;</String>
   <String Id="PrivacyStatementLink">&lt;A HREF=&quot;https://aka.ms/dev-privacy&quot;&gt;Privacy Statement&lt;/A&gt;</String>
   <String Id="MITLicenseLink">&lt;A HREF=&quot;https://aka.ms/dotnet-license&quot;&gt;MIT License&lt;/A&gt;</String>
+  <String Id="DotNetCLITelemetryLink">&lt;A HREF=&quot;&quot;&gt;Telemetry collection and opt-out&lt;/A&gt;</String>
   <String Id="InstallationNoteTitle">Installation note</String>
   <String Id="InstallationNote">A command will be run during the install process that will improve project restore speed and enable offline access. It will take up to a minute to complete.
   </String>
