@@ -26,10 +26,9 @@
         <Text Name="WelcomeHeaderMessage" X="160" Y="81" Width="300" Height="30" TabStop="yes" FontId="2">#(loc.WelcomeHeaderMessage)</Text>
         <Text Name="WelcomeDescription" X="160" Y="115" Width="460" Height="65" TabStop="yes" FontId="3">#(loc.WelcomeDescription)</Text>
         <Text Name="LearnMoreTitle" X="160" Y="164" Width="460" Height="30" TabStop="yes" FontId="2">#(loc.LearnMoreTitle)</Text>
-        <Hypertext Name="CoreDocumentationLink" X="185" Y="198" Width="400" Height="22" FontId="3" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.CoreDocumentationLink)</Hypertext>
-        <Hypertext Name="SDKDocumentation" X="185" Y="218" Width="400" Height="22" FontId="3" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.SDKDocumentation)</Hypertext>
-        <Hypertext Name="PrivacyStatementLink" X="185" Y="238" Width="400" Height="22" FontId="3" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.PrivacyStatementLink)</Hypertext>
-        <Hypertext Name="MITLicenseLink" X="185" Y="258" Width="400" Height="22" FontId="3" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.MITLicenseLink)</Hypertext>
+        <Hypertext Name="PrivacyStatementLink" X="185" Y="198" Width="400" Height="22" FontId="3" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.PrivacyStatementLink)</Hypertext>
+        <Hypertext Name="MITLicenseLink" X="185" Y="218" Width="400" Height="22" FontId="3" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.MITLicenseLink)</Hypertext>
+        <Hypertext Name="DotNetCLITelemetryLink" X="185" Y="238" Width="400" Height="22" FontId="3" TabStop="yes" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.DotNetCLITelemetryLink)</Hypertext>
         <Text Name="InstallationNoteTitle" X="160" Y="278" Width="460" Height="30" TabStop="yes" FontId="2">#(loc.InstallationNoteTitle)</Text>
         <Text Name="InstallationNote" X="160" Y="312" Width="460" Height="30" TabStop="yes" FontId="3" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.InstallationNote)</Text>
         <Hypertext Name="VisualStudioWarning" X="160" Y="350" Width="460" Height="30" TabStop="yes" FontId="3" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.VisualStudioWarning)</Hypertext>
