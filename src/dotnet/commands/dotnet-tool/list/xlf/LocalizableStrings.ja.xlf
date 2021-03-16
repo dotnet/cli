@@ -9,7 +9,7 @@
       </trans-unit>
       <trans-unit id="GlobalOptionDescription">
         <source>List tools in the current user's tools directory.</source>
-        <target state="translated">現在のユーザーのツール ディレクトリにあるツールを一覧表示します。</target>
+        <target state="translated">現在のユーザーのツール ディレクトリにツールを一覧表示します。</target>
         <note />
       </trans-unit>
       <trans-unit id="VersionColumn">

@@ -474,7 +474,7 @@
       </trans-unit>
       <trans-unit id="NoReferencesFound">
         <source>There are no {0} references in project {1}. ;; {0} is the type of the item being requested (project, package, p2p) and {1} is the object operated on (a project file or a solution file). </source>
-        <target state="translated">项目 {1} 中没有 {0} 引用。;; {0} 是正在请求的项类型(项目、包、p2p)，{1} 是操作的对象(项目文件或解决方案文件)。</target>
+        <target state="translated">项目 {1} 中没有 {0} 引用。 ;; {0} 是所请求的项的类型(项目、包、p2p)，{1} 是操作对象(项目文件或解决方案文件)。</target>
         <note />
       </trans-unit>
       <trans-unit id="NoProjectsFound">
@@ -616,7 +616,7 @@
       </trans-unit>
       <trans-unit id="VerbosityOptionDescription">
         <source>Set the MSBuild verbosity level. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].</source>
-        <target state="translated">设置 MSBuild 详细级别。允许值为 q[uiet]、m[inimal]、n[ormal]、d[etailed] 和 diag[nostic]。</target>
+        <target state="translated">设置 MSBuild 详细程度。允许值为 q[uiet]、m[inimal]、n[ormal]、d[etailed] 和 diag[nostic]。</target>
         <note />
       </trans-unit>
       <trans-unit id="CmdVersionSuffixDescription">
@@ -722,17 +722,17 @@ You can add it to the current session by running the following command:
 
 export PATH="$PATH:{0}"
 </source>
-        <target state="translated">工具目录“{0}”目前不在 PATH 环境变量中。
-如果你使用的是 bash，可运行以下命令将其添加到配置文件中:
+        <target state="translated">工具目录“{0}”当前不在 PATH 环境变量上。
+如果使用的是 bash，可运行以下命令直接将其添加到配置文件: 
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
-# Add .NET Core SDK tools
-export PATH="$PATH:{0}"
+# 添加 .NET Core SDK 工具
+导出 PATH="$PATH:{0}"
 EOF
 
-可通过运行以下命令将其添加到当前会话中: 
+可运行以下命令将其添加到当前会话:
 
-export PATH="$PATH:{0}"
+导出 PATH ="$PATH:{0}"
 </target>
         <note />
       </trans-unit>
@@ -749,17 +749,17 @@ You can add it to the current session by running the following command:
 
 export PATH="$PATH:{0}"
 </source>
-        <target state="translated">工具目录“{0}”目前不在 PATH 环境变量中。
-如果你使用的是 bash，可运行以下命令将其添加到配置文件中:
+        <target state="translated">工具目录“{0}”当前不在 PATH 环境变量上。
+如果使用的是 bash，可运行以下命令直接将其添加到配置文件: 
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
-# Add .NET Core SDK tools
-export PATH="$PATH:{0}"
+# 添加 .NET Core SDK 工具
+导出 PATH="$PATH:{0}"
 EOF
 
-可通过运行以下命令将其添加到当前会话中: 
+可运行以下命令将其添加到当前会话:
 
-export PATH="$PATH:{0}"
+导出 PATH ="$PATH:{0}"
 </target>
         <note />
       </trans-unit>

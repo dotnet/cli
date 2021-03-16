@@ -474,7 +474,7 @@
       </trans-unit>
       <trans-unit id="NoReferencesFound">
         <source>There are no {0} references in project {1}. ;; {0} is the type of the item being requested (project, package, p2p) and {1} is the object operated on (a project file or a solution file). </source>
-        <target state="translated">專案 {1} 中沒有任何 {0} 參考。;; {0} 是所要求項目的類型 (專案、套件、p2p)，而 {1} 是操作的物件 (專案檔或方案檔)。 </target>
+        <target state="translated">專案 {1} 中沒有 {0} 參考。;; {0} 是要求的項目類型 (專案、套件、p2p); {1} 執行作業的物件對象 (專案檔或解決方案檔案)。</target>
         <note />
       </trans-unit>
       <trans-unit id="NoProjectsFound">
@@ -616,7 +616,7 @@
       </trans-unit>
       <trans-unit id="VerbosityOptionDescription">
         <source>Set the MSBuild verbosity level. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].</source>
-        <target state="translated">設定 MSBuild 的詳細資訊層級。允許的值為 q[uiet]、m[inimal]、n[ormal]、d[etailed] 及 diag[nostic]。</target>
+        <target state="translated">設定 MSBuild 的詳細程度層級。允許的值為 q[uiet]、m[inimal]、n[ormal]、d[etailed] 及 diag[nostic]。</target>
         <note />
       </trans-unit>
       <trans-unit id="CmdVersionSuffixDescription">
@@ -722,15 +722,15 @@ You can add it to the current session by running the following command:
 
 export PATH="$PATH:{0}"
 </source>
-        <target state="translated">工具目錄 '{0}' 目前不在 PATH 環境變數上。
-若您正在使用 Bash，您可執行下列命令將其新增至您的設定檔:
+        <target state="translated">工具目錄 '{0}' 目前不在 PATH 環境變數中。
+若目前使用 bash，可執行下列命令將其新增至您的設定檔:
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
-# Add .NET Core SDK tools
+# 新增 .NET Core SDK 工具
 export PATH="$PATH:{0}"
 EOF
 
-您可執行下列命令將其新增至目前的工作階段:
+您可執行下列命令，將其新增至目前的工作階段:
 
 export PATH="$PATH:{0}"
 </target>
@@ -749,15 +749,15 @@ You can add it to the current session by running the following command:
 
 export PATH="$PATH:{0}"
 </source>
-        <target state="translated">工具目錄 '{0}' 目前不在 PATH 環境變數上。
-若您正在使用 Bash，您可執行下列命令將其新增至您的設定檔:
+        <target state="translated">工具目錄 '{0}' 目前不在 PATH 環境變數中。
+若目前使用 bash，可執行下列命令將其新增至您的設定檔:
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
-# Add .NET Core SDK tools
+# 新增 .NET Core SDK 工具
 export PATH="$PATH:{0}"
 EOF
 
-您可執行下列命令將其新增至目前的工作階段:
+您可執行下列命令，將其新增至目前的工作階段:
 
 export PATH="$PATH:{0}"
 </target>
@@ -820,7 +820,7 @@ setx PATH "%PATH%;{0}"
       </trans-unit>
       <trans-unit id="FailedToFindStagedToolPackage">
         <source>Failed to find staged tool package '{0}'.</source>
-        <target state="translated">無法找到分段工具套件 '{0}'。</target>
+        <target state="translated">無法找到暫存工具套件 '{0}'。</target>
         <note />
       </trans-unit>
       <trans-unit id="ToolSettingsInvalidLeadingDotCommandName">

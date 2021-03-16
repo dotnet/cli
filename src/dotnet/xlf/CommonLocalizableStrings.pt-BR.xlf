@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="pt-BR" original="../CommonLocalizableStrings.resx">
     <body>
@@ -9,8 +9,7 @@
       </trans-unit>
       <trans-unit id="MoreThanOneProjectInDirectory">
         <source>Found more than one project in `{0}`. Please specify which one to use.</source>
-        <target state="translated">Foi encontrado mais de um projeto em ‘{0}’. Especifique qual deve ser usado.
-</target>
+        <target state="translated">Foi encontrado mais de um projeto em ‘{0}’. Especifique qual deve ser usado.</target>
         <note />
       </trans-unit>
       <trans-unit id="ProjectAlreadyHasAreference">
@@ -105,7 +104,7 @@
       </trans-unit>
       <trans-unit id="Add">
         <source>Add</source>
-        <target state="translated">adicionar</target>
+        <target state="translated">Adicionar</target>
         <note />
       </trans-unit>
       <trans-unit id="Remove">
@@ -345,8 +344,7 @@
       </trans-unit>
       <trans-unit id="CouldNotFindSolutionOrDirectory">
         <source>Could not find solution or directory `{0}`.</source>
-        <target state="translated">Não foi possível encontrar a solução ou o diretório ‘{0}’.
-</target>
+        <target state="translated">Não foi possível encontrar a solução ou o diretório ‘{0}’.</target>
         <note />
       </trans-unit>
       <trans-unit id="SolutionDoesNotExist">
@@ -476,8 +474,7 @@
       </trans-unit>
       <trans-unit id="NoReferencesFound">
         <source>There are no {0} references in project {1}. ;; {0} is the type of the item being requested (project, package, p2p) and {1} is the object operated on (a project file or a solution file). </source>
-        <target state="translated">Não há referências de {0} no projeto {1}. ;; {0} é o tipo do item que está sendo solicitado (projeto, pacote, p2p) e {1} é o objeto no qual ocorre a operação (um arquivo de projeto ou de solução). 
-</target>
+        <target state="translated">Não há {0} referências no projeto {1}. ;; {0} é o tipo do item que está sendo solicitado (projeto, pacote, p2p) e {1} é o objeto operado (um arquivo de projeto ou um arquivo de solução). </target>
         <note />
       </trans-unit>
       <trans-unit id="NoProjectsFound">
@@ -619,7 +616,7 @@
       </trans-unit>
       <trans-unit id="VerbosityOptionDescription">
         <source>Set the MSBuild verbosity level. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].</source>
-        <target state="translated">Definir o nível de detalhes do MSBuild. Os valores permitidos são q[uiet], m[inimal], n[ormal], d[etailed] e diag[nostic].</target>
+        <target state="translated">Definir o nível de detalhamento do MSBuild. Os valores permitidos são q[uiet], m[inimal], n[ormal], d[etailed] e diag[nostic].</target>
         <note />
       </trans-unit>
       <trans-unit id="CmdVersionSuffixDescription">
@@ -726,7 +723,7 @@ You can add it to the current session by running the following command:
 export PATH="$PATH:{0}"
 </source>
         <target state="translated">O diretório de ferramentas '{0}' não está na variável de ambiente PATH no momento.
-Se você estiver usando o Bash, poderá adicioná-lo ao seu perfil executando o seguinte comando:
+Se você estiver usando o Bash, adicione-o ao seu perfil executando o seguinte comando
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
 # Add .NET Core SDK tools
@@ -753,7 +750,7 @@ You can add it to the current session by running the following command:
 export PATH="$PATH:{0}"
 </source>
         <target state="translated">O diretório de ferramentas '{0}' não está na variável de ambiente PATH no momento.
-Se você estiver usando o Bash, poderá adicioná-lo ao seu perfil executando o seguinte comando:
+Se você estiver usando o Bash, adicione-o ao seu perfil executando o seguinte comando
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
 # Add .NET Core SDK tools

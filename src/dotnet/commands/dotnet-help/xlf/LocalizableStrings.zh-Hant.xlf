@@ -74,7 +74,7 @@
       </trans-unit>
       <trans-unit id="PublishDefinition">
         <source>Publish a .NET project for deployment.</source>
-        <target state="translated">為部署發行 .NET 專案。</target>
+        <target state="translated">為部署發佈 .NET 專案。</target>
         <note />
       </trans-unit>
       <trans-unit id="RunDefinition">
@@ -219,12 +219,12 @@
       </trans-unit>
       <trans-unit id="DepsfilDefinition">
         <source>Path to &lt;application&gt;.deps.json file.</source>
-        <target state="translated">&lt;應用程式&gt;.deps.json 檔案的路徑。</target>
+        <target state="translated">&lt;application&gt;.deps.json 檔案的路徑。</target>
         <note />
       </trans-unit>
       <trans-unit id="RuntimeconfigDefinition">
         <source>Path to &lt;application&gt;.runtimeconfig.json file.</source>
-        <target state="translated">&lt;應用程式&gt;.runtimeconfig.json 檔案的路徑。</target>
+        <target state="translated">&lt;application&gt;.runtimeconfig.json 檔案的路徑。</target>
         <note />
       </trans-unit>
       <trans-unit id="FxVersionDefinition">
@@ -234,7 +234,7 @@
       </trans-unit>
       <trans-unit id="RollForwardOnNoCandidateFxDefinition">
         <source>Roll forward on no candidate shared framework is enabled.</source>
-        <target state="translated">已啟用在沒有候選共用架構上的向前復原。</target>
+        <target state="translated">已啟用在沒有候選版的情況下向前復原共用架構。</target>
         <note />
       </trans-unit>
       <trans-unit id="AdditionalDeps">

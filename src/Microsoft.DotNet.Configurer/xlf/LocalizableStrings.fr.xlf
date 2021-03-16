@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="fr" original="../LocalizableStrings.resx">
     <body>
@@ -13,16 +13,16 @@ Telemetry
 The .NET Core tools collect usage data in order to help us improve your experience. It is collected by Microsoft and shared with the community. You can opt-out of telemetry by setting the DOTNET_CLI_TELEMETRY_OPTOUT environment variable to '1' or 'true' using your favorite shell.
 
 Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemetry</source>
-        <target state="needs-review-translation">Bienvenue dans .NET Core !
+        <target state="translated">Bienvenue dans .NET Core !
 ---------------------
-En savoir plus sur .NET Core : https://aka.ms/dotnet-docs.
-Utilisez 'dotnet --help' pour voir les commandes disponibles ou visitez : https://aka.ms/dotnet-cli-docs
+En savoir plus sur .NET Core : https://aka.ms/dotnet-docs
+Utilisez 'dotnet --help' pour voir les commandes disponibles, ou accédez à https://aka.ms/dotnet-cli-docs
 
 Télémétrie
 ---------
-Les outils .NET Core collectent des données d'utilisation pour nous aider à améliorer votre expérience utilisateur. Ces données sont anonymes et n'incluent aucun argument de ligne de commande. Elles sont collectées par Microsoft et partagées avec la communauté. Vous pouvez refuser la télémétrie en affectant la valeur '1' ou 'true' à la variable d'environnement DOTNET_CLI_TELEMETRY_OPTOUT via l'interpréteur de commandes de votre choix.
+Les outils .NET Core collectent des données d'utilisation qui nous aident à améliorer votre expérience utilisateur. Elles sont collectées par Microsoft et partagées par la communauté. Vous pouvez refuser l'adhésion à la télémétrie en affectant la valeur '1' ou 'true' à la variable d'environnement DOTNET_CLI_TELEMETRY_OPTOUT via l'interpréteur de commandes de votre choix.
 
-En savoir plus sur la télémétrie des outils .NET Core CLI : https://aka.ms/dotnet-cli-telemetry</target>
+Pour plus d'informations sur la télémétrie des outils CLI .NET Core, consultez https://aka.ms/dotnet-cli-telemetry</target>
         <note />
       </trans-unit>
       <trans-unit id="FailedToPrimeCacheError">
@@ -34,9 +34,9 @@ En savoir plus sur la télémétrie des outils .NET Core CLI : https://aka.ms/d
         <source>Configuring...
 --------------
 A command is running to populate your local package cache to improve restore speed and enable offline access. This command takes up to one minute to complete and only runs once.</source>
-        <target state="translated">Configuration en cours
+        <target state="translated">Configuration en cours...
 --------------
-Une commande s'exécute pour remplir votre cache de package local afin d'améliorer la vitesse de restauration et activer l'accès hors connexion. Cette commande peut prendre jusqu'à une minute et ne s'exécute qu'une seule fois.</target>
+Une commande s'exécute pour remplir votre cache de packages local, améliorer la vitesse de restauration et activer l'accès hors connexion. Cette commande dure jusqu'à une minute et ne s'exécute qu'une seule fois.</target>
         <note />
       </trans-unit>
       <trans-unit id="UnauthorizedAccessMessage">
@@ -53,8 +53,8 @@ Here are some options to fix this error:
 Voici quelques options pour corriger cette erreur :
 ----------------------------------------
 1. Réexécutez cette commande avec un accès élevé.
-2. Désactivez l'introduction de l'interface logicielle lors de la première utilisation en affectant la valeur true à la variable d'environnement DOTNET_SKIP_FIRST_TIME_EXPERIENCE.
-3. Copiez le kit .NET Core SDK dans un emplacement non protégé à partir duquel vous l'utiliserez ensuite.
+2. Désactivez l'expérience de première exécution en affectant la valeur true à la variable d'environnement DOTNET_SKIP_FIRST_TIME_EXPERIENCE.
+3. Copiez le kit SDK .NET Core à un emplacement non protégé à partir duquel vous l'utiliserez ensuite.
     </target>
         <note />
       </trans-unit>

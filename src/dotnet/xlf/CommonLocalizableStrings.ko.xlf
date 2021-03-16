@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="ko" original="../CommonLocalizableStrings.resx">
     <body>
@@ -94,7 +94,7 @@
       </trans-unit>
       <trans-unit id="Application">
         <source>Application</source>
-        <target state="translated">응용 프로그램</target>
+        <target state="translated">애플리케이션</target>
         <note />
       </trans-unit>
       <trans-unit id="ReferenceAddedToTheProject">
@@ -722,15 +722,15 @@ You can add it to the current session by running the following command:
 
 export PATH="$PATH:{0}"
 </source>
-        <target state="translated">도구 디렉터리 '{0}'이(가) 현재 PATH 환경 변수에 있지 않습니다.
-Bash를 사용하는 경우 다음 명령을 실행하여 프로필에 추가할 수 있습니다.
+        <target state="translated">도구 디렉터리 '{0}'이(가) 현재 PATH 환경 변수에 없습니다.
+Bash를 사용하는 경우 다음 명령을 실행하여 프로필에 Bash를 추가할 수 있습니다.
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
 # Add .NET Core SDK tools
 export PATH="$PATH:{0}"
 EOF
 
-다음 명령을 실행하여 현재 세션에 추가할 수 있습니다.
+다음 명령을 실행하여 현재 세션에 Bash를 추가할 수 있습니다.
 
 export PATH="$PATH:{0}"
 </target>
@@ -749,15 +749,15 @@ You can add it to the current session by running the following command:
 
 export PATH="$PATH:{0}"
 </source>
-        <target state="translated">도구 디렉터리 '{0}'이(가) 현재 PATH 환경 변수에 있지 않습니다.
-Bash를 사용하는 경우 다음 명령을 실행하여 프로필에 추가할 수 있습니다.
+        <target state="translated">도구 디렉터리 '{0}'이(가) 현재 PATH 환경 변수에 없습니다.
+Bash를 사용하는 경우 다음 명령을 실행하여 프로필에 Bash를 추가할 수 있습니다.
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
 # Add .NET Core SDK tools
 export PATH="$PATH:{0}"
 EOF
 
-다음 명령을 실행하여 현재 세션에 추가할 수 있습니다.
+다음 명령을 실행하여 현재 세션에 Bash를 추가할 수 있습니다.
 
 export PATH="$PATH:{0}"
 </target>

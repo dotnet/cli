@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="es" original="../CommonLocalizableStrings.resx">
     <body>
@@ -159,7 +159,7 @@
       </trans-unit>
       <trans-unit id="File">
         <source>File</source>
-        <target state="translated">archivo</target>
+        <target state="translated">Archivo</target>
         <note />
       </trans-unit>
       <trans-unit id="Directory">
@@ -474,7 +474,7 @@
       </trans-unit>
       <trans-unit id="NoReferencesFound">
         <source>There are no {0} references in project {1}. ;; {0} is the type of the item being requested (project, package, p2p) and {1} is the object operated on (a project file or a solution file). </source>
-        <target state="translated">No hay referencias de {0} en el proyecto {1}. ;; {0} es el tipo de elemento solicitado (proyecto, paquete, p2p) y {1} es el objeto utilizado (un archivo de proyecto o de solución). </target>
+        <target state="translated">No hay ninguna referencia a {0} en el proyecto {1}. ;; {0} es el tipo de elemento que se solicita (proyecto, paquete, p2p) y {1} es el objeto que se usa (un archivo de proyecto o de solución). </target>
         <note />
       </trans-unit>
       <trans-unit id="NoProjectsFound">
@@ -722,15 +722,15 @@ You can add it to the current session by running the following command:
 
 export PATH="$PATH:{0}"
 </source>
-        <target state="translated">El directorio de herramientas "{0}" no está actualmente en la variable de entorno PATH.
-Si usa bash, puede agregarlo a su perfil mediante la ejecución de comando siguiente:
+        <target state="translated">El directorio de herramientas "{0}" no está en la variable de entorno PATH.
+Si usa Bash, puede agregarlo a su perfil mediante la ejecución del comando siguiente:
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
 # Add .NET Core SDK tools
 export PATH="$PATH:{0}"
 EOF
 
-Puede agregarlo a la sesión actual mediante la ejecución del comando siguiente:
+Agréguelo a la sesión actual mediante la ejecución del comando siguiente:
 
 export PATH="$PATH:{0}"
 </target>
@@ -749,15 +749,15 @@ You can add it to the current session by running the following command:
 
 export PATH="$PATH:{0}"
 </source>
-        <target state="translated">El directorio de herramientas "{0}" no está actualmente en la variable de entorno PATH.
-Si usa bash, puede agregarlo a su perfil mediante la ejecución de comando siguiente:
+        <target state="translated">El directorio de herramientas "{0}" no está en la variable de entorno PATH.
+Si usa Bash, puede agregarlo a su perfil mediante la ejecución del comando siguiente:
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
 # Add .NET Core SDK tools
 export PATH="$PATH:{0}"
 EOF
 
-Puede agregarlo a la sesión actual mediante la ejecución del comando siguiente:
+Agréguelo a la sesión actual mediante la ejecución del comando siguiente:
 
 export PATH="$PATH:{0}"
 </target>

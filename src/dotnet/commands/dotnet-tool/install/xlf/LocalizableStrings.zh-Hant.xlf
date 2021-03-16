@@ -16,7 +16,7 @@ Tool '{1}' (version '{2}') was successfully installed.</source>
       </trans-unit>
       <trans-unit id="CommandDescription">
         <source>Install a tool for use on the command line.</source>
-        <target state="translated">安裝用於命令列的工具。</target>
+        <target state="translated">安裝可在命令列上使用的工具。</target>
         <note />
       </trans-unit>
       <trans-unit id="ConfigFileOptionDescription">

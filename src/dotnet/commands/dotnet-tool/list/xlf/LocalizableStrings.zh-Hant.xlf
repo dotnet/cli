@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="CommandDescription">
         <source>List tools installed in the current development environment.</source>
-        <target state="translated">列出目前開發環境中所安裝的工具。</target>
+        <target state="translated">列出目前開發環境中安裝的工具。</target>
         <note />
       </trans-unit>
       <trans-unit id="GlobalOptionDescription">

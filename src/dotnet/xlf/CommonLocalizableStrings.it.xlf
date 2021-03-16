@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="it" original="../CommonLocalizableStrings.resx">
     <body>
@@ -569,7 +569,7 @@
       </trans-unit>
       <trans-unit id="SolutionAlreadyContainsProject">
         <source>Solution {0} already contains project {1}.</source>
-        <target state="translated">La soluzione {0} contiene già il progetto {\1\}.</target>
+        <target state="translated">La soluzione {0} contiene già il progetto {1}.</target>
         <note />
       </trans-unit>
       <trans-unit id="ArgumentsProjectOrSolutionDescription">
@@ -726,7 +726,7 @@ export PATH="$PATH:{0}"
 Se si usa bash, è possibile aggiungerla al profilo eseguendo il comando seguente:
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
-# Aggiunge gli strumenti di .NET Core SDK
+# Aggiungi .NET Core SDK Tools
 export PATH="$PATH:{0}"
 EOF
 
@@ -753,7 +753,7 @@ export PATH="$PATH:{0}"
 Se si usa bash, è possibile aggiungerla al profilo eseguendo il comando seguente:
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
-# Aggiunge gli strumenti di .NET Core SDK
+# Aggiungi .NET Core SDK Tools
 export PATH="$PATH:{0}"
 EOF
 

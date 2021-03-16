@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="fr" original="../CommonLocalizableStrings.resx">
     <body>
@@ -104,7 +104,7 @@
       </trans-unit>
       <trans-unit id="Add">
         <source>Add</source>
-        <target state="translated">ajouter</target>
+        <target state="translated">Ajouter</target>
         <note />
       </trans-unit>
       <trans-unit id="Remove">
@@ -114,7 +114,7 @@
       </trans-unit>
       <trans-unit id="Delete">
         <source>Delete</source>
-        <target state="translated">supprimer</target>
+        <target state="translated">Supprimer</target>
         <note />
       </trans-unit>
       <trans-unit id="Update">
@@ -474,7 +474,7 @@
       </trans-unit>
       <trans-unit id="NoReferencesFound">
         <source>There are no {0} references in project {1}. ;; {0} is the type of the item being requested (project, package, p2p) and {1} is the object operated on (a project file or a solution file). </source>
-        <target state="translated">Il n'y a pas de références {0} dans le projet {1}. ;; {0} est le type de l'élément demandé (projet, package, p2p) et {1} est l'objet utilisé (un fichier projet ou un fichier solution). </target>
+        <target state="translated">Il n'existe aucune référence {0} dans le projet {1}. ;; {0} est le type de l'élément demandé (projet, package, p2p) et {1} est l'objet utilisé (fichier projet ou fichier solution). </target>
         <note />
       </trans-unit>
       <trans-unit id="NoProjectsFound">
@@ -616,7 +616,7 @@
       </trans-unit>
       <trans-unit id="VerbosityOptionDescription">
         <source>Set the MSBuild verbosity level. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].</source>
-        <target state="translated">Définissez le niveau de détail MSBuild. Les valeurs autorisées sont q[uiet], m[inimal], n[ormal], d[etailed] et diag[nostic].</target>
+        <target state="translated">Définissez le niveau de verbosité MSBuild. Les valeurs autorisées sont q[uiet], m[inimal], n[ormal], d[etailed] et diag[nostic].</target>
         <note />
       </trans-unit>
       <trans-unit id="CmdVersionSuffixDescription">
@@ -722,15 +722,15 @@ You can add it to the current session by running the following command:
 
 export PATH="$PATH:{0}"
 </source>
-        <target state="translated">Le répertoire d'outils '{0}' ne se trouve pas actuellement sur la variable d'environnement PATH.
-Si vous utilisez Bash, vous pouvez l'ajouter à votre profil en exécutant la commande suivante :
+        <target state="translated">Le répertoire d'outils '{0}' n'est pas dans la variable d'environnement PATH.
+Si vous utilisez bash, vous pouvez l'ajouter à votre profil en exécutant la commande suivante :
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
-# Add .NET Core SDK tools
+# Ajouter les outils du kit SDK .NET Core
 export PATH="$PATH:{0}"
 EOF
 
-Vous pouvez l'ajouter à la session actuelle en exécutant la commande suivante :
+Vous pouvez l'ajouter à la session active en exécutant la commande suivante :
 
 export PATH="$PATH:{0}"
 </target>
@@ -749,15 +749,15 @@ You can add it to the current session by running the following command:
 
 export PATH="$PATH:{0}"
 </source>
-        <target state="translated">Le répertoire d'outils '{0}' ne se trouve pas actuellement sur la variable d'environnement PATH.
-Si vous utilisez Bash, vous pouvez l'ajouter à votre profil en exécutant la commande suivante :
+        <target state="translated">Le répertoire d'outils '{0}' n'est pas dans la variable d'environnement PATH.
+Si vous utilisez bash, vous pouvez l'ajouter à votre profil en exécutant la commande suivante :
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
-# Add .NET Core SDK tools
+# Ajouter les outils du kit SDK .NET Core
 export PATH="$PATH:{0}"
 EOF
 
-Vous pouvez l'ajouter à la session actuelle en exécutant la commande suivante :
+Vous pouvez l'ajouter à la session active en exécutant la commande suivante :
 
 export PATH="$PATH:{0}"
 </target>
@@ -820,7 +820,7 @@ setx PATH "%PATH%;{0}"
       </trans-unit>
       <trans-unit id="FailedToFindStagedToolPackage">
         <source>Failed to find staged tool package '{0}'.</source>
-        <target state="translated">Package d'outils intermédiaire '{0}' introuvable.</target>
+        <target state="translated">Package d'outils indexé '{0}' introuvable.</target>
         <note />
       </trans-unit>
       <trans-unit id="ToolSettingsInvalidLeadingDotCommandName">

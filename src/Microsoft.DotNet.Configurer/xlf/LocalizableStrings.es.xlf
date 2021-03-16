@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="es" original="../LocalizableStrings.resx">
     <body>
@@ -13,20 +13,21 @@ Telemetry
 The .NET Core tools collect usage data in order to help us improve your experience. It is collected by Microsoft and shared with the community. You can opt-out of telemetry by setting the DOTNET_CLI_TELEMETRY_OPTOUT environment variable to '1' or 'true' using your favorite shell.
 
 Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemetry</source>
-        <target state="needs-review-translation">Bienvenido a .NET Core
+        <target state="translated">Esto es .NET Core.
 ---------------------
-Aprenda sobre .NET Core en https://aka.ms/dotnet-docs. Use "dotnet --help" para ver los comandos disponibles o vaya a https://aka.ms/dotnet-cli-docs.
+Obtenga más información sobre .NET Core en: https://aka.ms/dotnet-docs
+Use "dotnet --help" para ver los comandos disponibles o visite: https://aka.ms/dotnet-cli-docs
 
 Telemetría
 ---------
-Las herramientas de .NET Core recopilan datos de uso con el fin de ayudarnos a mejorar su experiencia. Los datos son anónimos y no incluyen argumentos de la línea de comandos. Microsoft recopila los datos y los comparte con la comunidad. Si desea optar por no participar en la telemetría, establezca una variable de entorno DOTNET_CLI_TELEMETRY_OPTOUT en "1" o "true" con el shell de su preferencia.
+Las herramientas de .NET Core recopilan datos de uso para ayudarnos a mejorar su experiencia. Microsoft recopila estos datos y los comparte con la comunidad. Si no quiere participar en la telemetría, establezca la variable de entorno DOTNET_CLI_TELEMETRY_OPTOUT en "1" o "true" con el shell que prefiera.
 
-Obtenga más información sobre la telemetría de las herramientas de la CLI de .NET Core en https://aka.ms/dotnet-cli-telemetry.</target>
+Obtenga más información sobre la telemetría de las herramientas de la CLI de .NET Core en https://aka.ms/dotnet-cli-telemetry</target>
         <note />
       </trans-unit>
       <trans-unit id="FailedToPrimeCacheError">
         <source>Failed to prime the NuGet cache. {0} failed with: {1}</source>
-        <target state="translated">No se pudo desbloquear la caché de NuGet. Error de {0} con: {1}</target>
+        <target state="translated">No se pudo desbloquear la memoria caché de NuGet. Error de {0} con: {1}</target>
         <note />
       </trans-unit>
       <trans-unit id="NugetCachePrimeMessage">
@@ -35,7 +36,7 @@ Obtenga más información sobre la telemetría de las herramientas de la CLI de 
 A command is running to populate your local package cache to improve restore speed and enable offline access. This command takes up to one minute to complete and only runs once.</source>
         <target state="translated">Configurando...
 --------------
-Se está ejecutando un comando para rellenar la caché de paquetes local para mejorar la velocidad de restauración y habilitar el acceso sin conexión. Este comando tarda en completarse hasta un minuto y solo se ejecuta una vez.</target>
+Se está ejecutando un comando para rellenar la memoria caché del paquete local a fin de mejorar la velocidad de restauración y habilitar el acceso sin conexión. Este comando tarda como máximo un minuto y solo se ejecuta una vez.</target>
         <note />
       </trans-unit>
       <trans-unit id="UnauthorizedAccessMessage">
@@ -49,11 +50,11 @@ Here are some options to fix this error:
     </source>
         <target state="translated">Permiso denegado para modificar la carpeta "{0}".
 
-Estas son algunas opciones para corregir este error:
+A continuación se indican algunas opciones para corregir este error:
 ----------------------------------------
-1. Vuelva a ejecutar este comando con acceso con privilegios elevados.
-2. Deshabilite la primera experiencia de ejecución; para ello, establezca la variable de entorno DOTNET_SKIP_FIRST_TIME_EXPERIENCE en true.
-3. Copie el SDK de .NET Core en una ubicación no protegida y úselo desde ahí.
+1. Vuelva a ejecutar este comando con privilegios elevados.
+2. Establezca la variable de entorno DOTNET_SKIP_FIRST_TIME_EXPERIENCE en true para deshabilitar la primera experiencia de ejecución.
+3. Copie el SDK de .NET Core en una ubicación no protegida y úselo desde esta.
     </target>
         <note />
       </trans-unit>

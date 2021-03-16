@@ -1,15 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="ru" original="../LocalizableStrings.resx">
     <body>
       <trans-unit id="CommandDescription">
         <source>List tools installed in the current development environment.</source>
-        <target state="translated">Вывод списка инструментов, установленных в текущей среде разработки.</target>
+        <target state="translated">Получение списка средств, установленных в текущей среде разработки.</target>
         <note />
       </trans-unit>
       <trans-unit id="GlobalOptionDescription">
         <source>List tools in the current user's tools directory.</source>
-        <target state="translated">Вывод списка инструментов в каталоге инструментов текущего пользователя.</target>
+        <target state="translated">Получение списка средств в каталоге средств текущего пользователя.</target>
         <note />
       </trans-unit>
       <trans-unit id="VersionColumn">
@@ -29,7 +29,7 @@
       </trans-unit>
       <trans-unit id="InvalidPackageWarning">
         <source>Warning: tool package '{0}' is invalid: {1}</source>
-        <target state="translated">Предупреждение. Пакет инструментов "{0}" недопустим: {1}</target>
+        <target state="translated">Предупреждение: пакет средства "{0}" является недопустимым: {1}</target>
         <note />
       </trans-unit>
       <trans-unit id="NeedGlobalOrToolPath">

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="zh-Hant" original="../LocalizableStrings.resx">
     <body>
@@ -141,7 +141,7 @@
       </trans-unit>
       <trans-unit id="UnableToGenerateDepsJson">
         <source>Unable to generate deps.json, it may have been already generated.  You can specify the "-d" option before the tool name for diagnostic output (for example, "dotnet -d &lt;toolname&gt;": {0}</source>
-        <target state="translated">無法產生 deps.json，但先前可能產生過。您可以在診斷輸出的工具名稱前指定 "-d" 選項 (例如 "dotnet -d &lt;工具名稱&gt;": {0}</target>
+        <target state="translated">Deps.json 可能已經產生，因此無法再產生。您可於診斷輸出工具名稱 (例如 "dotnet-d &lt;toolname&gt;": {0}) 之前，指定 "-d" 選項</target>
         <note />
       </trans-unit>
       <trans-unit id="UnableToDeleteTemporaryDepsJson">
@@ -166,7 +166,7 @@
       </trans-unit>
       <trans-unit id="NoExecutableFoundMatchingCommand">
         <source>No executable found matching command "{0}"</source>
-        <target state="translated">沒有與命令 "{0}" 相符的可執行檔</target>
+        <target state="translated">找不到符合命令 "{0}" 的可執行檔</target>
         <note />
       </trans-unit>
       <trans-unit id="WaitingForDebuggerToAttach">
@@ -206,7 +206,7 @@
       </trans-unit>
       <trans-unit id="ProcessExitedWithCode">
         <source>&lt; {0} exited with {1} in {2} ms.</source>
-        <target state="translated">&lt; {0} 已結束，{1} 於 {2} 毫秒後。</target>
+        <target state="translated">&lt; {0} 已結束，{2} 毫秒內出現 {1}。</target>
         <note />
       </trans-unit>
       <trans-unit id="UnableToInvokeMemberNameAfterCommand">

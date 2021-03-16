@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="de" original="../CommonLocalizableStrings.resx">
     <body>
@@ -114,7 +114,7 @@
       </trans-unit>
       <trans-unit id="Delete">
         <source>Delete</source>
-        <target state="translated">löschen</target>
+        <target state="translated">Löschen</target>
         <note />
       </trans-unit>
       <trans-unit id="Update">
@@ -474,7 +474,7 @@
       </trans-unit>
       <trans-unit id="NoReferencesFound">
         <source>There are no {0} references in project {1}. ;; {0} is the type of the item being requested (project, package, p2p) and {1} is the object operated on (a project file or a solution file). </source>
-        <target state="translated">Das Projekt "{1}" enthält keine Verweise "{0}". ;; "{0}" ist die Art des angeforderten Elements (Projekt, Paket, P2P). "{1}" ist das Objekt, für das ein Vorgang ausgeführt wird (eine Projektdatei oder eine Projektmappendatei). </target>
+        <target state="translated">Es gibt keine {0}-Verweise im Projekt {1}. ;; {0} ist der Typ des angeforderten Elements (Projekt, Paket, P2P), und {1} ist das Objekt, für das der Vorgang durchgeführt wird (eine Projekt- oder Projektmappendatei).</target>
         <note />
       </trans-unit>
       <trans-unit id="NoProjectsFound">
@@ -722,15 +722,15 @@ You can add it to the current session by running the following command:
 
 export PATH="$PATH:{0}"
 </source>
-        <target state="translated">Das Toolverzeichnis "{0}" ist aktuell nicht in der PATH-Umgebungsvariable angegeben.
-Bei Verwendung von Bash können Sie hierzu den folgenden Befehl ausführen:
+        <target state="translated">Das Toolverzeichnis "{0}" befindet sich derzeit nicht in der PATH-Umgebungsvariablen.
+Wenn Sie Bash verwenden, können Sie es Ihrem Profil durch Ausführen des folgenden Befehls hinzufügen:
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
 # Add .NET Core SDK tools
 export PATH="$PATH:{0}"
 EOF
 
-Um das Verzeichnis der aktuellen Sitzung hinzuzufügen, können Sie den folgenden Befehl ausführen:
+Sie können es der aktuellen Sitzung hinzufügen, indem Sie den folgenden Befehl ausführen:
 
 export PATH="$PATH:{0}"
 </target>
@@ -749,15 +749,15 @@ You can add it to the current session by running the following command:
 
 export PATH="$PATH:{0}"
 </source>
-        <target state="translated">Das Toolverzeichnis "{0}" ist aktuell nicht in der PATH-Umgebungsvariable angegeben.
-Bei Verwendung von Bash können Sie hierzu den folgenden Befehl ausführen:
+        <target state="translated">Das Toolverzeichnis "{0}" befindet sich derzeit nicht in der PATH-Umgebungsvariablen.
+Wenn Sie Bash verwenden, können Sie es Ihrem Profil durch Ausführen des folgenden Befehls hinzufügen:
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
 # Add .NET Core SDK tools
 export PATH="$PATH:{0}"
 EOF
 
-Um das Verzeichnis der aktuellen Sitzung hinzuzufügen, können Sie den folgenden Befehl ausführen:
+Sie können es der aktuellen Sitzung hinzufügen, indem Sie den folgenden Befehl ausführen:
 
 export PATH="$PATH:{0}"
 </target>
@@ -820,7 +820,7 @@ setx PATH "%PATH%;{0}"
       </trans-unit>
       <trans-unit id="FailedToFindStagedToolPackage">
         <source>Failed to find staged tool package '{0}'.</source>
-        <target state="translated">Das bereitgestellte Toolpaket "{0}" wurde nicht gefunden.</target>
+        <target state="translated">Das gestagete Toolpaket "{0}" wurde nicht gefunden.</target>
         <note />
       </trans-unit>
       <trans-unit id="ToolSettingsInvalidLeadingDotCommandName">
