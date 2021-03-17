@@ -19,12 +19,12 @@
       </trans-unit>
       <trans-unit id="VersionOptionDescription">
         <source>Version of the tool package in NuGet.</source>
-        <target state="translated">NuGet 中工具包的版本。</target>
+        <target state="translated">NuGet 中的工具包版本。</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandDescription">
         <source>Update a tool to the latest stable version.</source>
-        <target state="translated">将工具更新为最新稳定版本。</target>
+        <target state="translated">将工具更新到最新的稳定版本。</target>
         <note />
       </trans-unit>
       <trans-unit id="ConfigFileOptionDescription">

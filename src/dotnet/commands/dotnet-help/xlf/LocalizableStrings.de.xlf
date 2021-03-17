@@ -219,12 +219,12 @@
       </trans-unit>
       <trans-unit id="DepsfilDefinition">
         <source>Path to &lt;application&gt;.deps.json file.</source>
-        <target state="translated">Pfad zur Datei "&lt;Anwendung&gt;.deps.json".</target>
+        <target state="translated">Pfad zur Datei "&lt;anwendung&gt;.deps.json".</target>
         <note />
       </trans-unit>
       <trans-unit id="RuntimeconfigDefinition">
         <source>Path to &lt;application&gt;.runtimeconfig.json file.</source>
-        <target state="translated">Pfad zur Datei "&lt;Anwendung&gt;.runtimeconfig.json".</target>
+        <target state="translated">Pfad zur Datei "&lt;anwendung&gt;.runtimeconfig.json".</target>
         <note />
       </trans-unit>
       <trans-unit id="FxVersionDefinition">
@@ -234,7 +234,7 @@
       </trans-unit>
       <trans-unit id="RollForwardOnNoCandidateFxDefinition">
         <source>Roll forward on no candidate shared framework is enabled.</source>
-        <target state="translated">Rollforward für freigegebenes Framework ohne Kandidaten ist aktiviert.</target>
+        <target state="translated">"Roll forward on no candidate" ist für das freigegebene Framework aktiviert.</target>
         <note />
       </trans-unit>
       <trans-unit id="AdditionalDeps">

@@ -67,9 +67,9 @@
                                         See https://aka.ms/vstest-report for more information on logger arguments.</source>
         <target state="translated">O agente a ser usado para os resultados de teste.
                                         Exemplos:
-                                        Registrar no formato trx usando um nome de arquivo exclusivo: --logger trx
-                                        Registrar no formato trx usando um nome de arquivo especificado: --logger "trx;LogFileName=&lt;TestResults.trx&gt;"
-                                        Veja https://aka.ms/vstest-report para obter mais informações sobre os argumentos do agente.</target>
+                                        Registre em log no formato trx usando um nome de arquivo exclusivo: --logger trx
+                                        Registre em log no formato trx usando o nome de arquivo especificado: --logger "trx;LogFileName=&lt;TestResults.trx&gt;"
+                                        Consulte https://aka.ms/vstest-report para obter mais informações sobre os argumentos do agente.</target>
         <note />
       </trans-unit>
       <trans-unit id="CmdOutputDir">

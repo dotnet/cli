@@ -19,12 +19,12 @@
       </trans-unit>
       <trans-unit id="VersionOptionDescription">
         <source>Version of the tool package in NuGet.</source>
-        <target state="translated">NuGet’teki araç paketinin sürümü.</target>
+        <target state="translated">NuGet'teki araç paketinin sürümü.</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandDescription">
         <source>Update a tool to the latest stable version.</source>
-        <target state="translated">Bir aracı en son kararlı sürüme güncelleştirir.</target>
+        <target state="translated">Bir aracı en son kararlı sürüme güncelleştirin.</target>
         <note />
       </trans-unit>
       <trans-unit id="ConfigFileOptionDescription">

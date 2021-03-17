@@ -19,7 +19,7 @@
       </trans-unit>
       <trans-unit id="CmdOutputDirDescription">
         <source>The directory containing the build artifacts to clean.</source>
-        <target state="translated">O diretório que contém os artefatos de build a serem limpos.</target>
+        <target state="translated">O diretório que contém os artefatos de compilação a serem limpos.</target>
         <note />
       </trans-unit>
       <trans-unit id="FrameworkOptionDescription">
@@ -29,7 +29,7 @@
       </trans-unit>
       <trans-unit id="RuntimeOptionDescription">
         <source>The target runtime to clean for.</source>
-        <target state="translated">O tempo de execução de destino para o qual a limpeza ocorrerá.</target>
+        <target state="translated">O runtime de destino para o qual a limpeza ocorrerá.</target>
         <note />
       </trans-unit>
       <trans-unit id="ConfigurationOptionDescription">

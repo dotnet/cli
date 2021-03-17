@@ -16,7 +16,7 @@ Pomyślnie zainstalowano narzędzie „{1}” (wersja: „{2}”).</target>
       </trans-unit>
       <trans-unit id="CommandDescription">
         <source>Install a tool for use on the command line.</source>
-        <target state="translated">Zainstaluj narzędzie do użytku w wierszu polecenia.</target>
+        <target state="translated">Zainstaluj narzędzie do użycia w wierszu polecenia.</target>
         <note />
       </trans-unit>
       <trans-unit id="ConfigFileOptionDescription">

@@ -67,9 +67,9 @@
                                         See https://aka.ms/vstest-report for more information on logger arguments.</source>
         <target state="translated">Die für Testergebnisse zu verwendende Protokollierung.
                                         Beispiele:
-                                        Hiermit werden Ergebnisse im TRX-Format mit eindeutigem Dateinamen protokolliert: --logger trx
-                                        Hiermit werden Ergebnisse im TRX-Format mit dem angegebenem Dateinamen protokolliert: --logger "trx;LogFileName=&lt;TestResults.trx&gt;"
-                                        Weitere Informationen zu den Argumenten der Protokollierung finden Sie unter https://aka.ms/vstest-report.</target>
+                                        Protokollierung im TRX-Format mit einem eindeutigen Dateinamen: --logger trx
+                                        Protokollierung im TRX-Format mit dem angegebenen Dateinamen: --logger "trx;LogFileName=&lt;TestResults.trx&gt;"
+                                        Weitere Informationen zu Protokollierungsargumenten finden Sie unter https://aka.ms/vstest-report.</target>
         <note />
       </trans-unit>
       <trans-unit id="CmdOutputDir">

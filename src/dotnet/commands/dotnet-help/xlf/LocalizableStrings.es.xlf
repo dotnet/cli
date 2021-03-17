@@ -234,7 +234,7 @@
       </trans-unit>
       <trans-unit id="RollForwardOnNoCandidateFxDefinition">
         <source>Roll forward on no candidate shared framework is enabled.</source>
-        <target state="translated">Puesta al día activada, no hay ninguna instancia de Shared Framework habilitada.</target>
+        <target state="translated">Se ha habilitado la puesta al día en un marco compartido no candidato.</target>
         <note />
       </trans-unit>
       <trans-unit id="AdditionalDeps">

@@ -4,12 +4,12 @@
     <body>
       <trans-unit id="CommandDescription">
         <source>List tools installed in the current development environment.</source>
-        <target state="translated">Liste as ferramentas instaladas no ambiente de desenvolvimento atual.</target>
+        <target state="translated">Listar ferramentas instaladas no ambiente de desenvolvimento atual.</target>
         <note />
       </trans-unit>
       <trans-unit id="GlobalOptionDescription">
         <source>List tools in the current user's tools directory.</source>
-        <target state="translated">Liste as ferramentas no diretório de ferramentas do usuário atual.</target>
+        <target state="translated">Listar ferramentas no diretório de ferramentas do usuário atual.</target>
         <note />
       </trans-unit>
       <trans-unit id="VersionColumn">
@@ -29,7 +29,7 @@
       </trans-unit>
       <trans-unit id="InvalidPackageWarning">
         <source>Warning: tool package '{0}' is invalid: {1}</source>
-        <target state="translated">Aviso: o pacote de ferramentas '{0}' é inválido: {1}</target>
+        <target state="translated">Aviso: o pacote de ferramentas '{0}' é inválido:{1}</target>
         <note />
       </trans-unit>
       <trans-unit id="NeedGlobalOrToolPath">

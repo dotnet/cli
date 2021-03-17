@@ -24,7 +24,7 @@
       </trans-unit>
       <trans-unit id="CommandDescription">
         <source>Update a tool to the latest stable version.</source>
-        <target state="translated">Hiermit wird ein Tool auf die neueste stabile Version aktualisiert.</target>
+        <target state="translated">Aktualisieren Sie ein Tool auf die neueste stabile Version.</target>
         <note />
       </trans-unit>
       <trans-unit id="ConfigFileOptionDescription">

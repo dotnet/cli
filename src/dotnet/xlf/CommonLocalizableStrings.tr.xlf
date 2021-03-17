@@ -474,7 +474,7 @@
       </trans-unit>
       <trans-unit id="NoReferencesFound">
         <source>There are no {0} references in project {1}. ;; {0} is the type of the item being requested (project, package, p2p) and {1} is the object operated on (a project file or a solution file). </source>
-        <target state="translated">{1} projesinde {0} başvurusu yok. ;; {0}, istenen öğenin türü (proje, paket, p2p) ve {1}, üzerinde işlem yapılan nesnedir (bir proje dosyası veya çözüm dosyası). </target>
+        <target state="translated">{1} projesinde {0} başvurusu yok. ;; {0}, istenen öğenin türü (proje, paket, p2p) ve {1}, üzerinde işlem yapılan nesne (bir proje dosyası veya çözüm dosyası).</target>
         <note />
       </trans-unit>
       <trans-unit id="NoProjectsFound">
@@ -722,15 +722,15 @@ You can add it to the current session by running the following command:
 
 export PATH="$PATH:{0}"
 </source>
-        <target state="translated">'{0}' araç dizini şu anda PATH ortam değişkeni üzerinde değil.
-Bash kullanıyorsanız aşağıdaki komutu çalıştırarak bunu profilinize ekleyebilirsiniz:
+        <target state="translated">'{0}' araçlar dizini şu anda PATH ortam değişkeni üzerinde değil.
+Bash kullanıyorsanız, şu komutu çalıştırarak profilinize ekleyebilirsiniz:
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
-# .NET Core SDK araçlarını ekle
+# Add .NET Core SDK tools
 export PATH="$PATH:{0}"
 EOF
 
-Aşağıdaki komutu çalıştırarak geçerli oturuma ekleyebilirsiniz:
+Şu komutu çalıştırarak geçerli komuta ekleyebilirsiniz:
 
 export PATH="$PATH:{0}"
 </target>
@@ -749,15 +749,15 @@ You can add it to the current session by running the following command:
 
 export PATH="$PATH:{0}"
 </source>
-        <target state="translated">'{0}' araç dizini şu anda PATH ortam değişkeni üzerinde değil.
-Bash kullanıyorsanız aşağıdaki komutu çalıştırarak bunu profilinize ekleyebilirsiniz:
+        <target state="translated">'{0}' araçlar dizini şu anda PATH ortam değişkeni üzerinde değil.
+Bash kullanıyorsanız, şu komutu çalıştırarak profilinize ekleyebilirsiniz:
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
-# .NET Core SDK araçlarını ekle
+# Add .NET Core SDK tools
 export PATH="$PATH:{0}"
 EOF
 
-Aşağıdaki komutu çalıştırarak geçerli oturuma ekleyebilirsiniz:
+Şu komutu çalıştırarak geçerli komuta ekleyebilirsiniz:
 
 export PATH="$PATH:{0}"
 </target>

@@ -29,7 +29,7 @@
       </trans-unit>
       <trans-unit id="InvalidPackageWarning">
         <source>Warning: tool package '{0}' is invalid: {1}</source>
-        <target state="translated">Avertissement : Le package d'outils '{0}' n'est pas valide : {1}</target>
+        <target state="translated">Avertissement : Le package d'outils '{0}' est non valide : {1}</target>
         <note />
       </trans-unit>
       <trans-unit id="NeedGlobalOrToolPath">
