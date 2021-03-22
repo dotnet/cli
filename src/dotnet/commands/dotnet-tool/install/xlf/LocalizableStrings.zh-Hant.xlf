@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="zh-Hant" original="../LocalizableStrings.resx">
     <body>
@@ -16,7 +16,7 @@ Tool '{1}' (version '{2}') was successfully installed.</source>
       </trans-unit>
       <trans-unit id="CommandDescription">
         <source>Install a tool for use on the command line.</source>
-        <target state="translated">安裝用於命令列的工具。</target>
+        <target state="translated">安裝可在命令列上使用的工具。</target>
         <note />
       </trans-unit>
       <trans-unit id="ConfigFileOptionDescription">

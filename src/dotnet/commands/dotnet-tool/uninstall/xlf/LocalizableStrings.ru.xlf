@@ -9,7 +9,7 @@
       </trans-unit>
       <trans-unit id="CommandDescription">
         <source>Uninstall a tool from the current development environment.</source>
-        <target state="translated">Удаление инструмента из текущей среды разработки.</target>
+        <target state="translated">Удаление средства из текущей среды разработки.</target>
         <note />
       </trans-unit>
       <trans-unit id="PackageIdArgumentName">

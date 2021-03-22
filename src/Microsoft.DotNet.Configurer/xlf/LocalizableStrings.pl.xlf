@@ -13,30 +13,30 @@ Telemetry
 The .NET Core tools collect usage data in order to help us improve your experience. It is collected by Microsoft and shared with the community. You can opt-out of telemetry by setting the DOTNET_CLI_TELEMETRY_OPTOUT environment variable to '1' or 'true' using your favorite shell.
 
 Read more about .NET Core CLI Tools telemetry: https://aka.ms/dotnet-cli-telemetry</source>
-        <target state="needs-review-translation">.NET Core — Zapraszamy!
+        <target state="translated">Platforma .NET — Zapraszamy!
 ---------------------
-Więcej informacji o programie .NET Core: https://aka.ms/dotnet-docs
-Aby wyświetlić dostępne polecenia, użyj polecenia „dotnet --help” lub przejdź na stronę: https://aka.ms/dotnet-cli-docs
+Dowiedz się więcej na temat platformy .NET Core: https://aka.ms/dotnet-docs
+Użyj polecenia „dotnet --help”, aby wyświetlić dostępne polecenia, lub odwiedź stronę https://aka.ms/dotnet-cli-docs
 
 Telemetria
 ---------
-Narzędzia programu .NET Core zbierają dane użycia mające pomóc nam ulepszyć Twoje środowisko pracy. Dane te są anonimowe i nie obejmują argumentów wiersza polecenia. Zbiera je firma Microsoft i udostępnia społeczności. Z telemetrii możesz zrezygnować, ustawiając zmienną środowiskową DOTNET_CLI_TELEMETRY_OPTOUT na wartość „1” lub „true” przy użyciu ulubionej powłoki.
+Narzędzia platformy .NET Core zbierają dane użycia, aby ułatwić nam ulepszanie środowiska. Są one zbierane przez firmę Microsoft i udostępniane społeczności. Możesz zrezygnować z telemetrii, ustawiając zmienną środowiskową DOTNET_CLI_TELEMETRY_OPTOUT na wartość „1” lub „true” przy użyciu powłoki.
 
-Przeczytaj więcej na temat telemetrii narzędzi interfejsu wiersza polecenia programu .NET Core: https://aka.ms/dotnet-cli-telemetry.</target>
+Dowiedz się więcej na temat narzędzi telemetrii interfejsu wiersza polecenia platformy .NET Core: https://aka.ms/dotnet-cli-telemetry</target>
         <note />
       </trans-unit>
       <trans-unit id="FailedToPrimeCacheError">
         <source>Failed to prime the NuGet cache. {0} failed with: {1}</source>
-        <target state="translated">Nie można utworzyć głównej pamięci podręcznej NuGet. Operacja {0} zakończyła się niepowodzeniem: {1}</target>
+        <target state="translated">Nie można wstępnie zapełnić pamięci podręcznej narzędzia NuGet. Polecenie {0} nie powiodło się: {1}</target>
         <note />
       </trans-unit>
       <trans-unit id="NugetCachePrimeMessage">
         <source>Configuring...
 --------------
 A command is running to populate your local package cache to improve restore speed and enable offline access. This command takes up to one minute to complete and only runs once.</source>
-        <target state="translated">Trwa konfigurowanie…
+        <target state="translated">Trwa konfigurowanie...
 --------------
-Wykonywane jest polecenie w celu wypełnienia lokalnej pamięci podręcznej pakietów, poprawy szybkości przywracania i włączenia dostępu offline. Wykonanie tego polecenia jest jednorazowe i zajmie maksymalnie minutę.</target>
+Uruchomiono polecenie wypełniające lokalną pamięć podręczną pakietów w celu zwiększenia szybkości przywracania i aby umożliwić korzystanie z dostępu w trybie offline. Wykonanie tego polecenia trwa do jednej minuty i jest ono uruchamiane tylko jeden raz.</target>
         <note />
       </trans-unit>
       <trans-unit id="UnauthorizedAccessMessage">
@@ -48,13 +48,13 @@ Here are some options to fix this error:
 2. Disabled the first run experience by setting the environment variable DOTNET_SKIP_FIRST_TIME_EXPERIENCE to true.
 3. Copy the .NET Core SDK to a non-protected location and use it from there.
     </source>
-        <target state="translated">Odmowa uprawnień do zmodyfikowania folderu „{0}”.
+        <target state="translated">Brak uprawnień wymaganych do zmodyfikowania folderu „{0}”.
 
-Oto kilka opcji naprawiania tego błędu:
+Oto niektóre możliwości naprawienia tego błędu:
 ----------------------------------------
-1. Uruchom to polecenie ponownie z podwyższonym poziomem uprawnień.
-2. Wyłącz środowisko pierwszego uruchomienia, ustawiając dla zmiennej środowiskowej DOTNET_SKIP_FIRST_TIME_EXPERIENCE wartość true.
-3. Skopiuj zestaw .NET Core SDK do lokalizacji niechronionej i tam z niego korzystaj.
+1. Uruchom ponownie to polecenie z podwyższonym poziomem uprawnień.
+2. Wyłącz środowisko pierwszego uruchomienia, ustawiając zmienną środowiskową DOTNET_SKIP_FIRST_TIME_EXPERIENCE na wartość true.
+3. Skopiuj zestaw .NET Core SDK do niechronionej lokalizacji i użyj go stamtąd.
     </target>
         <note />
       </trans-unit>

@@ -65,7 +65,7 @@
                                         Log in trx format using a unqiue file name: --logger trx
                                         Log in trx format using the specified file name: --logger "trx;LogFileName=&lt;TestResults.trx&gt;"
                                         See https://aka.ms/vstest-report for more information on logger arguments.</source>
-        <target state="translated">Logger da usare per i risultati del test.
+        <target state="translated">Logger da usare per i risultati dei test.
                                         Esempi:
                                         Log in formato trx con un nome file univoco: --logger trx
                                         Log in formato trx con il nome file specificato: --logger "trx;LogFileName=&lt;TestResults.trx&gt;"

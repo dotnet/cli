@@ -206,7 +206,7 @@
       </trans-unit>
       <trans-unit id="ProcessExitedWithCode">
         <source>&lt; {0} exited with {1} in {2} ms.</source>
-        <target state="translated">&lt; {0} s'est arrêté avec {1} en {2} ms.</target>
+        <target state="translated">&lt; {0} s'est arrêté avec {1} en {2} ms.</target>
         <note />
       </trans-unit>
       <trans-unit id="UnableToInvokeMemberNameAfterCommand">

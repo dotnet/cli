@@ -16,7 +16,7 @@ A ferramenta '{1}' (versão '{2}') foi instalada com êxito.</target>
       </trans-unit>
       <trans-unit id="CommandDescription">
         <source>Install a tool for use on the command line.</source>
-        <target state="translated">Instalar uma ferramenta para ser usada na linha de comando.</target>
+        <target state="translated">Instale uma ferramenta para uso na linha de comando.</target>
         <note />
       </trans-unit>
       <trans-unit id="ConfigFileOptionDescription">
@@ -46,7 +46,7 @@ A ferramenta '{1}' (versão '{2}') foi instalada com êxito.</target>
       </trans-unit>
       <trans-unit id="GlobalOptionDescription">
         <source>Install the tool to the current user's tools directory.</source>
-        <target state="translated">Instalar a ferramenta no diretório de ferramentas do usuário atual.</target>
+        <target state="translated">Instale a ferramenta no diretório de ferramentas do usuário atual.</target>
         <note />
       </trans-unit>
       <trans-unit id="InstallFullCommandNameLocalized">

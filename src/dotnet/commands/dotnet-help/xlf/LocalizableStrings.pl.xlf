@@ -74,7 +74,7 @@
       </trans-unit>
       <trans-unit id="PublishDefinition">
         <source>Publish a .NET project for deployment.</source>
-        <target state="translated">Publikuj projekt platformy .NET do wdrożenia.</target>
+        <target state="translated">Opublikuj projekt platformy .NET do wdrożenia.</target>
         <note />
       </trans-unit>
       <trans-unit id="RunDefinition">
@@ -234,7 +234,7 @@
       </trans-unit>
       <trans-unit id="RollForwardOnNoCandidateFxDefinition">
         <source>Roll forward on no candidate shared framework is enabled.</source>
-        <target state="translated">Nie przenoś do przodu w czasie dla żadnego kandydata, dla którego jest włączona platforma współużytkowana.</target>
+        <target state="translated">Przenoszenie do przodu w udostępnionej strukturze bez kandydata jest włączone.</target>
         <note />
       </trans-unit>
       <trans-unit id="AdditionalDeps">

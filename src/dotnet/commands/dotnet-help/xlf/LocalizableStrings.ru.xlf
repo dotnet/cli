@@ -234,7 +234,7 @@
       </trans-unit>
       <trans-unit id="RollForwardOnNoCandidateFxDefinition">
         <source>Roll forward on no candidate shared framework is enabled.</source>
-        <target state="translated">Если потенциальная общая платформа не включена, выполняется накат.</target>
+        <target state="translated">Накат на платформу, для которой кандидату не предоставлен общий доступ, включен.</target>
         <note />
       </trans-unit>
       <trans-unit id="AdditionalDeps">

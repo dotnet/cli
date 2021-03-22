@@ -569,7 +569,7 @@
       </trans-unit>
       <trans-unit id="SolutionAlreadyContainsProject">
         <source>Solution {0} already contains project {1}.</source>
-        <target state="translated">La soluzione {0} contiene già il progetto {\1\}.</target>
+        <target state="translated">La soluzione {0} contiene già il progetto {1}.</target>
         <note />
       </trans-unit>
       <trans-unit id="ArgumentsProjectOrSolutionDescription">
@@ -726,7 +726,7 @@ export PATH="$PATH:{0}"
 Se si usa bash, è possibile aggiungerla al profilo eseguendo il comando seguente:
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
-# Aggiunge gli strumenti di .NET Core SDK
+# Aggiungi .NET Core SDK Tools
 export PATH="$PATH:{0}"
 EOF
 
@@ -753,7 +753,7 @@ export PATH="$PATH:{0}"
 Se si usa bash, è possibile aggiungerla al profilo eseguendo il comando seguente:
 
 cat &lt;&lt; \EOF &gt;&gt; ~/.bash_profile
-# Aggiunge gli strumenti di .NET Core SDK
+# Aggiungi .NET Core SDK Tools
 export PATH="$PATH:{0}"
 EOF
 

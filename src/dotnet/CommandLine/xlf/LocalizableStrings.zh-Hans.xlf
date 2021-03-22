@@ -39,7 +39,7 @@
       </trans-unit>
       <trans-unit id="UsageHeader">
         <source>Usage:</source>
-        <target state="translated">使用情况:</target>
+        <target state="translated">用法:</target>
         <note />
       </trans-unit>
       <trans-unit id="UsageArgumentsToken">
@@ -84,7 +84,7 @@
       </trans-unit>
       <trans-unit id="UsageCommandAdditionalArgs">
         <source> [[--] &lt;additional arguments&gt;...]]</source>
-        <target state="translated"> [[--] &lt;附加参数&gt;...]]</target>
+        <target state="translated"> [[--] &lt;additional arguments&gt;...]]</target>
         <note />
       </trans-unit>
       <trans-unit id="UsageCommandsAdditionalArgsHeader">

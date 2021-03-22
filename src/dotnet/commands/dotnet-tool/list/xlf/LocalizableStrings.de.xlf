@@ -4,12 +4,12 @@
     <body>
       <trans-unit id="CommandDescription">
         <source>List tools installed in the current development environment.</source>
-        <target state="translated">Hiermit werden die in der aktuellen Entwicklungsumgebung installierten Tools aufgelistet.</target>
+        <target state="translated">Listen Sie die Tools auf, die in der aktuellen Entwicklungsumgebung installiert sind.</target>
         <note />
       </trans-unit>
       <trans-unit id="GlobalOptionDescription">
         <source>List tools in the current user's tools directory.</source>
-        <target state="translated">Hiermit werden Tools im Toolverzeichnis des aktuellen Benutzers aufgelistet.</target>
+        <target state="translated">Listen Sie die Tools im Verzeichnis "Extras" des aktuellen Benutzers auf.</target>
         <note />
       </trans-unit>
       <trans-unit id="VersionColumn">
