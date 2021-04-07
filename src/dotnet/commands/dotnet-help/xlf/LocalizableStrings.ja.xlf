@@ -74,7 +74,7 @@
       </trans-unit>
       <trans-unit id="PublishDefinition">
         <source>Publish a .NET project for deployment.</source>
-        <target state="translated">.NET プロジェクトを配置のために発行します。</target>
+        <target state="translated">.NET プロジェクトを配置のために公開します。</target>
         <note />
       </trans-unit>
       <trans-unit id="RunDefinition">
@@ -234,7 +234,7 @@
       </trans-unit>
       <trans-unit id="RollForwardOnNoCandidateFxDefinition">
         <source>Roll forward on no candidate shared framework is enabled.</source>
-        <target state="translated">候補がない Shared Framework に対するロールフォワードが有効です。</target>
+        <target state="translated">候補がない共有フレームワークでのロールフォワードが有効です。</target>
         <note />
       </trans-unit>
       <trans-unit id="AdditionalDeps">

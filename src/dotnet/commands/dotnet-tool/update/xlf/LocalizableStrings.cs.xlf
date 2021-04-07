@@ -19,7 +19,7 @@
       </trans-unit>
       <trans-unit id="VersionOptionDescription">
         <source>Version of the tool package in NuGet.</source>
-        <target state="translated">Verze balíčku nástroje v NuGetu</target>
+        <target state="translated">Verze balíčku nástroje v NuGet</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandDescription">

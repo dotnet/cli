@@ -16,7 +16,7 @@ Tool '{1}' (version '{2}') was successfully installed.</source>
       </trans-unit>
       <trans-unit id="CommandDescription">
         <source>Install a tool for use on the command line.</source>
-        <target state="translated">Устанавливает инструмент для использования в командной строке.</target>
+        <target state="translated">Установка средства для использования в командной строке.</target>
         <note />
       </trans-unit>
       <trans-unit id="ConfigFileOptionDescription">
@@ -46,7 +46,7 @@ Tool '{1}' (version '{2}') was successfully installed.</source>
       </trans-unit>
       <trans-unit id="GlobalOptionDescription">
         <source>Install the tool to the current user's tools directory.</source>
-        <target state="translated">Установка инструмента в каталог инструментов текущего пользователя.</target>
+        <target state="translated">Установка средства в каталог средств текущего пользователя.</target>
         <note />
       </trans-unit>
       <trans-unit id="InstallFullCommandNameLocalized">
