@@ -48,7 +48,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <!-- Dependencies from https://github.com/dotnet/templating -->
-    <MicrosoftTemplateEngineCliPackageVersion>3.1.16-servicing.21261.3</MicrosoftTemplateEngineCliPackageVersion>
+    <MicrosoftTemplateEngineCliPackageVersion>3.1.17-servicing.21303.2</MicrosoftTemplateEngineCliPackageVersion>
     <MicrosoftTemplateEngineAbstractionsPackageVersion>$(MicrosoftTemplateEngineCliPackageVersion)</MicrosoftTemplateEngineAbstractionsPackageVersion>
     <MicrosoftTemplateEngineCliLocalizationPackageVersion>$(MicrosoftTemplateEngineCliPackageVersion)</MicrosoftTemplateEngineCliLocalizationPackageVersion>
     <MicrosoftTemplateEngineOrchestratorRunnableProjectsPackageVersion>$(MicrosoftTemplateEngineCliPackageVersion)</MicrosoftTemplateEngineOrchestratorRunnableProjectsPackageVersion>
