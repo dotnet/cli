@@ -4,7 +4,7 @@
 #
 
 # Dockerfile that creates a container suitable to build dotnet-cli
-FROM microsoft/dotnet-buildtools-prereqs:ubuntu-18.04-f90bc20-20180320154721
+FROM mcr.microsoft.com/dotnet-buildtools/prereqs:ubuntu-18.04-f90bc20-20180320154721
 
 RUN apt-get update && \
     apt-get -qqy install \
