@@ -4,7 +4,7 @@
 #
 
 # Dockerfile that creates a container suitable to build dotnet-cli
-FROM microsoft/dotnet-buildtools-prereqs:fedora-27-82a3800-20180326211504
+FROM mcr.microsoft.com/dotnet-buildtools/prereqs:fedora-27-82a3800-20180326211504
 
 RUN dnf install -y findutils
 
