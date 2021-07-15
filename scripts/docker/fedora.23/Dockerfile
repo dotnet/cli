@@ -4,7 +4,7 @@
 #
 
 # Dockerfile that creates a container suitable to build dotnet-cli
-FROM microsoft/dotnet-buildtools-prereqs:fedora23_prereqs
+FROM mcr.microsoft.com/dotnet-buildtools/prereqs:fedora23_prereqs
 
 # Install tools used by the VSO build automation.
 RUN dnf install -y findutils && \

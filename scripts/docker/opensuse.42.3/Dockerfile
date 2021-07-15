@@ -3,7 +3,7 @@
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 #
 
-FROM microsoft/dotnet-buildtools-prereqs:opensuse-42.3-c103199-20180628122439
+FROM mcr.microsoft.com/dotnet-buildtools/prereqs:opensuse-42.3-c103199-20180628122439
 
 RUN zypper -n install sudo && \
     zypper clean -a
