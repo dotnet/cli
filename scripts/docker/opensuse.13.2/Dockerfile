@@ -3,7 +3,7 @@
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 #
 
-FROM microsoft/dotnet-buildtools-prereqs:opensuse132_prereqs_v4
+FROM mcr.microsoft.com/dotnet-buildtools/prereqs:opensuse132_prereqs_v4
 
 RUN zypper -n install sudo \
     ncurses-utils && \
