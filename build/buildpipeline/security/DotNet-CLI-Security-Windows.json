@@ -723,7 +723,7 @@
     "type": "TfsGit",
     "name": "DotNet-Cli-Trusted",
     "url": "https://devdiv.visualstudio.com/DevDiv/_git/DotNet-Cli-Trusted",
-    "defaultBranch": "refs/heads/master",
+    "defaultBranch": "refs/heads/release/2.1.5xx-MSRC",
     "clean": "true",
     "checkoutSubmodules": false
   },
