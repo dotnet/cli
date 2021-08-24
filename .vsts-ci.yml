@@ -223,18 +223,6 @@ jobs:
       testResultsFiles: '**/*.trx'
     condition: always()
 
-- job: release_osx_x64
-  displayName: OSX x64 Release Build
-  pool:
-    vmImage: internal-macos-10.13
-  steps:
-  - script: ./build.sh --skip-prereqs --configuration Release --targets Default
-  - task: PublishTestResults@2
-    inputs:
-      testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx'
-    condition: always()
-
 - job: release_rhel72_x64
   displayName: RHEL7.2 x64 Release Build
   pool:
