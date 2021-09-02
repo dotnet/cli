@@ -506,7 +506,7 @@ namespace Microsoft.DotNet.Tests.Commands.Tool
                 ToolCommandName + extension);
         }
 
-        private class NoOpFilePermissionSetter : IFilePermissionSetter
+        internal class NoOpFilePermissionSetter : IFilePermissionSetter
         {
             public void SetUserExecutionPermission(string path)
             {
