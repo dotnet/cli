@@ -52,7 +52,7 @@
       <Uri>https://github.com/NuGet/NuGet.Client</Uri>
       <Sha>6f8eb3a2e1db6b458451b9cfd2a4f5557769b041</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.20-servicing.21470.22">
+    <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.20-servicing.21471.1">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
       <Sha>0900090e30756addbd3f545d69db659deb06c3b2</Sha>
     </Dependency>
