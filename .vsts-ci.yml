@@ -13,11 +13,11 @@ jobs:
   displayName: CentOS7.1 x64 Debug Build
   pool:
     ${{ if eq(variables['System.TeamProject'], 'public') }}:
-      name: NetCorePublic-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64.Open
+      name: NetCore1ESPool-Svc-Public
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64.Open
     ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-      name: NetCoreInternal-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64
+      name: NetCore1ESPool-Svc-Internal
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default
@@ -31,11 +31,11 @@ jobs:
   displayName: fedora.27 x64 Debug Build
   pool:
     ${{ if eq(variables['System.TeamProject'], 'public') }}:
-      name: NetCorePublic-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64.Open
+      name: NetCore1ESPool-Svc-Public
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64.Open
     ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-      name: NetCoreInternal-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64
+      name: NetCore1ESPool-Svc-Internal
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --docker fedora.27 --linux-portable
@@ -49,11 +49,11 @@ jobs:
   displayName: Linux arm Debug Build
   pool:
     ${{ if eq(variables['System.TeamProject'], 'public') }}:
-      name: NetCorePublic-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64.Open
+      name: NetCore1ESPool-Svc-Public
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64.Open
     ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-      name: NetCoreInternal-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64
+      name: NetCore1ESPool-Svc-Internal
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --linux-portable --architecture arm /p:CLIBUILD_SKIP_TESTS=true
@@ -62,11 +62,11 @@ jobs:
   displayName: Linux arm64 Debug Build
   pool:
     ${{ if eq(variables['System.TeamProject'], 'public') }}:
-      name: NetCorePublic-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64.Open
+      name: NetCore1ESPool-Svc-Public
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64.Open
     ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-      name: NetCoreInternal-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64
+      name: NetCore1ESPool-Svc-Internal
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --linux-portable --architecture arm64 /p:CLIBUILD_SKIP_TESTS=true
@@ -75,11 +75,11 @@ jobs:
   displayName: Linux-musl x64 Debug Build
   pool:
     ${{ if eq(variables['System.TeamProject'], 'public') }}:
-      name: NetCorePublic-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64.Open
+      name: NetCore1ESPool-Svc-Public
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64.Open
     ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-      name: NetCoreInternal-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64
+      name: NetCore1ESPool-Svc-Internal
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --runtime-id linux-musl-x64 --docker alpine.3.6
@@ -94,11 +94,11 @@ jobs:
   timeoutInMinutes: 90
   pool:
     ${{ if eq(variables['System.TeamProject'], 'public') }}:
-      name: NetCorePublic-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64.Open
+      name: NetCore1ESPool-Svc-Public
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64.Open
     ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-      name: NetCoreInternal-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64
+      name: NetCore1ESPool-Svc-Internal
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --docker opensuse.42.3 --linux-portable
@@ -112,11 +112,11 @@ jobs:
   displayName: Ubuntu16.04 x64 Debug Build
   pool:
     ${{ if eq(variables['System.TeamProject'], 'public') }}:
-      name: NetCorePublic-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64.Open
+      name: NetCore1ESPool-Svc-Public
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64.Open
     ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-      name: NetCoreInternal-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64
+      name: NetCore1ESPool-Svc-Internal
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default
@@ -130,11 +130,11 @@ jobs:
   displayName: ubuntu.18.04 x64 Debug Build
   pool:
     ${{ if eq(variables['System.TeamProject'], 'public') }}:
-      name: NetCorePublic-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64.Open
+      name: NetCore1ESPool-Svc-Public
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64.Open
     ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-      name: NetCoreInternal-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64
+      name: NetCore1ESPool-Svc-Internal
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Debug --targets Default --docker ubuntu.18.04 --linux-portable
@@ -174,11 +174,11 @@ jobs:
   displayName: Linux_NoSuffix arm Release Build
   pool:
     ${{ if eq(variables['System.TeamProject'], 'public') }}:
-      name: NetCorePublic-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64.Open
+      name: NetCore1ESPool-Svc-Public
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64.Open
     ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-      name: NetCoreInternal-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64
+      name: NetCore1ESPool-Svc-Internal
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: |
@@ -189,11 +189,11 @@ jobs:
   displayName: Linux_NoSuffix x64 Release Build
   pool:
     ${{ if eq(variables['System.TeamProject'], 'public') }}:
-      name: NetCorePublic-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64.Open
+      name: NetCore1ESPool-Svc-Public
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64.Open
     ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-      name: NetCoreInternal-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64
+      name: NetCore1ESPool-Svc-Internal
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: |
@@ -209,11 +209,11 @@ jobs:
   displayName: Linux x64 Release Build
   pool:
     ${{ if eq(variables['System.TeamProject'], 'public') }}:
-      name: NetCorePublic-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64.Open
+      name: NetCore1ESPool-Svc-Public
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64.Open
     ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-      name: NetCoreInternal-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64
+      name: NetCore1ESPool-Svc-Internal
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Release --targets Default --linux-portable
@@ -227,11 +227,11 @@ jobs:
   displayName: RHEL7.2 x64 Release Build
   pool:
     ${{ if eq(variables['System.TeamProject'], 'public') }}:
-      name: NetCorePublic-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64.Open
+      name: NetCore1ESPool-Svc-Public
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64.Open
     ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-      name: NetCoreInternal-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64
+      name: NetCore1ESPool-Svc-Internal
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Release --targets Default
@@ -246,11 +246,11 @@ jobs:
   timeoutInMinutes: 90
   pool:
     ${{ if eq(variables['System.TeamProject'], 'public') }}:
-      name: NetCorePublic-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64.Open
+      name: NetCore1ESPool-Svc-Public
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64.Open
     ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-      name: NetCoreInternal-Pool
-      queue: BuildPool.Ubuntu.1604.Amd64
+      name: NetCore1ESPool-Svc-Internal
+      demands: ImageOverride -equals Build.Ubuntu.1604.Amd64
     vmImage: ubuntu-16.04
   steps:
   - script: ./build.sh --skip-prereqs --configuration Release --targets Default --docker ubuntu.14.04
