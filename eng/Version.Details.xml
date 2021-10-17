@@ -31,9 +31,9 @@
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-corefx</Uri>
       <Sha>059a4a19e602494bfbed473dbbb18f2dbfbd0878</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.AspNetCore.DeveloperCertificates.XPlat" Version="3.1.21-servicing.21505.20">
+    <Dependency Name="Microsoft.AspNetCore.DeveloperCertificates.XPlat" Version="3.1.21-servicing.21517.5">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-aspnetcore</Uri>
-      <Sha>b7bce98940c057350bb2c429004054919d8b152e</Sha>
+      <Sha>bf260e42ab618d06805d2772b1728f62dfb34f5b</Sha>
     </Dependency>
     <!-- Keep this dependency at the bottom of ProductDependencies, else it will be picked as the parent for CoherentParentDependencies -->
     <Dependency Name="Microsoft.NETCore.App.Ref" Version="3.1.0" Pinned="true">
@@ -48,9 +48,9 @@
     </Dependency>
   </ToolsetDependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.NET.Sdk" Version="3.1.415-servicing.21505.14">
+    <Dependency Name="Microsoft.NET.Sdk" Version="3.1.415-servicing.21513.12">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-sdk</Uri>
-      <Sha>53272f55ecec77d7a6e260d1a042b2090dc7a29a</Sha>
+      <Sha>ecb565f587197795e3855c765d51c513a7a3a62f</Sha>
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.21-servicing.21515.10">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
