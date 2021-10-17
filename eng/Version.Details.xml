@@ -40,9 +40,9 @@
       <Uri>https://github.com/dotnet/core-setup</Uri>
       <Sha>65f04fb6db7a5e198d05dbebd5c4ad21eb018f89</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NET.Sdk" Version="3.1.121-servicing.21505.21">
+    <Dependency Name="Microsoft.NET.Sdk" Version="3.1.121-servicing.21513.9">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-sdk</Uri>
-      <Sha>63cc232a0651a61ea133dbc38b5afbfcf93c38bb</Sha>
+      <Sha>02e1cc2c2264c244d0ae72b3173f8dc4651077d4</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19208.1">
       <Uri>https://github.com/dotnet/CliCommandLineParser</Uri>
