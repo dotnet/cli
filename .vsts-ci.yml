@@ -78,7 +78,7 @@ stages:
       parameters:
         agentOs: Linux
         pool:
-          name: Hosted Ubuntu 1604
+          vmImage: ubuntu-20.04
         timeoutInMinutes: 180
         strategy:
           matrix:
@@ -96,6 +96,20 @@ stages:
               _RuntimeIdentifier: ''
               _BuildArchitecture: 'x64'
               _DropSuffix: ''
+            Build_Ubuntu_16_04_Release_x64:
+              _BuildConfig: Release
+              _DockerParameter: '--docker ubuntu.16.04'
+              _LinuxPortable: '--linux-portable'
+              _RuntimeIdentifier: ''
+              _BuildArchitecture: 'x64'
+              _DropSuffix: ''
+            Build_Ubuntu_16_04_NoSuffix_Release_x64:
+              _BuildConfig: Release
+              _DockerParameter: '--docker ubuntu.16.04'
+              _LinuxPortable: '--linux-portable'
+              _RuntimeIdentifier: ''
+              _BuildArchitecture: 'x64'
+              _DropSuffix: true
             Build_Ubuntu_18_04_Debug_x64:
               _BuildConfig: Debug
               _DockerParameter: '--docker ubuntu.18.04'
@@ -138,20 +152,6 @@ stages:
               _RuntimeIdentifier: '--runtime-id linux-musl-x64'
               _BuildArchitecture: 'x64'
               _DropSuffix: ''
-            Build_LinuxPortable_Release_x64:
-              _BuildConfig: Release
-              _DockerParameter: ''
-              _LinuxPortable: '--linux-portable'
-              _RuntimeIdentifier: ''
-              _BuildArchitecture: 'x64'
-              _DropSuffix: ''
-            Build_LinuxPortable_NoSuffix_Release_x64:
-              _BuildConfig: Release
-              _DockerParameter: ''
-              _LinuxPortable: '--linux-portable'
-              _RuntimeIdentifier: ''
-              _BuildArchitecture: 'x64'
-              _DropSuffix: true
 
     - template: /eng/build.yml
       parameters:
