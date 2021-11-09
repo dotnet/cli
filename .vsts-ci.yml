@@ -78,7 +78,7 @@ stages:
       parameters:
         agentOs: Linux
         pool:
-          name: Hosted Ubuntu 1604
+          vmImage: ubuntu-20.04
         timeoutInMinutes: 180
         strategy:
           matrix:
