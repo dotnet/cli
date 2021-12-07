@@ -79,24 +79,10 @@ stages:
         agentOs: Linux
         pool:
           name: NetCore1ESPool-Svc-Public
-          demands: ImageOverride -equals Build.Ubuntu.1604.Amd64.Open
+          demands: ImageOverride -equals Build.Ubuntu.1804.Amd64.Open
         timeoutInMinutes: 180
         strategy:
           matrix:
-            Build_Ubuntu_14_04_Release_x64:
-              _BuildConfig: Release
-              _DockerParameter: '--docker ubuntu.14.04'
-              _LinuxPortable: ''
-              _RuntimeIdentifier: ''
-              _BuildArchitecture: 'x64'
-              _DropSuffix: ''
-            Build_Ubuntu_16_04_Debug_x64:
-              _BuildConfig: Debug
-              _DockerParameter: '--docker ubuntu.16.04'
-              _LinuxPortable: ''
-              _RuntimeIdentifier: ''
-              _BuildArchitecture: 'x64'
-              _DropSuffix: ''
             Build_Ubuntu_18_04_Debug_x64:
               _BuildConfig: Debug
               _DockerParameter: '--docker ubuntu.18.04'
