@@ -5,9 +5,9 @@
       <Uri>https://github.com/dotnet/templating</Uri>
       <Sha>611bf58075f1bd5cf930aafad9b3d0fed548c89c</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="3.1.22">
+    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="3.1.23">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
-      <Sha>35fa579a3029aef544cfb0b337eb77b882244d80</Sha>
+      <Sha>e38b64f0e364276b03d9e318e06c5f9dd5774301</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
@@ -21,9 +21,9 @@
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
       <Sha>3acd9b0cd16596bad450c82be08780875a73c05c</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.DotNetHostResolver" Version="3.1.22">
+    <Dependency Name="Microsoft.NETCore.DotNetHostResolver" Version="3.1.23">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
-      <Sha>35fa579a3029aef544cfb0b337eb77b882244d80</Sha>
+      <Sha>e38b64f0e364276b03d9e318e06c5f9dd5774301</Sha>
     </Dependency>
     <!-- Specific version here is not interesting, but we want Maestro to add corefx
          private feeds -->
@@ -52,9 +52,9 @@
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-sdk</Uri>
       <Sha>a5625301cc238b9754cfbccd46ee0e0df71b9036</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.22-servicing.21571.3">
+    <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.23-servicing.21608.5">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
-      <Sha>35fa579a3029aef544cfb0b337eb77b882244d80</Sha>
+      <Sha>e38b64f0e364276b03d9e318e06c5f9dd5774301</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19208.1">
       <Uri>https://github.com/dotnet/CliCommandLineParser</Uri>
