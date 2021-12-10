@@ -144,7 +144,7 @@ stages:
       parameters:
         agentOs: Darwin
         pool:
-          name: Hosted macOS
+          vmImage: 'macOS-latest'
         timeoutInMinutes: 180
         strategy:
           matrix:
