@@ -345,7 +345,7 @@ namespace Microsoft.DotNet.Cli.Test.Tests
             result.ExitCode.Should().Be(1);
         }
 
-        [Fact]
+        [WindowsOnlyFact]
         public void ItTestsWithTheSpecifiedRuntimeOption()
         {
             var testInstance = TestAssets.Get("XunitCore")
