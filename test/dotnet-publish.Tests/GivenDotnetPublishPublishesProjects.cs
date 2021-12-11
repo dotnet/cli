@@ -102,6 +102,9 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
         [InlineData("--self-contained=true")]
         public void ItPublishesSelfContainedWithRid(string args)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return;
+
             var testAppName = "MSBuildTestApp";
             var rid = DotnetLegacyRuntimeIdentifiers.InferLegacyRestoreRuntimeIdentifier();
             var outputDirectory = PublishApp(testAppName, rid, args);
@@ -119,6 +122,9 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
         [InlineData("--no-self-contained")]
         public void ItPublishesFrameworkDependentWithRid(string args)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return;
+
             var testAppName = "MSBuildTestApp";
             var rid = DotnetLegacyRuntimeIdentifiers.InferLegacyRestoreRuntimeIdentifier();
             var outputDirectory = PublishApp(testAppName, rid, args);
@@ -265,6 +271,9 @@ namespace Microsoft.DotNet.Cli.Publish.Tests
         [InlineData(true)]
         public void ItPublishesSuccessfullyWithNoBuildIfPreviouslyBuilt(bool selfContained)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return;
+
             var testInstance = TestAssets.Get("TestAppSimple")
                 .CreateInstance(nameof(ItPublishesSuccessfullyWithNoBuildIfPreviouslyBuilt) + selfContained)
                 .WithSourceFiles();
