@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.TemplateEngine.Cli" Version="3.1.20-servicing.21459.9">
+    <Dependency Name="Microsoft.TemplateEngine.Cli" Version="3.1.21-servicing.21505.4">
       <Uri>https://github.com/dotnet/templating</Uri>
-      <Sha>56f3119ae17dcfc7ec6e5e37ebe19218ecf2fa2e</Sha>
+      <Sha>611bf58075f1bd5cf930aafad9b3d0fed548c89c</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="3.1.20">
+    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="3.1.22">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
-      <Sha>2833dab8c3f9c29843545986f9e94ce8dea32918</Sha>
+      <Sha>35fa579a3029aef544cfb0b337eb77b882244d80</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
@@ -21,9 +21,9 @@
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
       <Sha>bed381477994a1fc59f84b39b9e00d34324c858e</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.DotNetHostResolver" Version="3.1.20">
+    <Dependency Name="Microsoft.NETCore.DotNetHostResolver" Version="3.1.22">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
-      <Sha>2833dab8c3f9c29843545986f9e94ce8dea32918</Sha>
+      <Sha>35fa579a3029aef544cfb0b337eb77b882244d80</Sha>
     </Dependency>
     <!-- Specific version here is not interesting, but we want Maestro to add corefx
          private feeds -->
@@ -31,18 +31,18 @@
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-corefx</Uri>
       <Sha>059a4a19e602494bfbed473dbbb18f2dbfbd0878</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.AspNetCore.DeveloperCertificates.XPlat" Version="3.1.20-servicing.21472.42">
+    <Dependency Name="Microsoft.AspNetCore.DeveloperCertificates.XPlat" Version="3.1.22-servicing.21579.4">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-aspnetcore</Uri>
-      <Sha>c04846dc66cc97f71d83a83a15437828435f5d44</Sha>
+      <Sha>7b22a279ec975335bbb0a7cbadef2e45ee15aa9c</Sha>
     </Dependency>
     <!-- Keep this dependency at the bottom of ProductDependencies, else it will be picked as the parent for CoherentParentDependencies -->
     <Dependency Name="Microsoft.NETCore.App.Ref" Version="3.1.0" Pinned="true">
       <Uri>https://github.com/dotnet/core-setup</Uri>
       <Sha>65f04fb6db7a5e198d05dbebd5c4ad21eb018f89</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NET.Sdk" Version="3.1.120-servicing.21471.46">
+    <Dependency Name="Microsoft.NET.Sdk" Version="3.1.121-servicing.21554.11">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-sdk</Uri>
-      <Sha>54da5360778df93820616742934812588faa586d</Sha>
+      <Sha>9f5f81ad87d12ae0f46e1292be659c2925b94b18</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19208.1">
       <Uri>https://github.com/dotnet/CliCommandLineParser</Uri>
@@ -52,9 +52,9 @@
       <Uri>https://github.com/NuGet/NuGet.Client</Uri>
       <Sha>6f8eb3a2e1db6b458451b9cfd2a4f5557769b041</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.20-servicing.21471.5">
+    <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.22-servicing.21571.3">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
-      <Sha>2833dab8c3f9c29843545986f9e94ce8dea32918</Sha>
+      <Sha>35fa579a3029aef544cfb0b337eb77b882244d80</Sha>
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Ref" Version="3.0.0" Pinned="true">
       <Uri>https://github.com/dotnet/core-setup</Uri>
