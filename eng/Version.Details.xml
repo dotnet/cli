@@ -5,9 +5,9 @@
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-templating</Uri>
       <Sha>c088cfded1fb1fb84c210514a717ccd5631b15b1</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="3.1.23">
+    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="3.1.24">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
-      <Sha>7af614fde0e0da1d20b33a6e2da7ae2994c5eec3</Sha>
+      <Sha>593c84e5585926c074a74992ccb1f2fb24709775</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
@@ -21,9 +21,9 @@
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
       <Sha>3acd9b0cd16596bad450c82be08780875a73c05c</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.DotNetHostResolver" Version="3.1.23">
+    <Dependency Name="Microsoft.NETCore.DotNetHostResolver" Version="3.1.24">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
-      <Sha>7af614fde0e0da1d20b33a6e2da7ae2994c5eec3</Sha>
+      <Sha>593c84e5585926c074a74992ccb1f2fb24709775</Sha>
     </Dependency>
     <!-- Specific version here is not interesting, but we want Maestro to add corefx
          private feeds -->
@@ -52,9 +52,9 @@
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-sdk</Uri>
       <Sha>13c5eecc659ea01e30c2bc5dd8c7bfde44cfcda1</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.23-servicing.22122.4">
+    <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.24-servicing.22164.10">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
-      <Sha>7af614fde0e0da1d20b33a6e2da7ae2994c5eec3</Sha>
+      <Sha>593c84e5585926c074a74992ccb1f2fb24709775</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19208.1">
       <Uri>https://github.com/dotnet/CliCommandLineParser</Uri>
