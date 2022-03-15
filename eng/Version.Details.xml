@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.TemplateEngine.Cli" Version="3.1.23-servicing.22123.3">
+    <Dependency Name="Microsoft.TemplateEngine.Cli" Version="3.1.24-servicing.22159.4">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-templating</Uri>
-      <Sha>f491af842a534e4f0a2e43f228988fa22f7ce199</Sha>
+      <Sha>c088cfded1fb1fb84c210514a717ccd5631b15b1</Sha>
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="3.1.23">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
