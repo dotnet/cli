@@ -93,11 +93,11 @@ ${buildCommand}
         }
     }
     else if (os == 'Ubuntu') {
-        buildCommand = "${baseShellBuildCommand} --docker ubuntu.14.04"
+        buildCommand = "${baseShellBuildCommand} --docker ubuntu.18.04"
     }
     else if (os == 'RHEL6') {
         osUsedForMachineAffinity = 'Ubuntu16.04';
-        buildCommand = "${baseShellBuildCommand} --runtime-id rhel.6-x64 --docker rhel.6"
+        buildCommand = "${baseShellBuildCommand} --runtime-id rhel.6-x64 --docker rhel"
     }
     else if (os == 'ubuntu.18.04' || os == 'fedora.27' || os == 'opensuse.42.3') {
         osUsedForMachineAffinity = 'Ubuntu16.04'
