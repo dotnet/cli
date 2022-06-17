@@ -1,7 +1,9 @@
 trigger:
-- master
-- release/*
-- internal/release/3.*
+  batch: true
+  branches:
+    include:
+      - release/3.*
+      - internal/release/3.*
 
 variables:
   - name: _TeamName
