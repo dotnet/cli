@@ -1,0 +1,23 @@
+{
+  "version": "1.0",
+  "tasks": [
+    {
+      "taskType": "trigger",
+      "capabilityId": "AutoMerge",
+      "subCapability": "AutoMerge",
+      "version": "1.0",
+      "id": "5og9QhbIT",
+      "config": {
+        "taskName": "Automatically  merge PR once CI passes",
+        "label": "Auto-Merge If Tests Pass",
+        "minMinutesOpen": "12",
+        "mergeType": "merge",
+        "deleteBranches": true,
+        "requireAllStatuses": true,
+        "minimumNumberOfCheckRuns": 4,
+        "removeLabelOnPush": true
+      }
+    }
+  ],
+  "userGroups": []
+}
