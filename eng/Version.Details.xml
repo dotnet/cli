@@ -5,9 +5,9 @@
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-templating</Uri>
       <Sha>a94593cddc6501d77594f392b4fb5020a76e8217</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="3.1.27">
-      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
-      <Sha>2d4bb962fd423dbd630a02e220880a73f4b9fa1a</Sha>
+    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="3.1.28">
+      <Uri>https://github.com/dotnet/core-setup</Uri>
+      <Sha>aed122f0a21b22490d99037525afc5418d623b56</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
@@ -21,9 +21,9 @@
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
       <Sha>9165b88e05fc37585aa1c3fc9585b5a7d751bb21</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.DotNetHostResolver" Version="3.1.27">
-      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
-      <Sha>2d4bb962fd423dbd630a02e220880a73f4b9fa1a</Sha>
+    <Dependency Name="Microsoft.NETCore.DotNetHostResolver" Version="3.1.28">
+      <Uri>https://github.com/dotnet/core-setup</Uri>
+      <Sha>aed122f0a21b22490d99037525afc5418d623b56</Sha>
     </Dependency>
     <!-- Specific version here is not interesting, but we want Maestro to add corefx
          private feeds -->
@@ -52,9 +52,9 @@
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-sdk</Uri>
       <Sha>2492f65a4f2664df43b73e84c4c1cc65f2d97d8d</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.27-servicing.22315.13">
-      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
-      <Sha>2d4bb962fd423dbd630a02e220880a73f4b9fa1a</Sha>
+    <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.28-servicing.22362.2">
+      <Uri>https://github.com/dotnet/core-setup</Uri>
+      <Sha>aed122f0a21b22490d99037525afc5418d623b56</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19208.1">
       <Uri>https://github.com/dotnet/CliCommandLineParser</Uri>
