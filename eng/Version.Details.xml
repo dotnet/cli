@@ -48,9 +48,9 @@
     </Dependency>
   </ToolsetDependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.NET.Sdk" Version="3.1.423-servicing.22402.29">
+    <Dependency Name="Microsoft.NET.Sdk" Version="3.1.423-servicing.22412.15">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-sdk</Uri>
-      <Sha>bdc8e524e9f289d7ebb34904eb940fa4e8410918</Sha>
+      <Sha>0669698327cc8417681af6ba77d8844b099957f4</Sha>
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.29-servicing.22412.1">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
