@@ -7,7 +7,7 @@
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="3.1.29">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
-      <Sha>9bf51ddc86a85de5e3b4febb63b63e6ee662bf90</Sha>
+      <Sha>cf71e78b8ce100bcd181eb67a59a53be3c863a84</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
@@ -23,7 +23,7 @@
     </Dependency>
     <Dependency Name="Microsoft.NETCore.DotNetHostResolver" Version="3.1.29">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
-      <Sha>9bf51ddc86a85de5e3b4febb63b63e6ee662bf90</Sha>
+      <Sha>cf71e78b8ce100bcd181eb67a59a53be3c863a84</Sha>
     </Dependency>
     <!-- Specific version here is not interesting, but we want Maestro to add corefx
          private feeds -->
@@ -52,9 +52,9 @@
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-sdk</Uri>
       <Sha>0669698327cc8417681af6ba77d8844b099957f4</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.29-servicing.22416.3">
+    <Dependency Name="Microsoft.NETCore.App.Internal" Version="3.1.29-servicing.22417.2">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-core-setup</Uri>
-      <Sha>9bf51ddc86a85de5e3b4febb63b63e6ee662bf90</Sha>
+      <Sha>cf71e78b8ce100bcd181eb67a59a53be3c863a84</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19208.1">
       <Uri>https://github.com/dotnet/CliCommandLineParser</Uri>
