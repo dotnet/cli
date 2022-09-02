@@ -45,7 +45,7 @@ stages:
       agentOs: Windows_NT
       pool:
         ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          name: NetCore1ESPool-Svc-Public
+          name: NetCore-Svc-Public
           demands: ImageOverride -equals build.windows.10.amd64.vs2017.open
         ${{ if ne(variables['System.TeamProject'], 'public') }}:
           name: NetCore1ESPool-Svc-Internal
@@ -80,7 +80,7 @@ stages:
       parameters:
         agentOs: Linux
         pool:
-          name: NetCore1ESPool-Svc-Public
+          name: NetCore-Svc-Public
           demands: ImageOverride -equals Build.Ubuntu.1804.Amd64.Open
         timeoutInMinutes: 180
         strategy:
