@@ -33,6 +33,8 @@ variables:
       value: /p:DotNetRuntimeSourceFeed=https://dotnetclimsrc.blob.core.windows.net/dotnet
              /p:DotNetRuntimeSourceFeedKey=$(dotnetclimsrc-read-sas-token-base64)
   - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+    - name: Codeql.Enabled
+      value: true
     - group: DotNet-CLI-SDLValidation-Params
 
 

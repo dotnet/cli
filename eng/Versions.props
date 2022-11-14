@@ -7,13 +7,13 @@
   </PropertyGroup>
   <!-- Repo Version Information -->
   <PropertyGroup>
-    <VersionPrefix>3.1.425</VersionPrefix>
+    <VersionPrefix>3.1.426</VersionPrefix>
     <PreReleaseVersionLabel>servicing</PreReleaseVersionLabel>
   </PropertyGroup>
   <!-- Production Dependencies -->
   <PropertyGroup>
     <!-- "Stage 0" from https://github.com/dotnet/core-sdk -->
-    <DotNetCoreSdkLKGVersion>3.1.401</DotNetCoreSdkLKGVersion>
+    <DotNetCoreSdkLKGVersion>3.1.424</DotNetCoreSdkLKGVersion>
   </PropertyGroup>
   <PropertyGroup>
     <!-- Dependencies from https://github.com/dotnet/core-setup -->
