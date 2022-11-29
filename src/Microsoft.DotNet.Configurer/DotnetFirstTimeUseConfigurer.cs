@@ -50,6 +50,8 @@ namespace Microsoft.DotNet.Configurer
 
             if (ShouldPrintFirstTimeUseNotice())
             {
+                // Migrate the nuget state from earlier SDKs
+                NuGet.Common.Migrations.MigrationRunner.Run();
                 if (!_dotnetFirstRunConfiguration.NoLogo)
                 {
                     PrintFirstTimeMessageWelcome();
