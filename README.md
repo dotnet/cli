@@ -1,6 +1,6 @@
 # This Repo has moved!
 
-This repo has been merged into https://github.com/dotnet/sdk.  Previous releases (prior to .NET 5) will still be serviced out of this repo.
+This repo has been merged into https://github.com/dotnet/sdk. All previous releases that were serviced out of this repo are now out of support. We have created [tags](https://github.com/dotnet/cli/tags) for all servicing branches if you still wish to build those branches. This repo will be made read-only on 2/17/2023
 
 For more information, see [dotnet/announcements#119 "Consolidating .NET GitHub repos"](https://github.com/dotnet/announcements/issues/119)
 
